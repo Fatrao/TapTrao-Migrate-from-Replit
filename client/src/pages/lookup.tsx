@@ -292,7 +292,7 @@ function getActionHint(req: RequirementDetail): string {
   if (t.includes("iuu") && t.includes("catch certificate")) return "Issued by flag state of fishing vessel \u2014 not the exporter";
   if (t.includes("flegt")) return "Only available from VPA partner countries";
   if (t.includes("kimberley")) return "Must be tamper-evident sealed";
-  return "Required before shipment";
+  return "Required to avoid delays";
 }
 
 function NextActionsPanel({
@@ -467,7 +467,7 @@ function SupplierBriefSection({ result }: { result: ComplianceResult }) {
           data-testid="button-generate-supplier-brief"
         >
           <Mail className="w-4 h-4 mr-2" />
-          {showBrief ? "Hide Supplier Brief" : `Generate Supplier Brief (${supplierDocs.length} documents)`}
+          {showBrief ? "Hide supplier instructions" : `Supplier instructions (${supplierDocs.length} documents)`}
         </Button>
 
         {showBrief && (
@@ -621,8 +621,8 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
 }) {
   const verdictStyles = {
     GREEN: { bg: "rgba(34,197,94,.05)", border: "rgba(34,197,94,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--green)", label: "LOW RISK" },
-    AMBER: { bg: "rgba(245,158,11,.05)", border: "rgba(245,158,11,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", label: "MODERATE RISK" },
-    RED: { bg: "rgba(239,68,68,.05)", border: "rgba(239,68,68,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", label: "HIGH RISK" },
+    AMBER: { bg: "rgba(245,158,11,.05)", border: "rgba(245,158,11,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", label: "ATTENTION NEEDED" },
+    RED: { bg: "rgba(239,68,68,.05)", border: "rgba(239,68,68,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", label: "HIGH RISK \u2014 ACTION REQUIRED" },
   };
 
   const v = verdictStyles[verdict];
@@ -635,10 +635,10 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
   };
 
   const factorRows = [
-    { key: "regulatory_complexity", label: "Regulatory complexity", penalty: factors.regulatory_complexity.penalty, max: factors.regulatory_complexity.max },
-    { key: "hazard_exposure", label: "Hazard exposure", penalty: factors.hazard_exposure.penalty, max: factors.hazard_exposure.max },
+    { key: "regulatory_complexity", label: "Regulatory requirements", penalty: factors.regulatory_complexity.penalty, max: factors.regulatory_complexity.max },
+    { key: "hazard_exposure", label: "Product controls", penalty: factors.hazard_exposure.penalty, max: factors.hazard_exposure.max },
     { key: "document_volume", label: "Document volume", penalty: factors.document_volume.penalty, max: factors.document_volume.max },
-    { key: "trade_restriction", label: "Trade restriction", penalty: factors.trade_restriction.penalty, max: factors.trade_restriction.max },
+    { key: "trade_restriction", label: "Trade restrictions", penalty: factors.trade_restriction.penalty, max: factors.trade_restriction.max },
   ];
 
   return (
@@ -898,7 +898,7 @@ function CheckLcButton({ result, locked = false }: { result: ComplianceResult & 
               data-testid="button-check-lc-locked"
             >
               <Lock className="w-4 h-4 mr-2" />
-              Check LC for this Trade
+              Check LC before submission
             </Button>
           </div>
         </TooltipTrigger>
@@ -939,7 +939,7 @@ function CheckLcButton({ result, locked = false }: { result: ComplianceResult & 
         data-testid="button-check-lc-for-trade"
       >
         <ArrowRight className="w-4 h-4 mr-2" />
-        Check LC for this Trade
+        Check LC before submission
       </Button>
       <p className="text-xs text-muted-foreground mt-1 text-center">
         Pre-fills commodity, HS code, origin, destination, and required documents from this lookup.
@@ -968,7 +968,7 @@ function SupplierBriefButton({ result }: { result: ComplianceResult }) {
       data-testid="button-supplier-brief-shortcut"
     >
       <Mail className="w-4 h-4 mr-2" />
-      Supplier Brief
+      Supplier instructions
     </Button>
   );
 }
@@ -1028,12 +1028,12 @@ function EudrAlertBlock({ lookupId, result }: { lookupId?: string; result: Compl
       <div style={{ fontSize: 22 }}>{eudrComplete ? "✓" : "⚠"}</div>
       <div style={{ flex: 1 }}>
         <div style={{ fontWeight: 700, color: "#fff", fontSize: 14 }}>
-          {eudrComplete ? "EUDR Due Diligence Complete" : "EUDR Due Diligence Required"}
+          {eudrComplete ? "EUDR Due Diligence Complete" : "EUDR due diligence required"}
         </div>
         <div style={{ color: "rgba(255,255,255,0.85)", fontSize: 12, marginTop: 2 }}>
           {eudrComplete
             ? "Your EUDR due diligence statement has been completed for this trade."
-            : "This commodity requires an EU Deforestation Regulation (EUDR) due diligence statement before import."}
+            : "Additional requirement to ship legally and avoid penalties."}
         </div>
       </div>
       {!eudrComplete && lookupId && (
@@ -1052,7 +1052,7 @@ function EudrAlertBlock({ lookupId, result }: { lookupId?: string; result: Compl
             whiteSpace: "nowrap",
           }}
         >
-          Start EUDR Workflow →
+          Prepare EUDR documents →
         </button>
       )}
     </div>
@@ -1216,14 +1216,12 @@ function ComplianceResultDisplay({ result, freeLocked = false }: { result: Compl
       {freeLocked && (
         <Card style={{ background: "var(--abg)" }} data-testid="banner-conversion">
           <CardContent className="p-5 space-y-3">
-            <h3 className="font-semibold text-base font-heading">Ready to ship this trade?</h3>
+            <h3 className="font-semibold text-base font-heading">Ready to proceed with this shipment?</h3>
             <p className="text-sm text-muted-foreground">
-              Your free lookup shows the full compliance picture.
-              To get your TwinLog Trail and run your LC check, upgrade to a trade pack.
+              This free check shows what applies. Unlock documents, TwinLog Trail, and LC checks to proceed with confidence.
             </p>
             <p className="text-sm italic text-muted-foreground">
-              "Banks reject approximately 30% of LC presentations on first submission.
-              One rejection costs more than a full year of trade packs."
+              ~30% of LC submissions are rejected on first presentation.
             </p>
             <div className="flex gap-3 flex-wrap">
               <Button
@@ -1400,7 +1398,7 @@ function ComplianceResultDisplay({ result, freeLocked = false }: { result: Compl
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4" style={{ color: "var(--amber)" }} />
                 <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" as const }}>
-                  YOUR SIDE (Buyer Documents)
+                  Your documents (you provide these)
                 </p>
               </div>
               <span className="text-xs text-muted-foreground" data-testid="text-buyer-progress">
@@ -1434,7 +1432,7 @@ function ComplianceResultDisplay({ result, freeLocked = false }: { result: Compl
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4" style={{ color: "var(--green)" }} />
                 <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" as const }}>
-                  THEIR SIDE (Supplier Documents)
+                  Supplier documents (you must request these)
                 </p>
               </div>
               <span className="text-xs text-muted-foreground" data-testid="text-supplier-progress">
@@ -1548,8 +1546,9 @@ function ComplianceResultDisplay({ result, freeLocked = false }: { result: Compl
               data-testid="button-download-customs-pack"
             >
               <Download className="w-4 h-4 mr-2" />
-              Customs Data Pack
+              Customs data pack (CSV)
             </Button>
+            <p style={{ fontSize: 11, color: "var(--t2)", textAlign: "center", marginTop: 4, fontStyle: "italic" }}>Use directly or share with a broker if you have one</p>
             <SupplierBriefButton result={result} />
           </div>
         </CardContent>
@@ -1803,12 +1802,12 @@ export default function Lookup() {
       <div className="flex-1 py-10 px-4">
         <div className="max-w-2xl mx-auto space-y-8">
           <div className="space-y-3">
-            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }}>TapTrao / Compliance Lookup</p>
+            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }}>TapTrao / Pre-shipment Compliance Check</p>
             <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: "var(--t1)" }} data-testid="text-lookup-title">
-              Compliance Lookup
+              Pre-shipment compliance check
             </h1>
             <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "var(--t2)", fontSize: 14 }}>
-              Enter your trade details to get the complete import requirements for your corridor.
+              See regulatory requirements, documents, and risk indicators before a shipment moves.
             </p>
           </div>
 
@@ -1822,7 +1821,7 @@ export default function Lookup() {
               data-testid="text-template-current-banner"
             >
               <p style={{ fontSize: 13, color: "var(--blue)", fontWeight: 600, lineHeight: 1.5 }}>
-                Loading from template: {templateData?.name} — check the fields below and click Run Compliance Check.
+                Loading from template: {templateData?.name} — check the fields below and click Check compliance risk.
               </p>
             </div>
           )}
@@ -1857,7 +1856,7 @@ export default function Lookup() {
               <div className="space-y-6">
                 <div className="space-y-2">
                   <label style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }} htmlFor="commodity">
-                    Commodity
+                    What are you shipping?
                   </label>
                   {isLoading ? (
                     <Skeleton className="h-9 w-full" />
@@ -1883,7 +1882,7 @@ export default function Lookup() {
 
                 <div className="space-y-2">
                   <label style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }} htmlFor="origin">
-                    Origin Country
+                    Where are the goods coming from?
                   </label>
                   {isLoading ? (
                     <Skeleton className="h-9 w-full" />
@@ -1905,7 +1904,7 @@ export default function Lookup() {
 
                 <div className="space-y-2">
                   <label style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }} htmlFor="destination">
-                    Destination
+                    Where are the goods going?
                   </label>
                   {isLoading ? (
                     <Skeleton className="h-9 w-full" />
@@ -1942,12 +1941,12 @@ export default function Lookup() {
                   {complianceMutation.isPending ? (
                     <>
                       <Search className="w-4 h-4 mr-2 animate-spin" />
-                      Running Compliance Check...
+                      Checking compliance risk...
                     </>
                   ) : (
                     <>
                       <Search className="w-4 h-4 mr-2" />
-                      {isFreeCheck ? "Run Compliance Check \u2014 Free" : "Run Compliance Check \u2014 $4.99"}
+                      {isFreeCheck ? "Check compliance risk \u2014 Free" : "Check compliance risk \u2014 $4.99"}
                     </>
                   )}
                 </Button>
