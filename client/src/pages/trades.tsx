@@ -31,15 +31,15 @@ type TradesSummary = {
 type FilterTab = "all" | "attention" | "progress" | "archived";
 
 function getStep(trade: EnrichedTrade): { label: string; color: string } {
-  if (!trade.lcVerdict) return { label: "Lookup", color: "var(--t3)" };
-  if (trade.lcVerdict === "DISCREPANCIES_FOUND") return { label: "LC Check", color: "var(--blue)" };
+  if (!trade.lcVerdict) return { label: "Paperwork review", color: "var(--t3)" };
+  if (trade.lcVerdict === "DISCREPANCIES_FOUND") return { label: "LC review", color: "var(--blue)" };
   if (trade.lcVerdict === "COMPLIANT" || trade.lcVerdict === "COMPLIANT_WITH_NOTES") return { label: "TwinLog Trail", color: "var(--amber)" };
-  return { label: "Lookup", color: "var(--t3)" };
+  return { label: "Paperwork review", color: "var(--t3)" };
 }
 
 function getRiskTag(verdict: string | null) {
   if (verdict === "RED") return { symbol: "\u2297", label: "Blocking", color: "var(--red)", bg: "var(--rbg)", bd: "var(--rbd)" };
-  if (verdict === "AMBER") return { symbol: "\u25CF", label: "At risk", color: "var(--amber)", bg: "var(--abg)", bd: "var(--abd)" };
+  if (verdict === "AMBER") return { symbol: "\u25CF", label: "At risk \u2014 review documents", color: "var(--amber)", bg: "var(--abg)", bd: "var(--abd)" };
   if (verdict === "GREEN") return { symbol: "\u2713", label: "Clear", color: "var(--green)", bg: "var(--gbg)", bd: "var(--gbd)" };
   return { symbol: "\u25CF", label: "Review", color: "var(--amber)", bg: "var(--abg)", bd: "var(--abd)" };
 }
@@ -54,7 +54,7 @@ function formatDate(d: string | Date) {
 }
 
 export default function Trades() {
-  usePageTitle("My Trades", "All your compliance lookups and LC checks in one place");
+  usePageTitle("My Trades", "All your compliance checks and LC reviews in one place");
   const [, navigate] = useLocation();
   const [filter, setFilter] = useState<FilterTab>("all");
   const [search, setSearch] = useState("");
@@ -87,17 +87,17 @@ export default function Trades() {
   }, [allTrades, filter, search]);
 
   const filters: { key: FilterTab; label: string }[] = [
-    { key: "all", label: "All trades" },
-    { key: "attention", label: "Needs attention" },
+    { key: "all", label: "All shipments" },
+    { key: "attention", label: "Needs action" },
     { key: "progress", label: "In progress" },
-    { key: "archived", label: "Archived" },
+    { key: "archived", label: "Closed" },
   ];
 
   const cards = [
-    { value: summary.total, color: "var(--blue)", label: "Active trades", gradient: false },
-    { value: summary.needAttention, color: "var(--red)", label: "Need attention", gradient: true },
+    { value: summary.total, color: "var(--blue)", label: "Active shipments", gradient: false },
+    { value: summary.needAttention, color: "var(--red)", label: "Action required", gradient: true },
     { value: summary.lcPending, color: "var(--amber)", label: "LC checks pending", gradient: false },
-    { value: summary.archiveReady, color: "var(--green)", label: "Ready to archive", gradient: false },
+    { value: summary.archiveReady, color: "var(--green)", label: "Ready to close", gradient: false },
   ];
 
   return (
@@ -113,7 +113,7 @@ export default function Trades() {
               My Trades
             </h1>
             <p style={{ fontSize: 13, color: "var(--t2)", marginTop: 6 }} data-testid="text-trades-subtitle">
-              {summary.total} active trades &middot; {summary.needAttention} need attention
+              {summary.total} active shipments &middot; {summary.needAttention} needs attention
             </p>
           </div>
           <Link href="/lookup">
@@ -130,7 +130,7 @@ export default function Trades() {
               }}
               data-testid="button-new-lookup"
             >
-              + New Lookup
+              + Start a new compliance check
             </button>
           </Link>
         </div>
@@ -224,7 +224,7 @@ export default function Trades() {
                 }}
                 data-testid="button-empty-new-lookup"
               >
-                + New Lookup
+                + Start a new compliance check
               </button>
             </Link>
           </div>
@@ -354,7 +354,13 @@ export default function Trades() {
                                 : "var(--green)",
                         }}
                       >
-                        {trade.readinessScore ?? "\u2014"}
+                        {trade.readinessScore == null
+                          ? "\u2014"
+                          : trade.readinessScore < 50
+                            ? `High risk (${trade.readinessScore})`
+                            : trade.readinessScore < 80
+                              ? `Medium risk (${trade.readinessScore})`
+                              : `Low risk (${trade.readinessScore})`}
                       </span>
                     </td>
                     {/* Updated */}
@@ -363,13 +369,13 @@ export default function Trades() {
                         {formatDate(trade.createdAt)}
                       </span>
                     </td>
-                    {/* Open arrow */}
+                    {/* Action link */}
                     <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>
                       <span
                         data-open
-                        style={{ fontSize: 11, fontWeight: 600, color: "var(--blue)", opacity: 0, transition: "opacity .15s" }}
+                        style={{ fontSize: 11, fontWeight: 600, color: "var(--blue)", opacity: 0, transition: "opacity .15s", whiteSpace: "nowrap" }}
                       >
-                        Open →
+                        {!trade.lcVerdict ? "Continue review →" : trade.lcVerdict === "DISCREPANCIES_FOUND" ? "Review LC →" : "View checklist →"}
                       </span>
                     </td>
                   </tr>
