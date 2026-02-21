@@ -1435,7 +1435,7 @@ export default function LcCheck() {
       </span>
     </div>
   ) : (
-    <span style={{ fontSize: 13, color: "var(--t2)", fontWeight: 600 }}>LC Document Checker</span>
+    <span style={{ fontSize: 13, color: "var(--t2)", fontWeight: 600 }}>LC Check</span>
   );
 
   return (
@@ -1455,12 +1455,12 @@ export default function LcCheck() {
       <div className="flex-1 py-8 px-4">
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="space-y-2">
-            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>TapTrao / LC Document Checker</p>
+            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>TapTrao / LC Check</p>
             <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: "var(--t1)" }} data-testid="text-lc-title">
-              LC Document Checker
+              Check your LC before sending it to the bank
             </h1>
             <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "var(--t2)", fontSize: 14 }}>
-              Cross-check your supplier documents against your Letter of Credit before submitting to the bank.
+              Catch document mismatches before the bank does.
             </p>
           </div>
 
@@ -1524,6 +1524,9 @@ export default function LcCheck() {
                 <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Step 1: LC Terms Entry</p>
               </CardHeader>
               <CardContent className="space-y-4">
+                <p style={{ fontSize: 12, color: "var(--t2)", lineHeight: 1.5, marginBottom: 4 }}>
+                  Enter what's written in your LC. We'll check supplier documents against this.
+                </p>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-1">
                     <label className="text-sm font-medium">Beneficiary Name (Supplier)</label>
@@ -1550,7 +1553,7 @@ export default function LcCheck() {
                   <Input
                     value={lcFields.goodsDescription}
                     onChange={e => updateLcField("goodsDescription", e.target.value)}
-                    placeholder="e.g. Raw Cocoa Beans, Grade 1, crop 2025/2026"
+                    placeholder="e.g. Raw cocoa beans as stated in LC"
                     data-testid="input-goods-description"
                   />
                 </div>
