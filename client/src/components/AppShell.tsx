@@ -1,8 +1,9 @@
 import { Link, useLocation } from "wouter";
 import { useTokenBalance } from "@/hooks/use-tokens";
-import { LayoutGrid, Settings, Plus, Search, FileCheck, Bell, Calculator, Bookmark } from "lucide-react";
+import { LayoutGrid, Settings, Plus, Search, FileCheck, Bell, Calculator, Bookmark, Menu, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import type { ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface NavItem {
   icon: typeof LayoutGrid;
@@ -41,10 +42,11 @@ interface AppShellProps {
   sidebarBottom?: ReactNode;
 }
 
-function SidebarNavItem({ item, isActive }: { item: NavItem; isActive: boolean }) {
+function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: boolean; onClick?: () => void }) {
   return (
     <Link href={item.href}>
       <div
+        onClick={onClick}
         style={{
           display: "flex",
           alignItems: "center",
@@ -128,12 +130,29 @@ function NavLabel({ children }: { children: ReactNode }) {
 
 export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) {
   const [location, navigate] = useLocation();
+  const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const tokenQuery = useTokenBalance();
   const balance = tokenQuery.data?.balance ?? 0;
   const inboxBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/supplier-inbox/badge-count"] });
   const inboxBadge = inboxBadgeQuery.data?.count ?? 0;
   const alertsBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/alerts/unread-count"] });
   const alertsBadge = alertsBadgeQuery.data?.count ?? 0;
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location]);
+
+  // Prevent body scroll when sidebar is open on mobile
+  useEffect(() => {
+    if (isMobile && sidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isMobile, sidebarOpen]);
 
   const wsItems: NavItem[] = workspaceItems.map((item) => {
     if (item.label === "My Trades" && inboxBadge > 0)
@@ -146,6 +165,112 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
     return item;
   });
 
+  const closeSidebar = () => setSidebarOpen(false);
+
+  const sidebarContent = (
+    <>
+      {/* Logo area */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "14px 16px",
+        }}
+      >
+        <Link href="/">
+          <div style={{ display: "flex", alignItems: "center", gap: 9, cursor: "pointer" }} data-testid="shell-logo">
+            <img src="/logo.png" alt="TapTrao" style={{ width: 36, height: 36, objectFit: "contain", borderRadius: 8 }} />
+            <span
+              style={{
+                fontFamily: "'Fraunces', serif",
+                fontWeight: 700,
+                fontSize: 16,
+                color: "var(--t1)",
+                letterSpacing: "-0.3px",
+              }}
+            >
+              TapTrao
+            </span>
+          </div>
+        </Link>
+        {isMobile && (
+          <button
+            onClick={closeSidebar}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--t2)",
+              padding: 4,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            aria-label="Close menu"
+          >
+            <X size={20} />
+          </button>
+        )}
+      </div>
+
+      {/* + New Lookup button */}
+      <div style={{ margin: "0 12px 4px" }}>
+        <button
+          onClick={() => { navigate("/lookup"); closeSidebar(); }}
+          style={{
+            background: "var(--blue)",
+            color: "white",
+            border: "none",
+            borderRadius: 7,
+            padding: "8px 12px",
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontSize: 12,
+            fontWeight: 600,
+            cursor: "pointer",
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+          }}
+          data-testid="shell-new-lookup"
+        >
+          <Plus size={14} />
+          New Lookup
+        </button>
+      </div>
+
+      {/* WORKSPACE */}
+      <NavLabel>Workspace</NavLabel>
+      {wsItems.map((item) => (
+        <div key={item.href} style={{ padding: "0 4px" }}>
+          <SidebarNavItem item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+        </div>
+      ))}
+
+      {/* TOOLS */}
+      <NavLabel>Tools</NavLabel>
+      {tlItems.map((item) => (
+        <div key={item.href} style={{ padding: "0 4px" }}>
+          <SidebarNavItem item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+        </div>
+      ))}
+
+      {/* ACCOUNT */}
+      <NavLabel>Account</NavLabel>
+      {accountItems.map((item) => (
+        <div key={item.href} style={{ padding: "0 4px" }}>
+          <SidebarNavItem item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+        </div>
+      ))}
+
+      {/* Spacer + optional bottom content */}
+      <div style={{ flex: 1 }} />
+      {sidebarBottom}
+    </>
+  );
+
   return (
     <div
       style={{
@@ -155,116 +280,96 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         background: "var(--bg)",
       }}
     >
-      {/* SIDEBAR — 200px, no borders */}
-      <div
-        style={{
-          width: 200,
-          minWidth: 200,
-          background: "var(--bg)",
-          display: "flex",
-          flexDirection: "column",
-          overflowY: "auto",
-          padding: 0,
-        }}
-      >
-        {/* Logo area */}
+      {/* SIDEBAR — desktop: always visible */}
+      {!isMobile && (
         <div
           style={{
+            width: 200,
+            minWidth: 200,
+            background: "var(--bg)",
             display: "flex",
-            alignItems: "center",
-            gap: 9,
-            padding: "14px 16px",
+            flexDirection: "column",
+            overflowY: "auto",
+            padding: 0,
           }}
         >
-          <Link href="/">
-            <div style={{ display: "flex", alignItems: "center", gap: 9, cursor: "pointer" }} data-testid="shell-logo">
-              <img src="/logo.png" alt="TapTrao" style={{ width: 36, height: 36, objectFit: "contain", borderRadius: 8 }} />
-              <span
-                style={{
-                  fontFamily: "'Fraunces', serif",
-                  fontWeight: 700,
-                  fontSize: 16,
-                  color: "var(--t1)",
-                  letterSpacing: "-0.3px",
-                }}
-              >
-                TapTrao
-              </span>
-            </div>
-          </Link>
+          {sidebarContent}
         </div>
+      )}
 
-        {/* + New Lookup button */}
-        <div style={{ margin: "0 12px 4px" }}>
-          <button
-            onClick={() => navigate("/lookup")}
+      {/* Mobile sidebar overlay */}
+      {isMobile && sidebarOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            onClick={closeSidebar}
             style={{
-              background: "var(--blue)",
-              color: "white",
-              border: "none",
-              borderRadius: 7,
-              padding: "8px 12px",
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: "pointer",
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.6)",
+              zIndex: 998,
             }}
-            data-testid="shell-new-lookup"
+          />
+          {/* Slide-in sidebar */}
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              bottom: 0,
+              width: 260,
+              maxWidth: "80vw",
+              background: "var(--bg)",
+              zIndex: 999,
+              display: "flex",
+              flexDirection: "column",
+              overflowY: "auto",
+              boxShadow: "4px 0 24px rgba(0,0,0,0.4)",
+            }}
           >
-            <Plus size={14} />
-            New Lookup
-          </button>
-        </div>
-
-        {/* WORKSPACE */}
-        <NavLabel>Workspace</NavLabel>
-        {wsItems.map((item) => (
-          <div key={item.href} style={{ padding: "0 4px" }}>
-            <SidebarNavItem item={item} isActive={isNavActive(item, location)} />
+            {sidebarContent}
           </div>
-        ))}
-
-        {/* TOOLS */}
-        <NavLabel>Tools</NavLabel>
-        {tlItems.map((item) => (
-          <div key={item.href} style={{ padding: "0 4px" }}>
-            <SidebarNavItem item={item} isActive={isNavActive(item, location)} />
-          </div>
-        ))}
-
-        {/* ACCOUNT */}
-        <NavLabel>Account</NavLabel>
-        {accountItems.map((item) => (
-          <div key={item.href} style={{ padding: "0 4px" }}>
-            <SidebarNavItem item={item} isActive={isNavActive(item, location)} />
-          </div>
-        ))}
-
-        {/* Spacer + optional bottom content */}
-        <div style={{ flex: 1 }} />
-        {sidebarBottom}
-      </div>
+        </>
+      )}
 
       {/* MAIN AREA */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        {/* TOPBAR — no border */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", width: "100%" }}>
+        {/* TOPBAR */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 24px",
+            padding: isMobile ? "0 12px" : "0 24px",
             height: 52,
             flexShrink: 0,
+            gap: 8,
           }}
         >
+          {/* Left: hamburger on mobile */}
+          {isMobile && (
+            <button
+              onClick={() => setSidebarOpen(true)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "var(--t1)",
+                padding: 6,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+              aria-label="Open menu"
+              data-testid="shell-hamburger"
+            >
+              <Menu size={22} />
+            </button>
+          )}
+
           {/* Center (breadcrumb / page title) */}
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
             {topCenter}
           </div>
 
@@ -294,7 +399,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                 }}
               />
               <span style={{ fontWeight: 500 }}>{balance}</span>
-              <span>credits</span>
+              <span style={{ display: isMobile ? "none" : "inline" }}>credits</span>
             </div>
             <button
               onClick={() => navigate("/pricing")}
@@ -303,7 +408,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                 color: "white",
                 border: "none",
                 borderRadius: 6,
-                padding: "6px 14px",
+                padding: isMobile ? "6px 10px" : "6px 14px",
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
                 fontSize: 12,
                 fontWeight: 600,
@@ -312,7 +417,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
               }}
               data-testid="shell-buy-cta"
             >
-              Buy trade pack
+              {isMobile ? "Buy" : "Buy trade pack"}
             </button>
           </div>
         </div>
