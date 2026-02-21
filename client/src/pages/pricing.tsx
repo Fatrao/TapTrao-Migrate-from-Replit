@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Search, FileCheck, Bell, Calendar, Shield, Archive, Loader2, Hexagon, Check, Building2, Mail, Gift, RefreshCw, ArrowLeft } from "lucide-react";
+import { Search, FileCheck, Bell, Calendar, Shield, Archive, Loader2, Hexagon, Check, X, Building2, Mail, Gift, RefreshCw, ArrowLeft } from "lucide-react";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { useTokenBalance } from "@/hooks/use-tokens";
 import { useMutation } from "@tanstack/react-query";
@@ -9,76 +9,78 @@ import { useToast } from "@/hooks/use-toast";
 const tradePacks = [
   {
     key: "single_trade",
-    name: "Single Trade",
+    name: "Single Shipment",
     price: "$24.99",
     lookups: 1,
     perLookup: "$24.99",
     features: [
       "Full compliance check",
-      "TwinLog Score & Trail PDF",
-      "LC Document Check (1 included)",
-      "Customs Data Pack CSV",
-      "Supplier Brief",
+      "Buyer & supplier document checklist",
+      "LC document check (first submission)",
+      "TwinLog score & audit trail",
+      "Customs data for broker (CSV)",
+      "Instructions for supplier",
     ],
   },
   {
     key: "3_trade",
-    name: "3-Trade Pack",
+    name: "3 Shipments",
     price: "$59.99",
     lookups: 3,
     perLookup: "$20.00",
     features: [
-      "Everything in Single Trade × 3",
-      "Save as Template",
+      "Everything in Single × 3",
+      "Save as template",
       "13% discount",
     ],
     popular: true,
   },
   {
     key: "10_trade",
-    name: "10-Trade Pack",
+    name: "10 Shipments",
     price: "$179",
     lookups: 10,
     perLookup: "$17.90",
     features: [
-      "Everything in 3-Trade × 10",
+      "Everything in 3-pack × 10",
       "Stale-check & refresh",
       "28% discount",
     ],
   },
   {
     key: "25_trade",
-    name: "25-Trade Pack",
+    name: "25 Shipments",
     price: "$349",
     lookups: 25,
     perLookup: "$13.96",
     features: [
-      "Everything in 10-Trade × 25",
+      "Everything in 10-pack × 25",
       "Best value for teams",
       "44% discount",
     ],
   },
 ];
 
-const monitoringFeatures = [
-  { icon: Bell, label: "Regulatory change alerts" },
-  { icon: Calendar, label: "Compliance calendar" },
-  { icon: Shield, label: "AEO tracker" },
-  { icon: Archive, label: "HMRC archive access" },
-];
-
 const faqs = [
   {
-    q: "What's included in a trade pack?",
-    a: "Each trade credit gives you a full compliance lookup — tariffs, SPS requirements, document checklists, and trade triggers (EUDR, CBAM, Kimberley). It also includes a TwinLog Score, Customs Data Pack CSV, Supplier Brief, TwinLog Trail PDF, and one LC Document Check per trade.",
+    q: "What's included in a trade credit?",
+    a: "Each credit gives you one full shipment check — duties, document checklists, regulatory triggers (EUDR, CBAM, Kimberley), TwinLog score, audit trail PDF, customs data CSV, supplier brief, and one LC document check.",
   },
   {
-    q: "What about LC re-checks?",
-    a: "Your first LC check per trade is included free. If your supplier corrects documents and you need to re-check, additional LC checks are $9.99 each.",
+    q: "Is the first shipment check really free?",
+    a: "Yes. Your first compliance check costs nothing — no credit card required. Premium features like the audit trail PDF and LC checks unlock when you purchase a trade credit.",
   },
   {
-    q: "Is the first lookup really free?",
-    a: "Yes. Your first compliance lookup costs nothing — no credit card required. Premium features like the TwinLog Trail PDF and LC checks unlock when you purchase a trade pack.",
+    q: "What if my supplier corrects documents?",
+    a: "Your first LC check per shipment is included. If your supplier updates documents and you need to re-check before resubmitting to the bank, additional checks are $9.99 each.",
+  },
+  {
+    q: "Can I check an LC without running a compliance check?",
+    a: "Yes. A standalone LC check is available for $19.99, but it does not include compliance requirements or document checklists. It's included free with every trade credit.",
+  },
+  {
+    q: "Why is the LC check included with a trade credit?",
+    a: "Because banks reject documents based on combined compliance and LC discrepancies. Checking them together reduces risk.",
   },
   {
     q: "Which countries are covered?",
@@ -86,15 +88,11 @@ const faqs = [
   },
   {
     q: "Do credits expire?",
-    a: "No. Your trade credits never expire. Use them whenever you need a compliance check.",
+    a: "No. Your trade credits never expire. Use them whenever you need a shipment check.",
   },
   {
-    q: "Can I export compliance results?",
-    a: "Yes. Every lookup includes a CSV export of customs data packs with HS codes, document codes, and duty rates. You can also generate a TwinLog Trail PDF for your compliance audit file.",
-  },
-  {
-    q: "What about enterprise or high-volume needs?",
-    a: "Contact us for custom pricing on high-volume compliance needs, API access, team accounts, and dedicated support.",
+    q: "What about high-volume or team needs?",
+    a: "Contact us for custom pricing, shared credits, API access, and dedicated support.",
   },
 ];
 
@@ -204,7 +202,7 @@ const S = {
 };
 
 export default function Pricing() {
-  usePageTitle("Pricing", "Pay-per-use trade compliance pricing with trade packs and bundled LC checks.");
+  usePageTitle("Pricing", "Pay-per-shipment trade compliance pricing. First check is free.");
   const tokenQuery = useTokenBalance();
   const { toast } = useToast();
 
@@ -254,10 +252,10 @@ export default function Pricing() {
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h1 style={S.heading} data-testid="text-pricing-title">
-            Simple, transparent pricing
+            Check a shipment before it costs you
           </h1>
           <p style={S.sub}>
-            Pay per trade. No subscriptions, no hidden fees. Your first compliance lookup is free.
+            Pay per shipment. No subscriptions. Your first compliance check is free.
           </p>
           {tokenQuery.data && (
             <div style={{ marginTop: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
@@ -272,14 +270,14 @@ export default function Pricing() {
                   style={{ ...S.badge, background: "var(--gbg)", color: "var(--green)", border: "1px solid var(--gbd)" }}
                   data-testid="badge-free-demo"
                 >
-                  First lookup free
+                  First check free
                 </span>
               )}
             </div>
           )}
         </div>
 
-        {/* Free lookup banner */}
+        {/* Free check banner */}
         <div
           style={{ ...S.card, background: "var(--gbg)", marginBottom: 40, display: "flex", flexDirection: "column", gap: 16 }}
           data-testid="card-free-lookup-banner"
@@ -290,10 +288,10 @@ export default function Pricing() {
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: "var(--t1)", margin: "0 0 4px" }}>
-                Your first lookup is free
+                Your first check is free
               </h3>
               <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
-                Try a full compliance check on any corridor — no credit card required. See your TwinLog Score, tariffs, SPS requirements, and document checklist.
+                Run one full compliance check for free — no card required. See duties, required documents, and shipment risks.
               </p>
             </div>
           </div>
@@ -303,104 +301,17 @@ export default function Pricing() {
             data-testid="button-free-lookup-cta"
           >
             <Search style={{ width: 16, height: 16 }} />
-            Try Free Lookup
+            Check shipment risk — Free
           </button>
         </div>
 
-        {/* LC Re-check */}
+        {/* SECTION 1 — Trade Packs (core product, FIRST) */}
         <div style={{ marginBottom: 40 }}>
-          <h2 style={S.sectionTitle} data-testid="text-lc-recheck-heading">
-            LC Document Checker
-          </h2>
-          <p style={S.sectionSub}>
-            Validate Letters of Credit against UCP 600 rules. First check included with every trade.
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
-            <div style={S.card} data-testid="card-lc-recheck-addon">
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                <RefreshCw style={{ width: 20, height: 20, color: "var(--blue)" }} />
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
-                  LC Re-check
-                </span>
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: "var(--t1)", letterSpacing: "-0.5px" }}>
-                  $9.99
-                </span>
-                <span style={{ color: "var(--t2)", fontSize: 13, marginLeft: 6 }}>per re-check</span>
-              </div>
-              <p style={{ fontSize: 13, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.6 }}>
-                Your first LC check per trade is included free. If your supplier corrects documents and you need to re-check, additional checks are $9.99 each.
-              </p>
-              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px" }}>
-                {[
-                  "First LC check bundled in trade pack",
-                  "UCP 600 compliance re-check",
-                  "Updated correction emails",
-                  "Pay only when needed",
-                ].map((f) => (
-                  <li key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--t2)", marginBottom: 6 }}>
-                    <Check style={{ width: 14, height: 14, color: "var(--green)", marginTop: 2, flexShrink: 0 }} />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                style={{ ...S.btnOutline, width: "100%" }}
-                onClick={() => window.location.href = "/lc-check"}
-                data-testid="button-lc-recheck-go"
-              >
-                <FileCheck style={{ width: 16, height: 16 }} />
-                Go to LC Checker
-              </button>
-            </div>
-
-            {/* Enterprise */}
-            <div style={{ ...S.card, border: "1px dashed var(--border2)" }} data-testid="card-enterprise">
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-                <Building2 style={{ width: 20, height: 20, color: "var(--blue)" }} />
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
-                  Enterprise
-                </span>
-                <span style={{ ...S.badge, background: "var(--card2)", color: "var(--t2)" }}>
-                  Contact Us
-                </span>
-              </div>
-              <p style={{ fontSize: 13, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.6 }}>
-                Custom pricing for high-volume traders, trading houses, and compliance teams.
-              </p>
-              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px" }}>
-                {[
-                  "Volume discounts beyond 25 trades",
-                  "API access for ERP integration",
-                  "Team accounts & shared credits",
-                  "Dedicated compliance support",
-                ].map((f) => (
-                  <li key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--t2)", marginBottom: 6 }}>
-                    <Check style={{ width: 14, height: 14, color: "var(--green)", marginTop: 2, flexShrink: 0 }} />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                style={{ ...S.btnOutline, width: "100%" }}
-                onClick={() => window.location.href = "mailto:hello@taptrao.com?subject=Enterprise%20Pricing%20Enquiry"}
-                data-testid="button-enterprise-contact"
-              >
-                <Mail style={{ width: 16, height: 16 }} />
-                Contact Sales
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Trade Packs */}
-        <div style={{ marginBottom: 56 }}>
           <h2 style={S.sectionTitle} data-testid="text-trade-packs-heading">
             Trade Packs
           </h2>
           <p style={S.sectionSub}>
-            1 credit = 1 full compliance lookup + bundled LC check. Buy more, save more.
+            1 credit = 1 shipment checked (compliance + LC). Buy more, save more.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
             {tradePacks.map((pack) => (
@@ -426,10 +337,10 @@ export default function Pricing() {
                       {pack.price}
                     </div>
                     <div style={{ ...S.statLabel, marginTop: 6 }}>
-                      {pack.lookups} {pack.lookups === 1 ? "trade" : "trades"}
+                      {pack.lookups} {pack.lookups === 1 ? "shipment" : "shipments"}
                     </div>
                     <div style={{ fontSize: 11, color: "var(--t3)", marginTop: 2 }}>
-                      {pack.perLookup} per trade
+                      {pack.perLookup} per shipment
                     </div>
                   </div>
                   <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px", flex: 1 }}>
@@ -461,41 +372,151 @@ export default function Pricing() {
           </div>
         </div>
 
+        {/* SECTION 2 — What's included (clarity block) */}
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ ...S.card, background: "var(--card2)", padding: 28 }}>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 16, color: "var(--t1)", margin: "0 0 16px", textAlign: "center" }}>
+              Every trade credit includes
+            </h3>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10 }}>
+              {[
+                "Full compliance check",
+                "Buyer & supplier document checklist",
+                "LC document check (first submission)",
+                "TwinLog score & audit trail",
+                "Customs data for broker (CSV)",
+                "Instructions for supplier",
+              ].map((f) => (
+                <div key={f} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--t2)" }}>
+                  <Check style={{ width: 14, height: 14, color: "var(--green)", flexShrink: 0 }} />
+                  <span>{f}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
-        {/* Pro Monitoring */}
+        {/* SECTION 3 — LC-only (secondary, muted) */}
+        <div style={{ marginBottom: 40 }}>
+          <h2 style={S.sectionTitle}>
+            Already have an LC?
+          </h2>
+          <p style={S.sectionSub}>
+            Check your LC without running a full compliance check.
+          </p>
+          <div style={{ maxWidth: 480, margin: "0 auto" }}>
+            <div style={{ ...S.card, background: "var(--card2)", border: "1px solid var(--border2)" }} data-testid="card-lc-standalone">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                <FileCheck style={{ width: 20, height: 20, color: "var(--blue)" }} />
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
+                  LC Document Check
+                </span>
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: "var(--t1)", letterSpacing: "-0.5px" }}>
+                  $19.99
+                </span>
+                <span style={{ color: "var(--t2)", fontSize: 13, marginLeft: 6 }}>one-time</span>
+              </div>
+              <p style={{ fontSize: 13, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.6 }}>
+                Validate supplier documents against your Letter of Credit (UCP 600) before submitting to the bank.
+              </p>
+              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 12px" }}>
+                {[
+                  { text: "First LC submission check", included: true },
+                  { text: "Discrepancy summary & fix suggestions", included: true },
+                  { text: "Compliance check", included: false },
+                  { text: "Document checklist", included: false },
+                ].map((f) => (
+                  <li key={f.text} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: f.included ? "var(--t2)" : "var(--t3)", marginBottom: 6 }}>
+                    {f.included ? (
+                      <Check style={{ width: 14, height: 14, color: "var(--green)", marginTop: 2, flexShrink: 0 }} />
+                    ) : (
+                      <X style={{ width: 14, height: 14, color: "var(--t3)", marginTop: 2, flexShrink: 0 }} />
+                    )}
+                    <span>{f.text}</span>
+                  </li>
+                ))}
+              </ul>
+              <p style={{ fontSize: 11, color: "var(--green)", margin: "0 0 16px", fontStyle: "italic" }}>
+                Included free with every trade credit
+              </p>
+              <button
+                style={{ ...S.btnOutline, width: "100%" }}
+                onClick={() => window.location.href = "/lc-check"}
+                data-testid="button-lc-standalone"
+              >
+                <FileCheck style={{ width: 16, height: 16 }} />
+                Check LC only
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 4 — LC Corrections (add-on) */}
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ maxWidth: 480, margin: "0 auto" }}>
+            <div style={{ ...S.card, border: "1px solid var(--border2)" }} data-testid="card-lc-recheck-addon">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <RefreshCw style={{ width: 18, height: 18, color: "var(--blue)" }} />
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
+                  LC corrections (if documents are updated)
+                </span>
+              </div>
+              <div style={{ marginBottom: 10 }}>
+                <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 22, color: "var(--t1)", letterSpacing: "-0.5px" }}>
+                  $9.99
+                </span>
+                <span style={{ color: "var(--t2)", fontSize: 13, marginLeft: 6 }}>per re-check</span>
+              </div>
+              <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
+                If your supplier corrects documents after the first submission, you can re-check the LC before resubmitting to the bank.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 5 — High volume (de-emphasised) */}
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ maxWidth: 480, margin: "0 auto" }}>
+            <div style={{ ...S.card, border: "1px dashed var(--border2)", background: "transparent" }} data-testid="card-enterprise">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <Building2 style={{ width: 18, height: 18, color: "var(--t2)" }} />
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
+                  High-volume or team usage
+                </span>
+              </div>
+              <p style={{ fontSize: 13, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.6 }}>
+                Custom pricing, shared credits, API access, and dedicated support.
+              </p>
+              <button
+                style={{ ...S.btnOutline, width: "100%" }}
+                onClick={() => window.location.href = "mailto:hello@taptrao.com?subject=Enterprise%20Pricing%20Enquiry"}
+                data-testid="button-enterprise-contact"
+              >
+                <Mail style={{ width: 16, height: 16 }} />
+                Contact sales
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 6 — Monitoring (last, muted) */}
         <div style={{ marginBottom: 64 }}>
-          <div style={{ ...S.card, border: "1px dashed var(--border2)" }} data-testid="card-pro-monitoring">
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 24 }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-                  <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 20, color: "var(--t1)", letterSpacing: "-0.3px" }}>
-                    Pro Monitoring
-                  </span>
-                  <span style={{ ...S.badge, background: "var(--abg)", color: "var(--amber)", border: "1px solid var(--abd)" }}>
-                    Coming Soon
-                  </span>
-                </div>
-                <div style={{ marginBottom: 4 }}>
-                  <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 24, color: "var(--t1)" }}>$29</span>
-                  <span style={{ fontSize: 13, color: "var(--t2)", marginLeft: 4 }}>/ month</span>
-                </div>
-                <p style={{ fontSize: 13, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.6 }}>
-                  Stay ahead of regulatory changes with automated monitoring and alerts.
-                </p>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 8 }}>
-                  {monitoringFeatures.map((f) => (
-                    <div key={f.label} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--t2)" }}>
-                      <f.icon style={{ width: 16, height: 16, color: "var(--t3)", flexShrink: 0 }} />
-                      <span>{f.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div style={{ flexShrink: 0 }}>
-                <button style={{ ...S.btnOutline, opacity: 0.45, cursor: "not-allowed" }} disabled data-testid="button-pro-monitoring">
+          <div style={{ maxWidth: 480, margin: "0 auto" }}>
+            <div style={{ ...S.card, border: "1px dashed var(--border2)", background: "transparent", opacity: 0.7 }} data-testid="card-pro-monitoring">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <Bell style={{ width: 18, height: 18, color: "var(--t3)" }} />
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
+                  Pro Monitoring
+                </span>
+                <span style={{ ...S.badge, background: "var(--abg)", color: "var(--amber)", border: "1px solid var(--abd)" }}>
                   Coming Soon
-                </button>
+                </span>
               </div>
+              <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
+                Regulatory change alerts and compliance calendar. For frequent shippers. Not required for occasional trades.
+              </p>
             </div>
           </div>
         </div>
