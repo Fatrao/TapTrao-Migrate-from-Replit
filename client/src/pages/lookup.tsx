@@ -1855,7 +1855,7 @@ export default function Lookup() {
             <CardContent className="p-6 space-y-6">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }} htmlFor="commodity">
+                  <label style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.95)" }} htmlFor="commodity">
                     What are you shipping?
                   </label>
                   {isLoading ? (
@@ -1881,7 +1881,7 @@ export default function Lookup() {
                 </div>
 
                 <div className="space-y-2">
-                  <label style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }} htmlFor="origin">
+                  <label style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.95)" }} htmlFor="origin">
                     Where are the goods coming from?
                   </label>
                   {isLoading ? (
@@ -1903,7 +1903,7 @@ export default function Lookup() {
                 </div>
 
                 <div className="space-y-2">
-                  <label style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }} htmlFor="destination">
+                  <label style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.95)" }} htmlFor="destination">
                     Where are the goods going?
                   </label>
                   {isLoading ? (
