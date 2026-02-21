@@ -24,9 +24,9 @@ const PORTS: PortRate[] = [
 ];
 
 const CONTAINER_OPTIONS: { value: ContainerType; label: string }[] = [
-  { value: "20ft", label: "20ft Standard" },
-  { value: "40ft", label: "40ft Standard" },
-  { value: "40hc", label: "40ft High Cube" },
+  { value: "20ft", label: "20ft standard" },
+  { value: "40ft", label: "40ft standard" },
+  { value: "40hc", label: "40ft high cube" },
   { value: "reefer", label: "Reefer (refrigerated)" },
 ];
 
@@ -103,7 +103,7 @@ export default function DemurragePage() {
           Demurrage Calculator
         </h1>
         <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, color: "var(--t2)", marginBottom: 24 }}>
-          Estimate container holding costs when goods are delayed at port
+          Estimate demurrage if this shipment is delayed at port
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "380px 1fr", gap: 20, alignItems: "start" }}>
@@ -164,7 +164,7 @@ export default function DemurragePage() {
                 value={freeDays}
                 onChange={e => setFreeDays(Math.min(30, Math.max(0, Number(e.target.value))))}
               />
-              <p style={s.helper}>Check your Bill of Lading — typically 7-14 days free</p>
+              <p style={s.helper}>Check your Bill of Lading. Most contracts allow 7–14 free days.</p>
             </div>
 
             <div style={s.field}>
@@ -177,7 +177,7 @@ export default function DemurragePage() {
                   onClick={() => setUseDate(!useDate)}
                   style={{ background: "none", border: "none", color: "var(--blue)", fontSize: 11, cursor: "pointer", fontWeight: 600 }}
                 >
-                  {useDate ? "Enter days manually" : "Calculate from date"}
+                  {useDate ? "Enter days manually" : "Calculate from arrival date"}
                 </button>
               </div>
               {useDate ? (
@@ -241,7 +241,7 @@ export default function DemurragePage() {
                   <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 700, color: "var(--t1)" }} data-testid="demurrage-chargeable-days">
                     {chargeableDays}
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--t3)" }}>Chargeable days</div>
+                  <div style={{ fontSize: 11, color: "var(--t3)" }}>Billable days</div>
                 </div>
                 <div style={{ textAlign: "center", padding: 12, background: "var(--card2)", borderRadius: 8 }}>
                   <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 700, color: "var(--t1)" }} data-testid="demurrage-daily-rate">
@@ -253,7 +253,7 @@ export default function DemurragePage() {
                   <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 700, color: "var(--t1)" }}>
                     {effectiveDaysHeld}
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--t3)" }}>Days held</div>
+                  <div style={{ fontSize: 11, color: "var(--t3)" }}>Days at port</div>
                 </div>
               </div>
 
@@ -301,6 +301,7 @@ export default function DemurragePage() {
                   ${total.toLocaleString()}
                 </span>
               </div>
+              <p style={{ fontSize: 11, color: "var(--t3)", textAlign: "right", marginTop: -8, marginBottom: 12, fontStyle: "italic" }}>Based on current inputs</p>
 
               {cargoVal > 0 && (
                 <div style={{ marginBottom: 12 }}>
@@ -324,11 +325,11 @@ export default function DemurragePage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
                 <div style={{ background: "var(--card2)", borderRadius: 8, padding: "12px 14px" }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>Re-export</div>
-                  <div style={{ fontSize: 11, color: "var(--t2)" }}>~30-50% of cargo value</div>
+                  <div style={{ fontSize: 11, color: "var(--t2)" }}>Often 30–50% of cargo value</div>
                 </div>
                 <div style={{ background: "var(--card2)", borderRadius: 8, padding: "12px 14px" }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>Destruction</div>
-                  <div style={{ fontSize: 11, color: "var(--t2)" }}>Typically $500-5,000 depending on volume and port</div>
+                  <div style={{ fontSize: 11, color: "var(--t2)" }}>Often $500–5,000, depending on port and volume</div>
                 </div>
                 <div style={{ background: "var(--card2)", borderRadius: 8, padding: "12px 14px" }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>Appeal / re-test</div>
@@ -337,7 +338,7 @@ export default function DemurragePage() {
               </div>
               <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)", marginTop: 12, lineHeight: 1.5 }}>
                 Rates are indicative based on published port tariffs. Actual rates vary by
-                carrier, season, and contract terms. Always verify with your freight agent.
+                carrier, season, and contract terms. Confirm final charges with your freight agent.
               </p>
             </div>
 
