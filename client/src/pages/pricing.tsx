@@ -226,25 +226,25 @@ export default function Pricing() {
   return (
     <div style={{ minHeight: "100vh", background: "#0D1117", fontFamily: "'Plus Jakarta Sans', sans-serif", WebkitFontSmoothing: "antialiased" }}>
       {/* NAV */}
-      <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 40px", height: 60, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+      <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px", height: 56, borderBottom: "1px solid rgba(255,255,255,0.07)", gap: 8, overflow: "hidden" }}>
         <Link href="/">
-          <span style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-            <img src="/logo.png" alt="TapTrao" style={{ width: 32, height: 32, borderRadius: 8, objectFit: "contain" }} />
-            <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)" }}>TapTrao</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexShrink: 0 }}>
+            <img src="/logo.png" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "contain" }} />
+            <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 16, color: "rgba(255,255,255,0.95)" }}>TapTrao</span>
           </span>
         </Link>
-        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, overflow: "auto", WebkitOverflowScrolling: "touch", flexShrink: 1, minWidth: 0 }}>
           <Link href="/lookup">
-            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, cursor: "pointer" }}>Compliance Lookup</span>
+            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" }}>Lookup</span>
           </Link>
           <Link href="/lc-check">
-            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, cursor: "pointer" }}>LC Checker</span>
+            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" }}>LC Checker</span>
           </Link>
           <Link href="/dashboard">
-            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, cursor: "pointer" }}>Dashboard</span>
+            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" }}>Dashboard</span>
           </Link>
           <Link href="/lookup">
-            <span style={{ background: "#427EFF", color: "white", padding: "8px 18px", borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+            <span style={{ background: "#427EFF", color: "white", padding: "7px 14px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
               Start free →
             </span>
           </Link>
@@ -281,28 +281,117 @@ export default function Pricing() {
 
         {/* Free lookup banner */}
         <div
-          style={{ ...S.card, background: "var(--gbg)", marginBottom: 40, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 16 }}
+          style={{ ...S.card, background: "var(--gbg)", marginBottom: 40, display: "flex", flexDirection: "column", gap: 16 }}
           data-testid="card-free-lookup-banner"
         >
-          <div style={{ padding: 12, borderRadius: "50%", background: "rgba(34,197,94,0.12)", flexShrink: 0 }}>
-            <Gift style={{ width: 24, height: 24, color: "var(--green)" }} />
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: "var(--t1)", margin: "0 0 4px" }}>
-              Your first lookup is free
-            </h3>
-            <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
-              Try a full compliance check on any corridor — no credit card required. See your TwinLog Score, tariffs, SPS requirements, and document checklist. Premium features like TwinLog Trail PDF and LC checks unlock with a trade pack.
-            </p>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
+            <div style={{ padding: 12, borderRadius: "50%", background: "rgba(34,197,94,0.12)", flexShrink: 0 }}>
+              <Gift style={{ width: 24, height: 24, color: "var(--green)" }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: "var(--t1)", margin: "0 0 4px" }}>
+                Your first lookup is free
+              </h3>
+              <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
+                Try a full compliance check on any corridor — no credit card required. See your TwinLog Score, tariffs, SPS requirements, and document checklist.
+              </p>
+            </div>
           </div>
           <button
-            style={{ ...S.btnOutline, flexShrink: 0, border: "1px solid var(--gbd)", color: "var(--green)" }}
+            style={{ ...S.btnOutline, border: "1px solid var(--gbd)", color: "var(--green)", width: "100%" }}
             onClick={() => window.location.href = "/lookup"}
             data-testid="button-free-lookup-cta"
           >
             <Search style={{ width: 16, height: 16 }} />
             Try Free Lookup
           </button>
+        </div>
+
+        {/* LC Re-check */}
+        <div style={{ marginBottom: 40 }}>
+          <h2 style={S.sectionTitle} data-testid="text-lc-recheck-heading">
+            LC Document Checker
+          </h2>
+          <p style={S.sectionSub}>
+            Validate Letters of Credit against UCP 600 rules. First check included with every trade.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
+            <div style={S.card} data-testid="card-lc-recheck-addon">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                <RefreshCw style={{ width: 20, height: 20, color: "var(--blue)" }} />
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
+                  LC Re-check
+                </span>
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: "var(--t1)", letterSpacing: "-0.5px" }}>
+                  $9.99
+                </span>
+                <span style={{ color: "var(--t2)", fontSize: 13, marginLeft: 6 }}>per re-check</span>
+              </div>
+              <p style={{ fontSize: 13, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.6 }}>
+                Your first LC check per trade is included free. If your supplier corrects documents and you need to re-check, additional checks are $9.99 each.
+              </p>
+              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px" }}>
+                {[
+                  "First LC check bundled in trade pack",
+                  "UCP 600 compliance re-check",
+                  "Updated correction emails",
+                  "Pay only when needed",
+                ].map((f) => (
+                  <li key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--t2)", marginBottom: 6 }}>
+                    <Check style={{ width: 14, height: 14, color: "var(--green)", marginTop: 2, flexShrink: 0 }} />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                style={{ ...S.btnOutline, width: "100%" }}
+                onClick={() => window.location.href = "/lc-check"}
+                data-testid="button-lc-recheck-go"
+              >
+                <FileCheck style={{ width: 16, height: 16 }} />
+                Go to LC Checker
+              </button>
+            </div>
+
+            {/* Enterprise */}
+            <div style={{ ...S.card, border: "1px dashed var(--border2)" }} data-testid="card-enterprise">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+                <Building2 style={{ width: 20, height: 20, color: "var(--blue)" }} />
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
+                  Enterprise
+                </span>
+                <span style={{ ...S.badge, background: "var(--card2)", color: "var(--t2)" }}>
+                  Contact Us
+                </span>
+              </div>
+              <p style={{ fontSize: 13, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.6 }}>
+                Custom pricing for high-volume traders, trading houses, and compliance teams.
+              </p>
+              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px" }}>
+                {[
+                  "Volume discounts beyond 25 trades",
+                  "API access for ERP integration",
+                  "Team accounts & shared credits",
+                  "Dedicated compliance support",
+                ].map((f) => (
+                  <li key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--t2)", marginBottom: 6 }}>
+                    <Check style={{ width: 14, height: 14, color: "var(--green)", marginTop: 2, flexShrink: 0 }} />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                style={{ ...S.btnOutline, width: "100%" }}
+                onClick={() => window.location.href = "mailto:hello@taptrao.com?subject=Enterprise%20Pricing%20Enquiry"}
+                data-testid="button-enterprise-contact"
+              >
+                <Mail style={{ width: 16, height: 16 }} />
+                Contact Sales
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Trade Packs */}
@@ -372,79 +461,6 @@ export default function Pricing() {
           </div>
         </div>
 
-        {/* LC Re-check + Enterprise */}
-        <div style={{ marginBottom: 56 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
-            {/* LC Re-check */}
-            <div style={S.card} data-testid="card-lc-recheck-addon">
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                <RefreshCw style={{ width: 20, height: 20, color: "var(--blue)" }} />
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
-                  LC Re-check
-                </span>
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: "var(--t1)", letterSpacing: "-0.5px" }}>
-                  $9.99
-                </span>
-                <span style={{ color: "var(--t2)", fontSize: 13, marginLeft: 6 }}>per re-check</span>
-              </div>
-              <p style={{ fontSize: 13, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.6 }}>
-                Your first LC check per trade is included free. If your supplier corrects documents and you need to re-check, additional checks are $9.99 each.
-              </p>
-              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                {[
-                  "First LC check bundled in trade pack",
-                  "UCP 600 compliance re-check",
-                  "Updated correction emails",
-                  "Pay only when needed",
-                ].map((f) => (
-                  <li key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--t2)", marginBottom: 6 }}>
-                    <Check style={{ width: 14, height: 14, color: "var(--green)", marginTop: 2, flexShrink: 0 }} />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Enterprise */}
-            <div style={{ ...S.card, border: "1px dashed var(--border2)" }} data-testid="card-enterprise">
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-                <Building2 style={{ width: 20, height: 20, color: "var(--blue)" }} />
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
-                  Enterprise
-                </span>
-                <span style={{ ...S.badge, background: "var(--card2)", color: "var(--t2)" }}>
-                  Contact Us
-                </span>
-              </div>
-              <p style={{ fontSize: 13, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.6 }}>
-                Custom pricing for high-volume traders, trading houses, and compliance teams.
-              </p>
-              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px" }}>
-                {[
-                  "Volume discounts beyond 25 trades",
-                  "API access for ERP integration",
-                  "Team accounts & shared credits",
-                  "Dedicated compliance support",
-                ].map((f) => (
-                  <li key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--t2)", marginBottom: 6 }}>
-                    <Check style={{ width: 14, height: 14, color: "var(--green)", marginTop: 2, flexShrink: 0 }} />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                style={{ ...S.btnOutline, width: "100%" }}
-                onClick={() => window.location.href = "mailto:hello@taptrao.com?subject=Enterprise%20Pricing%20Enquiry"}
-                data-testid="button-enterprise-contact"
-              >
-                <Mail style={{ width: 16, height: 16 }} />
-                Contact Sales
-              </button>
-            </div>
-          </div>
-        </div>
 
         {/* Pro Monitoring */}
         <div style={{ marginBottom: 64 }}>
