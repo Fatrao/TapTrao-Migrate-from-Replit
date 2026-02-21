@@ -108,6 +108,12 @@
     background: #1C2333;
     color: rgba(255,255,255,0.95);
   }
+
+  /* Make form labels clearly visible on dark backgrounds */
+  label.text-sm.font-medium,
+  label[class*="font-medium"] {
+    color: rgba(255,255,255,0.95) !important;
+  }
 }
 
 @layer utilities {
