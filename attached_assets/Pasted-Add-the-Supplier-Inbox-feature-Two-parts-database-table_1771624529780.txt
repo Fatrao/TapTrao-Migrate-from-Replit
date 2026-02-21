@@ -1,0 +1,130 @@
+Add the Supplier Inbox feature. Two parts: database tables first, then the UI page.
+
+━━━ PART 1: DATABASE ━━━
+
+Run these in a single transaction. Rollback on any failure.
+
+CREATE TABLE IF NOT EXISTS supplier_requests (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  lookup_id         UUID REFERENCES lookups(id) ON DELETE CASCADE,
+  user_session_id   TEXT NOT NULL,
+  supplier_name     TEXT NOT NULL DEFAULT 'Supplier',
+  supplier_email    TEXT,
+  supplier_whatsapp TEXT,
+  upload_token      UUID UNIQUE DEFAULT gen_random_uuid(),
+  upload_expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '30 days',
+  status            TEXT NOT NULL DEFAULT 'waiting'
+                    CHECK (status IN ('waiting','partial','blocking','complete')),
+  docs_required     JSONB NOT NULL DEFAULT '[]',
+  docs_received     JSONB NOT NULL DEFAULT '[]',
+  sent_via          TEXT[] DEFAULT '{}',
+  last_sent_at      TIMESTAMPTZ,
+  created_at        TIMESTAMPTZ DEFAULT NOW(),
+  updated_at        TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS supplier_uploads (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  request_id        UUID REFERENCES supplier_requests(id) ON DELETE CASCADE,
+  doc_type          TEXT NOT NULL,
+  original_filename TEXT NOT NULL,
+  file_key          TEXT NOT NULL,
+  filesize_bytes    INTEGER,
+  mime_type         TEXT,
+  uploaded_at       TIMESTAMPTZ DEFAULT NOW(),
+  uploaded_by       TEXT DEFAULT 'supplier' CHECK (uploaded_by IN ('supplier','trader')),
+  verified          BOOLEAN DEFAULT false,
+  finding           TEXT,
+  ucp_rule          TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_supplier_requests_session ON supplier_requests(user_session_id);
+CREATE INDEX IF NOT EXISTS idx_supplier_requests_token   ON supplier_requests(upload_token);
+CREATE INDEX IF NOT EXISTS idx_supplier_uploads_request  ON supplier_uploads(request_id);
+
+Verify by running:
+SELECT table_name FROM information_schema.tables WHERE table_name IN ('supplier_requests','supplier_uploads');
+Expected: 2 rows returned.
+
+━━━ PART 2: INBOX PAGE ━━━
+
+Create page: app/inbox/page.tsx (or pages/inbox.tsx)
+Use AppShell with activeNav="/inbox".
+Main content: overflow-y auto, padding 32px 40px 60px.
+
+DATA QUERY:
+SELECT sr.*, 
+  c.name as commodity_name, o.iso2 as origin_iso2, d.iso2 as dest_iso2,
+  o.country_name as origin_name, d.country_name as dest_name
+FROM supplier_requests sr
+JOIN lookups l ON sr.lookup_id = l.id
+JOIN commodities c ON l.commodity_id = c.id
+JOIN origin_countries o ON l.origin_iso2 = o.iso2
+JOIN destinations d ON l.dest_iso2 = d.iso2
+WHERE sr.user_session_id = [session]
+ORDER BY
+  CASE sr.status WHEN 'blocking' THEN 1 WHEN 'waiting' THEN 2 WHEN 'partial' THEN 3 ELSE 4 END,
+  sr.updated_at DESC
+
+PAGE HEADER:
+"Supplier Inbox" Fraunces 900 32px
+Subtitle: "[n] suppliers waiting · [n] blocking issues"
+
+SUMMARY CARDS (3 cards, same style as My Trades):
+Card 1: count WHERE status IN ('waiting','partial') — color var(--amber) — "Awaiting documents"
+Card 2: count WHERE status = 'blocking' — color var(--red) — "Blocking issue"
+Card 3: count WHERE status = 'complete' AND updated_at > NOW() - INTERVAL '7 days' — color var(--green) — "Complete this week"
+
+INBOX CARDS grouped by urgency:
+
+Group labels (DM Mono 9px uppercase var(--t3) with line after):
+"Needs attention" → status IN ('blocking','waiting')
+"In progress"     → status = 'partial'
+"Complete"        → status = 'complete' (render at 0.7 opacity)
+
+Each inbox card:
+  background var(--s1), border var(--s5), border-radius 10px, padding 16px 18px
+  cursor pointer, transition border-color .15s
+  Hover: border-color rgba(66,126,255,.3)
+  If status = 'blocking': base border-color rgba(239,68,68,.2)
+
+  Layout: flex row, gap 14px, align-items center
+
+  Avatar (40×40px, border-radius 9px): use getAvatarColour(origin_iso2), shows origin_iso2 text
+
+  Body (flex:1):
+    Supplier name (13px 700 var(--t1)) + route badge (DM Mono 10px var(--t3))
+    Description: what's outstanding (12px var(--t2)) — derive from docs_required vs docs_received
+    Document progress pips row: one 22×4px rect per required doc, border-radius 2px
+      verified doc → var(--green) | blocking → var(--red) | pending → var(--s5)
+    Pip count text: "X/Y docs · Z blocking/pending" DM Mono 10px var(--t3) margin-top 6px
+
+  Meta (flex column, align-items flex-end, gap 6px, flex-shrink 0):
+    Status tag (DM Mono 9px 600, coloured):
+      blocking → rbg/rbd/red "⊗ Blocking"
+      waiting  → abg/abd/amber "● Waiting"
+      partial  → blue-dim/blue-bd/blue "↻ Partial"
+      complete → gbg/gbd/green "✓ Complete"
+    Timestamp: DM Mono 10px var(--t3) (relative: "2h ago", "1d ago")
+    THREE SEND BUTTONS (always visible, flex row, gap 6px):
+      💬 WhatsApp: bg rgba(37,211,102,.12), border rgba(37,211,102,.3), color #25D366, 11px 600
+      ✉ Email:     bg var(--blue-dim), border var(--blue-bd), color var(--blue), 11px 600
+      🔗 Link:     bg var(--s3), border var(--s5), color var(--t2), 11px 600
+      All buttons: padding 5px 10px, border-radius 6px, cursor pointer
+      (Button click behaviour is wired in Prompt 14)
+
+EMPTY STATE (when no supplier_requests):
+  Centered, "No supplier requests yet."
+  "Send your first supplier brief from the LC Checker or Compliance Lookup."
+  13px var(--t3) margin-top 8px
+
+━━━ SIDEBAR BADGE ━━━
+Update AppShell to query count of supplier_requests WHERE status IN ('waiting','blocking','partial')
+for the current session. Pass as the amber badge count on the "Supplier Inbox" sidebar item.
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'supplier_requests';
+Expected: 14 (all columns created).
+Log: "PROMPT 13 COMPLETE — supplier inbox built"

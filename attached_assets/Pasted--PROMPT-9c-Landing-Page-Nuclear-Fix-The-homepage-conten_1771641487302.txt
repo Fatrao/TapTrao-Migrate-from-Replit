@@ -1,0 +1,361 @@
+# PROMPT 9c: Landing Page — Nuclear Fix
+
+The homepage content is still not rendering. The root layout is overriding the page styles. Fix this now with the following steps.
+
+## STEP 1 — Check what's in app/layout.tsx
+
+Open `app/layout.tsx`. It likely looks something like this:
+
+```tsx
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body className="some-dark-class">
+        <Sidebar />
+        <main>{children}</main>
+      </body>
+    </html>
+  )
+}
+```
+
+The Sidebar and any wrapping divs are hiding or overriding the homepage content.
+
+## STEP 2 — Create a route group for the app shell
+
+Restructure the app directory like this:
+
+```
+app/
+  layout.tsx          ← root layout (html + body ONLY, no sidebar)
+  page.tsx            ← homepage (standalone, no sidebar)
+  pricing/
+    page.tsx          ← standalone page (no sidebar)
+  (app)/              ← route group for sidebar pages
+    layout.tsx        ← sidebar layout (applied to all pages inside)
+    lookup/
+      page.tsx
+    lc-check/
+      page.tsx
+    dashboard/
+      page.tsx
+    trades/
+      page.tsx
+    templates/
+      page.tsx
+    alerts/
+      page.tsx
+    demurrage/
+      page.tsx
+    settings/
+      page.tsx
+    admin/
+      data/
+        page.tsx
+```
+
+The `(app)` folder name with parentheses is a Next.js route group — it does NOT affect the URL. `/lookup` still works. But it gets its own layout (with sidebar) separate from the root.
+
+## STEP 3 — Root layout (app/layout.tsx)
+
+Replace the entire root layout with this minimal version:
+
+```tsx
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'TapTrao — Trade Compliance for Commodity Traders',
+  description: 'Standalone trade compliance checks for commodity traders. No ERP required.',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body style={{ margin: 0, padding: 0, background: '#0D1117' }}>
+        {children}
+      </body>
+    </html>
+  )
+}
+```
+
+No sidebar here. No className. Just html + body + children.
+
+## STEP 4 — Sidebar layout (app/(app)/layout.tsx)
+
+Create this new file for all the app pages:
+
+```tsx
+import Sidebar from '@/components/Sidebar'
+
+export default function AppLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <div style={{
+      display: 'flex',
+      height: '100vh',
+      overflow: 'hidden',
+      background: '#0D1117',
+    }}>
+      <Sidebar />
+      <main style={{
+        flex: 1,
+        overflowY: 'auto',
+        background: '#0D1117',
+      }}>
+        {children}
+      </main>
+    </div>
+  )
+}
+```
+
+## STEP 5 — Homepage (app/page.tsx)
+
+Replace the entire homepage with this. Use ONLY inline styles — no className, no CSS modules, nothing that can be overridden:
+
+```tsx
+export default function HomePage() {
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: '#0D1117',
+      color: 'rgba(255,255,255,0.95)',
+      fontFamily: "'Plus Jakarta Sans', sans-serif",
+      WebkitFontSmoothing: 'antialiased',
+    }}>
+
+      {/* NAV */}
+      <nav style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 48px',
+        height: '64px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <img
+            src="/logo.png"
+            style={{ width: '32px', height: '32px', borderRadius: '7px', objectFit: 'contain' }}
+            alt="TapTrao"
+          />
+          <span style={{
+            fontFamily: "'Fraunces', serif",
+            fontWeight: 700,
+            fontSize: '18px',
+            color: 'rgba(255,255,255,0.95)',
+          }}>
+            TapTrao
+          </span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
+          <a href="/lookup" style={{ color: 'rgba(255,255,255,0.50)', fontSize: '14px', textDecoration: 'none' }}>Compliance Lookup</a>
+          <a href="/lc-check" style={{ color: 'rgba(255,255,255,0.50)', fontSize: '14px', textDecoration: 'none' }}>LC Checker</a>
+          <a href="/pricing" style={{ color: 'rgba(255,255,255,0.50)', fontSize: '14px', textDecoration: 'none' }}>Pricing</a>
+          <a href="/lookup" style={{
+            background: '#427EFF',
+            color: 'white',
+            padding: '9px 20px',
+            borderRadius: '8px',
+            fontSize: '13px',
+            fontWeight: 600,
+            textDecoration: 'none',
+          }}>
+            Start free →
+          </a>
+        </div>
+      </nav>
+
+      {/* HERO */}
+      <div style={{
+        maxWidth: '720px',
+        margin: '0 auto',
+        padding: '100px 48px 80px',
+        textAlign: 'center',
+      }}>
+        <div style={{
+          display: 'inline-block',
+          background: 'rgba(66,126,255,0.12)',
+          color: '#427EFF',
+          fontFamily: "'DM Mono', monospace",
+          fontSize: '10px',
+          letterSpacing: '0.1em',
+          padding: '5px 14px',
+          borderRadius: '20px',
+          marginBottom: '28px',
+          textTransform: 'uppercase' as const,
+        }}>
+          Trade Compliance · No ERP Required
+        </div>
+
+        <h1 style={{
+          fontFamily: "'Fraunces', serif",
+          fontWeight: 900,
+          fontSize: '54px',
+          lineHeight: 1.08,
+          letterSpacing: '-1.5px',
+          color: 'rgba(255,255,255,0.95)',
+          marginBottom: '22px',
+          marginTop: 0,
+        }}>
+          Know your compliance<br />before you commit.
+        </h1>
+
+        <p style={{
+          fontSize: '17px',
+          color: 'rgba(255,255,255,0.50)',
+          lineHeight: 1.65,
+          marginBottom: '40px',
+          maxWidth: '520px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+        }}>
+          The first standalone trade compliance tool for commodity traders sourcing from Africa.
+          Full regulatory picture, LC document checks, supplier briefs — from $4.99.
+        </p>
+
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+          <a href="/lookup" style={{
+            background: '#427EFF',
+            color: 'white',
+            padding: '14px 32px',
+            borderRadius: '9px',
+            fontSize: '15px',
+            fontWeight: 600,
+            textDecoration: 'none',
+            display: 'inline-block',
+          }}>
+            Run your first lookup →
+          </a>
+          <a href="/pricing" style={{
+            background: 'rgba(255,255,255,0.07)',
+            color: 'rgba(255,255,255,0.75)',
+            padding: '14px 32px',
+            borderRadius: '9px',
+            fontSize: '15px',
+            fontWeight: 500,
+            textDecoration: 'none',
+            display: 'inline-block',
+          }}>
+            See pricing
+          </a>
+        </div>
+      </div>
+
+      {/* FEATURE CARDS */}
+      <div style={{
+        maxWidth: '960px',
+        margin: '0 auto',
+        padding: '0 48px 120px',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr',
+        gap: '16px',
+      }}>
+        {[
+          {
+            icon: '⚡',
+            title: 'Compliance Lookup',
+            desc: 'Commodity + origin + destination = full regulatory checklist, duty estimate, risk flags, and supplier brief. In seconds.',
+            tag: '$4.99 per lookup',
+            href: '/lookup',
+          },
+          {
+            icon: '📄',
+            title: 'LC Document Checker',
+            desc: 'Cross-check your supplier documents against LC terms field by field. Catch discrepancies before your bank does.',
+            tag: '$2.99 per check',
+            href: '/lc-check',
+          },
+          {
+            icon: '🔔',
+            title: 'Regulatory Alerts',
+            desc: 'Get notified when SPS rules, duty rates, or EUDR requirements change for your saved commodities and corridors.',
+            tag: 'Coming soon',
+            href: '/pricing',
+          },
+        ].map((f) => (
+          <a
+            key={f.title}
+            href={f.href}
+            style={{ textDecoration: 'none', display: 'block' }}
+          >
+            <div style={{
+              background: '#161B27',
+              borderRadius: '14px',
+              padding: '28px',
+              height: '100%',
+              boxSizing: 'border-box' as const,
+              transition: 'background 0.15s',
+            }}>
+              <div style={{ fontSize: '26px', marginBottom: '14px' }}>{f.icon}</div>
+              <div style={{
+                fontWeight: 700,
+                fontSize: '15px',
+                color: 'rgba(255,255,255,0.95)',
+                marginBottom: '10px',
+              }}>
+                {f.title}
+              </div>
+              <div style={{
+                fontSize: '13px',
+                color: 'rgba(255,255,255,0.45)',
+                lineHeight: 1.6,
+                marginBottom: '20px',
+              }}>
+                {f.desc}
+              </div>
+              <div style={{
+                fontFamily: "'DM Mono', monospace",
+                fontSize: '11px',
+                color: '#427EFF',
+                letterSpacing: '0.04em',
+              }}>
+                {f.tag}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+
+    </div>
+  )
+}
+```
+
+## STEP 6 — globals.css
+
+Make sure globals.css has this and NOTHING that would override text colour:
+
+```css
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #0D1117;
+}
+```
+
+Remove any `color: black` or `color: #000` or default text colour rules from globals.css.
+
+## VERIFY
+
+1. `/` — dark hero page with logo, headline, two CTA buttons, three cards. All text visible.
+2. `/lookup` — sidebar layout with nav on left
+3. No white flash on any page
+4. No black text on dark background anywhere

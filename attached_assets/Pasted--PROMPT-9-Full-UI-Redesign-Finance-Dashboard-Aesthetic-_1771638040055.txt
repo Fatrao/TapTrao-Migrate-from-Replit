@@ -1,0 +1,605 @@
+# PROMPT 9: Full UI Redesign — Finance Dashboard Aesthetic
+
+Apply the following design system to the entire TapTrao application. Every page must be updated: Lookup, LC Checker, Dashboard, Templates, Pricing, Settings, Alerts, Demurrage — everything.
+
+Do NOT change any backend logic, database queries, or API routes. This is a visual-only change.
+
+---
+
+## DESIGN TOKENS
+
+Add these CSS custom properties to your global stylesheet (globals.css or equivalent):
+
+```css
+:root {
+  --bg:       #0D1117;
+  --sidebar:  #0D1117;
+  --card:     #161B27;
+  --card2:    #1C2333;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.12);
+
+  /* Text hierarchy — same white, different opacity */
+  --t1:       rgba(255,255,255,0.95);  /* headings, active items, selected values */
+  --t2:       rgba(255,255,255,0.55);  /* body text, document names */
+  --t3:       rgba(255,255,255,0.28);  /* hints, labels, authority names, timestamps */
+
+  /* Accent colours */
+  --blue:     #427EFF;
+  --blue-dim: rgba(66,126,255,0.12);
+  --blue-bd:  rgba(66,126,255,0.25);
+
+  /* Status colours */
+  --green:    #22C55E;
+  --gbg:      rgba(34,197,94,0.10);
+  --gbd:      rgba(34,197,94,0.20);
+  --amber:    #F59E0B;
+  --abg:      rgba(245,158,11,0.10);
+  --red:      #EF4444;
+  --rbg:      rgba(239,68,68,0.10);
+}
+```
+
+---
+
+## TYPOGRAPHY
+
+Import these Google Fonts (add to `<head>` or layout.tsx):
+
+```html
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+```
+
+**Usage rules:**
+- `Fraunces 900` — page titles, stat numbers, score displays (serif, large, impactful)
+- `Plus Jakarta Sans 400–700` — all body text, nav items, buttons, dropdown values
+- `DM Mono 400–500` — labels, codes, HS codes, hash references, nav section headers, timestamps
+
+---
+
+## LAYOUT
+
+### Global Body
+```css
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+```
+
+### App Shell
+Two-column layout: fixed sidebar (200px) + scrollable main content.
+
+```
+[SIDEBAR 200px fixed] [MAIN flex:1 overflow-y:auto]
+```
+
+---
+
+## SIDEBAR
+
+```css
+.sidebar {
+  width: 200px;
+  min-width: 200px;
+  background: var(--sidebar);   /* same as main bg — NO visual split */
+  display: flex;
+  flex-direction: column;
+}
+```
+
+**CRITICAL: No borders anywhere on the sidebar.** No border-right, no border-bottom between sections, no divider lines. Spacing alone separates elements.
+
+### Logo Area
+```css
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 16px;
+  /* NO border-bottom */
+}
+
+.logo-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--t1);
+  letter-spacing: -0.3px;
+}
+```
+
+Logo image: `<img src="/logo.png" style="width:36px; height:36px; object-fit:contain; border-radius:8px;" />`
+
+### New Lookup Button
+```css
+.new-lookup-btn {
+  margin: 12px 12px 4px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 7px;
+  padding: 8px 12px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  width: calc(100% - 24px);
+}
+```
+
+### Nav Section Labels
+```css
+.nav-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--t3);
+  text-transform: uppercase;
+  padding: 0 8px;
+  margin-bottom: 4px;
+}
+```
+
+### Nav Items — THE ACTIVE STATE LOGIC
+
+This is the core interaction pattern. Whichever page the user is on, that nav item is bright white. Everything else is faded.
+
+```css
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t2);          /* faded by default */
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--t1);          /* brightens on hover */
+}
+
+.nav-item.active {
+  background: rgba(66,126,255,0.12);
+  color: var(--t1);          /* bright white when active */
+}
+
+.nav-item.active .nav-icon {
+  color: var(--blue);        /* icon turns blue when active */
+}
+
+.nav-icon {
+  font-size: 14px;
+  width: 16px;
+  text-align: center;
+  color: var(--t3);          /* faded by default */
+}
+```
+
+**Implementation:** Use Next.js `usePathname()` hook to detect current route. Apply `active` class to the matching nav item automatically. Example:
+
+```tsx
+'use client'
+import { usePathname } from 'next/navigation'
+
+const pathname = usePathname()
+
+<div className={`nav-item ${pathname === '/lookup' ? 'active' : ''}`}>
+  <span className="nav-icon">⚡</span>
+  Compliance Lookup
+</div>
+```
+
+### Nav Structure
+```
+[Logo + wordmark]
+[+ New Lookup button]
+
+WORKSPACE
+  ⚡ Compliance Lookup    → /lookup
+  📄 LC Checker           → /lc-check
+  📁 My Trades            → /trades
+
+TOOLS
+  🔖 Templates            → /templates
+  🔔 Alerts               → /alerts
+  ⚓ Demurrage Calc        → /demurrage
+
+ACCOUNT
+  💳 Pricing              → /pricing
+  ⚙️  Settings             → /settings
+```
+
+---
+
+## TOPBAR
+
+```css
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 52px;
+  flex-shrink: 0;
+  /* NO border-bottom */
+}
+
+.breadcrumb {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--t3);
+  letter-spacing: 0.03em;
+}
+
+.token-badge {
+  background: var(--card);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--t2);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.token-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--blue);
+  border-radius: 50%;
+}
+
+.buy-btn {
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+```
+
+---
+
+## PAGE STRUCTURE
+
+### Page Header
+Every page starts with:
+```css
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 900;
+  font-size: 28px;
+  color: var(--t1);
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+```
+
+### Trade Route Display
+Below the page title on the Lookup results page:
+```css
+.trade-route {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.trade-commodity {
+  color: var(--t1);          /* bright white */
+  font-weight: 700;
+}
+
+.trade-arrow {
+  color: var(--t1);          /* bright white */
+  font-size: 14px;
+}
+
+.trade-country {
+  color: var(--t1);          /* bright white */
+  font-weight: 500;
+}
+```
+
+Example output: **Raw Cashew Nuts › Côte d'Ivoire › United Kingdom** — all bright white, no fading.
+
+---
+
+## CARDS
+
+### Standard Card
+```css
+.card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 20px 24px;
+  /* NO border */
+}
+```
+
+### Card with Subtle Top Shimmer (optional, for primary cards)
+```css
+.card-primary {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 20px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-primary::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(66,126,255,0.3), transparent);
+}
+```
+
+### Stat Cards
+```css
+.stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--t3);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 900;
+  font-size: 28px;
+  color: var(--t1);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.stat-value.green { color: var(--green); }
+.stat-value.amber { color: var(--amber); }
+.stat-value.blue  { color: var(--blue); }
+
+.stat-sub {
+  font-size: 11px;
+  color: var(--t3);
+  margin-top: 6px;
+}
+```
+
+---
+
+## FORM ELEMENTS
+
+### Dropdowns / Selects
+```css
+select, .form-select {
+  background: var(--card2);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--t1);          /* selected value = bright white */
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+select:focus, .form-select:focus {
+  outline: 1px solid var(--blue-bd);
+  color: var(--t1);
+}
+```
+
+### Form Labels
+```css
+.form-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--t3);          /* faded — label is a hint, not the data */
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+```
+
+### Text Inputs
+```css
+input[type="text"], input[type="email"], textarea {
+  background: var(--card2);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--t1);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+  width: 100%;
+}
+
+input::placeholder {
+  color: var(--t3);
+}
+```
+
+### Primary Button
+```css
+.btn-primary {
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+```
+
+---
+
+## RESULTS / DOCUMENT LISTS
+
+### Document Row
+```css
+.doc-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 12px;
+  /* NO border-bottom between rows — use padding only */
+}
+
+.doc-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.doc-dot.green { background: var(--green); }
+.doc-dot.amber { background: var(--amber); }
+.doc-dot.blue  { background: var(--blue); }
+.doc-dot.red   { background: var(--red); }
+
+.doc-name      { flex: 1; color: rgba(255,255,255,0.70); }   /* readable but not shouting */
+.doc-authority { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); }
+```
+
+### Section Headers (inside result cards)
+```css
+.result-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--t1);          /* bright white — these are the headings */
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+```
+
+### Status Badges
+```css
+.badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.badge.green { background: var(--gbg); color: var(--green); }
+.badge.amber { background: var(--abg); color: var(--amber); }
+.badge.red   { background: var(--rbg); color: var(--red); }
+.badge.blue  { background: var(--blue-dim); color: var(--blue); }
+```
+
+---
+
+## HASH / AUDIT FOOTER
+
+Every lookup and LC check result should end with:
+
+```css
+.hash-footer {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--card2);
+  border-radius: 7px;
+}
+
+.hash-ref {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--t3);
+  display: flex;
+  justify-content: space-between;
+}
+
+.hash-val { color: var(--blue); }
+```
+
+---
+
+## SCROLLBAR
+
+```css
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+```
+
+---
+
+## THE WHITE/GREY HIERARCHY — APPLIED CONSISTENTLY
+
+This is the most important rule. Apply it to every element across every page:
+
+| Opacity | Usage |
+|---------|-------|
+| `rgba(255,255,255,0.95)` — **var(--t1)** | Page titles, active nav items, card section headers, selected dropdown values, trade route (commodity + countries + arrows), stat numbers, result values |
+| `rgba(255,255,255,0.55)` — **var(--t2)** | Body text, document names, inactive nav items, general descriptions |
+| `rgba(255,255,255,0.28)` — **var(--t3)** | Form labels, nav section labels, authority names, timestamps, hash references, stat subtitles, placeholder text, breadcrumbs |
+
+**The rule:** If it IS the data → bright white. If it DESCRIBES the data → faded.
+
+---
+
+## BORDERS — ZERO POLICY
+
+Do not add any border, border-bottom, border-top, border-right, or border-left to any layout element. No lines between sidebar and main. No lines between nav sections. No lines between cards. No lines between document rows. No dividers anywhere.
+
+Use spacing, background colour differences, and border-radius to create visual separation.
+
+The only exceptions permitted:
+- `outline: 1px solid var(--blue-bd)` on focused form inputs (functional feedback)
+- `border: 1px solid var(--gbd)` on status badges (they are small and need definition)
+- The `::before` gradient shimmer on primary cards (this is a glow, not a line)
+
+---
+
+## APPLY TO ALL PAGES
+
+Update the layout and styling on every page to use this system:
+
+- `/` — Landing page
+- `/lookup` — Compliance Lookup (form + results)
+- `/lc-check` — LC Document Checker
+- `/dashboard` — Dashboard with stat cards
+- `/trades` — My Trades list
+- `/templates` — Trade Templates
+- `/alerts` — Regulatory Alerts
+- `/demurrage` — Demurrage Calculator
+- `/pricing` — Pricing page
+- `/settings` — Settings
+- `/admin/data` — Admin data page
+
+After applying, verify:
+1. Sidebar and main content have identical backgrounds (no visual split)
+2. Active nav item is bright white, others are faded — switches correctly on navigation
+3. All dropdown selected values are bright white
+4. No border lines visible anywhere in the layout
+5. Form labels, authority names, timestamps are all at the faded (--t3) level
+6. Card section headers (YOUR SIDE, THEIR SIDE, etc.) are bright white (--t1)

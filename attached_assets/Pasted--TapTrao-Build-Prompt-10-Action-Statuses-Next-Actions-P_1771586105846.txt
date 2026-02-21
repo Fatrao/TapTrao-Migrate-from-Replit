@@ -1,0 +1,255 @@
+# TapTrao — Build Prompt 10: Action Statuses + Next Actions Panel
+
+Feed this to Replit Agent as a single prompt. It makes every compliance requirement
+actionable — each document gets a status, an owner, and a deadline. A "Next Actions"
+panel surfaces what the user must do first. No new tables yet. No auth changes.
+
+---
+
+## WHAT WE'RE BUILDING
+
+Three things in one prompt, in this order:
+
+1. **Extend the compliance result** so every document has `status`, `owner`, and `due_by`
+2. **Make the document lists interactive** so users can update status in the UI
+3. **Add a Next Actions panel** that shows only what needs doing, sorted by urgency
+
+---
+
+## PART 1 — EXTEND THE DATA MODEL (server-side)
+
+In the compliance lookup server logic, extend every document object in both
+`buyer_docs` and `supplier_docs` arrays to include three new fields.
+
+Do NOT change existing fields. Append to each document object:
+
+```typescript
+status: "PENDING" | "READY" | "RISK_ACCEPTED"   // default: "PENDING"
+owner:  "IMPORTER" | "SUPPLIER" | "BROKER"
+due_by: "BEFORE_LOADING" | "BEFORE_ARRIVAL" | "POST_ARRIVAL"
+```
+
+### Owner assignment rules
+
+Apply these defaults based on which side the document appears on and the document type:
+
+**Buyer-side documents (YOUR SIDE):**
+- Customs declaration → `BROKER`
+- IPAFFS pre-notification → `IMPORTER`
+- TRACES/CHED pre-notification → `IMPORTER`
+- Import licence → `IMPORTER`
+- UKTR due diligence register → `IMPORTER`
+- IUU catch certificate → `IMPORTER`
+- All others → `IMPORTER`
+
+**Supplier-side documents (THEIR SIDE):**
+- All documents → `SUPPLIER`
+
+### Due-by assignment rules
+
+```
+Customs declaration          → BEFORE_ARRIVAL
+IPAFFS / TRACES notification → BEFORE_ARRIVAL
+Import licence               → BEFORE_LOADING
+Certificate of Origin        → BEFORE_LOADING
+Phytosanitary certificate    → BEFORE_LOADING
+Bill of Lading               → BEFORE_LOADING
+Commercial Invoice           → BEFORE_LOADING
+Packing List                 → BEFORE_LOADING
+IUU Catch Certificate        → BEFORE_LOADING
+FLEGT Licence                → BEFORE_LOADING
+Kimberley Process cert       → BEFORE_LOADING
+EUDR geolocation data        → BEFORE_LOADING
+OECD DDG declaration         → BEFORE_LOADING
+Port health inspection       → POST_ARRIVAL
+All others                   → BEFORE_LOADING
+```
+
+### Do NOT persist status to the database yet
+
+Return these fields in the lookup result JSON only. Persistence comes in Prompt 12
+(when we save lookups as working files). For now, status lives in component state.
+
+---
+
+## PART 2 — INTERACTIVE DOCUMENT LISTS (UI)
+
+In the lookup results page, update both the "YOUR SIDE" and "THEIR SIDE" document
+sections so each document row is interactive.
+
+### Each document row must show:
+
+```
+[STATUS BADGE ▾]  Document Name               OWNER    DUE BY
+[ PENDING    ▾]  Certificate of Origin       SUPPLIER  Before loading
+[ READY      ▾]  Commercial Invoice          SUPPLIER  Before loading
+[ RISK ACCEPTED] Phytosanitary Certificate   SUPPLIER  Before loading
+```
+
+### Status badge behaviour:
+
+- Clicking the badge opens a small inline dropdown with three options:
+  - Pending
+  - Ready
+  - Risk Accepted
+- Selecting an option updates the status in local component state immediately
+- No API call on status change (not persisted yet)
+- The badge colour updates instantly:
+  - PENDING → grey (#9E9E9E), label "Pending"
+  - READY → green (#1B7340), label "Ready"
+  - RISK_ACCEPTED → amber (#F39C12), label "Risk Accepted"
+
+### Owner label:
+
+Show as a small muted text label to the right of the document name:
+- IMPORTER → "You"
+- SUPPLIER → "Supplier"
+- BROKER → "Broker"
+
+### Due-by label:
+
+Show as a small muted text label:
+- BEFORE_LOADING → "Before loading"
+- BEFORE_ARRIVAL → "Before arrival"
+- POST_ARRIVAL → "On arrival"
+
+### Progress indicator:
+
+At the top of each section (YOUR SIDE / THEIR SIDE), show a completion summary:
+
+```
+YOUR SIDE (Buyer Documents)    2 of 4 ready
+```
+
+This counts documents with status = READY as a fraction of total documents in
+that section. Updates in real time as the user changes statuses.
+
+### Mobile:
+
+On screens under 640px, stack the owner and due-by labels below the document name
+rather than inline. The status badge should remain on the left, full-width row.
+
+---
+
+## PART 3 — NEXT ACTIONS PANEL
+
+Add a new card titled **"Next Actions"** to the results page.
+
+**Position:** Below the Compliance Readiness Score banner and above the YOUR SIDE
+document section. This is the second thing the user sees after the score.
+
+### Panel logic:
+
+Pull all documents from both buyer_docs and supplier_docs where `status === "PENDING"`.
+Sort by due_by priority:
+1. BEFORE_LOADING (most urgent)
+2. BEFORE_ARRIVAL
+3. POST_ARRIVAL
+
+Within each priority group, show IMPORTER/YOU items before SUPPLIER items.
+
+Show a maximum of 5 items in the panel. If there are more than 5 pending items,
+show a "See all X pending items ↓" link that scrolls to the full document lists.
+
+### Each item in the panel shows:
+
+```
+● Certificate of Origin          Supplier   Before loading
+  Issued by: [coo_issuing_body from origin country data]
+
+● IPAFFS Pre-notification        You        Before arrival
+  Submit at: ipaffs.co.uk — 24hrs before goods arrive
+
+● Customs Declaration            Broker     Before arrival
+  Provide HS code, origin, and CHED reference to your broker
+```
+
+The italicised line is a one-line "why it matters / where to go" hint:
+- Certificate of Origin: "Issued by: [authority name]"
+- Phytosanitary cert: "Issued by: [phyto_authority from origin data]"
+- IPAFFS: "Submit at: ipaffs.co.uk — 24hrs before goods arrive"
+- TRACES: "Submit at: webgate.ec.europa.eu/tracesnt — before departure"
+- Customs declaration: "Provide HS code, origin, and CHED reference to your broker"
+- EUDR geolocation: "GPS coordinates of production plot required"
+- IUU catch certificate: "Issued by flag state of fishing vessel — not the exporter"
+- FLEGT licence: "Only available from VPA partner countries"
+- Kimberley cert: "Must be tamper-evident sealed"
+- All others: "Required before shipment"
+
+### Empty state:
+
+If all documents are marked READY or RISK_ACCEPTED, show:
+
+```
+✓ All actions complete for this trade.
+  You can now download your compliance pack.
+```
+
+With a "Download Compliance Pack" button (placeholder — links to nothing yet, PDF
+comes in Prompt 11).
+
+### Panel header:
+
+```
+Next Actions                              3 pending  ●●○○○
+```
+
+The dot indicator shows pending/total ratio (filled dots = pending, empty = done).
+Maximum 5 dots. Update in real time as user marks items ready.
+
+---
+
+## RESULTS PAGE ORDER (UPDATED)
+
+The full results page order is now:
+
+1. Compliance Readiness Score banner  (Prompt 9)
+2. **Next Actions panel**             ← new (Prompt 10)
+3. YOUR SIDE (Buyer Documents)        ← now interactive (Prompt 10)
+4. THEIR SIDE (Supplier Documents)    ← now interactive (Prompt 10)
+5. RISK FLAGS
+6. AfCFTA Preferential Tariff (if applicable)
+7. Compliance check reference + integrity hash
+8. Download PDF / Download Customs Data Pack / Generate Supplier Brief
+
+---
+
+## IMPORTANT CONSTRAINTS
+
+- Do NOT refactor existing compliance cascade logic. Append to it.
+- Do NOT add database persistence for statuses yet. Local state only.
+- Do NOT remove or reorder any existing sections.
+- The Next Actions panel must update in real time when the user changes a status
+  in the document lists (if user marks an item READY, it disappears from Next Actions).
+- Risk Accepted items should NOT appear in the Next Actions panel — only PENDING items.
+- The status dropdown must be keyboard accessible (tab + enter to select).
+
+---
+
+## VERIFICATION
+
+Test these four scenarios and confirm:
+
+**Scenario 1 — Cashew, Côte d'Ivoire → UK:**
+- Should show ~5–6 documents total
+- Next Actions panel should list Certificate of Origin (Supplier, Before loading)
+  and IPAFFS Pre-notification (You, Before arrival) near the top
+- Marking Certificate of Origin as READY should remove it from Next Actions
+- Progress indicator should update from "0 of 3 ready" to "1 of 3 ready"
+
+**Scenario 2 — Cocoa Beans, Ghana → EU:**
+- Should show EUDR Geolocation as PENDING (Before loading, Supplier)
+- Should appear in Next Actions
+- Marking it RISK_ACCEPTED should remove it from Next Actions but NOT mark it green
+
+**Scenario 3 — All items marked READY:**
+- Next Actions panel should show the empty state with "All actions complete" message
+- "Download Compliance Pack" placeholder button should appear
+
+**Scenario 4 — Gold, DRC → Turkey (STOP flag):**
+- STOP flag is present — Next Actions panel should still render
+- But the first item in Next Actions should be the STOP warning, not a document
+- Or alternatively, suppress the Next Actions panel entirely when a STOP is active
+  (your choice — pick whichever is cleaner, but be consistent)
+
+Report all four scenario results before confirming the build is complete.

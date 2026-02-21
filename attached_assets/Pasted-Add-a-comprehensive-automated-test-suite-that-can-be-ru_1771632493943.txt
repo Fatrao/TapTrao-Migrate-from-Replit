@@ -1,0 +1,626 @@
+Add a comprehensive automated test suite that can be run after any prompt
+to verify the entire app is working correctly.
+
+No new UI. No new database tables. Tests only.
+
+━━━ STEP 1: INSTALL TEST DEPENDENCIES ━━━
+
+npm install --save-dev vitest @vitest/coverage-v8 supertest @types/supertest
+
+Add to package.json scripts:
+  "test": "vitest run",
+  "test:watch": "vitest",
+  "test:coverage": "vitest run --coverage",
+  "test:bot": "node scripts/bot-test.mjs"
+
+━━━ STEP 2: API TEST SUITE ━━━
+
+Create file: tests/api.test.ts
+
+import { describe, it, expect, beforeAll } from 'vitest'
+
+const BASE = process.env.TEST_URL ?? 'http://localhost:3000'
+
+// ── HEALTH ──────────────────────────────────────────────
+describe('Health', () => {
+  it('homepage loads', async () => {
+    const res = await fetch(`${BASE}/`)
+    expect(res.status).toBe(200)
+  })
+
+  it('lookup page loads', async () => {
+    const res = await fetch(`${BASE}/lookup`)
+    expect(res.status).toBe(200)
+  })
+
+  it('lc-check page loads', async () => {
+    const res = await fetch(`${BASE}/lc-check`)
+    expect(res.status).toBe(200)
+  })
+
+  it('trades page loads', async () => {
+    const res = await fetch(`${BASE}/trades`)
+    expect(res.status).toBe(200)
+  })
+
+  it('inbox page loads', async () => {
+    const res = await fetch(`${BASE}/inbox`)
+    expect(res.status).toBe(200)
+  })
+
+  it('templates page loads', async () => {
+    const res = await fetch(`${BASE}/templates`)
+    expect(res.status).toBe(200)
+  })
+
+  it('alerts page loads', async () => {
+    const res = await fetch(`${BASE}/alerts`)
+    expect(res.status).toBe(200)
+  })
+
+  it('pricing page loads', async () => {
+    const res = await fetch(`${BASE}/pricing`)
+    expect(res.status).toBe(200)
+  })
+
+  it('demurrage page loads', async () => {
+    const res = await fetch(`${BASE}/demurrage`)
+    expect(res.status).toBe(200)
+  })
+})
+
+// ── DATABASE ─────────────────────────────────────────────
+describe('Database — commodity counts', () => {
+  it('returns 154 total commodities', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.commodities.total).toBe(154)
+  })
+
+  it('returns 94 agricultural commodities', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.commodities.agricultural).toBe(94)
+  })
+
+  it('returns 13 seafood commodities', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.commodities.seafood).toBe(13)
+  })
+
+  it('returns 11 livestock commodities', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.commodities.livestock).toBe(11)
+  })
+
+  it('returns 10 forestry commodities', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.commodities.forestry).toBe(10)
+  })
+
+  it('returns 26 mineral commodities', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.commodities.mineral).toBe(26)
+  })
+
+  it('returns 22 EUDR-triggered commodities', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.commodities.eudr).toBeGreaterThanOrEqual(22)
+  })
+
+  it('returns 1 Kimberley-triggered commodity', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.commodities.kimberley).toBe(1)
+  })
+
+  it('returns 3 commodities with STOP flags', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.commodities.stop_flags).toBe(3)
+  })
+
+  it('returns 7 destinations', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.destinations).toBe(7)
+  })
+
+  it('returns 18 origin countries', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.origins).toBe(18)
+  })
+
+  it('returns 5 regional frameworks', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.frameworks).toBe(5)
+  })
+
+  it('Switzerland destination exists with correct VAT', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.switzerland).toBeDefined()
+    expect(data.switzerland.vat_rate).toBe(8.1)
+  })
+
+  it('2 regulatory alerts seeded (EUDR deadlines)', async () => {
+    const res = await fetch(`${BASE}/api/test/db-counts`)
+    const data = await res.json()
+    expect(data.regulatory_alerts).toBeGreaterThanOrEqual(2)
+  })
+})
+
+// ── COMPLIANCE LOOKUP ────────────────────────────────────
+describe('Compliance Lookup — cascade logic', () => {
+  it('cashew CI→GB returns green readiness score', async () => {
+    const res = await fetch(`${BASE}/api/lookup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        commodity_hs: '0801.31',
+        origin_iso2: 'CI',
+        dest_iso2: 'GB',
+        session_id: 'test-session'
+      })
+    })
+    const data = await res.json()
+    expect(res.status).toBe(200)
+    expect(data.readiness_verdict).toBe('GREEN')
+    expect(data.readiness_score).toBeGreaterThanOrEqual(80)
+  })
+
+  it('cocoa GH→EU triggers EUDR overlay', async () => {
+    const res = await fetch(`${BASE}/api/lookup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        commodity_hs: '1801.00',
+        origin_iso2: 'GH',
+        dest_iso2: 'EU',
+        session_id: 'test-session'
+      })
+    })
+    const data = await res.json()
+    expect(data.overlays_json).toContain('EUDR')
+    expect(data.readiness_verdict).toBe('AMBER')
+  })
+
+  it('cocoa GH→EU includes EUDR alert in response', async () => {
+    const res = await fetch(`${BASE}/api/lookup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        commodity_hs: '1801.00',
+        origin_iso2: 'GH',
+        dest_iso2: 'EU',
+        session_id: 'test-session'
+      })
+    })
+    const data = await res.json()
+    expect(data.eudr_required).toBe(true)
+  })
+
+  it('gold CD→TR returns RED with STOP flag', async () => {
+    const res = await fetch(`${BASE}/api/lookup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        commodity_hs: '7108.12',
+        origin_iso2: 'CD',
+        dest_iso2: 'TR',
+        session_id: 'test-session'
+      })
+    })
+    const data = await res.json()
+    expect(data.stops.length).toBeGreaterThan(0)
+    expect(data.readiness_verdict).toBe('RED')
+  })
+
+  it('Somalia charcoal returns STOP flag', async () => {
+    const res = await fetch(`${BASE}/api/lookup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        commodity_hs: '4402.90',
+        origin_iso2: 'SO',
+        dest_iso2: 'GB',
+        session_id: 'test-session'
+      })
+    })
+    const data = await res.json()
+    expect(data.stops.length).toBeGreaterThan(0)
+  })
+
+  it('rough diamonds trigger Kimberley Process', async () => {
+    const res = await fetch(`${BASE}/api/lookup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        commodity_hs: '7102.10',
+        origin_iso2: 'ZA',
+        dest_iso2: 'GB',
+        session_id: 'test-session'
+      })
+    })
+    const data = await res.json()
+    expect(data.overlays_json).toContain('Kimberley Process')
+  })
+
+  it('cashew CI→CH uses Switzerland destination (VAT 8.1%)', async () => {
+    const res = await fetch(`${BASE}/api/lookup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        commodity_hs: '0801.31',
+        origin_iso2: 'CI',
+        dest_iso2: 'CH',
+        session_id: 'test-session'
+      })
+    })
+    const data = await res.json()
+    expect(res.status).toBe(200)
+    expect(data.duty_estimate_json.vat_rate).toBe(8.1)
+  })
+
+  it('lookup generates a twinlog_ref', async () => {
+    const res = await fetch(`${BASE}/api/lookup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        commodity_hs: '0801.31',
+        origin_iso2: 'CI',
+        dest_iso2: 'GB',
+        session_id: 'test-session'
+      })
+    })
+    const data = await res.json()
+    expect(data.twinlog_ref).toMatch(/^TT-\d{4}-[A-F0-9]{6}$/i)
+  })
+})
+
+// ── LC CHECKER ───────────────────────────────────────────
+describe('LC Checker', () => {
+  it('catches invoice amount exceeding LC amount', async () => {
+    const res = await fetch(`${BASE}/api/lc-check`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: 'test-session',
+        lc_fields: {
+          beneficiary: 'ACME EXPORTS SARL',
+          total_amount: 50000,
+          currency: 'USD',
+          latest_shipment_date: '2026-06-30',
+          port_of_loading: 'Abidjan',
+          port_of_discharge: 'Felixstowe',
+          origin: 'CI'
+        },
+        documents: [{
+          doc_type: 'commercial_invoice',
+          fields: {
+            beneficiary: 'ACME EXPORTS SARL',
+            total_amount: 55000,
+            currency: 'USD'
+          }
+        }]
+      })
+    })
+    const data = await res.json()
+    expect(data.results.some((r: any) => r.severity === 'red')).toBe(true)
+    expect(data.results.some((r: any) => r.ucp_rule?.includes('18'))).toBe(true)
+  })
+
+  it('catches beneficiary name mismatch', async () => {
+    const res = await fetch(`${BASE}/api/lc-check`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: 'test-session',
+        lc_fields: {
+          beneficiary: 'ACME EXPORTS SARL',
+          total_amount: 50000,
+          currency: 'USD',
+          latest_shipment_date: '2026-06-30',
+          port_of_loading: 'Abidjan',
+          port_of_discharge: 'Felixstowe',
+          origin: 'CI'
+        },
+        documents: [{
+          doc_type: 'commercial_invoice',
+          fields: {
+            beneficiary: 'ACME EXPORT LTD',
+            total_amount: 48000,
+            currency: 'USD'
+          }
+        }]
+      })
+    })
+    const data = await res.json()
+    expect(data.results.some((r: any) =>
+      r.field === 'beneficiary' && r.severity === 'red'
+    )).toBe(true)
+  })
+
+  it('compliant check returns COMPLIANT verdict', async () => {
+    const res = await fetch(`${BASE}/api/lc-check`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: 'test-session',
+        lc_fields: {
+          beneficiary: 'ACME EXPORTS SARL',
+          total_amount: 50000,
+          currency: 'USD',
+          latest_shipment_date: '2026-12-31',
+          port_of_loading: 'Abidjan',
+          port_of_discharge: 'Felixstowe',
+          origin: 'CI'
+        },
+        documents: [{
+          doc_type: 'commercial_invoice',
+          fields: {
+            beneficiary: 'ACME EXPORTS SARL',
+            total_amount: 50000,
+            currency: 'USD'
+          }
+        }]
+      })
+    })
+    const data = await res.json()
+    expect(data.verdict).toMatch(/COMPLIANT/)
+  })
+})
+
+// ── READINESS SCORE ──────────────────────────────────────
+describe('Readiness Score', () => {
+  it('score function returns correct structure', async () => {
+    const res = await fetch(`${BASE}/api/test/readiness-score`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        overlays: [],
+        hazards: ['aflatoxin'],
+        buyer_doc_count: 4,
+        supplier_doc_count: 4,
+        stops: []
+      })
+    })
+    const data = await res.json()
+    expect(data).toHaveProperty('score')
+    expect(data).toHaveProperty('verdict')
+    expect(data).toHaveProperty('summary')
+    expect(data).toHaveProperty('factors')
+  })
+
+  it('STOP flag always forces RED verdict', async () => {
+    const res = await fetch(`${BASE}/api/test/readiness-score`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        overlays: [],
+        hazards: [],
+        buyer_doc_count: 2,
+        supplier_doc_count: 2,
+        stops: ['gold_to_TR']
+      })
+    })
+    const data = await res.json()
+    expect(data.verdict).toBe('RED')
+  })
+})
+
+// ── SUPPLIER UPLOAD ──────────────────────────────────────
+describe('Supplier upload', () => {
+  it('invalid token returns error page', async () => {
+    const res = await fetch(`${BASE}/upload/00000000-0000-0000-0000-000000000000`)
+    const text = await res.text()
+    expect(text).toMatch(/expired|invalid/i)
+  })
+})
+
+// ── TWINLOG VERIFY ───────────────────────────────────────
+describe('TwinLog verify', () => {
+  it('unknown ref returns not found', async () => {
+    const res = await fetch(`${BASE}/verify/TT-0000-000000`)
+    const text = await res.text()
+    expect(text).toMatch(/not found/i)
+  })
+})
+
+// ── DEMURRAGE CALCULATOR ─────────────────────────────────
+describe('Demurrage calculator', () => {
+  it('calculates correct total for Felixstowe 20ft 14 days free 3 held', async () => {
+    const res = await fetch(`${BASE}/api/test/demurrage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        port: 'Felixstowe',
+        container_type: '20ft',
+        free_days: 14,
+        days_held: 17
+      })
+    })
+    const data = await res.json()
+    // 3 chargeable days at $85 × 2.0 (day 15+) = $510
+    expect(data.total_usd).toBe(510)
+    expect(data.chargeable_days).toBe(3)
+  })
+
+  it('returns zero when within free days', async () => {
+    const res = await fetch(`${BASE}/api/test/demurrage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        port: 'Felixstowe',
+        container_type: '20ft',
+        free_days: 14,
+        days_held: 10
+      })
+    })
+    const data = await res.json()
+    expect(data.total_usd).toBe(0)
+    expect(data.chargeable_days).toBe(0)
+  })
+})
+
+━━━ STEP 3: TEST API ENDPOINTS ━━━
+
+Create file: app/api/test/db-counts/route.ts
+(Only active when NODE_ENV !== 'production' — add guard at top)
+
+Returns JSON with all counts the test suite needs:
+{
+  commodities: {
+    total, agricultural, seafood, livestock, forestry, mineral,
+    eudr, cbam, kimberley, conflict, stop_flags
+  },
+  destinations: count,
+  origins: count,
+  frameworks: count,
+  switzerland: { vat_rate } | null,
+  regulatory_alerts: count
+}
+
+Query each from the database. Return 403 if NODE_ENV === 'production'.
+
+Create file: app/api/test/readiness-score/route.ts
+Accepts POST body: { overlays, hazards, buyer_doc_count, supplier_doc_count, stops }
+Calls computeReadinessScore() with a mock lookup result built from those params.
+Returns the score object.
+Returns 403 if NODE_ENV === 'production'.
+
+Create file: app/api/test/demurrage/route.ts
+Accepts POST body: { port, container_type, free_days, days_held }
+Runs the demurrage calculation logic (same function used by /demurrage page).
+Returns { total_usd, chargeable_days, breakdown }.
+Returns 403 if NODE_ENV === 'production'.
+
+━━━ STEP 4: BOT TEST SCRIPT ━━━
+
+Create file: scripts/bot-test.mjs
+
+#!/usr/bin/env node
+// Run with: node scripts/bot-test.mjs [base_url]
+// Default base_url: http://localhost:3000
+
+const BASE = process.argv[2] ?? 'http://localhost:3000'
+const results = { pass: 0, fail: 0, errors: [] }
+
+async function check(label, fn) {
+  try {
+    await fn()
+    results.pass++
+    console.log(`  ✓ ${label}`)
+  } catch (e) {
+    results.fail++
+    results.errors.push({ label, error: e.message })
+    console.log(`  ✗ ${label}`)
+    console.log(`    → ${e.message}`)
+  }
+}
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message)
+}
+
+console.log(`\nTapTrao Bot Test Suite`)
+console.log(`Target: ${BASE}\n`)
+
+// Pages
+console.log('── Pages ──')
+for (const path of ['/', '/lookup', '/lc-check', '/trades', '/inbox',
+                     '/templates', '/alerts', '/pricing', '/demurrage']) {
+  await check(`GET ${path} returns 200`, async () => {
+    const r = await fetch(`${BASE}${path}`)
+    assert(r.status === 200, `Got ${r.status}`)
+  })
+}
+
+// DB counts
+console.log('\n── Database ──')
+const counts = await fetch(`${BASE}/api/test/db-counts`).then(r => r.json())
+await check('154 commodities', () => assert(counts.commodities.total === 154, `Got ${counts.commodities.total}`))
+await check('7 destinations (inc. Switzerland)', () => assert(counts.destinations === 7, `Got ${counts.destinations}`))
+await check('18 origin countries', () => assert(counts.origins === 18, `Got ${counts.origins}`))
+await check('Switzerland VAT = 8.1%', () => assert(counts.switzerland?.vat_rate === 8.1, `Got ${counts.switzerland?.vat_rate}`))
+await check('2+ EUDR alerts seeded', () => assert(counts.regulatory_alerts >= 2, `Got ${counts.regulatory_alerts}`))
+await check('3 STOP flag commodities', () => assert(counts.commodities.stop_flags === 3, `Got ${counts.commodities.stop_flags}`))
+
+// Compliance lookup
+console.log('\n── Compliance Lookup ──')
+
+const cashew = await fetch(`${BASE}/api/lookup`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ commodity_hs: '0801.31', origin_iso2: 'CI', dest_iso2: 'GB', session_id: 'bot' })
+}).then(r => r.json())
+
+await check('Cashew CI→GB returns 200', () => assert(cashew.readiness_score !== undefined, 'No score'))
+await check('Cashew CI→GB is GREEN', () => assert(cashew.readiness_verdict === 'GREEN', `Got ${cashew.readiness_verdict}`))
+await check('Cashew CI→GB has twinlog_ref', () => assert(/^TT-\d{4}-/i.test(cashew.twinlog_ref ?? ''), `Got ${cashew.twinlog_ref}`))
+
+const cocoa = await fetch(`${BASE}/api/lookup`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ commodity_hs: '1801.00', origin_iso2: 'GH', dest_iso2: 'EU', session_id: 'bot' })
+}).then(r => r.json())
+
+await check('Cocoa GH→EU triggers EUDR', () => assert(cocoa.eudr_required === true, `eudr_required=${cocoa.eudr_required}`))
+await check('Cocoa GH→EU is AMBER or RED', () => assert(['AMBER','RED'].includes(cocoa.readiness_verdict), `Got ${cocoa.readiness_verdict}`))
+
+const gold = await fetch(`${BASE}/api/lookup`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ commodity_hs: '7108.12', origin_iso2: 'CD', dest_iso2: 'TR', session_id: 'bot' })
+}).then(r => r.json())
+
+await check('Gold CD→TR is RED (STOP)', () => assert(gold.readiness_verdict === 'RED', `Got ${gold.readiness_verdict}`))
+await check('Gold CD→TR has STOP flag', () => assert((gold.stops?.length ?? 0) > 0, 'No stops'))
+
+const swiss = await fetch(`${BASE}/api/lookup`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ commodity_hs: '0801.31', origin_iso2: 'CI', dest_iso2: 'CH', session_id: 'bot' })
+}).then(r => r.json())
+
+await check('Cashew CI→CH resolves Switzerland', () => assert(swiss.duty_estimate_json?.vat_rate === 8.1, `VAT=${swiss.duty_estimate_json?.vat_rate}`))
+
+// Error states
+console.log('\n── Error States ──')
+const badUpload = await fetch(`${BASE}/upload/00000000-0000-0000-0000-000000000000`)
+await check('Invalid upload token returns error page', async () => {
+  const text = await badUpload.text()
+  assert(/expired|invalid/i.test(text), 'No error message found')
+})
+
+const badVerify = await fetch(`${BASE}/verify/TT-0000-000000`)
+await check('Unknown TwinLog ref returns not found', async () => {
+  const text = await badVerify.text()
+  assert(/not found/i.test(text), 'No not-found message')
+})
+
+// Summary
+console.log(`\n${'─'.repeat(40)}`)
+console.log(`Passed: ${results.pass}  Failed: ${results.fail}`)
+if (results.fail > 0) {
+  console.log('\nFailed tests:')
+  results.errors.forEach(e => console.log(`  ✗ ${e.label}: ${e.error}`))
+  process.exit(1)
+} else {
+  console.log('\n✓ All tests passed')
+  process.exit(0)
+}
+
+━━━ SELF-CHECK ━━━
+Run: node scripts/bot-test.mjs http://localhost:3000
+Expected output: all tests pass, exit code 0.
+If any tests fail, fix the underlying issue before marking this prompt complete.
+Log each failure clearly: test name + actual vs expected value.
+Log: "PROMPT 24 COMPLETE — bot test suite installed. [n] tests passing."

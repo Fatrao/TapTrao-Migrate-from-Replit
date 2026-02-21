@@ -1,0 +1,285 @@
+# PROMPT 9d: Complete UI Fix — One Pass, Everything
+
+Stop what you're doing. Do not add features. Fix the following issues across the entire application in one pass.
+
+---
+
+## ISSUE 1: GLOBAL CSS — APPLY TO EVERY PAGE
+
+Create or replace `app/globals.css` with ONLY this:
+
+```css
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: #0D1117;
+  color: rgba(255,255,255,0.95);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: inherit; }
+select, input, textarea {
+  font-family: inherit;
+  background: #1C2333;
+  color: rgba(255,255,255,0.95);
+  border: none;
+  outline: none;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  width: 100%;
+}
+select:focus, input:focus, textarea:focus {
+  outline: 1px solid rgba(66,126,255,0.4);
+}
+select option { background: #1C2333; color: rgba(255,255,255,0.95); }
+input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.28); }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+```
+
+This makes the colour system apply to EVERY page automatically, including Settings.
+
+---
+
+## ISSUE 2: ROOT LAYOUT — fonts + no sidebar
+
+Replace `app/layout.tsx` with:
+
+```tsx
+import './globals.css'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+      </head>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+No sidebar in root layout. No className on body.
+
+---
+
+## ISSUE 3: SIDEBAR LAYOUT — for app pages only
+
+Create `app/(app)/layout.tsx`:
+
+```tsx
+'use client'
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
+import Image from 'next/image'
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const nav = (href: string) => ({
+    display: 'flex' as const,
+    alignItems: 'center' as const,
+    gap: '8px',
+    padding: '7px 8px',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: pathname === href ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.40)',
+    background: pathname === href ? 'rgba(66,126,255,0.12)' : 'transparent',
+    cursor: 'pointer',
+    textDecoration: 'none',
+    transition: 'all 0.12s',
+  })
+
+  return (
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#0D1117' }}>
+
+      {/* SIDEBAR */}
+      <div style={{ width: '200px', minWidth: '200px', background: '#0D1117', display: 'flex', flexDirection: 'column' }}>
+
+        {/* Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '9px', padding: '16px 16px 12px' }}>
+          <img src="/logo.png" width={36} height={36} style={{ borderRadius: '8px', objectFit: 'contain' }} alt="TapTrao" />
+          <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: '16px', color: 'rgba(255,255,255,0.95)' }}>
+            TapTrao
+          </span>
+        </div>
+
+        {/* New Lookup button */}
+        <div style={{ padding: '0 12px 8px' }}>
+          <Link href="/lookup" style={{
+            display: 'block', background: '#427EFF', color: 'white', borderRadius: '7px',
+            padding: '8px 12px', fontSize: '12px', fontWeight: 600, textAlign: 'center' as const,
+            textDecoration: 'none',
+          }}>
+            + New Lookup
+          </Link>
+        </div>
+
+        {/* Nav sections */}
+        <nav style={{ flex: 1, padding: '8px' }}>
+
+          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '9px', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' as const, padding: '12px 8px 4px' }}>
+            Workspace
+          </div>
+          <Link href="/lookup" style={nav('/lookup')}>⚡ Compliance Lookup</Link>
+          <Link href="/lc-check" style={nav('/lc-check')}>📄 LC Checker</Link>
+          <Link href="/trades" style={nav('/trades')}>📁 My Trades</Link>
+
+          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '9px', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' as const, padding: '16px 8px 4px' }}>
+            Tools
+          </div>
+          <Link href="/templates" style={nav('/templates')}>🔖 Templates</Link>
+          <Link href="/alerts" style={nav('/alerts')}>🔔 Alerts</Link>
+          <Link href="/demurrage" style={nav('/demurrage')}>⚓ Demurrage</Link>
+
+          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '9px', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' as const, padding: '16px 8px 4px' }}>
+            Account
+          </div>
+          <Link href="/settings" style={nav('/settings')}>⚙️ Settings</Link>
+
+        </nav>
+      </div>
+
+      {/* MAIN */}
+      <main style={{ flex: 1, overflowY: 'auto', background: '#0D1117' }}>
+
+        {/* Topbar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 24px', height: '52px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              background: '#161B27', borderRadius: '6px', padding: '5px 10px',
+              fontFamily: "'DM Mono', monospace", fontSize: '11px', color: 'rgba(255,255,255,0.55)',
+              display: 'flex', alignItems: 'center', gap: '5px',
+            }}>
+              <div style={{ width: 6, height: 6, background: '#427EFF', borderRadius: '50%' }} />
+              Tokens: 0
+            </div>
+            <Link href="/pricing" style={{
+              background: '#427EFF', color: 'white', borderRadius: '6px',
+              padding: '6px 14px', fontSize: '12px', fontWeight: 600, textDecoration: 'none',
+            }}>
+              Buy trade pack
+            </Link>
+          </div>
+        </div>
+
+        {/* Page content */}
+        <div style={{ padding: '0 28px 40px' }}>
+          {children}
+        </div>
+
+      </main>
+    </div>
+  )
+}
+```
+
+---
+
+## ISSUE 4: MOVE ALL APP PAGES INTO (app) FOLDER
+
+Move these pages into `app/(app)/` so they get the sidebar layout:
+- `lookup/page.tsx` → `(app)/lookup/page.tsx`
+- `lc-check/page.tsx` → `(app)/lc-check/page.tsx`
+- `dashboard/page.tsx` → `(app)/dashboard/page.tsx`
+- `trades/page.tsx` → `(app)/trades/page.tsx`
+- `templates/page.tsx` → `(app)/templates/page.tsx`
+- `alerts/page.tsx` → `(app)/alerts/page.tsx`
+- `demurrage/page.tsx` → `(app)/demurrage/page.tsx`
+- `settings/page.tsx` → `(app)/settings/page.tsx`
+- `admin/` → `(app)/admin/`
+
+The URLs do not change. `/lookup` still works. The `(app)` folder is invisible to the router.
+
+Pages that stay at root level (NO sidebar):
+- `app/page.tsx` — homepage
+- `app/pricing/page.tsx` — pricing page
+
+---
+
+## ISSUE 5: REMOVE PRICING FROM SIDEBAR
+
+The sidebar nav above does NOT include a link to Pricing. It is accessible from the topbar "Buy trade pack" button only. Do not add it back to the sidebar.
+
+---
+
+## ISSUE 6: HOMEPAGE — MAKE LOGO VISIBLE
+
+In `app/page.tsx`, the logo in the top nav must use the TapTrao logo image AND show the wordmark in white. Replace the nav logo section with:
+
+```tsx
+<div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+  <img src="/logo.png" style={{ width: '32px', height: '32px', borderRadius: '7px', objectFit: 'contain' }} alt="" />
+  <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: '18px', color: 'rgba(255,255,255,0.95)' }}>
+    TapTrao
+  </span>
+</div>
+```
+
+Do NOT use a `#` hash icon. Do NOT use an SVG placeholder. Use the actual `/logo.png` file that already exists in `/public/`.
+
+---
+
+## ISSUE 7: PRICING PAGE — TOP NAV MUST BE VISIBLE
+
+The pricing page nav links are invisible because they're dark on dark. Replace `app/pricing/page.tsx` nav with:
+
+```tsx
+<nav style={{
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+  padding: '0 48px', height: '64px', background: '#0D1117',
+}}>
+  <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+    <img src="/logo.png" style={{ width: '32px', height: '32px', borderRadius: '7px', objectFit: 'contain' }} alt="" />
+    <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: '18px', color: 'rgba(255,255,255,0.95)' }}>TapTrao</span>
+  </a>
+  <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+    <a href="/lookup" style={{ color: 'rgba(255,255,255,0.55)', fontSize: '14px' }}>Compliance Lookup</a>
+    <a href="/lc-check" style={{ color: 'rgba(255,255,255,0.55)', fontSize: '14px' }}>LC Checker</a>
+    <a href="/lookup" style={{ background: '#427EFF', color: 'white', padding: '8px 18px', borderRadius: '7px', fontSize: '13px', fontWeight: 600 }}>Start free →</a>
+  </div>
+</nav>
+```
+
+---
+
+## ISSUE 8: SETTINGS PAGE — APPLY COLOUR SYSTEM
+
+The settings page is not picking up the global styles. Add inline styles to the settings page wrapper:
+
+```tsx
+<div style={{ color: 'rgba(255,255,255,0.95)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+  {/* all settings content inside here */}
+</div>
+```
+
+All form labels on settings should use:
+```tsx
+style={{ fontFamily: "'DM Mono', monospace", fontSize: '9px', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' }}
+```
+
+All input fields already get styled by globals.css. Make sure the settings page does not have its own conflicting styles.
+
+---
+
+## ISSUE 9: ALL BUTTONS AND LINKS MUST BE CLICKABLE
+
+Audit every page. Every button with an onClick, every Link with an href — make sure they actually work. If a button has no action yet, add a `console.log('TODO: ' + buttonName)` so it at least doesn't silently fail. No dead UI elements.
+
+---
+
+## VERIFY AFTER DEPLOYING
+
+1. `/` — logo visible (image + white wordmark), nav links visible, hero text visible, cards visible
+2. `/pricing` — logo and nav links visible, pricing cards readable
+3. `/lookup` — sidebar with active state on "Compliance Lookup", no Pricing in sidebar
+4. `/settings` — form labels faded, input text bright white, headings bright white
+5. `/lc-check` — sidebar active on "LC Checker"
+6. All sidebar nav items: inactive = `rgba(255,255,255,0.40)`, active = `rgba(255,255,255,0.95)` with blue background
+7. No black text anywhere. No invisible elements. No placeholder icons where the logo should be.

@@ -1,0 +1,72 @@
+Add the horizontal step navigation component and update existing pages to use it.
+
+━━━ STEP 1: STEP NAV COMPONENT ━━━
+
+Create file: components/StepNav.tsx
+
+Props:
+  steps: string[]          — e.g. ['Lookup', 'LC Check', 'TwinLog Trail', 'Archive']
+  currentIndex: number     — 0-based index of active step
+  completedUpTo: number    — steps before this index show as done (green check)
+
+Render: horizontal bar, background var(--s1), border-bottom 1px solid var(--s5), padding 0 24px
+
+Each step:
+  Container: flex row, align-items center, padding 13px 14px 11px, position relative
+  Active state: border-bottom 2px solid var(--blue), margin-bottom -1px
+  
+  Step dot (18×18, border-radius 50%):
+    Done  → background var(--green), border var(--green), shows "✓" in white 9px
+    Active → background var(--blue),  border var(--blue),  shows step number in white 9px
+    Pending → border 1.5px solid var(--t3), shows step number in var(--t3) 9px
+
+  Step label (12px, font-weight 600):
+    Done → color var(--t2)
+    Active → color var(--t1)
+    Pending → color var(--t3)
+
+  Arrow separator "›" between steps: color var(--s5) 12px, margin 0 2px
+
+━━━ STEP 2: TAB BAR COMPONENT ━━━
+
+Create file: components/TabBar.tsx
+
+Props: tabs: string[], activeTab: string, onChange: (tab: string) => void
+
+Render: horizontal bar, background var(--s0), border-bottom 1px solid var(--s5), padding 0 28px
+
+Each tab: padding 10px 16px, font-size 12px, font-weight 600, cursor pointer
+  Active: color var(--t1), border-bottom 2px solid var(--blue), margin-bottom -1px
+  Inactive: color var(--t3), no border
+
+━━━ STEP 3: UPDATE LC CHECKER PAGE ━━━
+
+In /lc-check, add above the existing form content:
+1. <StepNav steps={['Lookup','LC Check','TwinLog Trail','Archive']} currentIndex={1} completedUpTo={0} />
+2. <TabBar tabs={['Check','Supplier docs','Corrections']} activeTab="Check" onChange={...} />
+
+The tab bar switching is UI-only for now — "Supplier docs" and "Corrections" tabs
+show a placeholder: "Coming in the next update." in var(--t2) centered.
+
+━━━ STEP 4: UPDATE LOOKUP PAGE ━━━
+
+In /lookup, add above the results (below the form):
+<StepNav steps={['Lookup','LC Check','TwinLog Trail','Archive']} currentIndex={0} completedUpTo={-1} />
+
+Only show the StepNav after a lookup has been run (not on the empty form state).
+
+━━━ STEP 5: BREADCRUMB IN TOP BAR ━━━
+
+In /lc-check, pass to AppShell topCenter prop:
+A breadcrumb showing: [Commodity] · [Origin] → [Destination] · [BADGE]
+Badge: background var(--blue-dim), border var(--blue-bd), color var(--blue),
+       DM Mono 10px 600, padding 2px 8px, border-radius 4px, text = current step name
+
+If no active trade context yet, topCenter shows just the page name.
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no TypeScript errors.
+Run: grep -r "StepNav" app/ components/
+Expected: StepNav is imported in at least 2 page files.
+Log: "PROMPT 10 COMPLETE — step nav installed"

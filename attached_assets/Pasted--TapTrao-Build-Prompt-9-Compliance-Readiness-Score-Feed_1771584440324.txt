@@ -1,0 +1,271 @@
+# TapTrao — Build Prompt 9: Compliance Readiness Score
+
+Feed this to Replit Agent as a single prompt. It adds a Compliance Readiness Score
+to every Module 2 lookup result. No new tables required. No new API calls.
+This is additive — it does not touch existing lookup logic, only appends to the output.
+
+---
+
+## WHAT WE'RE BUILDING
+
+Add a **Compliance Readiness Score** banner to the top of every compliance lookup result.
+
+The score is computed server-side from data already returned by the cascade logic.
+It produces: a colour verdict (GREEN / AMBER / RED), a percentage (0–100),
+a one-line plain English decision sentence, and a breakdown of the four scoring factors.
+
+The score appears as the FIRST thing the user sees after running a lookup —
+above "YOUR SIDE", above "THEIR SIDE", above everything.
+
+---
+
+## SCORING LOGIC
+
+Compute the score from four factors. Each factor contributes a maximum number of
+penalty points. Higher penalties = lower score. A score of 100 = no issues found.
+
+---
+
+### FACTOR 1 — Regulatory Complexity (max 30 penalty points)
+
+Count the number of active overlay regulations from the lookup result (EUDR, CBAM,
+CSDDD, Kimberley, OECD DDG, IUU, CITES).
+
+```
+0 overlays  → 0 penalty points
+1 overlay   → 8 penalty points
+2 overlays  → 16 penalty points
+3+ overlays → 30 penalty points
+```
+
+Label this factor: **"Regulatory Complexity"**
+
+---
+
+### FACTOR 2 — Hazard Exposure (max 30 penalty points)
+
+Look at the commodity's `known_hazards` array. Map each hazard to a severity:
+
+HIGH hazards (15 points each, capped at 30 total):
+- aflatoxin, salmonella, histamine, BSE, FMD, avian_influenza, cyanide, radioactive
+
+MEDIUM hazards (8 points each, capped at 30 total):
+- pesticide_residues, heavy_metals, chrome_VI, antibiotics, cadmium, 3-MCPD,
+  mercury_contamination, fruit_fly, ethylene_oxide
+
+LOW hazards (3 points each):
+- coumarin, sulphur_dioxide, gossypol, formaldehyde, mineral_oil, lead, arsenic
+
+none_significant → 0 penalty points
+
+Cap total hazard penalty at 30. Don't double-count.
+
+Label this factor: **"Known Hazard Exposure"**
+
+---
+
+### FACTOR 3 — Document Volume (max 20 penalty points)
+
+Count the total number of required documents across buyer-side and supplier-side lists.
+
+```
+1–4 documents  → 0 penalty points
+5–7 documents  → 8 penalty points
+8–10 documents → 14 penalty points
+11+ documents  → 20 penalty points
+```
+
+Label this factor: **"Document Volume"**
+
+---
+
+### FACTOR 4 — STOP Flag (max 20 penalty points)
+
+If the lookup triggered a STOP warning: 20 penalty points.
+If no STOP: 0 penalty points.
+
+If a STOP is present, the overall verdict is always RED regardless of the total score.
+
+Label this factor: **"Trade Restriction"**
+
+---
+
+### SCORE CALCULATION
+
+```
+total_penalty = factor1 + factor2 + factor3 + factor4
+score = 100 - total_penalty (minimum 0)
+```
+
+### VERDICT THRESHOLDS
+
+```
+score 80–100 → GREEN  — "This trade has low regulatory complexity. Standard documents apply."
+score 50–79  → AMBER  — "This trade requires attention. [Primary risk factor] needs careful management."
+score 0–49   → RED    — "This trade is high complexity. Do not proceed without specialist review."
+```
+
+For AMBER and RED verdicts, identify the highest-penalty factor and name it in the
+plain English sentence. Examples:
+
+- If hazard exposure contributed most: "Known hazard exposure to [hazard name] requires
+  pre-shipment testing and documented results."
+- If regulatory complexity contributed most: "Multiple overlapping regulations apply —
+  verify [regulation name] compliance before committing to this trade."
+- If document volume contributed most: "High document count increases discrepancy risk —
+  run an LC check before finalising the shipment."
+- If STOP triggered: "This trade is subject to a trade restriction. See details below."
+
+---
+
+## UI — SCORE BANNER
+
+Display the score as a full-width banner at the top of the lookup results,
+immediately below the form inputs and above all other sections.
+
+**Banner layout:**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  COMPLIANCE READINESS SCORE                                      │
+│                                                                  │
+│  [LARGE NUMBER]  [COLOUR BADGE]   [PLAIN ENGLISH SENTENCE]       │
+│       72         ● AMBER          "This trade requires attention. │
+│                                   Aflatoxin risk needs pre-      │
+│                                   shipment testing."             │
+│                                                                  │
+│  Regulatory Complexity  ████░░░░░░  16/30 pts                    │
+│  Hazard Exposure        ██████░░░░  18/30 pts  ▲ primary risk    │
+│  Document Volume        ██░░░░░░░░  5/20 pts                     │
+│  Trade Restrictions     ░░░░░░░░░░  0/20 pts                     │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+Colour coding:
+- GREEN:  background #E8F5E9, border #1B7340, badge background #1B7340
+- AMBER:  background #FFF8E1, border #F39C12, badge background #F39C12
+- RED:    background #FEECEB, border #C0392B, badge background #C0392B
+
+The large score number should be 48–60px. The colour badge should read "LOW RISK",
+"MODERATE RISK", or "HIGH RISK" (not just the colour word).
+
+Progress bars for each factor: filled portion represents penalty taken as proportion
+of maximum possible for that factor. Higher bar = more penalty = more risk. Label
+the highest-penalty factor with a small "▲ primary risk" indicator.
+
+The banner should be visually prominent but not alarming for green trades. A score of
+95 with a green banner should feel like a clean bill of health, not a warning.
+
+---
+
+## SCORE STORAGE
+
+Add these columns to the existing `lookups` table (ALTER TABLE, not a new table):
+
+```sql
+ALTER TABLE lookups
+  ADD COLUMN readiness_score INTEGER,
+  ADD COLUMN readiness_verdict VARCHAR(10),  -- GREEN | AMBER | RED
+  ADD COLUMN readiness_factors JSONB,
+  ADD COLUMN readiness_summary TEXT;
+```
+
+`readiness_factors` structure:
+```json
+{
+  "regulatory_complexity": { "penalty": 16, "max": 30, "overlay_count": 2 },
+  "hazard_exposure":       { "penalty": 18, "max": 30, "primary_hazard": "aflatoxin" },
+  "document_volume":       { "penalty": 5,  "max": 20, "document_count": 7 },
+  "trade_restriction":     { "penalty": 0,  "max": 20, "stop_triggered": false },
+  "total_penalty":          39,
+  "score":                  61,
+  "primary_risk_factor":   "hazard_exposure"
+}
+```
+
+Store `readiness_summary` as the plain English sentence (the one shown in the banner).
+This allows it to be included in PDF exports and audit records without recomputation.
+
+---
+
+## PLACEMENT IN EXISTING RESULTS PAGE
+
+The score banner sits between the lookup form and the first results section.
+Do not move or restructure any existing content. The full results page order becomes:
+
+1. **[COMPLIANCE READINESS SCORE BANNER]**  ← new
+2. YOUR SIDE (Buyer Documents)
+3. THEIR SIDE (Supplier Documents)
+4. RISK FLAGS
+5. AfCFTA Preferential Tariff (if applicable)
+6. Compliance check reference + integrity hash
+7. Download PDF Report / Download Customs Data Pack / Generate Supplier Brief
+
+---
+
+## RETROACTIVE SCORING
+
+When the score is first deployed, run a background job (or a one-time script) to
+compute and populate readiness scores for all existing lookups in the database.
+This ensures the dashboard and "My Trades" history show scores for past lookups.
+
+Script: `scripts/backfill-readiness-scores.ts`
+Logic: read each lookup, recompute from stored `triggers`, `hazards`, `overlays_json`,
+`stops`, `buyer_docs_json`, `supplier_docs_json`. Update the new columns.
+
+---
+
+## DASHBOARD UPDATE
+
+On the `/dashboard` page, update the "Recent Lookups" list to show the readiness
+score badge alongside each lookup entry. Format:
+
+```
+Raw Cashew Nuts — Côte d'Ivoire → United Kingdom    ● 88 LOW RISK    14 Feb 2026
+Cocoa Beans — Ghana → European Union                ● 52 MODERATE    13 Feb 2026
+Gold (unwrought) — DRC → Turkey                    ● 12 HIGH RISK   12 Feb 2026
+```
+
+The colour badge should use the same green/amber/red scheme as the banner.
+
+---
+
+## MY TRADES UPDATE
+
+On `/trades`, add a score column to the lookup table. Allow sorting by score
+(ascending = highest risk first). This lets a user quickly identify which of their
+past or current trades needs the most attention.
+
+---
+
+## IMPORTANT CONSTRAINTS
+
+- The score is computed entirely from data already returned by the existing cascade logic.
+  Do not add new API calls or new database queries to compute the score.
+- The score is advisory, not blocking. A RED score does not prevent the user from
+  viewing the full results or proceeding with the trade.
+- Do not show the score on the LC Checker (Module 1). It belongs on compliance lookups only.
+- The "primary risk factor" label should only appear on the highest-penalty factor,
+  and only when that factor contributed more than 10 penalty points.
+- On mobile, collapse the factor breakdown behind a "See score breakdown" toggle to
+  keep the banner compact. Show only the large number, verdict badge, and summary
+  sentence by default on screens under 640px.
+
+---
+
+## VERIFICATION
+
+After building, test these five cases and confirm the expected output:
+
+| Commodity         | Origin | Destination | Expected Verdict |
+|-------------------|--------|-------------|-----------------|
+| Raw Cashew Nuts   | CI     | GB          | GREEN (low regulatory complexity, low-medium hazard) |
+| Cocoa Beans       | GH     | EU          | AMBER (EUDR + CSDDD + cadmium hazard) |
+| Sesame Seeds      | ET     | EU          | AMBER or RED (salmonella + ethylene oxide, known EU rejection pattern) |
+| Gold (unwrought)  | CD     | TR          | RED (conflict trigger + STOP flag for gold to Turkey) |
+| Rough Diamonds    | any    | GB          | AMBER (Kimberley Process required) |
+
+For the Gold → Turkey case: confirm the STOP flag forces RED verdict regardless of
+numerical score, and that the plain English sentence references the trade restriction.
+
+Report all five test results before confirming the build is complete.

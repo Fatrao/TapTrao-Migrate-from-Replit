@@ -1,0 +1,162 @@
+Add the Compliance Readiness Score to every lookup result.
+Computed server-side from existing data — no new API calls or tables needed
+(columns already added to lookups in Prompt 16).
+
+━━━ SCORING FUNCTION ━━━
+
+Add this function to lib/readinessScore.ts:
+
+import type { LookupResult } from './types';
+
+const HIGH_HAZARDS = ['aflatoxin','salmonella','histamine','BSE','FMD','avian_influenza','cyanide','radioactive'];
+const MED_HAZARDS  = ['pesticide_residues','heavy_metals','chrome_VI','antibiotics','cadmium','3-MCPD','mercury_contamination','fruit_fly','ethylene_oxide'];
+const LOW_HAZARDS  = ['coumarin','sulphur_dioxide','gossypol','formaldehyde','mineral_oil','lead','arsenic'];
+
+export function computeReadinessScore(result: LookupResult) {
+  // Factor 1 — Regulatory Complexity (max 30)
+  const overlays = result.overlays_json?.length ?? 0;
+  const f1 = overlays === 0 ? 0 : overlays === 1 ? 8 : overlays === 2 ? 16 : 30;
+
+  // Factor 2 — Hazard Exposure (max 30)
+  let f2 = 0;
+  let primaryHazard: string | null = null;
+  for (const h of (result.hazards ?? [])) {
+    if (h === 'none_significant') continue;
+    if (HIGH_HAZARDS.includes(h)) { f2 += 15; if (!primaryHazard) primaryHazard = h; }
+    else if (MED_HAZARDS.includes(h)) { f2 += 8;  if (!primaryHazard) primaryHazard = h; }
+    else if (LOW_HAZARDS.includes(h)) { f2 += 3; }
+  }
+  f2 = Math.min(f2, 30);
+
+  // Factor 3 — Document Volume (max 20)
+  const docs = (result.buyer_docs_json?.length ?? 0) + (result.supplier_docs_json?.length ?? 0);
+  const f3 = docs <= 4 ? 0 : docs <= 7 ? 8 : docs <= 10 ? 14 : 20;
+
+  // Factor 4 — STOP Flag (max 20)
+  const f4 = (result.stops?.length ?? 0) > 0 ? 20 : 0;
+
+  const penalty = f1 + f2 + f3 + f4;
+  const score   = Math.max(0, 100 - penalty);
+  const verdict = f4 > 0 ? 'RED' : score >= 80 ? 'GREEN' : score >= 50 ? 'AMBER' : 'RED';
+
+  const factorPenalties = { regulatory_complexity: f1, hazard_exposure: f2, document_volume: f3, trade_restriction: f4 };
+  const primaryFactor = (Object.entries(factorPenalties).sort((a,b) => b[1]-a[1])[0][0]) as string;
+
+  let summary = '';
+  if (verdict === 'GREEN')
+    summary = 'This trade has low regulatory complexity. Standard documents apply.';
+  else if (primaryFactor === 'hazard_exposure' && primaryHazard)
+    summary = `Known hazard exposure to ${primaryHazard} requires pre-shipment testing and documented results.`;
+  else if (primaryFactor === 'regulatory_complexity')
+    summary = 'Multiple overlapping regulations apply — verify all compliance requirements before committing.';
+  else if (primaryFactor === 'document_volume')
+    summary = 'High document count increases discrepancy risk — run an LC check before finalising.';
+  else if (primaryFactor === 'trade_restriction')
+    summary = 'This trade is subject to a restriction. Review the STOP warning below before proceeding.';
+  else
+    summary = 'This trade requires careful attention before proceeding.';
+
+  return {
+    score, verdict, summary,
+    factors: {
+      regulatory_complexity: { penalty: f1, max: 30, overlay_count: overlays },
+      hazard_exposure:       { penalty: f2, max: 30, primary_hazard: primaryHazard },
+      document_volume:       { penalty: f3, max: 20, document_count: docs },
+      trade_restriction:     { penalty: f4, max: 20, stop_triggered: f4 > 0 },
+    },
+    primary_risk_factor: primaryFactor,
+  };
+}
+
+━━━ INTEGRATE INTO LOOKUP ACTION ━━━
+
+In the server action that handles the compliance lookup (after cascade logic completes):
+1. Call computeReadinessScore(lookupResult)
+2. Store: UPDATE lookups SET readiness_score=score, readiness_verdict=verdict,
+          readiness_factors=factors, readiness_summary=summary WHERE id=lookupId
+
+━━━ SCORE BANNER UI ━━━
+
+Add a ReadinessBanner component: components/ReadinessBanner.tsx
+
+Props: score, verdict, summary, factors, primaryRiskFactor
+
+Render as the FIRST element inside the lookup results (above "YOUR SIDE", above everything):
+
+Banner container:
+  border-radius 10px, border 1px solid, padding 22px 26px, margin-bottom 24px
+  GREEN: background rgba(34,197,94,.05),  border rgba(34,197,94,.2)
+  AMBER: background rgba(245,158,11,.05), border rgba(245,158,11,.2)
+  RED:   background rgba(239,68,68,.05),  border rgba(239,68,68,.2)
+
+TWO-COLUMN layout inside (left 160px | right flex:1 padding-left 28px):
+
+LEFT COLUMN (flex column, gap 8px):
+  Score number: Fraunces 900 clamp(48px,6vw,64px) letter-spacing -4px color var(--t1) line-height 1
+  Verdict badge: inline-block, DM Mono 10px 600, padding 3px 10px, border-radius 4px
+    GREEN → gbg/gbd/green text "LOW RISK"
+    AMBER → abg/abd/amber text "MODERATE RISK"
+    RED   → rbg/rbd/red   text "HIGH RISK"
+  Summary sentence: 13px var(--t2) line-height 1.65 margin-top 6px max-width 260px
+
+RIGHT COLUMN (4 factor rows):
+  Each factor row (flex, align-items center, gap 10px, margin-bottom 8px):
+    Label (120px, 11px var(--t2), text-align right):
+      "Regulatory complexity" | "Hazard exposure" | "Document volume" | "Trade restriction"
+    Progress bar (flex:1, height 3px, background var(--s5), border-radius 2px, position relative):
+      Fill div: width = (penalty/max)*100%, height 100%, border-radius 2px
+        regulatory_complexity → var(--blue)
+        hazard_exposure       → var(--amber)
+        document_volume       → var(--t3)
+        trade_restriction     → var(--red)
+    Right label (DM Mono 10px, 48px text-align right):
+      If this is the primary risk factor AND penalty > 10: "▲ primary" in var(--amber) 9px
+      Otherwise: "[penalty]/[max]" in var(--t3)
+
+━━━ UPDATE MY TRADES + TWINLOG ━━━
+The My Trades table already reads readiness_score and readiness_verdict from the DB.
+Confirm the ReadinessBanner also re-renders correctly inside the TwinLog Trail view
+(it should — just pass the stored values as props).
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors in lib/readinessScore.ts or components/ReadinessBanner.tsx
+
+Run this test to verify scoring logic:
+  node -e "
+  const {computeReadinessScore} = require('./lib/readinessScore');
+  
+  // Test 1: Raw Cashew CI→GB (low risk)
+  const t1 = computeReadinessScore({
+    overlays_json: [],
+    hazards: ['aflatoxin','moisture_damage'],
+    buyer_docs_json: new Array(5),
+    supplier_docs_json: new Array(4),
+    stops: []
+  });
+  console.log('Test 1 cashew CI→GB:', t1.score, t1.verdict); // expect GREEN 77+
+
+  // Test 2: Cocoa GH→EU (EUDR + CSDDD + cadmium)
+  const t2 = computeReadinessScore({
+    overlays_json: ['EUDR','CSDDD'],
+    hazards: ['cadmium','ochratoxin'],
+    buyer_docs_json: new Array(7),
+    supplier_docs_json: new Array(5),
+    stops: []
+  });
+  console.log('Test 2 cocoa GH→EU:', t2.score, t2.verdict); // expect AMBER
+
+  // Test 3: Gold CD→TR (STOP flag)
+  const t3 = computeReadinessScore({
+    overlays_json: ['OECD_DDG'],
+    hazards: ['mercury_contamination'],
+    buyer_docs_json: new Array(6),
+    supplier_docs_json: new Array(5),
+    stops: ['gold_to_TR']
+  });
+  console.log('Test 3 gold CD→TR:', t3.score, t3.verdict); // expect RED (STOP)
+  "
+
+Expected output: Test 1 shows GREEN, Test 2 shows AMBER, Test 3 shows RED.
+Report the actual scores before confirming.
+Log: "PROMPT 17 COMPLETE — readiness score built and tested"

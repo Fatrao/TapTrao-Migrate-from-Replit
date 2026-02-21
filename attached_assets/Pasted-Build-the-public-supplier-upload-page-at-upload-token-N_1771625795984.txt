@@ -1,0 +1,137 @@
+Build the public supplier upload page at /upload/[token].
+NO authentication required. Must work on mobile.
+
+━━━ ROUTE ━━━
+Create: app/upload/[token]/page.tsx (or pages/upload/[token].tsx)
+This is a SERVER COMPONENT that fetches the supplier_request by token on load.
+
+On load:
+  SELECT sr.*, l.*, c.name, o.iso2, o.country_name, d.iso2, d.country_name
+  FROM supplier_requests sr
+  JOIN lookups l ON sr.lookup_id = l.id
+  JOIN commodities c ON l.commodity_id = c.id
+  JOIN origin_countries o ON l.origin_iso2 = o.iso2
+  JOIN destinations d ON l.dest_iso2 = d.iso2
+  WHERE sr.upload_token = [token]
+
+  If not found OR upload_expires_at < NOW(): render expired/invalid page (see below)
+  If found: render upload interface
+
+━━━ LAYOUT (standalone page, NOT AppShell) ━━━
+
+body: background var(--s0), min-height 100vh, padding-bottom 80px
+
+STICKY TOP BAR (height 52px, background var(--s0), border-bottom var(--s5)):
+  Left: logo (28px) + "TapTrao" Fraunces 700 16px
+  Right: "🔒 Secure upload" DM Mono 11px var(--t3)
+
+CONTAINER: max-width 560px, margin 0 auto, padding 28px 20px
+
+TRADE CONTEXT CARD:
+  background var(--s1), border var(--s5), border-radius 12px, padding 18px 20px, margin-bottom 24px
+  
+  Header row: avatar (38px, coloured) + commodity name (15px 700) + route (DM Mono 11px var(--t3))
+  Divider (1px var(--s5))
+  Message (13px var(--t2) line-height 1.65):
+    "Please upload the documents listed below for this shipment.
+     No account needed — just upload your files and they will go directly to the buyer."
+  Deadline chip:
+    If upload_expires_at < 7 days from now: amber-tinted, "⏱ Required before [formatted date]"
+    Otherwise: var(--t3) text only, "Deadline: [formatted date]"
+
+DOCUMENT CARDS (one per item in docs_required JSONB array):
+
+Each card: background var(--s1), border var(--s5), border-radius 12px, margin-bottom 10px, overflow hidden
+
+Determine card state from docs_received array (match by doc_type):
+  A) Verified (received AND verified=true):
+       Border: rgba(34,197,94,.22)
+       Header: green icon box + doc name + "✓ Received" green tag
+       File row: filename + size + green checkmark
+  B) Blocking (received AND verified=false AND finding exists):
+       Border: rgba(245,158,11,.2)
+       Header: amber icon box + doc name + "⚠ Amend & reupload" amber tag
+       Instruction row: plain-language finding text (rephrase to remove jargon)
+       Upload zone: active/droppable
+  C) Not uploaded:
+       Border: var(--s5)
+       Header: grey icon box + doc name + "Awaiting" grey tag
+       Upload zone: active/droppable
+
+UPLOAD ZONE (for states B and C):
+  border: 1.5px dashed var(--s5), border-radius 8px, padding 16px, text-align center
+  cursor pointer, transition all .15s
+  Hover/drag-over: border-color var(--blue-bd), background var(--blue-dim)
+  Content: 📎 emoji + "Drop file here or tap to choose" (13px var(--t2) 500) + "PDF, JPG, PNG · max 20MB" (11px var(--t3))
+  
+  Hidden <input type="file" accept=".pdf,.jpg,.jpeg,.png" />
+  
+  On file select (client-side handler):
+    Show upload spinner
+    POST to /api/upload/[token]/file with FormData { doc_type, file }
+    On success: refresh page data / update card state to "Uploaded — pending verification"
+    On error: show red error message
+
+PROGRESS SUMMARY:
+  background var(--s1), border var(--s5), border-radius 10px, padding 14px 16px, margin-top 24px
+  One row per document:
+    Green dot → "[doc name] — received"
+    Amber dot → "[doc name] — needs amendment"
+    Grey dot  → "[doc name] — not yet uploaded"
+  Font: 12px var(--t2)
+
+SUBMIT BUTTON:
+  Full width, background var(--blue), color #fff, font-weight 800, font-size 15px
+  padding 16px, border-radius 10px, border none
+  Display flex align-items center justify-content center gap 8px
+  Text: "Submit documents →"
+  Enabled: always (even if some docs pending — let supplier submit partial)
+  On click: POST /api/upload/[token]/submit
+    Response: update supplier_requests.status based on docs state
+    Show success message: "Documents submitted. The buyer has been notified."
+
+FOOTER NOTE (centered, margin-top 20px):
+  Logo (20px) + "TapTrao" Fraunces 700 14px var(--t2)
+  "Your files go directly and securely to the buyer. No TapTrao account required."
+  "This link expires [expiry date]." — 11px var(--t3) line-height 1.55
+
+━━━ UPLOAD API ROUTE ━━━
+
+Create: POST /api/upload/[token]/file
+  1. Validate token exists and not expired
+  2. Accept multipart form: doc_type (string) + file (File)
+  3. Validate: file must be PDF/JPG/PNG, max 20MB
+  4. Save file to /tmp/uploads/[token]/[timestamp]-[filename]
+     (or Replit object storage if available)
+  5. INSERT into supplier_uploads table
+  6. Update supplier_requests.docs_received JSONB array
+  7. Recalculate supplier_requests.status:
+     all docs received and none blocking → 'complete'
+     some docs received but some blocking → 'blocking'
+     some docs received → 'partial'
+     no docs → 'waiting'
+  8. Return: { success: true, filename, doc_type }
+
+Create: POST /api/upload/[token]/submit
+  1. Validate token
+  2. Update supplier_requests.updated_at = NOW()
+  3. Return: { success: true }
+
+━━━ EXPIRED/INVALID STATE ━━━
+If token invalid or expired, render:
+  Centered page: "This upload link has expired or is invalid."
+  "Please contact the buyer to request a new link."
+  Logo + TapTrao branding footer
+
+━━━ MOBILE REQUIREMENTS ━━━
+All touch targets minimum 44×44px
+Font minimum 13px body, 15px labels
+No horizontal scroll at any viewport width
+Input[type=file] trigger must work with iOS and Android native file pickers
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: curl -s http://localhost:3000/upload/invalid-token | grep -o 'expired or is invalid'
+Expected: "expired or is invalid" (error page renders).
+Log: "PROMPT 15 COMPLETE — supplier upload page built"

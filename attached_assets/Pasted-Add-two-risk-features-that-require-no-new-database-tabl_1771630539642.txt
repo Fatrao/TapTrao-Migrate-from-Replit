@@ -1,0 +1,155 @@
+Add two risk features that require no new database tables.
+
+━━━ PART 1: INSURANCE GAP ALERT ━━━
+
+Add a static alert to the LC Checker results page.
+Show it ONLY when the lc_check verdict is COMPLIANT or COMPLIANT_WITH_NOTES
+(i.e. the LC check passed — goods are cleared to ship, so insurance now matters).
+
+PLACEMENT: Below the verdict banner, above the field-by-field results.
+
+INSURANCE GAP ALERT CARD:
+  background rgba(66,126,255,.06), border 1px solid var(--blue-bd), border-radius 9px
+  padding 14px 18px, margin-bottom 20px
+
+  Header row: 🛡 icon + "Insurance gap — check your policy covers this trade"
+    Font: 13px 600 color var(--t1)
+
+  Body (12px var(--t2) line-height 1.65):
+    "Standard cargo insurance (Institute Cargo Clauses A/B/C) covers physical
+     loss and damage. It does NOT cover goods rejected at port due to regulatory
+     non-compliance — which is a separate and common risk for agricultural and
+     mineral commodities on African corridors."
+
+  Two-column detail block (DM Mono 11px, background var(--s3), border-radius 6px, padding 10px 14px):
+    Left column label "NOT covered by standard policy:"
+      • Regulatory rejection at border
+      • Phytosanitary detention and destruction
+      • EUDR non-compliance refusal
+      • Aflatoxin / contamination seizure
+    Right column label "Ask your insurer about:"
+      • Trade disruption insurance
+      • Rejection / condemnation clause
+      • Commodity-specific contamination cover
+      • Political risk (for certain corridors)
+
+  Footer (11px var(--t3)):
+    "This applies regardless of Incoterms. Even under CIF or CIP, the seller's
+     insurance does not cover destination regulatory rejection."
+
+  Dismiss button (top right, small × in var(--t3)):
+    localStorage key: 'insurance_alert_dismissed'
+    If dismissed, don't show again in this session.
+
+━━━ PART 2: DEMURRAGE CALCULATOR ━━━
+
+Add a standalone calculator accessible from two places:
+  1. New sidebar link under "Tools": "Demurrage Calculator"
+  2. Link from the Risk section of any compliance lookup result
+
+PAGE at /demurrage:
+Use AppShell (no activeNav highlight needed — or add "Tools" section to sidebar).
+
+Page title: "Demurrage Calculator" Fraunces 900 28px
+Subtitle: "Estimate container holding costs when goods are delayed at port" 13px var(--t2)
+
+TWO-COLUMN layout: inputs left (380px) | results right (flex:1)
+
+INPUT PANEL (background var(--s1), border var(--s5), border-radius 10px, padding 24px):
+
+  Port selector (dropdown, label "Port of discharge"):
+    Felixstowe, UK
+    Southampton, UK
+    Rotterdam, Netherlands
+    Hamburg, Germany
+    Antwerp, Belgium
+    Abidjan, Côte d'Ivoire
+    Tema, Ghana
+    Lagos (Apapa), Nigeria
+    Mombasa, Kenya
+    Dar es Salaam, Tanzania
+    Durban, South Africa
+    Casablanca, Morocco
+
+  Container type (radio button cards):
+    20ft Standard | 40ft Standard | 40ft High Cube | Reefer (refrigerated)
+
+  Free days (number input, label "Free days included in contract"):
+    Helper: "Check your Bill of Lading — typically 7-14 days free"
+    Default: 7, min 0, max 30
+
+  Days held (number input, label "How many days have goods been held?"):
+    Or: toggle to "Calculate from date" — date pickers for arrival date + today
+
+  Cargo value (number input, optional, label "Estimated cargo value (USD)"):
+    Helper: "Optional — used to calculate demurrage as % of cargo value"
+
+  "Calculate" button (solid blue, full width)
+
+HARDCODED DAILY RATES (per container type, USD):
+Apply after free days are exhausted.
+
+Port daily rates (all rates in USD per day):
+  Felixstowe:    20ft $85,  40ft $120, 40HC $130, Reefer $180
+  Southampton:   20ft $80,  40ft $115, 40HC $125, Reefer $170
+  Rotterdam:     20ft $75,  40ft $105, 40HC $115, Reefer $160
+  Hamburg:       20ft $78,  40ft $108, 40HC $118, Reefer $162
+  Antwerp:       20ft $72,  40ft $102, 40HC $112, Reefer $155
+  Abidjan:       20ft $45,  40ft $65,  40HC $70,  Reefer $110
+  Tema:          20ft $42,  40ft $60,  40HC $65,  Reefer $105
+  Lagos Apapa:   20ft $55,  40ft $78,  40HC $85,  Reefer $130
+  Mombasa:       20ft $40,  40ft $58,  40HC $62,  Reefer $100
+  Dar es Salaam: 20ft $38,  40ft $55,  40HC $60,  Reefer $95
+  Durban:        20ft $50,  40ft $70,  40HC $76,  Reefer $120
+  Casablanca:    20ft $35,  40ft $50,  40HC $55,  Reefer $90
+
+Many ports apply escalating rates after day 7 and again after day 14.
+Model this as:
+  Days 1-7 after free period: base rate × 1.0
+  Days 8-14: base rate × 1.5
+  Days 15+: base rate × 2.0
+
+RESULTS PANEL (updates live as inputs change, no submit needed):
+
+Total chargeable days: [days held] - [free days] = [chargeable days] (min 0)
+
+Daily cost: $[rate] × [container type] at [port]
+
+Cost breakdown table:
+  Days 1-7 (if applicable):   [days] × $[rate] = $[subtotal]
+  Days 8-14 (if applicable):  [days] × $[rate × 1.5] = $[subtotal]
+  Days 15+ (if applicable):   [days] × $[rate × 2.0] = $[subtotal]
+  TOTAL DEMURRAGE:             $[total] — large, Fraunces 900, colour:
+    < $1,000: var(--green) | $1,000-5,000: var(--amber) | > $5,000: var(--red)
+
+If cargo value provided:
+  "Demurrage as % of cargo value: [pct]%"
+  Above 5%: red text + "Consider whether re-export or destruction may be cheaper."
+
+DECISION NUDGE (always shown at bottom of results):
+  "Next step: compare demurrage against alternatives"
+  Three comparison cards (small, side by side):
+    "Re-export" → estimated re-export freight as % of original (show "~30-50% of cargo value")
+    "Destruction" → "Typically $500-5,000 depending on volume and port"
+    "Appeal / re-test" → "Re-testing fee typically $200-500 + additional storage"
+  Footer note (DM Mono 10px var(--t3)):
+    "Rates are indicative based on published port tariffs. Actual rates vary by
+     carrier, season, and contract terms. Always verify with your freight agent."
+
+DISCLAIMER (bottom, 11px var(--t3)):
+  "TapTrao demurrage estimates are based on published port tariff data and are
+   provided for planning purposes only. They do not constitute financial advice."
+
+━━━ SIDEBAR UPDATE ━━━
+
+Add a "Tools" section label and "Demurrage Calculator" link in the sidebar,
+below the main nav items and above Settings. Use a ⚖ or 🧮 icon.
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: curl -s http://localhost:3000/demurrage | grep -o 'Demurrage Calculator'
+Expected: "Demurrage Calculator" (page renders).
+Run: curl -s http://localhost:3000/lc-check | grep -o 'insurance'
+Expected: "insurance" (alert text present in page source when LC check results exist).
+Log: "PROMPT 21 COMPLETE — insurance gap alert and demurrage calculator built"

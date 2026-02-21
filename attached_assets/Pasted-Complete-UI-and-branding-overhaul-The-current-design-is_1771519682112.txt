@@ -1,0 +1,288 @@
+Complete UI and branding overhaul. The current design is unacceptable. 
+Rebuild everything from scratch.
+
+DESIGN PHILOSOPHY:
+- Wise.com level of cleanliness and trustworthiness for the app UI
+- Full-bleed African landscape photography as hero backgrounds 
+  (like the Paloseco reference — photography does the emotional work, 
+  UI stays minimal on top)
+- Generous white space everywhere — nothing cramped, nothing competing
+- The app itself (lookup, dashboard, LC checker) stays clean and 
+  functional — photography only on landing page and section breaks
+- Never overwhelming. If in doubt, remove something.
+
+COLOUR PALETTE — extracted from African landscapes:
+- Deep forest green: #1A3D2B (Congo rainforest)
+- Warm ochre: #C4882B (savannah grass, Ghana rock)
+- Terracotta: #B5521A (West African laterite soil)
+- Misty grey: #8C9BA5 (harmattan sky, coastal haze)
+- Turquoise: #2AADA8 (East African coast, Zanzibar)
+- Warm white: #FAF8F4 (background — never pure white)
+- Cream: #F2EDE4 (card surfaces)
+- Dark text: #1C1C1A
+- Secondary text: #6B6457
+- Border: #E2D9CC
+
+PRIMARY ACTIONS: ochre #C4882B (buttons, CTAs, active states)
+SECONDARY ACTIONS: forest green #1A3D2B
+ALERTS/WARNING: terracotta #B5521A
+SUCCESS: #1A6B3A
+
+TYPOGRAPHY:
+- Headings: Plus Jakarta Sans, 700/800 weight
+- Body: Inter, 400/500
+- Numbers/refs: JetBrains Mono
+Import both from Google Fonts.
+
+---
+
+LANDING PAGE — complete rebuild:
+
+NAVIGATION:
+- Sticky, transparent over hero image, white background after scroll
+- Left: "TapTrao" wordmark in Plus Jakarta Sans, weight 800, 
+  colour #1C1C1A
+- Right: "Compliance Lookup" · "LC Checker" · "Pricing" · 
+  "Start free" button (ochre, small, rounded)
+- Clean, no clutter. Maximum 4 nav items.
+
+HERO SECTION:
+- Full viewport height
+- Background: full-bleed image of African coastline or landscape. 
+  Use an Unsplash URL for a stunning African landscape image:
+  https://images.unsplash.com/photo-1489392191049-fc10c97e64b6
+  (Ghana coastline with fishing boats — warm, hazy, atmospheric)
+  Add a dark overlay: linear-gradient from rgba(26,61,43,0.75) 
+  to rgba(26,61,43,0.45) so text is readable
+- Headline (white, large, Plus Jakarta Sans 800):
+  "Trade compliance for every commodity corridor out of Africa."
+- Subheadline (white, 60% opacity, Inter 400, max-width 560px):
+  "Duty rates, import requirements, document checklists, and LC 
+  validation. Built for European importers buying direct from 
+  African producers."
+- Two buttons:
+  Primary: "Run a free lookup" — ochre background, white text, 
+  rounded, generous padding
+  Secondary: "See how it works" — white border, white text, 
+  transparent background
+- Scroll indicator: subtle animated arrow at bottom of hero
+
+TRUST STRIP (immediately below hero, warm cream background):
+Single row, centered, spaced:
+"18 African origins  ·  154 commodities  ·  UK · EU · Turkey · 
+UAE · China · US import rules  ·  UCP 600 validated"
+Small caps, secondary text colour, no icons needed.
+
+PROBLEM SECTION (warm white background):
+- Large section number "01" in ochre, very light, behind the heading
+- Heading: "The paperwork between Africa and Europe is a minefield."
+- Subheading: "Most compliance tools were built for 
+  manufactured goods from Asia. African commodity corridors are 
+  an afterthought — if they're covered at all."
+- Three cards in a row (cream background, subtle shadow, 
+  12px border-radius, generous padding):
+  
+  Card 1 — icon: document with X
+  Title: "One wrong field. Bank rejected."
+  Body: "A single mismatch between your Letter of Credit and 
+  your supplier's commercial invoice means the bank refuses 
+  to release payment. Demurrage starts immediately."
+  
+  Card 2 — icon: calendar/alert  
+  Title: "Regulations you didn't know existed."
+  Body: "EUDR. AfCFTA rules of origin. ECOWAS ETLS. 
+  Phytosanitary requirements that change without announcement. 
+  You need to know before you commit, not after you've shipped."
+  
+  Card 3 — icon: person/question
+  Title: "Your broker is guessing too."
+  Body: "Most freight forwarders and customs brokers handle 
+  containerised goods from established corridors. Specialist 
+  knowledge on African commodities costs extra — and is often wrong."
+
+HOW IT WORKS SECTION (forest green background, white text):
+- Heading (white): "Three inputs. Complete picture."
+- Three steps as large numbered cards side by side:
+  
+  Step 01: "Select your trade"
+  "Choose your commodity, origin country, and destination. 
+  That's all we need."
+  
+  Step 02: "Get the full compliance picture"  
+  "Duty rates, required documents, regulatory triggers, 
+  risk flags, and a ready-to-send supplier brief. One report."
+  
+  Step 03: "Trade with confidence"
+  "Check your LC documents before submitting to the bank. 
+  Save successful trades as templates. Get alerted when 
+  rules change."
+
+COMMODITIES SECTION (warm white background):
+- Heading: "Every commodity. Every corridor."
+- Subheading: "Agricultural, mineral, forestry, seafood, 
+  and livestock. From raw cashew in Côte d'Ivoire to cobalt 
+  ore in the DRC."
+- Horizontal scrolling ticker (infinite loop, slow, automatic):
+  Show these commodity names in alternating ochre and green:
+  Raw Cashew Nuts · Cocoa Beans · Coffee · Sesame Seeds · 
+  Gold · Rough Diamonds · Copper Ore · Timber · Tuna · 
+  Cotton · Palm Oil · Cobalt · Shea Butter · Iron Ore · 
+  Rubber · Tea · Groundnuts · Coltan · Vanilla · Mangoes
+
+PRICING SECTION (cream background):
+- Heading: "Pay per check. No subscription trap."
+- Subheading: "Buy tokens when you need them. 
+  Use them for lookups and document checks."
+
+Two clean pricing cards side by side:
+Card 1 (white, ochre top border, 4px):
+  "Compliance Lookup"
+  "$4.99 per lookup"
+  List: ✓ Full regulatory checklist  ✓ Duty estimate  
+  ✓ Risk flags  ✓ Supplier brief email  ✓ AfCFTA RoO check
+  Button: "Start with a free lookup"
+
+Card 2 (white, green top border, 4px):
+  "LC Document Check"  
+  "$2.99 per check"
+  List: ✓ Up to 6 supplier documents  ✓ UCP 600 validation  
+  ✓ Field-by-field cross-check  ✓ Correction email generated
+  Button: "Check your first LC"
+
+Below cards: 
+"Token packs from $9.99 · Pro monitoring from $29/month"
+In small secondary text.
+
+FINAL CTA SECTION (another African landscape image as background):
+Use: https://images.unsplash.com/photo-1516026672322-bc52d61a55d5
+(Savannah landscape — golden grass, acacia trees, big sky)
+Dark overlay same as hero.
+White text:
+Heading: "Know before you commit."
+Subheading: "Run your first compliance lookup free. 
+No account required."
+Single button: "Start free lookup" (ochre)
+
+FOOTER (dark forest green background, white text):
+- Logo wordmark (white)
+- Tagline: "Trade compliance for commodity traders."
+- Four columns: Product · Company · Legal · Contact
+  Product: Compliance Lookup · LC Checker · Pricing · Dashboard
+  Company: About · How it works
+  Legal: Privacy Policy · Terms of Service
+  Contact: hello@taptrao.com
+- Bottom bar: "© 2026 Fatrao Limited · Registered in England 
+  and Wales"
+
+---
+
+APP PAGES — Wise-level cleanliness:
+
+COMPLIANCE LOOKUP (/lookup):
+
+Page layout: centered, max-width 680px, lots of breathing room
+Background: warm white #FAF8F4
+
+Header area:
+- Breadcrumb: "TapTrao / Compliance Lookup" in small secondary text
+- H1: "Compliance Lookup" — Plus Jakarta Sans, weight 800
+- Subtitle: "Enter your trade details to get the complete 
+  import requirements for your corridor."
+
+The lookup form as a clean card (white, shadow, 16px border-radius, 
+40px padding):
+- Three fields stacked vertically with 24px gap between them
+- Each field: label above (weight 600, size 14px), 
+  then a large searchable dropdown (48px height, 
+  12px border-radius, border #E2D9CC)
+- Commodity dropdown: shows commodity name + HS code
+- Origin: shows flag emoji + country name
+- Destination: shows flag emoji + country name
+- CTA button: full width, 56px height, ochre background, 
+  white text, "Run Compliance Check — $4.99", 
+  24px border-radius
+- Token balance below button in small text: 
+  "Balance: X tokens · Top up"
+- First lookup free badge: green pill "First lookup free" 
+  if demo not used
+
+Results layout (after submission):
+- Verdict badge at very top: large pill, 
+  GREEN = "Low Risk", AMBER = "Moderate Risk", RED = "High Risk"
+- Four clean sections as separate cards with 16px gap:
+  
+  Section: "Import Requirements — Your Side"
+  Left border: 4px ochre
+  
+  Section: "Supplier Documents — Their Side"  
+  Left border: 4px forest green
+  
+  Section: "Active Regulations"
+  Left border: 4px terracotta
+  
+  Section: "Risk Flags"
+  Left border: 4px misty grey
+  
+- Each document row: expandable, clean, with chevron
+- Supplier brief button: ochre, bottom of results
+- Reference hash: bottom, monospace, small, secondary colour
+
+LC CHECKER (/lc-check):
+
+Same centered layout, max-width 720px.
+
+Header: "LC Document Checker"
+Subtitle: "Cross-check your supplier documents against your 
+Letter of Credit before submitting to the bank."
+
+Two-column layout on desktop:
+Left column (LC Terms): clean form, labelled fields
+Right column (Documents): tabbed, up to 6 document tabs
+
+Verdict at top of results:
+Large, prominent badge: 
+COMPLIANT (green background, white text)
+REVIEW NEEDED (ochre background, white text)  
+DISCREPANCIES FOUND (terracotta background, white text)
+
+Results table: clean rows, alternating white/cream, 
+red rows for critical issues have terracotta left border
+
+DASHBOARD (/dashboard):
+
+Clean, spacious. Max-width 1000px.
+
+Top: "Good morning." (or afternoon/evening based on time)
+Subtitle: "Your trade activity at a glance."
+
+Stats row: four clean stat cards in a row
+- Each: large number, small label, subtle icon
+- Token balance, total lookups, LC checks, active corridors
+
+Recent activity: clean timeline list, not a table
+Quick actions: two prominent cards — 
+"New Compliance Lookup" and "New LC Check"
+
+NAVIGATION (all pages):
+Top nav: white background, subtle bottom border
+- Left: TapTrao wordmark
+- Center links: Lookup · LC Checker · Templates · Alerts
+- Right: token balance chip (ochre pill) + profile initial circle
+
+Mobile: bottom tab bar, 4 tabs with icons and labels
+
+---
+
+GLOBAL RULES:
+- border-radius: 12px cards, 8px inputs, 24px buttons
+- Shadows: box-shadow: 0 2px 12px rgba(28,28,26,0.08)
+- No harsh dividers — use background colour changes
+- All Unsplash images: add ?w=1920&q=80 to URL for quality
+- Skeleton loaders not spinners
+- Every empty state: helpful message + action button
+- All copy in plain English — no jargon, no "utilise", 
+  no "leverage"
+- Error messages: tell the user what to do, not what went wrong
+
+After rebuilding, show me the homepage first, then the 
+lookup page, then the dashboard.

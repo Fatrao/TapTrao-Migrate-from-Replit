@@ -1,0 +1,114 @@
+Add Switzerland as a destination country. Switzerland is NOT in the EU —
+it has its own customs territory, tariff schedule, and regulatory framework.
+Do NOT copy EU data. Use Swiss-specific values throughout.
+
+━━━ DATABASE UPDATE ━━━
+
+INSERT INTO destinations (
+  country_name, iso2, tariff_source, vat_rate, sps_regime,
+  security_filing, special_rules, preference_schemes, is_afcfta_member
+) VALUES (
+  'Switzerland',
+  'CH',
+  'Swiss Federal Customs Administration — TARES (tares.admin.ch)',
+  8.1,
+  'Swiss Federal Food Safety and Veterinary Office (FSVO/BLV) — import notification via e-dec',
+  'Swiss customs declaration via e-dec or NCTS for transit',
+  '{
+    "agricultural_tariffs": "Switzerland maintains high agricultural protection. Many food commodities face specific duties (CHF per kg) rather than ad valorem. Verify via TARES before quoting landed cost.",
+    "sps_authority": "Federal Food Safety and Veterinary Office (FSVO/BLV)",
+    "phyto_authority": "Federal Plant Protection Service (FPPS/OFAG)",
+    "not_in_traces": "Switzerland is not in the EU TRACES system. Use Swiss e-dec for import notifications.",
+    "not_in_ipaffs": "Switzerland has its own notification system — not IPAFFS.",
+    "eudr_equivalent": "Switzerland passed its own Due Diligence Act covering timber and minerals. Cocoa and coffee expected to follow. Monitor Federal Office for the Environment (FOEN/BAFU) for updates.",
+    "bilateral_agreements": "CH-EU bilateral agreements cover mutual recognition of many standards. Products meeting EU standards generally accepted but separate Swiss declaration still required.",
+    "labelling": "Product labelling must comply with Swiss law — similar to EU but some differences in language requirements (all 4 national languages may be required for food)."
+  }',
+  '["GSP (Swiss Generalized System of Preferences)", "Various bilateral FTAs", "Partial agricultural preferences for ACP countries"]',
+  false
+)
+ON CONFLICT (iso2) DO UPDATE SET
+  tariff_source = EXCLUDED.tariff_source,
+  vat_rate = EXCLUDED.vat_rate,
+  sps_regime = EXCLUDED.sps_regime,
+  security_filing = EXCLUDED.security_filing,
+  special_rules = EXCLUDED.special_rules,
+  preference_schemes = EXCLUDED.preference_schemes;
+
+━━━ SWISS-SPECIFIC DOCUMENT RULES ━━━
+
+Switzerland requires different documents from the EU in several areas.
+Add these rules to the cascade logic (Layer 3 — Destination) when dest_iso2 = 'CH':
+
+BUYER SIDE documents for CH destination:
+  All commodity types: Swiss customs declaration (e-dec) — replaces CHIEF/CDS
+  Agricultural/food: Import notification to FSVO/BLV — replaces IPAFFS/TRACES
+  Plant products: Phytosanitary certificate processed by FPPS/OFAG — NOT via TRACES
+  CITES-listed species: Swiss CITES permit (FOEN/BAFU) — parallel to EU CITES
+  Timber: Swiss Due Diligence Act compliance statement (for timber/minerals) — parallel to EUDR
+
+SUPPLIER SIDE: same as other destinations — CoO, phyto, invoice, B/L, packing list.
+CoO note for CH: EUR.1 movement certificate accepted for preferential tariff under bilateral agreements.
+
+Add to the expandable document detail for CH destination:
+  Swiss customs declaration:
+    "What: Swiss import declaration filed via e-dec (electronic declaration system).
+     Who: Your Swiss customs agent or freight forwarder.
+     When: Before goods arrive at Swiss border.
+     Tip: Unlike CHIEF/CDS, e-dec submissions are handled by Swiss-licensed brokers only.
+          Ensure your freight forwarder has Swiss customs clearance authorisation."
+
+  FSVO import notification:
+    "What: Import notification to the Federal Food Safety and Veterinary Office.
+     Who: The importer (you or your Swiss agent).
+     When: Minimum 24 hours before arrival for food products.
+     Portal: Register at blv.admin.ch. Process similar to IPAFFS but separate system."
+
+━━━ TARIFF NOTE IN RESULTS ━━━
+
+For CH destination, the duty estimate section should show a special note:
+  "Swiss agricultural tariffs are often specific (CHF/kg) not ad valorem.
+   TARES API provides exact rates — estimate may be indicative for food commodities.
+   Verify at tares.admin.ch before quoting landed cost."
+
+Use amber-tinted callout (abg/abd) for this note.
+
+━━━ EUDR EQUIVALENT FOR CH ━━━
+
+When commodity triggers_eudr = true AND dest_iso2 = 'CH':
+  Show the EUDR alert block (from Prompt 20) but with modified text:
+  "Switzerland has passed its own Due Diligence Act covering timber and minerals.
+   Cocoa, coffee, and other EUDR commodities are expected to be added.
+   Monitor FOEN/BAFU (bafu.admin.ch) for confirmation of scope and timeline.
+   Prepare EUDR-equivalent documentation now — requirements will likely mirror the EU."
+  Risk level: amber (pending confirmation, not yet legally required for all commodities)
+
+━━━ VERIFY DESTINATION IS IN DROPDOWNS ━━━
+
+In the compliance lookup form (/lookup), the destination dropdown reads from
+the destinations table. Switzerland should now appear in the list.
+
+After inserting, verify:
+SELECT country_name, iso2, vat_rate, tariff_source
+FROM destinations WHERE iso2 = 'CH';
+
+Expected: Switzerland | CH | 8.1 | Swiss Federal Customs Administration — TARES
+
+Also run a test lookup in the application:
+  Commodity: Raw Cashew Nuts (CI)
+  Origin: Côte d'Ivoire
+  Destination: Switzerland
+
+Expected output:
+  - Duty estimate shows TARES as source + amber note about specific tariffs
+  - SPS regime shows FSVO/BLV (not IPAFFS, not TRACES)
+  - Buyer docs show Swiss e-dec (not CHIEF/CDS)
+  - No EUDR alert (cashew does not trigger EUDR)
+  - AfCFTA section: does NOT show (CH is not AfCFTA member)
+
+━━━ SELF-CHECK ━━━
+Run: SELECT iso2, vat_rate FROM destinations ORDER BY country_name;
+Expected: 7 rows (GB, EU, TR, AE, CN, US, CH). VAT for CH = 8.1.
+Run: curl -s http://localhost:3000/lookup | grep -o 'Switzerland'
+Expected: "Switzerland" (appears in destination dropdown).
+Log: "PROMPT 22 COMPLETE — Switzerland destination added"

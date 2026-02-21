@@ -1,0 +1,126 @@
+Add basic regulatory monitoring — the re-engagement engine.
+
+━━━ DATABASE ━━━
+
+CREATE TABLE IF NOT EXISTS alert_subscriptions (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_session_id  TEXT NOT NULL,
+  commodity_id     UUID REFERENCES commodities(id),
+  dest_iso2        CHAR(2),
+  created_at       TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_session_id, commodity_id, dest_iso2)
+);
+
+CREATE TABLE IF NOT EXISTS regulatory_alerts (
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  source                TEXT NOT NULL DEFAULT 'MANUAL',
+  hs_codes_affected     TEXT[] DEFAULT '{}',
+  dest_iso2_affected    CHAR(2)[],
+  summary               TEXT NOT NULL,
+  source_url            TEXT,
+  effective_date        DATE,
+  is_deadline           BOOLEAN DEFAULT false,
+  created_at            TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS alert_reads (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_session_id  TEXT NOT NULL,
+  alert_id         UUID REFERENCES regulatory_alerts(id),
+  read_at          TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_session_id, alert_id)
+);
+
+INSERT hardcoded deadline alerts (only if they don't already exist — check by source_url):
+
+INSERT INTO regulatory_alerts (source, hs_codes_affected, dest_iso2_affected, summary, source_url, effective_date, is_deadline)
+VALUES
+  ('EUDR_DEADLINE',
+   ARRAY['1801.00','1803.10','1804.00','1805.00','1802.00','0901.11','0901.21','2101.11',
+         '1511.10','1511.90','1513.21','4001.10','4001.21','4001.22','1201.90','1507.10',
+         '4407.29','4403.49','4412.31','4401.21','0102.29','9403.60'],
+   ARRAY['EU','GB'],
+   'EUDR compliance required for large operators from 30 December 2026. Geolocation data and due diligence statements must be in place before this date.',
+   'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32023R1115',
+   '2026-12-30',
+   true),
+  ('EUDR_DEADLINE',
+   ARRAY['1801.00','1803.10','1804.00','1805.00','1802.00','0901.11','0901.21','2101.11'],
+   ARRAY['EU','GB'],
+   'EUDR SME compliance deadline: 30 June 2027. Smaller operators have an extended timeline but must begin due diligence documentation now.',
+   'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32023R1115',
+   '2027-06-30',
+   true)
+ON CONFLICT DO NOTHING;
+
+━━━ WATCH CORRIDOR ━━━
+
+After any lookup result renders, show below the readiness score banner:
+"◎ Watch this corridor" ghost button (DM Mono 11px, var(--t2))
+Sub-text: "Get notified when regulations change for [commodity] → [dest]"
+
+On click:
+  Check current subscription count for this session.
+  If < 3: INSERT into alert_subscriptions (upsert — do nothing on conflict)
+          Button becomes "◉ Watching — [count]/3 corridors watched"
+  If = 3: Show modal: "You're watching 3 corridors (free limit). Upgrade to Pro to watch more."
+
+━━━ ALERTS PAGE at /alerts ━━━
+
+AppShell activeNav="/alerts"
+Sidebar blue badge = count of unread alerts for this session
+
+Page header: "Regulatory Alerts" Fraunces 900 32px
+Subtitle: "Monitoring [subscription_count] corridors"
+
+Fetch alerts relevant to this user:
+  SELECT ra.*, 
+    CASE WHEN ar.id IS NOT NULL THEN true ELSE false END as is_read
+  FROM regulatory_alerts ra
+  JOIN alert_subscriptions sub ON (
+    ra.hs_codes_affected && ARRAY(SELECT hs_code FROM commodities WHERE id = sub.commodity_id)
+    OR ra.is_deadline = true
+  )
+  LEFT JOIN alert_reads ar ON ar.alert_id = ra.id AND ar.user_session_id = [session]
+  WHERE sub.user_session_id = [session]
+  ORDER BY ra.effective_date ASC, ra.created_at DESC
+
+Each alert card:
+  background var(--s1), border var(--s5), border-radius 8px, padding 14px 16px, margin-bottom 8px
+  If not read: border-left 3px solid var(--blue)
+  
+  Source badge: DM Mono 9px 600, uppercase, coloured:
+    EUDR_DEADLINE → abg/abd/amber | MANUAL → blue-dim/blue-bd/blue | TARIFF_API → gbg/gbd/green
+  Summary: 13px var(--t1) line-height 1.55 margin: 6px 0
+  HS codes: DM Mono 10px var(--t3) if hs_codes_affected is set
+  Effective date: DM Mono 10px var(--t3) "Effective [date]"
+  
+  Footer row: flex space-between
+    Left: source_url → "↗ View source" link (11px var(--blue))
+    Right: "Run fresh lookup →" solid blue button (small: 11px 600, padding 5px 12px)
+           → links to /lookup pre-filled with first matching commodity + dest_iso2
+
+Mark read: when alert card comes into viewport (IntersectionObserver),
+POST /api/alerts/[alertId]/read to INSERT into alert_reads.
+
+EMPTY STATE: "You're not watching any corridors yet. Run a lookup and click 'Watch this corridor'."
+
+━━━ ADMIN ALERT CREATION at /admin/alerts/new ━━━
+
+Simple server-rendered form (no auth UI — just protect the API):
+Fields: source (text), hs_codes_affected (comma-separated), dest_iso2_affected (comma-separated),
+        summary (textarea), source_url, effective_date, admin_password (hidden)
+
+API: POST /api/admin/alerts — check that body.admin_password === process.env.ADMIN_PASSWORD
+     If match: INSERT into regulatory_alerts, return { success: true }
+     If not: return 401
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: SELECT COUNT(*) FROM regulatory_alerts;
+Expected: 2 (the two EUDR deadline rows inserted above).
+Run: SELECT COUNT(*) FROM information_schema.tables
+     WHERE table_name IN ('alert_subscriptions','regulatory_alerts','alert_reads');
+Expected: 3
+Log: "PROMPT 19 COMPLETE — regulatory alerts built"

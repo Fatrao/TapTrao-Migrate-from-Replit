@@ -1,0 +1,122 @@
+Build the TwinLog Trail — the audit trail that completes every trade record.
+
+━━━ PART 1: DATABASE ━━━
+
+ALTER TABLE lookups ADD COLUMN IF NOT EXISTS twinlog_ref TEXT;
+ALTER TABLE lookups ADD COLUMN IF NOT EXISTS twinlog_hash TEXT;
+ALTER TABLE lookups ADD COLUMN IF NOT EXISTS twinlog_locked_at TIMESTAMPTZ;
+
+On every completed lookup (after results are saved to DB), compute and store:
+  twinlog_ref:   'TT-' + year + '-' + first 6 chars of SHA256(lookup_id + created_at.toISOString())
+                 Example: "TT-2026-A3F91C"
+  twinlog_hash:  SHA256 of JSON.stringify(results, Object.keys(results).sort())
+                 (sort keys for deterministic output)
+  twinlog_locked_at: NOW()
+
+Use Node's built-in crypto module: import { createHash } from 'crypto'
+
+━━━ PART 2: TWINLOG TRAIL TAB ━━━
+
+In /lc-check, the StepNav has a "TwinLog Trail" step.
+When user clicks step 3 in the StepNav, show the TwinLog Trail view.
+(Use the same tab-switching pattern as the LC Check tabs.)
+
+Layout: same two-column grid as Supplier Docs tab (flex:1 left | 292px right)
+
+LEFT PANEL:
+
+Header:
+  "TwinLog Trail" Fraunces 700 26px
+  "[commodity] · [origin] → [dest] · locked [formatted twinlog_locked_at]" DM Mono 11px var(--t3)
+
+INCLUDED ITEMS section (DM Mono 9px section label + line):
+  Checklist of what is locked in this record:
+  Each row: dot (7px) + label (12px var(--t2)) + status right-aligned
+  
+  Compliance lookup:     always green (this lookup exists) → "✓ Locked"
+  LC check results:      if lc_check record exists → green "✓ Locked" | else → grey "—"
+  Supplier documents:    if supplier_request exists → "[X]/[Y] received" in var(--t2) | else → grey "—"
+  Customs data pack:     check if user downloaded it (track via boolean col) → green/grey
+  Readiness score:       if readiness_score is set → green "Score: [n]" | else → grey "—"
+
+INTEGRITY HASH BLOCK:
+  background var(--s3), border var(--s5), border-radius 7px, padding 12px 14px, margin-top 16px
+  
+  "🔒 [twinlog_ref]" — var(--blue) DM Mono 13px 700 margin-bottom 6px
+  "sha256: [first 12 chars]...[last 8 chars]" — DM Mono 10px var(--t3)
+    Full hash stored, truncated for display
+  "↗ Copy full hash" ghost button right-aligned — copies twinlog_hash to clipboard, shows "✓ Copied" 2s
+
+COMPLIANCE SCORE SUMMARY:
+  Same readiness score display as in the main lookup results (score number + verdict + summary sentence)
+  Just re-display the stored values — no recomputation needed
+
+RIGHT PANEL:
+
+"Export" label Fraunces 700 15px
+
+DOWNLOAD PDF BUTTON (full width, solid blue, margin-bottom 16px):
+  "↓ Download TwinLog PDF"
+  
+  On click: POST /api/twinlog/[lookupId]/pdf
+  
+  Returns a PDF containing (use pdfkit or @react-pdf/renderer):
+    Page 1:
+      TapTrao logo placeholder (text "TAPTRAO" if no image embed) + "TwinLog Trail" header
+      Reference: [twinlog_ref] — large, prominent
+      Hash: sha256:[twinlog_hash] — DM Mono small
+      Locked: [twinlog_locked_at formatted]
+      ---
+      Trade details: Commodity | HS Code | Origin | Destination | Incoterms
+      Readiness Score: [score] [verdict] — [summary sentence]
+      ---
+      Regulatory Overlays: list all active overlays
+      ---
+      Buyer Documents: numbered list with status (Ready / Pending / N/A)
+      Supplier Documents: numbered list with status
+      ---
+      LC Check: [verdict if run] — [total discrepancies if any]
+      ---
+      Footer: "Generated [datetime] by TapTrao (taptrao.com)
+               Verify at: taptrao.com/verify/[twinlog_ref]
+               This document contains a cryptographic integrity hash."
+    
+    Style: clean black on white, no dark backgrounds — this is a printable document.
+    Font: Helvetica (pdfkit default) or embed Inter/similar.
+    Page size: A4.
+
+ACTIVITY TIMELINE (below export button):
+  "History" label DM Mono 9px var(--t3)
+  Chronological list pulling from:
+    - lookups.created_at → "Compliance lookup run"
+    - lc_checks.created_at → "LC check run — [verdict]"
+    - supplier_requests.last_sent_at → "Supplier brief sent via [channel]"
+    - supplier_uploads.uploaded_at → "[doc_type] uploaded by supplier"
+    - twinlog_locked_at → "TwinLog locked"
+  Each row: 8px dot + event text 11px var(--t2) + DM Mono 9px var(--t3) timestamp
+  Separator: border-bottom var(--s5)
+
+━━━ PART 3: PUBLIC VERIFY PAGE ━━━
+
+Create: app/verify/[ref]/page.tsx (public, no auth)
+
+Look up lookups WHERE twinlog_ref = [ref].
+If not found: show "Reference not found."
+
+If found, display:
+  TapTrao logo + "TwinLog Verification" heading
+  Green banner: "✓ This record was locked on [twinlog_locked_at formatted] and has not been modified."
+  Trade: [commodity] | [origin] → [destination]
+  Reference: [twinlog_ref] — DM Mono
+  Hash: sha256:[twinlog_hash] — DM Mono, full hash
+  Locked: [datetime]
+  Score: [readiness_score] [readiness_verdict]
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: SELECT twinlog_ref, twinlog_hash FROM lookups WHERE twinlog_ref IS NOT NULL LIMIT 1;
+Expected: returns 1 row if any lookups have been run (or 0 rows if DB is empty — both fine).
+Run: curl -s http://localhost:3000/verify/TT-2026-000000 | grep -o 'not found'
+Expected: "not found" (graceful error for unknown ref).
+Log: "PROMPT 16 COMPLETE — TwinLog Trail built"

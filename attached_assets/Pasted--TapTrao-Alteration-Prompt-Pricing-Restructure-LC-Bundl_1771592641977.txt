@@ -1,0 +1,200 @@
+# TapTrao — Alteration Prompt: Pricing Restructure + LC Bundling
+
+This is a targeted alteration. Do NOT refactor existing code.
+Make only the specific changes listed below. Test after each section.
+
+---
+
+## CHANGE 1 — Rename demo_used to free_lookup_used
+
+In the database and all code references:
+- Rename `demo_used` boolean to `free_lookup_used`
+- The logic stays identical — one free lookup per session, tracked by this flag
+- Update any UI text that says "Free Demo" to "Free Lookup"
+
+---
+
+## CHANGE 2 — Free lookup gates TwinLog Trail and LC check
+
+When `free_lookup_used = true` AND the user has 0 tokens:
+
+- TwinLog Trail download button: visible but locked
+  - Show lock icon 🔒 on the button
+  - On hover/tap: tooltip "Included in trade pack — from $24.99"
+  - Do NOT hide the button
+
+- "Check LC for this Trade" button: visible but locked
+  - Same lock icon and tooltip behaviour
+  - Do NOT hide the button
+
+When the user has tokens (paid): both buttons work normally, no lock.
+
+---
+
+## CHANGE 3 — Add conversion banner to free lookup results
+
+When `free_lookup_used = true` AND user has 0 tokens, insert this banner
+BELOW the TwinLog Score and ABOVE the Next Actions panel:
+
+```
+Ready to ship this trade?
+
+Your free lookup shows the full compliance picture.
+To get your TwinLog Trail and run your LC check, upgrade to a trade pack.
+
+"Banks reject approximately 30% of LC presentations on first submission.
+One rejection costs more than a full year of trade packs."
+
+[Buy Single Trade — $24.99]    [See all packs →]
+```
+
+- "Buy Single Trade — $24.99" links to /pricing and triggers the $24.99
+  Stripe checkout directly
+- "See all packs →" links to /pricing
+- Banner background: very light amber — not alarming, just present
+- Dismiss ✕ is NOT available — this banner stays until the user buys
+
+---
+
+## CHANGE 4 — Update LC check to be bundled into trade token
+
+Each trade token now covers:
+- 1 compliance lookup
+- 1 TwinLog Trail download
+- 1 LC Document Check
+- 1 Customs Data Pack
+
+Update token deduction logic:
+- Remove any separate LC token cost
+- LC check is available at no extra token cost IF the user has a token
+  AND that token has not already been used for an LC check on this lookup
+- Track LC check usage per lookup via the existing `source_lookup_id`
+  link on lc_checks table
+- If user tries to run a second LC check on the same lookup
+  (supplier reissued docs): charge $9.99 flat via Stripe, no token deducted
+
+---
+
+## CHANGE 5 — Add $9.99 LC re-check Stripe payment
+
+Create a new Stripe price object: `price_lc_recheck` at $9.99 one-time.
+
+When a user clicks "Check LC for this Trade" and:
+- They have a token AND already ran one LC check on this lookup:
+  Show a prompt: "You've already run an LC check for this trade.
+  Re-check after supplier corrections — $9.99."
+  With a "Pay $9.99 and re-check" button that triggers Stripe checkout
+  for `price_lc_recheck`.
+
+Log additional LC re-checks in `token_transactions` with
+type = "LC_RECHECK" and the $9.99 amount.
+
+---
+
+## CHANGE 6 — Rebuild /pricing page content only
+
+Do NOT touch the page layout or components. Only replace the content.
+
+### Page header text:
+```
+Know before you commit.
+First lookup free. Trade packs never expire.
+No subscriptions. No monthly caps.
+```
+
+### Free lookup banner (above pricing cards):
+```
+Start free — no card required.
+Run your first compliance lookup free. See your TwinLog Score,
+full document checklist, and regulatory flags instantly.
+Ready to ship? Upgrade to a trade pack for your TwinLog Trail and LC check.
+
+[Run Free Lookup →]
+```
+"Run Free Lookup →" links to /lookup.
+
+### Social proof line (below banner, above cards):
+```
+Banks reject approximately 30% of LC presentations on first submission.
+One rejection costs more than a full year of trade packs.
+```
+Plain text, centred, muted colour. No box, no badge.
+
+### Replace all pricing cards with:
+
+| Label | Price | Per trade | Includes |
+|---|---|---|---|
+| Single Trade | $24.99 | — | 1 lookup + TwinLog Score + TwinLog Trail + 1 LC check + Customs Data Pack |
+| 3-Trade Pack | $59.99 | $20.00/trade | Same ×3 |
+| 10-Trade Pack | $179 | $17.90/trade | Same ×10 |
+| 25-Trade Pack | $349 | $13.96/trade | Same ×25 |
+
+No "most popular" or "best value" badges.
+No standalone lookup price.
+No standalone LC price.
+
+### Below cards — re-check line:
+```
+Need to re-check after supplier corrections?
+Additional LC check on the same trade — $9.99.
+```
+
+### Enterprise section (below re-check line):
+```
+Enterprise
+Large volume? Procurement requirements? Custom corridors?
+
+[Contact us →]
+```
+"Contact us →" = mailto:CONTACT_EMAIL
+Below: "We respond within one business day."
+
+### Remove entirely from pricing page:
+- Old token pack cards ($9.99, $19.99, $29.99)
+- "Pro Monitoring $29/month" card
+- "Free Demo" language
+- Any subscription or monthly pricing language
+- Standalone LC checker price
+
+---
+
+## CHANGE 7 — Update Stripe products
+
+Create or update these Stripe price objects:
+- `price_single_trade`:  $24.99 one-time
+- `price_3_trade`:       $59.99 one-time
+- `price_10_trade`:     $179.00 one-time
+- `price_25_trade`:     $349.00 one-time
+- `price_lc_recheck`:    $9.99 one-time
+
+Remove or archive old Stripe prices that no longer apply.
+
+---
+
+## VERIFICATION
+
+**Test 1 — Free lookup gate:**
+- Clear session (new user)
+- Run a lookup — confirm it works, TwinLog Score shows
+- Confirm TwinLog Trail and LC check buttons show lock icons
+- Confirm conversion banner appears below TwinLog Score
+- Buy Single Trade ($24.99) — confirm lock icons disappear
+- Confirm TwinLog Trail downloads and LC check runs normally
+
+**Test 2 — LC bundling:**
+- With 1 token, run a lookup
+- Run the LC check — confirm no additional charge, token not double-deducted
+- Try to run a second LC check on the same lookup
+- Confirm: prompt appears offering re-check for $9.99
+- Confirm: after $9.99 payment, second LC check runs
+
+**Test 3 — Pricing page:**
+- Go to /pricing
+- Confirm: 4 trade pack cards at $24.99 / $59.99 / $179 / $349
+- Confirm: free lookup banner at top with "Run Free Lookup →"
+- Confirm: "30% rejection" line between banner and cards
+- Confirm: $9.99 re-check line below cards
+- Confirm: Enterprise mailto link present
+- Confirm: no subscription language anywhere
+
+Report all three test results before confirming complete.

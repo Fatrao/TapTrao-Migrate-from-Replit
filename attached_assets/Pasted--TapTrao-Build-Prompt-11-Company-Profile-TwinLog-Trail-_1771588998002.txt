@@ -1,0 +1,388 @@
+# TapTrao — Build Prompt 11: Company Profile + TwinLog Trail (Exportable Compliance Record)
+
+Feed this to Replit Agent as a single prompt. It builds two things:
+1. A company profile page at /settings/profile
+2. The TwinLog Trail — a downloadable PDF compliance record that is audit-ready,
+   bank-shareable, and regulator-facing.
+
+The PDF cannot be downloaded without a completed company profile.
+This is not a technical gate — it is a legal one. A compliance record with no named
+party is not a compliance record.
+
+---
+
+## PART 1 — COMPANY PROFILE (/settings/profile)
+
+### Database
+
+Add a `company_profiles` table:
+
+```sql
+CREATE TABLE company_profiles (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_id          TEXT UNIQUE NOT NULL,         -- links to existing session
+  company_name        TEXT NOT NULL,
+  registered_address  TEXT NOT NULL,                -- full address as on incorporation docs
+  country_iso2        CHAR(2) NOT NULL,
+  vat_number          TEXT,                         -- optional but recommended
+  eori_number         TEXT,                         -- optional but strongly recommended
+  contact_email       TEXT,
+  profile_complete    BOOLEAN DEFAULT false,
+  created_at          TIMESTAMPTZ DEFAULT now(),
+  updated_at          TIMESTAMPTZ DEFAULT now()
+);
+```
+
+`profile_complete` is set to TRUE when at minimum `company_name`,
+`registered_address`, and `country_iso2` are filled. VAT and EORI are
+strongly recommended but not blocking.
+
+### Page: /settings/profile
+
+Clean, single-column form. No sidebar clutter. Title: **"Company Profile"**
+
+Subtitle: *"Your company details appear on every TwinLog Trail compliance record.
+Required for PDF generation."*
+
+Fields:
+
+| Field | Label | Required | Helper text |
+|-------|-------|----------|-------------|
+| company_name | Company Name | Yes | As it appears on your Certificate of Incorporation |
+| registered_address | Registered Office Address | Yes | Full address including postcode/ZIP. Must match incorporation documents. |
+| country_iso2 | Country of Registration | Yes | Dropdown — all countries |
+| vat_number | VAT Number | No | e.g. GB123456789. Used for EU/UK trade records. |
+| eori_number | EORI Number | No | Economic Operators Registration and Identification number. Required by UK/EU customs to track every shipment. Without this, your compliance record cannot reference your customs identity. |
+| contact_email | Contact Email | No | Appears on the compliance record as the responsible party contact. |
+
+Below the EORI field, show a permanent info box (not a tooltip — always visible):
+
+> **Why EORI matters**
+> Your EORI number is what customs authorities use to identify you on every
+> import declaration. A compliance record without an EORI cannot be linked to
+> your customs activity. UK traders: apply at gov.uk/eori. EU traders: apply
+> via your national customs authority.
+
+Save button: **"Save Profile"**
+
+On save: set `profile_complete = true` if minimum fields are present.
+Show a success state: *"Profile saved. You can now download TwinLog Trail records."*
+
+If EORI is empty on save, show an amber warning (not blocking):
+*"No EORI number saved. Your TwinLog Trail records will note this as incomplete.
+We recommend adding your EORI before sharing records with banks or customs authorities."*
+
+### Navigation
+
+Add **"Settings"** to the top nav bar, linking to /settings/profile.
+On mobile hamburger menu, Settings appears at the bottom of the nav list.
+
+---
+
+## PART 2 — TWINLOG TRAIL PDF
+
+### What it is
+
+The TwinLog Trail is a frozen, timestamped compliance record for a single trade.
+It captures the state of the compliance check at the moment of download —
+including the TwinLog Score, all document requirements with their
+current statuses, risk flags, regulatory overlays, and the integrity hash.
+
+It is designed to be handed to:
+- A bank (for LC or trade finance purposes)
+- A customs broker (pre-filing data pack)
+- A buyer or seller (proof of compliance due diligence)
+- A regulator or auditor (AEO readiness, EUDR annual reporting, HMRC inspection)
+
+### Filename
+
+```
+TwinLog-Trail_[Commodity]_[OriginISO]-[DestISO]_[YYYY-MM-DD].pdf
+```
+
+Example: `TwinLog-Trail_RawCashewNuts_CI-GB_2026-02-20.pdf`
+
+---
+
+### PDF STRUCTURE
+
+#### PAGE 1 — Cover
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                                                         │
+│  [TapTrao wordmark — top left]                          │
+│                                                         │
+│                                                         │
+│  SHIPPING TWIN                                          │
+│  Compliance Record                                      │
+│                                                         │
+│  ─────────────────────────────────────────────────────  │
+│                                                         │
+│  Commodity:     Raw Cashew Nuts (HS 0801.31)            │
+│  Origin:        Côte d'Ivoire (CI)                      │
+│  Destination:   United Kingdom (GB)                     │
+│  Trade corridor: CI → GB                                │
+│                                                         │
+│  ─────────────────────────────────────────────────────  │
+│                                                         │
+│  Prepared by:   [company_name]                          │
+│  Address:       [registered_address]                    │
+│  EORI:          [eori_number] or "NOT PROVIDED"         │
+│  VAT:           [vat_number] or "NOT PROVIDED"          │
+│                                                         │
+│  Generated:     20 February 2026, 14:32 UTC             │
+│  Reference:     TT-2026-A3F91C                          │
+│                                                         │
+│  ─────────────────────────────────────────────────────  │
+│                                                         │
+│  TwinLog Trail — Generated by TapTrao                   │
+│  Verified compliance record for regulatory audit        │
+│  and bank submission.                                   │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+If EORI is not provided, the field shows **"NOT PROVIDED"** in amber/orange text —
+not hidden, not omitted. The absence of EORI must be visible on the record.
+
+---
+
+#### PAGE 2 — TwinLog Score
+
+Section title: **TWINLOG SCORE**
+
+Show the four scoring factors in a clean table:
+
+| Factor | Penalty | Max | Notes |
+|--------|---------|-----|-------|
+| Regulatory Complexity | 8 | 30 | 1 active overlay (EUDR) |
+| Known Hazard Exposure | 5 | 30 | Aflatoxin, moisture damage |
+| Document Volume | 8 | 20 | 7 documents required |
+| Trade Restrictions | 0 | 20 | No restrictions |
+| **Total penalty** | **21** | **100** | |
+| **Readiness Score** | **79 / 100** | | **MODERATE RISK** |
+
+Below the table, the plain English verdict sentence in a shaded box:
+
+> *"This trade requires attention. Aflatoxin contamination risk requires pre-shipment
+> testing and documented results before goods are presented at port."*
+
+---
+
+#### PAGE 3 — Importer Requirements (YOUR SIDE)
+
+Section title: **IMPORTER REQUIREMENTS**
+Subtitle: *"Documents and actions required of the importing party."*
+
+Table with columns: Document | Owner | Due By | Status
+
+| Document | Owner | Due By | Status |
+|----------|-------|--------|--------|
+| Customs Declaration | Broker | Before arrival | ● PENDING |
+| IPAFFS Pre-notification | You | Before arrival | ● READY |
+| Import Licence | You | Before loading | ✓ READY |
+
+Status rendering:
+- PENDING → grey dot ● "Pending"
+- READY → green dot ● "Ready"
+- RISK_ACCEPTED → amber dot ● "Risk Accepted"
+
+At the bottom of this section, show the completion count:
+*"2 of 3 importer requirements marked ready at time of download."*
+
+---
+
+#### PAGE 4 — Supplier Requirements (THEIR SIDE)
+
+Section title: **SUPPLIER REQUIREMENTS**
+Subtitle: *"Documents the supplier must provide. Issuing authorities named."*
+
+Table with columns: Document | Issuing Authority | Due By | Status
+
+| Document | Issuing Authority | Due By | Status |
+|----------|-------------------|--------|--------|
+| Certificate of Origin | Chambre de Commerce et d'Industrie de Côte d'Ivoire | Before loading | ● PENDING |
+| Phytosanitary Certificate | LANADA/DPVCQ | Before loading | ● PENDING |
+| Commercial Invoice | Supplier | Before loading | ✓ READY |
+| Packing List | Supplier | Before loading | ✓ READY |
+| Bill of Lading | Shipping line | Before loading | ● PENDING |
+
+Issuing authority names must be pulled from the origin country data (exact names
+from the database — this is one of TapTrao's core value propositions).
+
+At the bottom: *"2 of 5 supplier requirements marked ready at time of download."*
+
+---
+
+#### PAGE 5 — Regulatory Overlays & Risk Flags
+
+Section title: **REGULATORY OVERLAYS**
+
+List each active overlay as a row:
+
+| Regulation | Status | Notes |
+|------------|--------|-------|
+| SPS — Sanitary & Phytosanitary | Active | IPAFFS pre-notification required |
+| EUDR — EU Deforestation Regulation | Not triggered | Destination is GB, not EU |
+
+Section title: **KNOWN HAZARDS**
+
+| Hazard | Severity | Mitigation |
+|--------|----------|------------|
+| Aflatoxin | HIGH | Pre-shipment mycotoxin test required. Results must accompany goods. |
+| Moisture damage | MEDIUM | Ensure moisture content certified on phytosanitary certificate. |
+
+If a STOP flag was triggered: show a full-width red box before all other content
+on this page with the STOP warning text.
+
+---
+
+#### PAGE 6 — Audit Footer & Integrity Record
+
+Section title: **AUDIT RECORD**
+
+```
+This document was generated by TapTrao (taptrao.com) on behalf of:
+
+  [company_name]
+  [registered_address]
+  EORI: [eori_number]
+  VAT:  [vat_number]
+
+Compliance check reference:   TT-2026-A3F91C
+Integrity hash (SHA-256):     sha256:a3f91c7d2e4b... [full hash]
+Lookup timestamp:             2026-02-20T14:32:11Z
+PDF generated:                2026-02-20T14:35:04Z
+Regulatory data version:      [reg_version_hash from lookup]
+
+This record reflects the compliance status of the above trade corridor
+at the time of generation. Regulatory requirements are subject to change.
+TapTrao recommends running a fresh compliance lookup before each shipment.
+
+TapTrao is a compliance information tool. This record does not constitute
+legal advice. The importing party remains responsible for ensuring all
+regulatory requirements are met.
+```
+
+This page must always be the last page. It is the chain of custody.
+
+---
+
+### PDF GENERATION IMPLEMENTATION
+
+Use the `@react-pdf/renderer` library (already available in Next.js projects,
+or install: `npm install @react-pdf/renderer`).
+
+Generate the PDF server-side via a Next.js API route: `POST /api/twinlog/generate`
+
+Request body:
+```json
+{
+  "lookup_id": "uuid",
+  "document_statuses": {
+    "doc_id_1": "READY",
+    "doc_id_2": "PENDING",
+    "doc_id_3": "RISK_ACCEPTED"
+  }
+}
+```
+
+The API route:
+1. Fetches the lookup record from the database by `lookup_id`
+2. Fetches the company profile for the current session
+3. If `profile_complete === false`: return 403 with message
+   `{ "error": "PROFILE_REQUIRED", "message": "Complete your company profile at /settings/profile before downloading TwinLog Trail records." }`
+4. Merges `document_statuses` from the request with the lookup data
+5. Generates the PDF using @react-pdf/renderer
+6. Returns the PDF as a binary stream with headers:
+   ```
+   Content-Type: application/pdf
+   Content-Disposition: attachment; filename="TwinLog-Trail_[commodity]_[origin]-[dest]_[date].pdf"
+   ```
+
+Store a record of each PDF generation in a `twinlog_downloads` table:
+```sql
+CREATE TABLE twinlog_downloads (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  lookup_id       UUID REFERENCES lookups(lookup_id),
+  session_id      TEXT,
+  company_name    TEXT,
+  eori_number     TEXT,
+  document_statuses JSONB,
+  pdf_hash        TEXT,           -- SHA-256 of the generated PDF bytes
+  generated_at    TIMESTAMPTZ DEFAULT now()
+);
+```
+
+This table is the audit log of who downloaded what and when.
+
+---
+
+### DOWNLOAD BUTTON ON RESULTS PAGE
+
+Replace the existing "Download PDF Report" placeholder button with:
+
+```
+[↓ Download TwinLog Trail]
+```
+
+If company profile is NOT complete:
+- Show the button greyed out
+- On hover/tap: show tooltip: *"Complete your company profile to download TwinLog Trail records. Settings →"*
+- "Settings →" is a link to /settings/profile
+
+If company profile IS complete:
+- Button is active
+- On click: POST to /api/twinlog/generate with current lookup_id and current
+  document statuses from component state
+- Show a loading state: "Generating TwinLog Trail..."
+- On success: trigger file download
+- On error: show inline error message
+
+---
+
+## IMPORTANT CONSTRAINTS
+
+- The PDF is a snapshot. It reflects statuses at the moment the download button
+  is clicked — not live state. If the user changes a status after downloading,
+  a new download creates a new record with a new timestamp and hash.
+- Do NOT require email verification or password auth. The session_id is sufficient
+  for this stage. Full auth comes in Prompt 12.
+- Do NOT use browser print or window.print() for PDF generation. Must be a proper
+  PDF file generated server-side.
+- The integrity hash on page 6 must match the hash stored in the lookups table
+  from the original compliance check. Do not recompute it at PDF generation time.
+- Every page must have a subtle footer: "TwinLog Trail — [Reference] — [company_name]"
+  in small grey text. This means if pages are separated, each page is still
+  attributable.
+
+---
+
+## VERIFICATION
+
+Test these three scenarios:
+
+**Scenario 1 — Profile not set up:**
+- Click "Download TwinLog Trail" without a company profile
+- Confirm: button is greyed out or shows profile-required message
+- Navigate to /settings/profile, fill in company name + address + country only
+- Save — confirm profile_complete becomes true
+- Return to lookup — confirm download button is now active
+
+**Scenario 2 — Full download with mixed statuses:**
+- Run a Cocoa Beans / Ghana → EU lookup
+- Mark 2 documents READY, leave 3 PENDING, mark 1 RISK_ACCEPTED
+- Download TwinLog Trail
+- Confirm: PDF has 6 pages, cover shows company name, page 3/4 show correct
+  statuses with correct colours, page 6 shows integrity hash
+- Confirm: a record appears in twinlog_downloads table
+
+**Scenario 3 — EORI missing:**
+- Remove EORI from company profile
+- Download a TwinLog Trail
+- Confirm: page 1 shows "EORI: NOT PROVIDED" in amber text
+- Confirm: page 6 shows "EORI: NOT PROVIDED"
+- Confirm: download still works — EORI absence is flagged, not blocking
+
+Report all three scenario results before confirming the build is complete.

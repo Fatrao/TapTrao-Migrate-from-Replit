@@ -1,0 +1,251 @@
+Add the EUDR due diligence workflow. This activates automatically when a
+compliance lookup returns a commodity with triggers_eudr = true AND the
+destination is EU or GB.
+
+This closes the biggest remaining gap: EUDR triggers exist in the database
+but nothing happens when they fire. After this prompt, traders get a
+step-by-step due diligence form and a generated compliance statement.
+
+━━━ DATABASE ━━━
+
+CREATE TABLE IF NOT EXISTS eudr_records (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  lookup_id           UUID REFERENCES lookups(id) ON DELETE CASCADE,
+  user_session_id     TEXT NOT NULL,
+  commodity_id        UUID REFERENCES commodities(id),
+  origin_iso2         CHAR(2),
+  dest_iso2           CHAR(2),
+  -- Step 1: Geolocation
+  plot_coordinates    JSONB,
+  -- Single point: {"type":"point","lat":5.3600,"lng":-4.0083}
+  -- Polygon:      {"type":"polygon","points":[{"lat":...,"lng":...},...]}
+  plot_country_iso2   CHAR(2),
+  plot_country_valid  BOOLEAN,
+  -- Step 2: Deforestation-free evidence
+  cutoff_date         DATE DEFAULT '2020-12-31',
+  evidence_type       TEXT,
+  -- 'satellite_ref' | 'third_party_cert' | 'geo_database' | 'other'
+  evidence_reference  TEXT,
+  evidence_date       DATE,
+  -- Step 3: Supplier verification
+  supplier_name       TEXT,
+  supplier_address    TEXT,
+  supplier_reg_number TEXT,
+  sanctions_checked   BOOLEAN DEFAULT false,
+  sanctions_clear     BOOLEAN,
+  -- Step 4: Risk assessment
+  risk_level          TEXT CHECK (risk_level IN ('low','standard','high')),
+  risk_factors        JSONB DEFAULT '[]',
+  high_risk_reason    TEXT,
+  -- Output
+  statement_json      JSONB,
+  statement_pdf_key   TEXT,
+  status              TEXT DEFAULT 'draft'
+                      CHECK (status IN ('draft','complete','expired')),
+  retention_until     DATE,
+  created_at          TIMESTAMPTZ DEFAULT NOW(),
+  updated_at          TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_eudr_lookup ON eudr_records(lookup_id);
+CREATE INDEX IF NOT EXISTS idx_eudr_session ON eudr_records(user_session_id);
+
+━━━ TRIGGER INTEGRATION ━━━
+
+In the lookup results page, after the Readiness Score banner and before
+"YOUR SIDE" section, add a conditional EUDR alert block:
+
+Condition: lookup result has triggers_eudr = true AND dest_iso2 IN ('EU','GB','CH')
+
+EUDR ALERT BLOCK:
+  background rgba(245,158,11,.06), border 1px solid rgba(245,158,11,.2), border-radius 10px
+  padding 18px 22px, margin-bottom 20px
+
+  Header row (flex, space-between):
+    Left: amber warning icon (⚠) + "EUDR Due Diligence Required" Fraunces 700 16px var(--t1)
+    Right: status badge
+      No record: "Not started" grey (DM Mono 9px, var(--s3) bg, var(--s5) border, var(--t3) text)
+      Draft:     "In progress" amber
+      Complete:  "✓ Complete"  green
+
+  Body text (12px var(--t2) line-height 1.6, margin 8px 0):
+    "The EU Deforestation Regulation applies to this commodity. You must collect
+     geolocation data and supplier verification before importing into the EU/UK.
+     Failure to comply can result in goods being refused entry."
+
+  Regulation reference (DM Mono 10px var(--t3)):
+    "EU Regulation 2023/1115 · Applies from 30 Dec 2026 (large operators)"
+
+  CTA button (solid blue or green if complete):
+    No record → "Start due diligence →" (opens EUDR form)
+    Draft → "Continue due diligence →" (opens EUDR form at current step)
+    Complete → "View statement →" (opens generated statement)
+
+━━━ EUDR FORM at /eudr/[lookupId] ━━━
+
+Use AppShell. This is a 4-step wizard.
+Show progress: Step 1 of 4 → Step 2 of 4 → Step 3 of 4 → Generate Statement
+
+STEP 1 — PRODUCTION PLOT LOCATION
+
+Heading: "Where was this commodity produced?"
+Subheading: "Enter the GPS coordinates of the farm or production area."
+
+Input mode toggle: "Single point" | "Multiple points (polygon)"
+
+Single point:
+  Latitude field: number input, placeholder "e.g. 5.3600", label "Latitude (decimal degrees)"
+  Longitude field: number input, placeholder "e.g. -4.0083", label "Longitude (decimal degrees)"
+  Helper text: "You can find coordinates in Google Maps by right-clicking the location."
+
+Multiple points: text area, placeholder "5.3600,-4.0083\n5.3650,-4.0090\n5.3580,-4.0070"
+  Helper: "Enter one coordinate pair per line. Minimum 3 points to define a polygon."
+
+Validation on Next:
+  Check that coordinates fall within the claimed origin country's bounding box.
+  Use hardcoded bounding boxes for the 18 origin countries:
+    CI: lat 4.3-10.7, lng -8.6 to -2.5
+    GH: lat 4.7-11.2, lng -3.3 to 1.2
+    CM: lat 1.6-13.1, lng 8.5-16.2
+    ET: lat 3.4-15.0, lng 33.0-48.0
+    KE: lat -4.7-5.0, lng 33.9-42.0
+    NG: lat 4.3-14.0, lng 2.7-15.0
+    TZ: lat -11.7-0.0, lng 29.3-40.4
+    UG: lat -1.5-4.3, lng 29.6-35.0
+    SN: lat 12.3-16.7, lng -17.5 to -11.4
+    (others: skip validation, just accept the coordinates)
+
+  If coordinates outside bounding box: amber warning (don't block):
+    "These coordinates appear to be outside [country]. Please verify they are correct."
+  Store coordinates regardless of warning.
+
+STEP 2 — DEFORESTATION-FREE EVIDENCE
+
+Heading: "Confirm the land was not deforested after 31 December 2020"
+Subheading: "EUDR Article 3 requires evidence that no deforestation occurred after the cut-off date."
+
+Evidence type selector (radio buttons, styled as cards):
+  Option A: "Satellite imagery reference"
+    Sub-label: "Reference number or URL from Global Forest Watch, Planet, or similar"
+    Input: text field, placeholder "e.g. GFW-2024-CI-045891 or https://..."
+  Option B: "Third-party certification"
+    Sub-label: "Rainforest Alliance, UTZ, or equivalent scheme"
+    Input: text field, placeholder "Certificate number"
+  Option C: "National geo-database"
+    Sub-label: "Country forest monitoring system registration"
+    Input: text field, placeholder "Registration reference"
+  Option D: "Other documented evidence"
+    Input: text area, placeholder "Describe the evidence and how it demonstrates no deforestation since 31 Dec 2020"
+
+Evidence date: date picker, label "Date of evidence / assessment"
+  Validation: must be 2021-01-01 or later (evidence must post-date the cut-off)
+
+Helper callout (blue-tinted, DM Mono 11px):
+  "Free resource: Global Forest Watch (globalforestwatch.org) provides free
+   deforestation data. Search your coordinates to get a reference number."
+
+STEP 3 — SUPPLIER VERIFICATION
+
+Heading: "Verify your supplier"
+Subheading: "EUDR requires you to record supplier details and confirm they are not sanctioned."
+
+Fields:
+  Supplier/exporter name (text, required)
+  Supplier address (textarea, required) — pre-fill from supplier_requests if exists
+  Registration number (text, optional) — company reg or trade licence number
+  Country of registration (select, pre-filled with origin country)
+
+Sanctions check:
+  Checkbox: "I confirm I have checked this supplier against the UK/EU consolidated sanctions list"
+  Helper: "Check at: sanctionsearch.ofsi.hmtreasury.gov.uk (UK) or eeas.europa.eu/sanctionsmap (EU)"
+  Note: (13px var(--t2)) "TapTrao records your confirmation. Automated screening available in Pro."
+
+STEP 4 — RISK ASSESSMENT + GENERATE STATEMENT
+
+Heading: "Risk assessment"
+
+Auto-compute risk level based on:
+  LOW risk: origin country not on EU high-risk list + evidence provided + supplier verified
+  HIGH risk: origin country on EU high-risk list (DRC, Congo, certain others — hardcode list)
+  HIGH risk: no evidence provided OR coordinates failed validation
+
+Display computed risk level (traffic light):
+  "Based on the information provided, this trade is classified as: [RISK LEVEL]"
+  Risk level badge: large, coloured, DM Mono
+
+If HIGH risk, show additional requirements callout (red-tinted):
+  "High-risk classification requires enhanced due diligence under EUDR Article 10.
+   Additional steps: independent verification, enhanced monitoring of supplier."
+
+GENERATE STATEMENT button (solid blue, full width):
+  On click: compile all Step 1-3 data + risk assessment into statement_json
+  Generate a PDF due diligence statement containing:
+
+  Header: "EUDR Due Diligence Statement"
+           "EU Regulation 2023/1115 on Deforestation-free Products"
+  ---
+  Operator details: [user company — use "FATRAO LIMITED" as placeholder]
+  Statement date: [today]
+  Reference: EUDR-[lookup twinlog_ref]-[YYYY]
+  ---
+  Commodity: [name] | HS Code: [hs_code]
+  Origin country: [country name]
+  Destination: [EU/GB]
+  Quantity: [from LC if available, else "as per commercial invoice"]
+  ---
+  GEOLOCATION DATA
+  Coordinates: [lat/lng or polygon points]
+  Country validated: [Yes/No]
+  ---
+  DEFORESTATION-FREE EVIDENCE
+  Evidence type: [selected type]
+  Reference: [reference text]
+  Evidence date: [date]
+  Cut-off date compliance: All evidence post-dates 31 December 2020 ✓
+  ---
+  SUPPLIER VERIFICATION
+  Supplier: [name]
+  Address: [address]
+  Registration: [number if provided]
+  Sanctions screening: Confirmed by operator on [today's date]
+  ---
+  RISK ASSESSMENT
+  Risk level: [LOW / STANDARD / HIGH]
+  [If high: additional measures taken/planned]
+  ---
+  DECLARATION
+  "I declare that to the best of my knowledge and belief, the information
+   provided in this due diligence statement is accurate and complete.
+   I understand that false declarations may result in penalties under
+   EU Regulation 2023/1115."
+  Operator signature: ________________________________
+  Date: [today]
+  ---
+  TwinLog reference: [twinlog_ref]
+  sha256: [twinlog_hash]
+  Generated by TapTrao (taptrao.com)
+
+  Save PDF to storage, store key in eudr_records.statement_pdf_key
+  Set status = 'complete', retention_until = [today + 5 years]
+  Update lookups table: add column eudr_complete BOOLEAN DEFAULT false, set to true
+
+AFTER GENERATION:
+  Show success screen:
+    Green banner: "EUDR due diligence statement generated and locked."
+    "Retained until [retention_until date] as required by EUDR Article 9."
+    Two buttons: "↓ Download statement PDF" | "Return to trade →"
+  Update the EUDR alert block in the lookup to show "✓ Complete" green status
+
+━━━ SIDEBAR INTEGRATION ━━━
+
+Add EUDR completion status to the TwinLog Trail "Included items" checklist:
+  EUDR due diligence: green if eudr_complete = true, amber with "Required" if triggers_eudr = true and not complete
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: SELECT table_name FROM information_schema.tables WHERE table_name = 'eudr_records';
+Expected: 1 row.
+Run: SELECT column_name FROM information_schema.columns WHERE table_name = 'eudr_records';
+Expected: at least 18 columns.
+Log: "PROMPT 20 COMPLETE — EUDR due diligence workflow built"

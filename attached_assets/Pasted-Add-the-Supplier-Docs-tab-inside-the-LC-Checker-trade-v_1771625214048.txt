@@ -1,0 +1,126 @@
+Add the Supplier Docs tab inside the LC Checker trade view,
+and wire up the three send actions (WhatsApp, Email, Copy link).
+
+━━━ PART 1: SUPPLIER DOCS TAB ━━━
+
+In /lc-check, the TabBar already exists from Prompt 10.
+Replace the "Supplier docs" placeholder content with the real UI.
+
+"Supplier docs" tab layout: grid, 2 columns (flex:1 main | 292px right panel)
+
+LEFT PANEL (padding 24px 28px, overflow-y auto):
+
+SEND BRIEF CARD:
+  background var(--s2), border 1px solid var(--blue-bd), border-radius 10px, padding 18px 20px
+  position relative, overflow hidden
+  ::before pseudo: absolute inset 0, background linear-gradient(135deg, var(--blue-glow), transparent 60%), pointer-events none
+  
+  Title: "Send document request to supplier" Fraunces 700 16px
+  Subtitle 12px var(--t2) line-height 1.5:
+    If no supplier_request yet:
+      "Generate a secure upload link and send it to your supplier. They can upload
+       directly — no account required."
+    If supplier_request exists and last_sent_at is set:
+      "Last sent via [channel] · [relative time] · [open status if known]"
+  
+  THREE SEND BUTTONS (flex row, gap 8px, flex-wrap wrap):
+    💬 Send via WhatsApp — bg rgba(37,211,102,.12), border rgba(37,211,102,.3), color #25D366, 12px 700
+    ✉ Send via Email    — bg var(--blue-dim), border var(--blue-bd), color var(--blue), 12px 700
+    🔗 Copy upload link  — bg var(--s3), border var(--s5), color var(--t2), 12px 700
+    All: padding 9px 16px, border-radius 7px, cursor pointer, display flex align-items center gap 7px
+
+DOCUMENT CHECKLIST:
+  Section label: DM Mono 9px uppercase var(--t3) "Required documents ([n])" with line after
+
+  If supplier_request exists: show docs from supplier_requests.docs_required
+  If no supplier_request yet: show docs from the current lookup's supplier_docs_json
+  
+  Each document card:
+    background var(--s2), border var(--s5), border-radius 9px, margin-bottom 6px, overflow hidden
+    
+    HEADER ROW (always visible, padding 12px 14px, flex align-items center, gap 12px):
+      Icon box (34×34, border-radius 8px):
+        verified: gbg/gbd | blocking: rbg/rbd | pending: abg/abd | waiting: var(--s4)/var(--s5)
+        Shows emoji: 📄 invoice, 🌍 CoO, 🌿 phyto, 📦 packing list, 🚢 bill of lading, 📋 other
+      Doc name: 13px 600 var(--t1) (flex:1)
+      Doc issuer: 10px var(--t3) DM Mono below name
+      Status tag (DM Mono 9px, right-aligned):
+        "✓ Verified" green | "⊗ Needs amendment" red | "● Awaiting upload" amber | "○ Not yet sent" grey
+
+    FINDING ROW (only if verified=false AND finding is set):
+      background var(--rbg), border-top 1px solid var(--rbd), padding 8px 14px
+      Flex row, gap 9px
+      Red dot (6px) + finding text (11px var(--t2) line-height 1.5 flex:1) + UCP rule badge (blue-tinted DM Mono 9px)
+
+    FILE ROW (always visible, padding 8px 14px, background var(--s1), border-top var(--s5)):
+      If file exists: filename (DM Mono 11px var(--t3)) + size + upload time + "↓ Download" + "Replace file" buttons
+      If no file: "Not yet uploaded" italic var(--t3) + "Upload on behalf" blue outline button
+
+RIGHT PANEL (background var(--s1), border-left var(--s5), padding 20px 18px, overflow-y auto):
+  Title: "Document progress" Fraunces 700 15px
+  Subtitle: DM Mono 11px var(--t3) "[commodity] · [origin] → [dest]"
+  
+  Progress label: DM Mono 9px var(--t3) "[X] of [Y] received"
+  Progress bar: height 4px, background var(--s5), border-radius 2px
+    Fill: width = (verified_count / total_count) * 100%
+    Color: 100% = var(--green), otherwise var(--amber)
+  
+  Status sentence: 11px var(--t2) line-height 1.5
+  
+  [Divider: 1px var(--s5)]
+  
+  Activity timeline label: DM Mono 9px var(--t3) "Activity"
+  Timeline events (from supplier_uploads + supplier_requests logs):
+    Each: flex row gap 10px, padding 8px 0, border-bottom var(--s5)
+    Dot (8px circle, colour by event type) + event text (11px var(--t2)) + time (DM Mono 9px var(--t3))
+    Events: "Supplier brief sent via WhatsApp", "Invoice uploaded", "CoO verified", etc.
+  
+  [Divider]
+  
+  Supplier label + supplier_name (12px 600 var(--t1))
+  Location if known (11px DM Mono var(--t3))
+  "View upload page →" ghost button (full width, var(--t2))
+
+━━━ PART 2: SEND ACTIONS ━━━
+
+Create API route: POST /api/supplier-requests/create-or-get
+  Body: { lookupId: string }
+  Logic:
+    1. Check if supplier_requests record exists for this lookupId
+    2. If not: create one with docs_required populated from lookup's supplier_docs_json
+       Set upload_expires_at = NOW() + 30 days
+       Generate upload_token automatically (DEFAULT gen_random_uuid() handles this)
+    3. Return: { requestId, uploadToken, uploadUrl: `https://app.taptrao.com/upload/${uploadToken}` }
+
+Create API route: POST /api/supplier-requests/[id]/log-send
+  Body: { channel: 'whatsapp' | 'email' | 'link' }
+  Logic: append channel to sent_via array, update last_sent_at = NOW()
+
+BUTTON WIRE-UP:
+
+"Send via WhatsApp" onClick:
+  1. Call /api/supplier-requests/create-or-get with current lookupId
+  2. Call /api/supplier-requests/[id]/log-send with channel='whatsapp'
+  3. Build message: `Please upload your documents for [commodity] ([origin] → [dest]) here: [uploadUrl]`
+  4. Open: window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank')
+
+"Send via Email" onClick:
+  1. Call /api/supplier-requests/create-or-get
+  2. Call log-send with channel='email'
+  3. Build subject: `Document request — [commodity] [origin] → [dest]`
+  4. Build body (multiline): list of required documents + upload URL
+  5. Open: window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(body)}`
+
+"Copy upload link" onClick:
+  1. Call /api/supplier-requests/create-or-get
+  2. Call log-send with channel='link'
+  3. navigator.clipboard.writeText(uploadUrl)
+  4. Button text changes to "✓ Copied!" for 2 seconds then reverts
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: curl -X POST http://localhost:3000/api/supplier-requests/create-or-get \
+  -H "Content-Type: application/json" -d '{"lookupId":"00000000-0000-0000-0000-000000000000"}'
+Expected: JSON response (error is fine if lookupId doesn't exist — just confirm the route responds).
+Log: "PROMPT 14 COMPLETE — supplier docs tab and send actions wired"

@@ -1,0 +1,106 @@
+Replace the existing /trades page with the new My Trades overview.
+
+━━━ PAGE STRUCTURE ━━━
+
+Use AppShell with activeNav="/trades".
+Main content area: overflow-y auto, padding 32px 40px 60px.
+
+1. PAGE HEADER ROW (flex, space-between, margin-bottom 28px)
+   Left:
+     "My Trades" — Fraunces 900 32px letter-spacing -1.5px color var(--t1)
+     Subtitle — 13px var(--t2):
+       Query: SELECT COUNT(*) FROM lookups WHERE user_session_id = [session]
+       Needs attention count: lookups where readiness_verdict = 'RED' OR 'AMBER'
+       Text: "[total] active trades · [attention] need attention"
+   Right: "+ New Lookup" → href="/lookup", solid blue, font-weight 700
+
+2. SUMMARY CARDS (4 cards, display grid grid-template-columns repeat(4,1fr), gap 2px, margin-bottom 28px)
+   Each card: background var(--s1), border var(--s5), padding 20px 22px
+   First: border-radius 10px 0 0 10px. Last: border-radius 0 10px 10px 0.
+   Value: Fraunces 900 36px letter-spacing -2px line-height 1
+   Label: DM Mono 11px color var(--t3) letter-spacing .04em margin-top 4px
+
+   Card 1: value = total lookup count, color var(--blue), label "Active trades"
+   Card 2: value = count where readiness_verdict IN ('RED','AMBER'), color var(--red), label "Need attention"
+     This card has: linear-gradient(135deg, rgba(239,68,68,.05), transparent 60%) overlay
+   Card 3: value = count of lc_checks with verdict = 'DISCREPANCIES_FOUND', color var(--amber), label "LC checks pending"
+   Card 4: value = count of lookups older than 30 days (proxy for archive-ready), color var(--green), label "Ready to archive"
+   All counts default to 0 if no data.
+
+3. FILTER BAR (flex, align-items center, gap 8px, margin-bottom 20px)
+   Filter pills (button elements):
+     "All trades" | "Needs attention" | "In progress" | "Archived"
+     Active: background var(--blue-dim), border var(--blue-bd), color var(--blue), border-radius 20px, padding 5px 14px
+     Inactive: border var(--s5), color var(--t2), border-radius 20px, same padding
+   Search input (margin-left auto):
+     background var(--s2), border var(--s5), border-radius 6px, padding 6px 12px
+     font-size 12px, width 220px, placeholder "Search commodity, corridor…"
+     focus: border-color var(--blue-bd), outline none
+
+4. TRADES TABLE
+   width 100%, border-collapse collapse
+
+   Header row: DM Mono 9px uppercase letter-spacing .12em color var(--t3)
+   Columns: Commodity · Corridor | Step | Risk | Score | Updated | (open arrow)
+
+   Data: SELECT l.*, c.name as commodity_name, c.hs_code, o.iso2 as origin_iso2,
+         o.country_name as origin_name, d.iso2 as dest_iso2, d.country_name as dest_name,
+         l.readiness_score, l.readiness_verdict
+         FROM lookups l
+         JOIN commodities c ON l.commodity_id = c.id
+         JOIN origin_countries o ON l.origin_iso2 = o.iso2
+         JOIN destinations d ON l.dest_iso2 = d.iso2
+         WHERE l.user_session_id = [session]
+         ORDER BY l.created_at DESC
+
+   For each row:
+   
+   Column 1 — Commodity · Corridor:
+     Flex row, gap 10px
+     Avatar: 32×32px, border-radius 8px, use getAvatarColour(origin_iso2) from lib/avatarColours.ts
+             DM Mono 10px font-weight 800, shows origin_iso2 (2 letters)
+     Text block: commodity_name (13px 600 var(--t1)) + origin_iso2 → dest_iso2 (11px DM Mono var(--t3))
+
+   Column 2 — Step:
+     Determine step from data:
+       No lc_check record → "Lookup" with color var(--t3)
+       lc_check verdict = 'DISCREPANCIES_FOUND' → "LC Check" with color var(--blue)
+       lc_check verdict = 'COMPLIANT' → "TwinLog Trail" with color var(--amber)
+       twinlog_locked_at is set → "Archive ready" with color var(--green)
+     Show: 6px dot in step colour + step label text 11px 500
+
+   Column 3 — Risk:
+     readiness_verdict = 'RED' → "⊗ Blocking" red tag
+     readiness_verdict = 'AMBER' → "● At risk" amber tag
+     readiness_verdict = 'GREEN' → "✓ Clear" green tag
+     null → "● Review" amber tag
+     Tag styling: DM Mono 9px, padding 2px 8px, border-radius 4px, matching bg/border/text
+
+   Column 4 — Score (text-align right):
+     DM Mono 14px 700
+     <50: color var(--red) | 50–79: color var(--amber) | 80+: color var(--green) | null: "—" var(--t3)
+
+   Column 5 — Updated (text-align right):
+     DM Mono 11px var(--t3), format: "20 Feb · 14:12"
+
+   Column 6 — Open:
+     Default: opacity 0. Row hover: opacity 1.
+     "Open →" 11px 600 var(--blue)
+     On click: navigate to /lc-check?lookupId=[id]
+
+   Row hover: all td background → var(--s2)
+   Row border-bottom: 1px solid var(--s5)
+   Stagger animation: each row fadeUp with 40ms delay × row index
+
+   EMPTY STATE (when no lookups):
+     Centered, padding 80px 0
+     "No trades yet." Fraunces 700 20px var(--t2)
+     "Run your first compliance lookup to get started." 13px var(--t3) margin-top 8px
+     "+ New Lookup" solid blue button, margin-top 20px
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: curl -s http://localhost:3000/trades | grep -o 'My Trades'
+Expected: "My Trades".
+Log: "PROMPT 12 COMPLETE — My Trades page built"

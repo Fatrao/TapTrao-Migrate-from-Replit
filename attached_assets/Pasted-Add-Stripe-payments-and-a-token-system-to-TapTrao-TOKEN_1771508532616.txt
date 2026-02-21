@@ -1,0 +1,128 @@
+Add Stripe payments and a token system to TapTrao.
+
+TOKEN SYSTEM:
+Create two new database tables:
+
+TABLE: user_tokens
+- session_id: string (primary key — matches the browser session UUID)
+- balance: integer default 0
+- created_at: timestamp
+- updated_at: timestamp
+
+TABLE: token_transactions
+- id: UUID primary key
+- session_id: string (FK to user_tokens)
+- type: enum (PURCHASE, SPEND)
+- amount: integer (positive for purchase, negative for spend)
+- description: string (e.g. "Compliance Lookup — Cashew CI→GB", "Token pack purchase — Standard")
+- stripe_session_id: string nullable
+- created_at: timestamp
+
+TOKEN COSTS:
+- Compliance Lookup (/lookup): costs 5 tokens per lookup
+- LC Document Check (/lc-check): costs 3 tokens per check
+
+TOKEN PACKS — create 4 Stripe Checkout products:
+- Starter: $9.99 = 10 tokens
+- Standard: $19.99 = 25 tokens
+- Pro: $29.99 = 45 tokens
+- Power: $49.99 = 85 tokens
+
+IMPLEMENTATION:
+
+1. SESSION IDENTITY
+Use a UUID stored in a browser cookie (httpOnly) as the user identifier.
+On first visit, generate a UUID, set the cookie, create a user_tokens row with balance 0.
+This persists across page reloads without requiring login.
+
+2. FREE DEMO
+Add a demo_used boolean column to user_tokens (default false).
+First compliance lookup is FREE — no tokens deducted, demo_used set to true.
+First LC check is also FREE if demo_used is false on LC checker.
+After demo used: require tokens for all subsequent actions.
+Show "Free demo" badge on the lookup/LC buttons until demo is used.
+
+3. TOKEN CHECK BEFORE RUNNING
+Before running a compliance lookup:
+- Check user_tokens.balance >= 5
+- If yes: run the lookup, deduct 5 tokens, log transaction
+- If no: show a modal — "You need 5 tokens for this lookup. You have X. Buy tokens to continue." with direct links to the $19.99 and $29.99 packs
+
+Before running an LC check:
+- Check balance >= 3
+- If yes: run the check, deduct 3 tokens, log transaction
+- If no: show same modal adapted for LC check (3 tokens needed)
+
+4. STRIPE CHECKOUT
+On /pricing page, wire up all 4 token pack "Buy" buttons to Stripe Checkout.
+Each button creates a Stripe Checkout session with:
+- The correct price
+- success_url: https://taptrao.com/tokens/success?session_id={CHECKOUT_SESSION_ID}
+- cancel_url: https://taptrao.com/pricing
+- metadata: { session_id: [user's cookie UUID], pack: "starter|standard|pro|power" }
+
+5. STRIPE WEBHOOK
+Create a webhook endpoint at /api/webhooks/stripe
+Listen for: checkout.session.completed
+
+IMPORTANT: The Stripe webhook must point to the live deployed URL, not localhost.
+When configuring the webhook in the Stripe dashboard, use:
+https://taptrao.com/api/webhooks/stripe
+
+On success:
+- Read metadata.session_id and metadata.pack
+- Credit the correct token amount to user_tokens.balance
+- Log a PURCHASE transaction in token_transactions
+- Do not credit twice — check stripe_session_id is not already in token_transactions
+
+6. TOKEN BALANCE IN NAV
+Show the token balance in the navigation bar at all times.
+Format: "⬡ 25 tokens" — update in real time after purchases and spending.
+If balance is 0 and demo is used, show in amber: "⬡ 0 tokens — Buy more"
+Clicking the token display goes to /pricing.
+
+7. SUCCESS PAGE
+Create /tokens/success page:
+- Confirm purchase: "You're topped up. X tokens added."
+- Show new balance
+- Two CTA buttons: "Run a Compliance Lookup" and "Check LC Documents"
+
+8. TRANSACTION HISTORY
+On /dashboard, add a "Token Activity" section showing last 10 transactions:
+- Date, description, amount (+25 purchase / -5 lookup), running balance
+This builds trust — traders can see exactly what they spent tokens on.
+
+ENVIRONMENT VARIABLES NEEDED:
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+
+DOMAIN CONFIGURATION:
+The production domain is taptrao.com (primary) and taptrao.app (alias).
+Both domains are registered on Cloudflare.
+Configure the app so all URLs, redirects, and canonical links use https://taptrao.com
+Set up the Next.js app to handle both taptrao.com and taptrao.app — taptrao.app should
+redirect to taptrao.com with a 301 permanent redirect.
+
+To connect the Replit deployment to taptrao.com via Cloudflare:
+1. In Replit, go to your Repl settings and add taptrao.com as a custom domain
+2. Replit will provide a CNAME target (e.g. your-repl.replit.app)
+3. In Cloudflare DNS for taptrao.com, add a CNAME record:
+   - Name: @ (or www)
+   - Target: [the CNAME Replit provides]
+   - Proxy status: DNS only (grey cloud) initially — switch to proxied once working
+4. Do the same for taptrao.app pointing to taptrao.com
+5. SSL is handled automatically by Replit + Cloudflare
+
+After building, test the full flow:
+1. Fresh session → run free demo lookup → confirm demo_used = true, balance unchanged
+2. Try second lookup with 0 tokens → confirm modal appears
+3. Go to pricing → click Standard pack ($19.99) → complete Stripe test checkout
+   using test card 4242 4242 4242 4242, any future expiry, any CVC
+4. Confirm 25 tokens credited to balance in nav bar
+5. Run a lookup → confirm 5 tokens deducted, transaction logged
+6. Run an LC check → confirm 3 tokens deducted, transaction logged
+7. Check /dashboard token activity shows all transactions correctly
+8. Confirm success_url redirects to https://taptrao.com/tokens/success correctly
+
+Use Stripe test mode throughout. Do not go live until all 8 tests pass.

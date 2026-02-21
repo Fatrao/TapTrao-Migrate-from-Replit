@@ -1,0 +1,138 @@
+Context
+This is a production web app (taptrao.com).
+Desktop layout is acceptable. Mobile layout is broken and must be fixed without redesigning the product.
+
+Target devices: iPhone 12–15, Android Chrome (360–430px width).
+
+🎯 Objective
+
+Fix mobile responsiveness and readability on the homepage without changing branding, copy, or product logic.
+
+🧱 Problems to fix (observed on mobile)
+
+Navigation bar
+
+Logo + text overlap or feel cramped
+
+Menu items (“Compliance Lookup”, “LC Checker”, “Pricing”) are too close
+
+No clear mobile hierarchy
+
+Hero section
+
+Headline (“Know your compliance before you commit.”) is too large vertically
+
+Excessive vertical spacing pushes CTA too far down
+
+Subtitle text is low contrast and hard to read on mobile
+
+Buttons
+
+Primary CTA (“Run your first lookup”) is good but spacing above/below is inconsistent
+
+Secondary CTA (“See pricing”) is visually weak and misaligned
+
+Overall
+
+Too much unused vertical space
+
+Text blocks not optimised for one-hand mobile reading
+
+Mobile view feels like desktop shrunk, not mobile-first
+
+🛠 Required fixes (DO THESE, NOTHING EXTRA)
+1. Mobile Navigation
+
+Convert top navigation into:
+
+Left: TapTrao logo (icon + wordmark stacked or inline)
+
+Right: hamburger menu
+
+Hamburger opens a full-height mobile drawer with:
+
+Compliance Lookup
+
+LC Checker
+
+Pricing
+
+Increase tap targets (min 44px height)
+
+2. Hero Section (Mobile)
+
+Reduce headline font size to max 36px
+
+Set line height for headline to 1.15–1.2
+
+Reduce top padding so headline appears immediately on load
+
+Increase subtitle contrast (lighter grey or white)
+
+Limit subtitle width to avoid edge-to-edge text
+
+3. Buttons
+
+Primary CTA:
+
+Full-width button on mobile
+
+Fixed height (48–52px)
+
+Secondary CTA:
+
+Text button or outlined button
+
+Centered
+
+Clear spacing below primary CTA
+
+4. Spacing & Layout
+
+Use a single-column layout
+
+Reduce vertical margins by ~30%
+
+Apply consistent padding: 16px or 20px max
+
+No new components, no animations
+
+🎨 Design constraints (IMPORTANT)
+
+Do NOT change colours
+
+Do NOT change fonts
+
+Do NOT change copy
+
+Do NOT add new sections
+
+Only adjust:
+
+CSS
+
+Tailwind classes
+
+Media queries
+
+Flex/grid behavior
+
+✅ Definition of done
+
+Page fits fully on mobile without horizontal scrolling
+
+CTA visible above the fold
+
+Navigation usable with one thumb
+
+No visual clutter
+
+Desktop layout unchanged
+
+🧪 Testing
+
+Test at widths: 360px, 390px, 414px
+
+Test dark mode if enabled
+
+Ensure Lighthouse mobile score does not regress

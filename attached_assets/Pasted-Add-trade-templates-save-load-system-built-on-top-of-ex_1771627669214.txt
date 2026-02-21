@@ -1,0 +1,82 @@
+Add trade templates — save/load system built on top of existing lookups.
+
+━━━ DATABASE ━━━
+
+CREATE TABLE IF NOT EXISTS templates (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_session_id  TEXT NOT NULL,
+  name             TEXT NOT NULL,
+  commodity_id     UUID REFERENCES commodities(id),
+  origin_iso2      CHAR(2),
+  dest_iso2        CHAR(2),
+  snapshot_json    JSONB NOT NULL,
+  lc_terms_json    JSONB,
+  supplier_json    JSONB,
+  variable_fields  JSONB DEFAULT '{}',
+  reg_version_hash TEXT,
+  last_used_at     TIMESTAMPTZ,
+  times_used       INTEGER DEFAULT 0,
+  created_at       TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_templates_session ON templates(user_session_id);
+
+reg_version_hash: computed as SHA256(origin_iso2 + dest_iso2 + commodity hs_code + current YYYY-MM)
+This changes monthly. When loaded template's hash ≠ current hash → show stale warning.
+
+━━━ SAVE AS TEMPLATE ━━━
+
+In the TwinLog Trail panel (right side, below the PDF export button):
+Add: "💾 Save as template" ghost button (full width, var(--t2) colour)
+
+On click: open a small modal/inline form:
+  Input: "Template name" (pre-filled: "[Commodity name] [Origin]→[Dest]")
+  Button: "Save template" (solid blue)
+  On confirm:
+    INSERT into templates with full lookup snapshot_json = the complete lookup result JSON
+    Set reg_version_hash
+    Show success: "Template saved. Find it at /templates."
+
+━━━ TEMPLATES PAGE at /templates ━━━
+
+AppShell activeNav="/templates"
+
+Page header: "Templates" Fraunces 900 32px + "[n] saved templates" subtitle
+
+Template cards (CSS grid, 2 columns, gap 12px):
+Each card: background var(--s1), border var(--s5), border-radius 10px, padding 16px 18px
+Hover: border-color rgba(66,126,255,.3)
+
+Card content:
+  Header row: avatar (32px, coloured by origin) + template name (14px 700 var(--t1)) + route DM Mono var(--t3)
+  Commodity name + hs_code (12px var(--t2), margin-top 4px)
+  Meta row: "Used [times_used] times · Last used [relative date]" DM Mono 10px var(--t3) margin-top 8px
+  
+  STALE WARNING (if current reg_version_hash ≠ stored reg_version_hash):
+    Amber-tinted row: padding 8px 12px, background var(--abg), border-top var(--abd)
+    "⚠ Regulations may have changed since this template was last used"
+    11px var(--amber) font-weight 600
+
+  Footer row (flex, gap 8px, margin-top 12px, padding-top 12px, border-top var(--s5)):
+    "Use template →" solid blue button (flex:1)
+    "Delete" ghost red button (padding 7px 14px, color var(--red), border rgba(239,68,68,.3))
+
+USE TEMPLATE:
+  On "Use template →" click:
+    1. UPDATE templates SET times_used = times_used + 1, last_used_at = NOW()
+    2. Navigate to /lookup?templateId=[id]
+    
+  In /lookup, detect templateId query param on load:
+    Fetch the template, pre-fill commodity/origin/destination selects
+    Show notice banner above the form:
+      Blue-tinted, "Loading from template: [name] — check the fields below and click Run Compliance Check."
+    The user sees the pre-filled form and clicks Run as normal — gets fresh results.
+
+EMPTY STATE: "No templates saved yet. Complete a lookup and save it as a template from the TwinLog Trail."
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: SELECT table_name FROM information_schema.tables WHERE table_name = 'templates';
+Expected: 1 row.
+Log: "PROMPT 18 COMPLETE — templates built"

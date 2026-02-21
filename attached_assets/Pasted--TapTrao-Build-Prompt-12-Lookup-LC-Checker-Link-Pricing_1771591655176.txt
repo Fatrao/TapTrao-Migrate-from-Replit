@@ -1,0 +1,270 @@
+# TapTrao — Build Prompt 12: Lookup → LC Checker Link + Pricing Page Update
+
+Feed this to Replit Agent as a single prompt. It does two things:
+1. Links the Compliance Lookup to the LC Checker — auto-filling trade details
+   so the user never has to re-enter what TapTrao already knows.
+2. Updates the /pricing page to reflect the correct token pack model.
+
+---
+
+## PART 1 — LOOKUP → LC CHECKER LINK
+
+### The problem this solves
+
+A trader runs a compliance lookup for Raw Cashew Nuts, Côte d'Ivoire → UK.
+They get their TwinLog Score, their document list, their TwinLog Trail.
+Then they receive the LC from their bank and need to run an LC check.
+Currently they go to /lc-check and re-enter the commodity, HS code, origin,
+destination, and Incoterms from scratch. TapTrao already has all of this.
+This prompt closes that gap.
+
+### What to build
+
+On the compliance lookup results page, add a button below the TwinLog Trail
+download button:
+
+```
+[→ Check LC for this Trade]
+```
+
+Subtitle under the button:
+*"Pre-fills commodity, HS code, origin, destination, and required documents
+from this lookup."*
+
+### On click behaviour
+
+Do NOT auto-run the LC check. Redirect to /lc-check with pre-filled fields only.
+The user reviews the pre-filled data, adds their LC details, and runs the check
+manually.
+
+Pass the following via sessionStorage:
+
+```typescript
+{
+  lookup_id:        string,   // UUID of the source lookup
+  commodity_name:   string,   // e.g. "Raw Cashew Nuts"
+  hs_code:          string,   // e.g. "0801.31"
+  origin_iso2:      string,   // e.g. "CI"
+  origin_name:      string,   // e.g. "Côte d'Ivoire"
+  dest_iso2:        string,   // e.g. "GB"
+  dest_name:        string,   // e.g. "United Kingdom"
+  incoterms:        string,   // default "FOB" — user can change
+  required_docs:    string[], // supplier-side document names from the lookup
+}
+```
+
+### LC Checker page (/lc-check) changes
+
+When the page loads with pre-fill data in sessionStorage:
+
+1. Show a blue info banner at the top of the form:
+   ```
+   ↗ Pre-filled from your compliance lookup
+   Raw Cashew Nuts — Côte d'Ivoire → United Kingdom
+   [View lookup →]
+   ```
+   "View lookup →" links back to the original lookup result.
+   The banner has an ✕ to dismiss it.
+
+2. Pre-fill these fields on the LC terms entry form (Step 1):
+   - Goods description → commodity_name
+   - HS code → hs_code
+   - Country of origin → origin_name
+   - Incoterms → "FOB" (default, user can change)
+
+3. In the supplier documents section (Step 2), pre-populate the document
+   type tabs with the required documents from the lookup. For each document
+   in `required_docs`, add a tab pre-labelled with that document type.
+   The user still enters the field values — only the document type is pre-selected.
+
+4. All pre-filled fields must be editable. Pre-fill is a starting point,
+   not a lock.
+
+### Store the link in the database
+
+Add a `source_lookup_id` column to the `lc_checks` table:
+
+```sql
+ALTER TABLE lc_checks
+  ADD COLUMN source_lookup_id UUID REFERENCES lookups(lookup_id) NULL;
+```
+
+When an LC check is created from a pre-filled lookup, store the source
+lookup ID. This creates a traceable link between the compliance check
+and the LC check for the same trade — the foundation of the TwinLog
+Archive (Module 6).
+
+### On the dashboard (/dashboard)
+
+In the "Recent Lookups" list, if a lookup has a linked LC check, show a
+small indicator:
+
+```
+Raw Cashew Nuts — CI → GB    ● 88 LOW RISK    LC ✓    20 Feb 2026
+```
+
+"LC ✓" in green means an LC check has been run for this trade.
+"LC —" in grey means no LC check yet — clicking it goes to
+/lc-check pre-filled from that lookup.
+
+---
+
+## PART 2 — PRICING PAGE UPDATE (/pricing)
+
+Replace the existing pricing cards entirely. New structure:
+
+### Header
+
+```
+Simple, transparent pricing.
+Buy trade packs. Tokens never expire.
+No subscriptions. No monthly caps.
+```
+
+### Pricing cards (4 cards in a row on desktop, stacked on mobile)
+
+**Card 1 — Single Trade**
+- Price: $24.99
+- Label: "Single Trade"
+- Includes:
+  - 1 compliance lookup
+  - TwinLog Score
+  - Full document checklist
+  - Supplier brief generator
+  - 1 TwinLog Trail download
+- CTA button: "Buy Single Trade"
+
+**Card 2 — 3-Trade Pack**
+- Price: $59.99
+- Per trade: "$20.00 per trade"
+- Label: "3-Trade Pack"
+- Same inclusions as Single Trade ×3
+- CTA button: "Buy 3-Trade Pack"
+
+**Card 3 — 10-Trade Pack**
+- Price: $179
+- Per trade: "$17.90 per trade"
+- Label: "10-Trade Pack"
+- Same inclusions ×10
+- CTA button: "Buy 10-Trade Pack"
+
+**Card 4 — 25-Trade Pack**
+- Price: $349
+- Per trade: "$13.96 per trade"
+- Label: "25-Trade Pack"
+- Same inclusions ×25
+- CTA button: "Buy 25-Trade Pack"
+
+No "most popular" or "best value" badges on any card. Let the per-trade
+price speak for itself.
+
+### Below the cards — LC Checker add-on
+
+```
+LC Document Checker
+$3.99 per check — purchased separately.
+Cross-check supplier documents against LC terms with UCP 600 references.
+Flags discrepancies before bank submission.
+```
+
+Small, not a card. Clean line item below the main packs.
+
+### Enterprise section
+
+Below the LC line item, a simple full-width section:
+
+```
+Enterprise
+Large volume? Procurement requirements? Custom corridors?
+
+[Contact us →]
+```
+
+"Contact us →" links to mailto:CONTACT_EMAIL (replace with real address).
+No form. No calendar link. Just email.
+
+One line below: *"We respond within one business day."*
+
+### Remove from pricing page
+
+- All existing token pack references ($9.99, $19.99, $29.99 packs)
+- "Pro Monitoring: $29/month — Coming soon" card
+- "Free Demo" references
+- Any subscription or monthly pricing language
+
+### Token logic update (backend)
+
+Update token costs to match new pricing:
+
+```
+1 trade pack    = 1 token   ($24.99)
+3 trade pack    = 3 tokens  ($59.99)
+10 trade pack   = 10 tokens ($179)
+25 trade pack   = 25 tokens ($349)
+```
+
+Each compliance lookup costs 1 token.
+LC checks purchased and tracked separately at $3.99 (update from $2.99).
+Tokens do not expire — remove any expiry logic if present.
+
+Update Stripe products/prices to match. Create 4 Stripe price objects:
+- price_single_trade:  $24.99 one-time
+- price_3_trade:       $59.99 one-time
+- price_10_trade:     $179.00 one-time
+- price_25_trade:     $349.00 one-time
+
+---
+
+## RESULTS PAGE BUTTON ORDER (FINAL)
+
+The bottom of every lookup results page should now have buttons in this order:
+
+```
+[↓ TwinLog Trail]          [→ Check LC for this Trade]
+
+[↓ Customs Data Pack]      [✉ Generate Supplier Brief]
+```
+
+Two rows, two buttons each. Primary actions top row, supporting actions bottom row.
+
+---
+
+## IMPORTANT CONSTRAINTS
+
+- Do NOT auto-run the LC check when redirecting from lookup. Pre-fill only.
+- Do NOT change the LC Checker's cross-check logic. Only touch the form
+  pre-population and the source_lookup_id storage.
+- Do NOT add badges to pricing cards.
+- The enterprise "Contact us" must be a mailto link, not a form.
+- All pre-filled fields on the LC Checker must remain editable.
+
+---
+
+## VERIFICATION
+
+Test these three scenarios:
+
+**Scenario 1 — Pre-fill flow:**
+- Run a Raw Cashew Nuts / CI → GB lookup
+- Click "Check LC for this Trade"
+- Confirm: redirected to /lc-check with blue banner showing correct commodity
+  and corridor
+- Confirm: goods description, HS code, origin, and Incoterms are pre-filled
+- Confirm: supplier document tabs are pre-populated with document types from lookup
+- Confirm: all fields are editable
+
+**Scenario 2 — Dashboard LC indicator:**
+- Complete a full LC check linked from a lookup
+- Go to /dashboard
+- Confirm: that lookup row shows "LC ✓" in green
+- Find a lookup with no LC check — confirm it shows "LC —" in grey
+- Click "LC —" — confirm it redirects to /lc-check pre-filled from that lookup
+
+**Scenario 3 — Pricing page:**
+- Go to /pricing
+- Confirm: 4 trade pack cards showing $24.99 / $59.99 / $179 / $349
+- Confirm: LC Checker shown as $3.99 line item below cards
+- Confirm: Enterprise "Contact us" mailto link present
+- Confirm: no subscription language, no monthly pricing, no badge labels
+
+Report all three scenario results before confirming the build is complete.

@@ -1,0 +1,388 @@
+# PROMPT 10: Logo, Icons (Android + iOS + Desktop) + Demo Section
+
+Three things. Do them in order.
+
+---
+
+## PART 1 — UPLOAD THE NEW LOGO AND ALL ICONS
+
+I have uploaded the following files. Place ALL of them into the `/public/` folder, replacing anything that was there before:
+
+| File | Purpose |
+|------|---------|
+| `logo.png` | App logo — used in sidebar and nav on every page |
+| `favicon.ico` | Browser tab icon (desktop) |
+| `favicon-16x16.png` | Browser favicon small |
+| `favicon-32x32.png` | Browser favicon standard |
+| `favicon-48x48.png` | Browser favicon large |
+| `icon-192x192.png` | Android Chrome — home screen icon |
+| `icon-512x512.png` | Android Chrome — splash screen |
+| `apple-touch-icon.png` | iOS Safari — home screen icon |
+
+---
+
+## PART 2 — WIRE UP THE ICONS IN THE APP
+
+### Root layout (`app/layout.tsx`)
+
+Replace the metadata export with:
+
+```tsx
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'TapTrao — Trade Compliance for Commodity Traders',
+  description: 'Standalone trade compliance checks for commodity traders sourcing from Africa. No ERP required. From $4.99.',
+  icons: {
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
+      { url: '/favicon.ico' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
+}
+```
+
+### Web manifest for Android (`public/manifest.json`)
+
+Create this file:
+
+```json
+{
+  "name": "TapTrao",
+  "short_name": "TapTrao",
+  "description": "Trade compliance for commodity traders",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D1117",
+  "theme_color": "#427EFF",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
+```
+
+### Link the manifest in root layout `<head>`
+
+In `app/layout.tsx`, add this inside the `<head>` tag:
+
+```tsx
+<link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#427EFF" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="TapTrao" />
+```
+
+### Update logo image everywhere
+
+Find every place in the codebase where the logo image is referenced (sidebar, homepage nav, pricing nav) and make sure they all use:
+
+```tsx
+<img src="/logo.png" width={36} height={36} style={{ borderRadius: '8px', objectFit: 'contain' }} alt="TapTrao" />
+```
+
+Delete any old logo files (`logo-old.png`, `taptrao-logo.png`, etc.) from `/public/`.
+
+---
+
+## PART 3 — DEMO SECTION ON HOMEPAGE
+
+Add an interactive 3-step demo to the homepage (`app/page.tsx`), between the hero and the feature cards.
+
+Since this needs interactivity, convert `app/page.tsx` to a client component by adding `'use client'` at the top, and import `useState` and `useEffect`.
+
+### The DemoSection component
+
+Add this component inside `page.tsx`:
+
+```tsx
+function DemoSection() {
+  const [step, setStep] = useState(1)
+  const total = 3
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setStep(s => s === total ? 1 : s + 1)
+    }, 4000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const tabStyle = (n: number): React.CSSProperties => ({
+    padding: '10px 20px',
+    fontSize: '10px',
+    fontWeight: 500,
+    cursor: 'pointer',
+    fontFamily: "'DM Mono', monospace",
+    letterSpacing: '0.05em',
+    textTransform: 'uppercase',
+    color: step === n ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.35)',
+    borderBottom: step === n ? '2px solid #427EFF' : '2px solid transparent',
+    transition: 'all 0.15s',
+    userSelect: 'none',
+  })
+
+  const card: React.CSSProperties = {
+    background: '#0D1117', borderRadius: '12px', padding: '18px 20px',
+  }
+
+  const sectionTitle: React.CSSProperties = {
+    fontSize: '11px', fontWeight: 700,
+    color: 'rgba(255,255,255,0.95)',
+    letterSpacing: '0.05em', textTransform: 'uppercase',
+  }
+
+  const docRow = (dotColor: string, name: string, auth: string) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0' }}>
+      <div style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
+      <div style={{ flex: 1, fontSize: '12px', color: 'rgba(255,255,255,0.70)' }}>{name}</div>
+      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '9px', color: 'rgba(255,255,255,0.28)' }}>{auth}</div>
+    </div>
+  )
+
+  return (
+    <div style={{ maxWidth: '960px', margin: '0 auto', padding: '60px 48px 80px' }}>
+      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '10px', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', textAlign: 'center', marginBottom: '16px' }}>
+        See it in action
+      </div>
+      <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: '32px', textAlign: 'center', color: 'rgba(255,255,255,0.95)', marginBottom: '8px', letterSpacing: '-0.5px' }}>
+        From trade idea to full compliance picture
+      </h2>
+      <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.45)', textAlign: 'center', marginBottom: '40px' }}>
+        Three inputs. Seconds. No broker needed.
+      </p>
+
+      {/* Demo window */}
+      <div style={{ background: '#161B27', borderRadius: '16px', overflow: 'hidden' }}>
+
+        {/* Browser chrome bar */}
+        <div style={{ background: '#1C2333', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#EF4444' }} />
+          <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#F59E0B' }} />
+          <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#22C55E' }} />
+          <div style={{ flex: 1, background: '#0D1117', borderRadius: '5px', padding: '4px 12px', fontFamily: "'DM Mono', monospace", fontSize: '11px', color: 'rgba(255,255,255,0.35)', margin: '0 12px' }}>
+            taptrao.com/lookup
+          </div>
+        </div>
+
+        {/* Step tabs */}
+        <div style={{ display: 'flex', background: '#1C2333' }}>
+          <div style={tabStyle(1)} onClick={() => setStep(1)}>① Enter trade</div>
+          <div style={tabStyle(2)} onClick={() => setStep(2)}>② Compliance report</div>
+          <div style={tabStyle(3)} onClick={() => setStep(3)}>③ Supplier brief</div>
+        </div>
+
+        {/* Step content */}
+        <div style={{ padding: '28px', minHeight: '340px' }}>
+
+          {/* STEP 1 — Enter trade */}
+          {step === 1 && (
+            <div>
+              <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: '22px', color: 'rgba(255,255,255,0.95)', marginBottom: '4px' }}>Compliance Lookup</div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', marginBottom: '20px' }}>Enter your commodity, origin, and destination</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '12px', alignItems: 'end', marginBottom: '24px' }}>
+                {[['Commodity', 'Raw Cashew Nuts'], ['Origin Country', "Côte d'Ivoire"], ['Destination', 'United Kingdom']].map(([label, value]) => (
+                  <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '9px', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' as const }}>{label}</div>
+                    <div style={{ background: '#0D1117', borderRadius: '8px', padding: '10px 12px', color: 'rgba(255,255,255,0.95)', fontSize: '13px', fontWeight: 500 }}>{value}</div>
+                  </div>
+                ))}
+                <button onClick={() => setStep(2)} style={{ background: '#427EFF', color: 'white', border: 'none', borderRadius: '8px', padding: '10px 20px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit' }}>
+                  Run Check →
+                </button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px' }}>
+                {[
+                  { label: 'Lookups Run', value: '12', color: '#427EFF', sub: 'this month' },
+                  { label: 'LC Checks', value: '4', color: 'rgba(255,255,255,0.95)', sub: 'discrepancies caught' },
+                  { label: 'Corridors', value: '3', color: 'rgba(255,255,255,0.95)', sub: 'saved' },
+                  { label: 'Alerts', value: '2', color: '#F59E0B', sub: 'new this week' },
+                ].map(s => (
+                  <div key={s.label} style={{ background: '#0D1117', borderRadius: '12px', padding: '16px 18px' }}>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '9px', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' as const, marginBottom: '8px' }}>{s.label}</div>
+                    <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: '28px', color: s.color, letterSpacing: '-1px' }}>{s.value}</div>
+                    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.28)', marginTop: '6px' }}>{s.sub}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2 — Compliance report */}
+          {step === 2 && (
+            <div>
+              <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: '22px', color: 'rgba(255,255,255,0.95)', marginBottom: '4px' }}>Compliance Report</div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.95)', fontWeight: 600, marginBottom: '20px' }}>
+                Raw Cashew Nuts › Côte d'Ivoire › United Kingdom
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div style={card}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                    <div style={sectionTitle}>Your Side — Buyer</div>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '9px', padding: '3px 8px', borderRadius: '4px', background: 'rgba(66,126,255,0.12)', color: '#427EFF' }}>5 docs</div>
+                  </div>
+                  {docRow('#22C55E', 'Customs Declaration (CDS)', 'HMRC')}
+                  {docRow('#22C55E', 'IPAFFS Pre-notification', 'APHA')}
+                  {docRow('#22C55E', 'Port Health Inspection', 'Port Health')}
+                  {docRow('#F59E0B', 'Import Licence (if >20MT)', 'HMRC RPA')}
+                  {docRow('#22C55E', 'Duty & VAT Payment', 'HMRC')}
+                </div>
+                <div style={card}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                    <div style={sectionTitle}>Their Side — Supplier</div>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '9px', padding: '3px 8px', borderRadius: '4px', background: 'rgba(66,126,255,0.12)', color: '#427EFF' }}>6 docs</div>
+                  </div>
+                  {docRow('#22C55E', 'Certificate of Origin', 'CCA (Conseil Anacarde)')}
+                  {docRow('#22C55E', 'Phytosanitary Certificate', 'LANADA / DPVCQ')}
+                  {docRow('#22C55E', 'Commercial Invoice', 'Supplier')}
+                  {docRow('#22C55E', 'Bill of Lading', 'Shipping Line')}
+                  {docRow('#F59E0B', 'Aflatoxin Test Report', 'Accredited Lab')}
+                </div>
+                <div style={card}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={sectionTitle}>Readiness Score</div>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '9px', padding: '3px 8px', borderRadius: '4px', background: 'rgba(34,197,94,0.10)', color: '#22C55E' }}>Low Risk</div>
+                  </div>
+                  <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: '52px', color: '#22C55E', lineHeight: 1, textAlign: 'center', padding: '8px 0 4px' }}>87</div>
+                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '10px', color: 'rgba(255,255,255,0.28)', textAlign: 'center', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>Compliance Readiness</div>
+                  <div style={{ height: 3, background: 'rgba(255,255,255,0.07)', borderRadius: 2, margin: '12px 0 8px', overflow: 'hidden' }}>
+                    <div style={{ height: 3, background: 'linear-gradient(90deg,#427EFF,#22C55E)', borderRadius: 2, width: '87%' }} />
+                  </div>
+                  {[['Commodity risk','LOW','#22C55E'],['Origin risk','LOW','#22C55E'],['Regulatory complexity','MEDIUM','#F59E0B'],['Known hazards','AFLATOXIN','#F59E0B']].map(([k,v,c]) => (
+                    <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', padding: '4px 0' }}>
+                      <span style={{ color: 'rgba(255,255,255,0.45)' }}>{k}</span>
+                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '10px', color: c }}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={card}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={sectionTitle}>Duty Estimate</div>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '9px', padding: '3px 8px', borderRadius: '4px', background: 'rgba(34,197,94,0.10)', color: '#22C55E' }}>GSP rate</div>
+                  </div>
+                  {[['MFN Tariff Rate','0%'],['GSP Preference','0% (eligible)'],['UK VAT (Import)','20%'],['Est. duty on $50k','$0'],['Est. VAT on $50k','$10,000']].map(([k,v]) => (
+                    <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', fontSize: '12px' }}>
+                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '10px', color: 'rgba(255,255,255,0.28)' }}>{k}</span>
+                      <span style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 600 }}>{v}</span>
+                    </div>
+                  ))}
+                  <div style={{ marginTop: '10px', background: '#1C2333', borderRadius: '7px', padding: '8px 12px', display: 'flex', justifyContent: 'space-between', fontFamily: "'DM Mono', monospace", fontSize: '10px', color: 'rgba(255,255,255,0.28)' }}>
+                    <span>TT-2026-a3f9c1</span>
+                    <span style={{ color: '#427EFF' }}>sha256:a3f9c1...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3 — Supplier brief */}
+          {step === 3 && (
+            <div>
+              <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: '22px', color: 'rgba(255,255,255,0.95)', marginBottom: '4px' }}>Supplier Brief</div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', marginBottom: '20px' }}>Ready to send — email or WhatsApp</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div style={{ background: '#0D1117', borderRadius: '12px', padding: '20px' }}>
+                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '9px', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' as const, marginBottom: '12px' }}>📧 Email Format</div>
+                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.70)', lineHeight: 1.8 }}>
+                    <div style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 600, marginBottom: '8px' }}>Subject: Required documents — Raw Cashew Nuts CIV → UK</div>
+                    Dear Supplier,<br/><br/>
+                    Please provide the following documents:<br/><br/>
+                    <span style={{ color: 'rgba(255,255,255,0.90)' }}>
+                      1. Certificate of Origin<br/>
+                      &nbsp;&nbsp;→ <span style={{ color: '#427EFF' }}>CCA (Conseil du Coton et de l'Anacarde)</span><br/><br/>
+                      2. Phytosanitary Certificate<br/>
+                      &nbsp;&nbsp;→ <span style={{ color: '#427EFF' }}>LANADA / DPVCQ</span><br/><br/>
+                      3. Aflatoxin Test Report<br/>
+                      &nbsp;&nbsp;→ Accredited laboratory
+                    </span>
+                  </div>
+                </div>
+                <div style={{ background: '#0D1117', borderRadius: '12px', padding: '20px' }}>
+                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '9px', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' as const, marginBottom: '12px' }}>💬 WhatsApp Format</div>
+                  <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.70)', lineHeight: 2 }}>
+                    <span style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 700 }}>TapTrao Document Request</span><br/>
+                    Raw Cashew Nuts · CIV → UK<br/><br/>
+                    Please send:<br/>
+                    ✅ Certificate of Origin<br/>
+                    <span style={{ color: 'rgba(255,255,255,0.40)', fontSize: '11px' }}>&nbsp;&nbsp;_(CCA — Conseil Anacarde)_</span><br/>
+                    ✅ Phytosanitary Certificate<br/>
+                    <span style={{ color: 'rgba(255,255,255,0.40)', fontSize: '11px' }}>&nbsp;&nbsp;_(LANADA/DPVCQ)_</span><br/>
+                    ✅ Aflatoxin Test Report<br/>
+                    <span style={{ color: 'rgba(255,255,255,0.40)', fontSize: '11px' }}>&nbsp;&nbsp;_(Accredited lab)_</span>
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginTop: '16px', display: 'flex', gap: '10px' }}>
+                <button style={{ background: '#427EFF', color: 'white', border: 'none', borderRadius: '7px', padding: '9px 20px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Copy Email</button>
+                <button style={{ background: 'rgba(37,211,102,0.15)', color: '#25D366', border: 'none', borderRadius: '7px', padding: '9px 20px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Copy WhatsApp</button>
+                <a href="/lookup" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.70)', borderRadius: '7px', padding: '9px 20px', fontSize: '13px', fontWeight: 500, display: 'inline-block' }}>Run another lookup →</a>
+              </div>
+            </div>
+          )}
+
+        </div>
+      </div>
+
+      {/* Progress dots + next button */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginTop: '20px' }}>
+        {[1, 2, 3].map(n => (
+          <div key={n} onClick={() => setStep(n)} style={{
+            height: 6, borderRadius: 3, cursor: 'pointer', transition: 'all 0.2s',
+            background: step === n ? '#427EFF' : 'rgba(255,255,255,0.15)',
+            width: step === n ? '20px' : '6px',
+          }} />
+        ))}
+        <button onClick={() => setStep(step === total ? 1 : step + 1)} style={{
+          background: 'rgba(66,126,255,0.15)', color: '#427EFF', border: 'none',
+          borderRadius: '6px', padding: '6px 14px', fontSize: '12px', fontWeight: 600,
+          cursor: 'pointer', fontFamily: 'inherit',
+        }}>
+          {step === total ? 'Start over ↺' : 'Next step →'}
+        </button>
+      </div>
+    </div>
+  )
+}
+```
+
+### Place the demo in the homepage
+
+In the main `HomePage` component, add `<DemoSection />` between the hero buttons and the feature cards:
+
+```tsx
+export default function HomePage() {
+  return (
+    <div>
+      {/* nav */}
+      {/* hero */}
+      <DemoSection />   {/* ← ADD HERE */}
+      {/* feature cards */}
+    </div>
+  )
+}
+```
+
+---
+
+## VERIFY
+
+1. Browser tab shows the TapTrao circular logo (not the default Next.js triangle)
+2. On Android Chrome: add to home screen → shows TapTrao icon at 192×192
+3. On iOS Safari: add to home screen → shows TapTrao icon
+4. Homepage shows: nav → hero → demo section (3 steps, auto-advances) → feature cards
+5. Demo tabs are clickable, progress dots are clickable
+6. Logo in sidebar and nav uses the new `/logo.png` file

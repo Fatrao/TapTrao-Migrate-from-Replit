@@ -1,0 +1,240 @@
+# PROMPT 9b: Fix Landing Page
+
+The landing page at `/` is broken — content is invisible (dark text on dark background) and the layout is wrong. Fix it now.
+
+## THE PROBLEM
+
+The homepage has a top navigation bar with links (Compliance Lookup, LC Checker, Pricing, Start free). This is the OLD layout. The content area below is completely black — nothing is visible.
+
+## WHAT TO DO
+
+### Step 1 — Fix the homepage layout
+
+The homepage `/` is a MARKETING page, not the app. It should NOT use the sidebar layout. It is a standalone full-width dark page.
+
+Replace the current homepage content entirely with this:
+
+```tsx
+// app/page.tsx (or pages/index.tsx)
+
+export default function HomePage() {
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: '#0D1117',
+      color: 'rgba(255,255,255,0.95)',
+      fontFamily: "'Plus Jakarta Sans', sans-serif",
+      WebkitFontSmoothing: 'antialiased',
+    }}>
+
+      {/* NAV */}
+      <nav style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 40px',
+        height: '60px',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <img src="/logo.png" style={{ width: '32px', height: '32px', borderRadius: '7px', objectFit: 'contain' }} alt="TapTrao" />
+          <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: '18px' }}>TapTrao</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          <a href="/lookup" style={{ color: 'rgba(255,255,255,0.55)', fontSize: '14px', textDecoration: 'none' }}>Compliance Lookup</a>
+          <a href="/lc-check" style={{ color: 'rgba(255,255,255,0.55)', fontSize: '14px', textDecoration: 'none' }}>LC Checker</a>
+          <a href="/pricing" style={{ color: 'rgba(255,255,255,0.55)', fontSize: '14px', textDecoration: 'none' }}>Pricing</a>
+          <a href="/lookup" style={{
+            background: '#427EFF',
+            color: 'white',
+            padding: '8px 18px',
+            borderRadius: '7px',
+            fontSize: '13px',
+            fontWeight: 600,
+            textDecoration: 'none',
+          }}>Start free →</a>
+        </div>
+      </nav>
+
+      {/* HERO */}
+      <div style={{
+        maxWidth: '760px',
+        margin: '0 auto',
+        padding: '120px 40px 80px',
+        textAlign: 'center',
+      }}>
+        <div style={{
+          display: 'inline-block',
+          background: 'rgba(66,126,255,0.12)',
+          color: '#427EFF',
+          fontFamily: "'DM Mono', monospace",
+          fontSize: '11px',
+          letterSpacing: '0.08em',
+          padding: '4px 12px',
+          borderRadius: '20px',
+          marginBottom: '24px',
+          textTransform: 'uppercase',
+        }}>
+          Trade Compliance for Commodity Traders
+        </div>
+
+        <h1 style={{
+          fontFamily: "'Fraunces', serif",
+          fontWeight: 900,
+          fontSize: '52px',
+          lineHeight: 1.1,
+          letterSpacing: '-1.5px',
+          color: 'rgba(255,255,255,0.95)',
+          marginBottom: '20px',
+        }}>
+          Know your compliance<br/>before you commit.
+        </h1>
+
+        <p style={{
+          fontSize: '17px',
+          color: 'rgba(255,255,255,0.55)',
+          lineHeight: 1.6,
+          marginBottom: '36px',
+          maxWidth: '560px',
+          margin: '0 auto 36px',
+        }}>
+          The first standalone trade compliance tool for commodity traders sourcing from Africa. No ERP. No broker. $4.99 per check.
+        </p>
+
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+          <a href="/lookup" style={{
+            background: '#427EFF',
+            color: 'white',
+            padding: '13px 28px',
+            borderRadius: '9px',
+            fontSize: '15px',
+            fontWeight: 600,
+            textDecoration: 'none',
+          }}>Run your first lookup →</a>
+          <a href="/pricing" style={{
+            background: 'rgba(255,255,255,0.06)',
+            color: 'rgba(255,255,255,0.80)',
+            padding: '13px 28px',
+            borderRadius: '9px',
+            fontSize: '15px',
+            fontWeight: 500,
+            textDecoration: 'none',
+          }}>See pricing</a>
+        </div>
+      </div>
+
+      {/* THREE FEATURES */}
+      <div style={{
+        maxWidth: '900px',
+        margin: '0 auto',
+        padding: '0 40px 100px',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr',
+        gap: '16px',
+      }}>
+        {[
+          {
+            icon: '⚡',
+            title: 'Compliance Lookup',
+            desc: 'Enter commodity, origin, and destination. Get the full regulatory picture in seconds — duties, documents, risk flags.',
+            price: '$4.99 per lookup',
+            href: '/lookup',
+          },
+          {
+            icon: '📄',
+            title: 'LC Document Checker',
+            desc: 'Upload your Letter of Credit and supplier documents. Catch discrepancies before your bank does.',
+            price: '$2.99 per check',
+            href: '/lc-check',
+          },
+          {
+            icon: '🔔',
+            title: 'Regulatory Alerts',
+            desc: 'Get notified when regulations change for your saved corridors. Never miss an SPS update or duty change.',
+            price: 'Coming soon',
+            href: '/pricing',
+          },
+        ].map((f) => (
+          <a key={f.title} href={f.href} style={{ textDecoration: 'none' }}>
+            <div style={{
+              background: '#161B27',
+              borderRadius: '14px',
+              padding: '24px',
+              height: '100%',
+              cursor: 'pointer',
+            }}>
+              <div style={{ fontSize: '24px', marginBottom: '12px' }}>{f.icon}</div>
+              <div style={{
+                fontWeight: 700,
+                fontSize: '15px',
+                color: 'rgba(255,255,255,0.95)',
+                marginBottom: '8px',
+              }}>{f.title}</div>
+              <div style={{
+                fontSize: '13px',
+                color: 'rgba(255,255,255,0.50)',
+                lineHeight: 1.5,
+                marginBottom: '16px',
+              }}>{f.desc}</div>
+              <div style={{
+                fontFamily: "'DM Mono', monospace",
+                fontSize: '11px',
+                color: '#427EFF',
+                letterSpacing: '0.04em',
+              }}>{f.price}</div>
+            </div>
+          </a>
+        ))}
+      </div>
+
+    </div>
+  )
+}
+```
+
+### Step 2 — Ensure fonts load globally
+
+In your `app/layout.tsx` (or `_app.tsx`), make sure this is in the `<head>`:
+
+```html
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+```
+
+### Step 3 — Ensure global background is set
+
+In `globals.css`, make sure:
+
+```css
+html, body {
+  background: #0D1117;
+  margin: 0;
+  padding: 0;
+}
+```
+
+This prevents any white flash or wrong background showing through.
+
+### Step 4 — Do NOT apply sidebar layout to the homepage
+
+The sidebar layout (with left nav) should only wrap these routes:
+- `/lookup`
+- `/lc-check`
+- `/dashboard`
+- `/trades`
+- `/templates`
+- `/alerts`
+- `/demurrage`
+- `/settings`
+- `/admin/*`
+
+The homepage `/` and `/pricing` should be full-width standalone pages with the top nav only.
+
+If you are using a root layout that applies the sidebar to all pages, move the sidebar into a nested layout that only covers the app routes above. The homepage must be excluded.
+
+## VERIFY
+
+After deploying:
+1. Go to `/` — should show dark hero page with headline, two buttons, three feature cards
+2. Go to `/lookup` — should show sidebar + main app layout
+3. Fonts should be Fraunces (serif) for the headline, Plus Jakarta Sans for body
+4. Background is `#0D1117` — no white, no grey, no default browser background

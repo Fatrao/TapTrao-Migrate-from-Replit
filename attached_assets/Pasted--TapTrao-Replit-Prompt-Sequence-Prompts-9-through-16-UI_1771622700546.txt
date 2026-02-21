@@ -1,0 +1,1397 @@
+# TapTrao — Replit Prompt Sequence
+## Prompts 9 through 16 · UI Rebuild + New Features
+
+**Where we are:** Prompts 1–8 are complete and live.
+Database has 154 commodities, 18 origins, 6 destinations, 5 regional frameworks.
+Module 2 (Compliance Lookup), Module 1 (LC Checker), Stripe tokens, dashboard all working.
+
+**Rules for Replit:**
+- Feed ONE prompt at a time, in order
+- Do not combine prompts
+- Each prompt ends with a SELF-CHECK — Replit runs these automatically (no manual testing needed)
+- All DB changes use `IF NOT EXISTS` — safe to re-run without breaking existing data
+- If something errors, fix it in the same prompt before moving on
+
+---
+
+## PROMPT 9 — Design System + App Shell
+
+```
+Replace the entire visual design of TapTrao. Do NOT change any backend logic,
+database, API routes, or business logic. This is CSS, layout, and typography only.
+
+━━━ STEP 1: GOOGLE FONTS ━━━
+
+In app/layout.tsx (or pages/_app.tsx), add this to <head>:
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+━━━ STEP 2: DESIGN TOKENS ━━━
+
+Create file: app/styles/tokens.css
+
+:root {
+  --s0:#07090C; --s1:#0F1318; --s2:#151920; --s3:#1C2028; --s4:#232830; --s5:#2C3240;
+  --t1:#E4E8F0; --t2:#7A8499; --t3:#424A5C;
+  --blue:#427EFF; --blue-dim:rgba(66,126,255,.12); --blue-bd:rgba(66,126,255,.28); --blue-glow:rgba(66,126,255,.06);
+  --green:#22C55E; --gbg:rgba(34,197,94,.10); --gbd:rgba(34,197,94,.18);
+  --amber:#F59E0B; --abg:rgba(245,158,11,.10); --abd:rgba(245,158,11,.20);
+  --red:#EF4444; --rbg:rgba(239,68,68,.10); --rbd:rgba(239,68,68,.20);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{background:var(--s0);color:var(--t1);font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+
+Import tokens.css in the global stylesheet.
+
+━━━ STEP 3: ORIGIN COUNTRY AVATAR COLOURS ━━━
+
+Create file: lib/avatarColours.ts
+
+export const AVATAR_COLOURS: Record<string, { bg: string; border: string; text: string }> = {
+  CI: { bg:'rgba(66,126,255,.18)',  border:'rgba(66,126,255,.32)',  text:'#93B4FF' },
+  GH: { bg:'rgba(245,158,11,.15)', border:'rgba(245,158,11,.28)', text:'#FCD34D' },
+  CM: { bg:'rgba(124,58,237,.18)', border:'rgba(124,58,237,.30)', text:'#C4B5FD' },
+  ET: { bg:'rgba(34,197,94,.12)',  border:'rgba(34,197,94,.22)',  text:'#6EE7B7' },
+  KE: { bg:'rgba(239,68,68,.12)',  border:'rgba(239,68,68,.22)',  text:'#FCA5A5' },
+  NG: { bg:'rgba(168,85,247,.15)', border:'rgba(168,85,247,.28)', text:'#D8B4FE' },
+  SN: { bg:'rgba(20,184,166,.12)', border:'rgba(20,184,166,.22)', text:'#5EEAD4' },
+  MA: { bg:'rgba(251,146,60,.12)', border:'rgba(251,146,60,.22)', text:'#FED7AA' },
+  ZA: { bg:'rgba(99,102,241,.15)', border:'rgba(99,102,241,.28)', text:'#C7D2FE' },
+  TZ: { bg:'rgba(236,72,153,.12)', border:'rgba(236,72,153,.22)', text:'#FBCFE8' },
+};
+export const DEFAULT_AVATAR = { bg:'rgba(44,50,64,.6)', border:'rgba(44,50,64,1)', text:'#7A8499' };
+export function getAvatarColour(iso2: string) {
+  return AVATAR_COLOURS[iso2] ?? DEFAULT_AVATAR;
+}
+
+━━━ STEP 4: APP SHELL COMPONENT ━━━
+
+Create file: components/AppShell.tsx
+
+A CSS grid wrapper used by every authenticated page:
+- grid-template-rows: 52px 1fr
+- grid-template-columns: 228px 1fr
+- height: 100vh; overflow: hidden
+
+TOP BAR (grid-column: 1/-1, height 52px, background var(--s0), border-bottom 1px solid var(--s5)):
+  Left section (width 228px, border-right 1px solid var(--s5)):
+    Logo img (30×30, object-fit contain) + "TapTrao" in Fraunces 700 17px color var(--t1)
+  Center (flex:1, padding 0 20px): children prop — used for breadcrumb or page title
+  Right (padding 0 16px, gap 8px):
+    Token chip: background var(--s3), border var(--s5), border-radius 20px, padding 4px 10px
+      "[n] tokens" — number in var(--blue) DM Mono 700
+    CTA button: background var(--blue), color #fff, font-weight 700, 11px, padding 6px 14px, border-radius 5px, text "Buy trade pack"
+
+SIDEBAR (background var(--s1), border-right 1px solid var(--s5), padding 10px 8px):
+  "+ New Lookup" button:
+    background var(--blue-dim), border 1px solid var(--blue-bd), color var(--blue)
+    font-size 12px, font-weight 700, border-radius 7px, padding 8px 10px, full width, margin-bottom 16px
+
+  Section labels: DM Mono 9px, letter-spacing .12em, uppercase, color var(--t3), padding 10px 8px 5px
+
+  Nav items (accepts: icon, label, href, active, badge):
+    padding 6px 8px, border-radius 6px, font-size 12px, font-weight 500
+    Default: color var(--t2)
+    Hover: background var(--s3), color var(--t1)
+    Active: background var(--s3), color var(--t1)
+      + 2px left border in var(--blue) (absolute positioned, top 4px, bottom 4px, left 0)
+    Badge prop (optional): shown right-aligned
+      amber badge: background var(--amber), color #000, DM Mono 8px, padding 1px 5px, border-radius 3px
+      blue badge: background var(--blue-dim), border var(--blue-bd), color var(--blue), same sizing
+
+  Sidebar nav items in order:
+    ▤  My Trades         href="/trades"
+    ✉  Supplier Inbox    href="/inbox"   (amber badge: pending supplier count)
+    ◈  Templates         href="/templates"
+    ◎  Regulatory Alerts href="/alerts"  (blue badge: unread alert count)
+    [divider: 1px var(--s5)]
+    ◈  Pricing           href="/pricing"
+    ⚙  Settings          href="/settings"
+
+  Children slot at bottom of sidebar for any extra content.
+
+Props for AppShell:
+  children: ReactNode       — main content
+  topCenter?: ReactNode     — breadcrumb or page title in top bar center
+  sidebarBottom?: ReactNode — extra content at sidebar bottom
+  activeNav: string         — matches href to set active state
+
+━━━ STEP 5: WRAP EXISTING PAGES ━━━
+
+Wrap these existing pages with AppShell (pass the correct activeNav prop):
+  /lookup    → activeNav="/trades"
+  /lc-check  → activeNav="/trades"
+  /dashboard → activeNav="/trades"
+  /trades    → activeNav="/trades"
+  /pricing   → activeNav="/pricing"
+
+Do NOT change the internal content of these pages yet — just wrap them.
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no TypeScript errors in the new files.
+Run: curl -s http://localhost:3000/lookup | grep -o 'Plus Jakarta Sans'
+Expected: returns "Plus Jakarta Sans" (font is in the page).
+Log to console: "PROMPT 9 COMPLETE — design system installed"
+```
+
+---
+
+## PROMPT 10 — Step Navigation + Page Titles
+
+```
+Add the horizontal step navigation component and update existing pages to use it.
+
+━━━ STEP 1: STEP NAV COMPONENT ━━━
+
+Create file: components/StepNav.tsx
+
+Props:
+  steps: string[]          — e.g. ['Lookup', 'LC Check', 'TwinLog Trail', 'Archive']
+  currentIndex: number     — 0-based index of active step
+  completedUpTo: number    — steps before this index show as done (green check)
+
+Render: horizontal bar, background var(--s1), border-bottom 1px solid var(--s5), padding 0 24px
+
+Each step:
+  Container: flex row, align-items center, padding 13px 14px 11px, position relative
+  Active state: border-bottom 2px solid var(--blue), margin-bottom -1px
+  
+  Step dot (18×18, border-radius 50%):
+    Done  → background var(--green), border var(--green), shows "✓" in white 9px
+    Active → background var(--blue),  border var(--blue),  shows step number in white 9px
+    Pending → border 1.5px solid var(--t3), shows step number in var(--t3) 9px
+
+  Step label (12px, font-weight 600):
+    Done → color var(--t2)
+    Active → color var(--t1)
+    Pending → color var(--t3)
+
+  Arrow separator "›" between steps: color var(--s5) 12px, margin 0 2px
+
+━━━ STEP 2: TAB BAR COMPONENT ━━━
+
+Create file: components/TabBar.tsx
+
+Props: tabs: string[], activeTab: string, onChange: (tab: string) => void
+
+Render: horizontal bar, background var(--s0), border-bottom 1px solid var(--s5), padding 0 28px
+
+Each tab: padding 10px 16px, font-size 12px, font-weight 600, cursor pointer
+  Active: color var(--t1), border-bottom 2px solid var(--blue), margin-bottom -1px
+  Inactive: color var(--t3), no border
+
+━━━ STEP 3: UPDATE LC CHECKER PAGE ━━━
+
+In /lc-check, add above the existing form content:
+1. <StepNav steps={['Lookup','LC Check','TwinLog Trail','Archive']} currentIndex={1} completedUpTo={0} />
+2. <TabBar tabs={['Check','Supplier docs','Corrections']} activeTab="Check" onChange={...} />
+
+The tab bar switching is UI-only for now — "Supplier docs" and "Corrections" tabs
+show a placeholder: "Coming in the next update." in var(--t2) centered.
+
+━━━ STEP 4: UPDATE LOOKUP PAGE ━━━
+
+In /lookup, add above the results (below the form):
+<StepNav steps={['Lookup','LC Check','TwinLog Trail','Archive']} currentIndex={0} completedUpTo={-1} />
+
+Only show the StepNav after a lookup has been run (not on the empty form state).
+
+━━━ STEP 5: BREADCRUMB IN TOP BAR ━━━
+
+In /lc-check, pass to AppShell topCenter prop:
+A breadcrumb showing: [Commodity] · [Origin] → [Destination] · [BADGE]
+Badge: background var(--blue-dim), border var(--blue-bd), color var(--blue),
+       DM Mono 10px 600, padding 2px 8px, border-radius 4px, text = current step name
+
+If no active trade context yet, topCenter shows just the page name.
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no TypeScript errors.
+Run: grep -r "StepNav" app/ components/
+Expected: StepNav is imported in at least 2 page files.
+Log: "PROMPT 10 COMPLETE — step nav installed"
+```
+
+---
+
+## PROMPT 11 — Landing Page
+
+```
+Replace the existing homepage at / with a new marketing landing page.
+This page does NOT use AppShell — it is a standalone public page.
+
+━━━ FULL PAGE STRUCTURE ━━━
+
+Create/replace: app/page.tsx (or pages/index.tsx)
+
+1. FIXED NAV BAR
+   height 58px, background rgba(7,9,12,.88), backdrop-filter blur(16px), border-bottom 1px solid var(--s5)
+   Left: logo (34px) + "TapTrao" Fraunces 700 20px
+   Center: links "How it works" | "Pricing" | "Corridors" — color var(--t2) 13px, gap 36px
+   Right: "Log in" ghost button (border var(--s5)) + "Start free" solid blue button
+
+2. HERO SECTION
+   min-height: 100vh, flex column, align-items center, justify-content center, text-align center
+   padding-top: 120px (clears nav)
+
+   Background (CSS only, no images):
+     Radial glow: absolute, top 15%, centered, 700px circle, rgba(66,126,255,.07) → transparent
+     Grid lines: background-image linear-gradient lines at 60px spacing, opacity .18
+       mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 0%, transparent 100%)
+
+   Badge: inline-flex, background var(--blue-dim), border var(--blue-bd), border-radius 20px
+     5px blue dot with CSS pulse animation + "Africa → World · 154 commodities · UCP 600 verified"
+     DM Mono 10px color var(--blue), letter-spacing .08em, margin-bottom 28px
+
+   H1: Fraunces 900, font-size clamp(40px,6vw,76px), letter-spacing -3px, line-height 1.02
+     "Trade with certainty" (color var(--t1)) + line break + "across every corridor" (color var(--blue))
+
+   Subtext: 17px color var(--t2), max-width 480px, line-height 1.7, margin-bottom 38px
+     "Compliance lookups, LC document checks, and tamper-proof audit trails
+      — built for commodity traders. No ERP. No broker."
+
+   CTA row: "Start your first lookup →" (blue solid, 14px, padding 13px 30px, border-radius 8px)
+             + "See how it works" (ghost, same height)
+
+   Proof line: 11px color var(--t3), flex row, gap 14px
+     ✓ No ERP required  ·  ✓ $24.99 per trade pack  ·  ✓ UCP 600 + ISBP 745  ·  ✓ sha256 audit trail
+     Checkmarks: color var(--green). Separators: color var(--s5)
+     margin-bottom 70px
+
+   APP SCREENSHOT FRAME (max-width 1080px, centered):
+     Browser chrome (border-radius 12px 12px 0 0, background var(--s1), border var(--s5)):
+       Chrome bar: 3 dots (red #FF5F57, yellow #FEBC2E, green #28C840, 11px each)
+                   + URL bar (background var(--s3), DM Mono 10px "app.taptrao.com")
+       Inside chrome: a static mock of the app UI
+         Use hard-coded HTML/JSX — no live data — showing:
+         - Sidebar with 4 trade items using coloured avatars (CI cashew, GH cocoa, CM timber, ET sesame)
+         - Step nav with "LC Check" active
+         - Main area: "LC Check" title, risk tag "● At risk — 2 blocking issues", score "74"
+         - Three doc rows: Invoice (⊗ Blocking), CoO (✓ Match), Phyto (● Pending)
+         - Right panel: "TwinLog Trail" title, reference "#TT-2026-A3F91C", download button
+         Height: 420px. Font sizes scaled down (multiply by 0.7 from app sizes).
+     Box shadow: 0 -24px 80px rgba(66,126,255,.08), 0 -8px 40px rgba(0,0,0,.6)
+
+3. FEATURES SECTION
+   padding: 80px 48px, max-width 1160px, centered
+
+   Label: DM Mono 10px uppercase var(--blue) "What TapTrao does"
+   Title: Fraunces 800 clamp(28px,4vw,46px) letter-spacing -2px "Everything a commodity trader needs to move goods"
+
+   3 cards side by side (gap 2px, borders touching):
+   Card 1: icon 🔍 in rgba(66,126,255,.18) box | "01" DM Mono | "Compliance Lookup" Fraunces 700 18px
+     Body: "Enter commodity, origin, and destination. Get the full regulatory picture — duty rates,
+            SPS requirements, EUDR triggers, and every document your supplier must provide."
+   Card 2: icon 📄 in rgba(34,197,94,.14) box | "02" | "LC Document Check"
+     Body: "Upload your Letter of Credit and supplier documents. Every field cross-checked against
+            UCP 600 and ISBP 745. Discrepancies flagged with exact article references."
+   Card 3: icon 🔒 in rgba(245,158,11,.14) box | "03" | "TwinLog Trail"
+     Body: "Every trade locked with a sha256 integrity hash. Timestamped, tamper-proof, downloadable.
+            The record your bank and auditors can verify independently."
+   Card hover: border-color rgba(66,126,255,.3)
+   First card: border-radius 10px 0 0 10px. Last card: border-radius 0 10px 10px 0.
+
+4. STATS STRIP
+   3 blocks side by side, gap 2px, max-width 1160px centered, margin-bottom 80px
+   Each block: background var(--s2), border var(--s5), padding 36px 32px, text-align center
+   Subtle blue gradient: position absolute inset 0, background linear-gradient(135deg, var(--blue-glow), transparent 60%)
+   First: border-radius 10px 0 0 10px. Last: border-radius 0 10px 10px 0.
+
+   Number: Fraunces 900 clamp(36px,5vw,56px) color var(--blue) letter-spacing -3px
+   Label:  DM Mono 12px color #C8D0E0
+
+   Values: 154 / Commodities covered | 18 / African origin countries | $24.99 / Per trade — all inclusive
+
+5. CTA CARD
+   max-width 1160px, centered, padding 0 48px, margin-bottom 100px
+   Card: background var(--s1), border var(--blue-bd), border-radius 16px, padding 64px 56px, text-align center
+   Blue radial glow from top center (position absolute, pointer-events none)
+   Title: Fraunces 900 clamp(28px,4vw,48px) letter-spacing -2px "Your first lookup is free. Start now."
+   Body: 15px color var(--t2) max-width 440px centered "No account required. Enter a commodity,
+         origin, and destination — see exactly what compliance looks like for your trade."
+   Buttons: "Run a free lookup →" (solid blue) + "View pricing" (ghost)
+
+6. FOOTER
+   border-top var(--s5), padding 32px 48px, flex row space-between
+   Left: logo (22px) + "TapTrao" Fraunces 700 + "FATRAO LIMITED · Registered in England & Wales" 11px var(--t3)
+   Center: Privacy Policy | Terms of Service | hello@taptrao.com — all 11px var(--t3) links
+   Right: © 2026 FATRAO LIMITED — 11px var(--t3)
+
+━━━ SELF-CHECK ━━━
+Run: curl -s http://localhost:3000/ | grep -o 'Fraunces'
+Expected: "Fraunces" (heading font loaded).
+Run: curl -s http://localhost:3000/ | grep -o 'FATRAO LIMITED'
+Expected: "FATRAO LIMITED" (footer text present).
+Log: "PROMPT 11 COMPLETE — landing page built"
+```
+
+---
+
+## PROMPT 12 — My Trades Page
+
+```
+Replace the existing /trades page with the new My Trades overview.
+
+━━━ PAGE STRUCTURE ━━━
+
+Use AppShell with activeNav="/trades".
+Main content area: overflow-y auto, padding 32px 40px 60px.
+
+1. PAGE HEADER ROW (flex, space-between, margin-bottom 28px)
+   Left:
+     "My Trades" — Fraunces 900 32px letter-spacing -1.5px color var(--t1)
+     Subtitle — 13px var(--t2):
+       Query: SELECT COUNT(*) FROM lookups WHERE user_session_id = [session]
+       Needs attention count: lookups where readiness_verdict = 'RED' OR 'AMBER'
+       Text: "[total] active trades · [attention] need attention"
+   Right: "+ New Lookup" → href="/lookup", solid blue, font-weight 700
+
+2. SUMMARY CARDS (4 cards, display grid grid-template-columns repeat(4,1fr), gap 2px, margin-bottom 28px)
+   Each card: background var(--s1), border var(--s5), padding 20px 22px
+   First: border-radius 10px 0 0 10px. Last: border-radius 0 10px 10px 0.
+   Value: Fraunces 900 36px letter-spacing -2px line-height 1
+   Label: DM Mono 11px color var(--t3) letter-spacing .04em margin-top 4px
+
+   Card 1: value = total lookup count, color var(--blue), label "Active trades"
+   Card 2: value = count where readiness_verdict IN ('RED','AMBER'), color var(--red), label "Need attention"
+     This card has: linear-gradient(135deg, rgba(239,68,68,.05), transparent 60%) overlay
+   Card 3: value = count of lc_checks with verdict = 'DISCREPANCIES_FOUND', color var(--amber), label "LC checks pending"
+   Card 4: value = count of lookups older than 30 days (proxy for archive-ready), color var(--green), label "Ready to archive"
+   All counts default to 0 if no data.
+
+3. FILTER BAR (flex, align-items center, gap 8px, margin-bottom 20px)
+   Filter pills (button elements):
+     "All trades" | "Needs attention" | "In progress" | "Archived"
+     Active: background var(--blue-dim), border var(--blue-bd), color var(--blue), border-radius 20px, padding 5px 14px
+     Inactive: border var(--s5), color var(--t2), border-radius 20px, same padding
+   Search input (margin-left auto):
+     background var(--s2), border var(--s5), border-radius 6px, padding 6px 12px
+     font-size 12px, width 220px, placeholder "Search commodity, corridor…"
+     focus: border-color var(--blue-bd), outline none
+
+4. TRADES TABLE
+   width 100%, border-collapse collapse
+
+   Header row: DM Mono 9px uppercase letter-spacing .12em color var(--t3)
+   Columns: Commodity · Corridor | Step | Risk | Score | Updated | (open arrow)
+
+   Data: SELECT l.*, c.name as commodity_name, c.hs_code, o.iso2 as origin_iso2,
+         o.country_name as origin_name, d.iso2 as dest_iso2, d.country_name as dest_name,
+         l.readiness_score, l.readiness_verdict
+         FROM lookups l
+         JOIN commodities c ON l.commodity_id = c.id
+         JOIN origin_countries o ON l.origin_iso2 = o.iso2
+         JOIN destinations d ON l.dest_iso2 = d.iso2
+         WHERE l.user_session_id = [session]
+         ORDER BY l.created_at DESC
+
+   For each row:
+   
+   Column 1 — Commodity · Corridor:
+     Flex row, gap 10px
+     Avatar: 32×32px, border-radius 8px, use getAvatarColour(origin_iso2) from lib/avatarColours.ts
+             DM Mono 10px font-weight 800, shows origin_iso2 (2 letters)
+     Text block: commodity_name (13px 600 var(--t1)) + origin_iso2 → dest_iso2 (11px DM Mono var(--t3))
+
+   Column 2 — Step:
+     Determine step from data:
+       No lc_check record → "Lookup" with color var(--t3)
+       lc_check verdict = 'DISCREPANCIES_FOUND' → "LC Check" with color var(--blue)
+       lc_check verdict = 'COMPLIANT' → "TwinLog Trail" with color var(--amber)
+       twinlog_locked_at is set → "Archive ready" with color var(--green)
+     Show: 6px dot in step colour + step label text 11px 500
+
+   Column 3 — Risk:
+     readiness_verdict = 'RED' → "⊗ Blocking" red tag
+     readiness_verdict = 'AMBER' → "● At risk" amber tag
+     readiness_verdict = 'GREEN' → "✓ Clear" green tag
+     null → "● Review" amber tag
+     Tag styling: DM Mono 9px, padding 2px 8px, border-radius 4px, matching bg/border/text
+
+   Column 4 — Score (text-align right):
+     DM Mono 14px 700
+     <50: color var(--red) | 50–79: color var(--amber) | 80+: color var(--green) | null: "—" var(--t3)
+
+   Column 5 — Updated (text-align right):
+     DM Mono 11px var(--t3), format: "20 Feb · 14:12"
+
+   Column 6 — Open:
+     Default: opacity 0. Row hover: opacity 1.
+     "Open →" 11px 600 var(--blue)
+     On click: navigate to /lc-check?lookupId=[id]
+
+   Row hover: all td background → var(--s2)
+   Row border-bottom: 1px solid var(--s5)
+   Stagger animation: each row fadeUp with 40ms delay × row index
+
+   EMPTY STATE (when no lookups):
+     Centered, padding 80px 0
+     "No trades yet." Fraunces 700 20px var(--t2)
+     "Run your first compliance lookup to get started." 13px var(--t3) margin-top 8px
+     "+ New Lookup" solid blue button, margin-top 20px
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: curl -s http://localhost:3000/trades | grep -o 'My Trades'
+Expected: "My Trades".
+Log: "PROMPT 12 COMPLETE — My Trades page built"
+```
+
+---
+
+## PROMPT 13 — Supplier Inbox Database + Overview Page
+
+```
+Add the Supplier Inbox feature. Two parts: database tables first, then the UI page.
+
+━━━ PART 1: DATABASE ━━━
+
+Run these in a single transaction. Rollback on any failure.
+
+CREATE TABLE IF NOT EXISTS supplier_requests (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  lookup_id         UUID REFERENCES lookups(id) ON DELETE CASCADE,
+  user_session_id   TEXT NOT NULL,
+  supplier_name     TEXT NOT NULL DEFAULT 'Supplier',
+  supplier_email    TEXT,
+  supplier_whatsapp TEXT,
+  upload_token      UUID UNIQUE DEFAULT gen_random_uuid(),
+  upload_expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '30 days',
+  status            TEXT NOT NULL DEFAULT 'waiting'
+                    CHECK (status IN ('waiting','partial','blocking','complete')),
+  docs_required     JSONB NOT NULL DEFAULT '[]',
+  docs_received     JSONB NOT NULL DEFAULT '[]',
+  sent_via          TEXT[] DEFAULT '{}',
+  last_sent_at      TIMESTAMPTZ,
+  created_at        TIMESTAMPTZ DEFAULT NOW(),
+  updated_at        TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS supplier_uploads (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  request_id        UUID REFERENCES supplier_requests(id) ON DELETE CASCADE,
+  doc_type          TEXT NOT NULL,
+  original_filename TEXT NOT NULL,
+  file_key          TEXT NOT NULL,
+  filesize_bytes    INTEGER,
+  mime_type         TEXT,
+  uploaded_at       TIMESTAMPTZ DEFAULT NOW(),
+  uploaded_by       TEXT DEFAULT 'supplier' CHECK (uploaded_by IN ('supplier','trader')),
+  verified          BOOLEAN DEFAULT false,
+  finding           TEXT,
+  ucp_rule          TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_supplier_requests_session ON supplier_requests(user_session_id);
+CREATE INDEX IF NOT EXISTS idx_supplier_requests_token   ON supplier_requests(upload_token);
+CREATE INDEX IF NOT EXISTS idx_supplier_uploads_request  ON supplier_uploads(request_id);
+
+Verify by running:
+SELECT table_name FROM information_schema.tables WHERE table_name IN ('supplier_requests','supplier_uploads');
+Expected: 2 rows returned.
+
+━━━ PART 2: INBOX PAGE ━━━
+
+Create page: app/inbox/page.tsx (or pages/inbox.tsx)
+Use AppShell with activeNav="/inbox".
+Main content: overflow-y auto, padding 32px 40px 60px.
+
+DATA QUERY:
+SELECT sr.*, 
+  c.name as commodity_name, o.iso2 as origin_iso2, d.iso2 as dest_iso2,
+  o.country_name as origin_name, d.country_name as dest_name
+FROM supplier_requests sr
+JOIN lookups l ON sr.lookup_id = l.id
+JOIN commodities c ON l.commodity_id = c.id
+JOIN origin_countries o ON l.origin_iso2 = o.iso2
+JOIN destinations d ON l.dest_iso2 = d.iso2
+WHERE sr.user_session_id = [session]
+ORDER BY
+  CASE sr.status WHEN 'blocking' THEN 1 WHEN 'waiting' THEN 2 WHEN 'partial' THEN 3 ELSE 4 END,
+  sr.updated_at DESC
+
+PAGE HEADER:
+"Supplier Inbox" Fraunces 900 32px
+Subtitle: "[n] suppliers waiting · [n] blocking issues"
+
+SUMMARY CARDS (3 cards, same style as My Trades):
+Card 1: count WHERE status IN ('waiting','partial') — color var(--amber) — "Awaiting documents"
+Card 2: count WHERE status = 'blocking' — color var(--red) — "Blocking issue"
+Card 3: count WHERE status = 'complete' AND updated_at > NOW() - INTERVAL '7 days' — color var(--green) — "Complete this week"
+
+INBOX CARDS grouped by urgency:
+
+Group labels (DM Mono 9px uppercase var(--t3) with line after):
+"Needs attention" → status IN ('blocking','waiting')
+"In progress"     → status = 'partial'
+"Complete"        → status = 'complete' (render at 0.7 opacity)
+
+Each inbox card:
+  background var(--s1), border var(--s5), border-radius 10px, padding 16px 18px
+  cursor pointer, transition border-color .15s
+  Hover: border-color rgba(66,126,255,.3)
+  If status = 'blocking': base border-color rgba(239,68,68,.2)
+
+  Layout: flex row, gap 14px, align-items center
+
+  Avatar (40×40px, border-radius 9px): use getAvatarColour(origin_iso2), shows origin_iso2 text
+
+  Body (flex:1):
+    Supplier name (13px 700 var(--t1)) + route badge (DM Mono 10px var(--t3))
+    Description: what's outstanding (12px var(--t2)) — derive from docs_required vs docs_received
+    Document progress pips row: one 22×4px rect per required doc, border-radius 2px
+      verified doc → var(--green) | blocking → var(--red) | pending → var(--s5)
+    Pip count text: "X/Y docs · Z blocking/pending" DM Mono 10px var(--t3) margin-top 6px
+
+  Meta (flex column, align-items flex-end, gap 6px, flex-shrink 0):
+    Status tag (DM Mono 9px 600, coloured):
+      blocking → rbg/rbd/red "⊗ Blocking"
+      waiting  → abg/abd/amber "● Waiting"
+      partial  → blue-dim/blue-bd/blue "↻ Partial"
+      complete → gbg/gbd/green "✓ Complete"
+    Timestamp: DM Mono 10px var(--t3) (relative: "2h ago", "1d ago")
+    THREE SEND BUTTONS (always visible, flex row, gap 6px):
+      💬 WhatsApp: bg rgba(37,211,102,.12), border rgba(37,211,102,.3), color #25D366, 11px 600
+      ✉ Email:     bg var(--blue-dim), border var(--blue-bd), color var(--blue), 11px 600
+      🔗 Link:     bg var(--s3), border var(--s5), color var(--t2), 11px 600
+      All buttons: padding 5px 10px, border-radius 6px, cursor pointer
+      (Button click behaviour is wired in Prompt 14)
+
+EMPTY STATE (when no supplier_requests):
+  Centered, "No supplier requests yet."
+  "Send your first supplier brief from the LC Checker or Compliance Lookup."
+  13px var(--t3) margin-top 8px
+
+━━━ SIDEBAR BADGE ━━━
+Update AppShell to query count of supplier_requests WHERE status IN ('waiting','blocking','partial')
+for the current session. Pass as the amber badge count on the "Supplier Inbox" sidebar item.
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'supplier_requests';
+Expected: 14 (all columns created).
+Log: "PROMPT 13 COMPLETE — supplier inbox built"
+```
+
+---
+
+## PROMPT 14 — Per-Trade Supplier Docs Tab + Send Actions
+
+```
+Add the Supplier Docs tab inside the LC Checker trade view,
+and wire up the three send actions (WhatsApp, Email, Copy link).
+
+━━━ PART 1: SUPPLIER DOCS TAB ━━━
+
+In /lc-check, the TabBar already exists from Prompt 10.
+Replace the "Supplier docs" placeholder content with the real UI.
+
+"Supplier docs" tab layout: grid, 2 columns (flex:1 main | 292px right panel)
+
+LEFT PANEL (padding 24px 28px, overflow-y auto):
+
+SEND BRIEF CARD:
+  background var(--s2), border 1px solid var(--blue-bd), border-radius 10px, padding 18px 20px
+  position relative, overflow hidden
+  ::before pseudo: absolute inset 0, background linear-gradient(135deg, var(--blue-glow), transparent 60%), pointer-events none
+  
+  Title: "Send document request to supplier" Fraunces 700 16px
+  Subtitle 12px var(--t2) line-height 1.5:
+    If no supplier_request yet:
+      "Generate a secure upload link and send it to your supplier. They can upload
+       directly — no account required."
+    If supplier_request exists and last_sent_at is set:
+      "Last sent via [channel] · [relative time] · [open status if known]"
+  
+  THREE SEND BUTTONS (flex row, gap 8px, flex-wrap wrap):
+    💬 Send via WhatsApp — bg rgba(37,211,102,.12), border rgba(37,211,102,.3), color #25D366, 12px 700
+    ✉ Send via Email    — bg var(--blue-dim), border var(--blue-bd), color var(--blue), 12px 700
+    🔗 Copy upload link  — bg var(--s3), border var(--s5), color var(--t2), 12px 700
+    All: padding 9px 16px, border-radius 7px, cursor pointer, display flex align-items center gap 7px
+
+DOCUMENT CHECKLIST:
+  Section label: DM Mono 9px uppercase var(--t3) "Required documents ([n])" with line after
+
+  If supplier_request exists: show docs from supplier_requests.docs_required
+  If no supplier_request yet: show docs from the current lookup's supplier_docs_json
+  
+  Each document card:
+    background var(--s2), border var(--s5), border-radius 9px, margin-bottom 6px, overflow hidden
+    
+    HEADER ROW (always visible, padding 12px 14px, flex align-items center, gap 12px):
+      Icon box (34×34, border-radius 8px):
+        verified: gbg/gbd | blocking: rbg/rbd | pending: abg/abd | waiting: var(--s4)/var(--s5)
+        Shows emoji: 📄 invoice, 🌍 CoO, 🌿 phyto, 📦 packing list, 🚢 bill of lading, 📋 other
+      Doc name: 13px 600 var(--t1) (flex:1)
+      Doc issuer: 10px var(--t3) DM Mono below name
+      Status tag (DM Mono 9px, right-aligned):
+        "✓ Verified" green | "⊗ Needs amendment" red | "● Awaiting upload" amber | "○ Not yet sent" grey
+
+    FINDING ROW (only if verified=false AND finding is set):
+      background var(--rbg), border-top 1px solid var(--rbd), padding 8px 14px
+      Flex row, gap 9px
+      Red dot (6px) + finding text (11px var(--t2) line-height 1.5 flex:1) + UCP rule badge (blue-tinted DM Mono 9px)
+
+    FILE ROW (always visible, padding 8px 14px, background var(--s1), border-top var(--s5)):
+      If file exists: filename (DM Mono 11px var(--t3)) + size + upload time + "↓ Download" + "Replace file" buttons
+      If no file: "Not yet uploaded" italic var(--t3) + "Upload on behalf" blue outline button
+
+RIGHT PANEL (background var(--s1), border-left var(--s5), padding 20px 18px, overflow-y auto):
+  Title: "Document progress" Fraunces 700 15px
+  Subtitle: DM Mono 11px var(--t3) "[commodity] · [origin] → [dest]"
+  
+  Progress label: DM Mono 9px var(--t3) "[X] of [Y] received"
+  Progress bar: height 4px, background var(--s5), border-radius 2px
+    Fill: width = (verified_count / total_count) * 100%
+    Color: 100% = var(--green), otherwise var(--amber)
+  
+  Status sentence: 11px var(--t2) line-height 1.5
+  
+  [Divider: 1px var(--s5)]
+  
+  Activity timeline label: DM Mono 9px var(--t3) "Activity"
+  Timeline events (from supplier_uploads + supplier_requests logs):
+    Each: flex row gap 10px, padding 8px 0, border-bottom var(--s5)
+    Dot (8px circle, colour by event type) + event text (11px var(--t2)) + time (DM Mono 9px var(--t3))
+    Events: "Supplier brief sent via WhatsApp", "Invoice uploaded", "CoO verified", etc.
+  
+  [Divider]
+  
+  Supplier label + supplier_name (12px 600 var(--t1))
+  Location if known (11px DM Mono var(--t3))
+  "View upload page →" ghost button (full width, var(--t2))
+
+━━━ PART 2: SEND ACTIONS ━━━
+
+Create API route: POST /api/supplier-requests/create-or-get
+  Body: { lookupId: string }
+  Logic:
+    1. Check if supplier_requests record exists for this lookupId
+    2. If not: create one with docs_required populated from lookup's supplier_docs_json
+       Set upload_expires_at = NOW() + 30 days
+       Generate upload_token automatically (DEFAULT gen_random_uuid() handles this)
+    3. Return: { requestId, uploadToken, uploadUrl: `https://app.taptrao.com/upload/${uploadToken}` }
+
+Create API route: POST /api/supplier-requests/[id]/log-send
+  Body: { channel: 'whatsapp' | 'email' | 'link' }
+  Logic: append channel to sent_via array, update last_sent_at = NOW()
+
+BUTTON WIRE-UP:
+
+"Send via WhatsApp" onClick:
+  1. Call /api/supplier-requests/create-or-get with current lookupId
+  2. Call /api/supplier-requests/[id]/log-send with channel='whatsapp'
+  3. Build message: `Please upload your documents for [commodity] ([origin] → [dest]) here: [uploadUrl]`
+  4. Open: window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank')
+
+"Send via Email" onClick:
+  1. Call /api/supplier-requests/create-or-get
+  2. Call log-send with channel='email'
+  3. Build subject: `Document request — [commodity] [origin] → [dest]`
+  4. Build body (multiline): list of required documents + upload URL
+  5. Open: window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(body)}`
+
+"Copy upload link" onClick:
+  1. Call /api/supplier-requests/create-or-get
+  2. Call log-send with channel='link'
+  3. navigator.clipboard.writeText(uploadUrl)
+  4. Button text changes to "✓ Copied!" for 2 seconds then reverts
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: curl -X POST http://localhost:3000/api/supplier-requests/create-or-get \
+  -H "Content-Type: application/json" -d '{"lookupId":"00000000-0000-0000-0000-000000000000"}'
+Expected: JSON response (error is fine if lookupId doesn't exist — just confirm the route responds).
+Log: "PROMPT 14 COMPLETE — supplier docs tab and send actions wired"
+```
+
+---
+
+## PROMPT 15 — Public Supplier Upload Page
+
+```
+Build the public supplier upload page at /upload/[token].
+NO authentication required. Must work on mobile.
+
+━━━ ROUTE ━━━
+Create: app/upload/[token]/page.tsx (or pages/upload/[token].tsx)
+This is a SERVER COMPONENT that fetches the supplier_request by token on load.
+
+On load:
+  SELECT sr.*, l.*, c.name, o.iso2, o.country_name, d.iso2, d.country_name
+  FROM supplier_requests sr
+  JOIN lookups l ON sr.lookup_id = l.id
+  JOIN commodities c ON l.commodity_id = c.id
+  JOIN origin_countries o ON l.origin_iso2 = o.iso2
+  JOIN destinations d ON l.dest_iso2 = d.iso2
+  WHERE sr.upload_token = [token]
+
+  If not found OR upload_expires_at < NOW(): render expired/invalid page (see below)
+  If found: render upload interface
+
+━━━ LAYOUT (standalone page, NOT AppShell) ━━━
+
+body: background var(--s0), min-height 100vh, padding-bottom 80px
+
+STICKY TOP BAR (height 52px, background var(--s0), border-bottom var(--s5)):
+  Left: logo (28px) + "TapTrao" Fraunces 700 16px
+  Right: "🔒 Secure upload" DM Mono 11px var(--t3)
+
+CONTAINER: max-width 560px, margin 0 auto, padding 28px 20px
+
+TRADE CONTEXT CARD:
+  background var(--s1), border var(--s5), border-radius 12px, padding 18px 20px, margin-bottom 24px
+  
+  Header row: avatar (38px, coloured) + commodity name (15px 700) + route (DM Mono 11px var(--t3))
+  Divider (1px var(--s5))
+  Message (13px var(--t2) line-height 1.65):
+    "Please upload the documents listed below for this shipment.
+     No account needed — just upload your files and they will go directly to the buyer."
+  Deadline chip:
+    If upload_expires_at < 7 days from now: amber-tinted, "⏱ Required before [formatted date]"
+    Otherwise: var(--t3) text only, "Deadline: [formatted date]"
+
+DOCUMENT CARDS (one per item in docs_required JSONB array):
+
+Each card: background var(--s1), border var(--s5), border-radius 12px, margin-bottom 10px, overflow hidden
+
+Determine card state from docs_received array (match by doc_type):
+  A) Verified (received AND verified=true):
+       Border: rgba(34,197,94,.22)
+       Header: green icon box + doc name + "✓ Received" green tag
+       File row: filename + size + green checkmark
+  B) Blocking (received AND verified=false AND finding exists):
+       Border: rgba(245,158,11,.2)
+       Header: amber icon box + doc name + "⚠ Amend & reupload" amber tag
+       Instruction row: plain-language finding text (rephrase to remove jargon)
+       Upload zone: active/droppable
+  C) Not uploaded:
+       Border: var(--s5)
+       Header: grey icon box + doc name + "Awaiting" grey tag
+       Upload zone: active/droppable
+
+UPLOAD ZONE (for states B and C):
+  border: 1.5px dashed var(--s5), border-radius 8px, padding 16px, text-align center
+  cursor pointer, transition all .15s
+  Hover/drag-over: border-color var(--blue-bd), background var(--blue-dim)
+  Content: 📎 emoji + "Drop file here or tap to choose" (13px var(--t2) 500) + "PDF, JPG, PNG · max 20MB" (11px var(--t3))
+  
+  Hidden <input type="file" accept=".pdf,.jpg,.jpeg,.png" />
+  
+  On file select (client-side handler):
+    Show upload spinner
+    POST to /api/upload/[token]/file with FormData { doc_type, file }
+    On success: refresh page data / update card state to "Uploaded — pending verification"
+    On error: show red error message
+
+PROGRESS SUMMARY:
+  background var(--s1), border var(--s5), border-radius 10px, padding 14px 16px, margin-top 24px
+  One row per document:
+    Green dot → "[doc name] — received"
+    Amber dot → "[doc name] — needs amendment"
+    Grey dot  → "[doc name] — not yet uploaded"
+  Font: 12px var(--t2)
+
+SUBMIT BUTTON:
+  Full width, background var(--blue), color #fff, font-weight 800, font-size 15px
+  padding 16px, border-radius 10px, border none
+  Display flex align-items center justify-content center gap 8px
+  Text: "Submit documents →"
+  Enabled: always (even if some docs pending — let supplier submit partial)
+  On click: POST /api/upload/[token]/submit
+    Response: update supplier_requests.status based on docs state
+    Show success message: "Documents submitted. The buyer has been notified."
+
+FOOTER NOTE (centered, margin-top 20px):
+  Logo (20px) + "TapTrao" Fraunces 700 14px var(--t2)
+  "Your files go directly and securely to the buyer. No TapTrao account required."
+  "This link expires [expiry date]." — 11px var(--t3) line-height 1.55
+
+━━━ UPLOAD API ROUTE ━━━
+
+Create: POST /api/upload/[token]/file
+  1. Validate token exists and not expired
+  2. Accept multipart form: doc_type (string) + file (File)
+  3. Validate: file must be PDF/JPG/PNG, max 20MB
+  4. Save file to /tmp/uploads/[token]/[timestamp]-[filename]
+     (or Replit object storage if available)
+  5. INSERT into supplier_uploads table
+  6. Update supplier_requests.docs_received JSONB array
+  7. Recalculate supplier_requests.status:
+     all docs received and none blocking → 'complete'
+     some docs received but some blocking → 'blocking'
+     some docs received → 'partial'
+     no docs → 'waiting'
+  8. Return: { success: true, filename, doc_type }
+
+Create: POST /api/upload/[token]/submit
+  1. Validate token
+  2. Update supplier_requests.updated_at = NOW()
+  3. Return: { success: true }
+
+━━━ EXPIRED/INVALID STATE ━━━
+If token invalid or expired, render:
+  Centered page: "This upload link has expired or is invalid."
+  "Please contact the buyer to request a new link."
+  Logo + TapTrao branding footer
+
+━━━ MOBILE REQUIREMENTS ━━━
+All touch targets minimum 44×44px
+Font minimum 13px body, 15px labels
+No horizontal scroll at any viewport width
+Input[type=file] trigger must work with iOS and Android native file pickers
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: curl -s http://localhost:3000/upload/invalid-token | grep -o 'expired or is invalid'
+Expected: "expired or is invalid" (error page renders).
+Log: "PROMPT 15 COMPLETE — supplier upload page built"
+```
+
+---
+
+## PROMPT 16 — TwinLog Trail
+
+```
+Build the TwinLog Trail — the audit trail that completes every trade record.
+
+━━━ PART 1: DATABASE ━━━
+
+ALTER TABLE lookups ADD COLUMN IF NOT EXISTS twinlog_ref TEXT;
+ALTER TABLE lookups ADD COLUMN IF NOT EXISTS twinlog_hash TEXT;
+ALTER TABLE lookups ADD COLUMN IF NOT EXISTS twinlog_locked_at TIMESTAMPTZ;
+
+On every completed lookup (after results are saved to DB), compute and store:
+  twinlog_ref:   'TT-' + year + '-' + first 6 chars of SHA256(lookup_id + created_at.toISOString())
+                 Example: "TT-2026-A3F91C"
+  twinlog_hash:  SHA256 of JSON.stringify(results, Object.keys(results).sort())
+                 (sort keys for deterministic output)
+  twinlog_locked_at: NOW()
+
+Use Node's built-in crypto module: import { createHash } from 'crypto'
+
+━━━ PART 2: TWINLOG TRAIL TAB ━━━
+
+In /lc-check, the StepNav has a "TwinLog Trail" step.
+When user clicks step 3 in the StepNav, show the TwinLog Trail view.
+(Use the same tab-switching pattern as the LC Check tabs.)
+
+Layout: same two-column grid as Supplier Docs tab (flex:1 left | 292px right)
+
+LEFT PANEL:
+
+Header:
+  "TwinLog Trail" Fraunces 700 26px
+  "[commodity] · [origin] → [dest] · locked [formatted twinlog_locked_at]" DM Mono 11px var(--t3)
+
+INCLUDED ITEMS section (DM Mono 9px section label + line):
+  Checklist of what is locked in this record:
+  Each row: dot (7px) + label (12px var(--t2)) + status right-aligned
+  
+  Compliance lookup:     always green (this lookup exists) → "✓ Locked"
+  LC check results:      if lc_check record exists → green "✓ Locked" | else → grey "—"
+  Supplier documents:    if supplier_request exists → "[X]/[Y] received" in var(--t2) | else → grey "—"
+  Customs data pack:     check if user downloaded it (track via boolean col) → green/grey
+  Readiness score:       if readiness_score is set → green "Score: [n]" | else → grey "—"
+
+INTEGRITY HASH BLOCK:
+  background var(--s3), border var(--s5), border-radius 7px, padding 12px 14px, margin-top 16px
+  
+  "🔒 [twinlog_ref]" — var(--blue) DM Mono 13px 700 margin-bottom 6px
+  "sha256: [first 12 chars]...[last 8 chars]" — DM Mono 10px var(--t3)
+    Full hash stored, truncated for display
+  "↗ Copy full hash" ghost button right-aligned — copies twinlog_hash to clipboard, shows "✓ Copied" 2s
+
+COMPLIANCE SCORE SUMMARY:
+  Same readiness score display as in the main lookup results (score number + verdict + summary sentence)
+  Just re-display the stored values — no recomputation needed
+
+RIGHT PANEL:
+
+"Export" label Fraunces 700 15px
+
+DOWNLOAD PDF BUTTON (full width, solid blue, margin-bottom 16px):
+  "↓ Download TwinLog PDF"
+  
+  On click: POST /api/twinlog/[lookupId]/pdf
+  
+  Returns a PDF containing (use pdfkit or @react-pdf/renderer):
+    Page 1:
+      TapTrao logo placeholder (text "TAPTRAO" if no image embed) + "TwinLog Trail" header
+      Reference: [twinlog_ref] — large, prominent
+      Hash: sha256:[twinlog_hash] — DM Mono small
+      Locked: [twinlog_locked_at formatted]
+      ---
+      Trade details: Commodity | HS Code | Origin | Destination | Incoterms
+      Readiness Score: [score] [verdict] — [summary sentence]
+      ---
+      Regulatory Overlays: list all active overlays
+      ---
+      Buyer Documents: numbered list with status (Ready / Pending / N/A)
+      Supplier Documents: numbered list with status
+      ---
+      LC Check: [verdict if run] — [total discrepancies if any]
+      ---
+      Footer: "Generated [datetime] by TapTrao (taptrao.com)
+               Verify at: taptrao.com/verify/[twinlog_ref]
+               This document contains a cryptographic integrity hash."
+    
+    Style: clean black on white, no dark backgrounds — this is a printable document.
+    Font: Helvetica (pdfkit default) or embed Inter/similar.
+    Page size: A4.
+
+ACTIVITY TIMELINE (below export button):
+  "History" label DM Mono 9px var(--t3)
+  Chronological list pulling from:
+    - lookups.created_at → "Compliance lookup run"
+    - lc_checks.created_at → "LC check run — [verdict]"
+    - supplier_requests.last_sent_at → "Supplier brief sent via [channel]"
+    - supplier_uploads.uploaded_at → "[doc_type] uploaded by supplier"
+    - twinlog_locked_at → "TwinLog locked"
+  Each row: 8px dot + event text 11px var(--t2) + DM Mono 9px var(--t3) timestamp
+  Separator: border-bottom var(--s5)
+
+━━━ PART 3: PUBLIC VERIFY PAGE ━━━
+
+Create: app/verify/[ref]/page.tsx (public, no auth)
+
+Look up lookups WHERE twinlog_ref = [ref].
+If not found: show "Reference not found."
+
+If found, display:
+  TapTrao logo + "TwinLog Verification" heading
+  Green banner: "✓ This record was locked on [twinlog_locked_at formatted] and has not been modified."
+  Trade: [commodity] | [origin] → [destination]
+  Reference: [twinlog_ref] — DM Mono
+  Hash: sha256:[twinlog_hash] — DM Mono, full hash
+  Locked: [datetime]
+  Score: [readiness_score] [readiness_verdict]
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: SELECT twinlog_ref, twinlog_hash FROM lookups WHERE twinlog_ref IS NOT NULL LIMIT 1;
+Expected: returns 1 row if any lookups have been run (or 0 rows if DB is empty — both fine).
+Run: curl -s http://localhost:3000/verify/TT-2026-000000 | grep -o 'not found'
+Expected: "not found" (graceful error for unknown ref).
+Log: "PROMPT 16 COMPLETE — TwinLog Trail built"
+```
+
+---
+
+## PROMPT 17 — Compliance Readiness Score
+
+```
+Add the Compliance Readiness Score to every lookup result.
+Computed server-side from existing data — no new API calls or tables needed
+(columns already added to lookups in Prompt 16).
+
+━━━ SCORING FUNCTION ━━━
+
+Add this function to lib/readinessScore.ts:
+
+import type { LookupResult } from './types';
+
+const HIGH_HAZARDS = ['aflatoxin','salmonella','histamine','BSE','FMD','avian_influenza','cyanide','radioactive'];
+const MED_HAZARDS  = ['pesticide_residues','heavy_metals','chrome_VI','antibiotics','cadmium','3-MCPD','mercury_contamination','fruit_fly','ethylene_oxide'];
+const LOW_HAZARDS  = ['coumarin','sulphur_dioxide','gossypol','formaldehyde','mineral_oil','lead','arsenic'];
+
+export function computeReadinessScore(result: LookupResult) {
+  // Factor 1 — Regulatory Complexity (max 30)
+  const overlays = result.overlays_json?.length ?? 0;
+  const f1 = overlays === 0 ? 0 : overlays === 1 ? 8 : overlays === 2 ? 16 : 30;
+
+  // Factor 2 — Hazard Exposure (max 30)
+  let f2 = 0;
+  let primaryHazard: string | null = null;
+  for (const h of (result.hazards ?? [])) {
+    if (h === 'none_significant') continue;
+    if (HIGH_HAZARDS.includes(h)) { f2 += 15; if (!primaryHazard) primaryHazard = h; }
+    else if (MED_HAZARDS.includes(h)) { f2 += 8;  if (!primaryHazard) primaryHazard = h; }
+    else if (LOW_HAZARDS.includes(h)) { f2 += 3; }
+  }
+  f2 = Math.min(f2, 30);
+
+  // Factor 3 — Document Volume (max 20)
+  const docs = (result.buyer_docs_json?.length ?? 0) + (result.supplier_docs_json?.length ?? 0);
+  const f3 = docs <= 4 ? 0 : docs <= 7 ? 8 : docs <= 10 ? 14 : 20;
+
+  // Factor 4 — STOP Flag (max 20)
+  const f4 = (result.stops?.length ?? 0) > 0 ? 20 : 0;
+
+  const penalty = f1 + f2 + f3 + f4;
+  const score   = Math.max(0, 100 - penalty);
+  const verdict = f4 > 0 ? 'RED' : score >= 80 ? 'GREEN' : score >= 50 ? 'AMBER' : 'RED';
+
+  const factorPenalties = { regulatory_complexity: f1, hazard_exposure: f2, document_volume: f3, trade_restriction: f4 };
+  const primaryFactor = (Object.entries(factorPenalties).sort((a,b) => b[1]-a[1])[0][0]) as string;
+
+  let summary = '';
+  if (verdict === 'GREEN')
+    summary = 'This trade has low regulatory complexity. Standard documents apply.';
+  else if (primaryFactor === 'hazard_exposure' && primaryHazard)
+    summary = `Known hazard exposure to ${primaryHazard} requires pre-shipment testing and documented results.`;
+  else if (primaryFactor === 'regulatory_complexity')
+    summary = 'Multiple overlapping regulations apply — verify all compliance requirements before committing.';
+  else if (primaryFactor === 'document_volume')
+    summary = 'High document count increases discrepancy risk — run an LC check before finalising.';
+  else if (primaryFactor === 'trade_restriction')
+    summary = 'This trade is subject to a restriction. Review the STOP warning below before proceeding.';
+  else
+    summary = 'This trade requires careful attention before proceeding.';
+
+  return {
+    score, verdict, summary,
+    factors: {
+      regulatory_complexity: { penalty: f1, max: 30, overlay_count: overlays },
+      hazard_exposure:       { penalty: f2, max: 30, primary_hazard: primaryHazard },
+      document_volume:       { penalty: f3, max: 20, document_count: docs },
+      trade_restriction:     { penalty: f4, max: 20, stop_triggered: f4 > 0 },
+    },
+    primary_risk_factor: primaryFactor,
+  };
+}
+
+━━━ INTEGRATE INTO LOOKUP ACTION ━━━
+
+In the server action that handles the compliance lookup (after cascade logic completes):
+1. Call computeReadinessScore(lookupResult)
+2. Store: UPDATE lookups SET readiness_score=score, readiness_verdict=verdict,
+          readiness_factors=factors, readiness_summary=summary WHERE id=lookupId
+
+━━━ SCORE BANNER UI ━━━
+
+Add a ReadinessBanner component: components/ReadinessBanner.tsx
+
+Props: score, verdict, summary, factors, primaryRiskFactor
+
+Render as the FIRST element inside the lookup results (above "YOUR SIDE", above everything):
+
+Banner container:
+  border-radius 10px, border 1px solid, padding 22px 26px, margin-bottom 24px
+  GREEN: background rgba(34,197,94,.05),  border rgba(34,197,94,.2)
+  AMBER: background rgba(245,158,11,.05), border rgba(245,158,11,.2)
+  RED:   background rgba(239,68,68,.05),  border rgba(239,68,68,.2)
+
+TWO-COLUMN layout inside (left 160px | right flex:1 padding-left 28px):
+
+LEFT COLUMN (flex column, gap 8px):
+  Score number: Fraunces 900 clamp(48px,6vw,64px) letter-spacing -4px color var(--t1) line-height 1
+  Verdict badge: inline-block, DM Mono 10px 600, padding 3px 10px, border-radius 4px
+    GREEN → gbg/gbd/green text "LOW RISK"
+    AMBER → abg/abd/amber text "MODERATE RISK"
+    RED   → rbg/rbd/red   text "HIGH RISK"
+  Summary sentence: 13px var(--t2) line-height 1.65 margin-top 6px max-width 260px
+
+RIGHT COLUMN (4 factor rows):
+  Each factor row (flex, align-items center, gap 10px, margin-bottom 8px):
+    Label (120px, 11px var(--t2), text-align right):
+      "Regulatory complexity" | "Hazard exposure" | "Document volume" | "Trade restriction"
+    Progress bar (flex:1, height 3px, background var(--s5), border-radius 2px, position relative):
+      Fill div: width = (penalty/max)*100%, height 100%, border-radius 2px
+        regulatory_complexity → var(--blue)
+        hazard_exposure       → var(--amber)
+        document_volume       → var(--t3)
+        trade_restriction     → var(--red)
+    Right label (DM Mono 10px, 48px text-align right):
+      If this is the primary risk factor AND penalty > 10: "▲ primary" in var(--amber) 9px
+      Otherwise: "[penalty]/[max]" in var(--t3)
+
+━━━ UPDATE MY TRADES + TWINLOG ━━━
+The My Trades table already reads readiness_score and readiness_verdict from the DB.
+Confirm the ReadinessBanner also re-renders correctly inside the TwinLog Trail view
+(it should — just pass the stored values as props).
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors in lib/readinessScore.ts or components/ReadinessBanner.tsx
+
+Run this test to verify scoring logic:
+  node -e "
+  const {computeReadinessScore} = require('./lib/readinessScore');
+  
+  // Test 1: Raw Cashew CI→GB (low risk)
+  const t1 = computeReadinessScore({
+    overlays_json: [],
+    hazards: ['aflatoxin','moisture_damage'],
+    buyer_docs_json: new Array(5),
+    supplier_docs_json: new Array(4),
+    stops: []
+  });
+  console.log('Test 1 cashew CI→GB:', t1.score, t1.verdict); // expect GREEN 77+
+
+  // Test 2: Cocoa GH→EU (EUDR + CSDDD + cadmium)
+  const t2 = computeReadinessScore({
+    overlays_json: ['EUDR','CSDDD'],
+    hazards: ['cadmium','ochratoxin'],
+    buyer_docs_json: new Array(7),
+    supplier_docs_json: new Array(5),
+    stops: []
+  });
+  console.log('Test 2 cocoa GH→EU:', t2.score, t2.verdict); // expect AMBER
+
+  // Test 3: Gold CD→TR (STOP flag)
+  const t3 = computeReadinessScore({
+    overlays_json: ['OECD_DDG'],
+    hazards: ['mercury_contamination'],
+    buyer_docs_json: new Array(6),
+    supplier_docs_json: new Array(5),
+    stops: ['gold_to_TR']
+  });
+  console.log('Test 3 gold CD→TR:', t3.score, t3.verdict); // expect RED (STOP)
+  "
+
+Expected output: Test 1 shows GREEN, Test 2 shows AMBER, Test 3 shows RED.
+Report the actual scores before confirming.
+Log: "PROMPT 17 COMPLETE — readiness score built and tested"
+```
+
+---
+
+## PROMPT 18 — Templates (Module 3)
+
+```
+Add trade templates — save/load system built on top of existing lookups.
+
+━━━ DATABASE ━━━
+
+CREATE TABLE IF NOT EXISTS templates (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_session_id  TEXT NOT NULL,
+  name             TEXT NOT NULL,
+  commodity_id     UUID REFERENCES commodities(id),
+  origin_iso2      CHAR(2),
+  dest_iso2        CHAR(2),
+  snapshot_json    JSONB NOT NULL,
+  lc_terms_json    JSONB,
+  supplier_json    JSONB,
+  variable_fields  JSONB DEFAULT '{}',
+  reg_version_hash TEXT,
+  last_used_at     TIMESTAMPTZ,
+  times_used       INTEGER DEFAULT 0,
+  created_at       TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_templates_session ON templates(user_session_id);
+
+reg_version_hash: computed as SHA256(origin_iso2 + dest_iso2 + commodity hs_code + current YYYY-MM)
+This changes monthly. When loaded template's hash ≠ current hash → show stale warning.
+
+━━━ SAVE AS TEMPLATE ━━━
+
+In the TwinLog Trail panel (right side, below the PDF export button):
+Add: "💾 Save as template" ghost button (full width, var(--t2) colour)
+
+On click: open a small modal/inline form:
+  Input: "Template name" (pre-filled: "[Commodity name] [Origin]→[Dest]")
+  Button: "Save template" (solid blue)
+  On confirm:
+    INSERT into templates with full lookup snapshot_json = the complete lookup result JSON
+    Set reg_version_hash
+    Show success: "Template saved. Find it at /templates."
+
+━━━ TEMPLATES PAGE at /templates ━━━
+
+AppShell activeNav="/templates"
+
+Page header: "Templates" Fraunces 900 32px + "[n] saved templates" subtitle
+
+Template cards (CSS grid, 2 columns, gap 12px):
+Each card: background var(--s1), border var(--s5), border-radius 10px, padding 16px 18px
+Hover: border-color rgba(66,126,255,.3)
+
+Card content:
+  Header row: avatar (32px, coloured by origin) + template name (14px 700 var(--t1)) + route DM Mono var(--t3)
+  Commodity name + hs_code (12px var(--t2), margin-top 4px)
+  Meta row: "Used [times_used] times · Last used [relative date]" DM Mono 10px var(--t3) margin-top 8px
+  
+  STALE WARNING (if current reg_version_hash ≠ stored reg_version_hash):
+    Amber-tinted row: padding 8px 12px, background var(--abg), border-top var(--abd)
+    "⚠ Regulations may have changed since this template was last used"
+    11px var(--amber) font-weight 600
+
+  Footer row (flex, gap 8px, margin-top 12px, padding-top 12px, border-top var(--s5)):
+    "Use template →" solid blue button (flex:1)
+    "Delete" ghost red button (padding 7px 14px, color var(--red), border rgba(239,68,68,.3))
+
+USE TEMPLATE:
+  On "Use template →" click:
+    1. UPDATE templates SET times_used = times_used + 1, last_used_at = NOW()
+    2. Navigate to /lookup?templateId=[id]
+    
+  In /lookup, detect templateId query param on load:
+    Fetch the template, pre-fill commodity/origin/destination selects
+    Show notice banner above the form:
+      Blue-tinted, "Loading from template: [name] — check the fields below and click Run Compliance Check."
+    The user sees the pre-filled form and clicks Run as normal — gets fresh results.
+
+EMPTY STATE: "No templates saved yet. Complete a lookup and save it as a template from the TwinLog Trail."
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: SELECT table_name FROM information_schema.tables WHERE table_name = 'templates';
+Expected: 1 row.
+Log: "PROMPT 18 COMPLETE — templates built"
+```
+
+---
+
+## PROMPT 19 — Regulatory Alerts (Module 6 Basic)
+
+```
+Add basic regulatory monitoring — the re-engagement engine.
+
+━━━ DATABASE ━━━
+
+CREATE TABLE IF NOT EXISTS alert_subscriptions (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_session_id  TEXT NOT NULL,
+  commodity_id     UUID REFERENCES commodities(id),
+  dest_iso2        CHAR(2),
+  created_at       TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_session_id, commodity_id, dest_iso2)
+);
+
+CREATE TABLE IF NOT EXISTS regulatory_alerts (
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  source                TEXT NOT NULL DEFAULT 'MANUAL',
+  hs_codes_affected     TEXT[] DEFAULT '{}',
+  dest_iso2_affected    CHAR(2)[],
+  summary               TEXT NOT NULL,
+  source_url            TEXT,
+  effective_date        DATE,
+  is_deadline           BOOLEAN DEFAULT false,
+  created_at            TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS alert_reads (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_session_id  TEXT NOT NULL,
+  alert_id         UUID REFERENCES regulatory_alerts(id),
+  read_at          TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_session_id, alert_id)
+);
+
+INSERT hardcoded deadline alerts (only if they don't already exist — check by source_url):
+
+INSERT INTO regulatory_alerts (source, hs_codes_affected, dest_iso2_affected, summary, source_url, effective_date, is_deadline)
+VALUES
+  ('EUDR_DEADLINE',
+   ARRAY['1801.00','1803.10','1804.00','1805.00','1802.00','0901.11','0901.21','2101.11',
+         '1511.10','1511.90','1513.21','4001.10','4001.21','4001.22','1201.90','1507.10',
+         '4407.29','4403.49','4412.31','4401.21','0102.29','9403.60'],
+   ARRAY['EU','GB'],
+   'EUDR compliance required for large operators from 30 December 2026. Geolocation data and due diligence statements must be in place before this date.',
+   'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32023R1115',
+   '2026-12-30',
+   true),
+  ('EUDR_DEADLINE',
+   ARRAY['1801.00','1803.10','1804.00','1805.00','1802.00','0901.11','0901.21','2101.11'],
+   ARRAY['EU','GB'],
+   'EUDR SME compliance deadline: 30 June 2027. Smaller operators have an extended timeline but must begin due diligence documentation now.',
+   'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32023R1115',
+   '2027-06-30',
+   true)
+ON CONFLICT DO NOTHING;
+
+━━━ WATCH CORRIDOR ━━━
+
+After any lookup result renders, show below the readiness score banner:
+"◎ Watch this corridor" ghost button (DM Mono 11px, var(--t2))
+Sub-text: "Get notified when regulations change for [commodity] → [dest]"
+
+On click:
+  Check current subscription count for this session.
+  If < 3: INSERT into alert_subscriptions (upsert — do nothing on conflict)
+          Button becomes "◉ Watching — [count]/3 corridors watched"
+  If = 3: Show modal: "You're watching 3 corridors (free limit). Upgrade to Pro to watch more."
+
+━━━ ALERTS PAGE at /alerts ━━━
+
+AppShell activeNav="/alerts"
+Sidebar blue badge = count of unread alerts for this session
+
+Page header: "Regulatory Alerts" Fraunces 900 32px
+Subtitle: "Monitoring [subscription_count] corridors"
+
+Fetch alerts relevant to this user:
+  SELECT ra.*, 
+    CASE WHEN ar.id IS NOT NULL THEN true ELSE false END as is_read
+  FROM regulatory_alerts ra
+  JOIN alert_subscriptions sub ON (
+    ra.hs_codes_affected && ARRAY(SELECT hs_code FROM commodities WHERE id = sub.commodity_id)
+    OR ra.is_deadline = true
+  )
+  LEFT JOIN alert_reads ar ON ar.alert_id = ra.id AND ar.user_session_id = [session]
+  WHERE sub.user_session_id = [session]
+  ORDER BY ra.effective_date ASC, ra.created_at DESC
+
+Each alert card:
+  background var(--s1), border var(--s5), border-radius 8px, padding 14px 16px, margin-bottom 8px
+  If not read: border-left 3px solid var(--blue)
+  
+  Source badge: DM Mono 9px 600, uppercase, coloured:
+    EUDR_DEADLINE → abg/abd/amber | MANUAL → blue-dim/blue-bd/blue | TARIFF_API → gbg/gbd/green
+  Summary: 13px var(--t1) line-height 1.55 margin: 6px 0
+  HS codes: DM Mono 10px var(--t3) if hs_codes_affected is set
+  Effective date: DM Mono 10px var(--t3) "Effective [date]"
+  
+  Footer row: flex space-between
+    Left: source_url → "↗ View source" link (11px var(--blue))
+    Right: "Run fresh lookup →" solid blue button (small: 11px 600, padding 5px 12px)
+           → links to /lookup pre-filled with first matching commodity + dest_iso2
+
+Mark read: when alert card comes into viewport (IntersectionObserver),
+POST /api/alerts/[alertId]/read to INSERT into alert_reads.
+
+EMPTY STATE: "You're not watching any corridors yet. Run a lookup and click 'Watch this corridor'."
+
+━━━ ADMIN ALERT CREATION at /admin/alerts/new ━━━
+
+Simple server-rendered form (no auth UI — just protect the API):
+Fields: source (text), hs_codes_affected (comma-separated), dest_iso2_affected (comma-separated),
+        summary (textarea), source_url, effective_date, admin_password (hidden)
+
+API: POST /api/admin/alerts — check that body.admin_password === process.env.ADMIN_PASSWORD
+     If match: INSERT into regulatory_alerts, return { success: true }
+     If not: return 401
+
+━━━ SELF-CHECK ━━━
+Run: npx tsc --noEmit
+Expected: no errors.
+Run: SELECT COUNT(*) FROM regulatory_alerts;
+Expected: 2 (the two EUDR deadline rows inserted above).
+Run: SELECT COUNT(*) FROM information_schema.tables
+     WHERE table_name IN ('alert_subscriptions','regulatory_alerts','alert_reads');
+Expected: 3
+Log: "PROMPT 19 COMPLETE — regulatory alerts built"
+```
+
+---
+
+## SUMMARY
+
+| Prompt | What it builds                        | Touches DB? | Touches backend? |
+|--------|---------------------------------------|-------------|------------------|
+| 9      | Design system + App Shell component   | No          | No               |
+| 10     | Step nav + Tab bar components         | No          | No               |
+| 11     | Landing page                          | No          | No               |
+| 12     | My Trades page                        | Read only   | No               |
+| 13     | Supplier Inbox DB + overview page     | Yes (2 new) | API routes       |
+| 14     | Supplier Docs tab + send actions      | Read/write  | 2 new API routes |
+| 15     | Public supplier upload page           | Read/write  | 2 new API routes |
+| 16     | TwinLog Trail + verify page           | Yes (3 cols)| PDF API route    |
+| 17     | Compliance Readiness Score            | Yes (4 cols)| Scoring function |
+| 18     | Templates (Module 3)                  | Yes (1 new) | No new routes    |
+| 19     | Regulatory Alerts (Module 6 basic)    | Yes (3 new) | 2 new API routes |
+
+**All prompts:** Self-checking only. No manual testing required between steps.
+ENDOFFILE
+echo "Written. Lines: $(wc -l < /home/claude/TapTrao_Replit_Prompts_Final.md)"

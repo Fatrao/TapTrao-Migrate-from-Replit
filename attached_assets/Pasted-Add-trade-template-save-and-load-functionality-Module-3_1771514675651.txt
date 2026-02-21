@@ -1,0 +1,108 @@
+Add trade template save and load functionality (Module 3).
+
+OVERVIEW:
+After a user completes a successful compliance lookup, they can save it 
+as a reusable template. Next time they trade the same commodity on the 
+same corridor, they load the template, update only what changed, and 
+regenerate everything automatically.
+
+DATABASE:
+Create a new table called "templates":
+- template_id: UUID primary key
+- session_id: string (FK — same session cookie system as tokens)
+- name: string (user-given name, e.g. "Cashew CdI to UK")
+- commodity_id: UUID FK to commodities table
+- origin_iso2: string(2)
+- dest_iso2: string(2)
+- snapshot_json: JSONB (full lookup results frozen at save time — 
+  buyer docs, supplier docs, duty rate, triggers, overlays, framework, 
+  STOP flags)
+- reg_version_hash: string (SHA-256 hash of the regulatory data at 
+  save time — used to detect if rules have changed since last use)
+- last_used_at: timestamp nullable
+- times_used: integer default 0
+- created_at: timestamp
+
+FEATURE 1 — SAVE AS TEMPLATE:
+On the compliance lookup results page, add a "Save as Template" button 
+at the bottom of every completed lookup result.
+
+When clicked:
+- Show a small modal: "Name this template" with a text input
+- Pre-fill the name as "[Commodity] [Origin] to [Destination]" 
+  e.g. "Raw Cashew Nuts CI to GB"
+- User can edit the name or keep it
+- Click Save — system stores the full lookup result as a template
+- Show confirmation: "Template saved. Find it in My Templates."
+
+FEATURE 2 — MY TEMPLATES PAGE at /templates:
+Show all saved templates for the current session as cards.
+Each card shows:
+- Template name
+- Commodity + corridor (e.g. "CI → GB")
+- Date saved
+- Times used counter
+- A "stale" warning badge if regulations may have changed 
+  (reg_version_hash differs from current data)
+- Two buttons: "Use Template" and "Delete"
+
+STALE DETECTION:
+When loading the templates page, for each template compare its 
+reg_version_hash against the current hash of the same 
+commodity+origin+destination lookup data.
+If different, show an amber warning on the card:
+"⚠ Regulations may have changed since you last used this. 
+Run a fresh lookup to update. (5 tokens)"
+
+This is intentional — stale detection drives paid re-lookups.
+
+FEATURE 3 — USE TEMPLATE:
+When user clicks "Use Template":
+- Load the /lookup page with commodity, origin, destination 
+  pre-selected and locked
+- Show the saved snapshot results immediately (free — no tokens)
+- Show a yellow banner at the top: 
+  "Showing saved results from [date]. Regulations may have changed."
+- Add a prominent button: "Refresh with live data — 5 tokens"
+- If user clicks Refresh: run a fresh lookup (deduct 5 tokens), 
+  update the snapshot, update reg_version_hash, increment times_used
+
+If template is NOT stale (hash matches):
+- Load results immediately
+- Show a green banner: "Regulations unchanged since [date]. 
+  Results are current."
+- Still show "Refresh anyway" as a smaller secondary option
+- Do NOT deduct tokens for loading a non-stale template
+
+FEATURE 4 — AUTO-SAVE PROMPT:
+After every successful compliance lookup, if the user has NOT already 
+saved this corridor as a template, show a subtle prompt at the bottom 
+of the results:
+"Save this trade as a template for next time? It's free."
+with a Save button. This increases template adoption without being 
+intrusive.
+
+NAVIGATION:
+Add "My Templates" as a nav link between "My Trades" and "Pricing".
+Show a count badge on the nav link if the user has templates 
+e.g. "My Templates (3)".
+
+REVENUE LOGIC:
+Templates themselves are FREE — saving and loading costs nothing.
+Revenue comes from:
+1. Stale template refresh: 5 tokens (same as a normal lookup)
+2. Templates drive return visits — users come back to check their 
+   saved corridors, see the stale warning, pay for a refresh
+
+After building, test:
+1. Run a compliance lookup → save as template → confirm it appears 
+   in /templates
+2. Load the template → confirm results show with "Showing saved 
+   results" banner
+3. Manually update the reg_version_hash in the database to simulate 
+   staleness → confirm amber warning appears on the template card
+4. Click "Refresh with live data" → confirm 5 tokens deducted and 
+   results updated
+5. Confirm times_used increments on each template use
+6. Confirm auto-save prompt appears after a lookup for a corridor 
+   with no existing template

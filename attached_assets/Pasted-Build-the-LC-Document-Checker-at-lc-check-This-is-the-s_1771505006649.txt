@@ -1,0 +1,104 @@
+Build the LC Document Checker at /lc-check. This is the second paid feature ($2.99/check).
+
+This MVP uses manual field entry. AI-powered PDF upload comes later.
+
+USER FLOW:
+
+STEP 1 — LC TERMS ENTRY:
+A form with these fields (the trader types in their LC details):
+- Beneficiary name (supplier)
+- Applicant name (buyer)  
+- Goods description (free text)
+- HS code
+- Quantity (number + unit: kg, MT, bags, etc.)
+- Unit price + currency
+- Total amount + currency
+- Country of origin
+- Port of loading
+- Port of discharge
+- Latest shipment date
+- LC expiry date
+- Incoterms (dropdown: FOB, CIF, CFR, FCA, EXW, etc.)
+- Partial shipments allowed? (yes/no)
+- Transhipment allowed? (yes/no)
+
+STEP 2 — SUPPLIER DOCUMENT ENTRY:
+Tabs for up to 6 documents. Each tab is a document type (dropdown: Commercial Invoice, Bill of Lading, Certificate of Origin, Phytosanitary Certificate, Packing List, Other).
+
+For each document, the trader enters the key fields:
+- Commercial Invoice: beneficiary name, goods description, quantity, unit price, total amount, currency
+- Bill of Lading: shipper name, consignee, port of loading, port of discharge, shipped on board date, vessel name
+- Certificate of Origin: exporter name, origin country, goods description, language of document
+- Phytosanitary Certificate: exporter name, origin country, commodity description
+- Packing List: quantity, gross weight, net weight, number of packages
+
+STEP 3 — CROSS-CHECK ENGINE:
+Run these checks and return results:
+
+STRING MATCHING:
+- Compare beneficiary name on LC vs name on each document. Flag: exact match, case-insensitive match, or MISMATCH (UCP 600 Art. 14(d))
+- Handle variations: "SARL" before/after company name, "Ltd" vs "Limited", "&" vs "and"
+
+NUMERIC CHECKS:
+- Invoice amount must NOT exceed LC amount (UCP 600 Art. 18(a))
+- Invoice currency must match LC currency (UCP 600 Art. 18(a))
+- Quantity on invoice vs LC: if within +/-5%, show AMBER warning with "ISBP 745 tolerance may apply for bulk goods". If >5% difference, show RED.
+- Quantity on invoice must match quantity on B/L must match quantity on packing list (UCP 600 Art. 14(d))
+
+DATE CHECKS:
+- B/L shipped date must be on or before LC latest shipment date (UCP 600 Art. 14(c))
+- Days between B/L date and today: if >21 days, flag "Presentation deadline exceeded — UCP 600 Art. 14(c)"
+
+PORT/ORIGIN CHECKS:
+- Port of loading on B/L must match LC port of loading (UCP 600 Art. 20(a)(ii))
+- Country of origin on CoO must match LC origin
+
+GOODS DESCRIPTION:
+- Invoice goods description must correspond with LC (UCP 600 Art. 18(c))
+- Other documents may use general terms — only flag if completely different
+
+IDENTIFIER FORMAT VALIDATION:
+When the user enters reference numbers in any document, validate known formats:
+- CHED reference: must match pattern GBCHDYYYY.NNNNNNN (e.g. GBCHD2026.0012345). If invalid format, show amber warning: "CHED reference format appears incorrect. Expected: GBCHDYYYY.NNNNNNN"
+- LC reference: no fixed format, but flag if empty
+- B/L number: no fixed format, but flag if empty
+This catches data entry errors before they cause real problems at the bank or customs.
+
+EVIDENCE HASHING:
+After generating results, compute SHA-256 hash of the full results JSON. Display:
+- "LC check ref: TT-LC-[YYYY]-[first 6 chars of hash]"
+- "Integrity hash: sha256:[full hash]"
+- "Checked: [timestamp]"
+Store hash in lc_checks table. Banks and compliance auditors can verify the check was performed.
+
+RESULTS DISPLAY:
+For each check, show:
+- Field name
+- LC value vs Document value
+- Status: GREEN (match), AMBER (warning/tolerance), RED (critical — bank will reject)
+- UCP 600 rule reference (e.g. "Art. 14(d)")
+- Plain English explanation
+
+Summary at top:
+- Total checks: X
+- Matches: X (green)
+- Warnings: X (amber)  
+- Critical: X (red)
+- Verdict: "COMPLIANT" (all green) / "COMPLIANT WITH NOTES" (green + amber) / "DISCREPANCIES FOUND" (any red)
+
+STEP 4 — CORRECTION EMAIL:
+If any RED findings, show "Generate Supplier Correction Email" button.
+Generate email listing every critical discrepancy:
+- "Your [document] shows [value]. The LC requires [value]. Please amend and reissue."
+Provide both email and WhatsApp format with copy buttons.
+
+Store results in a "lc_checks" table:
+- check_id: UUID
+- lc_fields_json: JSONB
+- documents_json: JSONB  
+- results_json: JSONB (per-field results with severity and ucp_rule)
+- summary: JSONB (total_checks, matches, warnings, criticals, pass_rate)
+- verdict: enum (COMPLIANT, COMPLIANT_WITH_NOTES, DISCREPANCIES_FOUND)
+- correction_email: text
+- comms_log: JSONB array
+- created_at: timestamp

@@ -1,0 +1,322 @@
+:root {
+  /* ── Prompt 9 Finance Dashboard tokens ── */
+  --bg:       #0D1117;
+  --sidebar:  #0D1117;
+  --card:     #161B27;
+  --card2:    #1C2333;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.12);
+
+  /* Legacy aliases (mapped to new tokens) */
+  --s0: #0D1117;
+  --s1: #161B27;
+  --s2: #1C2333;
+  --s3: #232D3F;
+  --s4: #2A3448;
+  --s5: rgba(255,255,255,0.07);
+
+  /* Text hierarchy — white at different opacities */
+  --t1: rgba(255,255,255,0.95);
+  --t2: rgba(255,255,255,0.55);
+  --t3: rgba(255,255,255,0.28);
+
+  /* Accent */
+  --blue:     #427EFF;
+  --blue-dim: rgba(66,126,255,0.12);
+  --blue-bd:  rgba(66,126,255,0.25);
+  --blue-glow:rgba(66,126,255,0.06);
+
+  /* Status */
+  --green:    #22C55E;
+  --gbg:      rgba(34,197,94,0.10);
+  --gbd:      rgba(34,197,94,0.20);
+  --amber:    #F59E0B;
+  --abg:      rgba(245,158,11,0.10);
+  --abd:      rgba(245,158,11,0.20);
+  --red:      #EF4444;
+  --rbg:      rgba(239,68,68,0.10);
+  --rbd:      rgba(239,68,68,0.20);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ── Base form elements ── */
+input, textarea, select {
+  background: var(--card2);
+  color: var(--t1);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  padding: 10px 12px;
+  width: 100%;
+  outline: none;
+  transition: outline-color .15s, box-shadow .15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--t3);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: 1px solid var(--blue-bd);
+  box-shadow: 0 0 0 3px var(--blue-dim);
+}
+
+input:hover:not(:focus), textarea:hover:not(:focus), select:hover:not(:focus) {
+  outline: 1px solid rgba(66,126,255,.15);
+}
+
+input[type="number"] {
+  font-family: 'DM Mono', monospace;
+}
+
+/* ── Select dropdown arrow ── */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237A8499' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+select option {
+  background: var(--card);
+  color: var(--t1);
+}
+
+/* ── Labels ── */
+label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--t3);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* ── Form groups ── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 16px;
+}
+
+.field-hint {
+  font-size: 11px;
+  color: var(--t3);
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+.field-error {
+  font-size: 11px;
+  color: var(--red);
+  margin-top: 5px;
+}
+
+input.error, textarea.error, select.error {
+  outline: 1px solid var(--rbd);
+  box-shadow: 0 0 0 3px var(--rbg);
+}
+
+/* ── Checkboxes ── */
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  padding: 0;
+  border-radius: 4px;
+  border: 1.5px solid var(--border2);
+  background: var(--card2);
+  cursor: pointer;
+  position: relative;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: background .12s, border-color .12s;
+}
+
+input[type="checkbox"]:checked {
+  background: var(--blue);
+  border-color: var(--blue);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='white' d='M1.5 5l2.5 2.5 4.5-4.5' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+input[type="checkbox"]:focus {
+  box-shadow: 0 0 0 3px var(--blue-dim);
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.checkbox-row label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t2);
+  cursor: pointer;
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+/* ── Radio buttons ── */
+input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  background: var(--card2);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: background .12s, border-color .12s;
+}
+
+input[type="radio"]:checked {
+  border-color: var(--blue);
+  background: radial-gradient(circle, var(--blue) 40%, transparent 41%);
+  box-shadow: inset 0 0 0 3px var(--card2);
+  background-color: var(--blue);
+}
+
+input[type="radio"]:focus {
+  box-shadow: 0 0 0 3px var(--blue-dim);
+}
+
+/* ── Radio card (styled option block) ── */
+.radio-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--card2);
+  border: 1px solid var(--gbd);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  margin-bottom: 6px;
+}
+
+.radio-card:has(input[type="radio"]:checked) {
+  background: var(--blue-dim);
+  border-color: var(--blue-bd);
+}
+
+.radio-card:hover:not(:has(input[type="radio"]:checked)) {
+  border-color: rgba(66,126,255,.2);
+}
+
+.radio-card-content {
+  flex: 1;
+}
+
+.radio-card-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t1);
+  margin-bottom: 2px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.radio-card-sub {
+  font-size: 11px;
+  color: var(--t3);
+  line-height: 1.5;
+}
+
+/* ── Date input ── */
+input[type="date"] {
+  font-family: 'DM Mono', monospace;
+  color-scheme: dark;
+}
+
+/* ── Number input — remove spinners ── */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ── Textarea ── */
+textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.6;
+}
+
+/* ── Disabled state ── */
+input:disabled, textarea:disabled, select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Search input variant ── */
+input[type="search"] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237A8499' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  padding-left: 32px;
+}
+
+/* ── Upload zone ── */
+.upload-zone {
+  border: 1.5px dashed var(--border2);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  background: transparent;
+}
+
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: var(--blue-bd);
+  background: var(--blue-dim);
+}
+
+.upload-zone input[type="file"] {
+  display: none;
+}
+
+/* ── Button base ── */
+button {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: opacity .15s, box-shadow .15s;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Autofill override ── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--card2) inset !important;
+  -webkit-text-fill-color: var(--t1) !important;
+  caret-color: var(--t1);
+}
