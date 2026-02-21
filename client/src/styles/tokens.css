@@ -60,7 +60,7 @@ input, textarea, select {
 }
 
 input::placeholder, textarea::placeholder {
-  color: var(--t3);
+  color: var(--t2);
 }
 
 input:focus, textarea:focus, select:focus {
@@ -96,7 +96,7 @@ label {
   font-family: 'DM Mono', monospace;
   font-size: 9px;
   letter-spacing: 0.08em;
-  color: var(--t3);
+  color: var(--t2);
   text-transform: uppercase;
   margin-bottom: 6px;
 }
@@ -111,7 +111,7 @@ label {
 
 .field-hint {
   font-size: 11px;
-  color: var(--t3);
+  color: var(--t2);
   margin-top: 5px;
   line-height: 1.5;
 }
@@ -237,7 +237,7 @@ input[type="radio"]:focus {
 
 .radio-card-sub {
   font-size: 11px;
-  color: var(--t3);
+  color: var(--t2);
   line-height: 1.5;
 }
 
