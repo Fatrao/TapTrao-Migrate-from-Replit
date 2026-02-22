@@ -245,6 +245,11 @@
 .demo-grid-2b { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
 @media (max-width: 768px) {
+  /* Hide TapTrao text on mobile, keep logo icon */
+  .hide-on-mobile {
+    display: none !important;
+  }
+
   /* Force all content to respect viewport width */
   body, #root {
     overflow-x: hidden !important;
