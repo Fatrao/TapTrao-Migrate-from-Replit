@@ -63,7 +63,7 @@ function DemoSection() {
         From trade idea to full compliance picture
       </h2>
       <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", textAlign: "center", marginBottom: 40 }}>
-        Three inputs. Seconds. No broker needed.
+        Three inputs. Seconds. <span style={{ color: "rgba(255,255,255,0.95)" }}>No broker needed.</span>
       </p>
 
       <div style={{ background: "#161B27", borderRadius: 16, overflow: "hidden" }}>
@@ -431,7 +431,7 @@ export default function Home() {
           maxWidth: 560,
           margin: "0 auto 36px",
         }} data-testid="text-hero-subtitle">
-          The first standalone trade compliance tool for commodity traders sourcing from Africa. No ERP. No broker. $4.99 per check.
+          The first standalone trade compliance tool for commodity traders <span style={{ color: "rgba(255,255,255,0.95)" }}>sourcing from Africa</span>. <span style={{ color: "rgba(255,255,255,0.95)" }}>No ERP. No broker.</span> First check free.
         </p>
 
         <div className="home-hero-buttons" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -449,7 +449,7 @@ export default function Home() {
               alignItems: "center",
               gap: 8,
             }} data-testid="button-hero-free-lookup">
-              Run your first lookup →
+              Run a free compliance check →
             </span>
           </Link>
           <Link href="/pricing">
@@ -469,13 +469,10 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="home-hero-stats" style={{ marginTop: 40, display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
-          {["18 origins", "154 commodities", "6 destinations"].map((stat) => (
-            <span key={stat} style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(255,255,255,0.40)", fontSize: 14 }}>
-              <CheckCircle2 size={14} style={{ color: "#427EFF" }} />
-              {stat}
-            </span>
-          ))}
+        <div className="home-hero-stats" style={{ marginTop: 40, textAlign: "center", maxWidth: 520, margin: "40px auto 0" }}>
+          <p style={{ color: "rgba(255,255,255,0.95)", fontSize: 15, lineHeight: 1.6 }}>
+            Know what can block, delay, or reject your shipment before money moves.
+          </p>
         </div>
       </div>
 
@@ -495,22 +492,22 @@ export default function Home() {
           {
             icon: "⚡",
             title: "Compliance Lookup",
-            desc: "Enter commodity, origin, and destination. Get the full regulatory picture in seconds — duties, documents, risk flags.",
-            price: "$4.99 per lookup",
+            desc: "Identify regulatory requirements, required documents, and risk flags before you commit.",
+            price: "Included in every trade pack",
             href: "/lookup",
           },
           {
             icon: "📄",
             title: "LC Document Checker",
-            desc: "Upload your Letter of Credit and supplier documents. Catch discrepancies before your bank does.",
-            price: "$2.99 per check",
+            desc: "Validate your LC and supplier documents against UCP 600 before bank submission.",
+            price: "Included with every compliance check",
             href: "/lc-check",
           },
           {
             icon: "🔔",
             title: "Regulatory Alerts",
-            desc: "Get notified when regulations change for your saved corridors. Never miss an SPS update or duty change.",
-            price: "Coming soon",
+            desc: "Get notified when regulations change for your saved corridors.",
+            price: "Available with Pro Monitoring",
             href: "/pricing",
           },
         ].map((f, i) => (
@@ -553,13 +550,13 @@ export default function Home() {
             Three inputs. Complete picture.
           </h2>
           <p style={{ color: "rgba(255,255,255,0.50)", textAlign: "center", fontSize: 16, marginBottom: 48 }}>
-            No ERP required. No broker needed. Just answers.
+            <span style={{ color: "rgba(255,255,255,0.95)" }}>No ERP required. No broker needed.</span> Just answers.
           </p>
           <div className="home-how-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }}>
             {[
-              { num: "01", title: "Pick your corridor", desc: "Select the origin country, destination market, and commodity from our database of 154 commodities across 18 African origins." },
-              { num: "02", title: "Get your compliance pack", desc: "Receive duty rates, document checklists, regulatory triggers, SPS requirements, and stop-flag warnings — all in one view." },
-              { num: "03", title: "Ship with confidence", desc: "Export results, generate supplier briefs, validate LC documents against UCP 600 rules, and download audit-ready TwinLog PDFs." },
+              { num: "01", title: "Define your corridor", desc: "Select the origin country, destination market, and commodity from our database of 154 commodities across 18 African origins." },
+              { num: "02", title: "Review compliance requirements", desc: "Receive duty rates, document checklists, regulatory triggers, SPS requirements, and stop-flag warnings — all in one view." },
+              { num: "03", title: "Proceed with confidence", desc: "Export results, generate supplier instructions, validate LC documents against UCP 600 rules, and download audit-ready TwinLog PDFs." },
             ].map((step, i) => (
               <div key={step.num} data-testid={`step-${i + 1}`}>
                 <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 48, color: "rgba(66,126,255,0.15)" }}>
@@ -583,7 +580,7 @@ export default function Home() {
           <h2 className="home-commodities-heading" style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.5px" }} data-testid="text-commodities-heading">
             Every commodity. Every corridor.
           </h2>
-          <p style={{ color: "rgba(255,255,255,0.40)", marginTop: 8, fontSize: 14 }} data-testid="text-commodities-subheading">
+          <p style={{ color: "rgba(255,255,255,0.65)", marginTop: 8, fontSize: 14 }} data-testid="text-commodities-subheading">
             From raw cashews to cobalt, we cover the commodities that move between Africa and the world.
           </p>
         </div>
@@ -597,7 +594,7 @@ export default function Home() {
                     fontSize: 18,
                     fontFamily: "'Fraunces', serif",
                     fontWeight: 600,
-                    color: i % 2 === 0 ? "#427EFF" : "rgba(255,255,255,0.30)",
+                    color: i % 2 === 0 ? "#427EFF" : "rgba(255,255,255,0.85)",
                   }}
                   data-testid={`text-commodity-${i}`}
                 >
@@ -619,18 +616,21 @@ export default function Home() {
           }} data-testid="text-pricing-heading">
             Pay per check. No subscription trap.
           </h2>
-          <p style={{ color: "rgba(255,255,255,0.50)", textAlign: "center", fontSize: 16, marginBottom: 40 }} data-testid="text-pricing-subheading">
-            Buy trade credits when you need them. Your first lookup is free.
+          <p style={{ color: "rgba(255,255,255,0.50)", textAlign: "center", fontSize: 16, marginBottom: 12 }} data-testid="text-pricing-subheading">
+            Buy trade credits when you need them. Your first compliance check is free.
+          </p>
+          <p style={{ color: "rgba(255,255,255,0.95)", textAlign: "center", fontSize: 14, fontWeight: 600, marginBottom: 40 }}>
+            No ERP. No broker. Just answers.
           </p>
           <div className="home-pricing-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, maxWidth: 640, margin: "0 auto" }}>
             <div style={{ background: "#161B27", borderRadius: 14, padding: 28, position: "relative", overflow: "hidden" }} data-testid="card-pricing-lookup">
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, #427EFF, transparent)" }} />
-              <h3 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)", marginTop: 0 }}>Compliance Lookup</h3>
+              <h3 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)", marginTop: 0 }}>Compliance Check</h3>
               <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginTop: 8 }}>
-                1 credit <span style={{ fontSize: 14, fontWeight: 400, color: "rgba(255,255,255,0.40)" }}>per lookup</span>
+                $24.99 <span style={{ fontSize: 14, fontWeight: 400, color: "rgba(255,255,255,0.40)" }}>per shipment</span>
               </p>
               <ul style={{ listStyle: "none", padding: 0, margin: "20px 0 0" }}>
-                {["Duty rates & tariff codes", "Document checklists", "Regulatory trigger screening", "SPS & phytosanitary requirements", "Bundled LC check included"].map((item) => (
+                {["Duty rates & tariff codes", "Document checklists", "Regulatory trigger screening", "SPS & phytosanitary requirements", "LC document check included"].map((item) => (
                   <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "rgba(255,255,255,0.60)", marginBottom: 10 }}>
                     <CheckCircle2 size={14} style={{ color: "#427EFF", flexShrink: 0, marginTop: 2 }} />
                     <span>{item}</span>
@@ -642,36 +642,38 @@ export default function Home() {
                   style={{ display: "block", textAlign: "center", background: "#427EFF", color: "white", padding: "10px 0", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", marginTop: 20 }}
                   data-testid="button-pricing-lookup"
                 >
-                  Start with a free lookup
+                  Start with a free check
                 </span>
               </Link>
             </div>
             <div style={{ background: "#161B27", borderRadius: 14, padding: 28, position: "relative", overflow: "hidden" }} data-testid="card-pricing-lc">
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, #22C55E, transparent)" }} />
-              <h3 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)", marginTop: 0 }}>LC Re-check</h3>
+              <h3 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)", marginTop: 0 }}>LC Document Check</h3>
               <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginTop: 8 }}>
-                $9.99 <span style={{ fontSize: 14, fontWeight: 400, color: "rgba(255,255,255,0.40)" }}>per re-check</span>
+                $19.99 <span style={{ fontSize: 14, fontWeight: 400, color: "rgba(255,255,255,0.40)" }}>one-time</span>
               </p>
               <ul style={{ listStyle: "none", padding: 0, margin: "20px 0 0" }}>
-                {["UCP 600 compliance validation", "Field-by-field discrepancy check", "Correction email & WhatsApp", "Actionable fix suggestions", "SHA-256 evidence hash"].map((item) => (
+                {["UCP 600 compliance validation", "Field-by-field discrepancy check", "Discrepancy summary & fix suggestions", "SHA-256 evidence hash"].map((item) => (
                   <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "rgba(255,255,255,0.60)", marginBottom: 10 }}>
                     <CheckCircle2 size={14} style={{ color: "#22C55E", flexShrink: 0, marginTop: 2 }} />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
+              <p style={{ fontSize: 11, color: "#22C55E", fontStyle: "italic", marginTop: 12 }}>Included free with every trade credit</p>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.40)", marginTop: 4 }}>Re-checks after supplier corrections: $9.99</p>
               <Link href="/lc-check">
                 <span
-                  style={{ display: "block", textAlign: "center", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.80)", padding: "10px 0", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer", marginTop: 20 }}
+                  style={{ display: "block", textAlign: "center", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.80)", padding: "10px 0", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer", marginTop: 16 }}
                   data-testid="button-pricing-lc"
                 >
-                  Check your first LC
+                  Check LC only
                 </span>
               </Link>
             </div>
           </div>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.30)", textAlign: "center", marginTop: 20 }} data-testid="text-pricing-note">
-            Trade packs: Single $4.99 &middot; 3-Trade $12.99 &middot; 10-Trade $34.99 &middot; 25-Trade $74.99
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.40)", textAlign: "center", marginTop: 20 }} data-testid="text-pricing-note">
+            Trade packs: Single $24.99 &middot; 3 Shipments $59.99 &middot; 10 Shipments $179 &middot; 25 Shipments $349
           </p>
         </div>
       </div>
