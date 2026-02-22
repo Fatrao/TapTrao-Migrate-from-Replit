@@ -224,14 +224,14 @@ export default function Pricing() {
   return (
     <div style={{ minHeight: "100vh", background: "#0D1117", fontFamily: "'Plus Jakarta Sans', sans-serif", WebkitFontSmoothing: "antialiased" }}>
       {/* NAV */}
-      <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px", height: 56, borderBottom: "1px solid rgba(255,255,255,0.07)", gap: 8, overflow: "hidden" }}>
+      <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 12px", height: 56, borderBottom: "1px solid rgba(255,255,255,0.07)", gap: 6, overflow: "hidden" }}>
         <Link href="/">
-          <span style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexShrink: 0 }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", flexShrink: 0 }}>
             <img src="/logo.png" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "contain" }} />
-            <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 16, color: "rgba(255,255,255,0.95)" }}>TapTrao</span>
+            <span className="hide-on-mobile" style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 16, color: "rgba(255,255,255,0.95)" }}>TapTrao</span>
           </span>
         </Link>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, overflow: "auto", WebkitOverflowScrolling: "touch", flexShrink: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, overflow: "auto", WebkitOverflowScrolling: "touch", flexShrink: 1, minWidth: 0, msOverflowStyle: "none", scrollbarWidth: "none" }}>
           <Link href="/lookup">
             <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" }}>Lookup</span>
           </Link>
@@ -242,8 +242,8 @@ export default function Pricing() {
             <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" }}>Dashboard</span>
           </Link>
           <Link href="/lookup">
-            <span style={{ background: "#427EFF", color: "white", padding: "7px 14px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
-              Start free →
+            <span style={{ background: "#427EFF", color: "white", padding: "7px 12px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
+              Free check →
             </span>
           </Link>
         </div>
