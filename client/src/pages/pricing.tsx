@@ -103,7 +103,7 @@ const S = {
     padding: "48px 16px",
   } as React.CSSProperties,
   heading: {
-    fontFamily: "'Fraunces', serif",
+    fontFamily: "var(--fh)",
     fontWeight: 900,
     fontSize: 28,
     color: "var(--t1)",
@@ -111,7 +111,7 @@ const S = {
     margin: 0,
   } as React.CSSProperties,
   sub: {
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    fontFamily: "var(--fb)",
     fontSize: 13,
     color: "var(--t2)",
     maxWidth: 480,
@@ -148,7 +148,7 @@ const S = {
     borderRadius: 8,
     border: "none",
     padding: "10px 20px",
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    fontFamily: "var(--fb)",
     fontSize: 13,
     fontWeight: 600,
     cursor: "pointer",
@@ -165,7 +165,7 @@ const S = {
     borderRadius: 8,
     border: "1px solid var(--border2)",
     padding: "10px 20px",
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    fontFamily: "var(--fb)",
     fontSize: 13,
     fontWeight: 600,
     cursor: "pointer",
@@ -176,7 +176,7 @@ const S = {
     transition: "opacity .15s",
   } as React.CSSProperties,
   sectionTitle: {
-    fontFamily: "'Fraunces', serif",
+    fontFamily: "var(--fh)",
     fontWeight: 900,
     fontSize: 20,
     color: "var(--t1)",
@@ -185,7 +185,7 @@ const S = {
     margin: "0 0 8px",
   } as React.CSSProperties,
   sectionSub: {
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    fontFamily: "var(--fb)",
     fontSize: 13,
     color: "var(--t2)",
     textAlign: "center" as const,
@@ -222,13 +222,13 @@ export default function Pricing() {
   const balance = tokenQuery.data?.balance ?? 0;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0D1117", fontFamily: "'Plus Jakarta Sans', sans-serif", WebkitFontSmoothing: "antialiased" }}>
+    <div style={{ minHeight: "100vh", background: "#000", fontFamily: "var(--fb)", WebkitFontSmoothing: "antialiased" }}>
       {/* NAV */}
       <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 12px", height: 56, borderBottom: "1px solid rgba(255,255,255,0.07)", gap: 6, overflow: "hidden" }}>
         <Link href="/">
           <span style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", flexShrink: 0 }}>
             <img src="/logo.png" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "contain" }} />
-            <span className="hide-on-mobile" style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 16, color: "rgba(255,255,255,0.95)" }}>TapTrao</span>
+            <span className="hide-on-mobile" style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 16, color: "rgba(255,255,255,0.95)" }}>TapTrao</span>
           </span>
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 10, overflow: "auto", WebkitOverflowScrolling: "touch", flexShrink: 1, minWidth: 0, msOverflowStyle: "none", scrollbarWidth: "none" }}>
@@ -242,7 +242,7 @@ export default function Pricing() {
             <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" }}>Dashboard</span>
           </Link>
           <Link href="/lookup">
-            <span style={{ background: "#427EFF", color: "white", padding: "7px 12px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
+            <span style={{ background: "#4ac329", color: "white", padding: "7px 12px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
               Free check →
             </span>
           </Link>
@@ -283,11 +283,11 @@ export default function Pricing() {
           data-testid="card-free-lookup-banner"
         >
           <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
-            <div style={{ padding: 12, borderRadius: "50%", background: "rgba(34,197,94,0.12)", flexShrink: 0 }}>
+            <div style={{ padding: 12, borderRadius: "50%", background: "rgba(74,195,41,0.12)", flexShrink: 0 }}>
               <Gift style={{ width: 24, height: 24, color: "var(--green)" }} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: "var(--t1)", margin: "0 0 4px" }}>
+              <h3 style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 16, color: "var(--t1)", margin: "0 0 4px" }}>
                 Your first check is free
               </h3>
               <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
@@ -330,10 +330,10 @@ export default function Pricing() {
                     </div>
                   )}
                   <div style={{ textAlign: "center", marginBottom: 16 }}>
-                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
+                    <div style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
                       {pack.name}
                     </div>
-                    <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: "var(--t1)", marginTop: 8, letterSpacing: "-0.5px" }}>
+                    <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)", marginTop: 8, letterSpacing: "-0.5px" }}>
                       {pack.price}
                     </div>
                     <div style={{ ...S.statLabel, marginTop: 6 }}>
@@ -375,7 +375,7 @@ export default function Pricing() {
         {/* SECTION 2 — What's included (clarity block) */}
         <div style={{ marginBottom: 40 }}>
           <div style={{ ...S.card, background: "var(--card2)", padding: 28 }}>
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 16, color: "var(--t1)", margin: "0 0 16px", textAlign: "center" }}>
+            <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 16, color: "var(--t1)", margin: "0 0 16px", textAlign: "center" }}>
               Every trade credit includes
             </h3>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10 }}>
@@ -408,12 +408,12 @@ export default function Pricing() {
             <div style={{ ...S.card, background: "var(--card2)", border: "1px solid var(--border2)" }} data-testid="card-lc-standalone">
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
                 <FileCheck style={{ width: 20, height: 20, color: "var(--blue)" }} />
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
+                <span style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
                   LC Document Check
                 </span>
               </div>
               <div style={{ marginBottom: 12 }}>
-                <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: "var(--t1)", letterSpacing: "-0.5px" }}>
+                <span style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)", letterSpacing: "-0.5px" }}>
                   $19.99
                 </span>
                 <span style={{ color: "var(--t2)", fontSize: 13, marginLeft: 6 }}>one-time</span>
@@ -459,12 +459,12 @@ export default function Pricing() {
             <div style={{ ...S.card, border: "1px solid var(--border2)" }} data-testid="card-lc-recheck-addon">
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                 <RefreshCw style={{ width: 18, height: 18, color: "var(--blue)" }} />
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
+                <span style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
                   LC corrections (if documents are updated)
                 </span>
               </div>
               <div style={{ marginBottom: 10 }}>
-                <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 22, color: "var(--t1)", letterSpacing: "-0.5px" }}>
+                <span style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "var(--t1)", letterSpacing: "-0.5px" }}>
                   $9.99
                 </span>
                 <span style={{ color: "var(--t2)", fontSize: 13, marginLeft: 6 }}>per re-check</span>
@@ -482,7 +482,7 @@ export default function Pricing() {
             <div style={{ ...S.card, border: "1px dashed var(--border2)", background: "transparent" }} data-testid="card-enterprise">
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                 <Building2 style={{ width: 18, height: 18, color: "var(--t2)" }} />
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
+                <span style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
                   High-volume or team usage
                 </span>
               </div>
@@ -507,7 +507,7 @@ export default function Pricing() {
             <div style={{ ...S.card, border: "1px dashed var(--border2)", background: "transparent", opacity: 0.7 }} data-testid="card-pro-monitoring">
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                 <Bell style={{ width: 18, height: 18, color: "var(--t3)" }} />
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
+                <span style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
                   Pro Monitoring
                 </span>
                 <span style={{ ...S.badge, background: "var(--abg)", color: "var(--amber)", border: "1px solid var(--abd)" }}>
@@ -530,7 +530,7 @@ export default function Pricing() {
             {faqs.map((faq, i) => (
               <div key={i} style={{ ...S.card, padding: 20 }}>
                 <h3
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: "var(--t1)", margin: "0 0 8px" }}
+                  style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 14, color: "var(--t1)", margin: "0 0 8px" }}
                   data-testid={`faq-question-${i}`}
                 >
                   {faq.q}

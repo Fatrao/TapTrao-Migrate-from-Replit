@@ -90,7 +90,7 @@ export default function Inbox() {
         {/* HEADER */}
         <div style={{ marginBottom: 28 }}>
           <h1
-            style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, letterSpacing: "-0.5px", color: "var(--t1)", margin: 0, lineHeight: 1.1 }}
+            style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "-0.5px", color: "var(--t1)", margin: 0, lineHeight: 1.1 }}
             data-testid="text-inbox-title"
           >
             Supplier Inbox
@@ -107,7 +107,7 @@ export default function Inbox() {
               key={c.label}
               style={{
                 background: c.label === "Blocking issue"
-                  ? `linear-gradient(135deg, rgba(239,68,68,.05), transparent 60%), var(--card)`
+                  ? `linear-gradient(135deg, rgba(218,60,61,.05), transparent 60%), var(--card)`
                   : "var(--card)",
                 padding: "20px 22px",
                 borderRadius:
@@ -116,7 +116,7 @@ export default function Inbox() {
               }}
               data-testid={`inbox-summary-card-${i}`}
             >
-              <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 36, letterSpacing: -2, lineHeight: 1, color: c.color }}>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 36, letterSpacing: -2, lineHeight: 1, color: c.color }}>
                 {c.value}
               </div>
               <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)", letterSpacing: ".04em", marginTop: 4 }}>
@@ -131,7 +131,7 @@ export default function Inbox() {
           <div style={{ padding: "80px 0", textAlign: "center", color: "var(--t2)", fontSize: 14 }}>Loading inbox...</div>
         ) : requests.length === 0 ? (
           <div style={{ padding: "80px 0", textAlign: "center" }} data-testid="inbox-empty-state">
-            <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, color: "var(--t2)" }}>
+            <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "var(--t2)" }}>
               No supplier requests yet.
             </div>
             <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 8 }}>

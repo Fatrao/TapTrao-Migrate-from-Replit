@@ -22,9 +22,9 @@ function relativeTime(date: string | Date) {
 
 function originAvatar(iso2: string) {
   const colors: Record<string, string> = {
-    CI: "#F59E0B", GH: "#22C55E", CD: "#EF4444", KE: "#427EFF",
-    NG: "#22C55E", TZ: "#F59E0B", ET: "#427EFF", ZA: "#EF4444",
-    SN: "#22C55E", CM: "#F59E0B", UG: "#427EFF", MZ: "#22C55E",
+    CI: "#ea8b43", GH: "#4ac329", CD: "#da3c3d", KE: "#4ac329",
+    NG: "#4ac329", TZ: "#ea8b43", ET: "#4ac329", ZA: "#da3c3d",
+    SN: "#4ac329", CM: "#ea8b43", UG: "#4ac329", MZ: "#4ac329",
   };
   const color = colors[iso2] || "var(--blue)";
   return (
@@ -135,7 +135,7 @@ function TemplateCard({
             fontWeight: 600,
             fontSize: 13,
             borderRadius: 6,
-            border: "1px solid rgba(239,68,68,.3)",
+            border: "1px solid rgba(218,60,61,.3)",
             cursor: "pointer",
           }}
           data-testid={`button-delete-template-${template.id}`}
@@ -204,7 +204,7 @@ export default function Templates() {
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <h1
             style={{
-              fontFamily: "'Fraunces', serif",
+              fontFamily: "var(--fh)",
               fontWeight: 900,
               fontSize: 28,
               letterSpacing: "-0.5px",
@@ -216,7 +216,7 @@ export default function Templates() {
           >
             Templates
           </h1>
-          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, color: "var(--t2)", marginTop: 6 }}>
+          <p style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t2)", marginTop: 6 }}>
             {count} saved template{count !== 1 ? "s" : ""}
           </p>
 
@@ -283,7 +283,7 @@ export default function Templates() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 18, color: "var(--t1)", marginBottom: 8 }}>
+            <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "var(--t1)", marginBottom: 8 }}>
               Delete Template
             </h3>
             <p style={{ fontSize: 13, color: "var(--t2)", marginBottom: 20, lineHeight: 1.5 }}>

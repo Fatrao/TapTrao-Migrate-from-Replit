@@ -27,7 +27,7 @@ export function NavBar() {
   const templateCount = templateCountQuery.data?.count ?? 0;
 
   return (
-    <header className="sticky top-0 z-50 bg-background border-b border-[#E2D9CC]">
+    <header className="sticky top-0 z-50 bg-background border-b border-border">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 px-6 h-16">
         <Link href="/" data-testid="link-home">
           <span className="flex items-center gap-2" data-testid="text-nav-logo">
@@ -84,7 +84,7 @@ export function NavBar() {
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden border-t border-[#E2D9CC] bg-background px-6 pb-4 pt-2" data-testid="nav-mobile">
+        <div className="md:hidden border-t border-border bg-background px-6 pb-4 pt-2" data-testid="nav-mobile">
           <nav className="flex flex-col gap-1">
             {navLinks.map((link) => {
               const isActive = location === link.href;
@@ -106,7 +106,7 @@ export function NavBar() {
                 </Link>
               );
             })}
-            <div className="flex items-center gap-2 pt-2 border-t border-[#E2D9CC] mt-1">
+            <div className="flex items-center gap-2 pt-2 border-t border-border mt-1">
               <span
                 className="inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1 text-sm font-medium"
                 data-testid="badge-token-balance-mobile"

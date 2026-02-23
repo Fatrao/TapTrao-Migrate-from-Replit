@@ -10,9 +10,7 @@ export function StepNav({ steps, currentIndex, completedUpTo }: StepNavProps) {
   return (
     <div
       style={{
-        background: "var(--s1)",
-        borderBottom: "1px solid var(--s5)",
-        padding: "0 24px",
+        padding: "18px 28px 8px",
         display: "flex",
         alignItems: "center",
       }}
@@ -21,7 +19,6 @@ export function StepNav({ steps, currentIndex, completedUpTo }: StepNavProps) {
       {steps.map((step, i) => {
         const isDone = i < completedUpTo;
         const isActive = i === currentIndex;
-        const isPending = !isDone && !isActive;
 
         return (
           <div key={step} style={{ display: "flex", alignItems: "center" }}>
@@ -29,56 +26,58 @@ export function StepNav({ steps, currentIndex, completedUpTo }: StepNavProps) {
               style={{
                 display: "flex",
                 alignItems: "center",
-                padding: "13px 14px 11px",
-                position: "relative",
-                borderBottom: isActive ? "2px solid var(--blue)" : "2px solid transparent",
-                marginBottom: isActive ? -1 : 0,
                 gap: 8,
               }}
               data-testid={`step-nav-item-${i}`}
             >
               <div
                 style={{
-                  width: 18,
-                  height: 18,
+                  width: 26,
+                  height: 26,
                   borderRadius: "50%",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 9,
-                  fontWeight: 700,
+                  fontSize: 11,
+                  fontWeight: 800,
                   flexShrink: 0,
+                  fontFamily: "var(--fh)",
+                  transition: "all 0.2s",
                   ...(isDone
-                    ? { background: "var(--green)", border: "1.5px solid var(--green)", color: "#fff" }
+                    ? { background: "var(--green)", color: "#000" }
                     : isActive
-                      ? { background: "var(--blue)", border: "1.5px solid var(--blue)", color: "#fff" }
-                      : { background: "transparent", border: "1.5px solid var(--t3)", color: "var(--t3)" }),
+                      ? { background: "rgba(255,255,255,0.15)", color: "#fff", border: "2px solid var(--green)" }
+                      : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.1)" }),
                 }}
               >
-                {isDone ? <Check size={10} strokeWidth={3} /> : i + 1}
+                {isDone ? <Check size={12} strokeWidth={3} /> : i + 1}
               </div>
               <span
                 style={{
                   fontSize: 12,
                   fontWeight: 600,
-                  color: isDone ? "var(--t2)" : isActive ? "var(--t1)" : "var(--t3)",
                   whiteSpace: "nowrap",
+                  ...(isDone
+                    ? { color: "var(--green)" }
+                    : isActive
+                      ? { color: "#fff" }
+                      : { color: "rgba(255,255,255,0.25)" }),
                 }}
               >
                 {step}
               </span>
             </div>
             {i < steps.length - 1 && (
-              <span
+              <div
                 style={{
-                  color: "var(--s5)",
-                  fontSize: 12,
-                  margin: "0 2px",
-                  userSelect: "none",
+                  flex: 1,
+                  height: 1,
+                  background: isDone ? "var(--green)" : "rgba(255,255,255,0.1)",
+                  margin: "0 10px",
+                  minWidth: 24,
+                  transition: "background 0.3s",
                 }}
-              >
-                ›
-              </span>
+              />
             )}
           </div>
         );

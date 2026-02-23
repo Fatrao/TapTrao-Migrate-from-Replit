@@ -160,7 +160,7 @@ export default function AlertsPage() {
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <h1
             style={{
-              fontFamily: "'Fraunces', serif",
+              fontFamily: "var(--fh)",
               fontWeight: 900,
               fontSize: 28,
               letterSpacing: "-0.5px",
@@ -173,7 +173,7 @@ export default function AlertsPage() {
           </h1>
           <p
             style={{
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontFamily: "var(--fb)",
               fontSize: 13,
               color: "var(--t2)",
               marginBottom: 24,

@@ -1,16 +1,16 @@
 export const AVATAR_COLOURS: Record<string, { bg: string; border: string; text: string }> = {
-  CI: { bg:'rgba(66,126,255,.18)',  border:'rgba(66,126,255,.32)',  text:'#93B4FF' },
-  GH: { bg:'rgba(245,158,11,.15)', border:'rgba(245,158,11,.28)', text:'#FCD34D' },
-  CM: { bg:'rgba(124,58,237,.18)', border:'rgba(124,58,237,.30)', text:'#C4B5FD' },
-  ET: { bg:'rgba(34,197,94,.12)',  border:'rgba(34,197,94,.22)',  text:'#6EE7B7' },
-  KE: { bg:'rgba(239,68,68,.12)',  border:'rgba(239,68,68,.22)',  text:'#FCA5A5' },
+  CI: { bg:'rgba(74,195,41,.18)',  border:'rgba(74,195,41,.32)',  text:'#8FE77A' },
+  GH: { bg:'rgba(234,139,67,.15)', border:'rgba(234,139,67,.28)', text:'#F5C78A' },
+  CM: { bg:'rgba(46,134,98,.18)', border:'rgba(46,134,98,.30)', text:'#7ECBA9' },
+  ET: { bg:'rgba(74,195,41,.12)',  border:'rgba(74,195,41,.22)',  text:'#8FE77A' },
+  KE: { bg:'rgba(218,60,61,.12)',  border:'rgba(218,60,61,.22)',  text:'#F5A5A5' },
   NG: { bg:'rgba(168,85,247,.15)', border:'rgba(168,85,247,.28)', text:'#D8B4FE' },
-  SN: { bg:'rgba(20,184,166,.12)', border:'rgba(20,184,166,.22)', text:'#5EEAD4' },
-  MA: { bg:'rgba(251,146,60,.12)', border:'rgba(251,146,60,.22)', text:'#FED7AA' },
-  ZA: { bg:'rgba(99,102,241,.15)', border:'rgba(99,102,241,.28)', text:'#C7D2FE' },
-  TZ: { bg:'rgba(236,72,153,.12)', border:'rgba(236,72,153,.22)', text:'#FBCFE8' },
+  SN: { bg:'rgba(46,134,98,.12)', border:'rgba(46,134,98,.22)', text:'#7ECBA9' },
+  MA: { bg:'rgba(234,139,67,.12)', border:'rgba(234,139,67,.22)', text:'#F5C78A' },
+  ZA: { bg:'rgba(74,195,41,.15)', border:'rgba(74,195,41,.28)', text:'#8FE77A' },
+  TZ: { bg:'rgba(218,60,61,.12)', border:'rgba(218,60,61,.22)', text:'#F5A5A5' },
 };
-export const DEFAULT_AVATAR = { bg:'rgba(44,50,64,.6)', border:'rgba(44,50,64,1)', text:'#7A8499' };
+export const DEFAULT_AVATAR = { bg:'rgba(28,28,30,.6)', border:'rgba(28,28,30,1)', text:'#999' };
 export function getAvatarColour(iso2: string) {
   return AVATAR_COLOURS[iso2] ?? DEFAULT_AVATAR;
 }

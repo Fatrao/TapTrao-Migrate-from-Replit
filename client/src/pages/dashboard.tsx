@@ -161,7 +161,7 @@ export default function Dashboard() {
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "40px 24px" }}>
         <div style={{ marginBottom: 32 }}>
           <h1
-            style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: "var(--t1)", letterSpacing: "-0.5px", marginBottom: 4 }}
+            style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)", letterSpacing: "-0.5px", marginBottom: 4 }}
             data-testid="text-dashboard-title"
           >
             {getGreeting()}
@@ -181,7 +181,7 @@ export default function Dashboard() {
               </div>
               <div
                 style={{
-                  fontFamily: "'Fraunces', serif", fontWeight: 900,
+                  fontFamily: "var(--fh)", fontWeight: 900,
                   fontSize: c.small ? 16 : 28, color: c.color, letterSpacing: -1, lineHeight: 1,
                 }}
                 data-testid={`stat-${c.label.toLowerCase().replace(/\s+/g, "-")}`}
@@ -201,7 +201,7 @@ export default function Dashboard() {
               onMouseEnter={(e) => { e.currentTarget.style.background = "var(--card2)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "var(--card)"; }}
             >
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(66,126,255,0.3), transparent)" }} />
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 8, background: "var(--blue-dim)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Search size={18} style={{ color: "var(--blue)" }} />
@@ -220,7 +220,7 @@ export default function Dashboard() {
               onMouseEnter={(e) => { e.currentTarget.style.background = "var(--card2)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "var(--card)"; }}
             >
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(34,197,94,0.3), transparent)" }} />
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 8, background: "var(--gbg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <FileCheck size={18} style={{ color: "var(--green)" }} />

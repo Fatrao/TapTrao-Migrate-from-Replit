@@ -97,12 +97,12 @@ export default function DemurragePage() {
     <AppShell>
       <div style={s.page}>
         <h1
-          style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, letterSpacing: "-0.5px", color: "var(--t1)", marginBottom: 4 }}
+          style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "-0.5px", color: "var(--t1)", marginBottom: 4 }}
           data-testid="demurrage-title"
         >
           Demurrage Calculator
         </h1>
-        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, color: "var(--t2)", marginBottom: 24 }}>
+        <p style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t2)", marginBottom: 24 }}>
           Estimate demurrage if this shipment is delayed at port
         </p>
 
@@ -296,7 +296,7 @@ export default function DemurragePage() {
                 <span style={{ fontSize: 14, fontWeight: 700, color: "var(--t1)" }}>TOTAL DEMURRAGE</span>
                 <span
                   data-testid="demurrage-total"
-                  style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: totalColor }}
+                  style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: totalColor }}
                 >
                   ${total.toLocaleString()}
                 </span>

@@ -98,7 +98,7 @@ export default function SupplierUpload() {
         <TopBar />
         <div style={{ maxWidth: 560, margin: "0 auto", padding: "80px 20px", textAlign: "center" }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>{"\u2705"}</div>
-          <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, color: "var(--t1)", marginBottom: 8 }}>
+          <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "var(--t1)", marginBottom: 8 }}>
             Documents submitted
           </h2>
           <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.6 }}>
@@ -222,12 +222,12 @@ export default function SupplierUpload() {
           let iconBd: string;
 
           if (isVerified) {
-            borderColor = "rgba(34,197,94,.22)";
+            borderColor = "rgba(74,195,41,.22)";
             statusTag = { label: "\u2713 Received", color: "var(--green)" };
             iconBg = "var(--gbg)";
             iconBd = "var(--gbd)";
           } else if (hasFinding) {
-            borderColor = "rgba(245,158,11,.2)";
+            borderColor = "rgba(234,139,67,.2)";
             statusTag = { label: "\u26A0 Amend & reupload", color: "var(--amber)" };
             iconBg = "var(--abg)";
             iconBd = "var(--abd)";
@@ -394,7 +394,7 @@ function TopBar() {
     >
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <img src="/logo.png" alt="TapTrao" style={{ width: 28, height: 28, objectFit: "contain", borderRadius: 6 }} />
-        <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 16, color: "var(--t1)" }}>
+        <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 16, color: "var(--t1)" }}>
           TapTrao
         </span>
       </div>
@@ -410,7 +410,7 @@ function Footer({ expiryDate }: { expiryDate: string }) {
     <div style={{ textAlign: "center", marginTop: 32, padding: "0 20px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 6 }}>
         <img src="/logo.png" alt="" style={{ width: 20, height: 20, objectFit: "contain", borderRadius: 4 }} />
-        <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 14, color: "var(--t2)" }}>TapTrao</span>
+        <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "var(--t2)" }}>TapTrao</span>
       </div>
       <p style={{ fontSize: 11, color: "var(--t3)", lineHeight: 1.55 }}>
         Your files go directly and securely to the buyer. No TapTrao account required.
@@ -427,7 +427,7 @@ function ExpiredPage({ reason }: { reason: "expired" | "invalid" }) {
     <div style={{ background: "var(--s0)", minHeight: "100vh" }}>
       <TopBar />
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "80px 20px", textAlign: "center" }}>
-        <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, color: "var(--t1)", marginBottom: 12 }} data-testid="text-expired-title">
+        <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "var(--t1)", marginBottom: 12 }} data-testid="text-expired-title">
           This upload link has expired or is invalid.
         </h2>
         <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.6 }}>
@@ -437,7 +437,7 @@ function ExpiredPage({ reason }: { reason: "expired" | "invalid" }) {
       <div style={{ textAlign: "center", marginTop: 40 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 6 }}>
           <img src="/logo.png" alt="" style={{ width: 20, height: 20, objectFit: "contain", borderRadius: 4 }} />
-          <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 14, color: "var(--t2)" }}>TapTrao</span>
+          <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "var(--t2)" }}>TapTrao</span>
         </div>
       </div>
     </div>

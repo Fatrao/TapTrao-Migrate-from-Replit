@@ -1,18 +1,18 @@
 :root {
-  /* ── Prompt 9 Finance Dashboard tokens ── */
-  --bg:       #0D1117;
-  --sidebar:  #0D1117;
-  --card:     #161B27;
-  --card2:    #1C2333;
+  /* ── New design system tokens (green/black theme) ── */
+  --bg:       #000000;
+  --sidebar:  #1c1c1e;
+  --card:     #1c1c1e;
+  --card2:    #1c1c1e;
   --border:   rgba(255,255,255,0.07);
   --border2:  rgba(255,255,255,0.12);
 
   /* Legacy aliases (mapped to new tokens) */
-  --s0: #0D1117;
-  --s1: #161B27;
-  --s2: #1C2333;
-  --s3: #232D3F;
-  --s4: #2A3448;
+  --s0: #000000;
+  --s1: #1c1c1e;
+  --s2: #1c1c1e;
+  --s3: #2a2a2e;
+  --s4: #333338;
   --s5: rgba(255,255,255,0.07);
 
   /* Text hierarchy — white at different opacities */
@@ -20,65 +20,76 @@
   --t2: rgba(255,255,255,0.55);
   --t3: rgba(255,255,255,0.28);
 
-  /* Accent */
-  --blue:     #427EFF;
-  --blue-dim: rgba(66,126,255,0.12);
-  --blue-bd:  rgba(66,126,255,0.25);
-  --blue-glow:rgba(66,126,255,0.06);
+  /* New design system colors */
+  --green:    #4ac329;
+  --teal:     #2e8662;
+  --amber:    #ea8b43;
+  --red:      #da3c3d;
+  --txt:      #111111;
+  --txt2:     #555555;
+  --txt3:     #999999;
+
+  /* Accent — mapped to green instead of blue */
+  --blue:     #4ac329;
+  --blue-dim: rgba(74,195,41,0.12);
+  --blue-bd:  rgba(74,195,41,0.25);
+  --blue-glow:rgba(74,195,41,0.06);
 
   /* Status */
-  --green:    #22C55E;
-  --gbg:      rgba(34,197,94,0.10);
-  --gbd:      rgba(34,197,94,0.20);
-  --amber:    #F59E0B;
-  --abg:      rgba(245,158,11,0.10);
-  --abd:      rgba(245,158,11,0.20);
-  --red:      #EF4444;
-  --rbg:      rgba(239,68,68,0.10);
-  --rbd:      rgba(239,68,68,0.20);
+  --gbg:      rgba(74,195,41,0.10);
+  --gbd:      rgba(74,195,41,0.20);
+  --abg:      rgba(234,139,67,0.10);
+  --abd:      rgba(234,139,67,0.20);
+  --rbg:      rgba(218,60,61,0.10);
+  --rbd:      rgba(218,60,61,0.20);
+
+  /* Font families */
+  --fh: 'Clash Display', sans-serif;
+  --fb: 'DM Sans', sans-serif;
 }
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
 
 /* ── Base form elements ── */
 input, textarea, select {
-  background: var(--card2);
-  color: var(--t1);
-  border: none;
-  border-radius: 8px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: #f5f5f5;
+  color: var(--txt);
+  border: 1px solid #e8e8e8;
+  border-radius: 9px;
+  font-family: var(--fb);
   font-size: 13px;
-  padding: 10px 12px;
+  padding: 10px 13px;
   width: 100%;
   outline: none;
-  transition: outline-color .15s, box-shadow .15s;
+  transition: all .15s;
   -webkit-appearance: none;
   appearance: none;
 }
 
 input::placeholder, textarea::placeholder {
-  color: var(--t2);
+  color: #bbb;
 }
 
 input:focus, textarea:focus, select:focus {
-  outline: 1px solid var(--blue-bd);
-  box-shadow: 0 0 0 3px var(--blue-dim);
+  border-color: var(--green);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(74,195,41,0.1);
 }
 
 input:hover:not(:focus), textarea:hover:not(:focus), select:hover:not(:focus) {
-  outline: 1px solid rgba(66,126,255,.15);
+  border-color: #ccc;
 }
 
 input[type="number"] {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--fh);
 }
 
 /* ── Select dropdown arrow ── */
 select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237A8499' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 32px;
@@ -86,19 +97,20 @@ select {
 }
 
 select option {
-  background: var(--card);
-  color: var(--t1);
+  background: #fff;
+  color: #111;
 }
 
 /* ── Labels ── */
 label {
   display: block;
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
+  font-family: var(--fb);
+  font-size: 10.5px;
+  font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--t2);
+  color: var(--txt3);
   text-transform: uppercase;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
 /* ── Form groups ── */
@@ -111,7 +123,7 @@ label {
 
 .field-hint {
   font-size: 11px;
-  color: var(--t2);
+  color: var(--txt2);
   margin-top: 5px;
   line-height: 1.5;
 }
@@ -123,7 +135,7 @@ label {
 }
 
 input.error, textarea.error, select.error {
-  outline: 1px solid var(--rbd);
+  border-color: var(--red);
   box-shadow: 0 0 0 3px var(--rbg);
 }
 
@@ -134,8 +146,8 @@ input[type="checkbox"] {
   min-width: 16px;
   padding: 0;
   border-radius: 4px;
-  border: 1.5px solid var(--border2);
-  background: var(--card2);
+  border: 1.5px solid #e0e0e0;
+  background: #f5f5f5;
   cursor: pointer;
   position: relative;
   appearance: none;
@@ -144,15 +156,15 @@ input[type="checkbox"] {
 }
 
 input[type="checkbox"]:checked {
-  background: var(--blue);
-  border-color: var(--blue);
+  background: var(--green);
+  border-color: var(--green);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='white' d='M1.5 5l2.5 2.5 4.5-4.5' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
 }
 
 input[type="checkbox"]:focus {
-  box-shadow: 0 0 0 3px var(--blue-dim);
+  box-shadow: 0 0 0 3px rgba(74,195,41,0.15);
 }
 
 .checkbox-row {
@@ -167,7 +179,7 @@ input[type="checkbox"]:focus {
   letter-spacing: 0;
   font-size: 13px;
   font-weight: 500;
-  color: var(--t2);
+  color: var(--txt2);
   cursor: pointer;
   margin-bottom: 0;
   line-height: 1.5;
@@ -180,8 +192,8 @@ input[type="radio"] {
   min-width: 16px;
   padding: 0;
   border-radius: 50%;
-  border: 1.5px solid var(--border2);
-  background: var(--card2);
+  border: 1.5px solid #e0e0e0;
+  background: #f5f5f5;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
@@ -189,14 +201,14 @@ input[type="radio"] {
 }
 
 input[type="radio"]:checked {
-  border-color: var(--blue);
-  background: radial-gradient(circle, var(--blue) 40%, transparent 41%);
-  box-shadow: inset 0 0 0 3px var(--card2);
-  background-color: var(--blue);
+  border-color: var(--green);
+  background: radial-gradient(circle, var(--green) 40%, transparent 41%);
+  box-shadow: inset 0 0 0 3px #f5f5f5;
+  background-color: var(--green);
 }
 
 input[type="radio"]:focus {
-  box-shadow: 0 0 0 3px var(--blue-dim);
+  box-shadow: 0 0 0 3px rgba(74,195,41,0.15);
 }
 
 /* ── Radio card (styled option block) ── */
@@ -205,8 +217,8 @@ input[type="radio"]:focus {
   align-items: flex-start;
   gap: 12px;
   padding: 12px 14px;
-  background: var(--card2);
-  border: 1px solid var(--gbd);
+  background: #f5f5f5;
+  border: 1px solid #e8e8e8;
   border-radius: 8px;
   cursor: pointer;
   transition: border-color .15s, background .15s;
@@ -214,12 +226,12 @@ input[type="radio"]:focus {
 }
 
 .radio-card:has(input[type="radio"]:checked) {
-  background: var(--blue-dim);
-  border-color: var(--blue-bd);
+  background: rgba(74,195,41,0.06);
+  border-color: rgba(74,195,41,0.25);
 }
 
 .radio-card:hover:not(:has(input[type="radio"]:checked)) {
-  border-color: rgba(66,126,255,.2);
+  border-color: rgba(74,195,41,.2);
 }
 
 .radio-card-content {
@@ -229,7 +241,7 @@ input[type="radio"]:focus {
 .radio-card-label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--t1);
+  color: var(--txt);
   margin-bottom: 2px;
   text-transform: none;
   letter-spacing: 0;
@@ -237,14 +249,13 @@ input[type="radio"]:focus {
 
 .radio-card-sub {
   font-size: 11px;
-  color: var(--t2);
+  color: var(--txt2);
   line-height: 1.5;
 }
 
 /* ── Date input ── */
 input[type="date"] {
-  font-family: 'DM Mono', monospace;
-  color-scheme: dark;
+  font-family: var(--fb);
 }
 
 /* ── Number input — remove spinners ── */
@@ -258,7 +269,7 @@ input[type="number"] { -moz-appearance: textfield; }
 /* ── Textarea ── */
 textarea {
   resize: vertical;
-  min-height: 90px;
+  min-height: 72px;
   line-height: 1.6;
 }
 
@@ -270,7 +281,7 @@ input:disabled, textarea:disabled, select:disabled {
 
 /* ── Search input variant ── */
 input[type="search"] {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237A8499' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: 10px center;
   padding-left: 32px;
@@ -278,18 +289,18 @@ input[type="search"] {
 
 /* ── Upload zone ── */
 .upload-zone {
-  border: 1.5px dashed var(--border2);
-  border-radius: 8px;
-  padding: 20px;
+  border: 2px dashed #e0e0e0;
+  border-radius: 12px;
+  padding: 26px 20px;
   text-align: center;
   cursor: pointer;
-  transition: border-color .15s, background .15s;
-  background: transparent;
+  transition: all .2s;
+  background: #fafafa;
 }
 
 .upload-zone:hover, .upload-zone.drag-over {
-  border-color: var(--blue-bd);
-  background: var(--blue-dim);
+  border-color: var(--green);
+  background: rgba(74,195,41,0.03);
 }
 
 .upload-zone input[type="file"] {
@@ -298,11 +309,11 @@ input[type="search"] {
 
 /* ── Button base ── */
 button {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--fb);
   cursor: pointer;
   border: none;
   outline: none;
-  transition: opacity .15s, box-shadow .15s;
+  transition: all .15s;
 }
 
 button:disabled {
@@ -316,7 +327,7 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 textarea:-webkit-autofill,
 select:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 1000px var(--card2) inset !important;
-  -webkit-text-fill-color: var(--t1) !important;
-  caret-color: var(--t1);
+  -webkit-box-shadow: 0 0 0 1000px #f5f5f5 inset !important;
+  -webkit-text-fill-color: var(--txt) !important;
+  caret-color: var(--txt);
 }

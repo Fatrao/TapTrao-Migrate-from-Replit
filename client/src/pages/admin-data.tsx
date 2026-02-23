@@ -65,12 +65,12 @@ export default function AdminData() {
         <div className="max-w-5xl mx-auto space-y-8">
           <div className="space-y-2">
             <h1
-              style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, letterSpacing: "-0.5px", color: "var(--t1)" }}
+              style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "-0.5px", color: "var(--t1)" }}
               data-testid="text-admin-title"
             >
               Data Overview
             </h1>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, color: "var(--t2)" }}>
+            <p style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t2)" }}>
               Record counts for each database table.
             </p>
           </div>

@@ -57,7 +57,7 @@ export default function VerifyPage() {
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <img src="/logo.png" alt="TapTrao" style={{ width: 28, height: 28, objectFit: "contain", borderRadius: 6 }} />
-          <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 16, color: "var(--t1)" }}>
+          <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 16, color: "var(--t1)" }}>
             TapTrao
           </span>
         </div>
@@ -71,7 +71,7 @@ export default function VerifyPage() {
         {query.isError && (
           <div style={{ textAlign: "center" }}>
             <h2
-              style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, color: "var(--t1)", marginBottom: 12 }}
+              style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "var(--t1)", marginBottom: 12 }}
               data-testid="text-not-found-title"
             >
               Reference not found.
@@ -85,7 +85,7 @@ export default function VerifyPage() {
         {query.data && (
           <>
             <h2
-              style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 22, color: "var(--t1)", marginBottom: 16 }}
+              style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 22, color: "var(--t1)", marginBottom: 16 }}
               data-testid="text-verify-heading"
             >
               TwinLog Verification
@@ -188,7 +188,7 @@ export default function VerifyPage() {
       <div style={{ textAlign: "center", marginTop: 40, padding: "0 20px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 6 }}>
           <img src="/logo.png" alt="" style={{ width: 20, height: 20, objectFit: "contain", borderRadius: 4 }} />
-          <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 14, color: "var(--t2)" }}>TapTrao</span>
+          <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "var(--t2)" }}>TapTrao</span>
         </div>
         <p style={{ fontSize: 11, color: "var(--t3)", lineHeight: 1.55 }}>
           Trade compliance verification powered by TapTrao.

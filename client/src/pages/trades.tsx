@@ -107,7 +107,7 @@ export default function Trades() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
           <div>
             <h1
-              style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, letterSpacing: "-0.5px", color: "var(--t1)", margin: 0, lineHeight: 1.1 }}
+              style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "-0.5px", color: "var(--t1)", margin: 0, lineHeight: 1.1 }}
               data-testid="text-trades-title"
             >
               My Trades
@@ -142,7 +142,7 @@ export default function Trades() {
               key={c.label}
               style={{
                 background: c.gradient
-                  ? `linear-gradient(135deg, rgba(239,68,68,.05), transparent 60%), var(--card)`
+                  ? `linear-gradient(135deg, rgba(218,60,61,.05), transparent 60%), var(--card)`
                   : "var(--card)",
                 padding: "20px 22px",
                 borderRadius:
@@ -151,7 +151,7 @@ export default function Trades() {
               }}
               data-testid={`summary-card-${i}`}
             >
-              <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 36, letterSpacing: -2, lineHeight: 1, color: c.color }}>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 36, letterSpacing: -2, lineHeight: 1, color: c.color }}>
                 {c.value}
               </div>
               <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)", letterSpacing: ".04em", marginTop: 4 }}>
@@ -207,7 +207,7 @@ export default function Trades() {
           <div style={{ padding: "80px 0", textAlign: "center", color: "var(--t2)", fontSize: 14 }}>Loading trades...</div>
         ) : filtered.length === 0 && allTrades.length === 0 ? (
           <div style={{ padding: "80px 0", textAlign: "center" }}>
-            <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, color: "var(--t2)" }}>No trades yet.</div>
+            <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "var(--t2)" }}>No trades yet.</div>
             <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 8 }}>Run your first compliance lookup to get started.</div>
             <Link href="/lookup">
               <button

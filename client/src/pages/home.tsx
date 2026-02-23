@@ -23,13 +23,13 @@ function DemoSection() {
     letterSpacing: "0.05em",
     textTransform: "uppercase",
     color: step === n ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.35)",
-    borderBottom: step === n ? "2px solid #427EFF" : "2px solid transparent",
+    borderBottom: step === n ? "2px solid #4ac329" : "2px solid transparent",
     transition: "all 0.15s",
     userSelect: "none",
   });
 
   const card: React.CSSProperties = {
-    background: "#0D1117",
+    background: "#1c1c1e",
     borderRadius: 12,
     padding: "18px 20px",
   };
@@ -59,24 +59,24 @@ function DemoSection() {
       <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: "0.1em", color: "rgba(255,255,255,0.28)", textTransform: "uppercase", textAlign: "center", marginBottom: 16 }}>
         See it in action
       </div>
-      <h2 className="home-demo-heading" style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 32, textAlign: "center", color: "rgba(255,255,255,0.95)", marginBottom: 8, letterSpacing: "-0.5px" }} data-testid="text-demo-heading">
+      <h2 className="home-demo-heading" style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, textAlign: "center", color: "rgba(255,255,255,0.95)", marginBottom: 8, letterSpacing: "-0.5px" }} data-testid="text-demo-heading">
         From trade idea to full compliance picture
       </h2>
       <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", textAlign: "center", marginBottom: 40 }}>
         Three inputs. Seconds. <span style={{ color: "rgba(255,255,255,0.95)" }}>No broker needed.</span>
       </p>
 
-      <div style={{ background: "#161B27", borderRadius: 16, overflow: "hidden" }}>
-        <div style={{ background: "#1C2333", padding: "12px 16px", display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#EF4444" }} />
-          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#F59E0B" }} />
-          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22C55E" }} />
-          <div style={{ flex: 1, background: "#0D1117", borderRadius: 5, padding: "4px 12px", fontFamily: "'DM Mono', monospace", fontSize: 11, color: "rgba(255,255,255,0.35)", margin: "0 12px" }}>
+      <div style={{ background: "#1c1c1e", borderRadius: 16, overflow: "hidden" }}>
+        <div style={{ background: "#2a2a2e", padding: "12px 16px", display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#da3c3d" }} />
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ea8b43" }} />
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#4ac329" }} />
+          <div style={{ flex: 1, background: "#1c1c1e", borderRadius: 5, padding: "4px 12px", fontFamily: "'DM Mono', monospace", fontSize: 11, color: "rgba(255,255,255,0.35)", margin: "0 12px" }}>
             taptrao.com/lookup
           </div>
         </div>
 
-        <div className="home-demo-tabs" style={{ display: "flex", background: "#1C2333" }}>
+        <div className="home-demo-tabs" style={{ display: "flex", background: "#2a2a2e" }}>
           <div style={tabStyle(1)} onClick={() => setStep(1)} data-testid="demo-tab-1">1. Enter trade</div>
           <div style={tabStyle(2)} onClick={() => setStep(2)} data-testid="demo-tab-2">2. Compliance report</div>
           <div style={tabStyle(3)} onClick={() => setStep(3)} data-testid="demo-tab-3">3. Supplier brief</div>
@@ -85,29 +85,29 @@ function DemoSection() {
         <div className="home-demo-content" style={{ padding: 28, minHeight: 340 }}>
           {step === 1 && (
             <div>
-              <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginBottom: 4 }}>Compliance Lookup</div>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginBottom: 4 }}>Compliance Lookup</div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginBottom: 20 }}>Enter your commodity, origin, and destination</div>
               <div className="demo-grid-3a" style={{ marginBottom: 24 }}>
                 {([["Commodity", "Raw Cashew Nuts"], ["Origin Country", "C\u00f4te d'Ivoire"], ["Destination", "United Kingdom"]] as const).map(([label, value]) => (
                   <div key={label} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                     <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.28)", textTransform: "uppercase" }}>{label}</div>
-                    <div style={{ background: "#0D1117", borderRadius: 8, padding: "10px 12px", color: "rgba(255,255,255,0.95)", fontSize: 13, fontWeight: 500 }}>{value}</div>
+                    <div style={{ background: "#1c1c1e", borderRadius: 8, padding: "10px 12px", color: "rgba(255,255,255,0.95)", fontSize: 13, fontWeight: 500 }}>{value}</div>
                   </div>
                 ))}
-                <button onClick={() => setStep(2)} style={{ background: "#427EFF", color: "white", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit" }} data-testid="demo-run-check">
+                <button onClick={() => setStep(2)} style={{ background: "#4ac329", color: "white", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit" }} data-testid="demo-run-check">
                   Run Check &rarr;
                 </button>
               </div>
               <div className="demo-grid-4">
                 {[
-                  { label: "Lookups Run", value: "12", color: "#427EFF", sub: "this month" },
+                  { label: "Lookups Run", value: "12", color: "#4ac329", sub: "this month" },
                   { label: "LC Checks", value: "4", color: "rgba(255,255,255,0.95)", sub: "discrepancies caught" },
                   { label: "Corridors", value: "3", color: "rgba(255,255,255,0.95)", sub: "saved" },
-                  { label: "Alerts", value: "2", color: "#F59E0B", sub: "new this week" },
+                  { label: "Alerts", value: "2", color: "#ea8b43", sub: "new this week" },
                 ].map((s) => (
-                  <div key={s.label} style={{ background: "#0D1117", borderRadius: 12, padding: "16px 18px" }} data-testid={`demo-stat-${s.label.toLowerCase().replace(/\s/g,"-")}`}>
+                  <div key={s.label} style={{ background: "#1c1c1e", borderRadius: 12, padding: "16px 18px" }} data-testid={`demo-stat-${s.label.toLowerCase().replace(/\s/g,"-")}`}>
                     <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.28)", textTransform: "uppercase", marginBottom: 8 }}>{s.label}</div>
-                    <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: s.color, letterSpacing: "-1px" }} data-testid={`text-demo-stat-value-${s.label.toLowerCase().replace(/\s/g,"-")}`}>{s.value}</div>
+                    <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: s.color, letterSpacing: "-1px" }} data-testid={`text-demo-stat-value-${s.label.toLowerCase().replace(/\s/g,"-")}`}>{s.value}</div>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,0.28)", marginTop: 6 }}>{s.sub}</div>
                   </div>
                 ))}
@@ -117,7 +117,7 @@ function DemoSection() {
 
           {step === 2 && (
             <div>
-              <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginBottom: 4 }}>Compliance Report</div>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginBottom: 4 }}>Compliance Report</div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,0.95)", fontWeight: 600, marginBottom: 20 }}>
                 Raw Cashew Nuts &rsaquo; C&ocirc;te d'Ivoire &rsaquo; United Kingdom
               </div>
@@ -125,36 +125,36 @@ function DemoSection() {
                 <div style={card}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                     <div style={sectionTitle}>Your Side &mdash; Buyer</div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "rgba(66,126,255,0.12)", color: "#427EFF" }}>5 docs</div>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "rgba(74,195,41,0.12)", color: "#4ac329" }}>5 docs</div>
                   </div>
-                  {docRow("#22C55E", "Customs Declaration (CDS)", "HMRC")}
-                  {docRow("#22C55E", "IPAFFS Pre-notification", "APHA")}
-                  {docRow("#22C55E", "Port Health Inspection", "Port Health")}
-                  {docRow("#F59E0B", "Import Licence (if >20MT)", "HMRC RPA")}
-                  {docRow("#22C55E", "Duty & VAT Payment", "HMRC")}
+                  {docRow("#4ac329", "Customs Declaration (CDS)", "HMRC")}
+                  {docRow("#4ac329", "IPAFFS Pre-notification", "APHA")}
+                  {docRow("#4ac329", "Port Health Inspection", "Port Health")}
+                  {docRow("#ea8b43", "Import Licence (if >20MT)", "HMRC RPA")}
+                  {docRow("#4ac329", "Duty & VAT Payment", "HMRC")}
                 </div>
                 <div style={card}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                     <div style={sectionTitle}>Their Side &mdash; Supplier</div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "rgba(66,126,255,0.12)", color: "#427EFF" }}>6 docs</div>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "rgba(74,195,41,0.12)", color: "#4ac329" }}>6 docs</div>
                   </div>
-                  {docRow("#22C55E", "Certificate of Origin", "CCA (Conseil Anacarde)")}
-                  {docRow("#22C55E", "Phytosanitary Certificate", "LANADA / DPVCQ")}
-                  {docRow("#22C55E", "Commercial Invoice", "Supplier")}
-                  {docRow("#22C55E", "Bill of Lading", "Shipping Line")}
-                  {docRow("#F59E0B", "Aflatoxin Test Report", "Accredited Lab")}
+                  {docRow("#4ac329", "Certificate of Origin", "CCA (Conseil Anacarde)")}
+                  {docRow("#4ac329", "Phytosanitary Certificate", "LANADA / DPVCQ")}
+                  {docRow("#4ac329", "Commercial Invoice", "Supplier")}
+                  {docRow("#4ac329", "Bill of Lading", "Shipping Line")}
+                  {docRow("#ea8b43", "Aflatoxin Test Report", "Accredited Lab")}
                 </div>
                 <div style={card}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                     <div style={sectionTitle}>Readiness Score</div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "rgba(34,197,94,0.10)", color: "#22C55E" }}>Low Risk</div>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "rgba(74,195,41,0.10)", color: "#4ac329" }}>Low Risk</div>
                   </div>
-                  <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 52, color: "#22C55E", lineHeight: 1, textAlign: "center", padding: "8px 0 4px" }} data-testid="text-demo-readiness-score">87</div>
+                  <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 52, color: "#4ac329", lineHeight: 1, textAlign: "center", padding: "8px 0 4px" }} data-testid="text-demo-readiness-score">87</div>
                   <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "rgba(255,255,255,0.28)", textAlign: "center", letterSpacing: "0.08em", textTransform: "uppercase" }}>Compliance Readiness</div>
                   <div style={{ height: 3, background: "rgba(255,255,255,0.07)", borderRadius: 2, margin: "12px 0 8px", overflow: "hidden" }}>
-                    <div style={{ height: 3, background: "linear-gradient(90deg,#427EFF,#22C55E)", borderRadius: 2, width: "87%" }} />
+                    <div style={{ height: 3, background: "linear-gradient(90deg,#4ac329,#4ac329)", borderRadius: 2, width: "87%" }} />
                   </div>
-                  {([["Commodity risk", "LOW", "#22C55E"], ["Origin risk", "LOW", "#22C55E"], ["Regulatory complexity", "MEDIUM", "#F59E0B"], ["Known hazards", "AFLATOXIN", "#F59E0B"]] as const).map(([k, v, c]) => (
+                  {([["Commodity risk", "LOW", "#4ac329"], ["Origin risk", "LOW", "#4ac329"], ["Regulatory complexity", "MEDIUM", "#ea8b43"], ["Known hazards", "AFLATOXIN", "#ea8b43"]] as const).map(([k, v, c]) => (
                     <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, padding: "4px 0" }}>
                       <span style={{ color: "rgba(255,255,255,0.45)" }}>{k}</span>
                       <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: c }}>{v}</span>
@@ -164,7 +164,7 @@ function DemoSection() {
                 <div style={card}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                     <div style={sectionTitle}>Duty Estimate</div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "rgba(34,197,94,0.10)", color: "#22C55E" }}>GSP rate</div>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "rgba(74,195,41,0.10)", color: "#4ac329" }}>GSP rate</div>
                   </div>
                   {([["MFN Tariff Rate", "0%"], ["GSP Preference", "0% (eligible)"], ["UK VAT (Import)", "20%"], ["Est. duty on $50k", "$0"], ["Est. VAT on $50k", "$10,000"]] as const).map(([k, v]) => (
                     <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", fontSize: 12 }}>
@@ -172,9 +172,9 @@ function DemoSection() {
                       <span style={{ color: "rgba(255,255,255,0.95)", fontWeight: 600 }}>{v}</span>
                     </div>
                   ))}
-                  <div style={{ marginTop: 10, background: "#1C2333", borderRadius: 7, padding: "8px 12px", display: "flex", justifyContent: "space-between", fontFamily: "'DM Mono', monospace", fontSize: 10, color: "rgba(255,255,255,0.28)" }}>
+                  <div style={{ marginTop: 10, background: "#2a2a2e", borderRadius: 7, padding: "8px 12px", display: "flex", justifyContent: "space-between", fontFamily: "'DM Mono', monospace", fontSize: 10, color: "rgba(255,255,255,0.28)" }}>
                     <span>TT-2026-a3f9c1</span>
-                    <span style={{ color: "#427EFF" }}>sha256:a3f9c1...</span>
+                    <span style={{ color: "#4ac329" }}>sha256:a3f9c1...</span>
                   </div>
                 </div>
               </div>
@@ -183,10 +183,10 @@ function DemoSection() {
 
           {step === 3 && (
             <div>
-              <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginBottom: 4 }}>Supplier Brief</div>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginBottom: 4 }}>Supplier Brief</div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginBottom: 20 }}>Ready to send &mdash; email or WhatsApp</div>
               <div className="demo-grid-2b">
-                <div style={{ background: "#0D1117", borderRadius: 12, padding: 20 }}>
+                <div style={{ background: "#1c1c1e", borderRadius: 12, padding: 20 }}>
                   <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.28)", textTransform: "uppercase", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}><Mail size={12} /> Email Format</div>
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,0.70)", lineHeight: 1.8 }}>
                     <div style={{ color: "rgba(255,255,255,0.95)", fontWeight: 600, marginBottom: 8 }}>Subject: Required documents &mdash; Raw Cashew Nuts CIV &rarr; UK</div>
@@ -194,25 +194,25 @@ function DemoSection() {
                     Please provide the following documents:<br /><br />
                     <span style={{ color: "rgba(255,255,255,0.90)" }}>
                       1. Certificate of Origin<br />
-                      &nbsp;&nbsp;&rarr; <span style={{ color: "#427EFF" }}>CCA (Conseil du Coton et de l'Anacarde)</span><br /><br />
+                      &nbsp;&nbsp;&rarr; <span style={{ color: "#4ac329" }}>CCA (Conseil du Coton et de l'Anacarde)</span><br /><br />
                       2. Phytosanitary Certificate<br />
-                      &nbsp;&nbsp;&rarr; <span style={{ color: "#427EFF" }}>LANADA / DPVCQ</span><br /><br />
+                      &nbsp;&nbsp;&rarr; <span style={{ color: "#4ac329" }}>LANADA / DPVCQ</span><br /><br />
                       3. Aflatoxin Test Report<br />
                       &nbsp;&nbsp;&rarr; Accredited laboratory
                     </span>
                   </div>
                 </div>
-                <div style={{ background: "#0D1117", borderRadius: 12, padding: 20 }}>
+                <div style={{ background: "#1c1c1e", borderRadius: 12, padding: 20 }}>
                   <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.28)", textTransform: "uppercase", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}><MessageCircle size={12} /> WhatsApp Format</div>
                   <div style={{ fontSize: 13, color: "rgba(255,255,255,0.70)", lineHeight: 2 }}>
                     <span style={{ color: "rgba(255,255,255,0.95)", fontWeight: 700 }}>TapTrao Document Request</span><br />
                     Raw Cashew Nuts &middot; CIV &rarr; UK<br /><br />
                     Please send:<br />
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><CircleCheck size={12} style={{ color: "#22C55E" }} /> Certificate of Origin</span><br />
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><CircleCheck size={12} style={{ color: "#4ac329" }} /> Certificate of Origin</span><br />
                     <span style={{ color: "rgba(255,255,255,0.40)", fontSize: 11 }}>&nbsp;&nbsp;_(CCA &mdash; Conseil Anacarde)_</span><br />
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><CircleCheck size={12} style={{ color: "#22C55E" }} /> Phytosanitary Certificate</span><br />
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><CircleCheck size={12} style={{ color: "#4ac329" }} /> Phytosanitary Certificate</span><br />
                     <span style={{ color: "rgba(255,255,255,0.40)", fontSize: 11 }}>&nbsp;&nbsp;_(LANADA/DPVCQ)_</span><br />
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><CircleCheck size={12} style={{ color: "#22C55E" }} /> Aflatoxin Test Report</span><br />
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><CircleCheck size={12} style={{ color: "#4ac329" }} /> Aflatoxin Test Report</span><br />
                     <span style={{ color: "rgba(255,255,255,0.40)", fontSize: 11 }}>&nbsp;&nbsp;_(Accredited lab)_</span>
                   </div>
                 </div>
@@ -220,7 +220,7 @@ function DemoSection() {
               <div style={{ marginTop: 16, display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <button
                   onClick={() => copyToClipboard("Subject: Required documents — Raw Cashew Nuts CIV → UK\n\nDear Supplier,\n\nPlease provide:\n1. Certificate of Origin (CCA)\n2. Phytosanitary Certificate (LANADA/DPVCQ)\n3. Aflatoxin Test Report (Accredited lab)", "email")}
-                  style={{ background: "#427EFF", color: "white", border: "none", borderRadius: 7, padding: "9px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                  style={{ background: "#4ac329", color: "white", border: "none", borderRadius: 7, padding: "9px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
                   data-testid="demo-copy-email"
                 >
                   Copy Email
@@ -253,7 +253,7 @@ function DemoSection() {
               borderRadius: 3,
               cursor: "pointer",
               transition: "all 0.2s",
-              background: step === n ? "#427EFF" : "rgba(255,255,255,0.15)",
+              background: step === n ? "#4ac329" : "rgba(255,255,255,0.15)",
               width: step === n ? 20 : 6,
             }}
             data-testid={`demo-dot-${n}`}
@@ -262,8 +262,8 @@ function DemoSection() {
         <button
           onClick={() => setStep(step === total ? 1 : step + 1)}
           style={{
-            background: "rgba(66,126,255,0.15)",
-            color: "#427EFF",
+            background: "rgba(74,195,41,0.15)",
+            color: "#4ac329",
             border: "none",
             borderRadius: 6,
             padding: "6px 14px",
@@ -299,9 +299,9 @@ export default function Home() {
   return (
     <div className="home-page-root" style={{
       minHeight: "100vh",
-      background: "#0D1117",
+      background: "#1c1c1e",
       color: "rgba(255,255,255,0.95)",
-      fontFamily: "'Plus Jakarta Sans', sans-serif",
+      fontFamily: "var(--fb)",
       WebkitFontSmoothing: "antialiased",
       overflowX: "hidden",
     }}>
@@ -322,7 +322,7 @@ export default function Home() {
         <Link href="/">
           <span style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} data-testid="text-landing-logo">
             <img src="/logo.png" alt="TapTrao" style={{ width: 32, height: 32, borderRadius: 8, objectFit: "contain" }} />
-            <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)" }}>TapTrao</span>
+            <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)" }}>TapTrao</span>
           </span>
         </Link>
         <div data-testid="nav-landing-desktop" className="hidden md:flex" style={{ alignItems: "center", gap: 24 }}>
@@ -338,7 +338,7 @@ export default function Home() {
           <Link href="/lookup">
             <span
               style={{
-                background: "#427EFF",
+                background: "#4ac329",
                 color: "white",
                 padding: "8px 18px",
                 borderRadius: 7,
@@ -375,7 +375,7 @@ export default function Home() {
             <Link href="/lookup">
               <span
                 onClick={() => setMobileMenuOpen(false)}
-                style={{ background: "#427EFF", color: "white", padding: "0 20px", borderRadius: 8, fontSize: 15, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", height: 48, width: "100%" }}
+                style={{ background: "#4ac329", color: "white", padding: "0 20px", borderRadius: 8, fontSize: 15, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", height: 48, width: "100%" }}
                 data-testid="button-mobile-start-free"
               >
                 Start free lookup
@@ -398,8 +398,8 @@ export default function Home() {
       >
         <div style={{
           display: "inline-block",
-          background: "rgba(66,126,255,0.12)",
-          color: "#427EFF",
+          background: "rgba(74,195,41,0.12)",
+          color: "#4ac329",
           fontFamily: "'DM Mono', monospace",
           fontSize: 11,
           letterSpacing: "0.08em",
@@ -412,7 +412,7 @@ export default function Home() {
         </div>
 
         <h1 className="home-hero-title" style={{
-          fontFamily: "'Fraunces', serif",
+          fontFamily: "var(--fh)",
           fontWeight: 900,
           fontSize: 52,
           lineHeight: 1.1,
@@ -437,7 +437,7 @@ export default function Home() {
         <div className="home-hero-buttons" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
           <Link href="/lookup">
             <span className="home-hero-primary" style={{
-              background: "#427EFF",
+              background: "#4ac329",
               color: "white",
               padding: "13px 28px",
               borderRadius: 9,
@@ -514,7 +514,7 @@ export default function Home() {
           <Link key={f.title} href={f.href}>
             <div
               style={{
-                background: "#161B27",
+                background: "#1c1c1e",
                 borderRadius: 14,
                 padding: 24,
                 height: "100%",
@@ -522,8 +522,8 @@ export default function Home() {
                 transition: "background .15s",
               }}
               data-testid={`card-capability-${i}`}
-              onMouseEnter={e => { e.currentTarget.style.background = "#1C2333"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#161B27"; }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#2a2a2e"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#1c1c1e"; }}
             >
               <div style={{ fontSize: 24, marginBottom: 12 }}>{f.icon}</div>
               <div style={{ fontWeight: 700, fontSize: 15, color: "rgba(255,255,255,0.95)", marginBottom: 8 }}>
@@ -532,7 +532,7 @@ export default function Home() {
               <div style={{ fontSize: 13, color: "rgba(255,255,255,0.50)", lineHeight: 1.5, marginBottom: 16 }}>
                 {f.desc}
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#427EFF", letterSpacing: "0.04em" }}>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#4ac329", letterSpacing: "0.04em" }}>
                 {f.price}
               </div>
             </div>
@@ -541,10 +541,10 @@ export default function Home() {
       </div>
 
       {/* HOW IT WORKS */}
-      <div id="how-it-works" className="home-how-section" style={{ background: "#0D1117", padding: "80px 40px" }} data-testid="section-how-it-works">
+      <div id="how-it-works" className="home-how-section" style={{ background: "#1c1c1e", padding: "80px 40px" }} data-testid="section-how-it-works">
         <div style={{ maxWidth: 800, margin: "0 auto" }}>
           <h2 className="home-how-heading" style={{
-            fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 32,
+            fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32,
             color: "rgba(255,255,255,0.95)", textAlign: "center", marginBottom: 8, letterSpacing: "-1px",
           }} data-testid="text-how-heading">
             Three inputs. Complete picture.
@@ -559,10 +559,10 @@ export default function Home() {
               { num: "03", title: "Proceed with confidence", desc: "Export results, generate supplier instructions, validate LC documents against UCP 600 rules, and download audit-ready TwinLog PDFs." },
             ].map((step, i) => (
               <div key={step.num} data-testid={`step-${i + 1}`}>
-                <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 48, color: "rgba(66,126,255,0.15)" }}>
+                <span style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 48, color: "rgba(74,195,41,0.15)" }}>
                   {step.num}
                 </span>
-                <h3 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)", marginTop: 4 }}>
+                <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)", marginTop: 4 }}>
                   {step.title}
                 </h3>
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.50)", marginTop: 8, lineHeight: 1.6 }}>
@@ -577,7 +577,7 @@ export default function Home() {
       {/* COMMODITIES TICKER */}
       <div style={{ background: "#0F1318", padding: "60px 0" }} data-testid="section-commodities">
         <div className="home-commodities-header" style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", padding: "0 40px", marginBottom: 32 }}>
-          <h2 className="home-commodities-heading" style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.5px" }} data-testid="text-commodities-heading">
+          <h2 className="home-commodities-heading" style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.5px" }} data-testid="text-commodities-heading">
             Every commodity. Every corridor.
           </h2>
           <p style={{ color: "rgba(255,255,255,0.65)", marginTop: 8, fontSize: 14 }} data-testid="text-commodities-subheading">
@@ -592,9 +592,9 @@ export default function Home() {
                   style={{
                     padding: "8px 24px",
                     fontSize: 18,
-                    fontFamily: "'Fraunces', serif",
+                    fontFamily: "var(--fh)",
                     fontWeight: 600,
-                    color: i % 2 === 0 ? "#427EFF" : "rgba(255,255,255,0.85)",
+                    color: i % 2 === 0 ? "#4ac329" : "rgba(255,255,255,0.85)",
                   }}
                   data-testid={`text-commodity-${i}`}
                 >
@@ -608,10 +608,10 @@ export default function Home() {
       </div>
 
       {/* PRICING PREVIEW */}
-      <div className="home-pricing-section" style={{ background: "#0D1117", padding: "80px 40px" }} data-testid="section-pricing">
+      <div className="home-pricing-section" style={{ background: "#1c1c1e", padding: "80px 40px" }} data-testid="section-pricing">
         <div style={{ maxWidth: 800, margin: "0 auto" }}>
           <h2 className="home-pricing-heading" style={{
-            fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 32,
+            fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32,
             color: "rgba(255,255,255,0.95)", textAlign: "center", letterSpacing: "-1px", marginBottom: 8,
           }} data-testid="text-pricing-heading">
             Pay per check. No subscription trap.
@@ -623,44 +623,44 @@ export default function Home() {
             No ERP. No broker. Just answers.
           </p>
           <div className="home-pricing-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, maxWidth: 640, margin: "0 auto" }}>
-            <div style={{ background: "#161B27", borderRadius: 14, padding: 28, position: "relative", overflow: "hidden" }} data-testid="card-pricing-lookup">
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, #427EFF, transparent)" }} />
-              <h3 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)", marginTop: 0 }}>Compliance Check</h3>
-              <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginTop: 8 }}>
+            <div style={{ background: "#1c1c1e", borderRadius: 14, padding: 28, position: "relative", overflow: "hidden" }} data-testid="card-pricing-lookup">
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, #4ac329, transparent)" }} />
+              <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)", marginTop: 0 }}>Compliance Check</h3>
+              <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginTop: 8 }}>
                 $24.99 <span style={{ fontSize: 14, fontWeight: 400, color: "rgba(255,255,255,0.40)" }}>per shipment</span>
               </p>
               <ul style={{ listStyle: "none", padding: 0, margin: "20px 0 0" }}>
                 {["Duty rates & tariff codes", "Document checklists", "Regulatory trigger screening", "SPS & phytosanitary requirements", "LC document check included"].map((item) => (
                   <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "rgba(255,255,255,0.60)", marginBottom: 10 }}>
-                    <CheckCircle2 size={14} style={{ color: "#427EFF", flexShrink: 0, marginTop: 2 }} />
+                    <CheckCircle2 size={14} style={{ color: "#4ac329", flexShrink: 0, marginTop: 2 }} />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
               <Link href="/lookup">
                 <span
-                  style={{ display: "block", textAlign: "center", background: "#427EFF", color: "white", padding: "10px 0", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", marginTop: 20 }}
+                  style={{ display: "block", textAlign: "center", background: "#4ac329", color: "white", padding: "10px 0", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", marginTop: 20 }}
                   data-testid="button-pricing-lookup"
                 >
                   Start with a free check
                 </span>
               </Link>
             </div>
-            <div style={{ background: "#161B27", borderRadius: 14, padding: 28, position: "relative", overflow: "hidden" }} data-testid="card-pricing-lc">
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, #22C55E, transparent)" }} />
-              <h3 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)", marginTop: 0 }}>LC Document Check</h3>
-              <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginTop: 8 }}>
+            <div style={{ background: "#1c1c1e", borderRadius: 14, padding: 28, position: "relative", overflow: "hidden" }} data-testid="card-pricing-lc">
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, #4ac329, transparent)" }} />
+              <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)", marginTop: 0 }}>LC Document Check</h3>
+              <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginTop: 8 }}>
                 $19.99 <span style={{ fontSize: 14, fontWeight: 400, color: "rgba(255,255,255,0.40)" }}>one-time</span>
               </p>
               <ul style={{ listStyle: "none", padding: 0, margin: "20px 0 0" }}>
                 {["UCP 600 compliance validation", "Field-by-field discrepancy check", "Discrepancy summary & fix suggestions", "SHA-256 evidence hash"].map((item) => (
                   <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "rgba(255,255,255,0.60)", marginBottom: 10 }}>
-                    <CheckCircle2 size={14} style={{ color: "#22C55E", flexShrink: 0, marginTop: 2 }} />
+                    <CheckCircle2 size={14} style={{ color: "#4ac329", flexShrink: 0, marginTop: 2 }} />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
-              <p style={{ fontSize: 11, color: "#22C55E", fontStyle: "italic", marginTop: 12 }}>Included free with every trade credit</p>
+              <p style={{ fontSize: 11, color: "#4ac329", fontStyle: "italic", marginTop: 12 }}>Included free with every trade credit</p>
               <p style={{ fontSize: 11, color: "rgba(255,255,255,0.40)", marginTop: 4 }}>Re-checks after supplier corrections: $9.99</p>
               <Link href="/lc-check">
                 <span
@@ -681,7 +681,7 @@ export default function Home() {
       {/* FINAL CTA */}
       <div className="home-cta-section" style={{ background: "#0F1318", padding: "80px 40px", textAlign: "center" }} data-testid="section-final-cta">
         <h2 className="home-cta-heading" style={{
-          fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 32,
+          fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32,
           color: "rgba(255,255,255,0.95)", letterSpacing: "-1px", marginBottom: 12,
         }} data-testid="text-cta-heading">
           Know before you commit.
@@ -693,7 +693,7 @@ export default function Home() {
           <span
             style={{
               display: "inline-flex", alignItems: "center", gap: 8,
-              background: "#427EFF", color: "white", padding: "13px 28px",
+              background: "#4ac329", color: "white", padding: "13px 28px",
               borderRadius: 9, fontSize: 15, fontWeight: 600, cursor: "pointer",
             }}
             data-testid="button-cta-start"
@@ -705,10 +705,10 @@ export default function Home() {
       </div>
 
       {/* FOOTER */}
-      <footer data-testid="section-footer" style={{ background: "#0D1117", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+      <footer data-testid="section-footer" style={{ background: "#1c1c1e", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="home-footer-inner" style={{ maxWidth: 960, margin: "0 auto", padding: "48px 40px 36px" }}>
           <div style={{ marginBottom: 24 }}>
-            <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, color: "rgba(255,255,255,0.95)" }} data-testid="text-footer-logo">TapTrao</span>
+            <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "rgba(255,255,255,0.95)" }} data-testid="text-footer-logo">TapTrao</span>
             <p style={{ color: "rgba(255,255,255,0.40)", fontSize: 13, marginTop: 6 }}>Trade compliance for commodity corridors out of Africa.</p>
           </div>
           <div className="home-footer-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 32 }}>
