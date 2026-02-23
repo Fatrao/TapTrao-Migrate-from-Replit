@@ -1,6 +1,6 @@
 :root {
   /* ── New design system tokens (green/black theme) ── */
-  --bg:       #000000;
+  --bg:       #f3f3f3;
   --sidebar:  #1c1c1e;
   --card:     #1c1c1e;
   --card2:    #1c1c1e;
@@ -21,7 +21,7 @@
   --t3: rgba(255,255,255,0.28);
 
   /* New design system colors */
-  --green:    #4ac329;
+  --green:    #4a8c6f;
   --teal:     #2e8662;
   --amber:    #ea8b43;
   --red:      #da3c3d;
@@ -30,14 +30,14 @@
   --txt3:     #999999;
 
   /* Accent — mapped to green instead of blue */
-  --blue:     #4ac329;
-  --blue-dim: rgba(74,195,41,0.12);
-  --blue-bd:  rgba(74,195,41,0.25);
-  --blue-glow:rgba(74,195,41,0.06);
+  --blue:     #4a8c6f;
+  --blue-dim: rgba(74,140,111,0.12);
+  --blue-bd:  rgba(74,140,111,0.25);
+  --blue-glow:rgba(74,140,111,0.06);
 
   /* Status */
-  --gbg:      rgba(74,195,41,0.10);
-  --gbd:      rgba(74,195,41,0.20);
+  --gbg:      rgba(74,140,111,0.10);
+  --gbd:      rgba(74,140,111,0.20);
   --abg:      rgba(234,139,67,0.10);
   --abd:      rgba(234,139,67,0.20);
   --rbg:      rgba(218,60,61,0.10);
@@ -46,6 +46,11 @@
   /* Font families */
   --fh: 'Clash Display', sans-serif;
   --fb: 'DM Sans', sans-serif;
+}
+
+/* ── Clash Display headings — prevent letter overlap ── */
+[style*="Clash Display"] {
+  letter-spacing: -0.02em;
 }
 
 /* ── Scrollbar ── */
@@ -76,7 +81,7 @@ input::placeholder, textarea::placeholder {
 input:focus, textarea:focus, select:focus {
   border-color: var(--green);
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(74,195,41,0.1);
+  box-shadow: 0 0 0 3px rgba(74,140,111,0.1);
 }
 
 input:hover:not(:focus), textarea:hover:not(:focus), select:hover:not(:focus) {
@@ -164,7 +169,7 @@ input[type="checkbox"]:checked {
 }
 
 input[type="checkbox"]:focus {
-  box-shadow: 0 0 0 3px rgba(74,195,41,0.15);
+  box-shadow: 0 0 0 3px rgba(74,140,111,0.15);
 }
 
 .checkbox-row {
@@ -208,7 +213,7 @@ input[type="radio"]:checked {
 }
 
 input[type="radio"]:focus {
-  box-shadow: 0 0 0 3px rgba(74,195,41,0.15);
+  box-shadow: 0 0 0 3px rgba(74,140,111,0.15);
 }
 
 /* ── Radio card (styled option block) ── */
@@ -226,12 +231,12 @@ input[type="radio"]:focus {
 }
 
 .radio-card:has(input[type="radio"]:checked) {
-  background: rgba(74,195,41,0.06);
-  border-color: rgba(74,195,41,0.25);
+  background: rgba(74,140,111,0.06);
+  border-color: rgba(74,140,111,0.25);
 }
 
 .radio-card:hover:not(:has(input[type="radio"]:checked)) {
-  border-color: rgba(74,195,41,.2);
+  border-color: rgba(74,140,111,.2);
 }
 
 .radio-card-content {
@@ -300,7 +305,7 @@ input[type="search"] {
 
 .upload-zone:hover, .upload-zone.drag-over {
   border-color: var(--green);
-  background: rgba(74,195,41,0.03);
+  background: rgba(74,140,111,0.03);
 }
 
 .upload-zone input[type="file"] {

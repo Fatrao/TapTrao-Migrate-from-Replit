@@ -84,7 +84,7 @@ export default function Dashboard() {
             <div className="animate-pulse-dot" style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--amber)", flexShrink: 0 }} />
             Commodity › Overview
           </div>
-          <div style={{ fontFamily: "var(--fh)", fontSize: 30, fontWeight: 700, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: 7 }} data-testid="text-dashboard-title">
+          <div style={{ fontFamily: "var(--fh)", fontSize: 30, fontWeight: 700, color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: 7 }} data-testid="text-dashboard-title">
             Compliance:<br />Pending
           </div>
           <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
@@ -115,11 +115,11 @@ export default function Dashboard() {
               <span style={{ fontSize: 15, color: "#ddd", cursor: "pointer" }}>···</span>
             </div>
             <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Total Trade Value at Risk</div>
-            <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 9, position: "relative", zIndex: 1 }}>
+            <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.02em", lineHeight: 1, marginBottom: 9, position: "relative", zIndex: 1 }}>
               <sup style={{ fontSize: 13, fontWeight: 500, verticalAlign: "super", marginRight: 1, opacity: .5 }}>$</sup>2,345,678
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, position: "relative", zIndex: 1 }}>
-              <span style={{ color: "#4ac329", fontWeight: 600 }}>↑ 12.5%</span><span style={{ color: "var(--txt3)" }}>{totalLookups} past shipments</span>
+              <span style={{ color: "#4a8c6f", fontWeight: 600 }}>↑ 12.5%</span><span style={{ color: "var(--txt3)" }}>{totalLookups} past shipments</span>
             </div>
           </div>
           <div className="dash-sc c-teal">
@@ -128,11 +128,11 @@ export default function Dashboard() {
               <span style={{ fontSize: 15, color: "#ddd", cursor: "pointer" }}>···</span>
             </div>
             <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Total Lookups</div>
-            <div style={{ fontFamily: "var(--fh)", fontSize: 24, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 9, position: "relative", zIndex: 1 }} data-testid="stat-compliance-lookups">
+            <div style={{ fontFamily: "var(--fh)", fontSize: 24, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.02em", lineHeight: 1, marginBottom: 9, position: "relative", zIndex: 1 }} data-testid="stat-compliance-lookups">
               {totalLookups} <span style={{ fontSize: 13, color: "var(--txt3)", fontWeight: 400, fontFamily: "var(--fb)" }}>checks</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, position: "relative", zIndex: 1 }}>
-              <span style={{ color: "#4ac329", fontWeight: 600 }}>↑ 8%</span><span style={{ color: "var(--txt3)" }}>vs prev. 28 days</span>
+              <span style={{ color: "#4a8c6f", fontWeight: 600 }}>↑ 8%</span><span style={{ color: "var(--txt3)" }}>vs prev. 28 days</span>
             </div>
           </div>
           <div className="dash-sc c-amber">
@@ -141,7 +141,7 @@ export default function Dashboard() {
               <span style={{ fontSize: 15, color: "#ddd", cursor: "pointer" }}>···</span>
             </div>
             <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Rejection Risk</div>
-            <div style={{ fontFamily: "var(--fh)", fontSize: 24, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 9, position: "relative", zIndex: 1, display: "flex", alignItems: "baseline", gap: 4 }}>
+            <div style={{ fontFamily: "var(--fh)", fontSize: 24, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.02em", lineHeight: 1, marginBottom: 9, position: "relative", zIndex: 1, display: "flex", alignItems: "baseline", gap: 4 }}>
               7.8<span style={{ fontSize: 14, fontWeight: 400, fontFamily: "var(--fb)" }}>%</span>
               <span style={{ background: "rgba(245,158,11,.1)", color: "#ea8b43", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 600, marginLeft: 4 }}>Moderate</span>
             </div>
@@ -151,7 +151,7 @@ export default function Dashboard() {
           </div>
           <div className="dash-sc cta" style={{ background: "#0a0a0a" }}>
             <div className="animate-breathe" style={{ position: "absolute", bottom: -20, right: -20, width: 130, height: 130, background: "radial-gradient(circle,rgba(46,204,113,.28) 0%,rgba(46,204,113,.06) 50%,transparent 70%)", borderRadius: "50%", pointerEvents: "none" }} />
-            <div style={{ fontFamily: "var(--fh)", fontSize: 32, fontWeight: 800, color: "var(--green)", letterSpacing: "-0.05em", lineHeight: 1, position: "relative", zIndex: 1 }} data-testid="stat-token-balance">{balance}</div>
+            <div style={{ fontFamily: "var(--fh)", fontSize: 32, fontWeight: 800, color: "var(--green)", letterSpacing: "-0.02em", lineHeight: 1, position: "relative", zIndex: 1 }} data-testid="stat-token-balance">{balance}</div>
             <div style={{ fontSize: 11.5, color: "#555", margin: "3px 0 14px", position: "relative", zIndex: 1 }}>Recommended with <span style={{ color: "var(--green)", fontWeight: 600 }}>AI</span></div>
             <Link href="/lookup">
               <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--green)", color: "#000", padding: "8px 14px", borderRadius: 22, fontSize: 12, fontWeight: 700, fontFamily: "var(--fb)", cursor: "pointer", position: "relative", zIndex: 1, boxShadow: "0 4px 16px rgba(46,204,113,.4)" }}>Pre-Shipment Check →</span>
@@ -198,9 +198,9 @@ export default function Dashboard() {
                     <div>
                       <span style={{
                         display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 600,
-                        ...(t.status === "comp" ? { background: "rgba(22,163,74,.09)", color: "#4ac329" } : t.status === "pend" ? { background: "rgba(245,158,11,.1)", color: "#ea8b43" } : { background: "rgba(231,76,60,.09)", color: "var(--red)" }),
+                        ...(t.status === "comp" ? { background: "rgba(22,163,74,.09)", color: "#4a8c6f" } : t.status === "pend" ? { background: "rgba(245,158,11,.1)", color: "#ea8b43" } : { background: "rgba(231,76,60,.09)", color: "var(--red)" }),
                       }}>
-                        <span style={{ width: 5, height: 5, borderRadius: "50%", flexShrink: 0, background: t.status === "comp" ? "#4ac329" : t.status === "pend" ? "var(--amber)" : "var(--red)" }} />
+                        <span style={{ width: 5, height: 5, borderRadius: "50%", flexShrink: 0, background: t.status === "comp" ? "#4a8c6f" : t.status === "pend" ? "var(--amber)" : "var(--red)" }} />
                         {t.statusLabel}
                       </span>
                     </div>
@@ -288,7 +288,7 @@ export default function Dashboard() {
                     <div style={{ fontSize: 12.5, fontWeight: 500, color: "var(--txt)" }}>{d.name}</div>
                     <div style={{ fontSize: 10.5, color: "var(--txt3)", marginTop: 1 }}>{d.meta}</div>
                   </div>
-                  <div style={{ fontSize: 11.5, fontWeight: 600, whiteSpace: "nowrap", marginLeft: "auto", paddingLeft: 10, color: d.stClass === "ok" ? "#4ac329" : d.stClass === "p" ? "#ea8b43" : "var(--red)" }}>{d.st}</div>
+                  <div style={{ fontSize: 11.5, fontWeight: 600, whiteSpace: "nowrap", marginLeft: "auto", paddingLeft: 10, color: d.stClass === "ok" ? "#4a8c6f" : d.stClass === "p" ? "#ea8b43" : "var(--red)" }}>{d.st}</div>
                 </div>
               ))}
             </div>
@@ -322,7 +322,7 @@ export default function Dashboard() {
                 ].map(s => (
                   <div key={s.lbl} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 12.5 }}>
                     <span style={{ color: "var(--txt2)", display: "flex", alignItems: "center", gap: 7 }}>{s.lbl}</span>
-                    <span style={{ fontWeight: s.cls === "sm" ? 400 : 600, color: s.cls === "g" ? "#4ac329" : s.cls === "a" ? "#ea8b43" : "var(--txt2)", fontSize: s.cls === "sm" ? 11.5 : undefined }}>{s.val}</span>
+                    <span style={{ fontWeight: s.cls === "sm" ? 400 : 600, color: s.cls === "g" ? "#4a8c6f" : s.cls === "a" ? "#ea8b43" : "var(--txt2)", fontSize: s.cls === "sm" ? 11.5 : undefined }}>{s.val}</span>
                   </div>
                 ))}
               </div>
@@ -336,7 +336,7 @@ export default function Dashboard() {
               </div>
               <div style={{ padding: "14px 20px" }}>
                 <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 9 }}>
-                  <div><span style={{ fontFamily: "var(--fh)", fontSize: 24, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.04em" }}>78%</span><span style={{ fontSize: 11.5, color: "var(--txt3)", marginLeft: 5 }}>Verified · 8 of 10</span></div>
+                  <div><span style={{ fontFamily: "var(--fh)", fontSize: 24, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.02em" }}>78%</span><span style={{ fontSize: 11.5, color: "var(--txt3)", marginLeft: 5 }}>Verified · 8 of 10</span></div>
                   <span style={{ fontSize: 11.5, color: "var(--txt3)" }}>8/10</span>
                 </div>
                 <div style={{ height: 6, background: "#f0f0f0", borderRadius: 20, overflow: "hidden", marginBottom: 12 }}>
@@ -351,7 +351,7 @@ export default function Dashboard() {
                     <div key={c.lbl} style={{ background: "#f7f7f7", borderRadius: 10, padding: "10px 7px", textAlign: "center", cursor: "pointer" }}>
                       <div style={{ fontSize: 17, marginBottom: 3 }}>{c.ic}</div>
                       <div style={{ fontSize: 10.5, color: "var(--txt2)", fontWeight: 500, lineHeight: 1.3 }}>{c.lbl}</div>
-                      <div style={{ fontSize: 10.5, marginTop: 2, fontWeight: 600, color: c.cls === "r" ? "var(--red)" : c.cls === "a" ? "#ea8b43" : "#4ac329" }}>{c.cnt}</div>
+                      <div style={{ fontSize: 10.5, marginTop: 2, fontWeight: 600, color: c.cls === "r" ? "var(--red)" : c.cls === "a" ? "#ea8b43" : "#4a8c6f" }}>{c.cnt}</div>
                     </div>
                   ))}
                 </div>
@@ -366,7 +366,7 @@ export default function Dashboard() {
               </div>
               <div style={{ height: 1, background: "#f5f5f5" }} />
               {[
-                { av: "F", avBg: "rgba(46,204,113,.12)", avColor: "#4ac329", txt: <><strong>Fatra</strong> ran compliance lookup · Recent trade</>, time: "2 hours ago" },
+                { av: "F", avBg: "rgba(46,204,113,.12)", avColor: "#4a8c6f", txt: <><strong>Fatra</strong> ran compliance lookup · Recent trade</>, time: "2 hours ago" },
                 { av: "F", avBg: "rgba(245,158,11,.12)", avColor: "#ea8b43", txt: <><strong>Fatra</strong> submitted LC check</>, time: "4 hours ago" },
                 { av: "AI", avBg: "rgba(20,184,166,.12)", avColor: "#0d9488", txt: <><strong>AI</strong> flagged EUDR gap</>, time: "1 day ago", fontSize: 9 },
               ].map((a, i) => (

@@ -57,7 +57,7 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
           fontSize: 13,
           fontWeight: isActive ? 500 : 400,
           color: isActive ? "var(--green)" : "#666",
-          background: isActive ? "rgba(74,195,41,0.12)" : "transparent",
+          background: isActive ? "rgba(74,140,111,0.12)" : "transparent",
           cursor: "pointer",
           transition: "all 0.15s",
           position: "relative",
@@ -106,7 +106,7 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
               fontWeight: 600,
               ...(item.badge.type === "amber"
                 ? { background: "rgba(218,60,61,0.2)", color: "#f87171" }
-                : { background: "rgba(74,195,41,0.15)", color: "var(--green)" }),
+                : { background: "rgba(74,140,111,0.15)", color: "var(--green)" }),
             }}
           >
             {item.badge.value}
@@ -194,9 +194,9 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
               borderRadius: "50%",
               overflow: "hidden",
               flexShrink: 0,
-              boxShadow: "0 0 16px rgba(74,195,41,0.4)",
+              boxShadow: "0 0 16px rgba(74,140,111,0.4)",
             }}>
-              <img src="/logo.png" alt="TapTrao" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <img src="/taptrao-green-logo.png" alt="TapTrao" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
             <span
               style={{
@@ -283,7 +283,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
           <div style={{ fontSize: 10, color: "#555" }}>TapTrao User</div>
         </div>
         <span style={{
-          background: "rgba(74,195,41,0.1)",
+          background: "rgba(74,140,111,0.1)",
           borderRadius: 20,
           padding: "2px 8px",
           fontSize: 11,
@@ -302,7 +302,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         padding: 10,
         gap: 10,
         minHeight: "100vh",
-        background: "#000",
+        background: "#f3f3f3",
       }}
     >
       {/* SIDEBAR — desktop: always visible */}
@@ -369,7 +369,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        background: "linear-gradient(180deg, #1a3832 0%, #1d3d35 8%, #1d3d35 16%, #243f37 26%, rgba(24,46,32,0.92) 36%, rgba(22,42,30,0.72) 46%, rgba(20,38,27,0.45) 56%, rgba(18,34,24,0.2) 66%, rgba(255,255,255,0.6) 76%, #ffffff 86%, #ffffff 100%)",
+        background: "linear-gradient(180deg, #0e4e45 0%, #104f47 5%, #14574a 10%, #1c6352 15%, #216354 20%, #2f725f 25%, #347161 30%, #3f7d6a 35%, #468271 40%, #498573 45%, #578d7d 50%, #619888 55%, #6a9f8d 60%, #7faa9b 65%, #87b0a2 68%, #8db3a6 71%, #94b5ab 74%, #9cbbb2 77%, #a6c3ba 80%, #bdd3cb 85%, #c7d9d2 88%, #e2e7e6 93%, #f2f2f2 97%, #f3f3f3 100%)",
         minHeight: "calc(100vh - 20px)",
       }}>
         {/* TOPNAV */}
@@ -452,7 +452,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                 fontWeight: 700,
                 cursor: "pointer",
                 whiteSpace: "nowrap",
-                boxShadow: "0 4px 18px rgba(74,195,41,0.35)",
+                boxShadow: "0 4px 18px rgba(74,140,111,0.35)",
               }}
               data-testid="shell-buy-cta"
             >

@@ -19,13 +19,13 @@ export default function Home() {
   );
 
   return (
-    <div className="page-wrap" style={{ fontFamily: "var(--fb)", background: "#000", color: "#fff", WebkitFontSmoothing: "antialiased" }}>
+    <div className="page-wrap" style={{ fontFamily: "var(--fb)", background: "linear-gradient(180deg, #0e4e45 0%, #104f47 5%, #14574a 10%, #1c6352 15%, #216354 20%, #2f725f 25%, #347161 30%, #3f7d6a 35%, #468271 40%, #498573 45%, #578d7d 50%, #619888 55%, #6a9f8d 60%, #7faa9b 65%, #87b0a2 68%, #8db3a6 71%, #94b5ab 74%, #9cbbb2 77%, #a6c3ba 80%, #bdd3cb 85%, #c7d9d2 88%, #e2e7e6 93%, #f2f2f2 97%, #f3f3f3 100%)", color: "#fff", WebkitFontSmoothing: "antialiased" }}>
 
       {/* ── NAV ── */}
       <div className="nav-bar" data-testid="nav-header">
         <Link href="/">
           <span className="nav-l" style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", textDecoration: "none" }} data-testid="text-landing-logo">
-            <img src="/logo.png" alt="TapTrao" style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", boxShadow: "0 0 16px rgba(74,195,41,.4)" }} />
+            <img src="/taptrao-green-logo.png" alt="TapTrao" style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", boxShadow: "0 0 16px rgba(74,140,111,.4)" }} />
             <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "#fff", letterSpacing: "-0.02em" }}>TapTrao</span>
           </span>
         </Link>
@@ -38,7 +38,7 @@ export default function Home() {
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <button className="md:block hidden" style={{ background: "none", border: 0, color: "rgba(255,255,255,.4)", fontFamily: "var(--fb)", fontSize: 13.5, fontWeight: 500, cursor: "pointer" }} data-testid="button-sign-in">Sign in</button>
           <Link href="/lookup">
-            <span style={{ background: "var(--green)", color: "#000", fontFamily: "var(--fb)", fontSize: 13, fontWeight: 700, padding: "9px 20px", borderRadius: 50, cursor: "pointer", boxShadow: "0 4px 18px rgba(74,195,41,.4)", display: "inline-block" }} data-testid="button-nav-start-free">Start Free →</span>
+            <span style={{ background: "var(--green)", color: "#000", fontFamily: "var(--fb)", fontSize: 13, fontWeight: 700, padding: "9px 20px", borderRadius: 50, cursor: "pointer", boxShadow: "0 4px 18px rgba(74,140,111,.4)", display: "inline-block" }} data-testid="button-nav-start-free">Start Free →</span>
           </Link>
           <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} style={{ background: "none", border: "none", color: "white", cursor: "pointer", padding: 4 }} data-testid="button-landing-mobile-menu">
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -53,7 +53,7 @@ export default function Home() {
           <Link href="/pricing"><span onClick={() => setMobileMenuOpen(false)} style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, cursor: "pointer", padding: "12px 16px", display: "flex", alignItems: "center", minHeight: 44 }}>Pricing</span></Link>
           <div style={{ marginTop: 8, padding: "0 16px" }}>
             <Link href="/lookup">
-              <span onClick={() => setMobileMenuOpen(false)} style={{ background: "#4ac329", color: "white", padding: "0 20px", borderRadius: 8, fontSize: 15, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", height: 48, width: "100%" }} data-testid="button-mobile-start-free">Start free lookup</span>
+              <span onClick={() => setMobileMenuOpen(false)} style={{ background: "#4a8c6f", color: "white", padding: "0 20px", borderRadius: 8, fontSize: 15, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", height: 48, width: "100%" }} data-testid="button-mobile-start-free">Start free lookup</span>
             </Link>
           </div>
         </div>
@@ -65,7 +65,7 @@ export default function Home() {
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.08)", backdropFilter: "blur(6px)", borderRadius: 24, padding: "6px 16px", marginBottom: 28, fontSize: 11, fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(255,255,255,.6)" }} className="home-hero-badge" data-testid="badge-hero">
             <span className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--green)", boxShadow: "0 0 8px var(--green)", display: "inline-block" }} /> Trade compliance for commodity traders
           </div>
-          <h1 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(38px,5.5vw,64px)", lineHeight: 1.08, letterSpacing: "-0.04em", color: "#fff", marginBottom: 20, marginTop: 0 }} className="home-hero-title" data-testid="text-hero-title">
+          <h1 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(38px,5.5vw,64px)", lineHeight: 1.08, letterSpacing: "-0.02em", color: "#fff", marginBottom: 20, marginTop: 0 }} className="home-hero-title" data-testid="text-hero-title">
             Know your compliance<br />before you <em style={{ fontStyle: "normal", color: "var(--green)" }}>commit.</em>
           </h1>
           <p style={{ fontSize: 17, lineHeight: 1.7, color: "rgba(255,255,255,.45)", marginBottom: 36 }} className="home-hero-subtitle" data-testid="text-hero-subtitle">
@@ -73,7 +73,7 @@ export default function Home() {
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 28 }} className="home-hero-buttons">
             <Link href="/lookup">
-              <span className="home-hero-primary" style={{ background: "var(--green)", color: "#000", fontFamily: "var(--fb)", fontSize: 15, fontWeight: 700, padding: "14px 32px", borderRadius: 50, cursor: "pointer", boxShadow: "0 4px 24px rgba(74,195,41,.45)", display: "inline-block" }} data-testid="button-hero-free-lookup">Run Free Lookup →</span>
+              <span className="home-hero-primary" style={{ background: "var(--green)", color: "#000", fontFamily: "var(--fb)", fontSize: 15, fontWeight: 700, padding: "14px 32px", borderRadius: 50, cursor: "pointer", boxShadow: "0 4px 24px rgba(74,140,111,.45)", display: "inline-block" }} data-testid="button-hero-free-lookup">Run Free Lookup →</span>
             </Link>
             <a href="#how">
               <span className="home-hero-secondary" style={{ background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.7)", fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600, padding: "14px 28px", borderRadius: 50, border: "1px solid rgba(255,255,255,.1)", cursor: "pointer", display: "inline-block" }} data-testid="button-hero-how-it-works">See how it works</span>
@@ -102,30 +102,30 @@ export default function Home() {
         <div className="section-inner">
           <div className="stat-grid">
             <div className="stat-card glow-green">
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 12, position: "relative", zIndex: 1, background: "rgba(74,195,41,.1)" }}>📦</div>
+              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 12, position: "relative", zIndex: 1, background: "rgba(74,140,111,.1)" }}>📦</div>
               <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Commodities Covered</div>
-              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.03em", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}>154 <span style={{ fontSize: 13, color: "var(--txt3)", fontWeight: 400, fontFamily: "var(--fb)" }}>types</span></div>
+              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.02em", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}>154 <span style={{ fontSize: 13, color: "var(--txt3)", fontWeight: 400, fontFamily: "var(--fb)" }}>types</span></div>
               <div style={{ fontSize: 11.5, position: "relative", zIndex: 1, color: "var(--txt3)" }}><span style={{ color: "var(--green)", fontWeight: 600 }}>↑ Full database</span> at launch</div>
             </div>
             <div className="stat-card glow-amber">
               <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 12, position: "relative", zIndex: 1, background: "rgba(234,139,67,.1)" }}>💰</div>
               <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Bank Amendment Fee</div>
-              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.03em", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}><sup style={{ fontSize: 13, fontWeight: 500, opacity: .5, verticalAlign: "super", marginRight: 1 }}>$</sup>150–500</div>
+              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.02em", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}><sup style={{ fontSize: 13, fontWeight: 500, opacity: .5, verticalAlign: "super", marginRight: 1 }}>$</sup>150–500</div>
               <div style={{ fontSize: 11.5, position: "relative", zIndex: 1, color: "var(--txt3)" }}><span style={{ color: "var(--red)", fontWeight: 600 }}>⚠ Per discrepancy</span> what's at stake</div>
             </div>
             <div className="stat-card glow-teal">
               <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 12, position: "relative", zIndex: 1, background: "rgba(46,134,98,.1)" }}>📋</div>
               <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Regulations Mapped</div>
-              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.03em", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}>40+ <span style={{ fontSize: 13, color: "var(--txt3)", fontWeight: 400, fontFamily: "var(--fb)" }}>rules</span></div>
+              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.02em", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}>40+ <span style={{ fontSize: 13, color: "var(--txt3)", fontWeight: 400, fontFamily: "var(--fb)" }}>rules</span></div>
               <div style={{ fontSize: 11.5, position: "relative", zIndex: 1, color: "var(--txt3)" }}><span style={{ color: "var(--green)", fontWeight: 600 }}>↑ EUDR · CBAM</span> + more</div>
             </div>
             <div className="stat-card cta">
-              <div className="animate-breathe" style={{ position: "absolute", bottom: -20, right: -20, width: 130, height: 130, background: "radial-gradient(circle,rgba(74,195,41,.28) 0%,rgba(74,195,41,.06) 50%,transparent 70%)", borderRadius: "50%", pointerEvents: "none" }} />
-              <div style={{ fontFamily: "var(--fh)", fontSize: 36, fontWeight: 800, color: "var(--green)", letterSpacing: "-0.04em", position: "relative", zIndex: 1, marginBottom: 4 }}>$0</div>
+              <div className="animate-breathe" style={{ position: "absolute", bottom: -20, right: -20, width: 130, height: 130, background: "radial-gradient(circle,rgba(74,140,111,.28) 0%,rgba(74,140,111,.06) 50%,transparent 70%)", borderRadius: "50%", pointerEvents: "none" }} />
+              <div style={{ fontFamily: "var(--fh)", fontSize: 36, fontWeight: 800, color: "var(--green)", letterSpacing: "-0.02em", position: "relative", zIndex: 1, marginBottom: 4 }}>$0</div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", position: "relative", zIndex: 1, marginBottom: 4 }}>Pre-Shipment Check with <strong style={{ color: "var(--green)" }}>AI</strong></div>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)", marginBottom: 2 }}>No card · No sign-up</div>
               <Link href="/lookup">
-                <span style={{ display: "inline-block", background: "var(--green)", color: "#000", fontFamily: "var(--fb)", fontSize: 12, fontWeight: 700, padding: "9px 16px", borderRadius: 10, cursor: "pointer", position: "relative", zIndex: 1, boxShadow: "0 0 16px rgba(74,195,41,.3)", marginTop: 10 }}>Run Free Check ✦</span>
+                <span style={{ display: "inline-block", background: "var(--green)", color: "#000", fontFamily: "var(--fb)", fontSize: 12, fontWeight: 700, padding: "9px 16px", borderRadius: 10, cursor: "pointer", position: "relative", zIndex: 1, boxShadow: "0 0 16px rgba(74,140,111,.3)", marginTop: 10 }}>Run Free Check ✦</span>
               </Link>
             </div>
           </div>
@@ -134,14 +134,14 @@ export default function Home() {
           <div className="free-banner">
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--green)", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>✦ No account needed</div>
-              <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(24px,3vw,36px)", color: "#fff", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: 12 }}>Run your first<br />lookup free.</h2>
+              <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(24px,3vw,36px)", color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: 12 }}>Run your first<br />lookup free.</h2>
               <p style={{ fontSize: 14, lineHeight: 1.7, color: "rgba(255,255,255,.35)", maxWidth: 460 }}>Enter commodity + origin + destination. Get the full compliance picture in seconds — duty rates, required documents, regulatory triggers, STOP warnings. No credit card. No sign-up.</p>
             </div>
             <div style={{ textAlign: "center", flexShrink: 0 }}>
               <div style={{ fontFamily: "var(--fh)", fontWeight: 800, fontSize: 64, color: "var(--green)", lineHeight: 1 }}>$0</div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,.35)", marginBottom: 14 }}>first lookup</div>
               <Link href="/lookup">
-                <span style={{ background: "var(--green)", color: "#000", fontFamily: "var(--fb)", fontSize: 14, fontWeight: 700, padding: "12px 24px", borderRadius: 50, cursor: "pointer", boxShadow: "0 4px 24px rgba(74,195,41,.45)", display: "inline-block" }}>Try it now →</span>
+                <span style={{ background: "var(--green)", color: "#000", fontFamily: "var(--fb)", fontSize: 14, fontWeight: 700, padding: "12px 24px", borderRadius: 50, cursor: "pointer", boxShadow: "0 4px 24px rgba(74,140,111,.45)", display: "inline-block" }}>Try it now →</span>
               </Link>
             </div>
           </div>
@@ -164,7 +164,7 @@ export default function Home() {
       <div className="section" id="how" data-testid="section-how-it-works">
         <div className="section-inner">
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--green)", marginBottom: 12 }}>How it works</div>
-          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.03em", color: "#fff", marginBottom: 8 }}>Three inputs. <em style={{ fontStyle: "normal", color: "var(--green)" }}>Complete picture.</em></div>
+          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#fff", marginBottom: 8 }}>Three inputs. <em style={{ fontStyle: "normal", color: "var(--green)" }}>Complete picture.</em></div>
           <div style={{ fontSize: 14, color: "rgba(255,255,255,.35)", lineHeight: 1.6, maxWidth: 460, marginBottom: 40 }}>No ERP required. No broker needed. Just answers.</div>
           <div className="how-grid">
             {[
@@ -173,7 +173,7 @@ export default function Home() {
               { num: "03", icon: "✅", title: "Proceed with confidence", desc: "Export results, generate supplier instructions, validate LC documents against UCP 600 rules, and download audit-ready TwinLog PDFs." },
             ].map((s, i) => (
               <div key={s.num} className="how-card" data-testid={`step-${i + 1}`}>
-                <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 42, color: "rgba(74,195,41,.15)", lineHeight: 1, marginBottom: 8 }}>{s.num}</div>
+                <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 42, color: "rgba(74,140,111,.15)", lineHeight: 1, marginBottom: 8 }}>{s.num}</div>
                 <div style={{ fontSize: 22, marginBottom: 14 }}>{s.icon}</div>
                 <h3 style={{ fontFamily: "var(--fh)", fontWeight: 600, fontSize: 16, color: "#fff", marginBottom: 8 }}>{s.title}</h3>
                 <p style={{ fontSize: 13, lineHeight: 1.6, color: "rgba(255,255,255,.35)" }}>{s.desc}</p>
@@ -187,7 +187,7 @@ export default function Home() {
       <div className="section" id="modules" data-testid="section-capabilities">
         <div className="section-inner">
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--green)", marginBottom: 12 }}>What's included</div>
-          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.03em", color: "#fff", marginBottom: 8 }}>Six modules. <em style={{ fontStyle: "normal", color: "var(--green)" }}>One engine.</em></div>
+          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#fff", marginBottom: 8 }}>Six modules. <em style={{ fontStyle: "normal", color: "var(--green)" }}>One engine.</em></div>
           <div style={{ fontSize: 14, color: "rgba(255,255,255,.35)", lineHeight: 1.6, maxWidth: 460, marginBottom: 40 }}>Every tool a commodity trader needs. Pay per check. No subscription required to start.</div>
           <div className="mod-grid">
             {[
@@ -201,7 +201,7 @@ export default function Home() {
               <div key={m.title} className="mod-card" data-testid={`card-capability-${i}`}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
                   <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(255,255,255,.05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{m.icon}</div>
-                  <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 50, whiteSpace: "nowrap", background: m.priceClass === "amber" ? "rgba(234,139,67,.12)" : m.priceClass === "free" ? "rgba(74,195,41,.2)" : "rgba(74,195,41,.12)", color: m.priceClass === "amber" ? "var(--amber)" : "var(--green)" }}>{m.price}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 50, whiteSpace: "nowrap", background: m.priceClass === "amber" ? "rgba(234,139,67,.12)" : m.priceClass === "free" ? "rgba(74,140,111,.2)" : "rgba(74,140,111,.12)", color: m.priceClass === "amber" ? "var(--amber)" : "var(--green)" }}>{m.price}</span>
                 </div>
                 <h3 style={{ fontFamily: "var(--fh)", fontWeight: 600, fontSize: 17, color: "#fff", marginBottom: 6 }}>{m.title}</h3>
                 <p style={{ fontSize: 12.5, lineHeight: 1.6, color: "rgba(255,255,255,.35)", marginBottom: 14 }}>{m.desc}</p>
@@ -218,7 +218,7 @@ export default function Home() {
       <div className="section" id="lc" style={{ paddingTop: 40 }}>
         <div className="section-inner">
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--green)", marginBottom: 12 }}>LC Document Check</div>
-          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.03em", color: "#fff", marginBottom: 8 }}>Just need to check <em style={{ fontStyle: "normal", color: "var(--green)" }}>an LC?</em></div>
+          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#fff", marginBottom: 8 }}>Just need to check <em style={{ fontStyle: "normal", color: "var(--green)" }}>an LC?</em></div>
           <div style={{ fontSize: 14, color: "rgba(255,255,255,.35)", lineHeight: 1.6, maxWidth: 460, marginBottom: 40 }}>Standalone LC checking without buying a full trade credit.</div>
           <div className="lc-cards">
             <div className="lc-card primary">
@@ -244,7 +244,7 @@ export default function Home() {
               <p style={{ fontSize: 13, color: "rgba(255,255,255,.35)", lineHeight: 1.6, marginBottom: 14 }}>Custom pricing, shared credits, API access, and dedicated support.</p>
               <span style={{ background: "rgba(255,255,255,.06)", color: "#fff", fontFamily: "var(--fb)", fontSize: 13, fontWeight: 700, padding: "9px 18px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}>✉ Contact sales</span>
             </div>
-            <div className="lc-card dashed" style={{ borderColor: "rgba(74,195,41,.12)" }}>
+            <div className="lc-card dashed" style={{ borderColor: "rgba(74,140,111,.12)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                 <span style={{ fontSize: 16 }}>🔔</span><span style={{ fontWeight: 700, fontSize: 15, color: "#fff" }}>Pro Monitoring</span>
                 <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", padding: "3px 10px", borderRadius: 6, background: "rgba(255,255,255,.08)", color: "rgba(255,255,255,.4)", marginLeft: 8 }}>Coming soon</span>
@@ -259,7 +259,7 @@ export default function Home() {
       <div className="section" id="pricing" data-testid="section-pricing">
         <div className="section-inner">
           <div style={{ textAlign: "center", marginBottom: 40 }}>
-            <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(28px,4vw,46px)", color: "#fff", letterSpacing: "-0.03em", marginBottom: 12 }} data-testid="text-pricing-heading">Check a shipment<br /><em style={{ fontStyle: "normal", color: "var(--green)" }}>before it costs you.</em></h2>
+            <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(28px,4vw,46px)", color: "#fff", letterSpacing: "-0.02em", marginBottom: 12 }} data-testid="text-pricing-heading">Check a shipment<br /><em style={{ fontStyle: "normal", color: "var(--green)" }}>before it costs you.</em></h2>
             <p style={{ fontSize: 14, color: "rgba(255,255,255,.35)", marginBottom: 20 }}>Pay per shipment. No subscriptions. Your first compliance check is free.</p>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 50, padding: "6px 18px", fontSize: 11, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.2)", marginBottom: 32 }}>
               <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--green)" }} /> 0 Trade Credits
@@ -272,7 +272,7 @@ export default function Home() {
               <strong style={{ fontSize: 13, color: "#fff", display: "block", marginBottom: 2 }}>Your first check is free</strong>
               <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Run one full compliance check for free — no card required. See duties, required documents, and shipment risks.</span>
             </div>
-            <Link href="/lookup"><span style={{ background: "rgba(74,195,41,.08)", color: "var(--green)", fontFamily: "var(--fb)", fontSize: 12, fontWeight: 700, padding: "9px 16px", borderRadius: 10, border: "1px solid rgba(74,195,41,.2)", cursor: "pointer", whiteSpace: "nowrap" }}>🔍 Check shipment risk — Free</span></Link>
+            <Link href="/lookup"><span style={{ background: "rgba(74,140,111,.08)", color: "var(--green)", fontFamily: "var(--fb)", fontSize: 12, fontWeight: 700, padding: "9px 16px", borderRadius: 10, border: "1px solid rgba(74,140,111,.2)", cursor: "pointer", whiteSpace: "nowrap" }}>🔍 Check shipment risk — Free</span></Link>
           </div>
 
           <div style={{ fontFamily: "var(--fh)", fontWeight: 600, fontSize: 18, color: "#fff", marginBottom: 6 }}>Trade Packs</div>
@@ -294,7 +294,7 @@ export default function Home() {
                   {p.features.map(f => <li key={f} style={{ fontSize: 12, color: "rgba(255,255,255,.4)", display: "flex", alignItems: "flex-start", gap: 7 }}><span style={{ color: "var(--green)", fontSize: 12, flexShrink: 0, marginTop: 1 }}>✔</span>{f}</li>)}
                 </ul>
                 <Link href="/pricing">
-                  <span style={{ display: "block", width: "100%", padding: 10, borderRadius: 10, fontFamily: "var(--fb)", fontSize: 13, fontWeight: 700, cursor: "pointer", textAlign: "center", ...(p.popular ? { background: "var(--green)", color: "#000", boxShadow: "0 4px 16px rgba(74,195,41,.3)" } : { background: "none", color: "rgba(255,255,255,.6)", border: "1px solid rgba(255,255,255,.1)" }) }}>Buy {p.name}</span>
+                  <span style={{ display: "block", width: "100%", padding: 10, borderRadius: 10, fontFamily: "var(--fb)", fontSize: 13, fontWeight: 700, cursor: "pointer", textAlign: "center", ...(p.popular ? { background: "var(--green)", color: "#000", boxShadow: "0 4px 16px rgba(74,140,111,.3)" } : { background: "none", color: "rgba(255,255,255,.6)", border: "1px solid rgba(255,255,255,.1)" }) }}>Buy {p.name}</span>
                 </Link>
               </div>
             ))}
@@ -306,7 +306,7 @@ export default function Home() {
       <footer data-testid="section-footer" style={{ padding: "40px 10px 24px", marginTop: 40 }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,.04)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <img src="/logo.png" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover" }} />
+            <img src="/taptrao-green-logo.png" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover" }} />
             <span style={{ fontFamily: "var(--fh)", fontWeight: 600, fontSize: 15, color: "#fff" }} data-testid="text-footer-logo">TapTrao</span>
           </div>
           <div style={{ fontSize: 11, color: "rgba(255,255,255,.2)" }} data-testid="text-footer-copyright">© 2026 FATRAO LIMITED · Trade compliance for commodity traders</div>
