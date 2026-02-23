@@ -1255,6 +1255,7 @@ function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null })
   );
 }
 
+
 export default function LcCheck() {
   const [step, setStep] = useState(1);
   const [prefillData, setPrefillData] = useState<LcPrefillData | null>(null);
@@ -1438,6 +1439,47 @@ export default function LcCheck() {
     <span style={{ fontSize: 13, color: "var(--t2)", fontWeight: 600 }}>LC Check</span>
   );
 
+  /* ── shared inline styles matching design ref ── */
+  const inputS: React.CSSProperties = {
+    background: "#f5f5f5", border: "1px solid #e8e8e8", borderRadius: 9,
+    padding: "10px 13px", fontSize: 13, color: "#111", fontFamily: "var(--fb)",
+    outline: "none", transition: "all 0.15s", width: "100%",
+  };
+  const labelS: React.CSSProperties = {
+    fontSize: 10.5, fontWeight: 700, color: "#999",
+    textTransform: "uppercase", letterSpacing: "0.08em",
+  };
+  const wcS: React.CSSProperties = {
+    background: "#fff", borderRadius: 16, padding: "20px 22px",
+    boxShadow: "0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)",
+    marginBottom: 12, position: "relative", overflow: "hidden",
+  };
+  const wcHeadS: React.CSSProperties = {
+    display: "flex", alignItems: "flex-start", justifyContent: "space-between",
+    marginBottom: 16, paddingBottom: 13, borderBottom: "1px solid #f0f0f0",
+  };
+  const btnGreenS = (enabled: boolean): React.CSSProperties => ({
+    background: enabled ? "var(--green)" : "#ccc", color: "#000", padding: "11px 26px",
+    borderRadius: 9, fontSize: 13.5, fontWeight: 700,
+    cursor: enabled ? "pointer" : "not-allowed", fontFamily: "var(--fb)",
+    display: "flex", alignItems: "center", gap: 6, transition: "all 0.15s",
+    boxShadow: enabled ? "0 4px 18px rgba(74,140,111,0.35)" : "none", border: "none",
+  });
+  const btnGreyS: React.CSSProperties = {
+    background: "#f0f0f0", color: "#111", padding: "11px 20px", borderRadius: 9,
+    fontSize: 13.5, fontWeight: 600, cursor: "pointer", fontFamily: "var(--fb)",
+    transition: "all 0.15s", border: "1px solid #e0e0e0",
+  };
+  const req = <span style={{ color: "var(--amber)" }}>*</span>;
+
+  const goStep = (n: number) => {
+    setStep(n);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  /* ── helper: get doc type label ── */
+  const docLabel = (dt: string) => DOC_TYPES.find(d => d.value === dt)?.label ?? dt;
+
   return (
     <AppShell topCenter={breadcrumb}>
       <StepNav steps={WORKFLOW_STEPS} currentIndex={1} completedUpTo={1} />
@@ -1452,371 +1494,479 @@ export default function LcCheck() {
           Coming in the next update.
         </div>
       ) : (
-      <div className="flex-1 py-8 px-4" data-testid="lc-check-page">
-        <div className="max-w-3xl mx-auto space-y-6">
-          {/* ── LC Header with green gradient ── */}
-          <div style={{ background: "linear-gradient(180deg,#0d2218 0%,#0f2a1e 30%,#143424 55%,#1a4030 75%,rgba(26,60,44,0.7) 88%,rgba(26,60,44,0) 100%)", borderRadius: 16, padding: "24px 28px 32px", position: "relative", overflow: "hidden" }}>
-            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,.4)", marginBottom: 8 }}>TapTrao / LC Check</p>
-            <h1 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 28, color: "#fff", letterSpacing: "-0.03em", marginBottom: 6 }} data-testid="text-lc-title">
-              Check your LC before sending it to the bank
-            </h1>
-            <p style={{ fontFamily: "var(--fb)", color: "rgba(255,255,255,.4)", fontSize: 14 }}>
-              Catch document mismatches before the bank does.
-            </p>
-          </div>
+      <div style={{ flex: 1, paddingBottom: 40 }} data-testid="lc-check-page">
 
-          {showPrefillBanner && prefillData && (
-            <div style={{ background: "var(--blue-dim)", borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "flex-start", gap: 12, position: "relative" }} data-testid="banner-lc-prefill">
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
-              <ExternalLink className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--blue)" }} />
-              <div className="flex-1 min-w-0">
-                <p style={{ fontSize: 13, fontWeight: 600, color: "var(--blue)" }} data-testid="text-prefill-info">
-                  Pre-filled from your compliance lookup
-                </p>
-                <p style={{ fontSize: 13, color: "var(--t2)" }}>
-                  {prefillData.commodity_name} — {prefillData.origin_name} → {prefillData.dest_name}
-                </p>
-                {prefillData.lookup_id && (
-                  <Link
-                    href={`/trades`}
-                    style={{ fontSize: 11, color: "var(--blue)", textDecoration: "underline", marginTop: 4, display: "inline-block" }}
-                    data-testid="link-view-lookup"
-                  >
-                    View lookup →
-                  </Link>
-                )}
-              </div>
-              <button
-                onClick={() => setShowPrefillBanner(false)}
-                style={{ color: "var(--t3)", background: "none", border: "none", cursor: "pointer" }}
-                data-testid="button-dismiss-prefill-banner"
-              >
-                <X className="w-4 h-4" />
-              </button>
+        {/* ═══════ HERO ═══════ */}
+        <div style={{
+          margin: "0 14px", borderRadius: 16, padding: "20px 24px 36px", position: "relative",
+          background: "linear-gradient(180deg, #0d2218 0%, #0f2a1e 30%, #143424 55%, #1a4030 75%, rgba(26,60,44,0.7) 88%, rgba(26,60,44,0) 100%)",
+          display: "flex", alignItems: "flex-start", justifyContent: "space-between", overflow: "hidden",
+        }}>
+          <div>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              background: "rgba(255,255,255,0.1)", borderRadius: 24, padding: "4px 14px",
+              fontSize: 12, color: "rgba(255,255,255,0.7)", marginBottom: 12,
+              backdropFilter: "blur(6px)",
+            }}>
+              Compliance › LC Check › New Check
             </div>
-          )}
+            <div style={{
+              fontFamily: "var(--fh)", fontSize: 30, fontWeight: 700, color: "#fff",
+              letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: 7,
+            }} data-testid="text-lc-title">
+              LC Document<br />Checker
+            </div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+              Cross-check supplier docs against your LC — UCP 600 &amp; ISBP 745 applied.
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8, paddingTop: 2, flexShrink: 0 }}>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 7,
+              background: "rgba(74,140,111,0.15)", borderRadius: 20, padding: "5px 13px",
+              fontSize: 12, color: "var(--green)", fontWeight: 600,
+            }}>
+              {isFreeCheck ? (
+                <><span style={{ background: "var(--green)", color: "#000", padding: "1px 7px", borderRadius: 20, fontSize: 10, fontWeight: 800 }}>FREE</span> First check · $19.99 after</>
+              ) : (
+                <>$19.99 per check</>
+              )}
+            </div>
+          </div>
+        </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "10px 0", marginBottom: 4 }}>
-            {[1, 2, 3].map(s => (
-              <div key={s} style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <div
-                  style={{
-                    width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, fontFamily: "var(--fh)", transition: "all .2s",
-                    ...(step === s ? { background: "var(--green)", color: "#000", boxShadow: "0 0 12px rgba(74,140,111,.35)" } : step > s ? { background: "rgba(74,140,111,.15)", color: "var(--green)" } : { background: "#f0f0f0", color: "#bbb" }),
-                  }}
-                  data-testid={`step-indicator-${s}`}
-                >
-                  {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
+        {/* ═══════ STEPPER ═══════ */}
+        <div style={{ padding: "18px 28px 8px" }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            {([
+              { n: 1, label: "LC Terms" },
+              { n: 2, label: "Supplier Docs" },
+              { n: 3, label: "Review" },
+              { n: 4, label: "Results" },
+            ] as const).map((s, i, arr) => (
+              <div key={s.n} style={{ display: "contents" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div
+                    style={{
+                      width: 26, height: 26, borderRadius: "50%",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 11, fontWeight: 800, flexShrink: 0,
+                      fontFamily: "var(--fh)", transition: "all 0.2s",
+                      ...(step > s.n
+                        ? { background: "var(--green)", color: "#000" }
+                        : step === s.n
+                        ? { background: "rgba(255,255,255,0.15)", color: "#fff", border: "2px solid var(--green)" }
+                        : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.1)" }),
+                    }}
+                    data-testid={`step-indicator-${s.n}`}
+                  >
+                    {step > s.n ? "✓" : s.n}
+                  </div>
+                  <span style={{
+                    fontSize: 12, fontWeight: 600, whiteSpace: "nowrap",
+                    color: step > s.n ? "var(--green)" : step === s.n ? "#fff" : "rgba(255,255,255,0.25)",
+                  }}>
+                    {s.label}
+                  </span>
                 </div>
-                <span className="hidden sm:inline" style={{ fontSize: 12, fontWeight: 600, color: step >= s ? "var(--txt)" : "var(--txt3)" }}>
-                  {s === 1 ? "LC Terms" : s === 2 ? "Documents" : "Results"}
-                </span>
-                {s < 3 && <div style={{ width: 32, height: 2, borderRadius: 2, background: step > s ? "var(--green)" : "#eee", transition: "background .3s" }} />}
+                {i < arr.length - 1 && (
+                  <div style={{
+                    flex: 1, height: 1, margin: "0 10px", minWidth: 24,
+                    background: step > s.n ? "var(--green)" : "rgba(255,255,255,0.1)",
+                    transition: "background 0.3s",
+                  }} />
+                )}
               </div>
             ))}
           </div>
+        </div>
 
-          {step === 1 && (
-            <Card style={{ background: "var(--card)", borderRadius: 14, border: "none", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
-              <CardHeader className="flex flex-row items-center gap-2 pb-2">
-                <FileText className="w-4 h-4" style={{ color: "var(--t3)" }} />
-                <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Step 1: LC Terms Entry</p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p style={{ fontSize: 12, color: "var(--t2)", lineHeight: 1.5, marginBottom: 4 }}>
-                  Enter what's written in your LC. We'll check supplier documents against this.
-                </p>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Beneficiary Name (Supplier)</label>
-                    <Input
+        {/* Prefill Banner */}
+        {showPrefillBanner && prefillData && (
+          <div style={{ margin: "14px 14px 0", background: "rgba(74,140,111,0.06)", borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "flex-start", gap: 12, position: "relative" }} data-testid="banner-lc-prefill">
+            <ExternalLink size={18} style={{ color: "var(--green)", flexShrink: 0, marginTop: 1 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-prefill-info">
+                Pre-filled from your compliance lookup
+              </p>
+              <p style={{ fontSize: 13, color: "#666" }}>
+                {prefillData.commodity_name} — {prefillData.origin_name} → {prefillData.dest_name}
+              </p>
+              {prefillData.lookup_id && (
+                <Link
+                  href="/trades"
+                  style={{ fontSize: 11, color: "var(--green)", textDecoration: "underline", marginTop: 4, display: "inline-block" }}
+                  data-testid="link-view-lookup"
+                >
+                  View lookup →
+                </Link>
+              )}
+            </div>
+            <button
+              onClick={() => setShowPrefillBanner(false)}
+              style={{ color: "#999", background: "none", border: "none", cursor: "pointer" }}
+              data-testid="button-dismiss-prefill-banner"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+
+        {/* ═══════ STEP 1 — LC Terms ═══════ */}
+        {step === 1 && (
+          <div style={{ marginTop: 14 }}>
+            <div style={{ padding: "0 14px" }}>
+              {/* LC Terms Card */}
+              <div style={wcS}>
+                <div style={wcHeadS}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#111", display: "flex", alignItems: "center", gap: 8 }}>
+                      📋 Letter of Credit — Key Terms
+                    </div>
+                    <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
+                      Enter exactly as they appear on your LC.
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 1: LC Reference + Issuing Bank */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13, marginBottom: 13 }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>LC Reference</label>
+                    <input type="text" style={inputS}
+                      value={lcFields.lcReference}
+                      onChange={e => updateLcField("lcReference", e.target.value)}
+                      placeholder="e.g. LC/2026/0001234"
+                      data-testid="input-lc-reference"
+                    />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Issuing Bank</label>
+                    <input type="text" style={inputS}
+                      placeholder="e.g. Société Générale, Abidjan"
+                    />
+                  </div>
+
+                  {/* Row 2: Beneficiary + Applicant */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Beneficiary (Supplier) {req}</label>
+                    <input type="text" style={inputS}
                       value={lcFields.beneficiaryName}
                       onChange={e => updateLcField("beneficiaryName", e.target.value)}
-                      placeholder="e.g. Cocoa Export SARL"
+                      placeholder="Exact name as on LC"
                       data-testid="input-beneficiary-name"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Applicant Name (Buyer)</label>
-                    <Input
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Applicant (Buyer) {req}</label>
+                    <input type="text" style={inputS}
                       value={lcFields.applicantName}
                       onChange={e => updateLcField("applicantName", e.target.value)}
-                      placeholder="e.g. Euro Trading GmbH"
+                      placeholder="Exact name as on LC"
                       data-testid="input-applicant-name"
+                    />
+                  </div>
+
+                  {/* Row 3: Goods Description (full width) */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5, gridColumn: "1 / -1" }}>
+                    <label style={labelS}>Goods Description {req}</label>
+                    <input type="text" style={inputS}
+                      value={lcFields.goodsDescription}
+                      onChange={e => updateLcField("goodsDescription", e.target.value)}
+                      placeholder="e.g. Raw Cashew Nuts in shell, crop 2025/26"
+                      data-testid="input-goods-description"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-sm font-medium">Goods Description</label>
-                  <Input
-                    value={lcFields.goodsDescription}
-                    onChange={e => updateLcField("goodsDescription", e.target.value)}
-                    placeholder="e.g. Raw cocoa beans as stated in LC"
-                    data-testid="input-goods-description"
-                  />
+                {/* 3-col: Quantity, LC Amount, Currency */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 13, marginBottom: 13 }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Quantity {req}</label>
+                    <input type="text" style={inputS}
+                      value={lcFields.quantity || ""}
+                      onChange={e => updateLcField("quantity", parseFloat(e.target.value) || 0)}
+                      placeholder="e.g. 500 MT"
+                      data-testid="input-quantity"
+                    />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>LC Amount {req}</label>
+                    <input type="number" style={inputS}
+                      value={lcFields.totalAmount || ""}
+                      onChange={e => updateLcField("totalAmount", parseFloat(e.target.value) || 0)}
+                      placeholder="e.g. 250,000.00"
+                      data-testid="input-total-amount"
+                    />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Currency</label>
+                    <select style={inputS}
+                      value={lcFields.currency}
+                      onChange={e => updateLcField("currency", e.target.value)}
+                      data-testid="select-currency"
+                    >
+                      {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+
+                  {/* Row 2 of 3-col */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Port of Loading</label>
+                    <input type="text" style={inputS}
+                      value={lcFields.portOfLoading}
+                      onChange={e => updateLcField("portOfLoading", e.target.value)}
+                      placeholder="e.g. Abidjan"
+                      data-testid="input-port-loading"
+                    />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Port of Discharge</label>
+                    <input type="text" style={inputS}
+                      value={lcFields.portOfDischarge}
+                      onChange={e => updateLcField("portOfDischarge", e.target.value)}
+                      placeholder="e.g. Felixstowe"
+                      data-testid="input-port-discharge"
+                    />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Country of Origin</label>
+                    <input type="text" style={inputS}
+                      value={lcFields.countryOfOrigin}
+                      onChange={e => updateLcField("countryOfOrigin", e.target.value)}
+                      placeholder="e.g. Côte d'Ivoire"
+                      data-testid="input-country-origin"
+                    />
+                  </div>
+
+                  {/* Row 3 of 3-col */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Latest Shipment Date {req}</label>
+                    <input type="date" style={inputS}
+                      value={lcFields.latestShipmentDate}
+                      onChange={e => updateLcField("latestShipmentDate", e.target.value)}
+                      data-testid="input-latest-shipment-date"
+                    />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>LC Expiry Date {req}</label>
+                    <input type="date" style={inputS}
+                      value={lcFields.lcExpiryDate}
+                      onChange={e => updateLcField("lcExpiryDate", e.target.value)}
+                      data-testid="input-lc-expiry-date"
+                    />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Incoterms</label>
+                    <select style={inputS}
+                      value={lcFields.incoterms}
+                      onChange={e => updateLcField("incoterms", e.target.value)}
+                      data-testid="select-incoterms"
+                    >
+                      {INCOTERMS.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">HS Code</label>
-                    <Input
+                {/* HS Code row (single, smaller) */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 13, marginBottom: 13 }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>HS Code</label>
+                    <input type="text" style={inputS}
                       value={lcFields.hsCode}
                       onChange={e => updateLcField("hsCode", e.target.value)}
                       placeholder="e.g. 1801.00"
                       data-testid="input-hs-code"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Quantity</label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="number"
-                        value={lcFields.quantity || ""}
-                        onChange={e => updateLcField("quantity", parseFloat(e.target.value) || 0)}
-                        placeholder="100"
-                        className="flex-1"
-                        data-testid="input-quantity"
-                      />
-                      <Select value={lcFields.quantityUnit} onValueChange={v => updateLcField("quantityUnit", v)}>
-                        <SelectTrigger className="w-24" data-testid="select-quantity-unit">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {QUANTITY_UNITS.map(u => (
-                            <SelectItem key={u} value={u}>{u}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">LC Reference</label>
-                    <Input
-                      value={lcFields.lcReference}
-                      onChange={e => updateLcField("lcReference", e.target.value)}
-                      placeholder="e.g. LC-2026-001234"
-                      data-testid="input-lc-reference"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Unit Price</label>
-                    <Input
-                      type="number"
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Unit Price</label>
+                    <input type="number" style={inputS}
                       value={lcFields.unitPrice || ""}
                       onChange={e => updateLcField("unitPrice", parseFloat(e.target.value) || 0)}
-                      placeholder="2500"
+                      placeholder="e.g. 2500"
                       data-testid="input-unit-price"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Total Amount</label>
-                    <Input
-                      type="number"
-                      value={lcFields.totalAmount || ""}
-                      onChange={e => updateLcField("totalAmount", parseFloat(e.target.value) || 0)}
-                      placeholder="250000"
-                      data-testid="input-total-amount"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Currency</label>
-                    <Select value={lcFields.currency} onValueChange={v => updateLcField("currency", v)}>
-                      <SelectTrigger data-testid="select-currency">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {CURRENCIES.map(c => (
-                          <SelectItem key={c} value={c}>{c}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Country of Origin</label>
-                    <Input
-                      value={lcFields.countryOfOrigin}
-                      onChange={e => updateLcField("countryOfOrigin", e.target.value)}
-                      placeholder="e.g. Ghana"
-                      data-testid="input-country-origin"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Incoterms</label>
-                    <Select value={lcFields.incoterms} onValueChange={v => updateLcField("incoterms", v)}>
-                      <SelectTrigger data-testid="select-incoterms">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {INCOTERMS.map(t => (
-                          <SelectItem key={t} value={t}>{t}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Port of Loading</label>
-                    <Input
-                      value={lcFields.portOfLoading}
-                      onChange={e => updateLcField("portOfLoading", e.target.value)}
-                      placeholder="e.g. Tema, Ghana"
-                      data-testid="input-port-loading"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Port of Discharge</label>
-                    <Input
-                      value={lcFields.portOfDischarge}
-                      onChange={e => updateLcField("portOfDischarge", e.target.value)}
-                      placeholder="e.g. Rotterdam, Netherlands"
-                      data-testid="input-port-discharge"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Latest Shipment Date</label>
-                    <Input
-                      type="date"
-                      value={lcFields.latestShipmentDate}
-                      onChange={e => updateLcField("latestShipmentDate", e.target.value)}
-                      data-testid="input-latest-shipment-date"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">LC Expiry Date</label>
-                    <Input
-                      type="date"
-                      value={lcFields.lcExpiryDate}
-                      onChange={e => updateLcField("lcExpiryDate", e.target.value)}
-                      data-testid="input-lc-expiry-date"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Partial Shipments Allowed?</label>
-                    <Select
-                      value={lcFields.partialShipmentsAllowed ? "yes" : "no"}
-                      onValueChange={v => updateLcField("partialShipmentsAllowed", v === "yes")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Quantity Unit</label>
+                    <select style={inputS}
+                      value={lcFields.quantityUnit}
+                      onChange={e => updateLcField("quantityUnit", e.target.value)}
+                      data-testid="select-quantity-unit"
                     >
-                      <SelectTrigger data-testid="select-partial-shipments">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="yes">Yes</SelectItem>
-                        <SelectItem value="no">No</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Transhipment Allowed?</label>
-                    <Select
-                      value={lcFields.transhipmentAllowed ? "yes" : "no"}
-                      onValueChange={v => updateLcField("transhipmentAllowed", v === "yes")}
-                    >
-                      <SelectTrigger data-testid="select-transhipment">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="yes">Yes</SelectItem>
-                        <SelectItem value="no">No</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      {QUANTITY_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+                    </select>
                   </div>
                 </div>
 
-                <div className="flex justify-end pt-2">
-                  <Button
-                    disabled={!canProceedStep1}
-                    onClick={() => setStep(2)}
-                    data-testid="button-next-step-2"
-                  >
-                    Next: Enter Documents
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
+                {/* Toggle: Partial Shipments */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 0", borderBottom: "1px solid #f5f5f5" }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#111" }}>Partial Shipments Allowed</div>
+                    <div style={{ fontSize: 11, color: "#999", marginTop: 1 }}>UCP 600 Art. 31</div>
+                  </div>
+                  <label style={{ position: "relative", width: 40, height: 22, flexShrink: 0, display: "inline-block", cursor: "pointer" }}>
+                    <input type="checkbox" style={{ opacity: 0, width: 0, height: 0, position: "absolute" }}
+                      checked={lcFields.partialShipmentsAllowed}
+                      onChange={e => updateLcField("partialShipmentsAllowed", e.target.checked)}
+                      data-testid="select-partial-shipments"
+                    />
+                    <span style={{
+                      position: "absolute", inset: 0, borderRadius: 22,
+                      background: lcFields.partialShipmentsAllowed ? "rgba(74,140,111,0.15)" : "#e8e8e8",
+                      cursor: "pointer", transition: "all 0.2s",
+                    }}>
+                      <span style={{
+                        content: "''", position: "absolute", width: 15, height: 15,
+                        left: lcFields.partialShipmentsAllowed ? 22 : 3, top: 3.5,
+                        borderRadius: "50%",
+                        background: lcFields.partialShipmentsAllowed ? "var(--green)" : "#bbb",
+                        transition: "all 0.2s",
+                      }} />
+                    </span>
+                  </label>
                 </div>
-              </CardContent>
-            </Card>
-          )}
 
-          {step === 2 && (
-            <Card style={{ background: "var(--card)", borderRadius: 14, border: "none", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
-              <CardHeader className="flex flex-row items-center gap-2 pb-2">
-                <FileText className="w-4 h-4" style={{ color: "var(--t3)" }} />
-                <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Step 2: Supplier Document Entry</p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-wrap gap-2 items-center">
+                {/* Toggle: Transhipment */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 0" }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#111" }}>Transhipment Allowed</div>
+                    <div style={{ fontSize: 11, color: "#999", marginTop: 1 }}>UCP 600 Art. 20</div>
+                  </div>
+                  <label style={{ position: "relative", width: 40, height: 22, flexShrink: 0, display: "inline-block", cursor: "pointer" }}>
+                    <input type="checkbox" style={{ opacity: 0, width: 0, height: 0, position: "absolute" }}
+                      checked={lcFields.transhipmentAllowed}
+                      onChange={e => updateLcField("transhipmentAllowed", e.target.checked)}
+                      data-testid="select-transhipment"
+                    />
+                    <span style={{
+                      position: "absolute", inset: 0, borderRadius: 22,
+                      background: lcFields.transhipmentAllowed ? "rgba(74,140,111,0.15)" : "#e8e8e8",
+                      cursor: "pointer", transition: "all 0.2s",
+                    }}>
+                      <span style={{
+                        content: "''", position: "absolute", width: 15, height: 15,
+                        left: lcFields.transhipmentAllowed ? 22 : 3, top: 3.5,
+                        borderRadius: "50%",
+                        background: lcFields.transhipmentAllowed ? "var(--green)" : "#bbb",
+                        transition: "all 0.2s",
+                      }} />
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 1 buttons */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 14px", margin: "4px 0 0" }}>
+              <button
+                disabled={!canProceedStep1}
+                onClick={() => goStep(2)}
+                style={btnGreenS(canProceedStep1)}
+                data-testid="button-next-step-2"
+              >
+                Continue to Supplier Docs →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ═══════ STEP 2 — Supplier Docs ═══════ */}
+        {step === 2 && (
+          <div style={{ marginTop: 14 }}>
+            <div style={{ padding: "0 14px" }}>
+              <div style={wcS}>
+                <div style={wcHeadS}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#111", display: "flex", alignItems: "center", gap: 8 }}>
+                      📦 Supplier Documents
+                    </div>
+                    <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
+                      Enter the key fields from each supplier document. Add up to 6 documents.
+                    </div>
+                  </div>
+                </div>
+
+                {/* Document Tabs */}
+                <div style={{ display: "flex", gap: 5, marginBottom: 16, flexWrap: "wrap" }}>
                   {documents.map((doc, i) => (
-                    <Button
+                    <div
                       key={i}
-                      variant={activeDocTab === i ? "default" : "outline"}
-                      size="sm"
                       onClick={() => setActiveDocTab(i)}
+                      style={{
+                        padding: "5px 13px", borderRadius: 8, fontSize: 12, fontWeight: 600,
+                        cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+                        transition: "all 0.15s",
+                        ...(activeDocTab === i
+                          ? { background: "var(--green)", color: "#000", border: "1px solid var(--green)" }
+                          : { background: "#f5f5f5", color: "#999", border: "1px solid #e8e8e8" }),
+                      }}
                       data-testid={`button-doc-tab-${i}`}
                     >
-                      Doc {i + 1}
-                    </Button>
+                      <span style={{
+                        width: 16, height: 16, borderRadius: "50%",
+                        background: "rgba(0,0,0,0.1)", fontSize: 9,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>{i + 1}</span>
+                      {docLabel(doc.documentType)}
+                    </div>
                   ))}
                   {documents.length < 6 && (
-                    <Button variant="ghost" size="sm" onClick={addDocument} data-testid="button-add-document">
-                      <Plus className="w-3 h-3 mr-1" />
-                      Add
-                    </Button>
+                    <div
+                      onClick={addDocument}
+                      style={{
+                        padding: "5px 13px", borderRadius: 8, fontSize: 12, fontWeight: 600,
+                        cursor: "pointer", background: "transparent", color: "#999",
+                        border: "1px dashed #ddd", transition: "all 0.15s",
+                      }}
+                      data-testid="button-add-document"
+                    >
+                      + Add doc
+                    </div>
                   )}
                 </div>
 
+                {/* Active document fields */}
                 {documents[activeDocTab] && (
-                  <div className="space-y-4 p-4" style={{ background: "var(--card2)", borderRadius: 14 }}>
-                    <div className="flex items-center justify-between gap-4 flex-wrap">
-                      <div className="space-y-1 flex-1 min-w-48">
-                        <label className="text-sm font-medium">Document Type</label>
-                        <Select
+                  <div>
+                    {/* Document Type selector */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 13 }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
+                        <label style={labelS}>Document Type</label>
+                        <select style={inputS}
                           value={documents[activeDocTab].documentType}
-                          onValueChange={(v: string) => updateDocType(activeDocTab, v as LcDocumentType)}
+                          onChange={e => updateDocType(activeDocTab, e.target.value as LcDocumentType)}
+                          data-testid="select-doc-type"
                         >
-                          <SelectTrigger data-testid="select-doc-type">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {DOC_TYPES.map(dt => (
-                              <SelectItem key={dt.value} value={dt.value}>{dt.label}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          {DOC_TYPES.map(dt => (
+                            <option key={dt.value} value={dt.value}>{dt.label}</option>
+                          ))}
+                        </select>
                       </div>
                       {documents.length > 1 && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
+                        <button
                           onClick={() => removeDocument(activeDocTab)}
+                          style={{
+                            background: "none", border: "none", cursor: "pointer",
+                            color: "#da3c3d", marginTop: 18, padding: 6,
+                          }}
                           data-testid="button-remove-document"
                         >
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
+                          <Trash2 size={16} />
+                        </button>
                       )}
                     </div>
 
-                    <div className="grid gap-3 md:grid-cols-2">
+                    {/* Dynamic fields */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13 }}>
                       {getDocFields(documents[activeDocTab].documentType).map(field => (
-                        <div key={field.key} className="space-y-1">
-                          <label className="text-sm font-medium">{field.label}</label>
-                          <Input
+                        <div key={field.key} style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                          <label style={labelS}>{field.label}</label>
+                          <input
                             type={field.type}
+                            style={inputS}
                             value={documents[activeDocTab].fields[field.key] || ""}
                             onChange={e => updateDocField(activeDocTab, field.key, e.target.value)}
                             data-testid={`input-doc-${field.key}`}
@@ -1826,263 +1976,478 @@ export default function LcCheck() {
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
 
-                <div className="flex justify-between pt-2 gap-4 flex-wrap">
-                  <Button variant="outline" onClick={() => setStep(1)} data-testid="button-back-step-1">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to LC Terms
-                  </Button>
-                  <Button
-                    disabled={!canProceedStep2 || checkMutation.isPending}
-                    onClick={() => {
-                      checkMutation.mutate(undefined, {
-                        onSuccess: () => setStep(3),
-                      });
-                    }}
-                    data-testid="button-run-lc-check"
-                  >
-                    {checkMutation.isPending ? (
-                      <>Running Cross-Check...</>
-                    ) : (
-                      <>
-                        <ClipboardCheck className="w-4 h-4 mr-2" />
-                        {isFreeCheck ? "Run LC Check — Free" : "Run LC Check — Included"}
-                      </>
-                    )}
-                  </Button>
+            {/* Step 2 buttons */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 14px", margin: "4px 0 0" }}>
+              <button
+                disabled={!canProceedStep2}
+                onClick={() => goStep(3)}
+                style={btnGreenS(canProceedStep2)}
+                data-testid="button-next-step-3"
+              >
+                Continue to Review →
+              </button>
+              <button onClick={() => goStep(1)} style={btnGreyS}>
+                ← Back
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ═══════ STEP 3 — Review ═══════ */}
+        {step === 3 && (
+          <div style={{ marginTop: 14 }}>
+            <div style={{ padding: "0 14px" }}>
+              <div style={wcS}>
+                <div style={wcHeadS}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#111", display: "flex", alignItems: "center", gap: 8 }}>
+                      🔍 Review Before Check
+                    </div>
+                    <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
+                      Correct any errors now — changes cannot be made after the credit is consumed.
+                    </div>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          )}
 
-          {step === 3 && checkMutation.data && (
-            <div className="space-y-4" data-testid="section-lc-results">
-              <Card style={{ background: "var(--card)", borderRadius: 14, border: "none", position: "relative", overflow: "hidden" }}>
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
-                <CardHeader className="flex flex-row items-center gap-2 pb-2">
-                  <ClipboardCheck className="w-4 h-4" style={{ color: "var(--t3)" }} />
-                  <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Cross-Check Summary</p>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <VerdictBadge verdict={checkMutation.data.summary.verdict} />
-                  </div>
-                  <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
-                    <div className="text-center p-3" style={{ background: "var(--card2)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--t1)" }} data-testid="text-total-checks">{checkMutation.data.summary.totalChecks}</p>
-                      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Total Checks</p>
-                    </div>
-                    <div className="text-center p-3" style={{ background: "var(--gbg)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--green)" }} data-testid="text-matches">{checkMutation.data.summary.matches}</p>
-                      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Matches</p>
-                    </div>
-                    <div className="text-center p-3" style={{ background: "var(--abg)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--amber)" }} data-testid="text-warnings">{checkMutation.data.summary.warnings}</p>
-                      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Warnings</p>
-                    </div>
-                    <div className="text-center p-3" style={{ background: "var(--rbg)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--red)" }} data-testid="text-criticals">{checkMutation.data.summary.criticals}</p>
-                      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Critical</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                {/* Warning note */}
+                <div style={{
+                  background: "#fffbf2", border: "1px solid #f5d8a0", borderRadius: 10,
+                  padding: "12px 15px", display: "flex", gap: 10, marginBottom: 14,
+                }}>
+                  <span style={{ fontSize: 14, flexShrink: 0 }}>⚠️</span>
+                  <span style={{ fontSize: 12, color: "#7a5020", lineHeight: 1.6 }}>
+                    Check all extracted fields carefully. Confirm dates and names match exactly what's on your LC.
+                  </span>
+                </div>
 
+                {/* Summary fields in 2-col */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13, marginBottom: 13 }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>LC Reference</label>
+                    <input type="text" style={{ ...inputS, background: "#fff" }} value={lcFields.lcReference} readOnly />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Beneficiary</label>
+                    <input type="text" style={{ ...inputS, background: "#fff" }} value={lcFields.beneficiaryName} readOnly />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>LC Amount</label>
+                    <input type="text" style={{ ...inputS, background: "#fff" }} value={`${lcFields.currency} ${lcFields.totalAmount.toLocaleString()}`} readOnly />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Goods Description</label>
+                    <input type="text" style={{ ...inputS, background: "#fff" }} value={lcFields.goodsDescription} readOnly />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>Latest Shipment Date</label>
+                    <input type="text" style={{ ...inputS, background: "#fff" }} value={lcFields.latestShipmentDate} readOnly />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <label style={labelS}>LC Expiry Date</label>
+                    <input type="text" style={{ ...inputS, background: "#fff" }} value={lcFields.lcExpiryDate} readOnly />
+                  </div>
+                </div>
+
+                {/* Documents summary */}
+                <div style={{ background: "#f7f7f7", borderRadius: 9, padding: "12px 14px" }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+                    Documents
+                  </div>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {documents.map((doc, i) => (
+                      <span key={i} style={{
+                        display: "inline-flex", alignItems: "center", gap: 4,
+                        padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600,
+                        background: "rgba(74,140,111,0.1)", color: "#16a34a",
+                      }}>
+                        ✓ {docLabel(doc.documentType)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3 buttons */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 14px", margin: "4px 0 0" }}>
+              <button
+                disabled={checkMutation.isPending}
+                onClick={() => {
+                  checkMutation.mutate(undefined, {
+                    onSuccess: () => goStep(4),
+                  });
+                }}
+                style={btnGreenS(!checkMutation.isPending)}
+                data-testid="button-run-lc-check"
+              >
+                {checkMutation.isPending
+                  ? "⏳ Checking..."
+                  : isFreeCheck
+                  ? "▶ Run LC Check — Free"
+                  : "▶ Run LC Check — $19.99"}
+              </button>
+              <button onClick={() => goStep(2)} style={btnGreyS}>
+                ← Back
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ═══════ STEP 4 — Results ═══════ */}
+        {step === 4 && checkMutation.data && (
+          <div style={{ marginTop: 14 }} data-testid="section-lc-results">
+            <div style={{ padding: "0 14px" }}>
+
+              {/* Verdict banner */}
+              {(() => {
+                const v = checkMutation.data.summary.verdict;
+                const isOk = v === "COMPLIANT";
+                const isWarn = v === "COMPLIANT_WITH_NOTES";
+                const isFail = v === "DISCREPANCIES_FOUND";
+                const verdictStyle: React.CSSProperties = {
+                  borderRadius: 14, padding: "16px 20px", marginBottom: 12,
+                  display: "flex", alignItems: "center", gap: 14,
+                  ...(isFail ? { background: "rgba(218,60,61,0.08)", border: "1px solid rgba(218,60,61,0.2)" }
+                    : isWarn ? { background: "rgba(234,139,67,0.1)", border: "1px solid rgba(234,139,67,0.25)" }
+                    : { background: "rgba(74,140,111,0.08)", border: "1px solid rgba(74,140,111,0.2)" }),
+                };
+                return (
+                  <div style={verdictStyle}>
+                    <span style={{ fontSize: 28 }}>
+                      {isFail ? "🔴" : isWarn ? "⚠️" : "✅"}
+                    </span>
+                    <div>
+                      <div style={{
+                        fontFamily: "var(--fh)", fontSize: 18, fontWeight: 800, letterSpacing: "-0.03em",
+                        color: isFail ? "var(--red)" : isWarn ? "var(--amber)" : "var(--green)",
+                      }}>
+                        {isFail ? "Discrepancies Found" : isWarn ? "Compliant With Notes" : "Fully Compliant"}
+                      </div>
+                      <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>
+                        {checkMutation.data.summary.criticals > 0
+                          ? `${checkMutation.data.summary.criticals} critical issue${checkMutation.data.summary.criticals > 1 ? "s" : ""} will cause bank rejection.`
+                          : checkMutation.data.summary.warnings > 0
+                          ? `${checkMutation.data.summary.warnings} warning${checkMutation.data.summary.warnings > 1 ? "s" : ""} to review.`
+                          : "All fields match LC terms."}
+                      </div>
+                    </div>
+                    <div style={{ marginLeft: "auto", display: "flex", gap: 14, flexShrink: 0 }}>
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "var(--fh)", lineHeight: 1, color: "var(--green)" }} data-testid="text-matches">{checkMutation.data.summary.matches}</div>
+                        <div style={{ fontSize: 10, color: "#999", textTransform: "uppercase", letterSpacing: "0.08em" }}>Match</div>
+                      </div>
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "var(--fh)", lineHeight: 1, color: "var(--amber)" }} data-testid="text-warnings">{checkMutation.data.summary.warnings}</div>
+                        <div style={{ fontSize: 10, color: "#999", textTransform: "uppercase", letterSpacing: "0.08em" }}>Warning</div>
+                      </div>
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "var(--fh)", lineHeight: 1, color: "var(--red)" }} data-testid="text-criticals">{checkMutation.data.summary.criticals}</div>
+                        <div style={{ fontSize: 10, color: "#999", textTransform: "uppercase", letterSpacing: "0.08em" }}>Critical</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Insurance gap alert */}
               {(checkMutation.data.summary.verdict === "COMPLIANT" || checkMutation.data.summary.verdict === "COMPLIANT_WITH_NOTES") && (
                 <InsuranceGapAlert />
               )}
 
-              <Card style={{ background: "var(--card)", borderRadius: 14, border: "none" }}>
-                <CardHeader className="flex flex-row items-center gap-2 pb-2">
-                  <FileText className="w-4 h-4" style={{ color: "var(--t3)" }} />
-                  <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Detailed Results</p>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-2">
-                    {checkMutation.data.results.map((r, i) => (
-                      <div
-                        key={i}
-                        className="p-3 text-sm space-y-1"
-                        style={{ background: "var(--card2)", borderRadius: 8 }}
-                        data-testid={`result-item-${i}`}
-                      >
-                        <div className="flex items-start justify-between gap-2 flex-wrap">
-                          <div className="flex items-center gap-2">
-                            <SeverityBadge severity={r.severity} />
-                            <span style={{ fontWeight: 600, color: "var(--t1)" }}>{r.fieldName}</span>
+              {/* Field-by-field Results */}
+              <div style={wcS}>
+                <div style={wcHeadS}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#111", display: "flex", alignItems: "center", gap: 8 }}>
+                      📊 Field-by-Field Results
+                    </div>
+                    <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
+                      Ref: TT-LC-{new Date().getFullYear()}-{checkMutation.data.integrityHash.substring(0, 6)} · {new Date(checkMutation.data.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Critical results */}
+                {checkMutation.data.results.filter(r => r.severity === "RED").length > 0 && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                      🔴 Critical — Bank will reject
+                    </div>
+                    {checkMutation.data.results.filter(r => r.severity === "RED").map((r, i) => (
+                      <div key={`fail-${i}`} style={{
+                        display: "flex", alignItems: "flex-start", gap: 10,
+                        padding: "10px 12px", borderRadius: 9, marginBottom: 5,
+                        background: "#fff5f5", border: "1px solid #f5c0c0",
+                      }} data-testid={`result-item-fail-${i}`}>
+                        <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--red)", flexShrink: 0, marginTop: 5 }} />
+                        <div>
+                          <div style={{ fontSize: 12.5, fontWeight: 700, color: "#111", marginBottom: 2 }}>{r.fieldName} — {r.documentType}</div>
+                          <div style={{ fontSize: 12, color: "#666", lineHeight: 1.5 }}>
+                            LC: <span style={{ color: "#2e8662", fontWeight: 600 }}>"{r.lcValue}"</span> · Doc: <span style={{ color: "var(--amber)", fontWeight: 600 }}>"{r.documentValue}"</span>
                           </div>
-                          <Badge variant="outline" style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)" }} className="shrink-0">{r.documentType}</Badge>
+                          <div style={{ fontSize: 12, color: "#666", lineHeight: 1.5 }}>{r.explanation}</div>
+                          <span style={{
+                            display: "inline-block", fontSize: 10, color: "var(--teal)",
+                            background: "rgba(46,134,98,0.1)", padding: "1px 7px", borderRadius: 20,
+                            marginTop: 3, fontWeight: 600,
+                          }}>{r.ucpRule}</span>
                         </div>
-                        <div className="grid gap-1 md:grid-cols-2 text-xs">
-                          <div>
-                            <span style={{ color: "var(--t3)" }}>LC value: </span>
-                            <span style={{ fontFamily: "'DM Mono', monospace", color: "var(--t1)" }}>{r.lcValue}</span>
-                          </div>
-                          <div>
-                            <span style={{ color: "var(--t3)" }}>Document: </span>
-                            <span style={{ fontFamily: "'DM Mono', monospace", color: "var(--t1)" }}>{r.documentValue}</span>
-                          </div>
-                        </div>
-                        <p style={{ fontSize: 11, color: "var(--t2)" }}>{r.explanation}</p>
-                        <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 600, color: "var(--t3)" }}>{r.ucpRule}</p>
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                )}
 
-              {checkMutation.data.summary.criticals > 0 && checkMutation.data.correctionEmail && (
-                <Card style={{ background: "var(--card)", borderRadius: 14, border: "none" }}>
-                  <CardContent className="p-4 space-y-3">
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => setShowCorrection(!showCorrection)}
-                      data-testid="button-generate-correction"
-                    >
-                      <Mail className="w-4 h-4 mr-2" />
-                      {showCorrection ? "Hide Correction Email" : "Generate Supplier Correction Email"}
-                    </Button>
-
-                    {showCorrection && (
-                      <div className="space-y-3">
-                        <div className="flex gap-2">
-                          <Button
-                            variant={correctionTab === "email" ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setCorrectionTab("email")}
-                            data-testid="button-correction-email-tab"
-                          >
-                            <Mail className="w-3 h-3 mr-1" />
-                            Email
-                          </Button>
-                          <Button
-                            variant={correctionTab === "whatsapp" ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setCorrectionTab("whatsapp")}
-                            data-testid="button-correction-whatsapp-tab"
-                          >
-                            <MessageCircle className="w-3 h-3 mr-1" />
-                            WhatsApp
-                          </Button>
+                {/* Warning results */}
+                {checkMutation.data.results.filter(r => r.severity === "AMBER").length > 0 && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                      🟡 Warnings
+                    </div>
+                    {checkMutation.data.results.filter(r => r.severity === "AMBER").map((r, i) => (
+                      <div key={`warn-${i}`} style={{
+                        display: "flex", alignItems: "flex-start", gap: 10,
+                        padding: "10px 12px", borderRadius: 9, marginBottom: 5,
+                        background: "#fffaf3", border: "1px solid #f5ddb0",
+                      }} data-testid={`result-item-warn-${i}`}>
+                        <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--amber)", flexShrink: 0, marginTop: 5 }} />
+                        <div>
+                          <div style={{ fontSize: 12.5, fontWeight: 700, color: "#111", marginBottom: 2 }}>{r.fieldName} — {r.documentType}</div>
+                          <div style={{ fontSize: 12, color: "#666", lineHeight: 1.5 }}>
+                            LC: <span style={{ color: "#2e8662", fontWeight: 600 }}>"{r.lcValue}"</span> · Doc: <span style={{ color: "var(--amber)", fontWeight: 600 }}>"{r.documentValue}"</span>
+                          </div>
+                          <div style={{ fontSize: 12, color: "#666", lineHeight: 1.5 }}>{r.explanation}</div>
+                          <span style={{
+                            display: "inline-block", fontSize: 10, color: "var(--teal)",
+                            background: "rgba(46,134,98,0.1)", padding: "1px 7px", borderRadius: 20,
+                            marginTop: 3, fontWeight: 600,
+                          }}>{r.ucpRule}</span>
                         </div>
-                        <pre
-                          className="text-xs p-3 whitespace-pre-wrap break-words font-mono max-h-80 overflow-y-auto"
-                          style={{ background: "var(--card2)", borderRadius: 8, color: "var(--t2)" }}
-                          data-testid={`text-correction-${correctionTab}`}
-                        >
-                          {correctionTab === "email" ? (checkMutation.data.correctionEmail || "") : (checkMutation.data.correctionWhatsApp || "")}
-                        </pre>
-                        <CopyBtn
-                          text={correctionTab === "email" ? (checkMutation.data.correctionEmail || "") : (checkMutation.data.correctionWhatsApp || "")}
-                          label={`correction-${correctionTab}`}
-                        />
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Matched results */}
+                {checkMutation.data.results.filter(r => r.severity === "GREEN").length > 0 && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                      🟢 Matched
+                    </div>
+                    {checkMutation.data.results.filter(r => r.severity === "GREEN").map((r, i) => (
+                      <div key={`ok-${i}`} style={{
+                        display: "flex", alignItems: "flex-start", gap: 10,
+                        padding: "10px 12px", borderRadius: 9, marginBottom: 5,
+                        background: "#f2faf4", border: "1px solid #d0ecd8",
+                      }} data-testid={`result-item-ok-${i}`}>
+                        <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--green)", flexShrink: 0, marginTop: 5 }} />
+                        <div>
+                          <div style={{ fontSize: 12.5, fontWeight: 700, color: "#111", marginBottom: 2 }}>{r.fieldName}</div>
+                          <div style={{ fontSize: 12, color: "#666", lineHeight: 1.5 }}>
+                            {r.explanation || "All fields match LC terms ✓"}
+                          </div>
+                          {r.ucpRule && (
+                            <span style={{
+                              display: "inline-block", fontSize: 10, color: "var(--teal)",
+                              background: "rgba(46,134,98,0.1)", padding: "1px 7px", borderRadius: 20,
+                              marginTop: 3, fontWeight: 600,
+                            }}>{r.ucpRule}</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Correction Email Card */}
+              {checkMutation.data.summary.criticals > 0 && checkMutation.data.correctionEmail && (
+                <div style={wcS}>
+                  <div style={wcHeadS}>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "#111", display: "flex", alignItems: "center", gap: 8 }}>
+                        ✉️ Supplier Correction Request
+                      </div>
+                      <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
+                        Ready to send — {checkMutation.data.summary.criticals} correction{checkMutation.data.summary.criticals > 1 ? "s" : ""} needed
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    background: "#f7f7f7", borderRadius: 10, padding: "16px 18px",
+                    border: "1px solid #e8e8e8",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#111" }}>
+                        {checkMutation.data.summary.criticals} amendment{checkMutation.data.summary.criticals > 1 ? "s" : ""} required
+                      </div>
+                      <div style={{ display: "flex", gap: 5 }}>
+                        <button
+                          onClick={() => setCorrectionTab("email")}
+                          style={{
+                            fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 20,
+                            cursor: "pointer", transition: "all 0.15s", border: "none",
+                            background: correctionTab === "email" ? "rgba(66,126,255,0.1)" : "transparent",
+                            color: correctionTab === "email" ? "#427EFF" : "#999",
+                          }}
+                          data-testid="button-correction-email-tab"
+                        >
+                          📋 Email
+                        </button>
+                        <button
+                          onClick={() => setCorrectionTab("whatsapp")}
+                          style={{
+                            fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 20,
+                            cursor: "pointer", transition: "all 0.15s", border: "none",
+                            background: correctionTab === "whatsapp" ? "rgba(74,140,111,0.1)" : "transparent",
+                            color: correctionTab === "whatsapp" ? "var(--green)" : "#999",
+                          }}
+                          data-testid="button-correction-whatsapp-tab"
+                        >
+                          💬 WhatsApp
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 12, color: "#666", lineHeight: 1.75,
+                        whiteSpace: "pre-wrap", maxHeight: 160, overflowY: "auto",
+                      }}
+                      data-testid={`text-correction-${correctionTab}`}
+                    >
+                      {correctionTab === "email" ? (checkMutation.data.correctionEmail || "") : (checkMutation.data.correctionWhatsApp || "")}
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12 }}>
+                    <CopyBtn
+                      text={correctionTab === "email" ? (checkMutation.data.correctionEmail || "") : (checkMutation.data.correctionWhatsApp || "")}
+                      label={`correction-${correctionTab}`}
+                    />
+                  </div>
+                </div>
               )}
 
-              <div style={{ background: "var(--card2)", borderRadius: 7, padding: "14px 16px" }}>
-                <div className="flex items-start gap-3">
-                  <Hash className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--t3)" }} />
-                  <div className="space-y-1 min-w-0">
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--blue)" }} data-testid="text-lc-check-ref">
+              {/* Integrity reference block */}
+              <div style={{ background: "#f7f7f7", borderRadius: 9, padding: "14px 16px", marginBottom: 12, border: "1px solid #e8e8e8" }}>
+                <div style={{ display: "flex", alignItems: "start", gap: 10 }}>
+                  <Hash size={18} style={{ color: "#999", flexShrink: 0, marginTop: 1 }} />
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-lc-check-ref">
                       LC check ref: TT-LC-{new Date().getFullYear()}-{checkMutation.data.integrityHash.substring(0, 6).toUpperCase()}
                     </p>
-                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)" }} className="break-all" data-testid="text-lc-integrity-hash">
+                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#999", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
                       Integrity hash: sha256:{checkMutation.data.integrityHash}
                     </p>
-                    <p style={{ fontSize: 11, color: "var(--t3)" }} data-testid="text-lc-check-timestamp">
+                    <p style={{ fontSize: 11, color: "#999" }} data-testid="text-lc-check-timestamp">
                       Checked: {new Date(checkMutation.data.timestamp).toLocaleString()}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex gap-3 flex-wrap">
-                <Button variant="outline" onClick={() => {
-                  setStep(1);
-                  checkMutation.reset();
-                  setShowCorrection(false);
-                  setLcFields({
-                    beneficiaryName: "", applicantName: "", goodsDescription: "", hsCode: "",
-                    quantity: 0, quantityUnit: "MT", unitPrice: 0, currency: "USD", totalAmount: 0,
-                    countryOfOrigin: "", portOfLoading: "", portOfDischarge: "",
-                    latestShipmentDate: "", lcExpiryDate: "", incoterms: "FOB",
-                    partialShipmentsAllowed: false, transhipmentAllowed: false, lcReference: "",
-                  });
-                  setDocuments([{ documentType: "commercial_invoice", fields: {} }]);
-                  setActiveDocTab(0);
-                }} data-testid="button-new-check">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  New Check
-                </Button>
-                <Button variant="outline" onClick={() => setStep(2)} data-testid="button-edit-documents">
-                  Edit Documents
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {checkMutation.isError && checkMutation.error.message !== "Insufficient tokens" && step !== 3 && (
-            <div style={{ background: "var(--rbg)", borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-              <XCircle className="w-5 h-5 shrink-0" style={{ color: "var(--red)" }} />
-              <p style={{ fontSize: 13, color: "var(--red)" }}>{checkMutation.error.message}</p>
-            </div>
-          )}
-
-          <Dialog open={showTokenModal} onOpenChange={setShowTokenModal}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Trade Pack Required</DialogTitle>
-                <DialogDescription>
-                  LC checks are included in every trade pack. Purchase a trade pack to run your LC check.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex gap-3 justify-end flex-wrap">
-                <Button variant="outline" onClick={() => setShowTokenModal(false)} data-testid="button-lc-modal-cancel">
-                  Cancel
-                </Button>
-                <Button onClick={() => navigate("/pricing")} data-testid="button-lc-modal-buy-tokens">
-                  Buy Trade Pack
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={showRecheckModal} onOpenChange={setShowRecheckModal}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>LC Re-check Required</DialogTitle>
-                <DialogDescription>
-                  You've already run an LC check for this trade. Re-check after supplier corrections — $9.99.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex gap-3 justify-end flex-wrap">
-                <Button variant="outline" onClick={() => setShowRecheckModal(false)} data-testid="button-recheck-modal-cancel">
-                  Cancel
-                </Button>
-                <Button
-                  onClick={async () => {
-                    try {
-                      const res = await apiRequest("POST", "/api/tokens/lc-recheck-checkout", {
-                        sourceLookupId: recheckLookupId,
-                      });
-                      const data = await res.json();
-                      if (data.url) window.location.href = data.url;
-                    } catch {
-                      navigate("/pricing");
-                    }
-                  }}
-                  data-testid="button-recheck-modal-pay"
+              {/* Action buttons */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 0", margin: "4px 0 0" }}>
+                <button
+                  onClick={() => goStep(2)}
+                  style={btnGreenS(true)}
                 >
-                  Pay $9.99 and re-check
-                </Button>
+                  Upload Corrected Docs →
+                </button>
+                <button
+                  onClick={() => {
+                    setStep(1);
+                    checkMutation.reset();
+                    setShowCorrection(false);
+                    setLcFields({
+                      beneficiaryName: "", applicantName: "", goodsDescription: "", hsCode: "",
+                      quantity: 0, quantityUnit: "MT", unitPrice: 0, currency: "USD", totalAmount: 0,
+                      countryOfOrigin: "", portOfLoading: "", portOfDischarge: "",
+                      latestShipmentDate: "", lcExpiryDate: "", incoterms: "FOB",
+                      partialShipmentsAllowed: false, transhipmentAllowed: false, lcReference: "",
+                    });
+                    setDocuments([{ documentType: "commercial_invoice", fields: {} }]);
+                    setActiveDocTab(0);
+                  }}
+                  style={btnGreyS}
+                  data-testid="button-new-check"
+                >
+                  New Check
+                </button>
               </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* Error display */}
+        {checkMutation.isError && checkMutation.error.message !== "Insufficient tokens" && step !== 4 && (
+          <div style={{
+            margin: "14px 14px 0",
+            background: "rgba(218,60,61,0.08)", border: "1px solid rgba(218,60,61,0.2)",
+            borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "center", gap: 12,
+          }}>
+            <XCircle size={18} style={{ color: "var(--red)", flexShrink: 0 }} />
+            <p style={{ fontSize: 13, color: "var(--red)" }}>{checkMutation.error.message}</p>
+          </div>
+        )}
+
+        {/* Token modal */}
+        <Dialog open={showTokenModal} onOpenChange={setShowTokenModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Trade Pack Required</DialogTitle>
+              <DialogDescription>
+                LC checks are included in every trade pack. Purchase a trade pack to run your LC check.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-3 justify-end flex-wrap">
+              <Button variant="outline" onClick={() => setShowTokenModal(false)} data-testid="button-lc-modal-cancel">
+                Cancel
+              </Button>
+              <Button onClick={() => navigate("/pricing")} data-testid="button-lc-modal-buy-tokens">
+                Buy Trade Pack
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Recheck modal */}
+        <Dialog open={showRecheckModal} onOpenChange={setShowRecheckModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>LC Re-check Required</DialogTitle>
+              <DialogDescription>
+                You've already run an LC check for this trade. Re-check after supplier corrections — $9.99.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-3 justify-end flex-wrap">
+              <Button variant="outline" onClick={() => setShowRecheckModal(false)} data-testid="button-recheck-modal-cancel">
+                Cancel
+              </Button>
+              <Button
+                onClick={async () => {
+                  try {
+                    const res = await apiRequest("POST", "/api/tokens/lc-recheck-checkout", {
+                      sourceLookupId: recheckLookupId,
+                    });
+                    const data = await res.json();
+                    if (data.url) window.location.href = data.url;
+                  } catch {
+                    navigate("/pricing");
+                  }
+                }}
+                data-testid="button-recheck-modal-pay"
+              >
+                Pay $9.99 and re-check
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
       </div>
       )}
     </AppShell>
