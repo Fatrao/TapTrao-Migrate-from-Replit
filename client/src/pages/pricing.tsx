@@ -242,7 +242,7 @@ export default function Pricing() {
             <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" }}>Dashboard</span>
           </Link>
           <Link href="/lookup">
-            <span style={{ background: "#4ac329", color: "white", padding: "7px 12px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
+            <span style={{ background: "#4a8c6f", color: "white", padding: "7px 12px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
               Free check →
             </span>
           </Link>
@@ -283,7 +283,7 @@ export default function Pricing() {
           data-testid="card-free-lookup-banner"
         >
           <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
-            <div style={{ padding: 12, borderRadius: "50%", background: "rgba(74,195,41,0.12)", flexShrink: 0 }}>
+            <div style={{ padding: 12, borderRadius: "50%", background: "rgba(74,140,111,0.12)", flexShrink: 0 }}>
               <Gift style={{ width: 24, height: 24, color: "var(--green)" }} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>

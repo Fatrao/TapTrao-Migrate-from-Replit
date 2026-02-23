@@ -620,7 +620,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
   primaryRiskFactor: string;
 }) {
   const verdictStyles = {
-    GREEN: { bg: "rgba(74,195,41,.05)", border: "rgba(74,195,41,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--green)", label: "LOW RISK" },
+    GREEN: { bg: "rgba(74,140,111,.05)", border: "rgba(74,140,111,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--green)", label: "LOW RISK" },
     AMBER: { bg: "rgba(234,139,67,.05)", border: "rgba(234,139,67,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", label: "ATTENTION NEEDED" },
     RED: { bg: "rgba(218,60,61,.05)", border: "rgba(218,60,61,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", label: "HIGH RISK \u2014 ACTION REQUIRED" },
   };
@@ -1851,7 +1851,7 @@ export default function Lookup() {
           )}
 
           <Card style={{ position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
             <CardContent className="p-6 space-y-6">
               <div className="space-y-6">
                 <div className="space-y-2">
@@ -1935,7 +1935,7 @@ export default function Lookup() {
                   size="lg"
                   disabled={!canSubmit || complianceMutation.isPending}
                   onClick={() => complianceMutation.mutate()}
-                  style={{ backgroundColor: 'var(--blue, #4ac329)', color: 'white' }}
+                  style={{ backgroundColor: 'var(--blue, #4a8c6f)', color: 'white' }}
                   data-testid="button-run-check"
                 >
                   {complianceMutation.isPending ? (

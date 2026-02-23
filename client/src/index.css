@@ -19,15 +19,15 @@
   --sidebar: 0 0% 11%;
   --sidebar-foreground: 0 0% 95%;
   --sidebar-border: 0 0% 12%;
-  --sidebar-primary: 108 76% 46%;
+  --sidebar-primary: 154 31% 42%;
   --sidebar-primary-foreground: 0 0% 0%;
   --sidebar-accent: 0 0% 13%;
   --sidebar-accent-foreground: 0 0% 95%;
-  --sidebar-ring: 108 76% 46%;
+  --sidebar-ring: 154 31% 42%;
   --popover: 0 0% 11%;
   --popover-foreground: 0 0% 95%;
   --popover-border: 0 0% 12%;
-  --primary: 108 76% 46%;
+  --primary: 154 31% 42%;
   --primary-foreground: 0 0% 0%;
   --secondary: 153 48% 35%;
   --secondary-foreground: 0 0% 100%;
@@ -38,8 +38,8 @@
   --destructive: 0 70% 55%;
   --destructive-foreground: 0 0% 100%;
   --input: 0 0% 12%;
-  --ring: 108 76% 46%;
-  --chart-1: 108 76% 46%;
+  --ring: 154 31% 42%;
+  --chart-1: 154 31% 42%;
   --chart-2: 153 48% 35%;
   --chart-3: 27 80% 56%;
   --chart-4: 0 63% 55%;
@@ -217,8 +217,8 @@
   }
 
   @keyframes pulse-dot {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(74,195,41,0.5); }
-    50% { box-shadow: 0 0 0 6px rgba(74,195,41,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(74,140,111,0.5); }
+    50% { box-shadow: 0 0 0 6px rgba(74,140,111,0); }
   }
 
   .animate-pulse-dot {
@@ -252,7 +252,7 @@
   }
 
   .hero-cta-glow {
-    box-shadow: 0 4px 18px rgba(74,195,41,0.4);
+    box-shadow: 0 4px 18px rgba(74,140,111,0.4);
   }
 
   /* Main content gradient: dark green → white */

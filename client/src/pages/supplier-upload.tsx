@@ -222,7 +222,7 @@ export default function SupplierUpload() {
           let iconBd: string;
 
           if (isVerified) {
-            borderColor = "rgba(74,195,41,.22)";
+            borderColor = "rgba(74,140,111,.22)";
             statusTag = { label: "\u2713 Received", color: "var(--green)" };
             iconBg = "var(--gbg)";
             iconBd = "var(--gbd)";

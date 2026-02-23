@@ -57,7 +57,7 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
           fontSize: 13,
           fontWeight: isActive ? 500 : 400,
           color: isActive ? "var(--green)" : "#666",
-          background: isActive ? "rgba(74,195,41,0.12)" : "transparent",
+          background: isActive ? "rgba(74,140,111,0.12)" : "transparent",
           cursor: "pointer",
           transition: "all 0.15s",
           position: "relative",
@@ -106,7 +106,7 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
               fontWeight: 600,
               ...(item.badge.type === "amber"
                 ? { background: "rgba(218,60,61,0.2)", color: "#f87171" }
-                : { background: "rgba(74,195,41,0.15)", color: "var(--green)" }),
+                : { background: "rgba(74,140,111,0.15)", color: "var(--green)" }),
             }}
           >
             {item.badge.value}
@@ -194,7 +194,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
               borderRadius: "50%",
               overflow: "hidden",
               flexShrink: 0,
-              boxShadow: "0 0 16px rgba(74,195,41,0.4)",
+              boxShadow: "0 0 16px rgba(74,140,111,0.4)",
             }}>
               <img src="/logo.png" alt="TapTrao" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
@@ -283,7 +283,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
           <div style={{ fontSize: 10, color: "#555" }}>TapTrao User</div>
         </div>
         <span style={{
-          background: "rgba(74,195,41,0.1)",
+          background: "rgba(74,140,111,0.1)",
           borderRadius: 20,
           padding: "2px 8px",
           fontSize: 11,
@@ -452,7 +452,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                 fontWeight: 700,
                 cursor: "pointer",
                 whiteSpace: "nowrap",
-                boxShadow: "0 4px 18px rgba(74,195,41,0.35)",
+                boxShadow: "0 4px 18px rgba(74,140,111,0.35)",
               }}
               data-testid="shell-buy-cta"
             >

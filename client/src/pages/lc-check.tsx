@@ -172,7 +172,7 @@ function InsuranceGapAlert() {
     <div
       data-testid="insurance-gap-alert"
       style={{
-        background: "rgba(74,195,41,.06)",
+        background: "rgba(74,140,111,.06)",
         borderRadius: 14,
         padding: "14px 18px",
         marginBottom: 20,
@@ -778,7 +778,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
   primaryRiskFactor: string;
 }) {
   const verdictStyles = {
-    GREEN: { bg: "rgba(74,195,41,.05)", border: "rgba(74,195,41,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--green)", label: "LOW RISK" },
+    GREEN: { bg: "rgba(74,140,111,.05)", border: "rgba(74,140,111,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--green)", label: "LOW RISK" },
     AMBER: { bg: "rgba(234,139,67,.05)", border: "rgba(234,139,67,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", label: "MODERATE RISK" },
     RED: { bg: "rgba(218,60,61,.05)", border: "rgba(218,60,61,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", label: "HIGH RISK" },
   };
@@ -1466,7 +1466,7 @@ export default function LcCheck() {
 
           {showPrefillBanner && prefillData && (
             <div style={{ background: "var(--blue-dim)", borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "flex-start", gap: 12, position: "relative" }} data-testid="banner-lc-prefill">
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
               <ExternalLink className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--blue)" }} />
               <div className="flex-1 min-w-0">
                 <p style={{ fontSize: 13, fontWeight: 600, color: "var(--blue)" }} data-testid="text-prefill-info">
@@ -1518,7 +1518,7 @@ export default function LcCheck() {
 
           {step === 1 && (
             <Card style={{ background: "var(--card)", borderRadius: 14, border: "none", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
               <CardHeader className="flex flex-row items-center gap-2 pb-2">
                 <FileText className="w-4 h-4" style={{ color: "var(--t3)" }} />
                 <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Step 1: LC Terms Entry</p>
@@ -1754,7 +1754,7 @@ export default function LcCheck() {
 
           {step === 2 && (
             <Card style={{ background: "var(--card)", borderRadius: 14, border: "none", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
               <CardHeader className="flex flex-row items-center gap-2 pb-2">
                 <FileText className="w-4 h-4" style={{ color: "var(--t3)" }} />
                 <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Step 2: Supplier Document Entry</p>
@@ -1858,7 +1858,7 @@ export default function LcCheck() {
           {step === 3 && checkMutation.data && (
             <div className="space-y-4" data-testid="section-lc-results">
               <Card style={{ background: "var(--card)", borderRadius: 14, border: "none", position: "relative", overflow: "hidden" }}>
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
                 <CardHeader className="flex flex-row items-center gap-2 pb-2">
                   <ClipboardCheck className="w-4 h-4" style={{ color: "var(--t3)" }} />
                   <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Cross-Check Summary</p>

@@ -201,7 +201,7 @@ export default function Dashboard() {
               onMouseEnter={(e) => { e.currentTarget.style.background = "var(--card2)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "var(--card)"; }}
             >
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 8, background: "var(--blue-dim)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Search size={18} style={{ color: "var(--blue)" }} />
@@ -220,7 +220,7 @@ export default function Dashboard() {
               onMouseEnter={(e) => { e.currentTarget.style.background = "var(--card2)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "var(--card)"; }}
             >
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 8, background: "var(--gbg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <FileCheck size={18} style={{ color: "var(--green)" }} />
