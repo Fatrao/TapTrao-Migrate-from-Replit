@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TapTrao — Pre-Shipment Regulatory Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #000;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  /* === HORIZONTAL NAV BAR === */
+  .top-nav {
+    background: #242428;
+    border-radius: 14px;
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .top-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .top-nav-left .logo-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  .top-nav-left .logo-text {
+    font-family: 'Clash Display', sans-serif;
+    font-weight: 600;
+    font-size: 17px;
+    color: #fff;
+  }
+
+  .top-nav-center {
+    display: flex;
+    gap: 32px;
+  }
+
+  .top-nav-center a {
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.45);
+    text-decoration: none;
+    transition: color 0.15s;
+    font-weight: 400;
+  }
+
+  .top-nav-center a:hover { color: rgba(255,255,255,0.85); }
+  .top-nav-center a.active { color: #fff; font-weight: 600; }
+
+  .top-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .nav-btn-ghost {
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    background: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .nav-btn-ghost:hover {
+    color: #fff;
+    border-color: rgba(255,255,255,0.3);
+  }
+
+  .nav-btn-primary {
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: #6b9080;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.15s;
+  }
+
+  .nav-btn-primary:hover { background: #5a7a6b; }
+
+  /* === MAIN CONTENT BOX === */
+  .main-box {
+    flex: 1;
+    border-radius: 18px;
+    overflow: hidden;
+    background: linear-gradient(180deg,
+      #1a1a1c 0%,
+      #1c2420 3%,
+      #1e2e28 6%,
+      #1f3830 9%,
+      #214232 12%,
+      #264a38 16%,
+      #2c5540 20%,
+      #356248 25%,
+      #3f7056 30%,
+      #4a7e64 35%,
+      #578d74 40%,
+      #659b82 45%,
+      #74a890 50%,
+      #85b49e 55%,
+      #96bfab 60%,
+      #a8cab8 65%,
+      #bbd5c6 70%,
+      #cddfd3 75%,
+      #dde8e1 80%,
+      #eaf0ec 85%,
+      #f2f4f3 90%,
+      #f5f5f5 95%
+    );
+  }
+
+  /* === GREEN HERO BOX === */
+  .green-hero {
+    margin: 32px 32px 0;
+    background: linear-gradient(135deg, #0e4e45 0%, #14574a 30%, #1c6352 60%, #327462 85%, #3a7d6a 100%);
+    border-radius: 14px;
+    padding: 60px 48px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .green-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 30%, rgba(74,222,128,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.1);
+    padding: 5px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .green-hero h1 {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 48px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    letter-spacing: -0.03em;
+    position: relative;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .green-hero h1 .accent { color: #4ade80; }
+
+  .green-hero .subtitle {
+    font-size: 16px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.6;
+    max-width: 520px;
+    margin: 0 auto 28px;
+    position: relative;
+  }
+
+  .hero-cta-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    position: relative;
+  }
+
+  .btn-hero {
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+    border: none;
+  }
+
+  .btn-hero-primary {
+    background: #6b9080;
+    color: #fff;
+  }
+
+  .btn-hero-primary:hover { background: #5a7a6b; }
+
+  .btn-hero-secondary {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .btn-hero-secondary:hover {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+  }
+
+  .hero-flags {
+    margin-top: 24px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.4);
+    position: relative;
+  }
+
+  .hero-flags span {
+    font-size: 22px;
+    margin: 0 3px;
+  }
+
+  /* === SECTION STYLES === */
+  .section {
+    padding: 48px 48px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(0,0,0,0.3);
+    margin-bottom: 8px;
+  }
+
+  .section h2 {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 30px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+
+  .section h2 .accent { color: #4ade80; }
+
+  .section .section-sub {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 36px;
+    max-width: 500px;
+  }
+
+  /* Dark section variant */
+  .section-dark {
+    padding: 48px 48px;
+  }
+
+  .section-dark .section-label {
+    color: #4ade80;
+  }
+
+  .section-dark h2 {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 30px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+
+  .section-dark h2 .accent { color: #4ade80; }
+
+  .section-dark .section-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 36px;
+    max-width: 500px;
+  }
+
+  /* === HOW IT WORKS === */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+
+  .step-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 28px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    position: relative;
+  }
+
+  .step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #6b9080;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    font-family: 'Clash Display', sans-serif;
+  }
+
+  .step-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+
+  .step-card p {
+    font-size: 13px;
+    color: #777;
+    line-height: 1.5;
+  }
+
+  .step-card .step-icon {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    font-size: 24px;
+    opacity: 0.6;
+  }
+
+  /* === PRICING HERO (centered, dark bg) === */
+  .pricing-hero {
+    text-align: center;
+    padding: 48px 48px 16px;
+  }
+
+  .pricing-hero h2 {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .pricing-hero h2 .accent { color: #4ade80; }
+
+  .pricing-hero p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 12px;
+  }
+
+  .credits-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 20px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+
+  .credits-pill .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+  }
+
+  /* === FREE CHECK BANNER === */
+  .free-banner {
+    margin: 24px 32px;
+    background: linear-gradient(135deg, #0e4e45 0%, #1c6352 60%, #327462 100%);
+    border-radius: 14px;
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .free-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 80% 50%, rgba(74,222,128,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .free-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+  }
+
+  .free-banner-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+
+  .free-banner-text h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .free-banner-text p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.4;
+  }
+
+  .free-banner-btn {
+    position: relative;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4ade80;
+    background: none;
+    border: 1px solid rgba(74,222,128,0.3);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+
+  .free-banner-btn:hover {
+    background: rgba(74,222,128,0.1);
+    border-color: rgba(74,222,128,0.5);
+  }
+
+  /* === TRADE PACKS GRID (4 cols) === */
+  .packs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+    padding: 0 32px 20px;
+  }
+
+  .pack-card {
+    background: linear-gradient(160deg, #0e3d34 0%, #0c332c 40%, #0a2e28 70%, #0b2924 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pack-card.featured {
+    border-color: #4ade80;
+    box-shadow: 0 0 20px rgba(74,222,128,0.08);
+  }
+
+  .pack-card .pack-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: #4ade80;
+    color: #0e4e45;
+    padding: 4px 12px;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    align-self: flex-start;
+  }
+
+  .pack-card .pack-name {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .pack-card .pack-price {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 38px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .pack-card .pack-meta {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 2px;
+  }
+
+  .pack-card .pack-per {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 20px;
+  }
+
+  .pack-card .pack-features {
+    list-style: none;
+    margin-bottom: 24px;
+    flex: 1;
+  }
+
+  .pack-features li {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    padding: 5px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.4;
+  }
+
+  .pack-features li .check { color: #4ade80; font-size: 14px; flex-shrink: 0; }
+
+  .pack-card .pack-btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    transition: all 0.15s;
+    width: 100%;
+  }
+
+  .pack-btn-outline {
+    background: none;
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .pack-btn-outline:hover {
+    border-color: rgba(255,255,255,0.35);
+    color: #fff;
+  }
+
+  .pack-btn-featured {
+    background: #4ade80;
+    color: #0e4e45;
+    border: none;
+    font-weight: 700;
+  }
+
+  .pack-btn-featured:hover { background: #3cc870; }
+
+  /* === LC DOCUMENT CHECK SECTION === */
+  .lc-section {
+    padding: 48px 48px;
+  }
+
+  .lc-section .section-label { color: #4ade80; }
+
+  .lc-section h2 {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .lc-section h2 .accent { color: #4ade80; }
+
+  .lc-section .section-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 32px;
+  }
+
+  .lc-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .lc-card {
+    background: linear-gradient(160deg, #0e3d34 0%, #0c332c 40%, #0a2e28 70%, #0b2924 100%);
+    border: 1px solid rgba(74,222,128,0.12);
+    border-radius: 14px;
+    padding: 28px 24px;
+  }
+
+  .lc-card .lc-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .lc-card .lc-card-header h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .lc-card .lc-price {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+
+  .lc-card .lc-price-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 12px;
+  }
+
+  .lc-card .lc-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  .lc-card .lc-features {
+    list-style: none;
+    margin-bottom: 16px;
+  }
+
+  .lc-features li {
+    font-size: 13px;
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .lc-features li.included { color: rgba(255,255,255,0.7); }
+  .lc-features li.excluded { color: rgba(255,255,255,0.25); }
+  .lc-features li .check { color: #4ade80; }
+  .lc-features li .cross { color: rgba(255,255,255,0.2); }
+
+  .lc-card .lc-note {
+    font-size: 12px;
+    font-style: italic;
+    color: #4ade80;
+    margin-bottom: 16px;
+  }
+
+  .lc-card .lc-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .lc-card .lc-btn:hover {
+    background: rgba(255,255,255,0.12);
+  }
+
+  /* Orange left border for re-check */
+  .lc-card.recheck {
+    border-left: 3px solid #f59e0b;
+  }
+
+  /* Green left border for main LC */
+  .lc-card.main-lc {
+    border-left: 3px solid #4ade80;
+  }
+
+  /* === TRUST === */
+  .trust-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .trust-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    text-align: center;
+  }
+
+  .trust-card .trust-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .trust-card h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+
+  .trust-card p {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.4;
+  }
+
+  /* === FOOTER === */
+  .footer {
+    padding: 32px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .footer-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: #999;
+  }
+
+  .footer-left .logo-img {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+
+  .footer-left .logo-name {
+    font-family: 'Clash Display', sans-serif;
+    font-weight: 600;
+    color: #666;
+    margin-right: 8px;
+  }
+
+  .footer-right {
+    display: flex;
+    gap: 24px;
+  }
+
+  .footer-right a {
+    font-size: 12px;
+    color: #999;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .footer-right a:hover { color: #555; }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .top-nav-center { display: none; }
+    .green-hero { padding: 40px 24px; }
+    .green-hero h1 { font-size: 32px; }
+    .section, .section-dark, .lc-section { padding: 36px 24px; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .packs-grid { grid-template-columns: 1fr 1fr; }
+    .lc-cards { grid-template-columns: 1fr; }
+    .trust-grid { grid-template-columns: 1fr 1fr; }
+    .hero-cta-row { flex-direction: column; align-items: center; }
+    .free-banner { flex-direction: column; gap: 16px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- HORIZONTAL NAV -->
+  <div class="top-nav">
+    <div class="top-nav-left">
+      <img class="logo-img" src="data:image/png;base64,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PXN5YXsYXnh18Yt//byngru392v1GinSnlZax3FMSnmejhNbq3v/7qu/umd3mtV6ua67A/tov//WD793aePi+XMX251OHCcsVmktAi42uJ2u2NTdma1ltsICIoq0n3ksoSAV+QxlO4EipTDfTa2xzHZj7USURldvvDW3trDXiT++012cr8eJAc/88lcul8vBk6cTpX0BMcYo7fmlwDC0msE//WevPYna3Z3YIN190Png6uPB9nTj3MIffufPnt04f+rkqU6vF8exMLh91ZlLsVu72MrMwgyAIiwiSnkBZWFHQ+a92f6qPV97nspDPghY5oWFY0rjtZtXT15aikZpb3tsLAetUr1VMqm9cXPr8184Me7KzRvt+YVmqVI21joP/kf/5FWci77xB9eePOi//da9px+25xer/kL54Ye9alm/d+f958++4AVefzAEkSAIhMWkRmZSOseDu2cRl00o7ZUc9coJGzEPO9px4wIuaWVM6nvUajVu3bnuHwssYDhK6qu1RrO8dWNnc3MQT227H88tlJYXK/PNuZ29yTROtaejxD7/4tLaeXqw3VMsjYX69oORhLFSOopsqekrpaeT+Ecf3X3x8ucGo6ExqSsTXDB1245L8px/ZwkfIIAo7ZeAnJsjuQCpiEgBkEtNEBEJrDHWmFazubP7pDfpBOUgGSVaUTqKjbGeYCmF8dSMhnGlVvXL/PJri2VVv32nXa74APTKa0sf3Ll38+3tTjd8eGsnSLk6F0TdJEmSZJIkw1SR2t/ZJ6QTKyf6g0GSWpesGmtAxLBlW+R5Yq3NWhoCSnulvBA58OCsACYEVxOKmNRUK2Xtqa2dB34l4Knh0JhRqhKJSeYbNV3SbG3Fp817nd442W63l1YrO49snFrPU/HU1JoUmrhzf1RGL2j5y+WKQmUaIhPGiNkYhbQ/2Du9dmYyjaIoMszWWiJiyywuvcrMKcv2mEWsUn4py3LVoZrQ01oASBMhMgsAzM0193d3hqMhRxBUdBDowPOrc+XWYjXtmuWVaqVcjwjrLRwPkvGAHm/GcUSe7//KV86eOKUsS2dv9NrrZ7wGJW3TGzACdPdCX7xWxTe+eBU12B77XrAwv9Af9K0RT2tSitlV48TWWHOwhblkTim/RESosjrL7R1aa0AUEBOnIMzWQGqVol6/LSRBPVAKo1CUxVazLB6LGP94cPxc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" alt="TapTrao">
+      <span class="logo-text">TapTrao</span>
+    </div>
+    <div class="top-nav-center">
+      <a href="#" class="active">Home</a>
+      <a href="#how">How It Works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#">Commodities</a>
+      <a href="#">About</a>
+    </div>
+    <div class="top-nav-right">
+      <button class="nav-btn-ghost">Log In</button>
+      <button class="nav-btn-primary">Start Free Check</button>
+    </div>
+  </div>
+
+  <!-- MAIN FADING BOX -->
+  <div class="main-box">
+
+    <!-- GREEN HERO -->
+    <div class="green-hero">
+      <div class="hero-badge">🛡 For SME commodity traders importing from Africa into Europe</div>
+      <h1>Pre-Shipment<br><span class="accent">Regulatory Check</span></h1>
+      <p class="subtitle">Know your compliance before you commit. Check EUDR, customs, LC docs and trade regulations — in minutes, not weeks.</p>
+      <div class="hero-cta-row">
+        <button class="btn-hero btn-hero-primary">Run Your First Check — Free</button>
+        <button class="btn-hero btn-hero-secondary">See How It Works</button>
+      </div>
+      <div class="hero-flags">
+        <span>🇬🇭</span><span>🇨🇮</span><span>🇪🇹</span><span>🇰🇪</span><span>🇹🇿</span><span>🇺🇬</span><span>🇳🇬</span><span>🇨🇲</span>
+        → <span>🇪🇺</span><span>🇬🇧</span><span>🇩🇪</span><span>🇫🇷</span><span>🇮🇹</span><span>🇪🇸</span><span>🇨🇭</span><span>🇦🇹</span>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="section" id="how">
+      <div class="section-label">How It Works</div>
+      <h2>Three steps to trade with confidence</h2>
+      <p class="section-sub">No compliance team needed. TapTrao checks your shipment against every regulation that matters.</p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-icon">📋</div>
+          <h3>Enter Your Trade</h3>
+          <p>Tell us the commodity, origin country, destination, and value. Takes under 2 minutes.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-icon">🔍</div>
+          <h3>We Check Everything</h3>
+          <p>EUDR compliance, HS code validation, customs duties, LC document rules (UCP 600), sanctions — all cross-referenced automatically.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-icon">✅</div>
+          <h3>Get Your Report</h3>
+          <p>A clear compliance report with flags, required documents, and next steps. Ready to share with your bank or broker.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRUST SIGNALS -->
+    <div class="section">
+      <div class="section-label">Why TapTrao</div>
+      <h2>Built for the traders who move goods, not paper</h2>
+      <p class="section-sub">We know the Africa–Europe corridor because we've lived it.</p>
+      <div class="trust-grid">
+        <div class="trust-card">
+          <div class="trust-icon">🛡</div>
+          <h4>EUDR Ready</h4>
+          <p>Full EU Deforestation Regulation screening with geolocation checks</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon">📄</div>
+          <h4>UCP 600 Compliant</h4>
+          <p>LC document checker built on international banking standards</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon">⚡</div>
+          <h4>Minutes, Not Weeks</h4>
+          <p>Get your compliance report before you commit capital to a trade</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon">🌍</div>
+          <h4>Africa–Europe Focus</h4>
+          <p>Purpose-built for the trade corridors that matter to you</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRICING HERO -->
+    <div class="pricing-hero" id="pricing">
+      <h2>Check a shipment<br><span class="accent">before it costs you.</span></h2>
+      <p>Pay per shipment. No subscriptions. Your first compliance check is free.</p>
+      <div class="credits-pill"><span class="dot"></span> 0 Trade Credits</div>
+    </div>
+
+    <!-- FREE CHECK BANNER -->
+    <div class="free-banner">
+      <div class="free-banner-left">
+        <div class="free-banner-icon">🎁</div>
+        <div class="free-banner-text">
+          <h4>Your first check is free</h4>
+          <p>Run one full compliance check for free — no card required. See duties, required documents, and shipment risks.</p>
+        </div>
+      </div>
+      <button class="free-banner-btn">🔍 Check shipment risk — Free</button>
+    </div>
+
+    <!-- TRADE PACKS -->
+    <div style="padding: 32px 48px 8px;">
+      <h2 style="font-family: 'Clash Display', sans-serif; font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 6px;">Trade Packs</h2>
+      <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 24px;">1 credit = 1 shipment checked (compliance + LC). Buy more, save more.</p>
+    </div>
+
+    <div class="packs-grid">
+      <!-- Single -->
+      <div class="pack-card">
+        <div class="pack-name">Single Shipment</div>
+        <div class="pack-price">$24.99</div>
+        <div class="pack-meta">1 Shipment</div>
+        <div class="pack-per">$24.99 per shipment</div>
+        <ul class="pack-features">
+          <li><span class="check">✓</span> Full compliance check</li>
+          <li><span class="check">✓</span> Buyer &amp; supplier document checklist</li>
+          <li><span class="check">✓</span> LC document check (first submission)</li>
+          <li><span class="check">✓</span> Risk score &amp; audit trail</li>
+          <li><span class="check">✓</span> Customs declaration data pack (CSV)</li>
+          <li><span class="check">✓</span> Instructions for supplier</li>
+        </ul>
+        <button class="pack-btn pack-btn-outline">Buy Single Shipment</button>
+      </div>
+
+      <!-- 3 Shipments — Featured -->
+      <div class="pack-card featured">
+        <div class="pack-badge">Most Popular</div>
+        <div class="pack-name">3 Shipments</div>
+        <div class="pack-price">$59.99</div>
+        <div class="pack-meta">3 Shipments</div>
+        <div class="pack-per">$20.00 per shipment</div>
+        <ul class="pack-features">
+          <li><span class="check">✓</span> Everything in Single × 3</li>
+          <li><span class="check">✓</span> Save as template</li>
+          <li><span class="check">✓</span> 13% discount</li>
+        </ul>
+        <button class="pack-btn pack-btn-featured">Buy 3 Shipments</button>
+      </div>
+
+      <!-- 10 Shipments -->
+      <div class="pack-card">
+        <div class="pack-name">10 Shipments</div>
+        <div class="pack-price">$179</div>
+        <div class="pack-meta">10 Shipments</div>
+        <div class="pack-per">$17.90 per shipment</div>
+        <ul class="pack-features">
+          <li><span class="check">✓</span> Everything in 3-pack × 10</li>
+          <li><span class="check">✓</span> Stale-check &amp; refresh</li>
+          <li><span class="check">✓</span> 28% discount</li>
+        </ul>
+        <button class="pack-btn pack-btn-outline">Buy 10 Shipments</button>
+      </div>
+
+      <!-- 25 Shipments -->
+      <div class="pack-card">
+        <div class="pack-name">25 Shipments</div>
+        <div class="pack-price">$349</div>
+        <div class="pack-meta">25 Shipments</div>
+        <div class="pack-per">$13.96 per shipment</div>
+        <ul class="pack-features">
+          <li><span class="check">✓</span> Everything in 10-pack × 25</li>
+          <li><span class="check">✓</span> Best value for teams</li>
+          <li><span class="check">✓</span> 44% discount</li>
+        </ul>
+        <button class="pack-btn pack-btn-outline">Buy 25 Shipments</button>
+      </div>
+    </div>
+
+    <!-- LC DOCUMENT CHECK -->
+    <div class="lc-section">
+      <div class="section-label">LC Document Check</div>
+      <h2>Just need to check <span class="accent">an LC?</span></h2>
+      <div class="section-sub">Standalone LC checking without buying a full trade credit.</div>
+
+      <div class="lc-cards">
+        <div class="lc-card main-lc">
+          <div class="lc-card-header"><span>📄</span><h3>LC Document Check</h3></div>
+          <div class="lc-price">$19.99</div>
+          <div class="lc-price-sub">one-time</div>
+          <p class="lc-desc">Validate supplier documents against your Letter of Credit (UCP 600) before submitting to the bank.</p>
+          <ul class="lc-features">
+            <li class="included"><span class="check">✓</span> First LC submission check</li>
+            <li class="included"><span class="check">✓</span> Discrepancy summary &amp; fix suggestions</li>
+            <li class="excluded"><span class="cross">✗</span> Compliance check</li>
+            <li class="excluded"><span class="cross">✗</span> Document checklist</li>
+          </ul>
+          <div class="lc-note">Included free with every trade credit</div>
+          <button class="lc-btn">📄 Check LC only</button>
+        </div>
+
+        <div class="lc-card recheck">
+          <div class="lc-card-header"><span>🔄</span><h3>LC corrections (if documents are updated)</h3></div>
+          <div class="lc-price">$9.99</div>
+          <div class="lc-price-sub">per re-check</div>
+          <p class="lc-desc">If your supplier corrects documents after the first submission, re-check before resubmitting to the bank.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div class="footer-left">
+        <img class="logo-img" src="data:image/png;base64,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PXN5YXsYXnh18Yt//byngru392v1GinSnlZax3FMSnmejhNbq3v/7qu/umd3mtV6ua67A/tov//WD793aePi+XMX251OHCcsVmktAi42uJ2u2NTdma1ltsICIoq0n3ksoSAV+QxlO4EipTDfTa2xzHZj7USURldvvDW3trDXiT++012cr8eJAc/88lcul8vBk6cTpX0BMcYo7fmlwDC0msE//WevPYna3Z3YIN190Png6uPB9nTj3MIffufPnt04f+rkqU6vF8exMLh91ZlLsVu72MrMwgyAIiwiSnkBZWFHQ+a92f6qPV97nspDPghY5oWFY0rjtZtXT15aikZpb3tsLAetUr1VMqm9cXPr8184Me7KzRvt+YVmqVI21joP/kf/5FWci77xB9eePOi//da9px+25xer/kL54Ye9alm/d+f958++4AVefzAEkSAIhMWkRmZSOseDu2cRl00o7ZUc9coJGzEPO9px4wIuaWVM6nvUajVu3bnuHwssYDhK6qu1RrO8dWNnc3MQT227H88tlJYXK/PNuZ29yTROtaejxD7/4tLaeXqw3VMsjYX69oORhLFSOopsqekrpaeT+Ecf3X3x8ucGo6ExqSsTXDB1245L8px/ZwkfIIAo7ZeAnJsjuQCpiEgBkEtNEBEJrDHWmFazubP7pDfpBOUgGSVaUTqKjbGeYCmF8dSMhnGlVvXL/PJri2VVv32nXa74APTKa0sf3Ll38+3tTjd8eGsnSLk6F0TdJEmSZJIkw1SR2t/ZJ6QTKyf6g0GSWpesGmtAxLBlW+R5Yq3NWhoCSnulvBA58OCsACYEVxOKmNRUK2Xtqa2dB34l4Knh0JhRqhKJSeYbNV3SbG3Fp817nd442W63l1YrO49snFrPU/HU1JoUmrhzf1RGL2j5y+WKQmUaIhPGiNkYhbQ/2Du9dmYyjaIoMszWWiJiyywuvcrMKcv2mEWsUn4py3LVoZrQ01oASBMhMgsAzM0193d3hqMhRxBUdBDowPOrc+XWYjXtmuWVaqVcjwjrLRwPkvGAHm/GcUSe7//KV86eOKUsS2dv9NrrZ7wGJW3TGzACdPdCX7xWxTe+eBU12B77XrAwv9Af9K0RT2tSitlV48TWWHOwhblkTim/RESosjrL7R1aa0AUEBOnIMzWQGqVol6/LSRBPVAKo1CUxVazLB6LGP94cPxc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" alt="TapTrao">
+        <span class="logo-name">TapTrao</span>
+        © 2026 FATRAO LIMITED · Trade compliance for commodity traders
+      </div>
+      <div class="footer-right">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+        <a href="#">Docs</a>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
