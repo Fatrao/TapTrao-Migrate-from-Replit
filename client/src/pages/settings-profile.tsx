@@ -160,12 +160,12 @@ export default function SettingsProfile() {
     <AppShell>
       <div className="max-w-2xl mx-auto px-4 py-8">
         <h1
-          style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, letterSpacing: "-0.5px", color: "var(--t1)", marginBottom: 8 }}
+          style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "-0.5px", color: "var(--t1)", marginBottom: 8 }}
           data-testid="text-profile-heading"
         >
           Company Profile
         </h1>
-        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, color: "var(--t2)", marginBottom: 24 }} data-testid="text-profile-subtitle">
+        <p style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t2)", marginBottom: 24 }} data-testid="text-profile-subtitle">
           Your company details appear on every TwinLog Trail compliance record.
           Required for PDF generation.
         </p>

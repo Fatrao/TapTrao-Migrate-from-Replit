@@ -70,7 +70,7 @@ export default function TokenSuccess() {
             <>
               <CheckCircle2 size={48} style={{ color: "var(--green)", margin: "0 auto 16px" }} />
               <h1
-                style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 24, color: "var(--t1)", marginBottom: 8 }}
+                style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--t1)", marginBottom: 8 }}
                 data-testid="text-purchase-success"
               >
                 Purchase Complete
@@ -104,7 +104,7 @@ export default function TokenSuccess() {
           ) : (
             <>
               <h1
-                style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 24, color: "var(--t1)", marginBottom: 8 }}
+                style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--t1)", marginBottom: 8 }}
               >
                 Processing
               </h1>

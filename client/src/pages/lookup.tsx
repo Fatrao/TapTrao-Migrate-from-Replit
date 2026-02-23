@@ -620,9 +620,9 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
   primaryRiskFactor: string;
 }) {
   const verdictStyles = {
-    GREEN: { bg: "rgba(34,197,94,.05)", border: "rgba(34,197,94,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--green)", label: "LOW RISK" },
-    AMBER: { bg: "rgba(245,158,11,.05)", border: "rgba(245,158,11,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", label: "ATTENTION NEEDED" },
-    RED: { bg: "rgba(239,68,68,.05)", border: "rgba(239,68,68,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", label: "HIGH RISK \u2014 ACTION REQUIRED" },
+    GREEN: { bg: "rgba(74,195,41,.05)", border: "rgba(74,195,41,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--green)", label: "LOW RISK" },
+    AMBER: { bg: "rgba(234,139,67,.05)", border: "rgba(234,139,67,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", label: "ATTENTION NEEDED" },
+    RED: { bg: "rgba(218,60,61,.05)", border: "rgba(218,60,61,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", label: "HIGH RISK \u2014 ACTION REQUIRED" },
   };
 
   const v = verdictStyles[verdict];
@@ -655,7 +655,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
         <div style={{ width: 160, display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
           <div
             style={{
-              fontFamily: "'Fraunces', serif",
+              fontFamily: "var(--fh)",
               fontWeight: 900,
               fontSize: "clamp(48px, 6vw, 64px)",
               letterSpacing: -4,
@@ -1326,7 +1326,7 @@ function ComplianceResultDisplay({ result, freeLocked = false }: { result: Compl
                 style={{
                   marginTop: 8,
                   padding: "10px 12px",
-                  background: "var(--abg, rgba(245,158,11,0.08))",
+                  background: "var(--abg, rgba(234,139,67,0.08))",
                   borderRadius: ".5rem",
                   fontSize: 12,
                   color: "var(--amber)",
@@ -1803,10 +1803,10 @@ export default function Lookup() {
         <div className="max-w-2xl mx-auto space-y-8">
           <div className="space-y-3">
             <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }}>TapTrao / Pre-shipment Compliance Check</p>
-            <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: "var(--t1)" }} data-testid="text-lookup-title">
+            <h1 style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)" }} data-testid="text-lookup-title">
               Pre-shipment compliance check
             </h1>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "var(--t2)", fontSize: 14 }}>
+            <p style={{ fontFamily: "var(--fb)", color: "var(--t2)", fontSize: 14 }}>
               See regulatory requirements, documents, and risk indicators before a shipment moves.
             </p>
           </div>
@@ -1851,7 +1851,7 @@ export default function Lookup() {
           )}
 
           <Card style={{ position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(66,126,255,0.3), transparent)" }} />
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
             <CardContent className="p-6 space-y-6">
               <div className="space-y-6">
                 <div className="space-y-2">
@@ -1935,7 +1935,7 @@ export default function Lookup() {
                   size="lg"
                   disabled={!canSubmit || complianceMutation.isPending}
                   onClick={() => complianceMutation.mutate()}
-                  style={{ backgroundColor: 'var(--blue, #427EFF)', color: 'white' }}
+                  style={{ backgroundColor: 'var(--blue, #4ac329)', color: 'white' }}
                   data-testid="button-run-check"
                 >
                   {complianceMutation.isPending ? (

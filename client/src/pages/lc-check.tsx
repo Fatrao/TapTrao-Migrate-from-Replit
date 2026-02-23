@@ -172,7 +172,7 @@ function InsuranceGapAlert() {
     <div
       data-testid="insurance-gap-alert"
       style={{
-        background: "rgba(66,126,255,.06)",
+        background: "rgba(74,195,41,.06)",
         borderRadius: 14,
         padding: "14px 18px",
         marginBottom: 20,
@@ -439,7 +439,7 @@ function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | null })
             }}
           />
           <div style={{ position: "relative" }}>
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 16, color: "var(--t1)", marginBottom: 6 }}>
+            <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 16, color: "var(--t1)", marginBottom: 6 }}>
               Send document request to supplier
             </h3>
             <p style={{ fontSize: 12, color: "var(--t2)", lineHeight: 1.5, marginBottom: 14 }}>
@@ -663,7 +663,7 @@ function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | null })
           overflowY: "auto",
         }}
       >
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 15, color: "var(--t1)", marginBottom: 4 }}>
+        <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 15, color: "var(--t1)", marginBottom: 4 }}>
           Document progress
         </h3>
         <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)", marginBottom: 16 }}>
@@ -778,9 +778,9 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
   primaryRiskFactor: string;
 }) {
   const verdictStyles = {
-    GREEN: { bg: "rgba(34,197,94,.05)", border: "rgba(34,197,94,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--green)", label: "LOW RISK" },
-    AMBER: { bg: "rgba(245,158,11,.05)", border: "rgba(245,158,11,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", label: "MODERATE RISK" },
-    RED: { bg: "rgba(239,68,68,.05)", border: "rgba(239,68,68,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", label: "HIGH RISK" },
+    GREEN: { bg: "rgba(74,195,41,.05)", border: "rgba(74,195,41,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--green)", label: "LOW RISK" },
+    AMBER: { bg: "rgba(234,139,67,.05)", border: "rgba(234,139,67,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", label: "MODERATE RISK" },
+    RED: { bg: "rgba(218,60,61,.05)", border: "rgba(218,60,61,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", label: "HIGH RISK" },
   };
   const v = verdictStyles[verdict];
   const barColors: Record<string, string> = {
@@ -799,7 +799,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
     <div style={{ borderRadius: 14, background: v.bg, padding: "22px 26px" }} data-testid="twinlog-readiness-banner">
       <div style={{ display: "flex", gap: 0 }}>
         <div style={{ width: 160, display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
-          <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: "clamp(48px, 6vw, 64px)", letterSpacing: -4, color: "var(--t1)", lineHeight: 1 }}>
+          <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: "clamp(48px, 6vw, 64px)", letterSpacing: -4, color: "var(--t1)", lineHeight: 1 }}>
             {score}
           </div>
           <span style={{ display: "inline-block", fontFamily: "'DM Mono', monospace", fontSize: 9, fontWeight: 600, padding: "3px 8px", borderRadius: 4, background: v.badgeBg, border: `1px solid ${v.badgeBorder}`, color: v.badgeColor, width: "fit-content", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
@@ -962,7 +962,7 @@ function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null })
     <div style={{ display: "flex", gap: 20, padding: "20px 0", alignItems: "flex-start" }} data-testid="twinlog-trail-tab">
       {/* Left Panel */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 26, color: "var(--t1)", marginBottom: 4 }}>
+        <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 26, color: "var(--t1)", marginBottom: 4 }}>
           TwinLog Trail
         </h2>
         <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)", marginBottom: 24, lineHeight: 1.5 }}>
@@ -1079,7 +1079,7 @@ function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null })
 
       {/* Right Panel */}
       <div style={{ width: 292, flexShrink: 0 }}>
-        <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 15, color: "var(--t1)", display: "block", marginBottom: 12 }}>
+        <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 15, color: "var(--t1)", display: "block", marginBottom: 12 }}>
           Export
         </span>
 
@@ -1456,17 +1456,17 @@ export default function LcCheck() {
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="space-y-2">
             <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>TapTrao / LC Check</p>
-            <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 28, color: "var(--t1)" }} data-testid="text-lc-title">
+            <h1 style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)" }} data-testid="text-lc-title">
               Check your LC before sending it to the bank
             </h1>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "var(--t2)", fontSize: 14 }}>
+            <p style={{ fontFamily: "var(--fb)", color: "var(--t2)", fontSize: 14 }}>
               Catch document mismatches before the bank does.
             </p>
           </div>
 
           {showPrefillBanner && prefillData && (
             <div style={{ background: "var(--blue-dim)", borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "flex-start", gap: 12, position: "relative" }} data-testid="banner-lc-prefill">
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(66,126,255,0.3), transparent)" }} />
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
               <ExternalLink className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--blue)" }} />
               <div className="flex-1 min-w-0">
                 <p style={{ fontSize: 13, fontWeight: 600, color: "var(--blue)" }} data-testid="text-prefill-info">
@@ -1518,7 +1518,7 @@ export default function LcCheck() {
 
           {step === 1 && (
             <Card style={{ background: "var(--card)", borderRadius: 14, border: "none", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(66,126,255,0.3), transparent)" }} />
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
               <CardHeader className="flex flex-row items-center gap-2 pb-2">
                 <FileText className="w-4 h-4" style={{ color: "var(--t3)" }} />
                 <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Step 1: LC Terms Entry</p>
@@ -1754,7 +1754,7 @@ export default function LcCheck() {
 
           {step === 2 && (
             <Card style={{ background: "var(--card)", borderRadius: 14, border: "none", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(66,126,255,0.3), transparent)" }} />
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
               <CardHeader className="flex flex-row items-center gap-2 pb-2">
                 <FileText className="w-4 h-4" style={{ color: "var(--t3)" }} />
                 <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Step 2: Supplier Document Entry</p>
@@ -1858,7 +1858,7 @@ export default function LcCheck() {
           {step === 3 && checkMutation.data && (
             <div className="space-y-4" data-testid="section-lc-results">
               <Card style={{ background: "var(--card)", borderRadius: 14, border: "none", position: "relative", overflow: "hidden" }}>
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(66,126,255,0.3), transparent)" }} />
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
                 <CardHeader className="flex flex-row items-center gap-2 pb-2">
                   <ClipboardCheck className="w-4 h-4" style={{ color: "var(--t3)" }} />
                   <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Cross-Check Summary</p>
@@ -1869,19 +1869,19 @@ export default function LcCheck() {
                   </div>
                   <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
                     <div className="text-center p-3" style={{ background: "var(--card2)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 24, color: "var(--t1)" }} data-testid="text-total-checks">{checkMutation.data.summary.totalChecks}</p>
+                      <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--t1)" }} data-testid="text-total-checks">{checkMutation.data.summary.totalChecks}</p>
                       <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Total Checks</p>
                     </div>
                     <div className="text-center p-3" style={{ background: "var(--gbg)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 24, color: "var(--green)" }} data-testid="text-matches">{checkMutation.data.summary.matches}</p>
+                      <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--green)" }} data-testid="text-matches">{checkMutation.data.summary.matches}</p>
                       <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Matches</p>
                     </div>
                     <div className="text-center p-3" style={{ background: "var(--abg)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 24, color: "var(--amber)" }} data-testid="text-warnings">{checkMutation.data.summary.warnings}</p>
+                      <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--amber)" }} data-testid="text-warnings">{checkMutation.data.summary.warnings}</p>
                       <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Warnings</p>
                     </div>
                     <div className="text-center p-3" style={{ background: "var(--rbg)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 900, fontSize: 24, color: "var(--red)" }} data-testid="text-criticals">{checkMutation.data.summary.criticals}</p>
+                      <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--red)" }} data-testid="text-criticals">{checkMutation.data.summary.criticals}</p>
                       <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Critical</p>
                     </div>
                   </div>

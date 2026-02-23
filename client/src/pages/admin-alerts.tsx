@@ -75,7 +75,7 @@ export default function AdminAlertsPage() {
         <div style={{ maxWidth: 520, margin: "0 auto" }}>
           <h1
             style={{
-              fontFamily: "'Fraunces', serif",
+              fontFamily: "var(--fh)",
               fontWeight: 900,
               fontSize: 28,
               letterSpacing: "-0.5px",

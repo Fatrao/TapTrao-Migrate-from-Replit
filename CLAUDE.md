@@ -1,245 +1,336 @@
-# TapTrao — Design System & Restyling Brief
+# CLAUDE.md — TapTrao Codebase Guide
 
-## Project Overview
-TapTrao is a B2B SaaS trade compliance platform for commodity traders importing from Africa into Europe. This document defines the new visual design system that must be applied across the entire React frontend.
+## What is TapTrao?
 
-## CRITICAL RULE
-**Keep ALL existing functionality, routing, auth, API calls, and database connections exactly as they are. Only change the visual styling, CSS, and layout markup.**
+TapTrao is a trade compliance SaaS platform for commodity traders. It lets users check tariffs, regulatory requirements, and compliance obligations for trading goods from African origin countries to international destinations — without needing an ERP system. Key capabilities:
 
----
+- **Compliance Lookup**: Select commodity + origin + destination → get duty rates, regulatory triggers, document checklists, readiness scores, and risk warnings
+- **LC Document Checker**: Cross-check Letter of Credit terms against supplier documents using UCP 600 rules
+- **TwinLog Trail**: Generate audit-ready PDF evidence records
+- **EUDR Due Diligence**: Build deforestation-regulation compliance statements with geolocation data
+- **Supplier Inbox**: Request and track documents from suppliers via token-gated upload links
+- **Regulatory Alerts**: Watch trade corridors for regulatory changes (max 3 free)
+- **Trade Templates**: Save and reuse compliance corridors with stale-detection
+- **Demurrage Calculator**: Estimate port demurrage costs
 
-## Colour Palette
+## Tech Stack
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `--green` | `#4ac329` | Primary CTA, active states, success indicators, green accents |
-| `--teal` | `#2e8662` | Secondary green, gradients paired with green |
-| `--amber` | `#ea8b43` | Warnings, moderate risk, secondary accent |
-| `--red` | `#da3c3d` | Errors, high risk, alert badges |
-| `--txt` | `#111111` | Primary text on white/light surfaces |
-| `--txt2` | `#555555` | Secondary text |
-| `--txt3` | `#999999` | Muted text, labels |
-| Background | `#000000` | Page/body background — pure black |
-| Surfaces | `#1c1c1e` | Cards, sidebar, panels — slightly grey |
-| White cards | `#ffffff` | Stat cards, data cards on dark backgrounds |
-| Muted white | `rgba(255,255,255,0.35)` | Muted text on dark surfaces |
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18 + TypeScript, Vite 7 |
+| Routing | wouter (lightweight client-side router) |
+| State | TanStack React Query v5 (server state) |
+| UI Components | shadcn/ui (new-york style) on Radix UI primitives |
+| Styling | Tailwind CSS 3 + CSS custom properties (`client/src/styles/tokens.css`) |
+| Backend | Express 5 + TypeScript (run via tsx) |
+| Database | PostgreSQL with Drizzle ORM |
+| Schema Validation | Zod + drizzle-zod |
+| Payments | Stripe Checkout + webhooks |
+| PDF Generation | pdfkit |
+| Testing | Vitest |
+| Build | esbuild (server) + Vite (client) |
 
-### Green Glow Effects
-- CTA buttons: `box-shadow: 0 4px 18px rgba(74,195,41,0.4)`
-- Logo: `box-shadow: 0 0 16px rgba(74,195,41,0.4)`
-- Breathing orb (AI CTA): `radial-gradient(circle, rgba(74,195,41,0.28) 0%, rgba(74,195,41,0.06) 50%, transparent 70%)`
+## Project Structure
 
-### White Card Radial Glows
-White stat cards get a subtle colored glow in the top-left corner:
-- Green glow: `radial-gradient(circle at 0% 0%, rgba(74,195,41,0.13) 0%, transparent 60%)`
-- Amber glow: `radial-gradient(circle at 0% 0%, rgba(234,139,67,0.11) 0%, transparent 60%)`
-- Teal glow: `radial-gradient(circle at 0% 0%, rgba(46,134,98,0.12) 0%, transparent 60%)`
-
----
-
-## Typography
-
-### Font Imports
-```html
-<link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+```
+├── client/                     # React SPA
+│   ├── index.html              # Entry HTML
+│   ├── public/                 # Static assets (favicon, PWA manifest, service worker, images)
+│   └── src/
+│       ├── main.tsx            # React entry point
+│       ├── App.tsx             # Root component with all route definitions
+│       ├── index.css           # Global styles + Tailwind imports
+│       ├── styles/
+│       │   └── tokens.css      # Design tokens (colors, spacing, shadows)
+│       ├── lib/
+│       │   ├── queryClient.ts  # React Query config + apiRequest() helper
+│       │   ├── utils.ts        # cn() class merge utility
+│       │   └── avatarColours.ts
+│       ├── hooks/
+│       │   ├── use-tokens.ts   # Token balance query hook
+│       │   ├── use-page-title.ts
+│       │   ├── use-mobile.tsx  # Mobile breakpoint detection (768px)
+│       │   └── use-toast.ts
+│       ├── components/
+│       │   ├── AppShell.tsx    # Main layout (sidebar + nav bar)
+│       │   ├── nav-bar.tsx
+│       │   ├── TabBar.tsx
+│       │   ├── StepNav.tsx     # Multi-step progress indicator
+│       │   ├── cookie-consent.tsx
+│       │   └── ui/             # 50+ shadcn/ui components
+│       └── pages/              # Route page components (see Routes section)
+├── server/
+│   ├── index.ts                # Express app setup, middleware, startup
+│   ├── routes.ts               # All API route handlers (~1700 lines)
+│   ├── db.ts                   # PostgreSQL pool + Drizzle instance
+│   ├── storage.ts              # IStorage interface + DatabaseStorage implementation
+│   ├── compliance.ts           # Compliance check engine + readiness score computation
+│   ├── lc-engine.ts            # LC cross-check engine (UCP 600 rules)
+│   ├── twinlog-pdf.ts          # TwinLog Trail PDF generator (pdfkit)
+│   ├── eudr-pdf.ts             # EUDR statement PDF generator (pdfkit)
+│   ├── seed.ts                 # Database seeding (destinations, origins, commodities, AfCFTA RoO)
+│   ├── static.ts               # Production static file serving
+│   └── vite.ts                 # Dev mode Vite middleware setup
+├── shared/
+│   └── schema.ts               # Drizzle ORM schema, Zod schemas, shared TypeScript types
+├── tests/
+│   └── api.test.ts             # Integration tests (30 tests, requires running server + DB)
+├── scripts/
+│   ├── backfill-readiness-scores.ts
+│   └── bot-test.mjs            # Quick 38-assertion smoke test
+├── script/
+│   └── build.ts                # Production build script (esbuild + vite)
+├── attached_assets/            # Static image assets
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+├── vitest.config.ts
+├── drizzle.config.ts
+├── tailwind.config.ts
+├── postcss.config.js
+└── components.json             # shadcn/ui configuration
 ```
 
-### CSS Variables
-```css
---fh: 'Clash Display', sans-serif;  /* Headings, numbers, labels */
---fb: 'DM Sans', sans-serif;        /* Body text, buttons, paragraphs */
+## Commands
+
+```bash
+# Development
+npm run dev                     # Start dev server (Express + Vite HMR) on port 5000
+
+# Production build
+npm run build                   # Build client (Vite) + server (esbuild) → dist/
+
+# Start production
+npm run start                   # Run built server from dist/index.cjs
+
+# Type checking
+npm run check                   # tsc --noEmit
+
+# Database
+npm run db:push                 # Push schema to DB (drizzle-kit push)
+
+# Tests (require running server + database)
+npx vitest run                  # Run integration tests
+node scripts/bot-test.mjs       # Quick smoke test (38 assertions)
 ```
 
-### Scale
-- Hero headline: `clamp(38px, 5.5vw, 64px)`, weight 700, letter-spacing -0.04em
-- Section headings: `clamp(26px, 3.5vw, 40px)`, weight 700, letter-spacing -0.03em
-- Card titles: `16-17px`, weight 600
-- Stat values: `24-28px`, weight 700, letter-spacing -0.04em
-- Body: `13-14px`, weight 400
-- Labels: `11-12px`, weight 600, uppercase, letter-spacing 0.12em
-- Badges: `10-11px`, weight 600-700
+## Environment Variables
 
----
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `STRIPE_SECRET_KEY` | No | Stripe API key (payments disabled without it) |
+| `STRIPE_WEBHOOK_SECRET` | No | Stripe webhook signature verification |
+| `ADMIN_PASSWORD` | No | Password for admin alert creation endpoint |
+| `PORT` | No | Server port (default: 5000) |
+| `NODE_ENV` | No | `development` or `production` |
 
-## Border Radius System
+## Path Aliases
 
-| Element | Radius |
-|---------|--------|
-| Main containers (sidebar, main area) | `18px` |
-| Cards (stat, module, pricing) | `16px` |
-| Inner header boxes | `16px` |
-| Buttons (primary CTA) | `50px` (pill) |
-| Buttons (secondary/action) | `8-10px` |
-| Icons/avatars | `8-10px` (square), `50%` (circle) |
-| Badges/pills | `20-24px` |
-| Input fields | `8px` |
+Defined in `tsconfig.json` and `vite.config.ts`:
 
----
+- `@/*` → `client/src/*`
+- `@shared/*` → `shared/*`
+- `@assets/*` → `attached_assets/*`
 
-## Layout Structure
+## Database Schema
 
-### Overall Page Layout
+All tables defined in `shared/schema.ts` using Drizzle ORM. Key tables:
+
+**Reference Data (seeded on startup):**
+- `destinations` — 7 destination countries/regions (GB, EU, CH, US, CN, AE, TR)
+- `origin_countries` — 18+ African origin countries
+- `regional_frameworks` — 5+ trade blocs (ECOWAS, EAC, SADC, CEMAC, COMESA)
+- `commodities` — 154+ commodities with HS codes, types, and regulatory trigger flags
+- `afcfta_roo` — AfCFTA Rules of Origin by HS heading
+
+**Transactional Data:**
+- `lookups` — Compliance check results with readiness scores, TwinLog refs, integrity hashes
+- `lc_checks` — LC document validation results with verdicts and correction emails
+- `user_tokens` — Session-based token balances (keyed by `taptrao_session` cookie)
+- `token_transactions` — Purchase/spend ledger with Stripe session dedup
+- `templates` — Saved trade corridors with snapshot data and stale detection
+- `company_profiles` — Company registration details for TwinLog PDFs
+- `twinlog_downloads` — Audit log of PDF downloads
+- `supplier_requests` — Document requests sent to suppliers
+- `supplier_uploads` — Files uploaded by suppliers
+- `alert_subscriptions` — Corridor watch subscriptions (max 3 per user)
+- `regulatory_alerts` — Regulatory change notices
+- `alert_reads` — Read tracking per user
+- `eudr_records` — EUDR due diligence records
+
+**Custom Enums:** `commodity_type`, `general_rule`, `lc_verdict`, `token_transaction_type`
+
+Schema changes: Edit `shared/schema.ts`, then run `npm run db:push`.
+
+## API Routes
+
+All API endpoints are in `server/routes.ts` under `/api/`.
+
+**Reference Data:**
+- `GET /api/commodities` — List all commodities
+- `GET /api/origins` — List origin countries
+- `GET /api/destinations` — List destinations
+
+**Compliance:**
+- `POST /api/compliance-check` — Run compliance lookup (body: `{commodityId, originId, destinationId}`)
+- `GET /api/lookups/recent` — Recent lookups
+- `GET /api/lookups/:id` — Single lookup
+
+**LC Checking:**
+- `POST /api/lc-checks` — Run LC document check (validated by `lcCheckRequestSchema`)
+- `GET /api/lc-checks/recent` — Recent LC checks
+- `POST /api/lc-checks/linked-lookups` — Map lookup IDs to LC check IDs
+
+**Tokens & Payments:**
+- `GET /api/tokens/balance` — Current token balance
+- `GET /api/tokens/transactions` — Transaction history
+- `POST /api/tokens/checkout` — Create Stripe checkout session
+- `POST /api/tokens/lc-recheck-checkout` — Stripe checkout for LC re-check ($9.99)
+- `GET /api/tokens/verify-purchase` — Verify and credit purchase
+- `POST /api/webhooks/stripe` — Stripe webhook handler
+
+**Templates:**
+- `GET /api/templates` — List user's templates
+- `POST /api/templates` — Save new template
+- `GET /api/templates/:id` — Get template
+- `GET /api/templates/:id/stale-check` — Check if template data is outdated
+- `POST /api/templates/:id/refresh` — Re-run compliance check for template
+- `DELETE /api/templates/:id` — Delete template
+
+**Company Profile & TwinLog:**
+- `GET /api/company-profile` — Get profile
+- `POST /api/company-profile` — Create/update profile
+- `POST /api/twinlog/generate` — Generate TwinLog Trail PDF
+- `GET /api/twinlog/:lookupId/data` — Get TwinLog data bundle
+- `GET /api/verify/:ref` — Public verification of TwinLog reference
+
+**Supplier Management:**
+- `GET /api/supplier-inbox` — List supplier requests
+- `POST /api/supplier-requests/create-or-get` — Create supplier document request
+- `GET /api/upload/:token/data` — Public: get upload form data
+- `POST /api/upload/:token/file` — Public: upload document file
+- `POST /api/upload/:token/submit` — Public: finalize upload
+
+**Alerts:**
+- `POST /api/alerts/subscribe` — Watch a corridor
+- `GET /api/alerts/subscriptions` — List subscriptions
+- `GET /api/alerts` — Get alerts for user
+- `GET /api/alerts/unread-count` — Unread count
+- `POST /api/alerts/:alertId/read` — Mark alert read
+- `POST /api/admin/alerts` — Admin: create alert (requires `ADMIN_PASSWORD`)
+
+**EUDR:**
+- `GET /api/eudr/:lookupId` — Get EUDR record
+- `POST /api/eudr` — Create EUDR record
+- `PATCH /api/eudr/:id` — Update EUDR record
+- `POST /api/eudr/:id/generate-statement` — Generate EUDR PDF statement
+
+**Dev-only test endpoints** (gated by `NODE_ENV !== 'production'`):
+- `POST /api/test/readiness-score` — Test readiness score computation
+- `POST /api/test/demurrage` — Test demurrage calculation
+
+## Client Routes
+
+All routes defined in `client/src/App.tsx`:
+
+| Route | Page Component | Purpose |
+|-------|---------------|---------|
+| `/` | `Home` | Marketing landing page with interactive demo |
+| `/lookup` | `Lookup` | Main compliance check tool (77KB) |
+| `/lc-check` | `LcCheck` | LC document validator (92KB) |
+| `/dashboard` | `Dashboard` | User activity overview |
+| `/trades` | `Trades` | Trade history with filtering |
+| `/templates` | `Templates` | Saved corridor templates |
+| `/pricing` | `Pricing` | Token pack purchase page |
+| `/alerts` | `AlertsPage` | Regulatory alert subscriptions |
+| `/demurrage` | `DemurragePage` | Port demurrage calculator |
+| `/eudr/:lookupId` | `EudrPage` | EUDR due diligence form |
+| `/inbox` | `Inbox` | Supplier communication |
+| `/upload/:token` | `SupplierUploadPage` | Token-gated supplier upload |
+| `/verify/:ref` | `VerifyPage` | Public TwinLog reference verification |
+| `/settings/profile` | `SettingsProfile` | Company profile settings |
+| `/tokens/success` | `TokenSuccess` | Payment success confirmation |
+| `/admin/data` | `AdminData` | Admin data management |
+| `/admin/alerts/new` | `AdminAlertsPage` | Admin alert creation |
+| `/privacy-policy` | `PrivacyPolicy` | Legal page |
+| `/terms-of-service` | `TermsOfService` | Legal page |
+
+## Architecture Patterns
+
+### Session Identity
+Users are identified by a `taptrao_session` httpOnly cookie (UUID, created on first API call, 1-year expiry). No user accounts or login — sessions are the identity.
+
+### Storage Layer
+`server/storage.ts` defines an `IStorage` interface and `DatabaseStorage` class. All database access goes through the exported `storage` singleton. When adding new data operations, add the method to `IStorage` first, then implement in `DatabaseStorage`.
+
+### API Communication
+The client uses `apiRequest(method, url, data?)` from `client/src/lib/queryClient.ts`. All requests include `credentials: "include"` for cookie-based session tracking. React Query handles caching with `staleTime: Infinity` (no auto-refetch) and `retry: false`.
+
+### Token Gating
+- First compliance lookup is free (`freeLookupUsed` flag)
+- Subsequent lookups cost 1 token
+- Endpoints return HTTP 402 when tokens are insufficient
+- Client shows buy-tokens modal on 402 responses
+
+### Data Seeding
+`server/seed.ts` seeds reference data (destinations, origins, commodities, frameworks, AfCFTA rules) on startup if tables are empty. Seed functions (`seedPrompt2` through `seedPrompt5`) are called in `registerRoutes()`.
+
+### PDF Generation
+Two PDF generators use pdfkit:
+- `server/twinlog-pdf.ts` — TwinLog Trail (6-page audit record)
+- `server/eudr-pdf.ts` — EUDR Due Diligence Statement
+
+Both stream the PDF response directly and compute SHA-256 hashes asynchronously.
+
+### Build Process
+`script/build.ts` runs:
+1. `rm -rf dist`
+2. Vite builds client → `dist/public/`
+3. esbuild bundles server → `dist/index.cjs` (CJS format, minified, select deps bundled)
+
+## Design System
+
+**Theme:** Dark-mode only. Background `#0D1117`, cards `#161B27`/`#1C2333`.
+
+**Colors (CSS custom properties in `tokens.css`):**
+- Primary: `#427EFF` (blue)
+- Success: `#22C55E` (green)
+- Warning: `#F59E0B` (amber)
+- Error: `#EF4444` (red)
+- Text: 95% white → 55% → 28% opacity hierarchy
+
+**Typography:**
+- Body: `Plus Jakarta Sans`
+- Headings: `Fraunces` (serif)
+- Labels/Mono: `DM Mono`
+
+**Risk badge colors:** GREEN = safe, AMBER = caution, RED = high risk, STOP = trade prohibited.
+
+## Testing
+
+Tests are integration tests requiring a running server and populated database:
+
+```bash
+# Start the dev server first, then in another terminal:
+npx vitest run
 ```
-┌─────────────────────────────────────────────┐
-│ BODY: #000 (pure black), padding: 10px      │
-│ ┌──────────┐ ┌────────────────────────────┐ │
-│ │ SIDEBAR  │ │ MAIN CONTENT BOX           │ │
-│ │ #1c1c1e  │ │ gradient: dark green → white│ │
-│ │ rounded  │ │ rounded 18px               │ │
-│ │ 18px     │ │                            │ │
-│ │          │ │ ┌────────────────────────┐  │ │
-│ │          │ │ │ GREEN HEADER BOX       │  │ │
-│ │          │ │ │ (breadcrumb + tabs)    │  │ │
-│ │          │ │ └────────────────────────┘  │ │
-│ │          │ │                            │ │
-│ │          │ │ [Content on white bg]      │ │
-│ └──────────┘ └────────────────────────────┘ │
-└─────────────────────────────────────────────┘
-```
 
-### Main Box Gradient (dark green → white)
-```css
-background: linear-gradient(180deg,
-  #1a3832 0%, #1d3d35 8%, #1d3d35 16%, #243f37 26%,
-  rgba(24,46,32,0.92) 36%, rgba(22,42,30,0.72) 46%,
-  rgba(20,38,27,0.45) 56%, rgba(18,34,24,0.2) 66%,
-  rgba(255,255,255,0.6) 76%, #ffffff 86%, #ffffff 100%
-);
-```
+Test file: `tests/api.test.ts` — covers reference data endpoints, compliance checks, readiness score engine, demurrage calculator, LC checks, token balance, templates, alerts, dashboard stats, and supplier inbox.
 
-### Inner Green Header Box
-```css
-background: linear-gradient(180deg,
-  #0d2218 0%, #0f2a1e 30%, #143424 55%,
-  #1a4030 75%, rgba(26,60,44,0.7) 88%, rgba(26,60,44,0) 100%
-);
-border-radius: 16px;
-margin: 0 14px;
-```
+Quick smoke test: `node scripts/bot-test.mjs` (38 assertions against a running server).
 
----
+Test configuration: `vitest.config.ts` — 30s timeout, scoped to `tests/**/*.test.ts`.
 
-## Component Patterns
+## Key Conventions
 
-### Sidebar
-- Background: `#1c1c1e`
-- Width: `210px`
-- Rounded: `18px`
-- Nav items: `13px`, color `#666`, hover `rgba(255,255,255,0.05)`
-- Active nav: `background: rgba(74,195,41,0.12)`, color `var(--green)`, left green bar `3px`
-- Badges: Red `rgba(218,60,61,0.2)`, Green `rgba(74,195,41,0.15)`
-- History cards: `background: rgba(255,255,255,0.04)`, rounded `8px`
-
-### Top Navigation Bar
-- Transparent background (sits on the dark green gradient)
-- Links: `13px`, color `rgba(255,255,255,0.35)`, active `#fff`
-- Icon buttons: `30px` square, `background: rgba(255,255,255,0.07)`, rounded `8px`
-- User avatar: `30px` circle, `gradient: var(--green) → var(--teal)`
-
-### White Stat Cards
-- Background: `#fff`, rounded `16px`
-- Box shadow: `0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)`
-- Hover: `translateY(-3px)`, shadow `0 10px 30px rgba(0,0,0,0.14)`
-- Colored radial glow via `::before` pseudo-element
-- Icon: `36px` square, rounded `10px`, tinted background
-- Value: Clash Display, `24-28px`, weight 700
-
-### Dark CTA Card (AI/Action)
-- Background: `#0a0a0a`
-- Green breathing orb in corner
-- Number: Clash Display, `32px`, weight 800, color `var(--green)`
-- Button: green with glow shadow
-
-### Dark Content Cards
-- Background: `#1c1c1e`, rounded `16px`
-- Green top border: `3px` height
-- Hover: `translateY(-3px)`, `box-shadow: 0 10px 30px rgba(0,0,0,0.3)`
-
-### Buttons
-- Primary: `background: var(--green)`, color `#000`, weight 700, rounded `50px`, glow shadow
-- Secondary: `background: rgba(255,255,255,0.06)`, border `1px solid rgba(255,255,255,0.1)`, rounded `50px`
-- Small action: `background: rgba(255,255,255,0.06)`, rounded `10px`, border `1px solid rgba(255,255,255,0.1)`
-
-### Status Pills
-- Pending: `background: rgba(245,158,11,0.1)`, color amber
-- Compliant: `background: rgba(74,195,41,0.1)`, color green
-- Review/Risk: `background: rgba(218,60,61,0.1)`, color red
-
-### Table Rows
-- White background, hover `var(--grey)`
-- Borders: `1px solid #f0f1f1`
-- Commodity cells: icon (32px, rounded 8px) + name + HS code subtitle
-
----
-
-## Animation Patterns
-
-### Breathing Green Orb (AI elements)
-```css
-@keyframes breathe {
-  0%, 100% { transform: scale(1) }
-  50% { transform: scale(1.18) }
-}
-animation: breathe 3.5s ease-in-out infinite;
-```
-
-### Pulsing Dot (status indicators)
-```css
-@keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(74,195,41,0.5) }
-  50% { box-shadow: 0 0 0 6px rgba(74,195,41,0) }
-}
-animation: pulse 2s ease-in-out infinite;
-```
-
-### Card Hover
-```css
-transition: transform 0.2s, box-shadow 0.2s;
-/* On hover: */
-transform: translateY(-3px);
-```
-
----
-
-## Pages to Restyle
-
-### 1. Landing Page (Homepage)
-- Green gradient hero box with headline "Know your compliance before you commit."
-- Trust bar with regulation badges (ECOWAS, AfCFTA, EUDR, etc.)
-- White stat cards (4-column grid)
-- Free lookup banner (dark card with green left border)
-- How it works (3 dark cards with numbered steps)
-- Six modules grid (dark cards with colored price badges)
-- LC Document Check section (dark cards with green/amber left borders)
-- Pricing (4-column pack cards, "MOST POPULAR" with green border ring)
-- Footer
-
-### 2. Dashboard
-- Sidebar + Main box with dark-green-to-white gradient
-- Inner green header box with breadcrumb + tabs
-- "Compliance: Pending" title on gradient transition zone
-- 4 stat cards (3 white + 1 dark AI CTA)
-- Recent Trades table
-- Pending Compliance Docs panel
-- Required Actions grid
-
-### 3. LC Document Checker
-- Same sidebar + main box structure
-- Stepper progress (done/active/pending states)
-- Upload and results panels
-- Document validation cards
-
-### 4. All Other Pages
-- Apply the same dark theme, card patterns, and green accents
-- Maintain consistent sidebar + main box structure
-
----
-
-## Files to Reference
-The following HTML mock files in the repo show the exact target design:
-- `design-refs/homepage.html` — Landing page design
-- `design-refs/dashboard.html` — Dashboard design
-- `design-refs/lc-checker.html` — LC Checker design
-
-These are visual references only. Extract the CSS patterns from them but keep the React component logic intact.
+1. **Shared types live in `shared/schema.ts`** — both server and client import from `@shared/schema`
+2. **No direct DB access outside storage.ts** — always go through the `storage` singleton
+3. **Route handlers in `server/routes.ts`** — all API routes are registered in `registerRoutes()`
+4. **Session ID via cookie** — use `getSessionId(req, res)` in route handlers
+5. **Zod validation for request bodies** — use schemas from `@shared/schema` (e.g., `lcCheckRequestSchema`)
+6. **HTTP 402 for token gating** — client expects this status code for "buy tokens" UX
+7. **Stripe dedup via `stripeSessionId`** — prevents double-crediting tokens
+8. **Integrity hashes** — SHA-256 hashes on lookups, LC checks, and PDFs for audit trails
+9. **shadcn/ui components** — add new UI components via shadcn CLI (`npx shadcn@latest add <component>`)
+10. **Page files are self-contained** — each page in `client/src/pages/` contains its own state, queries, and UI
