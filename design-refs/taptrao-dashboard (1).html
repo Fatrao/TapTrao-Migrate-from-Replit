@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TapTrao — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #000;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  /* === SIDEBAR === */
+  .sidebar {
+    width: 240px;
+    min-height: calc(100vh - 20px);
+    background: #242428;
+    padding: 20px 14px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    border-radius: 18px;
+  }
+
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+    padding: 0 8px;
+  }
+
+  .sidebar-logo .logo-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  .sidebar-logo span {
+    font-family: 'Clash Display', sans-serif;
+    font-weight: 600;
+    font-size: 17px;
+    color: #fff;
+  }
+
+  .sidebar-section { margin-bottom: 20px; }
+
+  .sidebar-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    margin-bottom: 6px;
+    padding-left: 10px;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+
+  .sidebar-item:hover {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.8);
+  }
+
+  .sidebar-item.active {
+    background: rgba(74, 222, 128, 0.1);
+    color: #4ade80;
+    border-left: 3px solid #4ade80;
+    padding-left: 7px;
+  }
+
+  .sidebar-item .icon { font-size: 15px; width: 20px; text-align: center; }
+
+  .sidebar-item .badge {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 10px;
+  }
+
+  .badge-red { background: #ef4444; color: #fff; }
+  .badge-green { background: #6b9080; color: #fff; }
+
+  .sidebar-history { margin-top: 4px; }
+
+  .history-card {
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .history-card:hover { background: rgba(255,255,255,0.07); }
+
+  .history-card .title {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 5px;
+  }
+
+  .history-card .tags { display: flex; gap: 5px; }
+
+  .history-card .tag {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* === MAIN WRAPPER === */
+  .main-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 20px);
+  }
+
+  /* === THE BIG MAIN BOX === */
+  .main-box {
+    flex: 1;
+    border-radius: 18px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg,
+      #1a1a1c 0%,
+      #1c2420 3%,
+      #1e2e28 6%,
+      #1f3830 9%,
+      #214232 12%,
+      #264a38 16%,
+      #2c5540 20%,
+      #356248 25%,
+      #3f7056 30%,
+      #4a7e64 35%,
+      #578d74 40%,
+      #659b82 45%,
+      #74a890 50%,
+      #85b49e 55%,
+      #96bfab 60%,
+      #a8cab8 65%,
+      #bbd5c6 70%,
+      #cddfd3 75%,
+      #dde8e1 80%,
+      #eaf0ec 85%,
+      #f2f4f3 90%,
+      #f5f5f5 95%
+    );
+  }
+
+  /* NAV BAR */
+  .main-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px 12px;
+  }
+
+  .main-nav-links {
+    display: flex;
+    gap: 26px;
+  }
+
+  .main-nav-links a {
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.45);
+    text-decoration: none;
+    transition: color 0.15s;
+    font-weight: 400;
+  }
+
+  .main-nav-links a:hover { color: rgba(255,255,255,0.8); }
+  .main-nav-links a.active { color: #fff; font-weight: 600; }
+
+  .main-nav-icons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .icon-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s;
+  }
+
+  .icon-btn:hover { background: rgba(255,255,255,0.14); }
+
+  .icon-btn .dot {
+    position: absolute;
+    top: 1px; right: 1px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #ef4444;
+  }
+
+  .user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* === GREEN HERO BOX === */
+  .green-hero {
+    margin: 4px 24px 16px;
+    background: linear-gradient(135deg, #0e4e45 0%, #14574a 30%, #1c6352 60%, #327462 85%, #3a7d6a 100%);
+    border-radius: 14px;
+    padding: 22px 28px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .green-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 80% 20%, rgba(74,222,128,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .breadcrumb {
+    display: inline-block;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.1);
+    padding: 4px 12px;
+    border-radius: 16px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+
+  .dash-alert {
+    background: rgba(234, 179, 8, 0.12);
+    border: 1px solid rgba(234, 179, 8, 0.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+  }
+
+  .dash-alert .alert-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #eab308;
+  }
+
+  .dash-alert .alert-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* Dash Tabs */
+  .dash-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 0 32px 16px;
+  }
+
+  .dash-tab {
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: rgba(0,0,0,0.35);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .dash-tab.active {
+    background: rgba(0,0,0,0.07);
+    color: rgba(0,0,0,0.7);
+    font-weight: 500;
+  }
+
+  /* Stat Cards */
+  .stat-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 14px;
+    padding: 0 24px 20px;
+  }
+
+  .stat-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  .stat-card .stat-icon {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  .stat-card .stat-label {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 6px;
+  }
+
+  .stat-card .stat-value {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+
+  .stat-card .stat-sub {
+    font-size: 11px;
+    color: #888;
+  }
+
+  .stat-card .stat-sub .up { color: #6b9080; }
+  .stat-card .stat-sub .down { color: #ef4444; }
+
+  .stat-card.ai-card {
+    background: linear-gradient(135deg, #0e4e45, #1c6352);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-width: 160px;
+  }
+
+  .ai-card .ai-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 4px;
+  }
+
+  .ai-card .ai-badge {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4ade80;
+    margin-bottom: 12px;
+  }
+
+  .ai-card .ai-btn {
+    background: #6b9080;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+  }
+
+  /* Grid */
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 0 24px 20px;
+  }
+
+  .dash-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  .dash-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .dash-card-header h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .dash-card-header .count {
+    font-size: 12px;
+    color: #888;
+    background: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  .dash-card-header .link {
+    font-size: 12px;
+    color: #6b9080;
+    cursor: pointer;
+  }
+
+  /* Trade table */
+  .trade-table { width: 100%; }
+  .trade-table th {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #999;
+    text-align: left;
+    padding: 0 0 10px;
+  }
+
+  .trade-table td {
+    padding: 10px 0;
+    font-size: 13px;
+    color: #333;
+    border-top: 1px solid #f0f0f0;
+    vertical-align: middle;
+  }
+
+  .trade-commodity { font-weight: 500; }
+  .trade-hs { font-size: 11px; color: #999; }
+
+  .status-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+
+  .status-pending { background: #fef3c7; color: #d97706; }
+  .status-compliant { background: #dcfce7; color: #16a34a; }
+  .status-review { background: #fee2e2; color: #ef4444; }
+
+  .action-link {
+    font-size: 12px;
+    color: #6b9080;
+    cursor: pointer;
+    border: 1px solid #e0e0e0;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: none;
+  }
+
+  /* Pending docs */
+  .pending-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .pending-item:first-child { border-top: none; }
+
+  .pending-icon {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .pending-info .pending-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+
+  .pending-info .pending-detail {
+    font-size: 11px;
+    color: #999;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .stat-cards { grid-template-columns: 1fr 1fr; }
+    .dash-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img class="logo-img" src="data:image/png;base64,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PXN5YXsYXnh18Yt//byngru392v1GinSnlZax3FMSnmejhNbq3v/7qu/umd3mtV6ua67A/tov//WD793aePi+XMX251OHCcsVmktAi42uJ2u2NTdma1ltsICIoq0n3ksoSAV+QxlO4EipTDfTa2xzHZj7USURldvvDW3trDXiT++012cr8eJAc/88lcul8vBk6cTpX0BMcYo7fmlwDC0msE//WevPYna3Z3YIN190Png6uPB9nTj3MIffufPnt04f+rkqU6vF8exMLh91ZlLsVu72MrMwgyAIiwiSnkBZWFHQ+a92f6qPV97nspDPghY5oWFY0rjtZtXT15aikZpb3tsLAetUr1VMqm9cXPr8184Me7KzRvt+YVmqVI21joP/kf/5FWci77xB9eePOi//da9px+25xer/kL54Ye9alm/d+f958++4AVefzAEkSAIhMWkRmZSOseDu2cRl00o7ZUc9coJGzEPO9px4wIuaWVM6nvUajVu3bnuHwssYDhK6qu1RrO8dWNnc3MQT227H88tlJYXK/PNuZ29yTROtaejxD7/4tLaeXqw3VMsjYX69oORhLFSOopsqekrpaeT+Ecf3X3x8ucGo6ExqSsTXDB1245L8px/ZwkfIIAo7ZeAnJsjuQCpiEgBkEtNEBEJrDHWmFazubP7pDfpBOUgGSVaUTqKjbGeYCmF8dSMhnGlVvXL/PJri2VVv32nXa74APTKa0sf3Ll38+3tTjd8eGsnSLk6F0TdJEmSZJIkw1SR2t/ZJ6QTKyf6g0GSWpesGmtAxLBlW+R5Yq3NWhoCSnulvBA58OCsACYEVxOKmNRUK2Xtqa2dB34l4Knh0JhRqhKJSeYbNV3SbG3Fp817nd442W63l1YrO49snFrPU/HU1JoUmrhzf1RGL2j5y+WKQmUaIhPGiNkYhbQ/2Du9dmYyjaIoMszWWiJiyywuvcrMKcv2mEWsUn4py3LVoZrQ01oASBMhMgsAzM0193d3hqMhRxBUdBDowPOrc+XWYjXtmuWVaqVcjwjrLRwPkvGAHm/GcUSe7//KV86eOKUsS2dv9NrrZ7wGJW3TGzACdPdCX7xWxTe+eBU12B77XrAwv9Af9K0RT2tSitlV48TWWHOwhblkTim/RESosjrL7R1aa0AUEBOnIMzWQGqVol6/LSRBPVAKo1CUxVazLB6LGP94cPxc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" alt="TapTrao">
+      <span>TapTrao</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Menu</div>
+      <div class="sidebar-item active">
+        <span class="icon">⊞</span> Dashboard
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">◉</span> My Trades <span class="badge badge-green">3</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">●</span> Lookup
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">📄</span> LC Check
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Compliance</div>
+      <div class="sidebar-item">
+        <span class="icon">📬</span> Supplier Inbox <span class="badge badge-red">2</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">🔔</span> Alerts <span class="badge badge-red">5</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">📋</span> Templates
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">History</div>
+      <div class="sidebar-history">
+        <div class="history-card">
+          <div class="title">🇨🇮 Cashew CI → 🇬🇧 UK Q1 2026</div>
+          <div class="tags"><span class="tag">LC Check</span><span class="tag">$126k</span></div>
+        </div>
+        <div class="history-card">
+          <div class="title">🇬🇭 Cocoa Beans GH → 🇪🇺 EU</div>
+          <div class="tags"><span class="tag">LC Check</span><span class="tag">$84k</span></div>
+        </div>
+        <div class="history-card">
+          <div class="title">🇪🇹 Sesame Seeds ET → 🇪🇺 EU</div>
+          <div class="tags"><span class="tag">Lookup</span><span class="tag">$43k</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-wrapper">
+    <div class="main-box">
+
+      <!-- NAV -->
+      <div class="main-nav">
+        <div class="main-nav-links">
+          <a href="#" class="active">Dashboard</a>
+          <a href="#">Commodities</a>
+          <a href="#">Suppliers</a>
+          <a href="#">Compliance</a>
+          <a href="#">Messages</a>
+        </div>
+        <div class="main-nav-icons">
+          <div class="icon-btn">🔔<div class="dot"></div></div>
+          <div class="icon-btn">💬</div>
+          <div class="icon-btn">⚙️</div>
+          <div class="user-avatar">F</div>
+        </div>
+      </div>
+
+      <!-- GREEN HERO BOX -->
+      <div class="green-hero">
+        <div class="breadcrumb">Commodity › Cocoa › 🇬🇭 Ghana</div>
+        <div class="dash-alert">
+          <span class="alert-label">⚠ Compliance: Pending</span>
+          <span class="alert-text">Cocoa Beans · 🇬🇭 Ghana → 🇪🇺 EU · 3 items need attention</span>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="dash-tabs">
+        <div class="dash-tab active">Overview</div>
+        <div class="dash-tab">Documents</div>
+        <div class="dash-tab">Activity</div>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-icon">🏛</div>
+          <div class="stat-label">Total Trade Value at Risk</div>
+          <div class="stat-value">$2,345,678</div>
+          <div class="stat-sub"><span class="up">↑ 12.5%</span> · 12 past shipments</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔍</div>
+          <div class="stat-label">Total Lookups</div>
+          <div class="stat-value">47 <span style="font-size:14px;color:#888;">checks</span></div>
+          <div class="stat-sub"><span class="up">↑ 8%</span> vs prev. 28 days</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-label">Rejection Risk</div>
+          <div class="stat-value">7.8% <span style="font-size:12px;color:#eab308;">Moderate</span></div>
+          <div class="stat-sub"><span class="down">↓ 1.7%</span> vs prev. 28 days</div>
+        </div>
+        <div class="stat-card ai-card">
+          <div class="ai-label">Recommended with</div>
+          <div class="ai-badge">AI</div>
+          <button class="ai-btn">Pre-Shipment<br>Check</button>
+        </div>
+      </div>
+
+      <!-- GRID -->
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3>Recent Trades <span class="count">12</span></h3>
+            <span class="link">View All ›</span>
+          </div>
+          <table class="trade-table">
+            <thead><tr><th>Commodity</th><th>Corridor</th><th>Value</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td><div class="trade-commodity">Cocoa Beans</div><div class="trade-hs">HS 1801.00</div></td>
+                <td>🇬🇭 GH → 🇪🇺 EU<br><span style="font-size:11px;color:#999;">20 Feb</span></td>
+                <td>$84,000</td>
+                <td><span class="status-badge status-pending">Pending</span></td>
+                <td><button class="action-link">Review</button></td>
+              </tr>
+              <tr>
+                <td><div class="trade-commodity">Raw Cashew</div><div class="trade-hs">HS 0801.31</div></td>
+                <td>🇨🇮 CI → 🇬🇧 GB<br><span style="font-size:11px;color:#999;">17 Feb</span></td>
+                <td>$126,500</td>
+                <td><span class="status-badge status-compliant">Compliant</span></td>
+                <td><button class="action-link">View</button></td>
+              </tr>
+              <tr>
+                <td><div class="trade-commodity">Sesame Seeds</div><div class="trade-hs">HS 1207.40</div></td>
+                <td>🇪🇹 ET → 🇪🇺 EU<br><span style="font-size:11px;color:#999;">14 Feb</span></td>
+                <td>$43,200</td>
+                <td><span class="status-badge status-review">Review</span></td>
+                <td><button class="action-link">Fix</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3>Pending Compliance Docs</h3>
+          </div>
+          <div class="pending-item">
+            <div class="pending-icon">📄</div>
+            <div class="pending-info">
+              <div class="pending-name">Bill of Lading</div>
+              <div class="pending-detail">Cocoa Beans · 🇬🇭 GH → 🇪🇺 EU</div>
+            </div>
+          </div>
+          <div class="pending-item">
+            <div class="pending-icon">🌍</div>
+            <div class="pending-info">
+              <div class="pending-name">🇬🇭 Country of Origin</div>
+              <div class="pending-detail">COCOBOD / Ghana Customs</div>
+            </div>
+          </div>
+          <div class="pending-item">
+            <div class="pending-icon">🔬</div>
+            <div class="pending-info">
+              <div class="pending-name">Inspection Certificate</div>
+              <div class="pending-detail">Port Health · Felixstowe</div>
+            </div>
+          </div>
+          <div class="pending-item">
+            <div class="pending-icon">🌿</div>
+            <div class="pending-info">
+              <div class="pending-name">EUDR Due Diligence</div>
+              <div class="pending-detail">Geolocation pending</div>
+            </div>
+          </div>
+          <div class="pending-item">
+            <div class="pending-icon">📑</div>
+            <div class="pending-info">
+              <div class="pending-name">Customs Declaration</div>
+              <div class="pending-detail">CDS · UK Import</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
