@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useTokenBalance } from "@/hooks/use-tokens";
-import { LayoutGrid, Settings, Plus, Search, FileCheck, Bell, Calculator, Bookmark, Menu, X } from "lucide-react";
+import { LayoutGrid, BarChart3, Settings, Plus, Search, FileCheck, Bell, Calculator, Bookmark, Menu, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, type ReactNode } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -14,9 +14,10 @@ interface NavItem {
 }
 
 const workspaceItems: NavItem[] = [
+  { icon: BarChart3, label: "Dashboard", href: "/dashboard" },
   { icon: Search, label: "Compliance Lookup", href: "/lookup" },
   { icon: FileCheck, label: "LC Checker", href: "/lc-check" },
-  { icon: LayoutGrid, label: "My Trades", href: "/trades", matchPaths: ["/trades", "/dashboard"] },
+  { icon: LayoutGrid, label: "My Trades", href: "/trades" },
 ];
 
 const toolsItems: NavItem[] = [

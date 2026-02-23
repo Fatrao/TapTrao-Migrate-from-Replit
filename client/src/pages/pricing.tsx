@@ -501,8 +501,8 @@ export default function Pricing() {
           </div>
         </div>
 
-        {/* SECTION 6 — Monitoring (last, muted) */}
-        <div style={{ marginBottom: 64 }}>
+        {/* SECTION 6 — Monitoring (muted) */}
+        <div style={{ marginBottom: 40 }}>
           <div style={{ maxWidth: 480, margin: "0 auto" }}>
             <div style={{ ...S.card, border: "1px dashed var(--border2)", background: "transparent", opacity: 0.7 }} data-testid="card-pro-monitoring">
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
@@ -516,6 +516,26 @@ export default function Pricing() {
               </div>
               <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
                 Regulatory change alerts and compliance calendar. For frequent shippers. Not required for occasional trades.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 7 — Public API (coming soon) */}
+        <div style={{ marginBottom: 64 }}>
+          <div style={{ maxWidth: 480, margin: "0 auto" }}>
+            <div style={{ ...S.card, border: "1px dashed var(--border2)", background: "transparent", opacity: 0.7 }} data-testid="card-public-api">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <Shield style={{ width: 18, height: 18, color: "var(--t3)" }} />
+                <span style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
+                  Public API
+                </span>
+                <span style={{ ...S.badge, background: "var(--abg)", color: "var(--amber)", border: "1px solid var(--abd)" }}>
+                  Coming Soon
+                </span>
+              </div>
+              <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
+                Integrate compliance checks directly into your systems via REST API. Programmatic access to duties, document requirements, and risk scores.
               </p>
             </div>
           </div>

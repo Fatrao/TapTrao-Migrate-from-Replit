@@ -1738,7 +1738,7 @@ export default function LcCheck() {
                 <div className="lc-note" style={{ marginTop: 12 }}>
                   <span className="lc-note-ic">💡</span>
                   <div className="lc-note-txt">
-                    <strong>PDF attached for reference</strong> &mdash; manual field entry is required for now. Auto-extraction from uploaded documents is coming soon.
+                    <strong>Auto-extraction coming soon</strong> &mdash; enter fields manually for now. Your PDF is attached for reference.
                   </div>
                 </div>
               </div>
@@ -2116,6 +2116,19 @@ export default function LcCheck() {
                 >
                   Upload Corrected Docs &rarr;
                 </button>
+                {checkMutation.data.correctionWhatsApp && (
+                  <button
+                    className="lc-btn-grey"
+                    style={{ background: "rgba(37,211,102,.12)", color: "#25D366", border: "1px solid rgba(37,211,102,.2)" }}
+                    onClick={() => {
+                      const text = encodeURIComponent(checkMutation.data!.correctionWhatsApp || "");
+                      window.open(`https://wa.me/?text=${text}`, "_blank");
+                    }}
+                    data-testid="button-results-send-whatsapp"
+                  >
+                    <MessageCircle size={14} style={{ marginRight: 4 }} /> Send via WhatsApp
+                  </button>
+                )}
                 <button className="lc-btn-grey" onClick={() => {
                   setStep(1);
                   checkMutation.reset();
