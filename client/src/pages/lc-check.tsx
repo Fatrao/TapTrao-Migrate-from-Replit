@@ -799,7 +799,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
     <div style={{ borderRadius: 14, background: v.bg, padding: "22px 26px" }} data-testid="twinlog-readiness-banner">
       <div style={{ display: "flex", gap: 0 }}>
         <div style={{ width: 160, display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
-          <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: "clamp(48px, 6vw, 64px)", letterSpacing: -4, color: "var(--t1)", lineHeight: 1 }}>
+          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(48px, 6vw, 64px)", letterSpacing: "-0.03em", color: "var(--t1)", lineHeight: 1 }}>
             {score}
           </div>
           <span style={{ display: "inline-block", fontFamily: "'DM Mono', monospace", fontSize: 9, fontWeight: 600, padding: "3px 8px", borderRadius: 4, background: v.badgeBg, border: `1px solid ${v.badgeBorder}`, color: v.badgeColor, width: "fit-content", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
@@ -1456,7 +1456,7 @@ export default function LcCheck() {
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="space-y-2">
             <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>TapTrao / LC Check</p>
-            <h1 style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)" }} data-testid="text-lc-title">
+            <h1 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 28, letterSpacing: "-0.03em", color: "var(--t1)" }} data-testid="text-lc-title">
               Check your LC before sending it to the bank
             </h1>
             <p style={{ fontFamily: "var(--fb)", color: "var(--t2)", fontSize: 14 }}>
@@ -1869,19 +1869,19 @@ export default function LcCheck() {
                   </div>
                   <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
                     <div className="text-center p-3" style={{ background: "var(--card2)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--t1)" }} data-testid="text-total-checks">{checkMutation.data.summary.totalChecks}</p>
+                      <p style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 24, color: "var(--t1)" }} data-testid="text-total-checks">{checkMutation.data.summary.totalChecks}</p>
                       <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Total Checks</p>
                     </div>
                     <div className="text-center p-3" style={{ background: "var(--gbg)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--green)" }} data-testid="text-matches">{checkMutation.data.summary.matches}</p>
+                      <p style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 24, color: "var(--green)" }} data-testid="text-matches">{checkMutation.data.summary.matches}</p>
                       <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Matches</p>
                     </div>
                     <div className="text-center p-3" style={{ background: "var(--abg)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--amber)" }} data-testid="text-warnings">{checkMutation.data.summary.warnings}</p>
+                      <p style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 24, color: "var(--amber)" }} data-testid="text-warnings">{checkMutation.data.summary.warnings}</p>
                       <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Warnings</p>
                     </div>
                     <div className="text-center p-3" style={{ background: "var(--rbg)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--red)" }} data-testid="text-criticals">{checkMutation.data.summary.criticals}</p>
+                      <p style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 24, color: "var(--red)" }} data-testid="text-criticals">{checkMutation.data.summary.criticals}</p>
                       <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Critical</p>
                     </div>
                   </div>
