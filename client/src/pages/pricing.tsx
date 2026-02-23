@@ -107,7 +107,7 @@ const S = {
     fontWeight: 900,
     fontSize: 28,
     color: "var(--t1)",
-    letterSpacing: "-0.5px",
+    letterSpacing: "0",
     margin: 0,
   } as React.CSSProperties,
   sub: {
@@ -180,7 +180,7 @@ const S = {
     fontWeight: 900,
     fontSize: 20,
     color: "var(--t1)",
-    letterSpacing: "-0.3px",
+    letterSpacing: "0",
     textAlign: "center" as const,
     margin: "0 0 8px",
   } as React.CSSProperties,
@@ -333,7 +333,7 @@ export default function Pricing() {
                     <div style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
                       {pack.name}
                     </div>
-                    <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)", marginTop: 8, letterSpacing: "-0.5px" }}>
+                    <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)", marginTop: 8, letterSpacing: "0" }}>
                       {pack.price}
                     </div>
                     <div style={{ ...S.statLabel, marginTop: 6 }}>
@@ -413,7 +413,7 @@ export default function Pricing() {
                 </span>
               </div>
               <div style={{ marginBottom: 12 }}>
-                <span style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)", letterSpacing: "-0.5px" }}>
+                <span style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)", letterSpacing: "0" }}>
                   $19.99
                 </span>
                 <span style={{ color: "var(--t2)", fontSize: 13, marginLeft: 6 }}>one-time</span>
@@ -464,7 +464,7 @@ export default function Pricing() {
                 </span>
               </div>
               <div style={{ marginBottom: 10 }}>
-                <span style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "var(--t1)", letterSpacing: "-0.5px" }}>
+                <span style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "var(--t1)", letterSpacing: "0" }}>
                   $9.99
                 </span>
                 <span style={{ color: "var(--t2)", fontSize: 13, marginLeft: 6 }}>per re-check</span>

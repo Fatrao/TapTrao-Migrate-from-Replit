@@ -19,14 +19,14 @@ export default function Home() {
   );
 
   return (
-    <div className="page-wrap" style={{ fontFamily: "var(--fb)", background: "linear-gradient(180deg, #0e4e45 0%, #104f47 5%, #14574a 10%, #1c6352 15%, #216354 20%, #2f725f 25%, #347161 30%, #3f7d6a 35%, #468271 40%, #498573 45%, #578d7d 50%, #619888 55%, #6a9f8d 60%, #7faa9b 65%, #87b0a2 68%, #8db3a6 71%, #94b5ab 74%, #9cbbb2 77%, #a6c3ba 80%, #bdd3cb 85%, #c7d9d2 88%, #e2e7e6 93%, #f2f2f2 97%, #f3f3f3 100%)", color: "#fff", WebkitFontSmoothing: "antialiased" }}>
+    <div className="page-wrap home-page-root" style={{ fontFamily: "var(--fb)", background: "#000", color: "#fff", WebkitFontSmoothing: "antialiased" }}>
 
       {/* ── NAV ── */}
       <div className="nav-bar" data-testid="nav-header">
         <Link href="/">
           <span className="nav-l" style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", textDecoration: "none" }} data-testid="text-landing-logo">
             <img src="/taptrao-green-logo.png" alt="TapTrao" style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", boxShadow: "0 0 16px rgba(74,140,111,.4)" }} />
-            <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "#fff", letterSpacing: "-0.02em" }}>TapTrao</span>
+            <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "#fff", letterSpacing: "0" }}>TapTrao</span>
           </span>
         </Link>
         <div className="nav-c" data-testid="nav-landing-desktop" style={{ display: "flex", gap: 28 }}>
@@ -65,7 +65,7 @@ export default function Home() {
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.08)", backdropFilter: "blur(6px)", borderRadius: 24, padding: "6px 16px", marginBottom: 28, fontSize: 11, fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(255,255,255,.6)" }} className="home-hero-badge" data-testid="badge-hero">
             <span className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--green)", boxShadow: "0 0 8px var(--green)", display: "inline-block" }} /> Trade compliance for commodity traders
           </div>
-          <h1 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(38px,5.5vw,64px)", lineHeight: 1.08, letterSpacing: "-0.02em", color: "#fff", marginBottom: 20, marginTop: 0 }} className="home-hero-title" data-testid="text-hero-title">
+          <h1 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(38px,5.5vw,64px)", lineHeight: 1.08, letterSpacing: "0", color: "#fff", marginBottom: 20, marginTop: 0 }} className="home-hero-title" data-testid="text-hero-title">
             Know your compliance<br />before you <em style={{ fontStyle: "normal", color: "var(--green)" }}>commit.</em>
           </h1>
           <p style={{ fontSize: 17, lineHeight: 1.7, color: "rgba(255,255,255,.45)", marginBottom: 36 }} className="home-hero-subtitle" data-testid="text-hero-subtitle">
@@ -104,24 +104,24 @@ export default function Home() {
             <div className="stat-card glow-green">
               <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 12, position: "relative", zIndex: 1, background: "rgba(74,140,111,.1)" }}>📦</div>
               <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Commodities Covered</div>
-              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.02em", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}>154 <span style={{ fontSize: 13, color: "var(--txt3)", fontWeight: 400, fontFamily: "var(--fb)" }}>types</span></div>
+              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "0", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}>154 <span style={{ fontSize: 13, color: "var(--txt3)", fontWeight: 400, fontFamily: "var(--fb)" }}>types</span></div>
               <div style={{ fontSize: 11.5, position: "relative", zIndex: 1, color: "var(--txt3)" }}><span style={{ color: "var(--green)", fontWeight: 600 }}>↑ Full database</span> at launch</div>
             </div>
             <div className="stat-card glow-amber">
               <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 12, position: "relative", zIndex: 1, background: "rgba(234,139,67,.1)" }}>💰</div>
               <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Bank Amendment Fee</div>
-              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.02em", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}><sup style={{ fontSize: 13, fontWeight: 500, opacity: .5, verticalAlign: "super", marginRight: 1 }}>$</sup>150–500</div>
+              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "0", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}><sup style={{ fontSize: 13, fontWeight: 500, opacity: .5, verticalAlign: "super", marginRight: 1 }}>$</sup>150–500</div>
               <div style={{ fontSize: 11.5, position: "relative", zIndex: 1, color: "var(--txt3)" }}><span style={{ color: "var(--red)", fontWeight: 600 }}>⚠ Per discrepancy</span> what's at stake</div>
             </div>
             <div className="stat-card glow-teal">
               <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 12, position: "relative", zIndex: 1, background: "rgba(46,134,98,.1)" }}>📋</div>
               <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Regulations Mapped</div>
-              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.02em", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}>40+ <span style={{ fontSize: 13, color: "var(--txt3)", fontWeight: 400, fontFamily: "var(--fb)" }}>rules</span></div>
+              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "0", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}>40+ <span style={{ fontSize: 13, color: "var(--txt3)", fontWeight: 400, fontFamily: "var(--fb)" }}>rules</span></div>
               <div style={{ fontSize: 11.5, position: "relative", zIndex: 1, color: "var(--txt3)" }}><span style={{ color: "var(--green)", fontWeight: 600 }}>↑ EUDR · CBAM</span> + more</div>
             </div>
             <div className="stat-card cta">
               <div className="animate-breathe" style={{ position: "absolute", bottom: -20, right: -20, width: 130, height: 130, background: "radial-gradient(circle,rgba(74,140,111,.28) 0%,rgba(74,140,111,.06) 50%,transparent 70%)", borderRadius: "50%", pointerEvents: "none" }} />
-              <div style={{ fontFamily: "var(--fh)", fontSize: 36, fontWeight: 800, color: "var(--green)", letterSpacing: "-0.02em", position: "relative", zIndex: 1, marginBottom: 4 }}>$0</div>
+              <div style={{ fontFamily: "var(--fh)", fontSize: 36, fontWeight: 800, color: "var(--green)", letterSpacing: "0", position: "relative", zIndex: 1, marginBottom: 4 }}>$0</div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", position: "relative", zIndex: 1, marginBottom: 4 }}>Pre-Shipment Check with <strong style={{ color: "var(--green)" }}>AI</strong></div>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)", marginBottom: 2 }}>No card · No sign-up</div>
               <Link href="/lookup">
@@ -134,7 +134,7 @@ export default function Home() {
           <div className="free-banner">
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--green)", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>✦ No account needed</div>
-              <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(24px,3vw,36px)", color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: 12 }}>Run your first<br />lookup free.</h2>
+              <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(24px,3vw,36px)", color: "#fff", letterSpacing: "0", lineHeight: 1.1, marginBottom: 12 }}>Run your first<br />lookup free.</h2>
               <p style={{ fontSize: 14, lineHeight: 1.7, color: "rgba(255,255,255,.35)", maxWidth: 460 }}>Enter commodity + origin + destination. Get the full compliance picture in seconds — duty rates, required documents, regulatory triggers, STOP warnings. No credit card. No sign-up.</p>
             </div>
             <div style={{ textAlign: "center", flexShrink: 0 }}>
@@ -164,7 +164,7 @@ export default function Home() {
       <div className="section" id="how" data-testid="section-how-it-works">
         <div className="section-inner">
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--green)", marginBottom: 12 }}>How it works</div>
-          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#fff", marginBottom: 8 }}>Three inputs. <em style={{ fontStyle: "normal", color: "var(--green)" }}>Complete picture.</em></div>
+          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "0", color: "#fff", marginBottom: 8 }}>Three inputs. <em style={{ fontStyle: "normal", color: "var(--green)" }}>Complete picture.</em></div>
           <div style={{ fontSize: 14, color: "rgba(255,255,255,.35)", lineHeight: 1.6, maxWidth: 460, marginBottom: 40 }}>No ERP required. No broker needed. Just answers.</div>
           <div className="how-grid">
             {[
@@ -187,7 +187,7 @@ export default function Home() {
       <div className="section" id="modules" data-testid="section-capabilities">
         <div className="section-inner">
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--green)", marginBottom: 12 }}>What's included</div>
-          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#fff", marginBottom: 8 }}>Six modules. <em style={{ fontStyle: "normal", color: "var(--green)" }}>One engine.</em></div>
+          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "0", color: "#fff", marginBottom: 8 }}>Six modules. <em style={{ fontStyle: "normal", color: "var(--green)" }}>One engine.</em></div>
           <div style={{ fontSize: 14, color: "rgba(255,255,255,.35)", lineHeight: 1.6, maxWidth: 460, marginBottom: 40 }}>Every tool a commodity trader needs. Pay per check. No subscription required to start.</div>
           <div className="mod-grid">
             {[
@@ -218,7 +218,7 @@ export default function Home() {
       <div className="section" id="lc" style={{ paddingTop: 40 }}>
         <div className="section-inner">
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--green)", marginBottom: 12 }}>LC Document Check</div>
-          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#fff", marginBottom: 8 }}>Just need to check <em style={{ fontStyle: "normal", color: "var(--green)" }}>an LC?</em></div>
+          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "0", color: "#fff", marginBottom: 8 }}>Just need to check <em style={{ fontStyle: "normal", color: "var(--green)" }}>an LC?</em></div>
           <div style={{ fontSize: 14, color: "rgba(255,255,255,.35)", lineHeight: 1.6, maxWidth: 460, marginBottom: 40 }}>Standalone LC checking without buying a full trade credit.</div>
           <div className="lc-cards">
             <div className="lc-card primary">
@@ -259,7 +259,7 @@ export default function Home() {
       <div className="section" id="pricing" data-testid="section-pricing">
         <div className="section-inner">
           <div style={{ textAlign: "center", marginBottom: 40 }}>
-            <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(28px,4vw,46px)", color: "#fff", letterSpacing: "-0.02em", marginBottom: 12 }} data-testid="text-pricing-heading">Check a shipment<br /><em style={{ fontStyle: "normal", color: "var(--green)" }}>before it costs you.</em></h2>
+            <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(28px,4vw,46px)", color: "#fff", letterSpacing: "0", marginBottom: 12 }} data-testid="text-pricing-heading">Check a shipment<br /><em style={{ fontStyle: "normal", color: "var(--green)" }}>before it costs you.</em></h2>
             <p style={{ fontSize: 14, color: "rgba(255,255,255,.35)", marginBottom: 20 }}>Pay per shipment. No subscriptions. Your first compliance check is free.</p>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 50, padding: "6px 18px", fontSize: 11, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.2)", marginBottom: 32 }}>
               <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--green)" }} /> 0 Trade Credits

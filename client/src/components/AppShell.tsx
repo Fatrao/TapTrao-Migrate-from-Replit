@@ -204,7 +204,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                 fontWeight: 800,
                 fontSize: 16,
                 color: "#fff",
-                letterSpacing: "-0.03em",
+                letterSpacing: "0",
               }}
             >
               TapTrao
@@ -369,7 +369,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        background: "linear-gradient(180deg, #0e4e45 0%, #0e4e46 1%, #0d5047 2%, #104f47 3%, #104e47 4%, #14574a 5%, #1c6352 6%, #165d4c 7%, #216354 8%, #236857 9%, #2f725f 10%, #327462 11%, #347161 12%, #3f7d6a 13%, #367763 14%, #397966 15%, #407d6a 16%, #41806c 17%, #468271 18%, #3b7a66 19%, #498573 20%, #4a8676 21%, #578d7d 22%, #619888 23%, #6a9f8d 24%, #7faa9b 25%, #87b0a2 26%, #89b1a3 27%, #8db3a6 28%, #94b5ab 29%, #9cbbb2 30%, #a6c3ba 31%, #a7c3ba 32%, #bdd3cb 33%, #bfd3cc 34%, #c7d9d2 35%, #e2e7e6 36%, #f2f2f2 37%, #f3f3f3 38%, #f3f3f3 100%)",
+        background: "linear-gradient(180deg, #0e4e45 0px, #0e4e45 400px, #1a6b5a 460px, #4a9e8a 520px, #8ac0b0 570px, #bdd9ce 610px, #e4efea 650px, #f3f3f3 700px)",
         minHeight: "calc(100vh - 20px)",
       }}>
         {/* TOPNAV */}

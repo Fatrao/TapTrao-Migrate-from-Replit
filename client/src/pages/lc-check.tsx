@@ -172,11 +172,13 @@ function InsuranceGapAlert() {
     <div
       data-testid="insurance-gap-alert"
       style={{
-        background: "rgba(74,140,111,.06)",
+        background: "#fff",
         borderRadius: 14,
         padding: "14px 18px",
         marginBottom: 20,
         position: "relative",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)",
+        border: "1px solid rgba(74,140,111,0.15)",
       }}
     >
       <button
@@ -185,20 +187,20 @@ function InsuranceGapAlert() {
         style={{
           position: "absolute", top: 10, right: 12,
           background: "none", border: "none", cursor: "pointer",
-          color: "var(--t3)", fontSize: 16, lineHeight: 1,
+          color: "#999", fontSize: 16, lineHeight: 1,
         }}
       >
         <X size={14} />
       </button>
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-        <Shield size={16} style={{ color: "var(--blue)", flexShrink: 0 }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>
+        <Shield size={16} style={{ color: "var(--green)", flexShrink: 0 }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: "#111" }}>
           Insurance gap — check your policy covers this trade
         </span>
       </div>
 
-      <p style={{ fontSize: 12, color: "var(--t2)", lineHeight: 1.65, marginBottom: 12 }}>
+      <p style={{ fontSize: 12, color: "#666", lineHeight: 1.65, marginBottom: 12 }}>
         Standard cargo insurance (Institute Cargo Clauses A/B/C) covers physical
         loss and damage. It does NOT cover goods rejected at port due to regulatory
         non-compliance — which is a separate and common risk for agricultural and
@@ -207,12 +209,12 @@ function InsuranceGapAlert() {
 
       <div style={{
         display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12,
-        background: "var(--card2)", borderRadius: 6, padding: "10px 14px",
+        background: "#f5f5f5", borderRadius: 6, padding: "10px 14px",
         fontFamily: "'DM Mono', monospace", fontSize: 11, marginBottom: 12,
       }}>
         <div>
-          <div style={{ fontWeight: 600, color: "var(--t1)", marginBottom: 6 }}>NOT covered by standard policy:</div>
-          <ul style={{ margin: 0, paddingLeft: 16, color: "var(--t2)", lineHeight: 1.8 }}>
+          <div style={{ fontWeight: 600, color: "#111", marginBottom: 6 }}>NOT covered by standard policy:</div>
+          <ul style={{ margin: 0, paddingLeft: 16, color: "#666", lineHeight: 1.8 }}>
             <li>Regulatory rejection at border</li>
             <li>Phytosanitary detention and destruction</li>
             <li>EUDR non-compliance refusal</li>
@@ -220,8 +222,8 @@ function InsuranceGapAlert() {
           </ul>
         </div>
         <div>
-          <div style={{ fontWeight: 600, color: "var(--t1)", marginBottom: 6 }}>Ask your insurer about:</div>
-          <ul style={{ margin: 0, paddingLeft: 16, color: "var(--t2)", lineHeight: 1.8 }}>
+          <div style={{ fontWeight: 600, color: "#111", marginBottom: 6 }}>Ask your insurer about:</div>
+          <ul style={{ margin: 0, paddingLeft: 16, color: "#666", lineHeight: 1.8 }}>
             <li>Trade disruption insurance</li>
             <li>Rejection / condemnation clause</li>
             <li>Commodity-specific contamination cover</li>
@@ -230,7 +232,7 @@ function InsuranceGapAlert() {
         </div>
       </div>
 
-      <p style={{ fontSize: 11, color: "var(--t3)", lineHeight: 1.5 }}>
+      <p style={{ fontSize: 11, color: "#999", lineHeight: 1.5 }}>
         This applies regardless of Incoterms. Even under CIF or CIP, the seller's
         insurance does not cover destination regulatory rejection.
       </p>
@@ -799,7 +801,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
     <div style={{ borderRadius: 14, background: v.bg, padding: "22px 26px" }} data-testid="twinlog-readiness-banner">
       <div style={{ display: "flex", gap: 0 }}>
         <div style={{ width: 160, display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
-          <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: "clamp(48px, 6vw, 64px)", letterSpacing: -4, color: "var(--t1)", lineHeight: 1 }}>
+          <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: "clamp(48px, 6vw, 64px)", letterSpacing: 0, color: "var(--t1)", lineHeight: 1 }}>
             {score}
           </div>
           <span style={{ display: "inline-block", fontFamily: "'DM Mono', monospace", fontSize: 9, fontWeight: 600, padding: "3px 8px", borderRadius: 4, background: v.badgeBg, border: `1px solid ${v.badgeBorder}`, color: v.badgeColor, width: "fit-content", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
@@ -1513,7 +1515,7 @@ export default function LcCheck() {
             </div>
             <div style={{
               fontFamily: "var(--fh)", fontSize: 30, fontWeight: 700, color: "#fff",
-              letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: 7,
+              letterSpacing: "0", lineHeight: 1.1, marginBottom: 7,
             }} data-testid="text-lc-title">
               LC Document<br />Checker
             </div>
@@ -1584,13 +1586,13 @@ export default function LcCheck() {
 
         {/* Prefill Banner */}
         {showPrefillBanner && prefillData && (
-          <div style={{ margin: "14px 14px 0", background: "rgba(74,140,111,0.06)", borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "flex-start", gap: 12, position: "relative" }} data-testid="banner-lc-prefill">
+          <div style={{ margin: "14px 14px 0", background: "rgba(74,140,111,0.15)", borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "flex-start", gap: 12, position: "relative" }} data-testid="banner-lc-prefill">
             <ExternalLink size={18} style={{ color: "var(--green)", flexShrink: 0, marginTop: 1 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-prefill-info">
                 Pre-filled from your compliance lookup
               </p>
-              <p style={{ fontSize: 13, color: "#666" }}>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>
                 {prefillData.commodity_name} — {prefillData.origin_name} → {prefillData.dest_name}
               </p>
               {prefillData.lookup_id && (
@@ -1605,7 +1607,7 @@ export default function LcCheck() {
             </div>
             <button
               onClick={() => setShowPrefillBanner(false)}
-              style={{ color: "#999", background: "none", border: "none", cursor: "pointer" }}
+              style={{ color: "rgba(255,255,255,0.4)", background: "none", border: "none", cursor: "pointer" }}
               data-testid="button-dismiss-prefill-banner"
             >
               <X size={16} />
@@ -2121,7 +2123,7 @@ export default function LcCheck() {
                     </span>
                     <div>
                       <div style={{
-                        fontFamily: "var(--fh)", fontSize: 18, fontWeight: 800, letterSpacing: "-0.03em",
+                        fontFamily: "var(--fh)", fontSize: 18, fontWeight: 800, letterSpacing: "0",
                         color: isFail ? "var(--red)" : isWarn ? "var(--amber)" : "var(--green)",
                       }}>
                         {isFail ? "Discrepancies Found" : isWarn ? "Compliant With Notes" : "Fully Compliant"}

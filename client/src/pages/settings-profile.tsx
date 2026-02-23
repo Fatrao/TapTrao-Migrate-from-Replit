@@ -160,7 +160,7 @@ export default function SettingsProfile() {
     <AppShell>
       <div className="max-w-2xl mx-auto px-4 py-8">
         <h1
-          style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "-0.5px", color: "var(--t1)", marginBottom: 8 }}
+          style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "0", color: "var(--t1)", marginBottom: 8 }}
           data-testid="text-profile-heading"
         >
           Company Profile

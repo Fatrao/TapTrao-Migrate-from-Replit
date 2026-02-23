@@ -207,7 +207,7 @@ export default function Templates() {
               fontFamily: "var(--fh)",
               fontWeight: 900,
               fontSize: 28,
-              letterSpacing: "-0.5px",
+              letterSpacing: "0",
               color: "var(--t1)",
               margin: 0,
               lineHeight: 1.1,

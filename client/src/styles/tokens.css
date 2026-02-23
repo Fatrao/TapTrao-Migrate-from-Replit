@@ -48,9 +48,9 @@
   --fb: 'DM Sans', sans-serif;
 }
 
-/* ── Clash Display headings — prevent letter overlap ── */
+/* ── Clash Display headings — normal spacing ── */
 [style*="Clash Display"] {
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 /* ── Scrollbar ── */
