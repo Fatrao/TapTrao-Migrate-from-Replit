@@ -1541,8 +1541,8 @@ export default function LcCheck() {
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8, paddingTop: 2, flexShrink: 0 }}>
             <div className="lc-price-pill">
-              {isFreeCheck && <span className="lc-free-dot">FREE</span>}
-              {isFreeCheck ? "First check included" : "1 credit per check"}
+              <span className="lc-free-dot">FREE</span>
+              {isFreeCheck ? "First check · $19.99 after" : "$19.99 per check"}
             </div>
           </div>
         </div>
@@ -1634,18 +1634,14 @@ export default function LcCheck() {
                   </div>
                 </div>
 
-                <div className="lc-fg2" style={{ marginTop: 13 }}>
+                <div className="lc-fg2" style={{ marginBottom: 13 }}>
                   <div className="lc-field lc-f-full">
                     <label>Goods Description <span className="req">*</span></label>
-                    <Input value={lcFields.goodsDescription} onChange={e => updateLcField("goodsDescription", e.target.value)} placeholder="e.g. Raw Cashew Nuts, Grade WW320" data-testid="input-goods-description" />
+                    <Input value={lcFields.goodsDescription} onChange={e => updateLcField("goodsDescription", e.target.value)} placeholder="e.g. Raw Cashew Nuts in shell, crop 2025/26" data-testid="input-goods-description" />
                   </div>
                 </div>
 
-                <div className="lc-fg3" style={{ marginTop: 13 }}>
-                  <div className="lc-field">
-                    <label>HS Code</label>
-                    <Input value={lcFields.hsCode} onChange={e => updateLcField("hsCode", e.target.value)} placeholder="e.g. 0801.31" data-testid="input-hs-code" />
-                  </div>
+                <div className="lc-fg3" style={{ marginBottom: 13 }}>
                   <div className="lc-field">
                     <label>Quantity <span className="req">*</span></label>
                     <div style={{ display: "flex", gap: 6 }}>
@@ -1658,11 +1654,8 @@ export default function LcCheck() {
                   </div>
                   <div className="lc-field">
                     <label>LC Amount <span className="req">*</span></label>
-                    <Input type="number" value={lcFields.totalAmount || ""} onChange={e => updateLcField("totalAmount", parseFloat(e.target.value) || 0)} placeholder="250000" data-testid="input-total-amount" />
+                    <Input type="number" value={lcFields.totalAmount || ""} onChange={e => updateLcField("totalAmount", parseFloat(e.target.value) || 0)} placeholder="e.g. 250,000.00" data-testid="input-total-amount" />
                   </div>
-                </div>
-
-                <div className="lc-fg3" style={{ marginTop: 13 }}>
                   <div className="lc-field">
                     <label>Currency</label>
                     <Select value={lcFields.currency} onValueChange={v => updateLcField("currency", v)}>
@@ -1671,20 +1664,6 @@ export default function LcCheck() {
                     </Select>
                   </div>
                   <div className="lc-field">
-                    <label>Unit Price</label>
-                    <Input type="number" value={lcFields.unitPrice || ""} onChange={e => updateLcField("unitPrice", parseFloat(e.target.value) || 0)} placeholder="500" data-testid="input-unit-price" />
-                  </div>
-                  <div className="lc-field">
-                    <label>Incoterms</label>
-                    <Select value={lcFields.incoterms} onValueChange={v => updateLcField("incoterms", v)}>
-                      <SelectTrigger data-testid="select-incoterms"><SelectValue /></SelectTrigger>
-                      <SelectContent>{INCOTERMS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="lc-fg2" style={{ marginTop: 13 }}>
-                  <div className="lc-field">
                     <label>Port of Loading</label>
                     <Input value={lcFields.portOfLoading} onChange={e => updateLcField("portOfLoading", e.target.value)} placeholder="e.g. Abidjan" data-testid="input-port-loading" />
                   </div>
@@ -1692,16 +1671,10 @@ export default function LcCheck() {
                     <label>Port of Discharge</label>
                     <Input value={lcFields.portOfDischarge} onChange={e => updateLcField("portOfDischarge", e.target.value)} placeholder="e.g. Felixstowe" data-testid="input-port-discharge" />
                   </div>
-                </div>
-
-                <div className="lc-fg2" style={{ marginTop: 13 }}>
                   <div className="lc-field">
                     <label>Country of Origin</label>
-                    <Input value={lcFields.countryOfOrigin} onChange={e => updateLcField("countryOfOrigin", e.target.value)} placeholder="e.g. Cote d'Ivoire" data-testid="input-country-origin" />
+                    <Input value={lcFields.countryOfOrigin} onChange={e => updateLcField("countryOfOrigin", e.target.value)} placeholder="e.g. Côte d'Ivoire" data-testid="input-country-origin" />
                   </div>
-                </div>
-
-                <div className="lc-fg2" style={{ marginTop: 13 }}>
                   <div className="lc-field">
                     <label>Latest Shipment Date <span className="req">*</span></label>
                     <Input type="date" value={lcFields.latestShipmentDate} onChange={e => updateLcField("latestShipmentDate", e.target.value)} data-testid="input-latest-shipment-date" />
@@ -1709,6 +1682,13 @@ export default function LcCheck() {
                   <div className="lc-field">
                     <label>LC Expiry Date <span className="req">*</span></label>
                     <Input type="date" value={lcFields.lcExpiryDate} onChange={e => updateLcField("lcExpiryDate", e.target.value)} data-testid="input-lc-expiry-date" />
+                  </div>
+                  <div className="lc-field">
+                    <label>Incoterms</label>
+                    <Select value={lcFields.incoterms} onValueChange={v => updateLcField("incoterms", v)}>
+                      <SelectTrigger data-testid="select-incoterms"><SelectValue /></SelectTrigger>
+                      <SelectContent>{INCOTERMS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                    </Select>
                   </div>
                 </div>
 

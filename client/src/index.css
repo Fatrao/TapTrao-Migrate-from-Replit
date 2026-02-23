@@ -421,6 +421,48 @@
 }
 .lc-field label .req { color: var(--amber); }
 
+/* Override shadcn dark inputs inside white cards */
+.lc-wc input,
+.lc-wc select,
+.lc-wc textarea,
+.lc-wc [data-slot="select-trigger"],
+.lc-wc button[role="combobox"] {
+  background: #f5f5f5 !important;
+  border-color: #e8e8e8 !important;
+  color: var(--txt) !important;
+  border-radius: 9px;
+  font-size: 13px;
+  font-family: var(--fb);
+}
+.lc-wc input::placeholder,
+.lc-wc textarea::placeholder {
+  color: #bbb !important;
+}
+.lc-wc input:focus,
+.lc-wc select:focus,
+.lc-wc textarea:focus,
+.lc-wc button[role="combobox"]:focus {
+  border-color: var(--green) !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(74,140,111,0.1) !important;
+  ring: none;
+  --tw-ring-color: transparent;
+}
+.lc-wc input:hover:not(:focus),
+.lc-wc select:hover:not(:focus),
+.lc-wc button[role="combobox"]:hover:not(:focus) {
+  border-color: #ccc !important;
+}
+/* Ensure checkbox/toggle inputs inside cards aren't overridden */
+.lc-wc .lc-tog input {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+/* SelectTrigger icon color fix */
+.lc-wc button[role="combobox"] svg {
+  color: var(--txt3) !important;
+}
+
 /* Toggle switch */
 .lc-tog-row {
   display: flex;
