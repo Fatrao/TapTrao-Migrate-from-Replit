@@ -1,763 +1,324 @@
 import { Link } from "wouter";
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
-import { CheckCircle2, ArrowRight, Menu, X, Mail, MessageCircle, CircleCheck } from "lucide-react";
-
-function DemoSection() {
-  const [step, setStep] = useState(1);
-  const total = 3;
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setStep((s) => (s === total ? 1 : s + 1));
-    }, 4000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const tabStyle = (n: number): React.CSSProperties => ({
-    padding: "10px 20px",
-    fontSize: 10,
-    fontWeight: 500,
-    cursor: "pointer",
-    fontFamily: "'DM Mono', monospace",
-    letterSpacing: "0.05em",
-    textTransform: "uppercase",
-    color: step === n ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.35)",
-    borderBottom: step === n ? "2px solid #4ac329" : "2px solid transparent",
-    transition: "all 0.15s",
-    userSelect: "none",
-  });
-
-  const card: React.CSSProperties = {
-    background: "#1c1c1e",
-    borderRadius: 12,
-    padding: "18px 20px",
-  };
-
-  const sectionTitle: React.CSSProperties = {
-    fontSize: 11,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.95)",
-    letterSpacing: "0.05em",
-    textTransform: "uppercase",
-  };
-
-  const docRow = (dotColor: string, name: string, auth: string) => (
-    <div key={name} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 0" }}>
-      <div style={{ width: 6, height: 6, borderRadius: "50%", background: dotColor, flexShrink: 0 }} />
-      <div style={{ flex: 1, fontSize: 12, color: "rgba(255,255,255,0.70)" }}>{name}</div>
-      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "rgba(255,255,255,0.28)" }}>{auth}</div>
-    </div>
-  );
-
-  const copyToClipboard = useCallback((text: string, label: string) => {
-    navigator.clipboard.writeText(text).catch(() => {});
-  }, []);
-
-  return (
-    <div className="home-demo-section" style={{ maxWidth: 960, margin: "0 auto", padding: "60px 48px 80px" }} data-testid="section-demo">
-      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: "0.1em", color: "rgba(255,255,255,0.28)", textTransform: "uppercase", textAlign: "center", marginBottom: 16 }}>
-        See it in action
-      </div>
-      <h2 className="home-demo-heading" style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, textAlign: "center", color: "rgba(255,255,255,0.95)", marginBottom: 8, letterSpacing: "-0.5px" }} data-testid="text-demo-heading">
-        From trade idea to full compliance picture
-      </h2>
-      <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", textAlign: "center", marginBottom: 40 }}>
-        Three inputs. Seconds. <span style={{ color: "rgba(255,255,255,0.95)" }}>No broker needed.</span>
-      </p>
-
-      <div style={{ background: "#1c1c1e", borderRadius: 16, overflow: "hidden" }}>
-        <div style={{ background: "#2a2a2e", padding: "12px 16px", display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#da3c3d" }} />
-          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ea8b43" }} />
-          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#4ac329" }} />
-          <div style={{ flex: 1, background: "#1c1c1e", borderRadius: 5, padding: "4px 12px", fontFamily: "'DM Mono', monospace", fontSize: 11, color: "rgba(255,255,255,0.35)", margin: "0 12px" }}>
-            taptrao.com/lookup
-          </div>
-        </div>
-
-        <div className="home-demo-tabs" style={{ display: "flex", background: "#2a2a2e" }}>
-          <div style={tabStyle(1)} onClick={() => setStep(1)} data-testid="demo-tab-1">1. Enter trade</div>
-          <div style={tabStyle(2)} onClick={() => setStep(2)} data-testid="demo-tab-2">2. Compliance report</div>
-          <div style={tabStyle(3)} onClick={() => setStep(3)} data-testid="demo-tab-3">3. Supplier brief</div>
-        </div>
-
-        <div className="home-demo-content" style={{ padding: 28, minHeight: 340 }}>
-          {step === 1 && (
-            <div>
-              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginBottom: 4 }}>Compliance Lookup</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginBottom: 20 }}>Enter your commodity, origin, and destination</div>
-              <div className="demo-grid-3a" style={{ marginBottom: 24 }}>
-                {([["Commodity", "Raw Cashew Nuts"], ["Origin Country", "C\u00f4te d'Ivoire"], ["Destination", "United Kingdom"]] as const).map(([label, value]) => (
-                  <div key={label} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.28)", textTransform: "uppercase" }}>{label}</div>
-                    <div style={{ background: "#1c1c1e", borderRadius: 8, padding: "10px 12px", color: "rgba(255,255,255,0.95)", fontSize: 13, fontWeight: 500 }}>{value}</div>
-                  </div>
-                ))}
-                <button onClick={() => setStep(2)} style={{ background: "#4ac329", color: "white", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit" }} data-testid="demo-run-check">
-                  Run Check &rarr;
-                </button>
-              </div>
-              <div className="demo-grid-4">
-                {[
-                  { label: "Lookups Run", value: "12", color: "#4ac329", sub: "this month" },
-                  { label: "LC Checks", value: "4", color: "rgba(255,255,255,0.95)", sub: "discrepancies caught" },
-                  { label: "Corridors", value: "3", color: "rgba(255,255,255,0.95)", sub: "saved" },
-                  { label: "Alerts", value: "2", color: "#ea8b43", sub: "new this week" },
-                ].map((s) => (
-                  <div key={s.label} style={{ background: "#1c1c1e", borderRadius: 12, padding: "16px 18px" }} data-testid={`demo-stat-${s.label.toLowerCase().replace(/\s/g,"-")}`}>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.28)", textTransform: "uppercase", marginBottom: 8 }}>{s.label}</div>
-                    <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: s.color, letterSpacing: "-1px" }} data-testid={`text-demo-stat-value-${s.label.toLowerCase().replace(/\s/g,"-")}`}>{s.value}</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.28)", marginTop: 6 }}>{s.sub}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div>
-              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginBottom: 4 }}>Compliance Report</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.95)", fontWeight: 600, marginBottom: 20 }}>
-                Raw Cashew Nuts &rsaquo; C&ocirc;te d'Ivoire &rsaquo; United Kingdom
-              </div>
-              <div className="demo-grid-2">
-                <div style={card}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                    <div style={sectionTitle}>Your Side &mdash; Buyer</div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "rgba(74,195,41,0.12)", color: "#4ac329" }}>5 docs</div>
-                  </div>
-                  {docRow("#4ac329", "Customs Declaration (CDS)", "HMRC")}
-                  {docRow("#4ac329", "IPAFFS Pre-notification", "APHA")}
-                  {docRow("#4ac329", "Port Health Inspection", "Port Health")}
-                  {docRow("#ea8b43", "Import Licence (if >20MT)", "HMRC RPA")}
-                  {docRow("#4ac329", "Duty & VAT Payment", "HMRC")}
-                </div>
-                <div style={card}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                    <div style={sectionTitle}>Their Side &mdash; Supplier</div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "rgba(74,195,41,0.12)", color: "#4ac329" }}>6 docs</div>
-                  </div>
-                  {docRow("#4ac329", "Certificate of Origin", "CCA (Conseil Anacarde)")}
-                  {docRow("#4ac329", "Phytosanitary Certificate", "LANADA / DPVCQ")}
-                  {docRow("#4ac329", "Commercial Invoice", "Supplier")}
-                  {docRow("#4ac329", "Bill of Lading", "Shipping Line")}
-                  {docRow("#ea8b43", "Aflatoxin Test Report", "Accredited Lab")}
-                </div>
-                <div style={card}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                    <div style={sectionTitle}>Readiness Score</div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "rgba(74,195,41,0.10)", color: "#4ac329" }}>Low Risk</div>
-                  </div>
-                  <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 52, color: "#4ac329", lineHeight: 1, textAlign: "center", padding: "8px 0 4px" }} data-testid="text-demo-readiness-score">87</div>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "rgba(255,255,255,0.28)", textAlign: "center", letterSpacing: "0.08em", textTransform: "uppercase" }}>Compliance Readiness</div>
-                  <div style={{ height: 3, background: "rgba(255,255,255,0.07)", borderRadius: 2, margin: "12px 0 8px", overflow: "hidden" }}>
-                    <div style={{ height: 3, background: "linear-gradient(90deg,#4ac329,#4ac329)", borderRadius: 2, width: "87%" }} />
-                  </div>
-                  {([["Commodity risk", "LOW", "#4ac329"], ["Origin risk", "LOW", "#4ac329"], ["Regulatory complexity", "MEDIUM", "#ea8b43"], ["Known hazards", "AFLATOXIN", "#ea8b43"]] as const).map(([k, v, c]) => (
-                    <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, padding: "4px 0" }}>
-                      <span style={{ color: "rgba(255,255,255,0.45)" }}>{k}</span>
-                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: c }}>{v}</span>
-                    </div>
-                  ))}
-                </div>
-                <div style={card}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                    <div style={sectionTitle}>Duty Estimate</div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "rgba(74,195,41,0.10)", color: "#4ac329" }}>GSP rate</div>
-                  </div>
-                  {([["MFN Tariff Rate", "0%"], ["GSP Preference", "0% (eligible)"], ["UK VAT (Import)", "20%"], ["Est. duty on $50k", "$0"], ["Est. VAT on $50k", "$10,000"]] as const).map(([k, v]) => (
-                    <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", fontSize: 12 }}>
-                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "rgba(255,255,255,0.28)" }}>{k}</span>
-                      <span style={{ color: "rgba(255,255,255,0.95)", fontWeight: 600 }}>{v}</span>
-                    </div>
-                  ))}
-                  <div style={{ marginTop: 10, background: "#2a2a2e", borderRadius: 7, padding: "8px 12px", display: "flex", justifyContent: "space-between", fontFamily: "'DM Mono', monospace", fontSize: 10, color: "rgba(255,255,255,0.28)" }}>
-                    <span>TT-2026-a3f9c1</span>
-                    <span style={{ color: "#4ac329" }}>sha256:a3f9c1...</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div>
-              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginBottom: 4 }}>Supplier Brief</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginBottom: 20 }}>Ready to send &mdash; email or WhatsApp</div>
-              <div className="demo-grid-2b">
-                <div style={{ background: "#1c1c1e", borderRadius: 12, padding: 20 }}>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.28)", textTransform: "uppercase", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}><Mail size={12} /> Email Format</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.70)", lineHeight: 1.8 }}>
-                    <div style={{ color: "rgba(255,255,255,0.95)", fontWeight: 600, marginBottom: 8 }}>Subject: Required documents &mdash; Raw Cashew Nuts CIV &rarr; UK</div>
-                    Dear Supplier,<br /><br />
-                    Please provide the following documents:<br /><br />
-                    <span style={{ color: "rgba(255,255,255,0.90)" }}>
-                      1. Certificate of Origin<br />
-                      &nbsp;&nbsp;&rarr; <span style={{ color: "#4ac329" }}>CCA (Conseil du Coton et de l'Anacarde)</span><br /><br />
-                      2. Phytosanitary Certificate<br />
-                      &nbsp;&nbsp;&rarr; <span style={{ color: "#4ac329" }}>LANADA / DPVCQ</span><br /><br />
-                      3. Aflatoxin Test Report<br />
-                      &nbsp;&nbsp;&rarr; Accredited laboratory
-                    </span>
-                  </div>
-                </div>
-                <div style={{ background: "#1c1c1e", borderRadius: 12, padding: 20 }}>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.28)", textTransform: "uppercase", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}><MessageCircle size={12} /> WhatsApp Format</div>
-                  <div style={{ fontSize: 13, color: "rgba(255,255,255,0.70)", lineHeight: 2 }}>
-                    <span style={{ color: "rgba(255,255,255,0.95)", fontWeight: 700 }}>TapTrao Document Request</span><br />
-                    Raw Cashew Nuts &middot; CIV &rarr; UK<br /><br />
-                    Please send:<br />
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><CircleCheck size={12} style={{ color: "#4ac329" }} /> Certificate of Origin</span><br />
-                    <span style={{ color: "rgba(255,255,255,0.40)", fontSize: 11 }}>&nbsp;&nbsp;_(CCA &mdash; Conseil Anacarde)_</span><br />
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><CircleCheck size={12} style={{ color: "#4ac329" }} /> Phytosanitary Certificate</span><br />
-                    <span style={{ color: "rgba(255,255,255,0.40)", fontSize: 11 }}>&nbsp;&nbsp;_(LANADA/DPVCQ)_</span><br />
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><CircleCheck size={12} style={{ color: "#4ac329" }} /> Aflatoxin Test Report</span><br />
-                    <span style={{ color: "rgba(255,255,255,0.40)", fontSize: 11 }}>&nbsp;&nbsp;_(Accredited lab)_</span>
-                  </div>
-                </div>
-              </div>
-              <div style={{ marginTop: 16, display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <button
-                  onClick={() => copyToClipboard("Subject: Required documents — Raw Cashew Nuts CIV → UK\n\nDear Supplier,\n\nPlease provide:\n1. Certificate of Origin (CCA)\n2. Phytosanitary Certificate (LANADA/DPVCQ)\n3. Aflatoxin Test Report (Accredited lab)", "email")}
-                  style={{ background: "#4ac329", color: "white", border: "none", borderRadius: 7, padding: "9px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
-                  data-testid="demo-copy-email"
-                >
-                  Copy Email
-                </button>
-                <button
-                  onClick={() => copyToClipboard("*TapTrao Document Request*\nRaw Cashew Nuts · CIV → UK\n\nPlease send:\n✅ Certificate of Origin\n✅ Phytosanitary Certificate\n✅ Aflatoxin Test Report", "whatsapp")}
-                  style={{ background: "rgba(37,211,102,0.15)", color: "#25D366", border: "none", borderRadius: 7, padding: "9px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
-                  data-testid="demo-copy-whatsapp"
-                >
-                  Copy WhatsApp
-                </button>
-                <Link href="/lookup">
-                  <span style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.70)", borderRadius: 7, padding: "9px 20px", fontSize: 13, fontWeight: 500, display: "inline-block", cursor: "pointer" }} data-testid="demo-run-another">
-                    Run another lookup &rarr;
-                  </span>
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginTop: 20 }}>
-        {[1, 2, 3].map((n) => (
-          <div
-            key={n}
-            onClick={() => setStep(n)}
-            style={{
-              height: 6,
-              borderRadius: 3,
-              cursor: "pointer",
-              transition: "all 0.2s",
-              background: step === n ? "#4ac329" : "rgba(255,255,255,0.15)",
-              width: step === n ? 20 : 6,
-            }}
-            data-testid={`demo-dot-${n}`}
-          />
-        ))}
-        <button
-          onClick={() => setStep(step === total ? 1 : step + 1)}
-          style={{
-            background: "rgba(74,195,41,0.15)",
-            color: "#4ac329",
-            border: "none",
-            borderRadius: 6,
-            padding: "6px 14px",
-            fontSize: 12,
-            fontWeight: 600,
-            cursor: "pointer",
-            fontFamily: "inherit",
-          }}
-          data-testid="demo-next-step"
-        >
-          {step === total ? "Start over \u21ba" : "Next step \u2192"}
-        </button>
-      </div>
-    </div>
-  );
-}
+import { Menu, X } from "lucide-react";
 
 const commodities = [
-  "Raw Cashew Nuts", "Cocoa Beans", "Coffee", "Sesame Seeds", "Gold",
-  "Rough Diamonds", "Copper Ore", "Timber", "Tuna", "Cotton",
-  "Palm Oil", "Cobalt", "Shea Butter", "Iron Ore", "Rubber",
-  "Tea", "Groundnuts", "Coltan", "Vanilla", "Mangoes",
+  "Coffee", "Cocoa Beans", "Gold", "Copper Ore", "Timber", "Cotton",
+  "Palm Oil", "Cobalt", "Shea Butter", "Iron Ore", "Rubber", "Tea",
+  "Groundnuts", "Coltan", "Vanilla", "Cashew Nuts", "Sesame Seeds",
+  "Rough Diamonds", "Tuna",
 ];
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   usePageTitle(
-    "Trade with certainty",
-    "Know your duty rates, document requirements, and regulatory triggers before you commit. Built for commodity traders working African corridors."
+    "Know your compliance before you commit",
+    "Trade compliance for commodity traders sourcing from Africa. No ERP. No broker. No guesswork."
   );
 
   return (
-    <div className="home-page-root" style={{
-      minHeight: "100vh",
-      background: "#1c1c1e",
-      color: "rgba(255,255,255,0.95)",
-      fontFamily: "var(--fb)",
-      WebkitFontSmoothing: "antialiased",
-      overflowX: "hidden",
-    }}>
+    <div className="page-wrap" style={{ fontFamily: "var(--fb)", background: "#000", color: "#fff", WebkitFontSmoothing: "antialiased" }}>
 
-      {/* NAV */}
-      <nav
-        className="home-nav"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 40px",
-          height: 60,
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
-        }}
-        data-testid="nav-header"
-      >
+      {/* ── NAV ── */}
+      <div className="nav-bar" data-testid="nav-header">
         <Link href="/">
-          <span style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} data-testid="text-landing-logo">
-            <img src="/logo.png" alt="TapTrao" style={{ width: 32, height: 32, borderRadius: 8, objectFit: "contain" }} />
-            <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)" }}>TapTrao</span>
+          <span className="nav-l" style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", textDecoration: "none" }} data-testid="text-landing-logo">
+            <img src="/logo.png" alt="TapTrao" style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", boxShadow: "0 0 16px rgba(74,195,41,.4)" }} />
+            <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "#fff", letterSpacing: "-0.02em" }}>TapTrao</span>
           </span>
         </Link>
-        <div data-testid="nav-landing-desktop" className="hidden md:flex" style={{ alignItems: "center", gap: 24 }}>
-          <Link href="/lookup">
-            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, textDecoration: "none", cursor: "pointer" }} data-testid="link-nav-lookup">Compliance Lookup</span>
-          </Link>
-          <Link href="/lc-check">
-            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, textDecoration: "none", cursor: "pointer" }} data-testid="link-nav-lc-check">LC Checker</span>
-          </Link>
-          <Link href="/pricing">
-            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, textDecoration: "none", cursor: "pointer" }} data-testid="link-nav-pricing">Pricing</span>
-          </Link>
-          <Link href="/lookup">
-            <span
-              style={{
-                background: "#4ac329",
-                color: "white",
-                padding: "8px 18px",
-                borderRadius: 7,
-                fontSize: 13,
-                fontWeight: 600,
-                textDecoration: "none",
-                cursor: "pointer",
-              }}
-              data-testid="button-nav-start-free"
-            >
-              Start free →
-            </span>
-          </Link>
+        <div className="nav-c" data-testid="nav-landing-desktop" style={{ display: "flex", gap: 28 }}>
+          <a href="#how" style={{ textDecoration: "none", fontSize: 13.5, color: "rgba(255,255,255,.4)", fontWeight: 500, transition: ".2s" }}>How it works</a>
+          <a href="#modules" style={{ textDecoration: "none", fontSize: 13.5, color: "rgba(255,255,255,.4)", fontWeight: 500, transition: ".2s" }}>Modules</a>
+          <a href="#lc" style={{ textDecoration: "none", fontSize: 13.5, color: "rgba(255,255,255,.4)", fontWeight: 500, transition: ".2s" }}>LC Check</a>
+          <a href="#pricing" style={{ textDecoration: "none", fontSize: 13.5, color: "rgba(255,255,255,.4)", fontWeight: 500, transition: ".2s" }}>Pricing</a>
         </div>
-        <button
-          className="md:hidden"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          style={{ background: "none", border: "none", color: "white", cursor: "pointer", padding: 4 }}
-          data-testid="button-landing-mobile-menu"
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </nav>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <button className="md:block hidden" style={{ background: "none", border: 0, color: "rgba(255,255,255,.4)", fontFamily: "var(--fb)", fontSize: 13.5, fontWeight: 500, cursor: "pointer" }} data-testid="button-sign-in">Sign in</button>
+          <Link href="/lookup">
+            <span style={{ background: "var(--green)", color: "#000", fontFamily: "var(--fb)", fontSize: 13, fontWeight: 700, padding: "9px 20px", borderRadius: 50, cursor: "pointer", boxShadow: "0 4px 18px rgba(74,195,41,.4)", display: "inline-block" }} data-testid="button-nav-start-free">Start Free →</span>
+          </Link>
+          <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} style={{ background: "none", border: "none", color: "white", cursor: "pointer", padding: 4 }} data-testid="button-landing-mobile-menu">
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+      </div>
 
       {mobileMenuOpen && (
-        <div
-          className="mobile-drawer"
-          data-testid="nav-mobile-dropdown"
-        >
-          <Link href="/lookup"><span onClick={() => setMobileMenuOpen(false)} style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, cursor: "pointer", padding: "12px 16px", display: "flex", alignItems: "center", minHeight: 44 }} data-testid="link-mobile-lookup">Compliance Lookup</span></Link>
-          <Link href="/lc-check"><span onClick={() => setMobileMenuOpen(false)} style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, cursor: "pointer", padding: "12px 16px", display: "flex", alignItems: "center", minHeight: 44 }} data-testid="link-mobile-lc-check">LC Checker</span></Link>
-          <Link href="/pricing"><span onClick={() => setMobileMenuOpen(false)} style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, cursor: "pointer", padding: "12px 16px", display: "flex", alignItems: "center", minHeight: 44 }} data-testid="link-mobile-pricing">Pricing</span></Link>
+        <div className="mobile-drawer" data-testid="nav-mobile-dropdown">
+          <Link href="/lookup"><span onClick={() => setMobileMenuOpen(false)} style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, cursor: "pointer", padding: "12px 16px", display: "flex", alignItems: "center", minHeight: 44 }}>Compliance Lookup</span></Link>
+          <Link href="/lc-check"><span onClick={() => setMobileMenuOpen(false)} style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, cursor: "pointer", padding: "12px 16px", display: "flex", alignItems: "center", minHeight: 44 }}>LC Checker</span></Link>
+          <Link href="/pricing"><span onClick={() => setMobileMenuOpen(false)} style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, cursor: "pointer", padding: "12px 16px", display: "flex", alignItems: "center", minHeight: 44 }}>Pricing</span></Link>
           <div style={{ marginTop: 8, padding: "0 16px" }}>
             <Link href="/lookup">
-              <span
-                onClick={() => setMobileMenuOpen(false)}
-                style={{ background: "#4ac329", color: "white", padding: "0 20px", borderRadius: 8, fontSize: 15, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", height: 48, width: "100%" }}
-                data-testid="button-mobile-start-free"
-              >
-                Start free lookup
-              </span>
+              <span onClick={() => setMobileMenuOpen(false)} style={{ background: "#4ac329", color: "white", padding: "0 20px", borderRadius: 8, fontSize: 15, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", height: 48, width: "100%" }} data-testid="button-mobile-start-free">Start free lookup</span>
             </Link>
           </div>
         </div>
       )}
 
-      {/* HERO */}
-      <div
-        className="home-hero"
-        style={{
-          maxWidth: 760,
-          margin: "0 auto",
-          padding: "120px 40px 80px",
-          textAlign: "center",
-        }}
-        data-testid="section-hero"
-      >
-        <div style={{
-          display: "inline-block",
-          background: "rgba(74,195,41,0.12)",
-          color: "#4ac329",
-          fontFamily: "'DM Mono', monospace",
-          fontSize: 11,
-          letterSpacing: "0.08em",
-          padding: "4px 12px",
-          borderRadius: 20,
-          marginBottom: 24,
-          textTransform: "uppercase",
-        }} className="home-hero-badge" data-testid="badge-hero">
-          Trade Compliance for Commodity Traders
-        </div>
-
-        <h1 className="home-hero-title" style={{
-          fontFamily: "var(--fh)",
-          fontWeight: 900,
-          fontSize: 52,
-          lineHeight: 1.1,
-          letterSpacing: "-1.5px",
-          color: "rgba(255,255,255,0.95)",
-          marginBottom: 20,
-          marginTop: 0,
-        }} data-testid="text-hero-title">
-          Know your compliance<br />before you commit.
-        </h1>
-
-        <p className="home-hero-subtitle" style={{
-          fontSize: 17,
-          color: "rgba(255,255,255,0.55)",
-          lineHeight: 1.6,
-          maxWidth: 560,
-          margin: "0 auto 36px",
-        }} data-testid="text-hero-subtitle">
-          The first standalone trade compliance tool for commodity traders <span style={{ color: "rgba(255,255,255,0.95)" }}>sourcing from Africa</span>. <span style={{ color: "rgba(255,255,255,0.95)" }}>No ERP. No broker.</span> First check free.
-        </p>
-
-        <div className="home-hero-buttons" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <Link href="/lookup">
-            <span className="home-hero-primary" style={{
-              background: "#4ac329",
-              color: "white",
-              padding: "13px 28px",
-              borderRadius: 9,
-              fontSize: 15,
-              fontWeight: 600,
-              textDecoration: "none",
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-            }} data-testid="button-hero-free-lookup">
-              Run a free compliance check →
-            </span>
-          </Link>
-          <Link href="/pricing">
-            <span className="home-hero-secondary" style={{
-              background: "rgba(255,255,255,0.06)",
-              color: "rgba(255,255,255,0.80)",
-              padding: "13px 28px",
-              borderRadius: 9,
-              fontSize: 15,
-              fontWeight: 500,
-              textDecoration: "none",
-              cursor: "pointer",
-              display: "inline-block",
-            }} data-testid="button-hero-how-it-works">
-              See pricing
-            </span>
-          </Link>
-        </div>
-
-        <div className="home-hero-stats" style={{ marginTop: 40, textAlign: "center", maxWidth: 520, margin: "40px auto 0" }}>
-          <p style={{ color: "rgba(255,255,255,0.95)", fontSize: 15, lineHeight: 1.6 }}>
-            Know what can block, delay, or reject your shipment before money moves.
+      {/* ── HERO BOX ── */}
+      <div className="hero-box" data-testid="section-hero">
+        <div style={{ position: "relative", zIndex: 1, textAlign: "center", maxWidth: 700, margin: "0 auto" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.08)", backdropFilter: "blur(6px)", borderRadius: 24, padding: "6px 16px", marginBottom: 28, fontSize: 11, fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(255,255,255,.6)" }} className="home-hero-badge" data-testid="badge-hero">
+            <span className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--green)", boxShadow: "0 0 8px var(--green)", display: "inline-block" }} /> Trade compliance for commodity traders
+          </div>
+          <h1 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(38px,5.5vw,64px)", lineHeight: 1.08, letterSpacing: "-0.04em", color: "#fff", marginBottom: 20, marginTop: 0 }} className="home-hero-title" data-testid="text-hero-title">
+            Know your compliance<br />before you <em style={{ fontStyle: "normal", color: "var(--green)" }}>commit.</em>
+          </h1>
+          <p style={{ fontSize: 17, lineHeight: 1.7, color: "rgba(255,255,255,.45)", marginBottom: 36 }} className="home-hero-subtitle" data-testid="text-hero-subtitle">
+            The first standalone trade compliance tool for commodity traders sourcing from Africa. <strong style={{ color: "rgba(255,255,255,.75)", fontWeight: 600 }}>No ERP. No broker. No guesswork.</strong>
           </p>
+          <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 28 }} className="home-hero-buttons">
+            <Link href="/lookup">
+              <span className="home-hero-primary" style={{ background: "var(--green)", color: "#000", fontFamily: "var(--fb)", fontSize: 15, fontWeight: 700, padding: "14px 32px", borderRadius: 50, cursor: "pointer", boxShadow: "0 4px 24px rgba(74,195,41,.45)", display: "inline-block" }} data-testid="button-hero-free-lookup">Run Free Lookup →</span>
+            </Link>
+            <a href="#how">
+              <span className="home-hero-secondary" style={{ background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.7)", fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600, padding: "14px 28px", borderRadius: 50, border: "1px solid rgba(255,255,255,.1)", cursor: "pointer", display: "inline-block" }} data-testid="button-hero-how-it-works">See how it works</span>
+            </a>
+          </div>
+          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(255,255,255,.2)", marginBottom: 20 }}>
+            First lookup free · No credit card required · Results in seconds
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 5, justifyContent: "center", flexWrap: "wrap" }}>
+            <span style={{ fontSize: 10, letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(255,255,255,.2)", fontWeight: 600 }}>Sourcing from</span>
+            {["🇨🇮","🇬🇭","🇳🇬","🇪🇹","🇰🇪","🇹🇿","🇿🇦","🇸🇳","🇨🇩","🇨🇲","🇲🇬","🇲🇿","🇺🇬","🇷🇼","🇲🇱","🇧🇫","🇬🇳","🇿🇲"].map((f, i) => (
+              <span key={i} style={{ fontSize: 16 }}>{f}</span>
+            ))}
+            <span style={{ fontSize: 10, letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(255,255,255,.2)", fontWeight: 600 }}>and more</span>
+          </div>
         </div>
       </div>
 
-      {/* INTERACTIVE DEMO */}
-      <DemoSection />
+      {/* ── TRUST BAR ── */}
+      <div className="trust-bar">
+        <span>🌍 ECOWAS · AfCFTA · EAC · SADC</span><div className="sep" /><span>📄 UCP 600 · ISBP 745</span><div className="sep" /><span>🌱 EUDR · CBAM · CSDDD · Kimberley</span><div className="sep" /><span>⚡ Pay-per-check from $19.99</span><div className="sep" /><span>🔒 No ERP required</span>
+      </div>
 
-      {/* THREE FEATURES */}
-      <div className="home-features" style={{
-        maxWidth: 900,
-        margin: "0 auto",
-        padding: "0 40px 100px",
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 16,
-      }} data-testid="section-capabilities">
-        {[
-          {
-            icon: "⚡",
-            title: "Compliance Lookup",
-            desc: "Identify regulatory requirements, required documents, and risk flags before you commit.",
-            price: "Included in every trade pack",
-            href: "/lookup",
-          },
-          {
-            icon: "📄",
-            title: "LC Document Checker",
-            desc: "Validate your LC and supplier documents against UCP 600 before bank submission.",
-            price: "Included with every compliance check",
-            href: "/lc-check",
-          },
-          {
-            icon: "🔔",
-            title: "Regulatory Alerts",
-            desc: "Get notified when regulations change for your saved corridors.",
-            price: "Available with Pro Monitoring",
-            href: "/pricing",
-          },
-        ].map((f, i) => (
-          <Link key={f.title} href={f.href}>
-            <div
-              style={{
-                background: "#1c1c1e",
-                borderRadius: 14,
-                padding: 24,
-                height: "100%",
-                cursor: "pointer",
-                transition: "background .15s",
-              }}
-              data-testid={`card-capability-${i}`}
-              onMouseEnter={e => { e.currentTarget.style.background = "#2a2a2e"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#1c1c1e"; }}
-            >
-              <div style={{ fontSize: 24, marginBottom: 12 }}>{f.icon}</div>
-              <div style={{ fontWeight: 700, fontSize: 15, color: "rgba(255,255,255,0.95)", marginBottom: 8 }}>
-                {f.title}
-              </div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.50)", lineHeight: 1.5, marginBottom: 16 }}>
-                {f.desc}
-              </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#4ac329", letterSpacing: "0.04em" }}>
-                {f.price}
-              </div>
+      {/* ── STAT CARDS ── */}
+      <div className="section">
+        <div className="section-inner">
+          <div className="stat-grid">
+            <div className="stat-card glow-green">
+              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 12, position: "relative", zIndex: 1, background: "rgba(74,195,41,.1)" }}>📦</div>
+              <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Commodities Covered</div>
+              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.03em", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}>154 <span style={{ fontSize: 13, color: "var(--txt3)", fontWeight: 400, fontFamily: "var(--fb)" }}>types</span></div>
+              <div style={{ fontSize: 11.5, position: "relative", zIndex: 1, color: "var(--txt3)" }}><span style={{ color: "var(--green)", fontWeight: 600 }}>↑ Full database</span> at launch</div>
             </div>
-          </Link>
-        ))}
-      </div>
-
-      {/* HOW IT WORKS */}
-      <div id="how-it-works" className="home-how-section" style={{ background: "#1c1c1e", padding: "80px 40px" }} data-testid="section-how-it-works">
-        <div style={{ maxWidth: 800, margin: "0 auto" }}>
-          <h2 className="home-how-heading" style={{
-            fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32,
-            color: "rgba(255,255,255,0.95)", textAlign: "center", marginBottom: 8, letterSpacing: "-1px",
-          }} data-testid="text-how-heading">
-            Three inputs. Complete picture.
-          </h2>
-          <p style={{ color: "rgba(255,255,255,0.50)", textAlign: "center", fontSize: 16, marginBottom: 48 }}>
-            <span style={{ color: "rgba(255,255,255,0.95)" }}>No ERP required. No broker needed.</span> Just answers.
-          </p>
-          <div className="home-how-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }}>
-            {[
-              { num: "01", title: "Define your corridor", desc: "Select the origin country, destination market, and commodity from our database of 154 commodities across 18 African origins." },
-              { num: "02", title: "Review compliance requirements", desc: "Receive duty rates, document checklists, regulatory triggers, SPS requirements, and stop-flag warnings — all in one view." },
-              { num: "03", title: "Proceed with confidence", desc: "Export results, generate supplier instructions, validate LC documents against UCP 600 rules, and download audit-ready TwinLog PDFs." },
-            ].map((step, i) => (
-              <div key={step.num} data-testid={`step-${i + 1}`}>
-                <span style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 48, color: "rgba(74,195,41,0.15)" }}>
-                  {step.num}
-                </span>
-                <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)", marginTop: 4 }}>
-                  {step.title}
-                </h3>
-                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.50)", marginTop: 8, lineHeight: 1.6 }}>
-                  {step.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* COMMODITIES TICKER */}
-      <div style={{ background: "#0F1318", padding: "60px 0" }} data-testid="section-commodities">
-        <div className="home-commodities-header" style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", padding: "0 40px", marginBottom: 32 }}>
-          <h2 className="home-commodities-heading" style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.5px" }} data-testid="text-commodities-heading">
-            Every commodity. Every corridor.
-          </h2>
-          <p style={{ color: "rgba(255,255,255,0.65)", marginTop: 8, fontSize: 14 }} data-testid="text-commodities-subheading">
-            From raw cashews to cobalt, we cover the commodities that move between Africa and the world.
-          </p>
-        </div>
-        <div style={{ overflow: "hidden" }}>
-          <div className="animate-ticker" style={{ display: "flex", whiteSpace: "nowrap" }}>
-            {[...commodities, ...commodities].map((c, i) => (
-              <span key={`${c}-${i}`} style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
-                <span
-                  style={{
-                    padding: "8px 24px",
-                    fontSize: 18,
-                    fontFamily: "var(--fh)",
-                    fontWeight: 600,
-                    color: i % 2 === 0 ? "#4ac329" : "rgba(255,255,255,0.85)",
-                  }}
-                  data-testid={`text-commodity-${i}`}
-                >
-                  {c}
-                </span>
-                <span style={{ color: "rgba(255,255,255,0.15)" }}>&middot;</span>
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* PRICING PREVIEW */}
-      <div className="home-pricing-section" style={{ background: "#1c1c1e", padding: "80px 40px" }} data-testid="section-pricing">
-        <div style={{ maxWidth: 800, margin: "0 auto" }}>
-          <h2 className="home-pricing-heading" style={{
-            fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32,
-            color: "rgba(255,255,255,0.95)", textAlign: "center", letterSpacing: "-1px", marginBottom: 8,
-          }} data-testid="text-pricing-heading">
-            Pay per check. No subscription trap.
-          </h2>
-          <p style={{ color: "rgba(255,255,255,0.50)", textAlign: "center", fontSize: 16, marginBottom: 12 }} data-testid="text-pricing-subheading">
-            Buy trade credits when you need them. Your first compliance check is free.
-          </p>
-          <p style={{ color: "rgba(255,255,255,0.95)", textAlign: "center", fontSize: 14, fontWeight: 600, marginBottom: 40 }}>
-            No ERP. No broker. Just answers.
-          </p>
-          <div className="home-pricing-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, maxWidth: 640, margin: "0 auto" }}>
-            <div style={{ background: "#1c1c1e", borderRadius: 14, padding: 28, position: "relative", overflow: "hidden" }} data-testid="card-pricing-lookup">
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, #4ac329, transparent)" }} />
-              <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)", marginTop: 0 }}>Compliance Check</h3>
-              <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginTop: 8 }}>
-                $24.99 <span style={{ fontSize: 14, fontWeight: 400, color: "rgba(255,255,255,0.40)" }}>per shipment</span>
-              </p>
-              <ul style={{ listStyle: "none", padding: 0, margin: "20px 0 0" }}>
-                {["Duty rates & tariff codes", "Document checklists", "Regulatory trigger screening", "SPS & phytosanitary requirements", "LC document check included"].map((item) => (
-                  <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "rgba(255,255,255,0.60)", marginBottom: 10 }}>
-                    <CheckCircle2 size={14} style={{ color: "#4ac329", flexShrink: 0, marginTop: 2 }} />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+            <div className="stat-card glow-amber">
+              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 12, position: "relative", zIndex: 1, background: "rgba(234,139,67,.1)" }}>💰</div>
+              <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Bank Amendment Fee</div>
+              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.03em", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}><sup style={{ fontSize: 13, fontWeight: 500, opacity: .5, verticalAlign: "super", marginRight: 1 }}>$</sup>150–500</div>
+              <div style={{ fontSize: 11.5, position: "relative", zIndex: 1, color: "var(--txt3)" }}><span style={{ color: "var(--red)", fontWeight: 600 }}>⚠ Per discrepancy</span> what's at stake</div>
+            </div>
+            <div className="stat-card glow-teal">
+              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 12, position: "relative", zIndex: 1, background: "rgba(46,134,98,.1)" }}>📋</div>
+              <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Regulations Mapped</div>
+              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.03em", lineHeight: 1, marginBottom: 6, position: "relative", zIndex: 1 }}>40+ <span style={{ fontSize: 13, color: "var(--txt3)", fontWeight: 400, fontFamily: "var(--fb)" }}>rules</span></div>
+              <div style={{ fontSize: 11.5, position: "relative", zIndex: 1, color: "var(--txt3)" }}><span style={{ color: "var(--green)", fontWeight: 600 }}>↑ EUDR · CBAM</span> + more</div>
+            </div>
+            <div className="stat-card cta">
+              <div className="animate-breathe" style={{ position: "absolute", bottom: -20, right: -20, width: 130, height: 130, background: "radial-gradient(circle,rgba(74,195,41,.28) 0%,rgba(74,195,41,.06) 50%,transparent 70%)", borderRadius: "50%", pointerEvents: "none" }} />
+              <div style={{ fontFamily: "var(--fh)", fontSize: 36, fontWeight: 800, color: "var(--green)", letterSpacing: "-0.04em", position: "relative", zIndex: 1, marginBottom: 4 }}>$0</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", position: "relative", zIndex: 1, marginBottom: 4 }}>Pre-Shipment Check with <strong style={{ color: "var(--green)" }}>AI</strong></div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)", marginBottom: 2 }}>No card · No sign-up</div>
               <Link href="/lookup">
-                <span
-                  style={{ display: "block", textAlign: "center", background: "#4ac329", color: "white", padding: "10px 0", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", marginTop: 20 }}
-                  data-testid="button-pricing-lookup"
-                >
-                  Start with a free check
-                </span>
+                <span style={{ display: "inline-block", background: "var(--green)", color: "#000", fontFamily: "var(--fb)", fontSize: 12, fontWeight: 700, padding: "9px 16px", borderRadius: 10, cursor: "pointer", position: "relative", zIndex: 1, boxShadow: "0 0 16px rgba(74,195,41,.3)", marginTop: 10 }}>Run Free Check ✦</span>
               </Link>
             </div>
-            <div style={{ background: "#1c1c1e", borderRadius: 14, padding: 28, position: "relative", overflow: "hidden" }} data-testid="card-pricing-lc">
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, #4ac329, transparent)" }} />
-              <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "rgba(255,255,255,0.95)", marginTop: 0 }}>LC Document Check</h3>
-              <p style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "rgba(255,255,255,0.95)", marginTop: 8 }}>
-                $19.99 <span style={{ fontSize: 14, fontWeight: 400, color: "rgba(255,255,255,0.40)" }}>one-time</span>
-              </p>
-              <ul style={{ listStyle: "none", padding: 0, margin: "20px 0 0" }}>
-                {["UCP 600 compliance validation", "Field-by-field discrepancy check", "Discrepancy summary & fix suggestions", "SHA-256 evidence hash"].map((item) => (
-                  <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "rgba(255,255,255,0.60)", marginBottom: 10 }}>
-                    <CheckCircle2 size={14} style={{ color: "#4ac329", flexShrink: 0, marginTop: 2 }} />
-                    <span>{item}</span>
-                  </li>
-                ))}
+          </div>
+
+          {/* FREE BANNER */}
+          <div className="free-banner">
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--green)", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>✦ No account needed</div>
+              <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(24px,3vw,36px)", color: "#fff", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: 12 }}>Run your first<br />lookup free.</h2>
+              <p style={{ fontSize: 14, lineHeight: 1.7, color: "rgba(255,255,255,.35)", maxWidth: 460 }}>Enter commodity + origin + destination. Get the full compliance picture in seconds — duty rates, required documents, regulatory triggers, STOP warnings. No credit card. No sign-up.</p>
+            </div>
+            <div style={{ textAlign: "center", flexShrink: 0 }}>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 800, fontSize: 64, color: "var(--green)", lineHeight: 1 }}>$0</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,.35)", marginBottom: 14 }}>first lookup</div>
+              <Link href="/lookup">
+                <span style={{ background: "var(--green)", color: "#000", fontFamily: "var(--fb)", fontSize: 14, fontWeight: 700, padding: "12px 24px", borderRadius: 50, cursor: "pointer", boxShadow: "0 4px 24px rgba(74,195,41,.45)", display: "inline-block" }}>Try it now →</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── MARQUEE ── */}
+      <div className="marquee-wrap">
+        <div className="marquee-track">
+          {[...commodities, ...commodities].map((c, i) => (
+            <span key={`${c}-${i}`} style={{ display: "contents" }}>
+              <span style={{ fontFamily: "var(--fh)", fontWeight: 600, fontSize: 18, whiteSpace: "nowrap", color: i % 2 === 0 ? "var(--green)" : "rgba(255,255,255,.12)" }}>{c}</span>
+              <span style={{ color: "rgba(255,255,255,.06)", fontSize: 18 }}>·</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ── HOW IT WORKS ── */}
+      <div className="section" id="how" data-testid="section-how-it-works">
+        <div className="section-inner">
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--green)", marginBottom: 12 }}>How it works</div>
+          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.03em", color: "#fff", marginBottom: 8 }}>Three inputs. <em style={{ fontStyle: "normal", color: "var(--green)" }}>Complete picture.</em></div>
+          <div style={{ fontSize: 14, color: "rgba(255,255,255,.35)", lineHeight: 1.6, maxWidth: 460, marginBottom: 40 }}>No ERP required. No broker needed. Just answers.</div>
+          <div className="how-grid">
+            {[
+              { num: "01", icon: "◎", title: "Define your corridor", desc: "Select the origin country, destination market, and commodity from our database of 154 commodities across 18 African origins." },
+              { num: "02", icon: "📊", title: "Review compliance requirements", desc: "Receive duty rates, document checklists, regulatory triggers, SPS requirements, and stop-flag warnings — all in one view." },
+              { num: "03", icon: "✅", title: "Proceed with confidence", desc: "Export results, generate supplier instructions, validate LC documents against UCP 600 rules, and download audit-ready TwinLog PDFs." },
+            ].map((s, i) => (
+              <div key={s.num} className="how-card" data-testid={`step-${i + 1}`}>
+                <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 42, color: "rgba(74,195,41,.15)", lineHeight: 1, marginBottom: 8 }}>{s.num}</div>
+                <div style={{ fontSize: 22, marginBottom: 14 }}>{s.icon}</div>
+                <h3 style={{ fontFamily: "var(--fh)", fontWeight: 600, fontSize: 16, color: "#fff", marginBottom: 8 }}>{s.title}</h3>
+                <p style={{ fontSize: 13, lineHeight: 1.6, color: "rgba(255,255,255,.35)" }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── MODULES ── */}
+      <div className="section" id="modules" data-testid="section-capabilities">
+        <div className="section-inner">
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--green)", marginBottom: 12 }}>What's included</div>
+          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.03em", color: "#fff", marginBottom: 8 }}>Six modules. <em style={{ fontStyle: "normal", color: "var(--green)" }}>One engine.</em></div>
+          <div style={{ fontSize: 14, color: "rgba(255,255,255,.35)", lineHeight: 1.6, maxWidth: 460, marginBottom: 40 }}>Every tool a commodity trader needs. Pay per check. No subscription required to start.</div>
+          <div className="mod-grid">
+            {[
+              { icon: "◎", title: "Compliance Lookup", price: "$4.99 / lookup", priceClass: "green", desc: "Full regulatory checklist, duty rates, ESG triggers, supplier brief, and risk flags in one report.", tags: ["ECOWAS","AfCFTA","EUDR","SPS"] },
+              { icon: "📄", title: "LC Document Checker", price: "$2.99 / check", priceClass: "green", desc: "AI cross-checks every field against UCP 600 and ISBP 745. Flags bank rejections before they happen.", tags: ["UCP 600","ISBP 745","Multilingual"] },
+              { icon: "📋", title: "Trade Templates", price: "Free", priceClass: "free", desc: "Save successful trades as reusable templates. Update quantities, regenerate all documents automatically.", tags: ["Corridors","No ERP"] },
+              { icon: "🌱", title: "ESG Due Diligence", price: "Included", priceClass: "green", desc: "EUDR geolocation, deforestation proof, UKTR register, conflict minerals. Auto-generates statements.", tags: ["EUDR","Kimberley","OECD DDG"] },
+              { icon: "⚠️", title: "Risk Dashboard", price: "$9.99 / scenario", priceClass: "amber", desc: "Pre-trade risk scores. Post-rejection decision trees — appeal, return, destroy, insurance, duty refund.", tags: ["Demurrage","Insurance","RASFF"] },
+              { icon: "◆", title: "Regulatory Monitoring", price: "$29 / mo", priceClass: "amber", desc: "Alerts when regulations change for your corridors. AEO tracker. HMRC archive. EUDR annual reports.", tags: ["WTO ePing","UK Tariff API","AEO"] },
+            ].map((m, i) => (
+              <div key={m.title} className="mod-card" data-testid={`card-capability-${i}`}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(255,255,255,.05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{m.icon}</div>
+                  <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 50, whiteSpace: "nowrap", background: m.priceClass === "amber" ? "rgba(234,139,67,.12)" : m.priceClass === "free" ? "rgba(74,195,41,.2)" : "rgba(74,195,41,.12)", color: m.priceClass === "amber" ? "var(--amber)" : "var(--green)" }}>{m.price}</span>
+                </div>
+                <h3 style={{ fontFamily: "var(--fh)", fontWeight: 600, fontSize: 17, color: "#fff", marginBottom: 6 }}>{m.title}</h3>
+                <p style={{ fontSize: 12.5, lineHeight: 1.6, color: "rgba(255,255,255,.35)", marginBottom: 14 }}>{m.desc}</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                  {m.tags.map(t => <span key={t} style={{ fontSize: 10, padding: "3px 9px", borderRadius: 6, background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.3)", fontWeight: 500 }}>{t}</span>)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── LC DOCUMENT CHECK ── */}
+      <div className="section" id="lc" style={{ paddingTop: 40 }}>
+        <div className="section-inner">
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--green)", marginBottom: 12 }}>LC Document Check</div>
+          <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(26px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.03em", color: "#fff", marginBottom: 8 }}>Just need to check <em style={{ fontStyle: "normal", color: "var(--green)" }}>an LC?</em></div>
+          <div style={{ fontSize: 14, color: "rgba(255,255,255,.35)", lineHeight: 1.6, maxWidth: 460, marginBottom: 40 }}>Standalone LC checking without buying a full trade credit.</div>
+          <div className="lc-cards">
+            <div className="lc-card primary">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}><span style={{ fontSize: 16 }}>📄</span><span style={{ fontWeight: 700, fontSize: 15, color: "#fff" }}>LC Document Check</span></div>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 38, color: "#fff", marginBottom: 4 }}>$19.99 <em style={{ fontStyle: "normal", fontSize: 15, fontWeight: 400, color: "rgba(255,255,255,.3)", fontFamily: "var(--fb)" }}>one-time</em></div>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,.35)", lineHeight: 1.6, marginBottom: 16 }}>Validate supplier documents against your Letter of Credit (UCP 600) before submitting to the bank.</p>
+              <ul style={{ listStyle: "none", padding: 0, marginBottom: 16, display: "flex", flexDirection: "column", gap: 6 }}>
+                <li style={{ fontSize: 13, display: "flex", alignItems: "center", gap: 8, color: "rgba(255,255,255,.7)" }}><span style={{ fontSize: 13, color: "var(--green)" }}>✔</span> First LC submission check</li>
+                <li style={{ fontSize: 13, display: "flex", alignItems: "center", gap: 8, color: "rgba(255,255,255,.7)" }}><span style={{ fontSize: 13, color: "var(--green)" }}>✔</span> Discrepancy summary & fix suggestions</li>
+                <li style={{ fontSize: 13, display: "flex", alignItems: "center", gap: 8, color: "rgba(255,255,255,.2)" }}><span style={{ fontSize: 13, color: "rgba(255,255,255,.15)" }}>✕</span> Compliance check</li>
+                <li style={{ fontSize: 13, display: "flex", alignItems: "center", gap: 8, color: "rgba(255,255,255,.2)" }}><span style={{ fontSize: 13, color: "rgba(255,255,255,.15)" }}>✕</span> Document checklist</li>
               </ul>
-              <p style={{ fontSize: 11, color: "#4ac329", fontStyle: "italic", marginTop: 12 }}>Included free with every trade credit</p>
-              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.40)", marginTop: 4 }}>Re-checks after supplier corrections: $9.99</p>
-              <Link href="/lc-check">
-                <span
-                  style={{ display: "block", textAlign: "center", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.80)", padding: "10px 0", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer", marginTop: 16 }}
-                  data-testid="button-pricing-lc"
-                >
-                  Check LC only
-                </span>
-              </Link>
+              <div style={{ fontSize: 12, color: "var(--green)", fontStyle: "italic", marginBottom: 14 }}>Included free with every trade credit</div>
+              <Link href="/lc-check"><span style={{ background: "rgba(255,255,255,.06)", color: "#fff", fontFamily: "var(--fb)", fontSize: 13, fontWeight: 700, padding: "9px 18px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }} data-testid="button-pricing-lc">📄 Check LC only</span></Link>
             </div>
-          </div>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.40)", textAlign: "center", marginTop: 20 }} data-testid="text-pricing-note">
-            Trade packs: Single $24.99 &middot; 3 Shipments $59.99 &middot; 10 Shipments $179 &middot; 25 Shipments $349
-          </p>
-        </div>
-      </div>
-
-      {/* FINAL CTA */}
-      <div className="home-cta-section" style={{ background: "#0F1318", padding: "80px 40px", textAlign: "center" }} data-testid="section-final-cta">
-        <h2 className="home-cta-heading" style={{
-          fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32,
-          color: "rgba(255,255,255,0.95)", letterSpacing: "-1px", marginBottom: 12,
-        }} data-testid="text-cta-heading">
-          Know before you commit.
-        </h2>
-        <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 16, marginBottom: 28 }} data-testid="text-cta-subheading">
-          Run your first compliance lookup free. No account required.
-        </p>
-        <Link href="/lookup">
-          <span
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              background: "#4ac329", color: "white", padding: "13px 28px",
-              borderRadius: 9, fontSize: 15, fontWeight: 600, cursor: "pointer",
-            }}
-            data-testid="button-cta-start"
-          >
-            Start free lookup
-            <ArrowRight size={16} />
-          </span>
-        </Link>
-      </div>
-
-      {/* FOOTER */}
-      <footer data-testid="section-footer" style={{ background: "#1c1c1e", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-        <div className="home-footer-inner" style={{ maxWidth: 960, margin: "0 auto", padding: "48px 40px 36px" }}>
-          <div style={{ marginBottom: 24 }}>
-            <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "rgba(255,255,255,0.95)" }} data-testid="text-footer-logo">TapTrao</span>
-            <p style={{ color: "rgba(255,255,255,0.40)", fontSize: 13, marginTop: 6 }}>Trade compliance for commodity corridors out of Africa.</p>
-          </div>
-          <div className="home-footer-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 32 }}>
-            <div>
-              <h4 style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "rgba(255,255,255,0.30)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Product</h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <Link href="/lookup"><span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }} data-testid="link-footer-lookup">Compliance Lookup</span></Link>
-                <Link href="/lc-check"><span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }} data-testid="link-footer-lc">LC Checker</span></Link>
-                <Link href="/pricing"><span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }} data-testid="link-footer-pricing">Pricing</span></Link>
-                <Link href="/dashboard"><span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }} data-testid="link-footer-dashboard">Dashboard</span></Link>
-              </div>
+            <div className="lc-card secondary">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}><span style={{ fontSize: 16 }}>🔄</span><span style={{ fontWeight: 700, fontSize: 15, color: "#fff" }}>LC corrections (if documents are updated)</span></div>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 38, color: "#fff", marginBottom: 4 }}>$9.99 <em style={{ fontStyle: "normal", fontSize: 15, fontWeight: 400, color: "rgba(255,255,255,.3)", fontFamily: "var(--fb)" }}>per re-check</em></div>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,.35)", lineHeight: 1.6 }}>If your supplier corrects documents after the first submission, re-check before resubmitting to the bank.</p>
             </div>
-            <div>
-              <h4 style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "rgba(255,255,255,0.30)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Company</h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }} onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} data-testid="link-footer-about">About</span>
-                <a href="#how-it-works" style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, textDecoration: "none" }} data-testid="link-footer-how">How it works</a>
-              </div>
+            <div className="lc-card dashed">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}><span style={{ fontSize: 16 }}>🏢</span><span style={{ fontWeight: 700, fontSize: 15, color: "#fff" }}>High-volume or team usage</span></div>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,.35)", lineHeight: 1.6, marginBottom: 14 }}>Custom pricing, shared credits, API access, and dedicated support.</p>
+              <span style={{ background: "rgba(255,255,255,.06)", color: "#fff", fontFamily: "var(--fb)", fontSize: 13, fontWeight: 700, padding: "9px 18px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}>✉ Contact sales</span>
             </div>
-            <div>
-              <h4 style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "rgba(255,255,255,0.30)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Legal</h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <Link href="/privacy-policy"><span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }} data-testid="link-footer-privacy">Privacy Policy</span></Link>
-                <Link href="/terms-of-service"><span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }} data-testid="link-footer-terms">Terms of Service</span></Link>
-                <button
-                  onClick={() => { import("@/components/cookie-consent").then(m => m.resetCookieConsent()); }}
-                  style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer", background: "none", border: "none", textAlign: "left", padding: 0 }}
-                  data-testid="link-footer-cookie-settings"
-                >
-                  Cookie Settings
-                </button>
+            <div className="lc-card dashed" style={{ borderColor: "rgba(74,195,41,.12)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                <span style={{ fontSize: 16 }}>🔔</span><span style={{ fontWeight: 700, fontSize: 15, color: "#fff" }}>Pro Monitoring</span>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", padding: "3px 10px", borderRadius: 6, background: "rgba(255,255,255,.08)", color: "rgba(255,255,255,.4)", marginLeft: 8 }}>Coming soon</span>
               </div>
-            </div>
-            <div>
-              <h4 style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "rgba(255,255,255,0.30)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Contact</h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <a href="mailto:hello@taptrao.com" style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, textDecoration: "none" }} data-testid="link-footer-email">hello@taptrao.com</a>
-              </div>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,.35)", lineHeight: 1.6 }}>Regulatory change alerts and compliance calendar. For frequent traders who need always-on monitoring.</p>
             </div>
           </div>
         </div>
-        <div className="home-footer-bottom" style={{ background: "#050709", padding: "18px 40px" }}>
-          <div style={{ maxWidth: 960, margin: "0 auto" }}>
-            <p style={{ color: "rgba(255,255,255,0.30)", fontSize: 13 }} data-testid="text-footer-copyright">
-              &copy; 2026 FATRAO LIMITED &middot; Registered in England and Wales
-            </p>
+      </div>
+
+      {/* ── PRICING ── */}
+      <div className="section" id="pricing" data-testid="section-pricing">
+        <div className="section-inner">
+          <div style={{ textAlign: "center", marginBottom: 40 }}>
+            <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(28px,4vw,46px)", color: "#fff", letterSpacing: "-0.03em", marginBottom: 12 }} data-testid="text-pricing-heading">Check a shipment<br /><em style={{ fontStyle: "normal", color: "var(--green)" }}>before it costs you.</em></h2>
+            <p style={{ fontSize: 14, color: "rgba(255,255,255,.35)", marginBottom: 20 }}>Pay per shipment. No subscriptions. Your first compliance check is free.</p>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 50, padding: "6px 18px", fontSize: 11, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.2)", marginBottom: 32 }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--green)" }} /> 0 Trade Credits
+            </div>
+          </div>
+
+          <div style={{ maxWidth: 700, margin: "0 auto 40px", background: "#1c1c1e", borderRadius: 14, padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+            <span style={{ fontSize: 24, flexShrink: 0 }}>🎁</span>
+            <div style={{ flex: 1 }}>
+              <strong style={{ fontSize: 13, color: "#fff", display: "block", marginBottom: 2 }}>Your first check is free</strong>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Run one full compliance check for free — no card required. See duties, required documents, and shipment risks.</span>
+            </div>
+            <Link href="/lookup"><span style={{ background: "rgba(74,195,41,.08)", color: "var(--green)", fontFamily: "var(--fb)", fontSize: 12, fontWeight: 700, padding: "9px 16px", borderRadius: 10, border: "1px solid rgba(74,195,41,.2)", cursor: "pointer", whiteSpace: "nowrap" }}>🔍 Check shipment risk — Free</span></Link>
+          </div>
+
+          <div style={{ fontFamily: "var(--fh)", fontWeight: 600, fontSize: 18, color: "#fff", marginBottom: 6 }}>Trade Packs</div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,.3)", marginBottom: 24 }}>1 credit = 1 shipment checked (compliance + LC). Buy more, save more.</div>
+
+          <div className="packs-grid">
+            {[
+              { name: "Single Shipment", price: "$24.99", credits: "1 Shipment", per: "$24.99 per shipment", features: ["Full compliance check","Buyer & supplier document checklist","LC document check (first submission)","Risk score & audit trail","Customs declaration data pack (CSV)","Instructions for supplier"], popular: false },
+              { name: "3 Shipments", price: "$59.99", credits: "3 Shipments", per: "$20.00 per shipment", features: ["Everything in Single × 3","Save as template","13% discount"], popular: true },
+              { name: "10 Shipments", price: "$179", credits: "10 Shipments", per: "$17.90 per shipment", features: ["Everything in 3-pack × 10","Stale-check & refresh","28% discount"], popular: false },
+              { name: "25 Shipments", price: "$349", credits: "25 Shipments", per: "$13.96 per shipment", features: ["Everything in 10-pack × 25","Best value for teams","44% discount"], popular: false },
+            ].map((p) => (
+              <div key={p.name} className={`pack-card${p.popular ? " popular" : ""}`}>
+                <div style={{ fontFamily: "var(--fh)", fontWeight: 600, fontSize: 15, color: "#fff", marginBottom: 8 }}>{p.name}</div>
+                <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 32, color: "#fff", marginBottom: 4 }}>{p.price}</div>
+                <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>{p.credits}</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginBottom: 18 }}>{p.per}</div>
+                <ul style={{ listStyle: "none", padding: 0, marginBottom: 18, display: "flex", flexDirection: "column", gap: 5 }}>
+                  {p.features.map(f => <li key={f} style={{ fontSize: 12, color: "rgba(255,255,255,.4)", display: "flex", alignItems: "flex-start", gap: 7 }}><span style={{ color: "var(--green)", fontSize: 12, flexShrink: 0, marginTop: 1 }}>✔</span>{f}</li>)}
+                </ul>
+                <Link href="/pricing">
+                  <span style={{ display: "block", width: "100%", padding: 10, borderRadius: 10, fontFamily: "var(--fb)", fontSize: 13, fontWeight: 700, cursor: "pointer", textAlign: "center", ...(p.popular ? { background: "var(--green)", color: "#000", boxShadow: "0 4px 16px rgba(74,195,41,.3)" } : { background: "none", color: "rgba(255,255,255,.6)", border: "1px solid rgba(255,255,255,.1)" }) }}>Buy {p.name}</span>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── FOOTER ── */}
+      <footer data-testid="section-footer" style={{ padding: "40px 10px 24px", marginTop: 40 }}>
+        <div style={{ maxWidth: 1080, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,.04)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <img src="/logo.png" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover" }} />
+            <span style={{ fontFamily: "var(--fh)", fontWeight: 600, fontSize: 15, color: "#fff" }} data-testid="text-footer-logo">TapTrao</span>
+          </div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,.2)" }} data-testid="text-footer-copyright">© 2026 FATRAO LIMITED · Trade compliance for commodity traders</div>
+          <div style={{ display: "flex", gap: 18 }}>
+            <Link href="/privacy-policy"><span style={{ fontSize: 12, color: "rgba(255,255,255,.3)", cursor: "pointer" }} data-testid="link-footer-privacy">Privacy</span></Link>
+            <Link href="/terms-of-service"><span style={{ fontSize: 12, color: "rgba(255,255,255,.3)", cursor: "pointer" }} data-testid="link-footer-terms">Terms</span></Link>
+            <a href="mailto:hello@taptrao.com" style={{ fontSize: 12, color: "rgba(255,255,255,.3)", textDecoration: "none" }} data-testid="link-footer-email">Contact</a>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,.3)", cursor: "pointer" }}>Docs</span>
           </div>
         </div>
       </footer>
+
     </div>
   );
 }

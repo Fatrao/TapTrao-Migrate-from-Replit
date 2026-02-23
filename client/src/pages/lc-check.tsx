@@ -1452,14 +1452,15 @@ export default function LcCheck() {
           Coming in the next update.
         </div>
       ) : (
-      <div className="flex-1 py-8 px-4">
+      <div className="flex-1 py-8 px-4" data-testid="lc-check-page">
         <div className="max-w-3xl mx-auto space-y-6">
-          <div className="space-y-2">
-            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>TapTrao / LC Check</p>
-            <h1 style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)" }} data-testid="text-lc-title">
+          {/* ── LC Header with green gradient ── */}
+          <div style={{ background: "linear-gradient(180deg,#0d2218 0%,#0f2a1e 30%,#143424 55%,#1a4030 75%,rgba(26,60,44,0.7) 88%,rgba(26,60,44,0) 100%)", borderRadius: 16, padding: "24px 28px 32px", position: "relative", overflow: "hidden" }}>
+            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,.4)", marginBottom: 8 }}>TapTrao / LC Check</p>
+            <h1 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 28, color: "#fff", letterSpacing: "-0.03em", marginBottom: 6 }} data-testid="text-lc-title">
               Check your LC before sending it to the bank
             </h1>
-            <p style={{ fontFamily: "var(--fb)", color: "var(--t2)", fontSize: 14 }}>
+            <p style={{ fontFamily: "var(--fb)", color: "rgba(255,255,255,.4)", fontSize: 14 }}>
               Catch document mismatches before the bank does.
             </p>
           </div>
@@ -1495,23 +1496,22 @@ export default function LcCheck() {
             </div>
           )}
 
-          <div className="flex items-center gap-2 mb-4">
+          <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "10px 0", marginBottom: 4 }}>
             {[1, 2, 3].map(s => (
-              <div key={s} className="flex items-center gap-2">
+              <div key={s} style={{ display: "flex", alignItems: "center", gap: 4 }}>
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium"
                   style={{
-                    background: step === s ? "var(--blue)" : step > s ? "var(--gbg)" : "var(--card2)",
-                    color: step === s ? "#fff" : step > s ? "var(--green)" : "var(--t3)",
+                    width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, fontFamily: "var(--fh)", transition: "all .2s",
+                    ...(step === s ? { background: "var(--green)", color: "#000", boxShadow: "0 0 12px rgba(74,195,41,.35)" } : step > s ? { background: "rgba(74,195,41,.15)", color: "var(--green)" } : { background: "#f0f0f0", color: "#bbb" }),
                   }}
                   data-testid={`step-indicator-${s}`}
                 >
                   {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
                 </div>
-                <span style={{ fontSize: 11, color: "var(--t3)" }} className="hidden sm:inline">
+                <span className="hidden sm:inline" style={{ fontSize: 12, fontWeight: 600, color: step >= s ? "var(--txt)" : "var(--txt3)" }}>
                   {s === 1 ? "LC Terms" : s === 2 ? "Documents" : "Results"}
                 </span>
-                {s < 3 && <div className="w-8 h-px" style={{ background: "var(--border)" }} />}
+                {s < 3 && <div style={{ width: 32, height: 2, borderRadius: 2, background: step > s ? "var(--green)" : "#eee", transition: "background .3s" }} />}
               </div>
             ))}
           </div>

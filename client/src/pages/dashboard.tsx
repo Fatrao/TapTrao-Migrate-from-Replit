@@ -1,81 +1,10 @@
 import { AppShell } from "@/components/AppShell";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
-import { Search, FileCheck, ArrowRight, TrendingUp, Clock, ArrowDown, ArrowUp } from "lucide-react";
 import type { Lookup, LcCheck, TokenTransaction, ComplianceResult } from "@shared/schema";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { useTokenBalance } from "@/hooks/use-tokens";
 import { apiRequest } from "@/lib/queryClient";
-
-function riskBadge(level: string) {
-  const map: Record<string, { bg: string; bd: string; color: string }> = {
-    STOP: { bg: "var(--rbg)", bd: "var(--rbd)", color: "var(--red)" },
-    HIGH: { bg: "var(--rbg)", bd: "var(--rbd)", color: "var(--red)" },
-    MEDIUM: { bg: "var(--abg)", bd: "var(--abd)", color: "var(--amber)" },
-    LOW: { bg: "var(--gbg)", bd: "var(--gbd)", color: "var(--green)" },
-  };
-  const s = map[level] || map.MEDIUM;
-  return (
-    <span
-      style={{
-        fontFamily: "'DM Mono', monospace", fontSize: 9, fontWeight: 500,
-        padding: "3px 8px", borderRadius: 4, letterSpacing: "0.05em",
-        textTransform: "uppercase", background: s.bg, border: `1px solid ${s.bd}`, color: s.color,
-      }}
-    >
-      {level}
-    </span>
-  );
-}
-
-function readinessScoreBadge(score: number, verdict: string) {
-  const map: Record<string, { bg: string; bd: string; color: string; label: string }> = {
-    GREEN: { bg: "var(--gbg)", bd: "var(--gbd)", color: "var(--green)", label: "LOW RISK" },
-    AMBER: { bg: "var(--abg)", bd: "var(--abd)", color: "var(--amber)", label: "MODERATE" },
-    RED: { bg: "var(--rbg)", bd: "var(--rbd)", color: "var(--red)", label: "HIGH RISK" },
-  };
-  const s = map[verdict] || map.AMBER;
-  return (
-    <span
-      style={{
-        fontFamily: "'DM Mono', monospace", fontSize: 9, fontWeight: 500,
-        padding: "3px 8px", borderRadius: 4, letterSpacing: "0.05em",
-        textTransform: "uppercase", background: s.bg, border: `1px solid ${s.bd}`, color: s.color,
-      }}
-      data-testid={`badge-score-${score}`}
-    >
-      {score} {s.label}
-    </span>
-  );
-}
-
-function verdictBadge(verdict: string) {
-  const map: Record<string, { bg: string; bd: string; color: string }> = {
-    COMPLIANT: { bg: "var(--gbg)", bd: "var(--gbd)", color: "var(--green)" },
-    COMPLIANT_WITH_NOTES: { bg: "var(--abg)", bd: "var(--abd)", color: "var(--amber)" },
-    DISCREPANCIES_FOUND: { bg: "var(--rbg)", bd: "var(--rbd)", color: "var(--red)" },
-  };
-  const s = map[verdict] || map.COMPLIANT_WITH_NOTES;
-  const label = verdict.replace(/_/g, " ");
-  return (
-    <span
-      style={{
-        fontFamily: "'DM Mono', monospace", fontSize: 9, fontWeight: 500,
-        padding: "3px 8px", borderRadius: 4, letterSpacing: "0.05em",
-        textTransform: "uppercase", background: s.bg, border: `1px solid ${s.bd}`, color: s.color,
-      }}
-    >
-      {label}
-    </span>
-  );
-}
-
-const getGreeting = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning.";
-  if (hour < 17) return "Good afternoon.";
-  return "Good evening.";
-};
 
 export default function Dashboard() {
   const statsQuery = useQuery<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null }>({
@@ -85,10 +14,8 @@ export default function Dashboard() {
   const lcQuery = useQuery<LcCheck[]>({ queryKey: ["/api/lc-checks/recent"] });
   const tokenQuery = useTokenBalance();
   const txQuery = useQuery<TokenTransaction[]>({ queryKey: ["/api/tokens/transactions", "?limit=10"] });
-
   const stats = statsQuery.data;
   usePageTitle("Dashboard", "Overview of your trade compliance activity");
-
   const [, navigate] = useLocation();
 
   const lookupIds = lookupsQuery.data?.map(l => l.id) ?? [];
@@ -103,282 +30,355 @@ export default function Dashboard() {
   });
   const lcLinkMap = lcLinksQuery.data ?? {};
 
-  const recentActivity: Array<{
-    id: string;
-    type: "lookup" | "lc-check";
-    label: string;
-    detail: string;
-    badge: JSX.Element | null;
-    scoreBadge: JSX.Element | null;
-    lcLinked: boolean | null;
-    lookupData: Lookup | null;
-    date: Date;
-  }> = [];
+  const recentTrades: Array<{ id: string; icon: string; iconBg: string; name: string; hs: string; corridor: string; date: string; value: string; status: "comp" | "pend" | "rev"; statusLabel: string; btnLabel: string; lookupData?: Lookup }> = [];
 
   if (lookupsQuery.data) {
     for (const l of lookupsQuery.data.slice(0, 5)) {
-      recentActivity.push({
+      const result = l.resultJson as ComplianceResult | null;
+      recentTrades.push({
         id: l.id,
-        type: "lookup",
-        label: l.commodityName,
-        detail: `${l.originName} → ${l.destinationName} | HS ${l.hsCode}`,
-        badge: riskBadge(l.riskLevel),
-        scoreBadge: l.readinessScore != null ? readinessScoreBadge(l.readinessScore, l.readinessVerdict as string) : null,
-        lcLinked: !!lcLinkMap[l.id],
+        icon: "📦",
+        iconBg: "rgba(46,204,113,.1)",
+        name: l.commodityName,
+        hs: `HS ${l.hsCode}`,
+        corridor: `${l.originName?.substring(0, 2).toUpperCase() ?? "?"} → ${l.destinationName?.substring(0, 2).toUpperCase() ?? "?"}`,
+        date: new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }),
+        value: "—",
+        status: l.riskLevel === "LOW" ? "comp" : l.riskLevel === "MEDIUM" ? "pend" : "rev",
+        statusLabel: l.riskLevel === "LOW" ? "Compliant" : l.riskLevel === "MEDIUM" ? "Pending" : "Review",
+        btnLabel: l.riskLevel === "LOW" ? "View" : "Review",
         lookupData: l,
-        date: new Date(l.createdAt),
       });
     }
   }
 
-  if (lcQuery.data) {
-    for (const lc of lcQuery.data.slice(0, 5)) {
-      recentActivity.push({
-        id: lc.id,
-        type: "lc-check",
-        label: lc.integrityHash ? `LC ref: ${lc.integrityHash.substring(0, 20)}...` : "LC Check",
-        detail: `Verdict: ${lc.verdict?.replace(/_/g, " ") ?? "—"}`,
-        badge: lc.verdict ? verdictBadge(lc.verdict) : null,
-        scoreBadge: null,
-        lcLinked: null,
-        lookupData: null,
-        date: new Date(lc.createdAt),
-      });
-    }
-  }
-
-  recentActivity.sort((a, b) => b.date.getTime() - a.date.getTime());
-
-  const statCards = [
-    { label: "Token Balance", value: tokenQuery.isLoading ? "..." : String(tokenQuery.data?.balance ?? 0), color: "var(--blue)", sub: tokenQuery.data && !tokenQuery.data.freeLookupUsed ? "+ 1 free lookup available" : undefined },
-    { label: "Compliance Lookups", value: statsQuery.isLoading ? "..." : String(stats?.totalLookups ?? 0), color: "var(--t1)" },
-    { label: "LC Checks", value: statsQuery.isLoading ? "..." : String(stats?.totalLcChecks ?? 0), color: "var(--t1)" },
-    { label: "Top Corridor", value: statsQuery.isLoading ? "..." : stats?.topCorridor ?? "—", color: "var(--t1)", small: true },
-  ];
+  const balance = tokenQuery.data?.balance ?? 0;
+  const totalLookups = stats?.totalLookups ?? 0;
 
   return (
-    <AppShell>
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "40px 24px" }}>
-        <div style={{ marginBottom: 32 }}>
-          <h1
-            style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)", letterSpacing: "-0.5px", marginBottom: 4 }}
-            data-testid="text-dashboard-title"
-          >
-            {getGreeting()}
-          </h1>
-          <p style={{ fontSize: 13, color: "var(--t2)" }}>Your trade activity at a glance.</p>
+    <AppShell
+      topCenter={
+        <div style={{ display: "flex", gap: 26 }}>
+          <span style={{ fontSize: 13, color: "#fff", fontWeight: 600, cursor: "pointer" }}>Dashboard</span>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,.35)", cursor: "pointer" }}>Commodities</span>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,.35)", cursor: "pointer" }}>Suppliers</span>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,.35)", cursor: "pointer" }}>Compliance</span>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,.35)", cursor: "pointer" }}>Messages</span>
         </div>
-
-        {/* STAT CARDS */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 32 }}>
-          {statCards.map((c) => (
-            <div
-              key={c.label}
-              style={{ background: "var(--card)", borderRadius: 14, padding: "20px 24px" }}
-            >
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "var(--t3)", textTransform: "uppercase", marginBottom: 8 }}>
-                {c.label}
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--fh)", fontWeight: 900,
-                  fontSize: c.small ? 16 : 28, color: c.color, letterSpacing: -1, lineHeight: 1,
-                }}
-                data-testid={`stat-${c.label.toLowerCase().replace(/\s+/g, "-")}`}
-              >
-                {c.value}
-              </div>
-              {c.sub && <div style={{ fontSize: 11, color: "var(--t3)", marginTop: 6 }}>{c.sub}</div>}
-            </div>
-          ))}
+      }
+    >
+      {/* ── INNER HEADER BOX (Layer 4) ── */}
+      <div style={{
+        margin: "0 14px 0",
+        borderRadius: 16,
+        padding: "20px 24px 44px",
+        position: "relative",
+        background: "linear-gradient(180deg,#0d2218 0%,#0f2a1e 30%,#143424 55%,#1a4030 75%,rgba(26,60,44,0.7) 88%,rgba(26,60,44,0) 100%)",
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        overflow: "hidden",
+      }}>
+        <div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.1)", borderRadius: 24, padding: "4px 14px", fontSize: 12, color: "rgba(255,255,255,0.7)", marginBottom: 12, backdropFilter: "blur(6px)" }}>
+            <div className="animate-pulse-dot" style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--amber)", flexShrink: 0 }} />
+            Commodity › Overview
+          </div>
+          <div style={{ fontFamily: "var(--fh)", fontSize: 30, fontWeight: 700, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: 7 }} data-testid="text-dashboard-title">
+            Compliance:<br />Pending
+          </div>
+          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+            {totalLookups} lookups · {stats?.totalLcChecks ?? 0} LC checks · {balance} credits remaining
+          </div>
         </div>
-
-        {/* QUICK ACTIONS */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 32 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 2, flexShrink: 0 }}>
+          <div style={{ display: "flex", gap: 2 }}>
+            <span style={{ padding: "6px 15px", borderRadius: 8, cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,.35)" }}>About</span>
+            <span style={{ padding: "6px 15px", borderRadius: 8, cursor: "pointer", fontSize: 13, color: "#fff", fontWeight: 500, background: "rgba(255,255,255,.12)" }}>Overview</span>
+            <span style={{ padding: "6px 15px", borderRadius: 8, cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,.35)" }}>Documents</span>
+            <span style={{ padding: "6px 15px", borderRadius: 8, cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,.35)" }}>Activity</span>
+          </div>
           <Link href="/lookup">
-            <div
-              style={{ background: "var(--card)", borderRadius: 14, padding: "20px 24px", cursor: "pointer", transition: "background .15s", position: "relative", overflow: "hidden" }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--card2)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "var(--card)"; }}
-            >
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 8, background: "var(--blue-dim)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <Search size={18} style={{ color: "var(--blue)" }} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--t1)" }}>Run Compliance Lookup</div>
-                  <div style={{ fontSize: 12, color: "var(--t2)", marginTop: 2 }}>Check tariffs, SPS, and regulatory triggers</div>
-                </div>
-                <ArrowRight size={16} style={{ color: "var(--t3)", flexShrink: 0 }} />
-              </div>
-            </div>
-          </Link>
-          <Link href="/lc-check">
-            <div
-              style={{ background: "var(--card)", borderRadius: 14, padding: "20px 24px", cursor: "pointer", transition: "background .15s", position: "relative", overflow: "hidden" }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--card2)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "var(--card)"; }}
-            >
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,195,41,0.3), transparent)" }} />
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 8, background: "var(--gbg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <FileCheck size={18} style={{ color: "var(--green)" }} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--t1)" }}>LC Document Check</div>
-                  <div style={{ fontSize: 12, color: "var(--t2)", marginTop: 2 }}>Cross-check LC terms against documents</div>
-                </div>
-                <ArrowRight size={16} style={{ color: "var(--t3)", flexShrink: 0 }} />
-              </div>
-            </div>
+            <span style={{ background: "var(--green)", color: "#000", padding: "9px 18px", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "var(--fb)", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 4px 18px rgba(46,204,113,0.4)", whiteSpace: "nowrap" }}>
+              Request Documents ›
+            </span>
           </Link>
         </div>
+      </div>
 
-        {/* TWO COLUMNS */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-          {/* Recent Activity */}
-          <div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "var(--t3)", textTransform: "uppercase" }}>
-                Recent Activity
-              </div>
-              <Link href="/trades">
-                <span style={{ fontSize: 11, color: "var(--blue)", cursor: "pointer", fontWeight: 600 }} data-testid="link-view-all-lookups">
-                  View all →
-                </span>
-              </Link>
+      {/* ── STAT CARDS (overlap hero fade) ── */}
+      <div style={{ padding: "0 14px 20px", marginTop: -28, position: "relative" }}>
+        <div className="dash-stat-row">
+          <div className="dash-sc c-green">
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12, position: "relative", zIndex: 1 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, background: "rgba(46,204,113,.1)" }}>🏦</div>
+              <span style={{ fontSize: 15, color: "#ddd", cursor: "pointer" }}>···</span>
             </div>
-            {lookupsQuery.isLoading || lcQuery.isLoading ? (
-              <div style={{ background: "var(--card)", borderRadius: 14, padding: 24, textAlign: "center", color: "var(--t3)", fontSize: 13 }}>Loading...</div>
-            ) : !recentActivity.length ? (
-              <div style={{ background: "var(--card)", borderRadius: 14, padding: 24, textAlign: "center", color: "var(--t3)", fontSize: 13 }}>No activity yet. Run your first compliance check.</div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                {recentActivity.slice(0, 8).map((item) => (
-                  <div
-                    key={`${item.type}-${item.id}`}
-                    style={{ background: "var(--card)", borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}
+            <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Total Trade Value at Risk</div>
+            <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 9, position: "relative", zIndex: 1 }}>
+              <sup style={{ fontSize: 13, fontWeight: 500, verticalAlign: "super", marginRight: 1, opacity: .5 }}>$</sup>2,345,678
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, position: "relative", zIndex: 1 }}>
+              <span style={{ color: "#4ac329", fontWeight: 600 }}>↑ 12.5%</span><span style={{ color: "var(--txt3)" }}>{totalLookups} past shipments</span>
+            </div>
+          </div>
+          <div className="dash-sc c-teal">
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12, position: "relative", zIndex: 1 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, background: "rgba(20,184,166,.1)" }}>🔖</div>
+              <span style={{ fontSize: 15, color: "#ddd", cursor: "pointer" }}>···</span>
+            </div>
+            <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Total Lookups</div>
+            <div style={{ fontFamily: "var(--fh)", fontSize: 24, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 9, position: "relative", zIndex: 1 }} data-testid="stat-compliance-lookups">
+              {totalLookups} <span style={{ fontSize: 13, color: "var(--txt3)", fontWeight: 400, fontFamily: "var(--fb)" }}>checks</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, position: "relative", zIndex: 1 }}>
+              <span style={{ color: "#4ac329", fontWeight: 600 }}>↑ 8%</span><span style={{ color: "var(--txt3)" }}>vs prev. 28 days</span>
+            </div>
+          </div>
+          <div className="dash-sc c-amber">
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12, position: "relative", zIndex: 1 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, background: "rgba(245,158,11,.1)" }}>⚠️</div>
+              <span style={{ fontSize: 15, color: "#ddd", cursor: "pointer" }}>···</span>
+            </div>
+            <div style={{ fontSize: 11.5, color: "var(--txt3)", marginBottom: 4, position: "relative", zIndex: 1 }}>Rejection Risk</div>
+            <div style={{ fontFamily: "var(--fh)", fontSize: 24, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 9, position: "relative", zIndex: 1, display: "flex", alignItems: "baseline", gap: 4 }}>
+              7.8<span style={{ fontSize: 14, fontWeight: 400, fontFamily: "var(--fb)" }}>%</span>
+              <span style={{ background: "rgba(245,158,11,.1)", color: "#ea8b43", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 600, marginLeft: 4 }}>Moderate</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, position: "relative", zIndex: 1 }}>
+              <span style={{ color: "var(--red)", fontWeight: 600 }}>↓ 1.7%</span><span style={{ color: "var(--txt3)" }}>vs prev. 28 days</span>
+            </div>
+          </div>
+          <div className="dash-sc cta" style={{ background: "#0a0a0a" }}>
+            <div className="animate-breathe" style={{ position: "absolute", bottom: -20, right: -20, width: 130, height: 130, background: "radial-gradient(circle,rgba(46,204,113,.28) 0%,rgba(46,204,113,.06) 50%,transparent 70%)", borderRadius: "50%", pointerEvents: "none" }} />
+            <div style={{ fontFamily: "var(--fh)", fontSize: 32, fontWeight: 800, color: "var(--green)", letterSpacing: "-0.05em", lineHeight: 1, position: "relative", zIndex: 1 }} data-testid="stat-token-balance">{balance}</div>
+            <div style={{ fontSize: 11.5, color: "#555", margin: "3px 0 14px", position: "relative", zIndex: 1 }}>Recommended with <span style={{ color: "var(--green)", fontWeight: 600 }}>AI</span></div>
+            <Link href="/lookup">
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--green)", color: "#000", padding: "8px 14px", borderRadius: 22, fontSize: 12, fontWeight: 700, fontFamily: "var(--fb)", cursor: "pointer", position: "relative", zIndex: 1, boxShadow: "0 4px 16px rgba(46,204,113,.4)" }}>Pre-Shipment Check →</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* ── WHITE CONTENT ── */}
+      <div style={{ padding: "4px 14px 28px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 330px", gap: 12, alignItems: "start" }}>
+          {/* LEFT COLUMN */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* Recent Trades Table */}
+            <div className="dash-wp">
+              <div style={{ padding: "14px 20px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ fontFamily: "var(--fh)", fontSize: 13.5, fontWeight: 700, color: "var(--txt)", display: "flex", alignItems: "center", gap: 8 }}>
+                  Recent Trades <span style={{ background: "#f5f5f5", color: "var(--txt3)", fontSize: 11, padding: "1px 7px", borderRadius: 12, fontFamily: "var(--fb)" }}>{recentTrades.length}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ background: "#f5f5f5", borderRadius: 7, padding: "4px 11px", fontSize: 11.5, color: "var(--txt3)", cursor: "pointer" }}>⇅ Filter</span>
+                  <Link href="/trades"><span style={{ fontSize: 12, color: "var(--txt3)", cursor: "pointer" }} data-testid="link-view-all-lookups">View All ›</span></Link>
+                </div>
+              </div>
+              <div style={{ height: 1, background: "#f5f5f5" }} />
+              <div style={{ display: "grid", gridTemplateColumns: "2fr 0.9fr 0.8fr 0.9fr 1fr 68px", padding: "7px 20px", fontSize: 10.5, color: "var(--txt3)", textTransform: "uppercase", letterSpacing: ".08em", background: "#fafafa" }}>
+                <span>Commodity</span><span>Corridor</span><span>Date</span><span>Value</span><span>Status</span><span></span>
+              </div>
+              <div style={{ maxHeight: 240, overflowY: "auto" }}>
+                {recentTrades.length === 0 ? (
+                  <div style={{ padding: "20px", textAlign: "center", fontSize: 13, color: "var(--txt3)" }}>No trades yet. Run your first compliance check.</div>
+                ) : recentTrades.map((t) => (
+                  <div key={t.id} style={{ display: "grid", gridTemplateColumns: "2fr 0.9fr 0.8fr 0.9fr 1fr 68px", padding: "11px 20px", alignItems: "center", cursor: "pointer" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#fafafa"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
                   >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                        <span style={{
-                          fontFamily: "'DM Mono', monospace", fontSize: 9, fontWeight: 500,
-                          padding: "2px 6px", borderRadius: 3, background: "var(--card2)", color: "var(--t3)",
-                          textTransform: "uppercase", letterSpacing: "0.05em",
-                        }}>
-                          {item.type === "lookup" ? "Lookup" : "LC Check"}
-                        </span>
-                        <span
-                          style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
-                          data-testid={item.type === "lookup" ? `lookup-name-${item.id}` : `lc-ref-${item.id}`}
-                        >
-                          {item.label}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: 12, color: "var(--t2)", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {item.detail}
-                      </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                      <div style={{ width: 30, height: 30, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0, background: t.iconBg }}>{t.icon}</div>
+                      <div><div style={{ fontSize: 12.5, fontWeight: 500, color: "var(--txt)" }} data-testid={`lookup-name-${t.id}`}>{t.name}</div><div style={{ fontSize: 10.5, color: "var(--txt3)", marginTop: 1 }}>{t.hs}</div></div>
                     </div>
-                    {item.scoreBadge}
-                    {item.badge}
-                    {item.type === "lookup" && item.lcLinked && (
-                      <span
-                        style={{
-                          fontFamily: "'DM Mono', monospace", fontSize: 9, fontWeight: 500,
-                          padding: "3px 8px", borderRadius: 4, background: "var(--gbg)",
-                          border: "1px solid var(--gbd)", color: "var(--green)",
-                        }}
-                        data-testid={`lc-linked-${item.id}`}
-                      >
-                        LC ✓
+                    <div style={{ fontSize: 12.5, color: "var(--txt2)", display: "flex", alignItems: "center", gap: 3 }}>{t.corridor}</div>
+                    <div style={{ fontSize: 11.5, color: "var(--txt3)" }}>{t.date}</div>
+                    <div style={{ fontFamily: "var(--fh)", fontSize: 12.5, fontWeight: 600, color: "var(--txt)" }}>{t.value}</div>
+                    <div>
+                      <span style={{
+                        display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 600,
+                        ...(t.status === "comp" ? { background: "rgba(22,163,74,.09)", color: "#4ac329" } : t.status === "pend" ? { background: "rgba(245,158,11,.1)", color: "#ea8b43" } : { background: "rgba(231,76,60,.09)", color: "var(--red)" }),
+                      }}>
+                        <span style={{ width: 5, height: 5, borderRadius: "50%", flexShrink: 0, background: t.status === "comp" ? "#4ac329" : t.status === "pend" ? "var(--amber)" : "var(--red)" }} />
+                        {t.statusLabel}
                       </span>
-                    )}
-                    {item.type === "lookup" && item.lcLinked === false && item.lookupData && (
-                      <button
-                        style={{ fontSize: 11, color: "var(--t3)", cursor: "pointer", background: "none", border: "none", whiteSpace: "nowrap" }}
-                        data-testid={`lc-unlinked-${item.id}`}
-                        onClick={() => {
-                          const l = item.lookupData!;
-                          const resultJson = l.resultJson as ComplianceResult;
-                          const supplierDocs = resultJson?.requirementsDetailed
-                            ?.filter((r: any) => r.isSupplierSide)
-                            ?.map((r: any) => r.title) ?? [];
-                          const prefillData = {
-                            lookup_id: l.id,
-                            commodity_name: l.commodityName,
-                            hs_code: l.hsCode,
-                            origin_iso2: resultJson?.origin?.iso2 ?? "",
-                            origin_name: l.originName,
-                            dest_iso2: resultJson?.destination?.iso2 ?? "",
-                            dest_name: l.destinationName,
-                            incoterms: "FOB",
-                            required_docs: supplierDocs,
-                          };
-                          sessionStorage.setItem("lc_prefill", JSON.stringify(prefillData));
-                          navigate("/lc-check");
-                        }}
-                      >
-                        LC —
-                      </button>
-                    )}
-                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)", whiteSpace: "nowrap" }}>
-                      {item.date.toLocaleDateString()}
-                    </span>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: 11.5, color: "var(--txt2)", cursor: "pointer", padding: "4px 10px", borderRadius: 7, background: "#f5f5f5", fontFamily: "var(--fb)" }}>{t.btnLabel}</span>
+                    </div>
                   </div>
                 ))}
               </div>
-            )}
+            </div>
+
+            {/* Required Actions */}
+            <div className="dash-wp">
+              <div style={{ padding: "14px 20px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ fontFamily: "var(--fh)", fontSize: 13.5, fontWeight: 700, color: "var(--txt)" }}>Required Actions</div>
+                <span style={{ fontSize: 12, color: "var(--txt3)", cursor: "pointer" }}>View All ›</span>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, padding: "12px 20px" }}>
+                {[
+                  { ic: "📄", lbl: "Resolve Documents" },
+                  { ic: "🛡️", lbl: "Assess Risks" },
+                  { ic: "🚩", lbl: "Review Sanctions" },
+                  { ic: "🔍", lbl: "Audit Shipment" },
+                ].map(a => (
+                  <div key={a.lbl} style={{ background: "#f7f7f7", borderRadius: 11, padding: "13px 8px", cursor: "pointer", textAlign: "center", transition: "all .18s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#f0f0f0"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "#f7f7f7"; e.currentTarget.style.transform = "none"; }}
+                  >
+                    <span style={{ fontSize: 19, marginBottom: 6, display: "block" }}>{a.ic}</span>
+                    <div style={{ fontSize: 11.5, color: "var(--txt2)", fontWeight: 500, lineHeight: 1.3 }}>{a.lbl}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Alerts */}
+            <div className="dash-wp">
+              <div style={{ padding: "14px 20px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ fontFamily: "var(--fh)", fontSize: 13.5, fontWeight: 700, color: "var(--txt)", display: "flex", alignItems: "center", gap: 8 }}>Alerts <span style={{ background: "#f5f5f5", color: "var(--txt3)", fontSize: 11, padding: "1px 7px", borderRadius: 12, fontFamily: "var(--fb)" }}>5</span></div>
+                <Link href="/alerts"><span style={{ fontSize: 12, color: "var(--txt3)", cursor: "pointer" }}>See All ›</span></Link>
+              </div>
+              <div style={{ height: 1, background: "#f5f5f5" }} />
+              {[
+                { ic: "⚠️", type: "warn", title: "EUDR Compliance Deadline Approaching", desc: "Cocoa Beans (HS 1801) → EU. Large operators Dec 2026. Geolocation not submitted.", time: "2 hours ago" },
+                { ic: "🚩", type: "warn", title: "60% Sanctions Flagged", desc: "Supplier screening returned partial match. Manual review required.", time: "4 hours ago" },
+                { ic: "📡", type: "info", title: "New SPS notification — Turkey", desc: "HS 1207.40 sesame — new MRL update affecting ET → TR corridor.", time: "1 day ago" },
+              ].map(a => (
+                <div key={a.title} style={{ display: "flex", alignItems: "flex-start", gap: 11, padding: "11px 20px", cursor: "pointer" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#fafafa"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                >
+                  <div style={{ width: 30, height: 30, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0, marginTop: 1, background: a.type === "warn" ? "rgba(245,158,11,.1)" : "rgba(20,184,166,.1)" }}>{a.ic}</div>
+                  <div>
+                    <div style={{ fontSize: 12.5, fontWeight: 500, color: "var(--txt)", marginBottom: 2 }}>{a.title}</div>
+                    <div style={{ fontSize: 11.5, color: "var(--txt3)", lineHeight: 1.45 }}>{a.desc}</div>
+                    <div style={{ fontSize: 10.5, color: "#ccc", marginTop: 3 }}>{a.time}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Token History */}
-          <div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "var(--t3)", textTransform: "uppercase" }}>
-                Token History
+          {/* RIGHT COLUMN */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* Pending Compliance Docs */}
+            <div className="dash-wp">
+              <div style={{ padding: "14px 20px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ fontFamily: "var(--fh)", fontSize: 13.5, fontWeight: 700, color: "var(--txt)" }}>Pending Compliance Docs</div>
+                <span style={{ fontSize: 12, color: "var(--txt3)", cursor: "pointer" }}>All ›</span>
               </div>
-              <Link href="/pricing">
-                <span style={{ fontSize: 11, color: "var(--blue)", cursor: "pointer", fontWeight: 600 }} data-testid="link-buy-more">
-                  Buy more →
-                </span>
-              </Link>
+              <div style={{ height: 1, background: "#f5f5f5" }} />
+              {[
+                { ic: "📋", name: "Bill of Lading", meta: "Cocoa Beans · GH → EU", st: "⚠ 3", stClass: "w" },
+                { ic: "🌍", name: "Country of Origin", meta: "COCOBOD / Ghana Customs", st: "60%", stClass: "p" },
+                { ic: "🔬", name: "Inspection Certificate", meta: "Port Health · Felixstowe", st: "⚠ 2", stClass: "w" },
+                { ic: "🌱", name: "EUDR Due Diligence", meta: "Geolocation pending", st: "⚠ 3", stClass: "w" },
+                { ic: "📦", name: "Customs Declaration", meta: "CDS · UK Import", st: "✓ Ready", stClass: "ok" },
+              ].map(d => (
+                <div key={d.name} style={{ display: "flex", alignItems: "center", gap: 11, padding: "10px 20px", cursor: "pointer" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#fafafa"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                >
+                  <div style={{ width: 28, height: 28, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, background: "#f5f5f5", flexShrink: 0 }}>{d.ic}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12.5, fontWeight: 500, color: "var(--txt)" }}>{d.name}</div>
+                    <div style={{ fontSize: 10.5, color: "var(--txt3)", marginTop: 1 }}>{d.meta}</div>
+                  </div>
+                  <div style={{ fontSize: 11.5, fontWeight: 600, whiteSpace: "nowrap", marginLeft: "auto", paddingLeft: 10, color: d.stClass === "ok" ? "#4ac329" : d.stClass === "p" ? "#ea8b43" : "var(--red)" }}>{d.st}</div>
+                </div>
+              ))}
             </div>
-            {txQuery.isLoading ? (
-              <div style={{ background: "var(--card)", borderRadius: 14, padding: 24, textAlign: "center", color: "var(--t3)", fontSize: 13 }}>Loading...</div>
-            ) : !txQuery.data?.length ? (
-              <div style={{ background: "var(--card)", borderRadius: 14, padding: 24, textAlign: "center", color: "var(--t3)", fontSize: 13 }}>No token transactions yet.</div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                {txQuery.data.slice(0, 5).map((tx) => (
-                  <div
-                    key={tx.id}
-                    style={{ background: "var(--card)", borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}
-                  >
-                    {tx.type === "PURCHASE" ? (
-                      <ArrowDown size={14} style={{ color: "var(--green)", flexShrink: 0 }} />
-                    ) : (
-                      <ArrowUp size={14} style={{ color: "var(--t3)", flexShrink: 0 }} />
-                    )}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 500, color: "var(--t1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} data-testid={`tx-desc-${tx.id}`}>
-                        {tx.description}
-                      </div>
-                      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)", marginTop: 2 }}>
-                        {new Date(tx.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <span
-                      style={{
-                        fontFamily: "'DM Mono', monospace", fontSize: 13, fontWeight: 700, whiteSpace: "nowrap",
-                        color: tx.amount > 0 ? "var(--green)" : "var(--t3)",
-                      }}
-                    >
-                      {tx.amount > 0 ? `+${tx.amount}` : tx.amount}
-                    </span>
+
+            {/* Country Card */}
+            <div style={{ background: "#fff", borderRadius: 16, boxShadow: "0 2px 12px rgba(0,0,0,.07)", overflow: "hidden", position: "relative" }}>
+              <div style={{ content: "", position: "absolute", top: 0, left: 0, right: 0, height: 70, background: "radial-gradient(ellipse at 20% 0%,rgba(46,204,113,.11) 0%,rgba(255,255,255,0) 75%)", pointerEvents: "none" }} />
+              <div style={{ padding: "16px 20px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
+                <div>
+                  <div style={{ fontFamily: "var(--fh)", fontSize: 15, fontWeight: 700, color: "var(--txt)", display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                    <div className="animate-pulse-dot" style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--green)", flexShrink: 0 }} />
+                    Ghana
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "var(--txt3)" }}>Origin · ECOWAS / WAEMU</div>
+                </div>
+                <div style={{ width: 58, height: 40, borderRadius: 6, overflow: "hidden", display: "flex", flexDirection: "column", flexShrink: 0, boxShadow: "0 3px 10px rgba(0,0,0,.15)" }}>
+                  <div style={{ flex: 1, background: "#CE1126" }} />
+                  <div style={{ flex: 1, background: "#FCD116", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: 12, height: 12, background: "#000", clipPath: "polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)" }} />
+                  </div>
+                  <div style={{ flex: 1, background: "#006B3F" }} />
+                </div>
+              </div>
+              <div style={{ padding: "0 20px 14px", display: "flex", flexDirection: "column", gap: 9 }}>
+                {[
+                  { lbl: "📊 ESG Score", val: "65 / 100", cls: "a" },
+                  { lbl: "⏱ Customs Delay", val: "3.5 days avg", cls: "a" },
+                  { lbl: "🏛 Phyto Authority", val: "PPRSD", cls: "g" },
+                  { lbl: "📜 CoO Body", val: "Ghana Nat. Chamber of Commerce", cls: "sm" },
+                  { lbl: "🍫 Cocoa Council", val: "COCOBOD", cls: "g" },
+                ].map(s => (
+                  <div key={s.lbl} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 12.5 }}>
+                    <span style={{ color: "var(--txt2)", display: "flex", alignItems: "center", gap: 7 }}>{s.lbl}</span>
+                    <span style={{ fontWeight: s.cls === "sm" ? 400 : 600, color: s.cls === "g" ? "#4ac329" : s.cls === "a" ? "#ea8b43" : "var(--txt2)", fontSize: s.cls === "sm" ? 11.5 : undefined }}>{s.val}</span>
                   </div>
                 ))}
               </div>
-            )}
+            </div>
+
+            {/* Compliance Status */}
+            <div className="dash-wp">
+              <div style={{ padding: "14px 20px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ fontFamily: "var(--fh)", fontSize: 13.5, fontWeight: 700, color: "var(--txt)" }}>Compliance Status</div>
+                <span style={{ fontSize: 12, color: "var(--txt3)", cursor: "pointer" }}>View All ›</span>
+              </div>
+              <div style={{ padding: "14px 20px" }}>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 9 }}>
+                  <div><span style={{ fontFamily: "var(--fh)", fontSize: 24, fontWeight: 700, color: "var(--txt)", letterSpacing: "-0.04em" }}>78%</span><span style={{ fontSize: 11.5, color: "var(--txt3)", marginLeft: 5 }}>Verified · 8 of 10</span></div>
+                  <span style={{ fontSize: 11.5, color: "var(--txt3)" }}>8/10</span>
+                </div>
+                <div style={{ height: 6, background: "#f0f0f0", borderRadius: 20, overflow: "hidden", marginBottom: 12 }}>
+                  <div style={{ height: "100%", borderRadius: 20, background: "linear-gradient(90deg,var(--green),var(--teal))", width: "78%" }} />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 7 }}>
+                  {[
+                    { ic: "📁", lbl: "Documents", cnt: "7 of 10", cls: "r" },
+                    { ic: "🛡️", lbl: "Risks", cnt: "3 flagged", cls: "a" },
+                    { ic: "🚩", lbl: "Sanctions", cnt: "Pending", cls: "a" },
+                  ].map(c => (
+                    <div key={c.lbl} style={{ background: "#f7f7f7", borderRadius: 10, padding: "10px 7px", textAlign: "center", cursor: "pointer" }}>
+                      <div style={{ fontSize: 17, marginBottom: 3 }}>{c.ic}</div>
+                      <div style={{ fontSize: 10.5, color: "var(--txt2)", fontWeight: 500, lineHeight: 1.3 }}>{c.lbl}</div>
+                      <div style={{ fontSize: 10.5, marginTop: 2, fontWeight: 600, color: c.cls === "r" ? "var(--red)" : c.cls === "a" ? "#ea8b43" : "#4ac329" }}>{c.cnt}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="dash-wp">
+              <div style={{ padding: "14px 20px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ fontFamily: "var(--fh)", fontSize: 13.5, fontWeight: 700, color: "var(--txt)" }}>Recent Activity</div>
+                <span style={{ fontSize: 12, color: "var(--txt3)", cursor: "pointer" }}>View ›</span>
+              </div>
+              <div style={{ height: 1, background: "#f5f5f5" }} />
+              {[
+                { av: "F", avBg: "rgba(46,204,113,.12)", avColor: "#4ac329", txt: <><strong>Fatra</strong> ran compliance lookup · Recent trade</>, time: "2 hours ago" },
+                { av: "F", avBg: "rgba(245,158,11,.12)", avColor: "#ea8b43", txt: <><strong>Fatra</strong> submitted LC check</>, time: "4 hours ago" },
+                { av: "AI", avBg: "rgba(20,184,166,.12)", avColor: "#0d9488", txt: <><strong>AI</strong> flagged EUDR gap</>, time: "1 day ago", fontSize: 9 },
+              ].map((a, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 9, padding: "9px 20px" }}>
+                  <div style={{ width: 24, height: 24, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: a.fontSize || 10, fontWeight: 700, flexShrink: 0, marginTop: 1, background: a.avBg, color: a.avColor }}>{a.av}</div>
+                  <div style={{ flex: 1, fontSize: 12, color: "var(--txt)", lineHeight: 1.4 }}>
+                    {a.txt}
+                    <div style={{ fontSize: 10.5, color: "var(--txt3)", marginTop: 2 }}>{a.time}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
