@@ -59,7 +59,7 @@ function DemoSection() {
       <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: "0.1em", color: "rgba(255,255,255,0.28)", textTransform: "uppercase", textAlign: "center", marginBottom: 16 }}>
         See it in action
       </div>
-      <h2 className="home-demo-heading" style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, textAlign: "center", color: "rgba(255,255,255,0.95)", marginBottom: 8, letterSpacing: "-0.5px" }} data-testid="text-demo-heading">
+      <h2 className="home-demo-heading" style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, textAlign: "center", color: "rgba(255,255,255,0.95)", marginBottom: 8, letterSpacing: 0 }} data-testid="text-demo-heading">
         From trade idea to full compliance picture
       </h2>
       <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", textAlign: "center", marginBottom: 40 }}>
@@ -107,7 +107,7 @@ function DemoSection() {
                 ].map((s) => (
                   <div key={s.label} style={{ background: "#1c1c1e", borderRadius: 12, padding: "16px 18px" }} data-testid={`demo-stat-${s.label.toLowerCase().replace(/\s/g,"-")}`}>
                     <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.28)", textTransform: "uppercase", marginBottom: 8 }}>{s.label}</div>
-                    <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: s.color, letterSpacing: "-1px" }} data-testid={`text-demo-stat-value-${s.label.toLowerCase().replace(/\s/g,"-")}`}>{s.value}</div>
+                    <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: s.color, letterSpacing: 0 }} data-testid={`text-demo-stat-value-${s.label.toLowerCase().replace(/\s/g,"-")}`}>{s.value}</div>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,0.28)", marginTop: 6 }}>{s.sub}</div>
                   </div>
                 ))}
@@ -416,12 +416,12 @@ export default function Home() {
           fontWeight: 900,
           fontSize: 52,
           lineHeight: 1.1,
-          letterSpacing: "-1.5px",
+          letterSpacing: 0,
           color: "rgba(255,255,255,0.95)",
           marginBottom: 20,
           marginTop: 0,
         }} data-testid="text-hero-title">
-          Know your compliance<br />before you commit.
+          Know the regulatory risks<br />before you commit.
         </h1>
 
         <p className="home-hero-subtitle" style={{
@@ -545,7 +545,7 @@ export default function Home() {
         <div style={{ maxWidth: 800, margin: "0 auto" }}>
           <h2 className="home-how-heading" style={{
             fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32,
-            color: "rgba(255,255,255,0.95)", textAlign: "center", marginBottom: 8, letterSpacing: "-1px",
+            color: "rgba(255,255,255,0.95)", textAlign: "center", marginBottom: 8, letterSpacing: 0,
           }} data-testid="text-how-heading">
             Three inputs. Complete picture.
           </h2>
@@ -577,7 +577,7 @@ export default function Home() {
       {/* COMMODITIES TICKER */}
       <div style={{ background: "#0F1318", padding: "60px 0" }} data-testid="section-commodities">
         <div className="home-commodities-header" style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", padding: "0 40px", marginBottom: 32 }}>
-          <h2 className="home-commodities-heading" style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.5px" }} data-testid="text-commodities-heading">
+          <h2 className="home-commodities-heading" style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "rgba(255,255,255,0.95)", letterSpacing: 0 }} data-testid="text-commodities-heading">
             Every commodity. Every corridor.
           </h2>
           <p style={{ color: "rgba(255,255,255,0.65)", marginTop: 8, fontSize: 14 }} data-testid="text-commodities-subheading">
@@ -612,7 +612,7 @@ export default function Home() {
         <div style={{ maxWidth: 800, margin: "0 auto" }}>
           <h2 className="home-pricing-heading" style={{
             fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32,
-            color: "rgba(255,255,255,0.95)", textAlign: "center", letterSpacing: "-1px", marginBottom: 8,
+            color: "rgba(255,255,255,0.95)", textAlign: "center", letterSpacing: 0, marginBottom: 8,
           }} data-testid="text-pricing-heading">
             Pay per check. No subscription trap.
           </h2>
@@ -682,7 +682,7 @@ export default function Home() {
       <div className="home-cta-section" style={{ background: "#0F1318", padding: "80px 40px", textAlign: "center" }} data-testid="section-final-cta">
         <h2 className="home-cta-heading" style={{
           fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32,
-          color: "rgba(255,255,255,0.95)", letterSpacing: "-1px", marginBottom: 12,
+          color: "rgba(255,255,255,0.95)", letterSpacing: 0, marginBottom: 12,
         }} data-testid="text-cta-heading">
           Know before you commit.
         </h2>
