@@ -320,7 +320,7 @@
 
   .home-nav { padding: 0 16px !important; }
   .home-hero { padding: 60px 16px 40px !important; }
-  .home-hero-title { font-size: 32px !important; line-height: 1.15 !important; letter-spacing: -1px !important; }
+  .home-hero-title { font-size: 32px !important; line-height: 1.15 !important; letter-spacing: 0 !important; }
   .home-hero-subtitle { font-size: 15px !important; color: rgba(255,255,255,0.70) !important; margin-bottom: 24px !important; }
   .home-hero-badge { margin-bottom: 16px !important; }
   .home-hero-buttons { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; }
