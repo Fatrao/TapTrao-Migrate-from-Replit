@@ -1455,11 +1455,11 @@ export default function LcCheck() {
       <div className="flex-1 py-8 px-4">
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="space-y-2">
-            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>TapTrao / LC Check</p>
-            <h1 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 28, letterSpacing: "-0.03em", color: "var(--t1)" }} data-testid="text-lc-title">
+            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--txt3)" }}>TapTrao / LC Check</p>
+            <h1 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 28, letterSpacing: "-0.03em", color: "var(--txt)" }} data-testid="text-lc-title">
               Check your LC before sending it to the bank
             </h1>
-            <p style={{ fontFamily: "var(--fb)", color: "var(--t2)", fontSize: 14 }}>
+            <p style={{ fontFamily: "var(--fb)", color: "var(--txt2)", fontSize: 14 }}>
               Catch document mismatches before the bank does.
             </p>
           </div>
@@ -1495,37 +1495,45 @@ export default function LcCheck() {
             </div>
           )}
 
-          <div className="flex items-center gap-2 mb-4">
+          <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
             {[1, 2, 3].map(s => (
-              <div key={s} className="flex items-center gap-2">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium"
-                  style={{
-                    background: step === s ? "var(--blue)" : step > s ? "var(--gbg)" : "var(--card2)",
-                    color: step === s ? "#fff" : step > s ? "var(--green)" : "var(--t3)",
-                  }}
-                  data-testid={`step-indicator-${s}`}
-                >
-                  {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
+              <div key={s} style={{ display: "contents" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div
+                    style={{
+                      width: 26, height: 26, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 11, fontWeight: 800, fontFamily: "var(--fh)", flexShrink: 0, transition: "all 0.2s",
+                      ...(step > s ? { background: "var(--green)", color: "#000" } :
+                         step === s ? { background: "rgba(255,255,255,0.15)", color: "#fff", border: "2px solid var(--green)" } :
+                         { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.1)" }),
+                    }}
+                    data-testid={`step-indicator-${s}`}
+                  >
+                    {step > s ? "✓" : s}
+                  </div>
+                  <span style={{
+                    fontSize: 12, fontWeight: 600, whiteSpace: "nowrap",
+                    color: step > s ? "var(--green)" : step === s ? "#fff" : "rgba(255,255,255,0.25)",
+                  }}>
+                    {s === 1 ? "LC Terms" : s === 2 ? "Documents" : "Results"}
+                  </span>
                 </div>
-                <span style={{ fontSize: 11, color: "var(--t3)" }} className="hidden sm:inline">
-                  {s === 1 ? "LC Terms" : s === 2 ? "Documents" : "Results"}
-                </span>
-                {s < 3 && <div className="w-8 h-px" style={{ background: "var(--border)" }} />}
+                {s < 3 && (
+                  <div style={{ flex: 1, height: 1, margin: "0 10px", minWidth: 24, transition: "background 0.3s", background: step > s ? "var(--green)" : "rgba(255,255,255,0.1)" }} />
+                )}
               </div>
             ))}
           </div>
 
           {step === 1 && (
-            <Card style={{ background: "var(--card)", borderRadius: 14, border: "none", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
-              <CardHeader className="flex flex-row items-center gap-2 pb-2">
-                <FileText className="w-4 h-4" style={{ color: "var(--t3)" }} />
-                <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Step 1: LC Terms Entry</p>
+            <Card style={{ background: "#fff", borderRadius: 16, border: "none", position: "relative", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)" }}>
+              <CardHeader className="flex flex-row items-center gap-2 pb-2" style={{ borderBottom: "1px solid #f0f0f0", paddingBottom: 13 }}>
+                <FileText className="w-4 h-4" style={{ color: "var(--txt3)" }} />
+                <p style={{ fontSize: 14, fontWeight: 700, color: "var(--txt)" }}>📋 Letter of Credit — Key Terms</p>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p style={{ fontSize: 12, color: "var(--t2)", lineHeight: 1.5, marginBottom: 4 }}>
-                  Enter what's written in your LC. We'll check supplier documents against this.
+                <p style={{ fontSize: 12, color: "var(--txt2)", lineHeight: 1.5, marginBottom: 4 }}>
+                  Enter exactly as they appear on your LC.
                 </p>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-1">
@@ -1753,11 +1761,10 @@ export default function LcCheck() {
           )}
 
           {step === 2 && (
-            <Card style={{ background: "var(--card)", borderRadius: 14, border: "none", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
-              <CardHeader className="flex flex-row items-center gap-2 pb-2">
-                <FileText className="w-4 h-4" style={{ color: "var(--t3)" }} />
-                <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Step 2: Supplier Document Entry</p>
+            <Card style={{ background: "#fff", borderRadius: 16, border: "none", position: "relative", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)" }}>
+              <CardHeader className="flex flex-row items-center gap-2 pb-2" style={{ borderBottom: "1px solid #f0f0f0", paddingBottom: 13 }}>
+                <FileText className="w-4 h-4" style={{ color: "var(--txt3)" }} />
+                <p style={{ fontSize: 14, fontWeight: 700, color: "var(--txt)" }}>📦 Supplier Documents</p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex flex-wrap gap-2 items-center">
@@ -1781,7 +1788,7 @@ export default function LcCheck() {
                 </div>
 
                 {documents[activeDocTab] && (
-                  <div className="space-y-4 p-4" style={{ background: "var(--card2)", borderRadius: 14 }}>
+                  <div className="space-y-4 p-4" style={{ background: "#f7f7f7", borderRadius: 14 }}>
                     <div className="flex items-center justify-between gap-4 flex-wrap">
                       <div className="space-y-1 flex-1 min-w-48">
                         <label className="text-sm font-medium">Document Type</label>
@@ -1857,32 +1864,31 @@ export default function LcCheck() {
 
           {step === 3 && checkMutation.data && (
             <div className="space-y-4" data-testid="section-lc-results">
-              <Card style={{ background: "var(--card)", borderRadius: 14, border: "none", position: "relative", overflow: "hidden" }}>
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
-                <CardHeader className="flex flex-row items-center gap-2 pb-2">
-                  <ClipboardCheck className="w-4 h-4" style={{ color: "var(--t3)" }} />
-                  <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Cross-Check Summary</p>
+              <Card style={{ background: "#fff", borderRadius: 16, border: "none", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)" }}>
+                <CardHeader className="flex flex-row items-center gap-2 pb-2" style={{ borderBottom: "1px solid #f0f0f0", paddingBottom: 13 }}>
+                  <ClipboardCheck className="w-4 h-4" style={{ color: "var(--txt3)" }} />
+                  <p style={{ fontSize: 14, fontWeight: 700, color: "var(--txt)" }}>🔍 Cross-Check Summary</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center gap-3 flex-wrap">
                     <VerdictBadge verdict={checkMutation.data.summary.verdict} />
                   </div>
                   <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
-                    <div className="text-center p-3" style={{ background: "var(--card2)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 24, color: "var(--t1)" }} data-testid="text-total-checks">{checkMutation.data.summary.totalChecks}</p>
-                      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Total Checks</p>
+                    <div className="text-center p-3" style={{ background: "#f7f7f7", borderRadius: 8 }}>
+                      <p style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 24, color: "var(--txt)" }} data-testid="text-total-checks">{checkMutation.data.summary.totalChecks}</p>
+                      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--txt3)" }}>Total Checks</p>
                     </div>
-                    <div className="text-center p-3" style={{ background: "var(--gbg)", borderRadius: 8 }}>
+                    <div className="text-center p-3" style={{ background: "rgba(74,140,111,0.08)", borderRadius: 8 }}>
                       <p style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 24, color: "var(--green)" }} data-testid="text-matches">{checkMutation.data.summary.matches}</p>
-                      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Matches</p>
+                      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--txt3)" }}>Matches</p>
                     </div>
-                    <div className="text-center p-3" style={{ background: "var(--abg)", borderRadius: 8 }}>
+                    <div className="text-center p-3" style={{ background: "rgba(234,139,67,0.08)", borderRadius: 8 }}>
                       <p style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 24, color: "var(--amber)" }} data-testid="text-warnings">{checkMutation.data.summary.warnings}</p>
-                      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Warnings</p>
+                      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--txt3)" }}>Warnings</p>
                     </div>
-                    <div className="text-center p-3" style={{ background: "var(--rbg)", borderRadius: 8 }}>
+                    <div className="text-center p-3" style={{ background: "rgba(218,60,61,0.08)", borderRadius: 8 }}>
                       <p style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 24, color: "var(--red)" }} data-testid="text-criticals">{checkMutation.data.summary.criticals}</p>
-                      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)" }}>Critical</p>
+                      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--txt3)" }}>Critical</p>
                     </div>
                   </div>
                 </CardContent>
@@ -1892,10 +1898,10 @@ export default function LcCheck() {
                 <InsuranceGapAlert />
               )}
 
-              <Card style={{ background: "var(--card)", borderRadius: 14, border: "none" }}>
-                <CardHeader className="flex flex-row items-center gap-2 pb-2">
-                  <FileText className="w-4 h-4" style={{ color: "var(--t3)" }} />
-                  <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" }}>Detailed Results</p>
+              <Card style={{ background: "#fff", borderRadius: 16, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)" }}>
+                <CardHeader className="flex flex-row items-center gap-2 pb-2" style={{ borderBottom: "1px solid #f0f0f0", paddingBottom: 13 }}>
+                  <FileText className="w-4 h-4" style={{ color: "var(--txt3)" }} />
+                  <p style={{ fontSize: 14, fontWeight: 700, color: "var(--txt)" }}>📋 Detailed Results</p>
                 </CardHeader>
                 <CardContent className="pt-0">
                   <div className="space-y-2">
@@ -1903,28 +1909,28 @@ export default function LcCheck() {
                       <div
                         key={i}
                         className="p-3 text-sm space-y-1"
-                        style={{ background: "var(--card2)", borderRadius: 8 }}
+                        style={{ background: r.severity === "GREEN" ? "#f2faf4" : r.severity === "AMBER" ? "#fffaf3" : "#fff5f5", borderRadius: 9, border: `1px solid ${r.severity === "GREEN" ? "#d0ecd8" : r.severity === "AMBER" ? "#f5ddb0" : "#f5c0c0"}` }}
                         data-testid={`result-item-${i}`}
                       >
                         <div className="flex items-start justify-between gap-2 flex-wrap">
                           <div className="flex items-center gap-2">
                             <SeverityBadge severity={r.severity} />
-                            <span style={{ fontWeight: 600, color: "var(--t1)" }}>{r.fieldName}</span>
+                            <span style={{ fontWeight: 700, fontSize: 12.5, color: "var(--txt)" }}>{r.fieldName}</span>
                           </div>
-                          <Badge variant="outline" style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)" }} className="shrink-0">{r.documentType}</Badge>
+                          <Badge variant="outline" style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--txt3)" }} className="shrink-0">{r.documentType}</Badge>
                         </div>
                         <div className="grid gap-1 md:grid-cols-2 text-xs">
                           <div>
-                            <span style={{ color: "var(--t3)" }}>LC value: </span>
-                            <span style={{ fontFamily: "'DM Mono', monospace", color: "var(--t1)" }}>{r.lcValue}</span>
+                            <span style={{ color: "var(--txt3)" }}>LC value: </span>
+                            <span style={{ fontFamily: "'DM Mono', monospace", color: "#2e8662", fontWeight: 600 }}>{r.lcValue}</span>
                           </div>
                           <div>
-                            <span style={{ color: "var(--t3)" }}>Document: </span>
-                            <span style={{ fontFamily: "'DM Mono', monospace", color: "var(--t1)" }}>{r.documentValue}</span>
+                            <span style={{ color: "var(--txt3)" }}>Document: </span>
+                            <span style={{ fontFamily: "'DM Mono', monospace", color: "var(--amber)", fontWeight: 600 }}>{r.documentValue}</span>
                           </div>
                         </div>
-                        <p style={{ fontSize: 11, color: "var(--t2)" }}>{r.explanation}</p>
-                        <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 600, color: "var(--t3)" }}>{r.ucpRule}</p>
+                        <p style={{ fontSize: 12, color: "var(--txt2)", lineHeight: 1.5 }}>{r.explanation}</p>
+                        <span style={{ display: "inline-block", fontSize: 10, color: "var(--teal)", background: "rgba(46,134,98,0.1)", padding: "1px 7px", borderRadius: 20, fontWeight: 600, marginTop: 3 }}>{r.ucpRule}</span>
                       </div>
                     ))}
                   </div>
@@ -1932,7 +1938,7 @@ export default function LcCheck() {
               </Card>
 
               {checkMutation.data.summary.criticals > 0 && checkMutation.data.correctionEmail && (
-                <Card style={{ background: "var(--card)", borderRadius: 14, border: "none" }}>
+                <Card style={{ background: "#fff", borderRadius: 16, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)" }}>
                   <CardContent className="p-4 space-y-3">
                     <Button
                       variant="outline"
