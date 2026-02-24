@@ -6,15 +6,15 @@ import { usePageTitle } from "@/hooks/use-page-title";
 
 /* Country name → emoji flag mapping */
 const countryFlags: Record<string, string> = {
-  "Ghana": "🇬🇭", "Côte d'Ivoire": "🇨🇮", "Cote d'Ivoire": "🇨🇮", "Ethiopia": "🇪🇹",
-  "Kenya": "🇰🇪", "Tanzania": "🇹🇿", "Uganda": "🇺🇬", "Nigeria": "🇳🇬", "Cameroon": "🇨🇲",
-  "EU": "🇪🇺", "European Union": "🇪🇺", "United Kingdom": "🇬🇧", "UK": "🇬🇧",
-  "Germany": "🇩🇪", "France": "🇫🇷", "Italy": "🇮🇹", "Spain": "🇪🇸",
-  "Switzerland": "🇨🇭", "Austria": "🇦🇹", "United States": "🇺🇸", "China": "🇨🇳",
-  "UAE": "🇦🇪", "Turkey": "🇹🇷", "Türkiye": "🇹🇷",
+  "Ghana": "\uD83C\uDDEC\uD83C\uDDED", "C\u00F4te d'Ivoire": "\uD83C\uDDE8\uD83C\uDDEE", "Cote d'Ivoire": "\uD83C\uDDE8\uD83C\uDDEE", "Ethiopia": "\uD83C\uDDEA\uD83C\uDDF9",
+  "Kenya": "\uD83C\uDDF0\uD83C\uDDEA", "Tanzania": "\uD83C\uDDF9\uD83C\uDDFF", "Uganda": "\uD83C\uDDFA\uD83C\uDDEC", "Nigeria": "\uD83C\uDDF3\uD83C\uDDEC", "Cameroon": "\uD83C\uDDE8\uD83C\uDDF2",
+  "EU": "\uD83C\uDDEA\uD83C\uDDFA", "European Union": "\uD83C\uDDEA\uD83C\uDDFA", "United Kingdom": "\uD83C\uDDEC\uD83C\uDDE7", "UK": "\uD83C\uDDEC\uD83C\uDDE7",
+  "Germany": "\uD83C\uDDE9\uD83C\uDDEA", "France": "\uD83C\uDDEB\uD83C\uDDF7", "Italy": "\uD83C\uDDEE\uD83C\uDDF9", "Spain": "\uD83C\uDDEA\uD83C\uDDF8",
+  "Switzerland": "\uD83C\uDDE8\uD83C\uDDED", "Austria": "\uD83C\uDDE6\uD83C\uDDF9", "United States": "\uD83C\uDDFA\uD83C\uDDF8", "China": "\uD83C\uDDE8\uD83C\uDDF3",
+  "UAE": "\uD83C\uDDE6\uD83C\uDDEA", "Turkey": "\uD83C\uDDF9\uD83C\uDDF7", "T\u00FCrkiye": "\uD83C\uDDF9\uD83C\uDDF7",
 };
 function getFlag(name: string): string {
-  return countryFlags[name] || "🏳";
+  return countryFlags[name] || "\uD83C\uDFF3";
 }
 
 export default function Dashboard() {
@@ -34,11 +34,11 @@ export default function Dashboard() {
   /* Map risk level → status badge */
   function statusBadge(riskLevel: string) {
     switch (riskLevel) {
-      case "LOW": return <span className="db-status db-status-compliant">Compliant</span>;
-      case "MEDIUM": return <span className="db-status db-status-pending">Pending</span>;
+      case "LOW": return <span className="status-badge status-compliant">Compliant</span>;
+      case "MEDIUM": return <span className="status-badge status-pending">Pending</span>;
       case "HIGH":
-      case "STOP": return <span className="db-status db-status-review">Review</span>;
-      default: return <span className="db-status db-status-pending">Pending</span>;
+      case "STOP": return <span className="status-badge status-review">Review</span>;
+      default: return <span className="status-badge status-pending">Pending</span>;
     }
   }
 
@@ -55,20 +55,20 @@ export default function Dashboard() {
   /* Pending compliance docs — derived from latest lookup or placeholder */
   const pendingDocs = [
     {
-      icon: "📄",
+      icon: "\uD83D\uDCC4",
       name: "Bill of Lading",
       detail: latestLookup
-        ? `${latestLookup.commodityName} · ${getFlag(latestLookup.originName)} ${latestLookup.originCode || latestLookup.originName} → ${getFlag(latestLookup.destinationName)} ${latestLookup.destinationCode || latestLookup.destinationName}`
-        : "Cocoa Beans · 🇬🇭 GH → 🇪🇺 EU",
+        ? `${latestLookup.commodityName} \u00B7 ${getFlag(latestLookup.originName)} ${latestLookup.originCode || latestLookup.originName} \u2192 ${getFlag(latestLookup.destinationName)} ${latestLookup.destinationCode || latestLookup.destinationName}`
+        : "Cocoa Beans \u00B7 \uD83C\uDDEC\uD83C\uDDED GH \u2192 \uD83C\uDDEA\uD83C\uDDFA EU",
     },
     {
-      icon: "🌍",
-      name: `${latestLookup ? getFlag(latestLookup.originName) : "🇬🇭"} Country of Origin`,
+      icon: "\uD83C\uDF0D",
+      name: `${latestLookup ? getFlag(latestLookup.originName) : "\uD83C\uDDEC\uD83C\uDDED"} Country of Origin`,
       detail: latestLookup ? `COCOBOD / ${latestLookup.originName} Customs` : "COCOBOD / Ghana Customs",
     },
-    { icon: "🔬", name: "Inspection Certificate", detail: "Port Health · Felixstowe" },
-    { icon: "🌿", name: "EUDR Due Diligence", detail: "Geolocation pending" },
-    { icon: "📑", name: "Customs Declaration", detail: "CDS · UK Import" },
+    { icon: "\uD83D\uDD2C", name: "Inspection Certificate", detail: "Port Health \u00B7 Felixstowe" },
+    { icon: "\uD83C\uDF3F", name: "EUDR Due Diligence", detail: "Geolocation pending" },
+    { icon: "\uD83D\uDCD1", name: "Customs Declaration", detail: "CDS \u00B7 UK Import" },
   ];
 
   /* Count items needing attention */
@@ -77,31 +77,20 @@ export default function Dashboard() {
   ).length;
 
   return (
-    <AppShell
-      topCenter={
-        <div className="db-nav-links">
-          <Link href="/dashboard"><span className="active">Dashboard</span></Link>
-          <Link href="/lookup"><span>Commodities</span></Link>
-          <Link href="/inbox"><span>Suppliers</span></Link>
-          <Link href="/alerts"><span>Compliance</span></Link>
-          <Link href="/inbox"><span>Messages</span></Link>
-        </div>
-      }
-    >
+    <AppShell contentClassName="dash-content">
       {/* ── GREEN HERO ── */}
-      <div className="db-hero">
-        <div className="db-hero-glow" />
-        <div className="db-breadcrumb">
+      <div className="green-hero-box">
+        <div className="dash-breadcrumb">
           {latestLookup
-            ? `Commodity › ${latestLookup.commodityName} › ${getFlag(latestLookup.originName)} ${latestLookup.originName}`
-            : "Dashboard › Overview"}
+            ? `Commodity \u203A ${latestLookup.commodityName} \u203A ${getFlag(latestLookup.originName)} ${latestLookup.originName}`
+            : "Dashboard \u203A Overview"}
         </div>
         {pendingCount > 0 && latestLookup && (
-          <div className="db-alert">
-            <span className="db-alert-label">⚠️ Compliance: Pending</span>
-            <span className="db-alert-text">
-              {latestLookup.commodityName} · {getFlag(latestLookup.originName)} {latestLookup.originName} →{" "}
-              {getFlag(latestLookup.destinationName)} {latestLookup.destinationName} · {pendingCount} item
+          <div className="dash-alert">
+            <span className="alert-label">{"\u26A0"} Compliance: Pending</span>
+            <span className="alert-text">
+              {latestLookup.commodityName} {"\u00B7"} {getFlag(latestLookup.originName)} {latestLookup.originName} {"\u2192"}{" "}
+              {getFlag(latestLookup.destinationName)} {latestLookup.destinationName} {"\u00B7"} {pendingCount} item
               {pendingCount !== 1 ? "s" : ""} need attention
             </span>
           </div>
@@ -109,75 +98,64 @@ export default function Dashboard() {
       </div>
 
       {/* ── TABS ── */}
-      <div className="db-tabs">
-        <div className="db-tab active">Overview</div>
-        <div className="db-tab">Documents</div>
-        <div className="db-tab">Activity</div>
+      <div className="dash-tabs">
+        <div className="dash-tab active">Overview</div>
+        <div className="dash-tab">Documents</div>
+        <div className="dash-tab">Activity</div>
       </div>
 
       {/* ── STAT CARDS ── */}
-      <div className="db-stat-cards">
+      <div className="stat-cards">
         {/* Total Trade Value at Risk */}
-        <div className="db-stat-card">
-          <div className="db-stat-icon">🏛</div>
-          <div className="db-stat-label">Total Trade Value at Risk</div>
-          <div className="db-stat-value" data-testid="stat-token-balance">
-            $2,345,678
-          </div>
-          <div className="db-stat-sub">
-            <span className="up">↑ 12.5%</span> · 12 past shipments
-          </div>
+        <div className="stat-card">
+          <div className="stat-icon">{"\uD83C\uDFDB"}</div>
+          <div className="stat-label">Total Trade Value at Risk</div>
+          <div className="stat-value" data-testid="stat-token-balance">$2,345,678</div>
+          <div className="stat-sub"><span className="up">{"\u2191"} 12.5%</span> {"\u00B7"} 12 past shipments</div>
         </div>
 
         {/* Total Lookups */}
-        <div className="db-stat-card">
-          <div className="db-stat-icon">🔍</div>
-          <div className="db-stat-label">Total Lookups</div>
-          <div className="db-stat-value" data-testid="stat-compliance-lookups">
-            {statsQuery.isLoading ? "..." : totalLookups}
-            <span className="db-stat-unit">checks</span>
+        <div className="stat-card">
+          <div className="stat-icon">{"\uD83D\uDD0D"}</div>
+          <div className="stat-label">Total Lookups</div>
+          <div className="stat-value" data-testid="stat-compliance-lookups">
+            {statsQuery.isLoading ? "..." : totalLookups}{" "}
+            <span style={{ fontSize: 14, color: "#888" }}>checks</span>
           </div>
-          <div className="db-stat-sub">
-            <span className="up">↑ 8%</span> vs prev. 28 days
-          </div>
+          <div className="stat-sub"><span className="up">{"\u2191"} 8%</span> vs prev. 28 days</div>
         </div>
 
         {/* Rejection Risk */}
-        <div className="db-stat-card">
-          <div className="db-stat-icon">⚠️</div>
-          <div className="db-stat-label">Rejection Risk</div>
-          <div className="db-stat-value" data-testid="stat-lc-checks">
-            7.8% <span className="db-stat-unit" style={{ fontSize: 12, color: "#eab308" }}>Moderate</span>
+        <div className="stat-card">
+          <div className="stat-icon">{"\u26A0\uFE0F"}</div>
+          <div className="stat-label">Rejection Risk</div>
+          <div className="stat-value" data-testid="stat-lc-checks">
+            7.8% <span style={{ fontSize: 12, color: "#eab308" }}>Moderate</span>
           </div>
-          <div className="db-stat-sub">
-            <span className="down">↓ 1.7%</span> vs prev. 28 days
-          </div>
+          <div className="stat-sub"><span className="down">{"\u2193"} 1.7%</span> vs prev. 28 days</div>
         </div>
 
         {/* AI CTA card */}
-        <div className="db-stat-card db-ai-card">
-          <div className="db-ai-label">Recommended with</div>
-          <div className="db-ai-badge">AI</div>
+        <div className="stat-card ai-card">
+          <div className="ai-label">Recommended with</div>
+          <div className="ai-badge">AI</div>
           <Link href="/lookup">
-            <span className="db-ai-btn">Pre-Shipment<br />Check</span>
+            <button className="ai-btn">Pre-Shipment<br />Check</button>
           </Link>
         </div>
       </div>
 
       {/* ── GRID: Recent Trades + Pending Docs ── */}
-      <div className="db-grid">
+      <div className="dash-grid">
         {/* Recent Trades */}
-        <div className="db-card">
-          <div className="db-card-header">
-            <h3>
-              Recent Trades{" "}
-              <span className="db-count">{lookups.length}</span>
-            </h3>
+        <div className="dash-card">
+          <div className="dash-card-header">
+            <h3>Recent Trades <span className="count">{lookups.length}</span></h3>
             <Link href="/trades">
-              <span className="db-link" data-testid="link-view-all-lookups">View All ›</span>
+              <span className="link" data-testid="link-view-all-lookups">View All {"\u203A"}</span>
             </Link>
           </div>
-          <table className="db-trade-table">
+          <table className="trade-table">
             <thead>
               <tr>
                 <th>Commodity</th>
@@ -204,11 +182,11 @@ export default function Dashboard() {
                 lookups.slice(0, 5).map((l) => (
                   <tr key={l.id}>
                     <td>
-                      <div className="db-trade-commodity">{l.commodityName}</div>
-                      <div className="db-trade-hs">HS {l.hsCode}</div>
+                      <div className="trade-commodity">{l.commodityName}</div>
+                      <div className="trade-hs">HS {l.hsCode}</div>
                     </td>
                     <td>
-                      {getFlag(l.originName)} {l.originName} → {getFlag(l.destinationName)} {l.destinationName}
+                      {getFlag(l.originName)} {l.originName} {"\u2192"} {getFlag(l.destinationName)} {l.destinationName}
                       <br />
                       <span style={{ fontSize: 11, color: "#999" }}>
                         {new Date(l.createdAt).toLocaleDateString("en-GB", {
@@ -217,13 +195,11 @@ export default function Dashboard() {
                         })}
                       </span>
                     </td>
-                    <td>
-                      —
-                    </td>
+                    <td>{"\u2014"}</td>
                     <td>{statusBadge(l.riskLevel)}</td>
                     <td>
                       <button
-                        className="db-action-link"
+                        className="action-link"
                         onClick={() => navigate(`/lookup/${l.id}`)}
                       >
                         {actionLabel(l.riskLevel)}
@@ -237,16 +213,16 @@ export default function Dashboard() {
         </div>
 
         {/* Pending Compliance Docs */}
-        <div className="db-card">
-          <div className="db-card-header">
+        <div className="dash-card">
+          <div className="dash-card-header">
             <h3>Pending Compliance Docs</h3>
           </div>
           {pendingDocs.map((doc, i) => (
-            <div key={i} className="db-pending-item">
-              <div className="db-pending-icon">{doc.icon}</div>
-              <div className="db-pending-info">
-                <div className="db-pending-name">{doc.name}</div>
-                <div className="db-pending-detail">{doc.detail}</div>
+            <div key={i} className="pending-item">
+              <div className="pending-icon">{doc.icon}</div>
+              <div className="pending-info">
+                <div className="pending-name">{doc.name}</div>
+                <div className="pending-detail">{doc.detail}</div>
               </div>
             </div>
           ))}

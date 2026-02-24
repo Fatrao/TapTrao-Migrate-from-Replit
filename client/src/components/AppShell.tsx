@@ -14,23 +14,21 @@ interface NavItem {
 
 /* ── Section: Menu ── */
 const menuItems: NavItem[] = [
-  { icon: "⊞", label: "Dashboard", href: "/dashboard" },
-  { icon: "◉", label: "My Trades", href: "/trades" },
-  { icon: "●", label: "Lookup", href: "/lookup" },
-  { icon: "📄", label: "LC Check", href: "/lc-check" },
+  { icon: "\u229E", label: "Dashboard", href: "/dashboard" },
+  { icon: "\u25C9", label: "My Trades", href: "/trades" },
+  { icon: "\u25CF", label: "Lookup", href: "/lookup" },
+  { icon: "\uD83D\uDCC4", label: "LC Check", href: "/lc-check" },
 ];
 
 /* ── Section: Compliance ── */
 const complianceItems: NavItem[] = [
-  { icon: "📬", label: "Supplier Inbox", href: "/inbox" },
-  { icon: "🔔", label: "Alerts", href: "/alerts" },
-  { icon: "📋", label: "Templates", href: "/templates" },
+  { icon: "\uD83D\uDCEC", label: "Supplier Inbox", href: "/inbox" },
+  { icon: "\uD83D\uDD14", label: "Alerts", href: "/alerts" },
+  { icon: "\uD83D\uDCCB", label: "Templates", href: "/templates" },
 ];
 
 function isNavActive(item: NavItem, pathname: string): boolean {
-  if (item.matchPaths) {
-    return item.matchPaths.some((p) => pathname.startsWith(p));
-  }
+  if (item.matchPaths) return item.matchPaths.some((p) => pathname.startsWith(p));
   return pathname.startsWith(item.href);
 }
 
@@ -38,6 +36,7 @@ interface AppShellProps {
   children: ReactNode;
   topCenter?: ReactNode;
   sidebarBottom?: ReactNode;
+  contentClassName?: string;
 }
 
 /* ── Sidebar nav item ── */
@@ -45,50 +44,14 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
   return (
     <Link href={item.href}>
       <div
+        className={`sidebar-item${isActive ? " active" : ""}`}
         onClick={onClick}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          padding: isActive ? "9px 10px 9px 7px" : "9px 10px",
-          borderRadius: 8,
-          fontSize: 13.5,
-          fontWeight: isActive ? 500 : 400,
-          color: isActive ? "#4ade80" : "rgba(255,255,255,0.5)",
-          background: isActive ? "rgba(74, 222, 128, 0.1)" : "transparent",
-          borderLeft: isActive ? "3px solid #4ade80" : "3px solid transparent",
-          cursor: "pointer",
-          transition: "all 0.15s",
-          textDecoration: "none",
-        }}
         data-testid={`shell-nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
-        onMouseEnter={(e) => {
-          if (!isActive) {
-            e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-            e.currentTarget.style.color = "rgba(255,255,255,0.8)";
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isActive) {
-            e.currentTarget.style.background = "transparent";
-            e.currentTarget.style.color = "rgba(255,255,255,0.5)";
-          }
-        }}
       >
-        <span style={{ fontSize: 15, flexShrink: 0, width: 20, textAlign: "center" }}>{item.icon}</span>
-        <span style={{ flex: 1 }}>{item.label}</span>
+        <span className="icon">{item.icon}</span>
+        {item.label}
         {item.badge && item.badge.value > 0 && (
-          <span
-            style={{
-              fontSize: 11,
-              padding: "1px 7px",
-              borderRadius: 10,
-              fontWeight: 600,
-              marginLeft: "auto",
-              color: "#fff",
-              background: item.badge.type === "amber" ? "#ef4444" : "#22c55e",
-            }}
-          >
+          <span className={`badge ${item.badge.type === "amber" ? "badge-red" : "badge-green"}`}>
             {item.badge.value}
           </span>
         )}
@@ -97,58 +60,14 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
   );
 }
 
-/* ── Section label ── */
-function SidebarLabel({ children }: { children: ReactNode }) {
-  return (
-    <div
-      style={{
-        fontSize: 10,
-        fontWeight: 600,
-        letterSpacing: "1.2px",
-        color: "rgba(255,255,255,0.25)",
-        textTransform: "uppercase",
-        paddingLeft: 10,
-        marginBottom: 6,
-        marginTop: 20,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
 /* ── History card ── */
 function HistoryCard({ title, tags }: { title: string; tags: string[] }) {
   return (
-    <div
-      style={{
-        background: "rgba(255,255,255,0.04)",
-        borderRadius: 8,
-        padding: "10px 12px",
-        marginBottom: 6,
-        cursor: "pointer",
-        transition: "background 0.15s",
-      }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
-    >
-      <div style={{ fontSize: 12.5, fontWeight: 500, color: "rgba(255,255,255,0.85)", marginBottom: 5 }}>
-        {title}
-      </div>
-      <div style={{ display: "flex", gap: 5 }}>
+    <div className="history-card">
+      <div className="title">{title}</div>
+      <div className="tags">
         {tags.map((tag, i) => (
-          <span
-            key={i}
-            style={{
-              fontSize: 10,
-              padding: "2px 7px",
-              borderRadius: 4,
-              background: "rgba(255,255,255,0.07)",
-              color: "rgba(255,255,255,0.4)",
-            }}
-          >
-            {tag}
-          </span>
+          <span key={i} className="tag">{tag}</span>
         ))}
       </div>
     </div>
@@ -165,7 +84,7 @@ function DefaultNavLinks({ activePage }: { activePage: string }) {
     { label: "Messages", href: "/inbox", match: [] },
   ];
   return (
-    <div className="db-nav-links">
+    <div className="top-nav-links">
       {links.map((link) => (
         <Link key={link.label} href={link.href}>
           <span className={link.match.some((m) => activePage.startsWith(m)) ? "active" : ""}>
@@ -177,29 +96,26 @@ function DefaultNavLinks({ activePage }: { activePage: string }) {
   );
 }
 
-export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) {
+export function AppShell({ children, topCenter, sidebarBottom, contentClassName = "content-area" }: AppShellProps) {
   const [location] = useLocation();
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  /* Badge counts */
   const inboxBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/supplier-inbox/badge-count"] });
   const inboxBadge = inboxBadgeQuery.data?.count ?? 0;
   const alertsBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/alerts/unread-count"] });
   const alertsBadge = alertsBadgeQuery.data?.count ?? 0;
 
-  // Fetch recent lookups for history cards
+  /* Recent lookups for history cards */
   const recentLookupsQuery = useQuery<any[]>({ queryKey: ["/api/lookups/recent"] });
   const recentLookups = recentLookupsQuery.data?.slice(0, 3) ?? [];
 
-  useEffect(() => {
-    setSidebarOpen(false);
-  }, [location]);
+  useEffect(() => { setSidebarOpen(false); }, [location]);
 
   useEffect(() => {
-    if (isMobile && sidebarOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    if (isMobile && sidebarOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
     return () => { document.body.style.overflow = ""; };
   }, [isMobile, sidebarOpen]);
 
@@ -223,94 +139,61 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
   const sidebarContent = (
     <>
       {/* Logo */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 8px",
-          marginBottom: 30,
-        }}
-      >
+      <div className="sidebar-logo">
         <Link href="/">
-          <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} data-testid="shell-logo">
-            <div style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              overflow: "hidden",
-              flexShrink: 0,
-            }}>
-              <img src="/logo.png" alt="TapTrao" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            </div>
-            <span
-              style={{
-                fontFamily: "'Clash Display', sans-serif",
-                fontWeight: 600,
-                fontSize: 17,
-                color: "#fff",
-              }}
-            >
-              TapTrao
-            </span>
-          </div>
+          <span data-testid="shell-logo">
+            <img src="/logo.png" alt="TapTrao" />
+            <span>TapTrao</span>
+          </span>
         </Link>
         {isMobile && (
-          <button
-            onClick={closeSidebar}
-            style={{
-              background: "none",
-              border: "none",
-              color: "rgba(255,255,255,0.6)",
-              padding: 4,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            aria-label="Close menu"
-          >
+          <button className="sidebar-close" onClick={closeSidebar} aria-label="Close menu">
             <X size={20} />
           </button>
         )}
       </div>
 
       {/* Menu section */}
-      <SidebarLabel>Menu</SidebarLabel>
-      {mItems.map((item) => (
-        <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
-      ))}
+      <div className="sidebar-section">
+        <div className="sidebar-section-label">Menu</div>
+        {mItems.map((item) => (
+          <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+        ))}
+      </div>
 
       {/* Compliance section */}
-      <SidebarLabel>Compliance</SidebarLabel>
-      {cItems.map((item) => (
-        <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
-      ))}
+      <div className="sidebar-section">
+        <div className="sidebar-section-label">Compliance</div>
+        {cItems.map((item) => (
+          <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+        ))}
+      </div>
 
       {/* Spacer */}
       <div style={{ flex: 1 }} />
 
       {/* History section */}
-      <SidebarLabel>History</SidebarLabel>
-      <div style={{ marginTop: 4, padding: "0 2px" }}>
-        {recentLookups.length > 0 ? (
-          recentLookups.map((lookup: any) => {
-            const originFlag = lookup.originFlag || "";
-            const destFlag = lookup.destinationFlag || "";
-            const originCode = lookup.originCode || "";
-            const destCode = lookup.destinationCode || "";
-            const commodity = lookup.commodityName || "Trade";
-            const title = `${originFlag} ${commodity} ${originCode} → ${destFlag} ${destCode}`;
-            const tags = ["Lookup"];
-            return <HistoryCard key={lookup.id} title={title} tags={tags} />;
-          })
-        ) : (
-          <>
-            <HistoryCard title="🇨🇮 Cashew CI → 🇬🇧 UK Q1 2026" tags={["LC Check", "$126k"]} />
-            <HistoryCard title="🇬🇭 Cocoa Beans GH → 🇪🇺 EU" tags={["LC Check", "$84k"]} />
-            <HistoryCard title="🇪🇹 Sesame Seeds ET → 🇪🇺 EU" tags={["Lookup", "$43k"]} />
-          </>
-        )}
+      <div className="sidebar-section">
+        <div className="sidebar-section-label">History</div>
+        <div className="sidebar-history">
+          {recentLookups.length > 0 ? (
+            recentLookups.map((lookup: any) => {
+              const originFlag = lookup.originFlag || "";
+              const destFlag = lookup.destinationFlag || "";
+              const originCode = lookup.originCode || "";
+              const destCode = lookup.destinationCode || "";
+              const commodity = lookup.commodityName || "Trade";
+              const title = `${originFlag} ${commodity} ${originCode} \u2192 ${destFlag} ${destCode}`;
+              return <HistoryCard key={lookup.id} title={title} tags={["Lookup"]} />;
+            })
+          ) : (
+            <>
+              <HistoryCard title="\uD83C\uDDE8\uD83C\uDDEE Cashew CI \u2192 \uD83C\uDDEC\uD83C\uDDE7 UK Q1 2026" tags={["LC Check", "$126k"]} />
+              <HistoryCard title="\uD83C\uDDEC\uD83C\uDDED Cocoa Beans GH \u2192 \uD83C\uDDEA\uD83C\uDDFA EU" tags={["LC Check", "$84k"]} />
+              <HistoryCard title="\uD83C\uDDEA\uD83C\uDDF9 Sesame Seeds ET \u2192 \uD83C\uDDEA\uD83C\uDDFA EU" tags={["Lookup", "$43k"]} />
+            </>
+          )}
+        </div>
       </div>
 
       {/* Custom sidebar bottom slot */}
@@ -319,250 +202,70 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
   );
 
   return (
-    <div
-      style={{
-        display: "flex",
-        padding: 10,
-        gap: 10,
-        minHeight: "100vh",
-        background: "#000",
-      }}
-    >
+    <div className="app-layout">
       {/* SIDEBAR — desktop */}
-      {!isMobile && (
-        <div
-          style={{
-            width: 240,
-            minWidth: 240,
-            background: "linear-gradient(180deg, #1e2726 0%, #1f2d2a 50%, #1a2825 100%)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 18,
-            padding: "20px 14px",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-            position: "sticky",
-            top: 10,
-            height: "calc(100vh - 20px)",
-            flexShrink: 0,
-            zIndex: 10,
-          }}
-        >
-          {sidebarContent}
-        </div>
-      )}
+      {!isMobile && <aside className="sidebar">{sidebarContent}</aside>}
 
       {/* Mobile sidebar overlay */}
       {isMobile && sidebarOpen && (
         <>
-          <div
-            onClick={closeSidebar}
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0,0,0,0.6)",
-              zIndex: 998,
-            }}
-          />
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              bottom: 0,
-              width: 260,
-              maxWidth: "80vw",
-              background: "linear-gradient(180deg, #1e2726 0%, #1f2d2a 50%, #1a2825 100%)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "0 18px 18px 0",
-              zIndex: 999,
-              padding: "20px 14px",
-              display: "flex",
-              flexDirection: "column",
-              overflowY: "auto",
-              boxShadow: "4px 0 24px rgba(0,0,0,0.4)",
-            }}
-          >
-            {sidebarContent}
-          </div>
+          <div className="sidebar-backdrop" onClick={closeSidebar} />
+          <aside className="sidebar sidebar-mobile">{sidebarContent}</aside>
         </>
       )}
 
-      {/* MAIN BOX — green-to-light gradient, rounded 18px */}
-      <div style={{
-        flex: 1,
-        minWidth: 0,
-        borderRadius: 18,
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        background: `linear-gradient(180deg,
-          #0e4e45 0%, #0e4e46 2%, #0d5047 4%, #104f47 6%,
-          #14574a 10%, #1c6352 14%, #216354 18%, #2f725f 22%,
-          #327462 24%, #3f7d6a 27%, #407d6a 30%, #468271 32%,
-          #498573 34%, #578d7d 37%, #619888 39%, #6a9f8d 41%,
-          #7faa9b 44%, #87b0a2 46%, #8db3a6 48%, #94b5ab 50%,
-          #9cbbb2 52%, #a6c3ba 54%, #bdd3cb 60%, #c7d9d2 65%,
-          #e2e7e6 75%, #f2f2f2 85%, #f3f3f3 90%
-        )`,
-        minHeight: "calc(100vh - 20px)",
-      }}>
-        {/* NAV BAR — inside main box at top */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: isMobile ? "10px 12px" : "14px 32px",
-            flexShrink: 0,
-          }}
-        >
-          {/* Left: hamburger on mobile, nav links on desktop */}
-          {isMobile ? (
-            <button
-              onClick={() => setSidebarOpen(true)}
-              style={{
-                background: "none",
-                border: "none",
-                color: "rgba(255,255,255,0.7)",
-                padding: 6,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-              aria-label="Open menu"
-              data-testid="shell-hamburger"
-            >
-              <Menu size={22} />
-            </button>
-          ) : (
-            <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-              {topCenter || <DefaultNavLinks activePage={location} />}
-            </div>
-          )}
+      {/* MAIN CONTENT */}
+      <div className="main-wrapper">
+        <div className="main-box">
+          <div className={contentClassName}>
+            {/* NAV BAR — inside content area at top */}
+            <div className="top-nav">
+              {isMobile ? (
+                <button
+                  className="hamburger-btn"
+                  onClick={() => setSidebarOpen(true)}
+                  aria-label="Open menu"
+                  data-testid="shell-hamburger"
+                >
+                  <Menu size={22} />
+                </button>
+              ) : (
+                <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+                  {topCenter || <DefaultNavLinks activePage={location} />}
+                </div>
+              )}
 
-          {/* Mobile: topCenter in middle */}
-          {isMobile && (
-            <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-              {topCenter || <DefaultNavLinks activePage={location} />}
-            </div>
-          )}
+              {isMobile && (
+                <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+                  {topCenter || <DefaultNavLinks activePage={location} />}
+                </div>
+              )}
 
-          {/* Right: icon buttons + avatar */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
-            {/* Notification bell */}
-            <Link href="/alerts">
-              <div
-                style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: "50%",
-                  background: "rgba(255,255,255,0.1)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  position: "relative",
-                  transition: "background 0.15s",
-                  fontSize: 13,
-                  color: "rgba(255,255,255,0.6)",
-                }}
-                data-testid="shell-bell-icon"
-                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
-              >
-                🔔
-                {alertsBadge > 0 && (
-                  <span style={{
-                    position: "absolute",
-                    top: 1,
-                    right: 1,
-                    width: 7,
-                    height: 7,
-                    borderRadius: "50%",
-                    background: "#ef4444",
-                  }} />
+              {/* Right: icon buttons + avatar */}
+              <div className="top-nav-icons">
+                <Link href="/alerts">
+                  <div className="icon-btn" data-testid="shell-bell-icon">
+                    {"\uD83D\uDD14"}
+                    {alertsBadge > 0 && <div className="dot" />}
+                  </div>
+                </Link>
+                {!isMobile && (
+                  <Link href="/inbox">
+                    <div className="icon-btn">{"\uD83D\uDCAC"}</div>
+                  </Link>
                 )}
+                {!isMobile && (
+                  <Link href="/settings/profile">
+                    <div className="icon-btn">{"\u2699\uFE0F"}</div>
+                  </Link>
+                )}
+                <div className="user-avatar" data-testid="shell-user-avatar">F</div>
               </div>
-            </Link>
-
-            {/* Chat icon */}
-            {!isMobile && (
-              <Link href="/inbox">
-                <div
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.1)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    transition: "background 0.15s",
-                    fontSize: 13,
-                    color: "rgba(255,255,255,0.6)",
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
-                >
-                  💬
-                </div>
-              </Link>
-            )}
-
-            {/* Settings icon */}
-            {!isMobile && (
-              <Link href="/settings/profile">
-                <div
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.1)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    transition: "background 0.15s",
-                    fontSize: 13,
-                    color: "rgba(255,255,255,0.6)",
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
-                >
-                  ⚙️
-                </div>
-              </Link>
-            )}
-
-            {/* User avatar */}
-            <div
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: "50%",
-                background: "#3b82f6",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#fff",
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-              data-testid="shell-user-avatar"
-            >
-              F
             </div>
-          </div>
-        </div>
 
-        {/* Scrollable content */}
-        <div style={{ flex: 1, overflow: "auto", padding: "0 0 60px" }}>
-          {children}
+            {/* Scrollable content */}
+            {children}
+          </div>
         </div>
       </div>
     </div>
