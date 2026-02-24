@@ -346,6 +346,8 @@
   font-weight: 600;
   border: 1px solid rgba(34, 197, 94, 0.25);
   position: relative;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Stepper */
@@ -658,6 +660,8 @@
 /* LC page responsive */
 @media (max-width: 768px) {
   .lc-hero { padding: 16px 16px 20px; margin: 4px 8px 12px; }
+  .lc-hero-top { flex-wrap: wrap; gap: 8px; }
+  .lc-price-pill { font-size: 12px; padding: 5px 12px; white-space: normal; text-align: center; }
   .lc-hero-title { font-size: 24px; }
   .lc-fg2, .lc-fg3 { grid-template-columns: 1fr; }
   .lc-stepper-wrap { padding: 12px 16px 14px; }
