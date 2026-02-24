@@ -1,12 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { useTokenBalance } from "@/hooks/use-tokens";
-import { LayoutGrid, BarChart3, Settings, Search, FileCheck, Bell, Calculator, Bookmark, Menu, X, Inbox, MessageCircle } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, type ReactNode } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface NavItem {
-  icon: typeof LayoutGrid;
+  icon: string;
   label: string;
   href: string;
   matchPaths?: string[];
@@ -15,17 +14,17 @@ interface NavItem {
 
 /* ── Section: Menu ── */
 const menuItems: NavItem[] = [
-  { icon: BarChart3, label: "Dashboard", href: "/dashboard" },
-  { icon: LayoutGrid, label: "My Trades", href: "/trades" },
-  { icon: Search, label: "Lookup", href: "/lookup" },
-  { icon: FileCheck, label: "LC Check", href: "/lc-check" },
+  { icon: "⊞", label: "Dashboard", href: "/dashboard" },
+  { icon: "◉", label: "My Trades", href: "/trades" },
+  { icon: "●", label: "Lookup", href: "/lookup" },
+  { icon: "📄", label: "LC Check", href: "/lc-check" },
 ];
 
 /* ── Section: Compliance ── */
 const complianceItems: NavItem[] = [
-  { icon: Inbox, label: "Supplier Inbox", href: "/inbox" },
-  { icon: Bell, label: "Alerts", href: "/alerts" },
-  { icon: Bookmark, label: "Templates", href: "/templates" },
+  { icon: "📬", label: "Supplier Inbox", href: "/inbox" },
+  { icon: "🔔", label: "Alerts", href: "/alerts" },
+  { icon: "📋", label: "Templates", href: "/templates" },
 ];
 
 function isNavActive(item: NavItem, pathname: string): boolean {
@@ -76,14 +75,7 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
           }
         }}
       >
-        <item.icon
-          size={15}
-          style={{
-            flexShrink: 0,
-            width: 20,
-            textAlign: "center",
-          }}
-        />
+        <span style={{ fontSize: 15, flexShrink: 0, width: 20, textAlign: "center" }}>{item.icon}</span>
         <span style={{ flex: 1 }}>{item.label}</span>
         {item.badge && item.badge.value > 0 && (
           <span
@@ -186,11 +178,9 @@ function DefaultNavLinks({ activePage }: { activePage: string }) {
 }
 
 export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) {
-  const [location, navigate] = useLocation();
+  const [location] = useLocation();
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const tokenQuery = useTokenBalance();
-  const balance = tokenQuery.data?.balance ?? 0;
   const inboxBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/supplier-inbox/badge-count"] });
   const inboxBadge = inboxBadgeQuery.data?.count ?? 0;
   const alertsBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/alerts/unread-count"] });
@@ -457,7 +447,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
             </div>
           )}
 
-          {/* Right: icon buttons + avatar + token badge */}
+          {/* Right: icon buttons + avatar */}
           <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
             {/* Notification bell */}
             <Link href="/alerts">
@@ -473,12 +463,14 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                   cursor: "pointer",
                   position: "relative",
                   transition: "background 0.15s",
+                  fontSize: 13,
+                  color: "rgba(255,255,255,0.5)",
                 }}
                 data-testid="shell-bell-icon"
                 onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
               >
-                <Bell size={13} style={{ color: "rgba(255,255,255,0.5)" }} />
+                🔔
                 {alertsBadge > 0 && (
                   <span style={{
                     position: "absolute",
@@ -507,11 +499,13 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                     justifyContent: "center",
                     cursor: "pointer",
                     transition: "background 0.15s",
+                    fontSize: 13,
+                    color: "rgba(255,255,255,0.5)",
                   }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
                 >
-                  <MessageCircle size={13} style={{ color: "rgba(255,255,255,0.5)" }} />
+                  💬
                 </div>
               </Link>
             )}
@@ -530,11 +524,13 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                     justifyContent: "center",
                     cursor: "pointer",
                     transition: "background 0.15s",
+                    fontSize: 13,
+                    color: "rgba(255,255,255,0.5)",
                   }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
                 >
-                  <Settings size={13} style={{ color: "rgba(255,255,255,0.5)" }} />
+                  ⚙️
                 </div>
               </Link>
             )}
@@ -558,45 +554,6 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
             >
               F
             </div>
-
-            {/* Token badge */}
-            <div
-              style={{
-                background: "rgba(255,255,255,0.07)",
-                borderRadius: 8,
-                padding: "5px 10px",
-                fontSize: 11,
-                color: "rgba(255,255,255,0.45)",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-              }}
-              data-testid="shell-token-chip"
-            >
-              <span style={{ width: 6, height: 6, background: "#6b9080", borderRadius: "50%", display: "inline-block" }} />
-              <span style={{ fontWeight: 500, color: "#6b9080" }}>{balance}</span>
-              {!isMobile && <span>credits</span>}
-            </div>
-
-            {/* Buy CTA */}
-            <button
-              onClick={() => navigate("/pricing")}
-              style={{
-                background: "#6b9080",
-                color: "#fff",
-                border: "none",
-                borderRadius: 10,
-                padding: isMobile ? "6px 12px" : "8px 18px",
-                fontFamily: "'Inter', sans-serif",
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-              data-testid="shell-buy-cta"
-            >
-              {isMobile ? "Buy" : "Buy trade pack"}
-            </button>
           </div>
         </div>
 

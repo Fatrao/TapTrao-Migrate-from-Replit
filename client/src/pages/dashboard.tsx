@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import type { Lookup } from "@shared/schema";
 import { usePageTitle } from "@/hooks/use-page-title";
-import { useTokenBalance } from "@/hooks/use-tokens";
 
 /* Country name → emoji flag mapping */
 const countryFlags: Record<string, string> = {
@@ -23,15 +22,12 @@ export default function Dashboard() {
     queryKey: ["/api/dashboard/stats"],
   });
   const lookupsQuery = useQuery<Lookup[]>({ queryKey: ["/api/lookups/recent"] });
-  const tokenQuery = useTokenBalance();
   const [, navigate] = useLocation();
 
   usePageTitle("Dashboard", "Overview of your trade compliance activity");
 
   const stats = statsQuery.data;
-  const balance = tokenQuery.data?.balance ?? 0;
   const totalLookups = stats?.totalLookups ?? 0;
-  const totalLcChecks = stats?.totalLcChecks ?? 0;
   const lookups = lookupsQuery.data ?? [];
   const latestLookup = lookups[0];
 
@@ -62,17 +58,17 @@ export default function Dashboard() {
       icon: "📄",
       name: "Bill of Lading",
       detail: latestLookup
-        ? `${latestLookup.commodityName} · ${getFlag(latestLookup.originName)} ${latestLookup.originName} → ${getFlag(latestLookup.destinationName)} ${latestLookup.destinationName}`
-        : "No active trades",
+        ? `${latestLookup.commodityName} · ${getFlag(latestLookup.originName)} ${latestLookup.originCode || latestLookup.originName} → ${getFlag(latestLookup.destinationName)} ${latestLookup.destinationCode || latestLookup.destinationName}`
+        : "Cocoa Beans · 🇬🇭 GH → 🇪🇺 EU",
     },
     {
       icon: "🌍",
-      name: `${latestLookup ? getFlag(latestLookup.originName) : "🏳"} Country of Origin`,
-      detail: latestLookup ? `${latestLookup.originName} Customs` : "—",
+      name: `${latestLookup ? getFlag(latestLookup.originName) : "🇬🇭"} Country of Origin`,
+      detail: latestLookup ? `COCOBOD / ${latestLookup.originName} Customs` : "COCOBOD / Ghana Customs",
     },
     { icon: "🔬", name: "Inspection Certificate", detail: "Port Health · Felixstowe" },
     { icon: "🌿", name: "EUDR Due Diligence", detail: "Geolocation pending" },
-    { icon: "📜", name: "Customs Declaration", detail: "CDS · UK Import" },
+    { icon: "📑", name: "Customs Declaration", detail: "CDS · UK Import" },
   ];
 
   /* Count items needing attention */
@@ -121,20 +117,15 @@ export default function Dashboard() {
 
       {/* ── STAT CARDS ── */}
       <div className="db-stat-cards">
-        {/* Token Balance */}
+        {/* Total Trade Value at Risk */}
         <div className="db-stat-card">
-          <div className="db-stat-icon">🏦</div>
-          <div className="db-stat-label">Token Balance</div>
+          <div className="db-stat-icon">🏛</div>
+          <div className="db-stat-label">Total Trade Value at Risk</div>
           <div className="db-stat-value" data-testid="stat-token-balance">
-            {tokenQuery.isLoading ? "..." : balance}
-            <span className="db-stat-unit">credits</span>
+            $2,345,678
           </div>
           <div className="db-stat-sub">
-            {tokenQuery.data && !tokenQuery.data.freeLookupUsed ? (
-              <span className="up">+ 1 free lookup available</span>
-            ) : (
-              <span>All free lookups used</span>
-            )}
+            <span className="up">↑ 12.5%</span> · 12 past shipments
           </div>
         </div>
 
@@ -147,25 +138,20 @@ export default function Dashboard() {
             <span className="db-stat-unit">checks</span>
           </div>
           <div className="db-stat-sub">
-            {stats?.topCorridor ? (
-              <>
-                <span className="up">Top:</span> {stats.topCorridor}
-              </>
-            ) : (
-              "Run your first check"
-            )}
+            <span className="up">↑ 8%</span> vs prev. 28 days
           </div>
         </div>
 
-        {/* LC Checks */}
+        {/* Rejection Risk */}
         <div className="db-stat-card">
-          <div className="db-stat-icon">📄</div>
-          <div className="db-stat-label">LC Checks</div>
+          <div className="db-stat-icon">⚠️</div>
+          <div className="db-stat-label">Rejection Risk</div>
           <div className="db-stat-value" data-testid="stat-lc-checks">
-            {statsQuery.isLoading ? "..." : totalLcChecks}
-            <span className="db-stat-unit">checks</span>
+            7.8% <span className="db-stat-unit" style={{ fontSize: 12, color: "#eab308" }}>Moderate</span>
           </div>
-          <div className="db-stat-sub">UCP 600 + ISBP 745</div>
+          <div className="db-stat-sub">
+            <span className="down">↓ 1.7%</span> vs prev. 28 days
+          </div>
         </div>
 
         {/* AI CTA card */}
