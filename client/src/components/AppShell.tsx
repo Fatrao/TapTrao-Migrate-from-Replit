@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useTokenBalance } from "@/hooks/use-tokens";
-import { LayoutGrid, BarChart3, Settings, Plus, Search, FileCheck, Bell, Calculator, Bookmark, Menu, X } from "lucide-react";
+import { LayoutGrid, BarChart3, Settings, Search, FileCheck, Bell, Calculator, Bookmark, Menu, X, Inbox } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, type ReactNode } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -13,21 +13,19 @@ interface NavItem {
   badge?: { type: "amber" | "green"; value: number };
 }
 
-const workspaceItems: NavItem[] = [
+/* ── Section: Menu ── */
+const menuItems: NavItem[] = [
   { icon: BarChart3, label: "Dashboard", href: "/dashboard" },
-  { icon: Search, label: "Compliance Lookup", href: "/lookup" },
-  { icon: FileCheck, label: "LC Checker", href: "/lc-check" },
   { icon: LayoutGrid, label: "My Trades", href: "/trades" },
+  { icon: Search, label: "Lookup", href: "/lookup" },
+  { icon: FileCheck, label: "LC Check", href: "/lc-check" },
 ];
 
-const toolsItems: NavItem[] = [
-  { icon: Bookmark, label: "Templates", href: "/templates" },
+/* ── Section: Compliance ── */
+const complianceItems: NavItem[] = [
+  { icon: Inbox, label: "Supplier Inbox", href: "/inbox" },
   { icon: Bell, label: "Alerts", href: "/alerts" },
-  { icon: Calculator, label: "Demurrage Calc", href: "/demurrage" },
-];
-
-const accountItems: NavItem[] = [
-  { icon: Settings, label: "Settings", href: "/settings/profile" },
+  { icon: Bookmark, label: "Templates", href: "/templates" },
 ];
 
 function isNavActive(item: NavItem, pathname: string): boolean {
@@ -43,6 +41,7 @@ interface AppShellProps {
   sidebarBottom?: ReactNode;
 }
 
+/* ── Sidebar nav item ── */
 function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: boolean; onClick?: () => void }) {
   return (
     <Link href={item.href}>
@@ -51,63 +50,51 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 9,
-          padding: "8px 12px",
-          margin: "0 6px 1px",
+          gap: 10,
+          padding: isActive ? "9px 10px 9px 7px" : "9px 10px",
           borderRadius: 8,
-          fontSize: 13,
+          fontSize: 13.5,
           fontWeight: isActive ? 500 : 400,
-          color: isActive ? "var(--green)" : "#666",
-          background: isActive ? "rgba(74,140,111,0.12)" : "transparent",
+          color: isActive ? "#4ade80" : "rgba(255,255,255,0.5)",
+          background: isActive ? "rgba(74, 222, 128, 0.1)" : "transparent",
+          borderLeft: isActive ? "3px solid #4ade80" : "3px solid transparent",
           cursor: "pointer",
           transition: "all 0.15s",
-          position: "relative",
+          textDecoration: "none",
         }}
         data-testid={`shell-nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
         onMouseEnter={(e) => {
           if (!isActive) {
             e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-            e.currentTarget.style.color = "#999";
+            e.currentTarget.style.color = "rgba(255,255,255,0.8)";
           }
         }}
         onMouseLeave={(e) => {
           if (!isActive) {
             e.currentTarget.style.background = "transparent";
-            e.currentTarget.style.color = "#666";
+            e.currentTarget.style.color = "rgba(255,255,255,0.5)";
           }
         }}
       >
-        {/* Active indicator bar */}
-        {isActive && (
-          <div style={{
-            position: "absolute",
-            left: 0,
-            top: "50%",
-            transform: "translateY(-50%)",
-            width: 3,
-            height: 18,
-            background: "var(--green)",
-            borderRadius: "0 3px 3px 0",
-          }} />
-        )}
         <item.icon
-          size={14}
+          size={15}
           style={{
             flexShrink: 0,
-            opacity: 0.6,
+            width: 20,
+            textAlign: "center",
           }}
         />
         <span style={{ flex: 1 }}>{item.label}</span>
         {item.badge && item.badge.value > 0 && (
           <span
             style={{
-              fontSize: 10,
-              padding: "1px 6px",
-              borderRadius: 20,
+              fontSize: 11,
+              padding: "1px 7px",
+              borderRadius: 10,
               fontWeight: 600,
-              ...(item.badge.type === "amber"
-                ? { background: "rgba(218,60,61,0.2)", color: "#f87171" }
-                : { background: "rgba(74,140,111,0.15)", color: "var(--green)" }),
+              marginLeft: "auto",
+              color: "#fff",
+              background: item.badge.type === "amber" ? "#ef4444" : "#6b9080",
             }}
           >
             {item.badge.value}
@@ -118,21 +105,60 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
   );
 }
 
-function NavLabel({ children }: { children: ReactNode }) {
+/* ── Section label ── */
+function SidebarLabel({ children }: { children: ReactNode }) {
   return (
     <div
       style={{
         fontSize: 10,
         fontWeight: 600,
-        letterSpacing: "0.12em",
+        letterSpacing: "1.2px",
         color: "rgba(255,255,255,0.25)",
         textTransform: "uppercase",
-        padding: "0 16px",
-        marginBottom: 5,
-        marginTop: 16,
+        paddingLeft: 10,
+        marginBottom: 6,
+        marginTop: 20,
       }}
     >
       {children}
+    </div>
+  );
+}
+
+/* ── History card ── */
+function HistoryCard({ title, tags }: { title: string; tags: string[] }) {
+  return (
+    <div
+      style={{
+        background: "rgba(255,255,255,0.04)",
+        borderRadius: 8,
+        padding: "10px 12px",
+        marginBottom: 6,
+        cursor: "pointer",
+        transition: "background 0.15s",
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
+    >
+      <div style={{ fontSize: 12.5, fontWeight: 500, color: "rgba(255,255,255,0.85)", marginBottom: 5 }}>
+        {title}
+      </div>
+      <div style={{ display: "flex", gap: 5 }}>
+        {tags.map((tag, i) => (
+          <span
+            key={i}
+            style={{
+              fontSize: 10,
+              padding: "2px 7px",
+              borderRadius: 4,
+              background: "rgba(255,255,255,0.07)",
+              color: "rgba(255,255,255,0.4)",
+            }}
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -148,6 +174,10 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
   const alertsBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/alerts/unread-count"] });
   const alertsBadge = alertsBadgeQuery.data?.count ?? 0;
 
+  // Fetch recent lookups for history cards
+  const recentLookupsQuery = useQuery<any[]>({ queryKey: ["/api/lookups/recent"] });
+  const recentLookups = recentLookupsQuery.data?.slice(0, 3) ?? [];
+
   useEffect(() => {
     setSidebarOpen(false);
   }, [location]);
@@ -161,51 +191,52 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
     return () => { document.body.style.overflow = ""; };
   }, [isMobile, sidebarOpen]);
 
-  const wsItems: NavItem[] = workspaceItems.map((item) => {
+  /* Build nav items with live badge counts */
+  const mItems: NavItem[] = menuItems.map((item) => {
     if (item.label === "My Trades" && inboxBadge > 0)
-      return { ...item, badge: { type: "amber" as const, value: inboxBadge } };
+      return { ...item, badge: { type: "green" as const, value: inboxBadge } };
     return item;
   });
-  const tlItems: NavItem[] = toolsItems.map((item) => {
+  const cItems: NavItem[] = complianceItems.map((item) => {
+    if (item.label === "Supplier Inbox" && inboxBadge > 0)
+      return { ...item, badge: { type: "amber" as const, value: inboxBadge } };
     if (item.label === "Alerts" && alertsBadge > 0)
-      return { ...item, badge: { type: "green" as const, value: alertsBadge } };
+      return { ...item, badge: { type: "amber" as const, value: alertsBadge } };
     return item;
   });
 
   const closeSidebar = () => setSidebarOpen(false);
 
+  /* ── Sidebar content ── */
   const sidebarContent = (
     <>
-      {/* Logo area */}
+      {/* Logo */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "20px 16px 16px",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-          marginBottom: 12,
+          padding: "0 8px",
+          marginBottom: 30,
         }}
       >
         <Link href="/">
-          <div style={{ display: "flex", alignItems: "center", gap: 9, cursor: "pointer" }} data-testid="shell-logo">
+          <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} data-testid="shell-logo">
             <div style={{
               width: 32,
               height: 32,
-              borderRadius: "50%",
+              borderRadius: 8,
               overflow: "hidden",
               flexShrink: 0,
-              boxShadow: "0 0 16px rgba(74,140,111,0.4)",
             }}>
               <img src="/logo.png" alt="TapTrao" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
             <span
               style={{
-                fontFamily: "var(--fh)",
-                fontWeight: 800,
-                fontSize: 16,
+                fontFamily: "'Clash Display', sans-serif",
+                fontWeight: 600,
+                fontSize: 17,
                 color: "#fff",
-                letterSpacing: "-0.03em",
               }}
             >
               TapTrao
@@ -218,7 +249,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
             style={{
               background: "none",
               border: "none",
-              color: "#999",
+              color: "rgba(255,255,255,0.5)",
               padding: 4,
               cursor: "pointer",
               display: "flex",
@@ -232,67 +263,46 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         )}
       </div>
 
-      {/* WORKSPACE */}
-      <NavLabel>Workspace</NavLabel>
-      {wsItems.map((item) => (
+      {/* Menu section */}
+      <SidebarLabel>Menu</SidebarLabel>
+      {mItems.map((item) => (
         <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
       ))}
 
-      {/* TOOLS */}
-      <NavLabel>Tools</NavLabel>
-      {tlItems.map((item) => (
+      {/* Compliance section */}
+      <SidebarLabel>Compliance</SidebarLabel>
+      {cItems.map((item) => (
         <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
       ))}
 
-      {/* ACCOUNT */}
-      <NavLabel>Account</NavLabel>
-      {accountItems.map((item) => (
-        <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
-      ))}
-
-      {/* Spacer + bottom */}
+      {/* Spacer */}
       <div style={{ flex: 1 }} />
 
-      {/* History cards placeholder */}
-      {sidebarBottom}
-
-      {/* Sidebar footer */}
-      <div style={{
-        marginTop: "auto",
-        padding: "14px 12px 16px",
-        borderTop: "1px solid rgba(255,255,255,0.06)",
-        display: "flex",
-        alignItems: "center",
-        gap: 9,
-      }}>
-        <div style={{
-          width: 30,
-          height: 30,
-          borderRadius: "50%",
-          background: "linear-gradient(135deg, var(--green), var(--teal))",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontWeight: 800,
-          fontSize: 12,
-          color: "#000",
-          fontFamily: "var(--fh)",
-          flexShrink: 0,
-        }}>T</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "#ccc" }}>Trader</div>
-          <div style={{ fontSize: 10, color: "#555" }}>TapTrao User</div>
-        </div>
-        <span style={{
-          background: "rgba(74,140,111,0.1)",
-          borderRadius: 20,
-          padding: "2px 8px",
-          fontSize: 11,
-          color: "var(--green)",
-          fontWeight: 500,
-          whiteSpace: "nowrap",
-        }}>{balance}</span>
+      {/* History section */}
+      <SidebarLabel>History</SidebarLabel>
+      <div style={{ marginTop: 4, padding: "0 2px" }}>
+        {recentLookups.length > 0 ? (
+          recentLookups.map((lookup: any) => {
+            const originFlag = lookup.originFlag || "";
+            const destFlag = lookup.destinationFlag || "";
+            const originCode = lookup.originCode || "";
+            const destCode = lookup.destinationCode || "";
+            const commodity = lookup.commodityName || "Trade";
+            const title = `${originFlag} ${commodity} ${originCode} → ${destFlag} ${destCode}`;
+            const tags = ["Lookup"];
+            return <HistoryCard key={lookup.id} title={title} tags={tags} />;
+          })
+        ) : (
+          <>
+            <HistoryCard title="🇨🇮 Cashew CI → 🇬🇧 UK Q1 2026" tags={["LC Check", "$126k"]} />
+            <HistoryCard title="🇬🇭 Cocoa Beans GH → 🇪🇺 EU" tags={["LC Check", "$84k"]} />
+            <HistoryCard title="🇪🇹 Sesame Seeds ET → 🇪🇺 EU" tags={["Lookup", "$43k"]} />
+          </>
+        )}
       </div>
+
+      {/* Custom sidebar bottom slot */}
+      {sidebarBottom}
     </>
   );
 
@@ -306,14 +316,15 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         background: "#000",
       }}
     >
-      {/* SIDEBAR — desktop: always visible */}
+      {/* SIDEBAR — desktop */}
       {!isMobile && (
         <div
           style={{
-            width: 210,
-            minWidth: 210,
-            background: "#1c1c1e",
+            width: 240,
+            minWidth: 240,
+            background: "#242428",
             borderRadius: 18,
+            padding: "20px 14px",
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
@@ -348,9 +359,10 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
               bottom: 0,
               width: 260,
               maxWidth: "80vw",
-              background: "#1c1c1e",
+              background: "#242428",
               borderRadius: "0 18px 18px 0",
               zIndex: 999,
+              padding: "20px 14px",
               display: "flex",
               flexDirection: "column",
               overflowY: "auto",
@@ -362,7 +374,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         </>
       )}
 
-      {/* MAIN AREA — rounded panel with green-to-white gradient */}
+      {/* MAIN AREA — 22-stop dark-to-light gradient */}
       <div style={{
         flex: 1,
         minWidth: 0,
@@ -370,10 +382,17 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        background: "linear-gradient(180deg, #1a3832 0%, #1d3d35 8%, #1d3d35 16%, #243f37 26%, rgba(24,46,32,0.92) 36%, rgba(22,42,30,0.72) 46%, rgba(20,38,27,0.45) 56%, rgba(18,34,24,0.2) 66%, rgba(255,255,255,0.6) 76%, #ffffff 86%, #ffffff 100%)",
+        background: `linear-gradient(180deg,
+          #1a1a1c 0%, #1c2420 3%, #1e2e28 6%, #1f3830 9%,
+          #214232 12%, #264a38 16%, #2c5540 20%, #356248 25%,
+          #3f7056 30%, #4a7e64 35%, #578d74 40%, #659b82 45%,
+          #74a890 50%, #85b49e 55%, #96bfab 60%, #a8cab8 65%,
+          #bbd5c6 70%, #cddfd3 75%, #dde8e1 80%, #eaf0ec 85%,
+          #f2f4f3 90%, #f5f5f5 95%
+        )`,
         minHeight: "calc(100vh - 20px)",
       }}>
-        {/* TOPNAV */}
+        {/* TOP NAV */}
         <div
           style={{
             display: "flex",
@@ -432,28 +451,27 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                 style={{
                   width: 6,
                   height: 6,
-                  background: "var(--green)",
+                  background: "#6b9080",
                   borderRadius: "50%",
                   display: "inline-block",
                 }}
               />
-              <span style={{ fontWeight: 500, color: "var(--green)" }}>{balance}</span>
+              <span style={{ fontWeight: 500, color: "#6b9080" }}>{balance}</span>
               <span style={{ display: isMobile ? "none" : "inline" }}>credits</span>
             </div>
             <button
               onClick={() => navigate("/pricing")}
               style={{
-                background: "var(--green)",
-                color: "#000",
+                background: "#6b9080",
+                color: "#fff",
                 border: "none",
-                borderRadius: 50,
-                padding: isMobile ? "6px 12px" : "6px 16px",
-                fontFamily: "var(--fb)",
-                fontSize: 12,
-                fontWeight: 700,
+                borderRadius: 10,
+                padding: isMobile ? "6px 12px" : "8px 20px",
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 13,
+                fontWeight: 600,
                 cursor: "pointer",
                 whiteSpace: "nowrap",
-                boxShadow: "0 4px 18px rgba(74,140,111,0.35)",
               }}
               data-testid="shell-buy-cta"
             >
