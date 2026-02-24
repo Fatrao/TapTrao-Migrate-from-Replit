@@ -22,6 +22,7 @@ export default function Home() {
           </div>
         </Link>
         <div className="hp-topnav-center">
+          <Link href="/"><span className="active">Home</span></Link>
           <a href="#how">How It Works</a>
           <a href="#pricing">Pricing</a>
           <Link href="/lookup"><span>Commodities</span></Link>
@@ -47,6 +48,7 @@ export default function Home() {
       {/* Mobile menu */}
       {mobileMenuOpen && (
         <div className="hp-mobile-menu">
+          <Link href="/"><span onClick={() => setMobileMenuOpen(false)}>Home</span></Link>
           <a href="#how" onClick={() => setMobileMenuOpen(false)}>How It Works</a>
           <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
           <Link href="/lookup"><span onClick={() => setMobileMenuOpen(false)}>Commodities</span></Link>
@@ -97,8 +99,8 @@ export default function Home() {
         {/* HOW IT WORKS */}
         <section className="hp-section" id="how">
           <div className="hp-section-label">How It Works</div>
-          <h2>Three steps to <span className="accent">compliance.</span></h2>
-          <p className="hp-section-sub">No ERP. No broker. No guesswork. Just enter your trade details.</p>
+          <h2>Three steps to trade with confidence</h2>
+          <p className="hp-section-sub">No compliance team needed. TapTrao checks your shipment against every regulation that matters.</p>
           <div className="hp-steps-grid">
             {[
               { num: 1, icon: "📋", title: "Enter Your Trade", desc: "Tell us the commodity, origin country, destination, and value. Takes under 2 minutes." },
@@ -118,8 +120,8 @@ export default function Home() {
         {/* TRUST SIGNALS */}
         <section className="hp-section">
           <div className="hp-section-label">Why TapTrao</div>
-          <h2>Built for traders who <span className="accent">move fast.</span></h2>
-          <p className="hp-section-sub">Purpose-built for commodity traders sourcing from Africa into Europe and beyond.</p>
+          <h2>Built for the traders who move goods, not paper</h2>
+          <p className="hp-section-sub">We know the Africa–Europe corridor because we've lived it.</p>
           <div className="hp-trust-grid">
             {[
               { icon: "🛡", title: "EUDR Ready", desc: "Full EU Deforestation Regulation screening with geolocation checks" },
