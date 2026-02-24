@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useTokenBalance } from "@/hooks/use-tokens";
-import { LayoutGrid, BarChart3, Settings, Search, FileCheck, Bell, Calculator, Bookmark, Menu, X, Inbox } from "lucide-react";
+import { LayoutGrid, BarChart3, Settings, Search, FileCheck, Bell, Calculator, Bookmark, Menu, X, Inbox, MessageCircle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, type ReactNode } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -159,6 +159,28 @@ function HistoryCard({ title, tags }: { title: string; tags: string[] }) {
           </span>
         ))}
       </div>
+    </div>
+  );
+}
+
+/* ── Default nav links (shown when topCenter is not provided) ── */
+function DefaultNavLinks({ activePage }: { activePage: string }) {
+  const links = [
+    { label: "Dashboard", href: "/dashboard", match: ["/dashboard", "/trades"] },
+    { label: "Commodities", href: "/lookup", match: ["/lookup", "/demurrage"] },
+    { label: "Suppliers", href: "/inbox", match: ["/inbox"] },
+    { label: "Compliance", href: "/alerts", match: ["/alerts", "/lc-check", "/templates", "/eudr"] },
+    { label: "Messages", href: "/inbox", match: [] },
+  ];
+  return (
+    <div className="db-nav-links">
+      {links.map((link) => (
+        <Link key={link.label} href={link.href}>
+          <span className={link.match.some((m) => activePage.startsWith(m)) ? "active" : ""}>
+            {link.label}
+          </span>
+        </Link>
+      ))}
     </div>
   );
 }
@@ -374,7 +396,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         </>
       )}
 
-      {/* MAIN AREA — 22-stop dark-to-light gradient */}
+      {/* MAIN BOX — 22-stop dark-to-light gradient, rounded 18px */}
       <div style={{
         flex: 1,
         minWidth: 0,
@@ -392,21 +414,18 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         )`,
         minHeight: "calc(100vh - 20px)",
       }}>
-        {/* TOP NAV */}
+        {/* NAV BAR — inside main box at top */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: isMobile ? "0 12px" : "0 24px",
-            height: 50,
+            padding: isMobile ? "10px 12px" : "16px 32px 12px",
             flexShrink: 0,
-            background: "transparent",
-            gap: 8,
           }}
         >
-          {/* Left: hamburger on mobile */}
-          {isMobile && (
+          {/* Left: hamburger on mobile, nav links on desktop */}
+          {isMobile ? (
             <button
               onClick={() => setSidebarOpen(true)}
               style={{
@@ -425,15 +444,122 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
             >
               <Menu size={22} />
             </button>
+          ) : (
+            <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+              {topCenter || <DefaultNavLinks activePage={location} />}
+            </div>
           )}
 
-          {/* Center (breadcrumb / page title) */}
-          <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-            {topCenter}
-          </div>
+          {/* Mobile: topCenter in middle */}
+          {isMobile && (
+            <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+              {topCenter || <DefaultNavLinks activePage={location} />}
+            </div>
+          )}
 
-          {/* Right: token badge + buy CTA */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          {/* Right: icon buttons + avatar + token badge */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+            {/* Notification bell */}
+            <Link href="/alerts">
+              <div
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: "50%",
+                  background: "rgba(255,255,255,0.08)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  position: "relative",
+                  transition: "background 0.15s",
+                }}
+                data-testid="shell-bell-icon"
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+              >
+                <Bell size={13} style={{ color: "rgba(255,255,255,0.5)" }} />
+                {alertsBadge > 0 && (
+                  <span style={{
+                    position: "absolute",
+                    top: 1,
+                    right: 1,
+                    width: 7,
+                    height: 7,
+                    borderRadius: "50%",
+                    background: "#ef4444",
+                  }} />
+                )}
+              </div>
+            </Link>
+
+            {/* Chat icon */}
+            {!isMobile && (
+              <Link href="/inbox">
+                <div
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: "50%",
+                    background: "rgba(255,255,255,0.08)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    transition: "background 0.15s",
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+                >
+                  <MessageCircle size={13} style={{ color: "rgba(255,255,255,0.5)" }} />
+                </div>
+              </Link>
+            )}
+
+            {/* Settings icon */}
+            {!isMobile && (
+              <Link href="/settings/profile">
+                <div
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: "50%",
+                    background: "rgba(255,255,255,0.08)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    transition: "background 0.15s",
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+                >
+                  <Settings size={13} style={{ color: "rgba(255,255,255,0.5)" }} />
+                </div>
+              </Link>
+            )}
+
+            {/* User avatar */}
+            <div
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: "50%",
+                background: "#3b82f6",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+              data-testid="shell-user-avatar"
+            >
+              F
+            </div>
+
+            {/* Token badge */}
             <div
               style={{
                 background: "rgba(255,255,255,0.07)",
@@ -447,18 +573,12 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
               }}
               data-testid="shell-token-chip"
             >
-              <span
-                style={{
-                  width: 6,
-                  height: 6,
-                  background: "#6b9080",
-                  borderRadius: "50%",
-                  display: "inline-block",
-                }}
-              />
+              <span style={{ width: 6, height: 6, background: "#6b9080", borderRadius: "50%", display: "inline-block" }} />
               <span style={{ fontWeight: 500, color: "#6b9080" }}>{balance}</span>
-              <span style={{ display: isMobile ? "none" : "inline" }}>credits</span>
+              {!isMobile && <span>credits</span>}
             </div>
+
+            {/* Buy CTA */}
             <button
               onClick={() => navigate("/pricing")}
               style={{
@@ -466,7 +586,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                 color: "#fff",
                 border: "none",
                 borderRadius: 10,
-                padding: isMobile ? "6px 12px" : "8px 20px",
+                padding: isMobile ? "6px 12px" : "8px 18px",
                 fontFamily: "'Inter', sans-serif",
                 fontSize: 13,
                 fontWeight: 600,
