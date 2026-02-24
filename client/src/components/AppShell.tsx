@@ -86,7 +86,7 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
               fontWeight: 600,
               marginLeft: "auto",
               color: "#fff",
-              background: item.badge.type === "amber" ? "#ef4444" : "#6b9080",
+              background: item.badge.type === "amber" ? "#ef4444" : "#22c55e",
             }}
           >
             {item.badge.value}
@@ -261,7 +261,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
             style={{
               background: "none",
               border: "none",
-              color: "rgba(255,255,255,0.5)",
+              color: "rgba(255,255,255,0.6)",
               padding: 4,
               cursor: "pointer",
               display: "flex",
@@ -334,7 +334,8 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
           style={{
             width: 240,
             minWidth: 240,
-            background: "#242428",
+            background: "linear-gradient(180deg, #1e2726 0%, #1f2d2a 50%, #1a2825 100%)",
+            border: "1px solid rgba(255,255,255,0.08)",
             borderRadius: 18,
             padding: "20px 14px",
             display: "flex",
@@ -371,7 +372,8 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
               bottom: 0,
               width: 260,
               maxWidth: "80vw",
-              background: "#242428",
+              background: "linear-gradient(180deg, #1e2726 0%, #1f2d2a 50%, #1a2825 100%)",
+              border: "1px solid rgba(255,255,255,0.08)",
               borderRadius: "0 18px 18px 0",
               zIndex: 999,
               padding: "20px 14px",
@@ -386,7 +388,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         </>
       )}
 
-      {/* MAIN BOX — 22-stop dark-to-light gradient, rounded 18px */}
+      {/* MAIN BOX — green-to-light gradient, rounded 18px */}
       <div style={{
         flex: 1,
         minWidth: 0,
@@ -395,12 +397,13 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         display: "flex",
         flexDirection: "column",
         background: `linear-gradient(180deg,
-          #1a1a1c 0%, #1c2420 3%, #1e2e28 6%, #1f3830 9%,
-          #214232 12%, #264a38 16%, #2c5540 20%, #356248 25%,
-          #3f7056 30%, #4a7e64 35%, #578d74 40%, #659b82 45%,
-          #74a890 50%, #85b49e 55%, #96bfab 60%, #a8cab8 65%,
-          #bbd5c6 70%, #cddfd3 75%, #dde8e1 80%, #eaf0ec 85%,
-          #f2f4f3 90%, #f5f5f5 95%
+          #0e4e45 0%, #0e4e46 2%, #0d5047 4%, #104f47 6%,
+          #14574a 10%, #1c6352 14%, #216354 18%, #2f725f 22%,
+          #327462 24%, #3f7d6a 27%, #407d6a 30%, #468271 32%,
+          #498573 34%, #578d7d 37%, #619888 39%, #6a9f8d 41%,
+          #7faa9b 44%, #87b0a2 46%, #8db3a6 48%, #94b5ab 50%,
+          #9cbbb2 52%, #a6c3ba 54%, #bdd3cb 60%, #c7d9d2 65%,
+          #e2e7e6 75%, #f2f2f2 85%, #f3f3f3 90%
         )`,
         minHeight: "calc(100vh - 20px)",
       }}>
@@ -410,7 +413,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: isMobile ? "10px 12px" : "16px 32px 12px",
+            padding: isMobile ? "10px 12px" : "14px 32px",
             flexShrink: 0,
           }}
         >
@@ -456,7 +459,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                   width: 30,
                   height: 30,
                   borderRadius: "50%",
-                  background: "rgba(255,255,255,0.08)",
+                  background: "rgba(255,255,255,0.1)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -464,11 +467,11 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                   position: "relative",
                   transition: "background 0.15s",
                   fontSize: 13,
-                  color: "rgba(255,255,255,0.5)",
+                  color: "rgba(255,255,255,0.6)",
                 }}
                 data-testid="shell-bell-icon"
                 onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
               >
                 🔔
                 {alertsBadge > 0 && (
@@ -493,17 +496,17 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                     width: 30,
                     height: 30,
                     borderRadius: "50%",
-                    background: "rgba(255,255,255,0.08)",
+                    background: "rgba(255,255,255,0.1)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     cursor: "pointer",
                     transition: "background 0.15s",
                     fontSize: 13,
-                    color: "rgba(255,255,255,0.5)",
+                    color: "rgba(255,255,255,0.6)",
                   }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
                 >
                   💬
                 </div>
@@ -518,17 +521,17 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
                     width: 30,
                     height: 30,
                     borderRadius: "50%",
-                    background: "rgba(255,255,255,0.08)",
+                    background: "rgba(255,255,255,0.1)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     cursor: "pointer",
                     transition: "background 0.15s",
                     fontSize: 13,
-                    color: "rgba(255,255,255,0.5)",
+                    color: "rgba(255,255,255,0.6)",
                   }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
                 >
                   ⚙️
                 </div>
