@@ -17,24 +17,49 @@
 
   /* Text hierarchy — white at different opacities */
   --t1: rgba(255,255,255,0.95);
-  --t2: rgba(255,255,255,0.55);
-  --t3: rgba(255,255,255,0.28);
+  --t2: rgba(255,255,255,0.45);
+  --t3: rgba(255,255,255,0.25);
 
   /* Primary colors — sage green system */
   --green:    #6b9080;
   --sage:     #6b9080;
   --sage-hover: #5a7a6b;
   --teal:     #5a7a6b;
-  --amber:    #ea8b43;
-  --red:      #da3c3d;
+  --amber:    #eab308;
+  --red:      #ef4444;
 
   /* Accent — bright green (badges, active states ONLY — never for buttons) */
   --green-accent:    #4ade80;
   --green-accent-bg: rgba(74, 222, 128, 0.1);
 
-  /* Dark text for light surfaces */
-  --txt:      #111111;
-  --txt2:     #555555;
+  /* Gradient backgrounds */
+  --bg-body:       #000000;
+  --bg-green-hero: linear-gradient(135deg, #0e4e45 0%, #14574a 30%, #1c6352 60%, #327462 85%, #3a7d6a 100%);
+  --bg-card-dark:  linear-gradient(160deg, #0e3d34 0%, #0c332c 40%, #0a2e28 70%, #0b2924 100%);
+  --bg-main-box:   linear-gradient(180deg,
+    #1a1a1c 0%, #1c2420 3%, #1e2e28 6%, #1f3830 9%,
+    #214232 12%, #264a38 16%, #2c5540 20%, #356248 25%,
+    #3f7056 30%, #4a7e64 35%, #578d74 40%, #659b82 45%,
+    #74a890 50%, #85b49e 55%, #96bfab 60%, #a8cab8 65%,
+    #bbd5c6 70%, #cddfd3 75%, #dde8e1 80%, #eaf0ec 85%,
+    #f2f4f3 90%, #f5f5f5 95%
+  );
+  --hero-glow:     radial-gradient(ellipse at 80% 20%, rgba(74,222,128,0.06) 0%, transparent 60%);
+
+  /* Card backgrounds */
+  --white-card: #ffffff;
+
+  /* Named text colors (from design system) */
+  --text-white:           #ffffff;
+  --text-white-secondary: rgba(255,255,255,0.45);
+  --text-white-muted:     rgba(255,255,255,0.25);
+  --text-dark:            #1a1a1a;
+  --text-dark-secondary:  #888888;
+  --text-dark-muted:      #999999;
+
+  /* Dark text for light surfaces (legacy aliases) */
+  --txt:      #1a1a1a;
+  --txt2:     #888888;
   --txt3:     #999999;
 
   /* Accent — mapped to sage (legacy aliases) */
@@ -46,10 +71,10 @@
   /* Status badge colors */
   --gbg:      rgba(107,144,128,0.10);
   --gbd:      rgba(107,144,128,0.20);
-  --abg:      rgba(234,139,67,0.10);
-  --abd:      rgba(234,139,67,0.20);
-  --rbg:      rgba(218,60,61,0.10);
-  --rbd:      rgba(218,60,61,0.20);
+  --abg:      rgba(234,179,8,0.12);
+  --abd:      rgba(234,179,8,0.20);
+  --rbg:      rgba(239,68,68,0.10);
+  --rbd:      rgba(239,68,68,0.20);
 
   /* Font families */
   --fh: 'Clash Display', sans-serif;

@@ -35,14 +35,14 @@
   --muted-foreground: 0 0% 55%;
   --accent: 0 0% 10%;
   --accent-foreground: 0 0% 95%;
-  --destructive: 0 70% 55%;
+  --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
   --input: 0 0% 12%;
   --ring: 155 16% 47%;
   --chart-1: 155 16% 47%;
   --chart-2: 155 14% 41%;
-  --chart-3: 27 80% 56%;
-  --chart-4: 0 63% 55%;
+  --chart-3: 45 93% 47%;
+  --chart-4: 0 84% 60%;
   --chart-5: 0 0% 60%;
   --font-sans: 'Inter', sans-serif;
   --font-heading: 'Clash Display', sans-serif;
