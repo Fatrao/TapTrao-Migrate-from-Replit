@@ -325,9 +325,9 @@ input[type="search"] {
 
 /* ── Upload zone ── */
 .upload-zone {
-  border: 2px dashed #e0e0e0;
+  border: 2px dashed #d0d0d0;
   border-radius: 12px;
-  padding: 26px 20px;
+  padding: 36px;
   text-align: center;
   cursor: pointer;
   transition: all .2s;

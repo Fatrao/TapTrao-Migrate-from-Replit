@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { AppShell } from "@/components/AppShell";
 import { StepNav } from "@/components/StepNav";
 import { TabBar } from "@/components/TabBar";
@@ -23,26 +22,18 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
-  Globe,
-  ArrowLeft,
-  ArrowRight,
-  FileText,
   CheckCircle2,
   AlertTriangle,
   XCircle,
-  Plus,
   Trash2,
   Mail,
   MessageCircle,
   Copy,
   Check,
   Hash,
-  ClipboardCheck,
-  Hexagon,
   X,
   ExternalLink,
   Shield,
-  Upload,
 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useTokenBalance } from "@/hooks/use-tokens";
@@ -173,7 +164,7 @@ function InsuranceGapAlert() {
     <div
       data-testid="insurance-gap-alert"
       style={{
-        background: "rgba(74,140,111,.06)",
+        background: "rgba(107,144,128,.06)",
         borderRadius: 14,
         padding: "14px 18px",
         marginBottom: 20,
@@ -186,20 +177,20 @@ function InsuranceGapAlert() {
         style={{
           position: "absolute", top: 10, right: 12,
           background: "none", border: "none", cursor: "pointer",
-          color: "var(--t3)", fontSize: 16, lineHeight: 1,
+          color: "#999", fontSize: 16, lineHeight: 1,
         }}
       >
         <X size={14} />
       </button>
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-        <Shield size={16} style={{ color: "var(--blue)", flexShrink: 0 }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>
+        <Shield size={16} style={{ color: "var(--green)", flexShrink: 0 }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a" }}>
           Insurance gap — check your policy covers this trade
         </span>
       </div>
 
-      <p style={{ fontSize: 12, color: "var(--t2)", lineHeight: 1.65, marginBottom: 12 }}>
+      <p style={{ fontSize: 12, color: "#555", lineHeight: 1.65, marginBottom: 12 }}>
         Standard cargo insurance (Institute Cargo Clauses A/B/C) covers physical
         loss and damage. It does NOT cover goods rejected at port due to regulatory
         non-compliance — which is a separate and common risk for agricultural and
@@ -208,12 +199,12 @@ function InsuranceGapAlert() {
 
       <div style={{
         display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12,
-        background: "var(--card2)", borderRadius: 6, padding: "10px 14px",
-        fontFamily: "'DM Mono', monospace", fontSize: 11, marginBottom: 12,
+        background: "#f5f5f5", borderRadius: 6, padding: "10px 14px",
+        fontFamily: "var(--fb)", fontSize: 11, marginBottom: 12,
       }}>
         <div>
-          <div style={{ fontWeight: 600, color: "var(--t1)", marginBottom: 6 }}>NOT covered by standard policy:</div>
-          <ul style={{ margin: 0, paddingLeft: 16, color: "var(--t2)", lineHeight: 1.8 }}>
+          <div style={{ fontWeight: 600, color: "#1a1a1a", marginBottom: 6 }}>NOT covered by standard policy:</div>
+          <ul style={{ margin: 0, paddingLeft: 16, color: "#555", lineHeight: 1.8 }}>
             <li>Regulatory rejection at border</li>
             <li>Phytosanitary detention and destruction</li>
             <li>EUDR non-compliance refusal</li>
@@ -221,8 +212,8 @@ function InsuranceGapAlert() {
           </ul>
         </div>
         <div>
-          <div style={{ fontWeight: 600, color: "var(--t1)", marginBottom: 6 }}>Ask your insurer about:</div>
-          <ul style={{ margin: 0, paddingLeft: 16, color: "var(--t2)", lineHeight: 1.8 }}>
+          <div style={{ fontWeight: 600, color: "#1a1a1a", marginBottom: 6 }}>Ask your insurer about:</div>
+          <ul style={{ margin: 0, paddingLeft: 16, color: "#555", lineHeight: 1.8 }}>
             <li>Trade disruption insurance</li>
             <li>Rejection / condemnation clause</li>
             <li>Commodity-specific contamination cover</li>
@@ -231,8 +222,8 @@ function InsuranceGapAlert() {
         </div>
       </div>
 
-      <p style={{ fontSize: 11, color: "var(--t3)", lineHeight: 1.5 }}>
-        This applies regardless of Incoterms. Even under CIF or CIP, the seller's
+      <p style={{ fontSize: 11, color: "#999", lineHeight: 1.5 }}>
+        This applies regardless of Incoterms. Even under CIF or CIP, the seller&apos;s
         insurance does not cover destination regulatory rejection.
       </p>
     </div>
@@ -241,22 +232,22 @@ function InsuranceGapAlert() {
 
 function SeverityBadge({ severity }: { severity: string }) {
   if (severity === "GREEN") {
-    return <Badge variant="secondary" style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "var(--gbg)", border: "1px solid var(--gbd)", color: "var(--green)" }} data-testid="badge-severity-green"><CheckCircle2 className="w-3 h-3 mr-1" />Match</Badge>;
+    return <Badge variant="secondary" style={{ fontFamily: "var(--fb)", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "var(--gbg)", border: "1px solid var(--gbd)", color: "var(--green)" }} data-testid="badge-severity-green"><CheckCircle2 className="w-3 h-3 mr-1" />Match</Badge>;
   }
   if (severity === "AMBER") {
-    return <Badge variant="secondary" style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "var(--abg)", border: "1px solid var(--abd)", color: "var(--amber)" }} data-testid="badge-severity-amber"><AlertTriangle className="w-3 h-3 mr-1" />Warning</Badge>;
+    return <Badge variant="secondary" style={{ fontFamily: "var(--fb)", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "var(--abg)", border: "1px solid var(--abd)", color: "var(--amber)" }} data-testid="badge-severity-amber"><AlertTriangle className="w-3 h-3 mr-1" />Warning</Badge>;
   }
-  return <Badge variant="destructive" style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "var(--rbg)", border: "1px solid var(--rbd)", color: "var(--red)" }} data-testid="badge-severity-red"><XCircle className="w-3 h-3 mr-1" />Critical</Badge>;
+  return <Badge variant="destructive" style={{ fontFamily: "var(--fb)", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "var(--rbg)", border: "1px solid var(--rbd)", color: "var(--red)" }} data-testid="badge-severity-red"><XCircle className="w-3 h-3 mr-1" />Critical</Badge>;
 }
 
 function VerdictBadge({ verdict }: { verdict: string }) {
   if (verdict === "COMPLIANT") {
-    return <Badge variant="secondary" style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "var(--gbg)", border: "1px solid var(--gbd)", color: "var(--green)" }} data-testid="badge-verdict">COMPLIANT</Badge>;
+    return <Badge variant="secondary" style={{ fontFamily: "var(--fb)", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "var(--gbg)", border: "1px solid var(--gbd)", color: "var(--green)" }} data-testid="badge-verdict">COMPLIANT</Badge>;
   }
   if (verdict === "COMPLIANT_WITH_NOTES") {
-    return <Badge variant="secondary" style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "var(--abg)", border: "1px solid var(--abd)", color: "var(--amber)" }} data-testid="badge-verdict">COMPLIANT WITH NOTES</Badge>;
+    return <Badge variant="secondary" style={{ fontFamily: "var(--fb)", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "var(--abg)", border: "1px solid var(--abd)", color: "var(--amber)" }} data-testid="badge-verdict">COMPLIANT WITH NOTES</Badge>;
   }
-  return <Badge variant="destructive" style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "var(--rbg)", border: "1px solid var(--rbd)", color: "var(--red)" }} data-testid="badge-verdict">DISCREPANCIES FOUND</Badge>;
+  return <Badge variant="destructive" style={{ fontFamily: "var(--fb)", fontSize: 9, padding: "3px 8px", borderRadius: 4, background: "var(--rbg)", border: "1px solid var(--rbd)", color: "var(--red)" }} data-testid="badge-verdict">DISCREPANCIES FOUND</Badge>;
 }
 
 type LcPrefillData = {
@@ -512,7 +503,7 @@ function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | null })
 
         {/* DOCUMENT CHECKLIST */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", whiteSpace: "nowrap" }}>
+          <span style={{ fontFamily: "var(--fb)", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", whiteSpace: "nowrap" }}>
             Required documents ({totalCount})
           </span>
           <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
@@ -582,11 +573,11 @@ function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | null })
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{docName}</div>
-                  <div style={{ fontSize: 10, color: "var(--t3)", fontFamily: "'DM Mono', monospace" }}>{getDocIssuer(docName)}</div>
+                  <div style={{ fontSize: 10, color: "var(--t3)", fontFamily: "var(--fb)" }}>{getDocIssuer(docName)}</div>
                 </div>
                 <span
                   style={{
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "var(--fb)",
                     fontSize: 9,
                     color: statusColor,
                     whiteSpace: "nowrap",
@@ -613,7 +604,7 @@ function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | null })
                   {upload!.ucpRule && (
                     <span
                       style={{
-                        fontFamily: "'DM Mono', monospace",
+                        fontFamily: "var(--fb)",
                         fontSize: 9,
                         background: "var(--blue-dim)",
                         
@@ -641,7 +632,7 @@ function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | null })
               >
                 {upload ? (
                   <>
-                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)", flex: 1 }}>
+                    <span style={{ fontFamily: "var(--fb)", fontSize: 11, color: "var(--t3)", flex: 1 }}>
                       {upload.originalFilename}
                       {upload.filesizeBytes ? ` \u00B7 ${(upload.filesizeBytes / 1024).toFixed(0)}KB` : ""}
                       {upload.uploadedAt ? ` \u00B7 ${relativeTime(upload.uploadedAt as unknown as string)}` : ""}
@@ -667,11 +658,11 @@ function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | null })
         <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 15, color: "var(--t1)", marginBottom: 4 }}>
           Document progress
         </h3>
-        <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)", marginBottom: 16 }}>
+        <p style={{ fontFamily: "var(--fb)", fontSize: 11, color: "var(--t3)", marginBottom: 16 }}>
           {prefillData?.commodity_name || "Commodity"} \u00B7 {prefillData?.origin_name || ""} \u2192 {prefillData?.dest_name || ""}
         </p>
 
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)", marginBottom: 6 }}>
+        <div style={{ fontFamily: "var(--fb)", fontSize: 9, color: "var(--t3)", marginBottom: 6 }}>
           {receivedCount} of {totalCount} received
         </div>
         <div style={{ height: 4, background: "var(--border)", borderRadius: 2, marginBottom: 12, overflow: "hidden" }}>
@@ -696,7 +687,7 @@ function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | null })
 
         <div style={{ height: 1, background: "var(--border)", margin: "12px 0" }} />
 
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", marginBottom: 10 }}>
+        <div style={{ fontFamily: "var(--fb)", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", marginBottom: 10 }}>
           Activity
         </div>
 
@@ -707,7 +698,7 @@ function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | null })
               <div style={{ fontSize: 11, color: "var(--t2)" }}>
                 Supplier brief sent via {(sr.sentVia as string[])?.slice(-1)[0] || "link"}
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)" }}>
+              <div style={{ fontFamily: "var(--fb)", fontSize: 9, color: "var(--t3)" }}>
                 {relativeTime(sr.lastSentAt as unknown as string)}
               </div>
             </div>
@@ -721,7 +712,7 @@ function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | null })
               <div style={{ fontSize: 11, color: "var(--t2)" }}>
                 {upload.verified ? `${upload.docType} verified` : `${upload.docType} uploaded`}
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)" }}>
+              <div style={{ fontFamily: "var(--fb)", fontSize: 9, color: "var(--t3)" }}>
                 {upload.uploadedAt ? relativeTime(upload.uploadedAt as unknown as string) : ""}
               </div>
             </div>
@@ -736,7 +727,7 @@ function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | null })
 
         <div style={{ height: 1, background: "var(--border)", margin: "12px 0" }} />
 
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", marginBottom: 6 }}>
+        <div style={{ fontFamily: "var(--fb)", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", marginBottom: 6 }}>
           Supplier
         </div>
         <div style={{ fontSize: 12, fontWeight: 600, color: "var(--t1)", marginBottom: 4 }}>
@@ -803,7 +794,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
           <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(48px, 6vw, 64px)", letterSpacing: "-0.03em", color: "var(--t1)", lineHeight: 1 }}>
             {score}
           </div>
-          <span style={{ display: "inline-block", fontFamily: "'DM Mono', monospace", fontSize: 9, fontWeight: 600, padding: "3px 8px", borderRadius: 4, background: v.badgeBg, border: `1px solid ${v.badgeBorder}`, color: v.badgeColor, width: "fit-content", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
+          <span style={{ display: "inline-block", fontFamily: "var(--fb)", fontSize: 9, fontWeight: 600, padding: "3px 8px", borderRadius: 4, background: v.badgeBg, border: `1px solid ${v.badgeBorder}`, color: v.badgeColor, width: "fit-content", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
             {v.label}
           </span>
           <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.65, marginTop: 6, maxWidth: 260 }}>
@@ -820,7 +811,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
                 <div style={{ flex: 1, height: 3, background: "var(--border)", borderRadius: 2, position: "relative" }}>
                   <div style={{ width: `${pct}%`, height: "100%", borderRadius: 2, background: barColors[f.key] || "var(--t3)" }} />
                 </div>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: isPrimary ? 9 : 10, width: 48, textAlign: "right", color: isPrimary ? "var(--amber)" : "var(--t3)", flexShrink: 0 }}>
+                <span style={{ fontFamily: "var(--fb)", fontSize: isPrimary ? 9 : 10, width: 48, textAlign: "right", color: isPrimary ? "var(--amber)" : "var(--t3)", flexShrink: 0 }}>
                   {isPrimary ? "▲ primary" : `${f.penalty}/${f.max}`}
                 </span>
               </div>
@@ -966,7 +957,7 @@ function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null })
         <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 26, color: "var(--t1)", marginBottom: 4 }}>
           TwinLog Trail
         </h2>
-        <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)", marginBottom: 24, lineHeight: 1.5 }}>
+        <p style={{ fontFamily: "var(--fb)", fontSize: 11, color: "var(--t3)", marginBottom: 24, lineHeight: 1.5 }}>
           {lookup.commodityName} &middot; {lookup.originName} &rarr; {lookup.destinationName}
           {lookup.twinlogLockedAt && <> &middot; locked {formatTimestamp(lookup.twinlogLockedAt)}</>}
         </p>
@@ -974,7 +965,7 @@ function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null })
         {/* Included Items */}
         <div style={{ marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1 }}>
+            <span style={{ fontFamily: "var(--fb)", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1 }}>
               Included Items
             </span>
             <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
@@ -1017,7 +1008,7 @@ function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null })
                 }} />
                 <span style={{ fontSize: 12, color: "var(--t2)" }}>{item.label}</span>
               </div>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: item.color }}>
+              <span style={{ fontFamily: "var(--fb)", fontSize: 10, color: item.color }}>
                 {item.status}
               </span>
             </div>
@@ -1037,10 +1028,10 @@ function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null })
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
-                <div style={{ color: "var(--blue)", fontFamily: "'DM Mono', monospace", fontSize: 13, fontWeight: 700, marginBottom: 6 }}>
+                <div style={{ color: "var(--blue)", fontFamily: "var(--fb)", fontSize: 13, fontWeight: 700, marginBottom: 6 }}>
                   {lookup.twinlogRef}
                 </div>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)" }}>
+                <div style={{ fontFamily: "var(--fb)", fontSize: 10, color: "var(--t3)" }}>
                   {hashDisplay}
                 </div>
               </div>
@@ -1050,7 +1041,7 @@ function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null })
                   background: "transparent",
                   border: "none",
                   color: "var(--t3)",
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "var(--fb)",
                   fontSize: 10,
                   cursor: "pointer",
                   padding: "4px 8px",
@@ -1133,7 +1124,7 @@ function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null })
             </button>
           ) : (
             <div style={{ marginBottom: 16, padding: "12px 14px", background: "var(--card2)", borderRadius: 14 }}>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)", marginBottom: 8 }}>Template name</div>
+              <div style={{ fontFamily: "var(--fb)", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)", marginBottom: 8 }}>Template name</div>
               <input
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
@@ -1218,7 +1209,7 @@ function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null })
 
         {/* Activity Timeline */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1 }}>
+          <span style={{ fontFamily: "var(--fb)", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1 }}>
             History
           </span>
           <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
@@ -1245,7 +1236,7 @@ function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null })
             }} />
             <div>
               <div style={{ fontSize: 11, color: "var(--t2)" }}>{entry.event}</div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)" }}>
+              <div style={{ fontFamily: "var(--fb)", fontSize: 9, color: "var(--t3)" }}>
                 {formatFullDate(entry.timestamp)}
               </div>
             </div>
@@ -1281,10 +1272,10 @@ function UploadZone({ icon, title, subtitle, accept, onFileSelect }: {
       }}
       data-testid="upload-zone"
     >
-      <div style={{ fontSize: 26, marginBottom: 8 }}>{icon}</div>
-      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--txt)", marginBottom: 4 }}>{title}</div>
-      <div style={{ fontSize: 12, color: "var(--txt3)" }}>
-        <em style={{ color: "var(--green)", fontStyle: "normal", fontWeight: 600 }}>{subtitle}</em>
+      <div style={{ fontSize: 28, marginBottom: 8, color: "#bbb" }}>{icon}</div>
+      <div style={{ fontSize: 14, fontWeight: 500, color: "#333", marginBottom: 4 }}>{title}</div>
+      <div style={{ fontSize: 13, color: "#4ade80" }}>
+        <em style={{ fontStyle: "normal", fontWeight: 600 }}>{subtitle}</em>
       </div>
       <input
         ref={inputRef}
@@ -1469,33 +1460,6 @@ export default function LcCheck() {
   const LC_TABS = ["Check", "Supplier docs", "TwinLog Trail", "Corrections"];
   const LC_STEP_LABELS = ["LC Terms", "Supplier Docs", "Review", "Results"];
 
-  const breadcrumb = prefillData ? (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--t2)" }}>
-      <span>{prefillData.commodity_name}</span>
-      <span style={{ color: "var(--t3)" }}>&middot;</span>
-      <span>{prefillData.origin_name} &rarr; {prefillData.dest_name}</span>
-      <span style={{ color: "var(--t3)" }}>&middot;</span>
-      <span
-        style={{
-          background: "var(--blue-dim)",
-          color: "var(--blue)",
-          fontFamily: "'DM Mono', monospace",
-          fontSize: 9,
-          fontWeight: 600,
-          padding: "3px 8px",
-          borderRadius: 4,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase" as const,
-        }}
-        data-testid="breadcrumb-step-badge"
-      >
-        LC Check
-      </span>
-    </div>
-  ) : (
-    <span style={{ fontSize: 13, color: "var(--t2)", fontWeight: 600 }}>LC Check</span>
-  );
-
   const docTypeLabel = (dt: LcDocumentType) =>
     DOC_TYPES.find(d => d.value === dt)?.label || dt;
 
@@ -1517,7 +1481,17 @@ export default function LcCheck() {
       : "All fields match LC terms.";
 
   return (
-    <AppShell topCenter={breadcrumb}>
+    <AppShell
+      topCenter={
+        <div className="db-nav-links">
+          <Link href="/dashboard"><span>Dashboard</span></Link>
+          <Link href="/lookup"><span>Commodities</span></Link>
+          <Link href="/inbox"><span>Suppliers</span></Link>
+          <Link href="/lc-check"><span className="active">Compliance</span></Link>
+          <Link href="/inbox"><span>Messages</span></Link>
+        </div>
+      }
+    >
       <StepNav steps={WORKFLOW_STEPS} currentIndex={1} completedUpTo={1} />
       <TabBar tabs={LC_TABS} activeTab={lcActiveTab} onChange={setLcActiveTab} />
 
@@ -1530,21 +1504,18 @@ export default function LcCheck() {
           Coming in the next update.
         </div>
       ) : (
-      <div style={{ flex: 1, overflowY: "auto", padding: "0 0 60px" }} data-testid="lc-check-page">
+      <div style={{ flex: 1, overflowY: "auto", paddingBottom: 60 }} data-testid="lc-check-page">
 
         {/* HERO BANNER */}
         <div className="lc-hero">
-          <div>
+          <div className="lc-hero-top">
             <div className="lc-hero-tag">Compliance &rsaquo; LC Check &rsaquo; New Check</div>
-            <div className="lc-hero-title">LC Document<br />Checker</div>
-            <div className="lc-hero-sub">Cross-check supplier docs against your LC &mdash; UCP 600 &amp; ISBP 745 applied.</div>
+            <span className="lc-price-pill">
+              {isFreeCheck ? "First Check FREE" : "$19.99 per check"}
+            </span>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8, paddingTop: 2, flexShrink: 0 }}>
-            <div className="lc-price-pill">
-              <span className="lc-free-dot">FREE</span>
-              {isFreeCheck ? "First check · $19.99 after" : "$19.99 per check"}
-            </div>
-          </div>
+          <div className="lc-hero-title">LC Document<br />Checker</div>
+          <div className="lc-hero-sub">Cross-check supplier docs against your LC &mdash; UCP 600 &amp; ISBP 745 applied.</div>
         </div>
 
         {/* STEPPER */}
@@ -1569,10 +1540,10 @@ export default function LcCheck() {
         </div>
 
         {/* CONTENT AREA */}
-        <div style={{ padding: "0 14px" }}>
+        <div>
 
           {showPrefillBanner && prefillData && (
-            <div className="lc-note" style={{ marginBottom: 14 }} data-testid="banner-lc-prefill">
+            <div className="lc-note" style={{ margin: "0 24px 14px" }} data-testid="banner-lc-prefill">
               <span className="lc-note-ic">
                 <ExternalLink size={14} style={{ color: "var(--green)" }} />
               </span>
@@ -1623,7 +1594,7 @@ export default function LcCheck() {
                   </div>
                 </div>
 
-                <div className="lc-fg2" style={{ marginTop: 13 }}>
+                <div className="lc-fg2">
                   <div className="lc-field">
                     <label>Beneficiary / Supplier <span className="req">*</span></label>
                     <Input value={lcFields.beneficiaryName} onChange={e => updateLcField("beneficiaryName", e.target.value)} placeholder="e.g. SARL AGRO EXPORT CI" data-testid="input-beneficiary-name" />
@@ -1634,14 +1605,15 @@ export default function LcCheck() {
                   </div>
                 </div>
 
-                <div className="lc-fg2" style={{ marginBottom: 13 }}>
+                <div className="lc-fg2">
                   <div className="lc-field lc-f-full">
                     <label>Goods Description <span className="req">*</span></label>
                     <Input value={lcFields.goodsDescription} onChange={e => updateLcField("goodsDescription", e.target.value)} placeholder="e.g. Raw Cashew Nuts in shell, crop 2025/26" data-testid="input-goods-description" />
                   </div>
                 </div>
 
-                <div className="lc-fg3" style={{ marginBottom: 13 }}>
+                {/* Row: Quantity, Amount, Currency */}
+                <div className="lc-fg3">
                   <div className="lc-field">
                     <label>Quantity <span className="req">*</span></label>
                     <div style={{ display: "flex", gap: 6 }}>
@@ -1663,6 +1635,10 @@ export default function LcCheck() {
                       <SelectContent>{CURRENCIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
+                </div>
+
+                {/* Row: Ports, Origin */}
+                <div className="lc-fg3">
                   <div className="lc-field">
                     <label>Port of Loading</label>
                     <Input value={lcFields.portOfLoading} onChange={e => updateLcField("portOfLoading", e.target.value)} placeholder="e.g. Abidjan" data-testid="input-port-loading" />
@@ -1675,6 +1651,10 @@ export default function LcCheck() {
                     <label>Country of Origin</label>
                     <Input value={lcFields.countryOfOrigin} onChange={e => updateLcField("countryOfOrigin", e.target.value)} placeholder="e.g. Côte d'Ivoire" data-testid="input-country-origin" />
                   </div>
+                </div>
+
+                {/* Row: Dates, Incoterms */}
+                <div className="lc-fg3">
                   <div className="lc-field">
                     <label>Latest Shipment Date <span className="req">*</span></label>
                     <Input type="date" value={lcFields.latestShipmentDate} onChange={e => updateLcField("latestShipmentDate", e.target.value)} data-testid="input-latest-shipment-date" />
@@ -1693,7 +1673,7 @@ export default function LcCheck() {
                 </div>
 
                 {/* Toggle switches */}
-                <div style={{ marginTop: 16, borderTop: "1px solid #f0f0f0", paddingTop: 12 }}>
+                <div>
                   <div className="lc-tog-row">
                     <div>
                       <div className="lc-tog-lbl">Partial Shipments Allowed</div>
@@ -1911,7 +1891,7 @@ export default function LcCheck() {
                 </div>
 
                 {/* Documents status */}
-                <div style={{ marginTop: 16, padding: "12px 14px", background: "#f7f7f7", borderRadius: 10 }}>
+                <div style={{ marginTop: 16, padding: "12px 14px", background: "#f5f5f5", borderRadius: 10 }}>
                   <label style={{ marginBottom: 8, display: "block" }}>Documents</label>
                   <div className="lc-doc-status">
                     {documents.map((doc, i) => {
@@ -1978,7 +1958,9 @@ export default function LcCheck() {
               </div>
 
               {(checkMutation.data.summary.verdict === "COMPLIANT" || checkMutation.data.summary.verdict === "COMPLIANT_WITH_NOTES") && (
-                <InsuranceGapAlert />
+                <div style={{ margin: "0 24px" }}>
+                  <InsuranceGapAlert />
+                </div>
               )}
 
               {/* Results card with grouped rows */}
@@ -2090,14 +2072,14 @@ export default function LcCheck() {
               )}
 
               {/* Integrity hash */}
-              <div style={{ background: "#f7f7f7", border: "1px solid #e8e8e8", borderRadius: 10, padding: "14px 16px" }}>
+              <div style={{ background: "#f7f7f7", border: "1px solid #e8e8e8", borderRadius: 10, padding: "14px 16px", margin: "0 24px 12px" }}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                   <Hash size={16} style={{ color: "var(--txt3)", marginTop: 2, flexShrink: 0 }} />
                   <div style={{ minWidth: 0, flex: 1 }}>
                     <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-lc-check-ref">
                       LC check ref: TT-LC-{new Date().getFullYear()}-{checkMutation.data.integrityHash.substring(0, 6).toUpperCase()}
                     </p>
-                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--txt3)", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
+                    <p style={{ fontFamily: "var(--fb)", fontSize: 10, color: "var(--txt3)", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
                       Integrity hash: sha256:{checkMutation.data.integrityHash}
                     </p>
                     <p style={{ fontSize: 11, color: "var(--txt3)" }} data-testid="text-lc-check-timestamp">
@@ -2153,7 +2135,7 @@ export default function LcCheck() {
 
           {/* Error display */}
           {checkMutation.isError && checkMutation.error.message !== "Insufficient tokens" && checkMutation.error.message !== "LC re-check required" && step !== 4 && (
-            <div style={{ background: "#fff5f5", borderRadius: 10, padding: "12px 15px", display: "flex", alignItems: "center", gap: 10, marginTop: 12 }}>
+            <div style={{ background: "#fff5f5", borderRadius: 10, padding: "12px 15px", display: "flex", alignItems: "center", gap: 10, margin: "12px 24px 0" }}>
               <XCircle size={16} style={{ color: "var(--red)", flexShrink: 0 }} />
               <p style={{ fontSize: 13, color: "var(--red)" }}>{checkMutation.error.message}</p>
             </div>
