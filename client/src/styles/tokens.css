@@ -1,16 +1,16 @@
 :root {
-  /* ── New design system tokens (green/black theme) ── */
+  /* ── Design system tokens (sage/black theme) ── */
   --bg:       #000000;
-  --sidebar:  #1c1c1e;
-  --card:     #1c1c1e;
-  --card2:    #1c1c1e;
+  --sidebar:  #242428;
+  --card:     #242428;
+  --card2:    #242428;
   --border:   rgba(255,255,255,0.07);
   --border2:  rgba(255,255,255,0.12);
 
   /* Legacy aliases (mapped to new tokens) */
   --s0: #000000;
-  --s1: #1c1c1e;
-  --s2: #1c1c1e;
+  --s1: #242428;
+  --s2: #242428;
   --s3: #2a2a2e;
   --s4: #333338;
   --s5: rgba(255,255,255,0.07);
@@ -20,24 +20,32 @@
   --t2: rgba(255,255,255,0.55);
   --t3: rgba(255,255,255,0.28);
 
-  /* New design system colors */
-  --green:    #4a8c6f;
-  --teal:     #2e8662;
+  /* Primary colors — sage green system */
+  --green:    #6b9080;
+  --sage:     #6b9080;
+  --sage-hover: #5a7a6b;
+  --teal:     #5a7a6b;
   --amber:    #ea8b43;
   --red:      #da3c3d;
+
+  /* Accent — bright green (badges, active states ONLY — never for buttons) */
+  --green-accent:    #4ade80;
+  --green-accent-bg: rgba(74, 222, 128, 0.1);
+
+  /* Dark text for light surfaces */
   --txt:      #111111;
   --txt2:     #555555;
   --txt3:     #999999;
 
-  /* Accent — mapped to green instead of blue */
-  --blue:     #4a8c6f;
-  --blue-dim: rgba(74,140,111,0.12);
-  --blue-bd:  rgba(74,140,111,0.25);
-  --blue-glow:rgba(74,140,111,0.06);
+  /* Accent — mapped to sage (legacy aliases) */
+  --blue:     #6b9080;
+  --blue-dim: rgba(107,144,128,0.12);
+  --blue-bd:  rgba(107,144,128,0.25);
+  --blue-glow:rgba(107,144,128,0.06);
 
-  /* Status */
-  --gbg:      rgba(74,140,111,0.10);
-  --gbd:      rgba(74,140,111,0.20);
+  /* Status badge colors */
+  --gbg:      rgba(107,144,128,0.10);
+  --gbd:      rgba(107,144,128,0.20);
   --abg:      rgba(234,139,67,0.10);
   --abd:      rgba(234,139,67,0.20);
   --rbg:      rgba(218,60,61,0.10);
@@ -45,7 +53,10 @@
 
   /* Font families */
   --fh: 'Clash Display', sans-serif;
-  --fb: 'DM Sans', sans-serif;
+  --fb: 'Inter', sans-serif;
+
+  /* Sidebar */
+  --bg-sidebar: #242428;
 }
 
 /* ── Scrollbar ── */
@@ -74,9 +85,9 @@ input::placeholder, textarea::placeholder {
 }
 
 input:focus, textarea:focus, select:focus {
-  border-color: var(--green);
+  border-color: #4ade80;
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(74,140,111,0.1);
+  box-shadow: 0 0 0 3px rgba(74,222,128,0.12);
 }
 
 input:hover:not(:focus), textarea:hover:not(:focus), select:hover:not(:focus) {
@@ -156,15 +167,15 @@ input[type="checkbox"] {
 }
 
 input[type="checkbox"]:checked {
-  background: var(--green);
-  border-color: var(--green);
+  background: var(--sage);
+  border-color: var(--sage);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='white' d='M1.5 5l2.5 2.5 4.5-4.5' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
 }
 
 input[type="checkbox"]:focus {
-  box-shadow: 0 0 0 3px rgba(74,140,111,0.15);
+  box-shadow: 0 0 0 3px rgba(107,144,128,0.15);
 }
 
 .checkbox-row {
@@ -201,14 +212,14 @@ input[type="radio"] {
 }
 
 input[type="radio"]:checked {
-  border-color: var(--green);
-  background: radial-gradient(circle, var(--green) 40%, transparent 41%);
+  border-color: var(--sage);
+  background: radial-gradient(circle, var(--sage) 40%, transparent 41%);
   box-shadow: inset 0 0 0 3px #f5f5f5;
-  background-color: var(--green);
+  background-color: var(--sage);
 }
 
 input[type="radio"]:focus {
-  box-shadow: 0 0 0 3px rgba(74,140,111,0.15);
+  box-shadow: 0 0 0 3px rgba(107,144,128,0.15);
 }
 
 /* ── Radio card (styled option block) ── */
@@ -226,12 +237,12 @@ input[type="radio"]:focus {
 }
 
 .radio-card:has(input[type="radio"]:checked) {
-  background: rgba(74,140,111,0.06);
-  border-color: rgba(74,140,111,0.25);
+  background: rgba(107,144,128,0.06);
+  border-color: rgba(107,144,128,0.25);
 }
 
 .radio-card:hover:not(:has(input[type="radio"]:checked)) {
-  border-color: rgba(74,140,111,.2);
+  border-color: rgba(107,144,128,.2);
 }
 
 .radio-card-content {
@@ -299,8 +310,8 @@ input[type="search"] {
 }
 
 .upload-zone:hover, .upload-zone.drag-over {
-  border-color: var(--green);
-  background: rgba(74,140,111,0.03);
+  border-color: #4ade80;
+  background: rgba(74,222,128,0.03);
 }
 
 .upload-zone input[type="file"] {
