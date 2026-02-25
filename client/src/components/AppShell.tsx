@@ -47,13 +47,37 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
     <Link href={item.href}>
       <div
         onClick={onClick}
-        className={`sidebar-item${isActive ? " active" : ""}`}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 9,
+          padding: "8px 12px",
+          margin: "0 6px 1px",
+          borderRadius: 8,
+          fontSize: 13,
+          fontWeight: isActive ? 500 : 400,
+          color: isActive ? "var(--green)" : "#666",
+          background: isActive ? "rgba(74,140,111,0.12)" : "transparent",
+          cursor: "pointer",
+          transition: "all 0.15s",
+          position: "relative",
+        }}
         data-testid={`shell-nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
       >
         <span className="icon">{item.icon}</span>
         <span className="label">{item.label}</span>
         {item.badge && item.badge.value > 0 && (
-          <span className={`badge ${item.badge.type === "amber" ? "badge-red" : "badge-green"}`}>
+          <span
+            style={{
+              fontSize: 10,
+              padding: "1px 6px",
+              borderRadius: 20,
+              fontWeight: 600,
+              ...(item.badge.type === "amber"
+                ? { background: "rgba(218,60,61,0.2)", color: "#f87171" }
+                : { background: "rgba(74,140,111,0.15)", color: "var(--green)" }),
+            }}
+          >
             {item.badge.value}
           </span>
         )}
@@ -157,9 +181,28 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
       {/* Logo */}
       <div className="sidebar-logo">
         <Link href="/">
-          <div className="logo-link" data-testid="shell-logo">
-            <img className="logo-img" src="/logo.png" alt="TapTrao" />
-            <span>TapTrao</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 9, cursor: "pointer" }} data-testid="shell-logo">
+            <div style={{
+              width: 32,
+              height: 32,
+              borderRadius: "50%",
+              overflow: "hidden",
+              flexShrink: 0,
+              boxShadow: "0 0 16px rgba(74,140,111,0.4)",
+            }}>
+              <img src="/taptrao-green-logo.png" alt="TapTrao" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            </div>
+            <span
+              style={{
+                fontFamily: "var(--fh)",
+                fontWeight: 800,
+                fontSize: 16,
+                color: "#fff",
+                letterSpacing: "0",
+              }}
+            >
+              TapTrao
+            </span>
           </div>
         </Link>
         {isMobile && (
@@ -215,6 +258,15 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
             </>
           )}
         </div>
+        <span style={{
+          background: "rgba(74,140,111,0.1)",
+          borderRadius: 20,
+          padding: "2px 8px",
+          fontSize: 11,
+          color: "var(--green)",
+          fontWeight: 500,
+          whiteSpace: "nowrap",
+        }}>{balance}</span>
       </div>
 
       {/* Custom sidebar bottom slot */}
@@ -223,8 +275,16 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
   );
 
   return (
-    <div className="app-shell">
-      {/* SIDEBAR — desktop */}
+    <div
+      style={{
+        display: "flex",
+        padding: 10,
+        gap: 10,
+        minHeight: "100vh",
+        background: "#f3f3f3",
+      }}
+    >
+      {/* SIDEBAR — desktop: always visible */}
       {!isMobile && (
         <div className="sidebar">
           {sidebarContent}
@@ -241,24 +301,51 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
         </>
       )}
 
-      {/* MAIN WRAPPER + MAIN BOX */}
-      <div className="main-wrapper">
-        <div className="main-box">
-          {/* NAV BAR — inside main box at top */}
-          <div className="top-nav">
-            {/* Left: hamburger on mobile, nav links on desktop */}
-            {isMobile ? (
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="hamburger-btn"
-                aria-label="Open menu"
-                data-testid="shell-hamburger"
-              >
-                <Menu size={22} />
-              </button>
-            ) : (
-              topCenter || <DefaultNavLinks activePage={location} />
-            )}
+      {/* MAIN AREA — rounded panel with green-to-white gradient */}
+      <div style={{
+        flex: 1,
+        minWidth: 0,
+        borderRadius: 18,
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        background: "linear-gradient(180deg, #0e4e45 0px, #0e4e45 400px, #1a6b5a 460px, #4a9e8a 520px, #8ac0b0 570px, #bdd9ce 610px, #e4efea 650px, #f3f3f3 700px)",
+        minHeight: "calc(100vh - 20px)",
+      }}>
+        {/* TOPNAV */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: isMobile ? "0 12px" : "0 24px",
+            height: 50,
+            flexShrink: 0,
+            background: "transparent",
+            gap: 8,
+          }}
+        >
+          {/* Left: hamburger on mobile */}
+          {isMobile && (
+            <button
+              onClick={() => setSidebarOpen(true)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "rgba(255,255,255,0.7)",
+                padding: 6,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+              aria-label="Open menu"
+              data-testid="shell-hamburger"
+            >
+              <Menu size={22} />
+            </button>
+          )}
 
             {/* Mobile: topCenter in middle */}
             {isMobile && (
@@ -293,6 +380,25 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
 
               {/* User avatar — hidden, no auth system */}
             </div>
+            <button
+              onClick={() => navigate("/pricing")}
+              style={{
+                background: "var(--green)",
+                color: "#000",
+                border: "none",
+                borderRadius: 50,
+                padding: isMobile ? "6px 12px" : "6px 16px",
+                fontFamily: "var(--fb)",
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                boxShadow: "0 4px 18px rgba(74,140,111,0.35)",
+              }}
+              data-testid="shell-buy-cta"
+            >
+              {isMobile ? "Buy" : "Buy trade pack"}
+            </button>
           </div>
 
           {/* Scrollable content */}

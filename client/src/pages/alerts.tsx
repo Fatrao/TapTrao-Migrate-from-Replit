@@ -163,7 +163,7 @@ export default function AlertsPage() {
               fontFamily: "var(--fh)",
               fontWeight: 900,
               fontSize: 28,
-              letterSpacing: "-0.5px",
+              letterSpacing: "0",
               color: "var(--t1)",
               marginBottom: 4,
             }}

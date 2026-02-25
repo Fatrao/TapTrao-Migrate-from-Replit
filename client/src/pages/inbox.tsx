@@ -90,7 +90,7 @@ export default function Inbox() {
         {/* HEADER */}
         <div style={{ marginBottom: 28 }}>
           <h1
-            style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "-0.5px", color: "var(--t1)", margin: 0, lineHeight: 1.1 }}
+            style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "0", color: "var(--t1)", margin: 0, lineHeight: 1.1 }}
             data-testid="text-inbox-title"
           >
             Supplier Inbox
@@ -116,7 +116,7 @@ export default function Inbox() {
               }}
               data-testid={`inbox-summary-card-${i}`}
             >
-              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 36, letterSpacing: -2, lineHeight: 1, color: c.color }}>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 36, letterSpacing: 0, lineHeight: 1, color: c.color }}>
                 {c.value}
               </div>
               <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)", letterSpacing: ".04em", marginTop: 4 }}>

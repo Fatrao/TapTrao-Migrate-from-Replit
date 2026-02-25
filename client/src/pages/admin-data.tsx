@@ -65,7 +65,7 @@ export default function AdminData() {
         <div className="max-w-5xl mx-auto space-y-8">
           <div className="space-y-2">
             <h1
-              style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "-0.5px", color: "var(--t1)" }}
+              style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "0", color: "var(--t1)" }}
               data-testid="text-admin-title"
             >
               Data Overview

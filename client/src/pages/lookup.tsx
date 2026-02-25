@@ -658,7 +658,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
               fontFamily: "var(--fh)",
               fontWeight: 900,
               fontSize: "clamp(48px, 6vw, 64px)",
-              letterSpacing: -4,
+              letterSpacing: 0,
               color: "var(--t1)",
               lineHeight: 1,
             }}

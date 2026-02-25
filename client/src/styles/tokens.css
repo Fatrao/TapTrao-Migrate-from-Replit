@@ -1,9 +1,9 @@
 :root {
-  /* ── Design system tokens (sage/black theme) ── */
-  --bg:       #000000;
-  --sidebar:  #242428;
-  --card:     #242428;
-  --card2:    #242428;
+  /* ── New design system tokens (green/black theme) ── */
+  --bg:       #f3f3f3;
+  --sidebar:  #1c1c1e;
+  --card:     #1c1c1e;
+  --card2:    #1c1c1e;
   --border:   rgba(255,255,255,0.07);
   --border2:  rgba(255,255,255,0.12);
 
@@ -17,64 +17,31 @@
 
   /* Text hierarchy — white at different opacities */
   --t1: rgba(255,255,255,0.95);
-  --t2: rgba(255,255,255,0.45);
-  --t3: rgba(255,255,255,0.25);
+  --t2: rgba(255,255,255,0.55);
+  --t3: rgba(255,255,255,0.28);
 
-  /* Primary colors — sage green system */
-  --green:    #6b9080;
-  --sage:     #6b9080;
-  --sage-hover: #5a7a6b;
-  --teal:     #5a7a6b;
-  --amber:    #eab308;
-  --red:      #ef4444;
-
-  /* Accent — bright green (badges, active states ONLY — never for buttons) */
-  --green-accent:    #4ade80;
-  --green-accent-bg: rgba(74, 222, 128, 0.1);
-
-  /* Gradient backgrounds */
-  --bg-body:       #000000;
-  --bg-green-hero: linear-gradient(135deg, #0e4e45 0%, #14574a 30%, #1c6352 60%, #327462 85%, #3a7d6a 100%);
-  --bg-card-dark:  linear-gradient(160deg, #0e3d34 0%, #0c332c 40%, #0a2e28 70%, #0b2924 100%);
-  --bg-main-box:   linear-gradient(180deg,
-    #1a1a1c 0%, #1c2420 3%, #1e2e28 6%, #1f3830 9%,
-    #214232 12%, #264a38 16%, #2c5540 20%, #356248 25%,
-    #3f7056 30%, #4a7e64 35%, #578d74 40%, #659b82 45%,
-    #74a890 50%, #85b49e 55%, #96bfab 60%, #a8cab8 65%,
-    #bbd5c6 70%, #cddfd3 75%, #dde8e1 80%, #eaf0ec 85%,
-    #f2f4f3 90%, #f5f5f5 95%
-  );
-  --hero-glow:     radial-gradient(ellipse at 80% 20%, rgba(74,222,128,0.06) 0%, transparent 60%);
-
-  /* Card backgrounds */
-  --white-card: #ffffff;
-
-  /* Named text colors (from design system) */
-  --text-white:           #ffffff;
-  --text-white-secondary: rgba(255,255,255,0.45);
-  --text-white-muted:     rgba(255,255,255,0.25);
-  --text-dark:            #1a1a1a;
-  --text-dark-secondary:  #888888;
-  --text-dark-muted:      #999999;
-
-  /* Dark text for light surfaces (legacy aliases) */
-  --txt:      #1a1a1a;
-  --txt2:     #888888;
+  /* New design system colors */
+  --green:    #4a8c6f;
+  --teal:     #2e8662;
+  --amber:    #ea8b43;
+  --red:      #da3c3d;
+  --txt:      #111111;
+  --txt2:     #555555;
   --txt3:     #999999;
 
-  /* Accent — mapped to sage (legacy aliases) */
-  --blue:     #6b9080;
-  --blue-dim: rgba(107,144,128,0.12);
-  --blue-bd:  rgba(107,144,128,0.25);
-  --blue-glow:rgba(107,144,128,0.06);
+  /* Accent — mapped to green instead of blue */
+  --blue:     #4a8c6f;
+  --blue-dim: rgba(74,140,111,0.12);
+  --blue-bd:  rgba(74,140,111,0.25);
+  --blue-glow:rgba(74,140,111,0.06);
 
-  /* Status badge colors */
-  --gbg:      rgba(107,144,128,0.10);
-  --gbd:      rgba(107,144,128,0.20);
-  --abg:      rgba(234,179,8,0.12);
-  --abd:      rgba(234,179,8,0.20);
-  --rbg:      rgba(239,68,68,0.10);
-  --rbd:      rgba(239,68,68,0.20);
+  /* Status */
+  --gbg:      rgba(74,140,111,0.10);
+  --gbd:      rgba(74,140,111,0.20);
+  --abg:      rgba(234,139,67,0.10);
+  --abd:      rgba(234,139,67,0.20);
+  --rbg:      rgba(218,60,61,0.10);
+  --rbd:      rgba(218,60,61,0.20);
 
   /* Font families */
   --fh: 'Clash Display', sans-serif;
@@ -82,6 +49,11 @@
 
   /* Sidebar */
   --bg-sidebar: #242428;
+}
+
+/* ── Clash Display headings — normal spacing ── */
+[style*="Clash Display"] {
+  letter-spacing: 0;
 }
 
 /* ── Scrollbar ── */
@@ -112,7 +84,7 @@ input::placeholder, textarea::placeholder {
 input:focus, textarea:focus, select:focus {
   border-color: #4ade80;
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(74,222,128,0.12);
+  box-shadow: 0 0 0 3px rgba(74,140,111,0.1);
 }
 
 input:hover:not(:focus), textarea:hover:not(:focus), select:hover:not(:focus) {
@@ -200,7 +172,7 @@ input[type="checkbox"]:checked {
 }
 
 input[type="checkbox"]:focus {
-  box-shadow: 0 0 0 3px rgba(107,144,128,0.15);
+  box-shadow: 0 0 0 3px rgba(74,140,111,0.15);
 }
 
 .checkbox-row {
@@ -244,7 +216,7 @@ input[type="radio"]:checked {
 }
 
 input[type="radio"]:focus {
-  box-shadow: 0 0 0 3px rgba(107,144,128,0.15);
+  box-shadow: 0 0 0 3px rgba(74,140,111,0.15);
 }
 
 /* ── Radio card (styled option block) ── */
@@ -262,12 +234,12 @@ input[type="radio"]:focus {
 }
 
 .radio-card:has(input[type="radio"]:checked) {
-  background: rgba(107,144,128,0.06);
-  border-color: rgba(107,144,128,0.25);
+  background: rgba(74,140,111,0.06);
+  border-color: rgba(74,140,111,0.25);
 }
 
 .radio-card:hover:not(:has(input[type="radio"]:checked)) {
-  border-color: rgba(107,144,128,.2);
+  border-color: rgba(74,140,111,.2);
 }
 
 .radio-card-content {
@@ -335,8 +307,8 @@ input[type="search"] {
 }
 
 .upload-zone:hover, .upload-zone.drag-over {
-  border-color: #4ade80;
-  background: rgba(74,222,128,0.03);
+  border-color: var(--green);
+  background: rgba(74,140,111,0.03);
 }
 
 .upload-zone input[type="file"] {

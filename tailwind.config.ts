@@ -78,9 +78,9 @@ export default {
           border: "var(--sidebar-accent-border)"
         },
         status: {
-          online: "rgb(107 144 128)",
-          away: "rgb(234 179 8)",
-          busy: "rgb(239 68 68)",
+          online: "rgb(74 140 111)",
+          away: "rgb(234 139 67)",
+          busy: "rgb(218 60 61)",
           offline: "rgb(156 163 175)",
         },
         sage: '#6b9080',
