@@ -394,8 +394,14 @@
 .breadcrumb { display: inline-block; font-size: 12px; color: rgba(255,255,255,0.65); background: rgba(255,255,255,0.1); padding: 5px 14px; border-radius: 20px; }
 .price-pill { display: inline-block; font-size: 13px; font-weight: 600; background: rgba(34,197,94,0.15); color: #4ade80; padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(34,197,94,0.25); }
 @media (max-width: 768px) {
+  #root {
+    display: block;
+    padding: 6px;
+  }
   .sidebar { display: none; }
-  .main-wrapper { padding: 6px; }
+  .main-wrapper {
+    min-height: calc(100vh - 12px);
+  }
 }
 
 /* AppShell utility classes */
