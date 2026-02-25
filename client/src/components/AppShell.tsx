@@ -115,6 +115,8 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
   const inboxBadge = inboxBadgeQuery.data?.count ?? 0;
   const alertsBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/alerts/unread-count"] });
   const alertsBadge = alertsBadgeQuery.data?.count ?? 0;
+  const tradesBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/trades/pending-count"] });
+  const tradesBadge = tradesBadgeQuery.data?.count ?? 0;
 
   // Fetch recent lookups for history cards
   const recentLookupsQuery = useQuery<any[]>({ queryKey: ["/api/lookups/recent"] });
@@ -135,8 +137,8 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
 
   /* Build nav items with live badge counts */
   const mItems: NavItem[] = menuItems.map((item) => {
-    if (item.label === "My Trades" && inboxBadge > 0)
-      return { ...item, badge: { type: "green" as const, value: inboxBadge } };
+    if (item.label === "My Trades" && tradesBadge > 0)
+      return { ...item, badge: { type: "green" as const, value: tradesBadge } };
     return item;
   });
   const cItems: NavItem[] = complianceItems.map((item) => {
