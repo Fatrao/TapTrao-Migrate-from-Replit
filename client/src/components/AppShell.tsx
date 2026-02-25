@@ -223,7 +223,7 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
   );
 
   return (
-    <>
+    <div className="app-shell">
       {/* SIDEBAR — desktop */}
       {!isMobile && (
         <div className="sidebar">
@@ -304,6 +304,6 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

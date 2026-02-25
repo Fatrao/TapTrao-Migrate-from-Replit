@@ -105,6 +105,14 @@
     display: block;
   }
 
+  /* AppShell wrapper — isolates sidebar + main flex layout from #root siblings */
+  .app-shell {
+    display: flex;
+    flex: 1;
+    gap: 10px;
+    min-width: 0;
+  }
+
   a {
     text-decoration: none;
     color: inherit;
