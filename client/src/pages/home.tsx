@@ -63,9 +63,9 @@ export default function Home() {
           <div className="hero-flags">
             <span>🇬🇭</span><span>🇨🇮</span><span>🇪🇹</span><span>🇰🇪</span><span>🇹🇿</span><span>🇺🇬</span><span>🇳🇬</span><span>🇨🇲</span>
             {" → "}
-          <span>🇳🇬</span><span>🇧🇷</span><span>🇬🇭</span><span>🇨🇲</span><span>🇫🇷</span><span>🇧🇪</span><span>🇮🇹</span><span>🇵🇱</span><span>🇨🇭</span><span>🇹🇷</span><span>🇵🇹</span><span>🇪🇸</span></span>
+            <span>🇳🇬</span><span>🇧🇷</span><span>🇬🇭</span><span>🇨🇲</span><span>🇫🇷</span><span>🇧🇪</span><span>🇮🇹</span><span>🇵🇱</span><span>🇨🇭</span><span>🇹🇷</span><span>🇵🇹</span><span>🇪🇸</span>
+          </div>
         </div>
-      </div>
       )}
 
       {/* — HERO BOX — */}
@@ -152,6 +152,7 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </div>
 
       {/* ── MARQUEE ── */}
       <div className="marquee-wrap">
@@ -185,6 +186,8 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
 
       {/* ── MODULES ── */}
       <div className="section" id="modules" data-testid="section-capabilities">
@@ -215,6 +218,7 @@ export default function Home() {
             ))}
           </div>
         </div>
+      </div>
 
       {/* ── LC DOCUMENT CHECK ── */}
       <div className="section" id="lc" style={{ paddingTop: 40 }}>
