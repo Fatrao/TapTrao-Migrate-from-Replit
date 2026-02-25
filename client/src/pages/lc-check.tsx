@@ -50,6 +50,7 @@ import {
 } from "./lc-check/constants";
 import type { LcCheckResponse, LcPrefillData, UploadedFile } from "./lc-check/constants";
 import { getDocFields, mapDocNameToType, getDocEmoji, docTypeLabel } from "./lc-check/helpers";
+import { CopyBtn } from "./lc-check/Badges";
 import { InsuranceGapAlert } from "./lc-check/InsuranceGapAlert";
 import { UploadZone, FilePill } from "./lc-check/UploadZone";
 import { SupplierDocsTab } from "./lc-check/SupplierDocsTab";
@@ -773,30 +774,7 @@ export default function LcCheck() {
                             data-testid={`input-doc-${field.key}`}
                           />
                         </div>
-                        {documents.length > 1 && (
-                          <button
-                            onClick={() => removeDocument(activeDocTab)}
-                            style={{ color: "var(--red)", background: "none", border: "none", cursor: "pointer", padding: 4 }}
-                            data-testid="button-remove-document"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="lc-fg2">
-                        {getDocFields(documents[activeDocTab].documentType).map(field => (
-                          <div key={field.key} className="lc-field">
-                            <label>{field.label}</label>
-                            <Input
-                              type={field.type}
-                              value={documents[activeDocTab].fields[field.key] || ""}
-                              onChange={e => updateDocField(activeDocTab, field.key, e.target.value)}
-                              data-testid={`input-doc-${field.key}`}
-                            />
-                          </div>
-                        ))}
-                      </div>
+                      ))}
                     </div>
                   </div>
                 )}
