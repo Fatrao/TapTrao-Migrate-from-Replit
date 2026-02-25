@@ -90,8 +90,19 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* App shell layout: sidebar + main side by side */
   #root {
     min-height: 100vh;
+    display: flex;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  /* Homepage is the sole child — it manages its own padding */
+  #root:has(> .hp-page) {
+    padding: 0;
+    gap: 0;
+    display: block;
   }
 
   a {
@@ -255,31 +266,31 @@
     box-shadow: 0 4px 18px rgba(74,140,111,0.4);
   }
 
-  /* Main content gradient: green -> white (matches design HTML) */
-  .main-gradient {
-    background: linear-gradient(180deg,
-      #0e4e45 0%, #0e4e46 2%, #0d5047 4%, #104f47 6%, #14574a 10%,
-      #1c6352 14%, #216354 18%, #2f725f 22%, #327462 24%, #3f7d6a 27%,
-      #407d6a 30%, #468271 32%, #498573 34%, #578d7d 37%, #619888 39%,
-      #6a9f8d 41%, #7faa9b 44%, #87b0a2 46%, #8db3a6 48%, #94b5ab 50%,
-      #9cbbb2 52%, #a6c3ba 54%, #bdd3cb 60%, #c7d9d2 65%, #e2e7e6 75%,
-      #f2f2f2 85%, #f3f3f3 90%
-    );
-  }
-
-  /* Inner green header gradient (matches content-area top) */
-  .green-header-gradient {
-    background: linear-gradient(180deg,
-      #0e4e45 0%, #104f47 6%, #14574a 12%,
-      #1c6352 20%, #327462 35%, rgba(50,116,98,0.7) 55%, rgba(50,116,98,0) 100%
-    );
-  }
-
   @keyframes lc-fadeUp {
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
   }
   .lc-fadein { animation: lc-fadeUp .3s ease both; }
+}
+
+/* Main content gradient: green -> white (matches design HTML) */
+.main-gradient {
+  background: linear-gradient(180deg,
+    #0e4e45 0%, #0e4e46 2%, #0d5047 4%, #104f47 6%, #14574a 10%,
+    #1c6352 14%, #216354 18%, #2f725f 22%, #327462 24%, #3f7d6a 27%,
+    #407d6a 30%, #468271 32%, #498573 34%, #578d7d 37%, #619888 39%,
+    #6a9f8d 41%, #7faa9b 44%, #87b0a2 46%, #8db3a6 48%, #94b5ab 50%,
+    #9cbbb2 52%, #a6c3ba 54%, #bdd3cb 60%, #c7d9d2 65%, #e2e7e6 75%,
+    #f2f2f2 85%, #f3f3f3 90%
+  );
+}
+
+/* Inner green header gradient */
+.green-header-gradient {
+  background: linear-gradient(180deg,
+    #0e4e45 0%, #104f47 6%, #14574a 12%,
+    #1c6352 20%, #327462 35%, rgba(50,116,98,0.7) 55%, rgba(50,116,98,0) 100%
+  );
 }
 
 /* ══════════════════════════════════════════════════════
@@ -348,7 +359,7 @@
 .history-card .tags { display: flex; gap: 5px; }
 .history-card .tag { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.4); }
 .main-wrapper { flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: calc(100vh - 20px); }
-.main-box { border-radius: 18px; flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.main-box { border-radius: 18px; flex: 1; overflow: hidden; display: flex; flex-direction: column; background: #0e4e45; }
 .top-nav { padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
 .top-nav-links { display: flex; gap: 26px; }
 .top-nav-links a { font-size: 13.5px; color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.15s; font-weight: 400; }
