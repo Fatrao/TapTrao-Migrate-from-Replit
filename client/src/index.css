@@ -255,28 +255,23 @@
     box-shadow: 0 4px 18px rgba(74,140,111,0.4);
   }
 
-  /* Main content gradient: dark green -> white */
+  /* Main content gradient: green -> white (matches design HTML) */
   .main-gradient {
     background: linear-gradient(180deg,
-      #1a3832 0%,
-      #1d3d35 8%,
-      #1d3d35 16%,
-      #243f37 26%,
-      rgba(24,46,32,0.92) 36%,
-      rgba(22,42,30,0.72) 46%,
-      rgba(20,38,27,0.45) 56%,
-      rgba(18,34,24,0.2) 66%,
-      rgba(255,255,255,0.6) 76%,
-      #ffffff 86%,
-      #ffffff 100%
+      #0e4e45 0%, #0e4e46 2%, #0d5047 4%, #104f47 6%, #14574a 10%,
+      #1c6352 14%, #216354 18%, #2f725f 22%, #327462 24%, #3f7d6a 27%,
+      #407d6a 30%, #468271 32%, #498573 34%, #578d7d 37%, #619888 39%,
+      #6a9f8d 41%, #7faa9b 44%, #87b0a2 46%, #8db3a6 48%, #94b5ab 50%,
+      #9cbbb2 52%, #a6c3ba 54%, #bdd3cb 60%, #c7d9d2 65%, #e2e7e6 75%,
+      #f2f2f2 85%, #f3f3f3 90%
     );
   }
 
-  /* Inner green header gradient */
+  /* Inner green header gradient (matches content-area top) */
   .green-header-gradient {
     background: linear-gradient(180deg,
-      #0d2218 0%, #0f2a1e 30%, #143424 55%,
-      #1a4030 75%, rgba(26,60,44,0.7) 88%, rgba(26,60,44,0) 100%
+      #0e4e45 0%, #104f47 6%, #14574a 12%,
+      #1c6352 20%, #327462 35%, rgba(50,116,98,0.7) 55%, rgba(50,116,98,0) 100%
     );
   }
 
