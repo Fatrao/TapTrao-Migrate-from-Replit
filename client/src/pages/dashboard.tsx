@@ -89,8 +89,8 @@ export default function Dashboard() {
           <div className="dash-alert">
             <span className="alert-label">{"\u26a0\ufe0f"} Compliance: Pending</span>
             <span className="alert-text">
-              {latestLookup.commodityName} \u00b7 {getFlag(latestLookup.originName)} {latestLookup.originName} \u2192{" "}
-              {getFlag(latestLookup.destinationName)} {latestLookup.destinationName} \u00b7 {pendingCount} item
+              {latestLookup.commodityName} {"\u00b7"} {getFlag(latestLookup.originName)} {latestLookup.originName} {"\u2192"}{" "}
+              {getFlag(latestLookup.destinationName)} {latestLookup.destinationName} {"\u00b7"} {pendingCount} item
               {pendingCount !== 1 ? "s" : ""} need attention
             </span>
           </div>
@@ -114,7 +114,7 @@ export default function Dashboard() {
             $2,345,678
           </div>
           <div className="stat-sub">
-            <span className="up">{"\u2191"} 12.5%</span> \u00b7 12 past shipments
+            <span className="up">{"\u2191"} 12.5%</span> {"\u00b7"} 12 past shipments
           </div>
         </div>
 
@@ -124,7 +124,7 @@ export default function Dashboard() {
           <div className="stat-label">Total Lookups</div>
           <div className="stat-value" data-testid="stat-compliance-lookups">
             {statsQuery.isLoading ? "..." : totalLookups}
-            <span style={{ fontSize: 14, color: '#888' }}>checks</span>
+            <span style={{ fontSize: 14, color: '#888' }}>{" "}checks</span>
           </div>
           <div className="stat-sub">
             <span className="up">{"\u2191"} 8%</span> vs prev. 28 days
