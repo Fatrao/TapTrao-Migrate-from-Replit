@@ -442,12 +442,21 @@ export default function Pricing() {
                 Included free with every trade credit
               </p>
               <button
-                style={{ ...S.btnOutline, width: "100%" }}
-                onClick={() => window.location.href = "/lc-check"}
+                style={{
+                  ...S.btnOutline,
+                  width: "100%",
+                  opacity: checkoutMutation.isPending ? 0.6 : 1,
+                }}
+                disabled={checkoutMutation.isPending}
+                onClick={() => checkoutMutation.mutate("lc_standalone")}
                 data-testid="button-lc-standalone"
               >
-                <FileCheck style={{ width: 16, height: 16 }} />
-                Check LC only
+                {checkoutMutation.isPending && checkoutMutation.variables === "lc_standalone" ? (
+                  <Loader2 style={{ width: 16, height: 16, animation: "spin 1s linear infinite" }} />
+                ) : (
+                  <FileCheck style={{ width: 16, height: 16 }} />
+                )}
+                Check LC only — $19.99
               </button>
             </div>
           </div>
