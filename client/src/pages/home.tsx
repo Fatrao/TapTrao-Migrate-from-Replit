@@ -63,16 +63,14 @@ export default function Home() {
           <div className="hero-flags">
             <span>🇬🇭</span><span>🇨🇮</span><span>🇪🇹</span><span>🇰🇪</span><span>🇹🇿</span><span>🇺🇬</span><span>🇳🇬</span><span>🇨🇲</span>
             {" → "}
-            <span>🇪🇺</span><span>🇬🇧</span><span>🇩🇪</span><span>🇫🇷</span><span>🇮🇹</span><span>🇪🇸</span><span>🇨🇭</span><span>🇦🇹</span>
-          </div>
+          <span>🇳🇬</span><span>🇧🇷</span><span>🇬🇭</span><span>🇨🇲</span><span>🇫🇷</span><span>🇧🇪</span><span>🇮🇹</span><span>🇵🇱</span><span>🇨🇭</span><span>🇹🇷</span><span>🇵🇹</span><span>🇪🇸</span></span>
         </div>
+      </div>
+      )}
 
-      {/* ── HERO BOX ── */}
+      {/* — HERO BOX — */}
       <div className="hero-box" data-testid="section-hero">
         <div style={{ position: "relative", zIndex: 1, textAlign: "center", maxWidth: 700, margin: "0 auto" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.08)", backdropFilter: "blur(6px)", borderRadius: 24, padding: "6px 16px", marginBottom: 28, fontSize: 11, fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(255,255,255,.6)" }} className="home-hero-badge" data-testid="badge-hero">
-            <span className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--green)", boxShadow: "0 0 8px var(--green)", display: "inline-block" }} /> Trade compliance for commodity traders
-          </div>
           <h1 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(38px,5.5vw,64px)", lineHeight: 1.08, letterSpacing: "0", color: "#fff", marginBottom: 20, marginTop: 0 }} className="home-hero-title" data-testid="text-hero-title">
             Know your compliance<br />before you <em style={{ fontStyle: "normal", color: "var(--green)" }}>commit.</em>
           </h1>
