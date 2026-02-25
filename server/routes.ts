@@ -23,6 +23,7 @@ const TOKEN_PACKS: Record<string, { price: number; tokens: number; name: string 
   "3_trade": { price: 5999, tokens: 3, name: "3-Trade Pack" },
   "10_trade": { price: 17900, tokens: 10, name: "10-Trade Pack" },
   "25_trade": { price: 34900, tokens: 25, name: "25-Trade Pack" },
+  lc_standalone: { price: 1999, tokens: 0, name: "LC Document Check" },
 };
 
 const LOOKUP_COST = 1;

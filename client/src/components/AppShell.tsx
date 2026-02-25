@@ -291,10 +291,7 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
                 </Link>
               )}
 
-              {/* User avatar */}
-              <div className="user-avatar" data-testid="shell-user-avatar">
-                F
-              </div>
+              {/* User avatar — hidden, no auth system */}
             </div>
           </div>
 
