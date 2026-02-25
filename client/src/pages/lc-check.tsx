@@ -1399,8 +1399,10 @@ export default function LcCheck() {
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [, navigate] = useLocation();
   const balance = tokenQuery.data?.balance ?? 0;
+  const lcBalance = tokenQuery.data?.lcBalance ?? 0;
   const freeLookupUsed = tokenQuery.data?.freeLookupUsed ?? false;
   const isFreeCheck = !freeLookupUsed;
+  const hasAccess = isFreeCheck || balance > 0 || lcBalance > 0;
 
   const [showRecheckModal, setShowRecheckModal] = useState(false);
   const [recheckLookupId, setRecheckLookupId] = useState<string | null>(null);
@@ -1493,7 +1495,6 @@ export default function LcCheck() {
         </div>
       }
     >
-      <StepNav steps={WORKFLOW_STEPS} currentIndex={1} completedUpTo={1} />
       <TabBar tabs={LC_TABS} activeTab={lcActiveTab} onChange={setLcActiveTab} />
 
       {lcActiveTab === "Supplier docs" ? (
@@ -1519,6 +1520,58 @@ export default function LcCheck() {
           <div className="lc-hero-sub">Cross-check supplier docs against your LC &mdash; UCP 600 &amp; ISBP 745 applied.</div>
         </div>
 
+        {/* PAYWALL GATE — show when user has no credits */}
+        {!tokenQuery.isLoading && !hasAccess && (
+          <div style={{
+            margin: "24px 24px 0",
+            background: "linear-gradient(135deg, rgba(107,144,128,0.08), rgba(107,144,128,0.03))",
+            border: "1px solid rgba(107,144,128,0.2)",
+            borderRadius: 12,
+            padding: "32px 24px",
+            textAlign: "center",
+          }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>{"\uD83D\uDD12"}</div>
+            <h3 style={{
+              fontFamily: "var(--fh)",
+              fontWeight: 700,
+              fontSize: 18,
+              color: "var(--t1)",
+              margin: "0 0 8px",
+            }}>
+              LC Check requires a trade credit
+            </h3>
+            <p style={{
+              fontSize: 13,
+              color: "var(--t2)",
+              margin: "0 0 20px",
+              lineHeight: 1.6,
+              maxWidth: 420,
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}>
+              Purchase a trade pack to unlock LC document checking, or buy a standalone LC check for $19.99.
+            </p>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <button
+                onClick={() => navigate("/pricing")}
+                style={{
+                  background: "var(--green)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "10px 24px",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  fontFamily: "var(--fb)",
+                  cursor: "pointer",
+                }}
+              >
+                View Trade Packs
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* STEPPER */}
         <div className="lc-stepper-wrap">
           <div className="lc-stepper">
@@ -1541,6 +1594,7 @@ export default function LcCheck() {
         </div>
 
         {/* CONTENT AREA */}
+        {hasAccess && (
         <div>
 
           {showPrefillBanner && prefillData && (
@@ -1597,11 +1651,11 @@ export default function LcCheck() {
 
                 <div className="lc-fg2">
                   <div className="lc-field">
-                    <label>Beneficiary / Supplier <span className="req">*</span></label>
+                    <label>Beneficiary (Supplier) <span className="req">*</span></label>
                     <Input value={lcFields.beneficiaryName} onChange={e => updateLcField("beneficiaryName", e.target.value)} placeholder="e.g. SARL AGRO EXPORT CI" data-testid="input-beneficiary-name" />
                   </div>
                   <div className="lc-field">
-                    <label>Applicant / Buyer <span className="req">*</span></label>
+                    <label>Applicant (Buyer) <span className="req">*</span></label>
                     <Input value={lcFields.applicantName} onChange={e => updateLcField("applicantName", e.target.value)} placeholder="e.g. Euro Trading GmbH" data-testid="input-applicant-name" />
                   </div>
                 </div>
@@ -2142,6 +2196,7 @@ export default function LcCheck() {
             </div>
           )}
         </div>
+        )}
 
         {/* Token Modal */}
         <Dialog open={showTokenModal} onOpenChange={setShowTokenModal}>
