@@ -3,6 +3,7 @@ import { Menu, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, type ReactNode } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTokenBalance } from "@/hooks/use-tokens";
 
 interface NavItem {
   icon: string;
@@ -132,9 +133,11 @@ function DefaultNavLinks({ activePage }: { activePage: string }) {
 }
 
 export function AppShell({ children, topCenter, sidebarBottom, contentClassName }: AppShellProps) {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const tokenQuery = useTokenBalance();
+  const balance = tokenQuery.data?.balance ?? 0;
   const inboxBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/supplier-inbox/badge-count"] });
   const inboxBadge = inboxBadgeQuery.data?.count ?? 0;
   const alertsBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/alerts/unread-count"] });
@@ -407,6 +410,5 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
           </div>
         </div>
       </div>
-    </div>
   );
 }
