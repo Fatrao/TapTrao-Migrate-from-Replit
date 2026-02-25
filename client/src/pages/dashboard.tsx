@@ -3,8 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import type { Lookup, LcCheck, TokenTransaction, ComplianceResult } from "@shared/schema";
 import { usePageTitle } from "@/hooks/use-page-title";
-import { useTokenBalance } from "@/hooks/use-tokens";
-import { apiRequest } from "@/lib/queryClient";
 
 export default function Dashboard() {
   const statsQuery = useQuery<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null }>({
@@ -54,6 +52,11 @@ export default function Dashboard() {
 
   const balance = tokenQuery.data?.balance ?? 0;
   const totalLookups = stats?.totalLookups ?? 0;
+
+  /* Count items needing attention */
+  const pendingCount = lookups.filter(
+    (l) => l.riskLevel === "MEDIUM" || l.riskLevel === "HIGH" || l.riskLevel === "STOP"
+  ).length;
 
   return (
     <AppShell

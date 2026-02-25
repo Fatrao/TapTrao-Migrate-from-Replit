@@ -46,6 +46,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Mobile menu */}
       {mobileMenuOpen && (
         <div className="mobile-drawer" data-testid="nav-mobile-dropdown">
           <Link href="/lookup"><span onClick={() => setMobileMenuOpen(false)} style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, cursor: "pointer", padding: "12px 16px", display: "flex", alignItems: "center", minHeight: 44 }}>Compliance Lookup</span></Link>
@@ -55,9 +56,16 @@ export default function Home() {
             <Link href="/lookup">
               <span onClick={() => setMobileMenuOpen(false)} style={{ background: "#4a8c6f", color: "white", padding: "0 20px", borderRadius: 8, fontSize: 15, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", height: 48, width: "100%" }} data-testid="button-mobile-start-free">Start free lookup</span>
             </Link>
+            <a href="#how">
+              <span className="btn-hero btn-hero-secondary">See How It Works</span>
+            </a>
+          </div>
+          <div className="hero-flags">
+            <span>🇬🇭</span><span>🇨🇮</span><span>🇪🇹</span><span>🇰🇪</span><span>🇹🇿</span><span>🇺🇬</span><span>🇳🇬</span><span>🇨🇲</span>
+            {" → "}
+            <span>🇪🇺</span><span>🇬🇧</span><span>🇩🇪</span><span>🇫🇷</span><span>🇮🇹</span><span>🇪🇸</span><span>🇨🇭</span><span>🇦🇹</span>
           </div>
         </div>
-      )}
 
       {/* ── HERO BOX ── */}
       <div className="hero-box" data-testid="section-hero">
@@ -146,7 +154,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
 
       {/* ── MARQUEE ── */}
       <div className="marquee-wrap">
@@ -180,8 +187,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
-      </div>
 
       {/* ── MODULES ── */}
       <div className="section" id="modules" data-testid="section-capabilities">
@@ -212,7 +217,6 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </div>
 
       {/* ── LC DOCUMENT CHECK ── */}
       <div className="section" id="lc" style={{ paddingTop: 40 }}>

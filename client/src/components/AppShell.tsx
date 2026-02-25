@@ -1,32 +1,30 @@
 import { Link, useLocation } from "wouter";
-import { useTokenBalance } from "@/hooks/use-tokens";
-import { LayoutGrid, Settings, Plus, Search, FileCheck, Bell, Calculator, Bookmark, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, type ReactNode } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface NavItem {
-  icon: typeof LayoutGrid;
+  icon: string;
   label: string;
   href: string;
   matchPaths?: string[];
   badge?: { type: "amber" | "green"; value: number };
 }
 
-const workspaceItems: NavItem[] = [
-  { icon: Search, label: "Compliance Lookup", href: "/lookup" },
-  { icon: FileCheck, label: "LC Checker", href: "/lc-check" },
-  { icon: LayoutGrid, label: "My Trades", href: "/trades", matchPaths: ["/trades", "/dashboard"] },
+/* ── Section: Menu ── */
+const menuItems: NavItem[] = [
+  { icon: "⊞", label: "Dashboard", href: "/dashboard" },
+  { icon: "◉", label: "My Trades", href: "/trades" },
+  { icon: "●", label: "Lookup", href: "/lookup" },
+  { icon: "📄", label: "LC Check", href: "/lc-check" },
 ];
 
-const toolsItems: NavItem[] = [
-  { icon: Bookmark, label: "Templates", href: "/templates" },
-  { icon: Bell, label: "Alerts", href: "/alerts" },
-  { icon: Calculator, label: "Demurrage Calc", href: "/demurrage" },
-];
-
-const accountItems: NavItem[] = [
-  { icon: Settings, label: "Settings", href: "/settings/profile" },
+/* ── Section: Compliance ── */
+const complianceItems: NavItem[] = [
+  { icon: "📬", label: "Supplier Inbox", href: "/inbox" },
+  { icon: "🔔", label: "Alerts", href: "/alerts" },
+  { icon: "📋", label: "Templates", href: "/templates" },
 ];
 
 function isNavActive(item: NavItem, pathname: string): boolean {
@@ -40,8 +38,10 @@ interface AppShellProps {
   children: ReactNode;
   topCenter?: ReactNode;
   sidebarBottom?: ReactNode;
+  contentClassName?: string;
 }
 
+/* ── Sidebar nav item ── */
 function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: boolean; onClick?: () => void }) {
   return (
     <Link href={item.href}>
@@ -63,40 +63,9 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
           position: "relative",
         }}
         data-testid={`shell-nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
-        onMouseEnter={(e) => {
-          if (!isActive) {
-            e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-            e.currentTarget.style.color = "#999";
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isActive) {
-            e.currentTarget.style.background = "transparent";
-            e.currentTarget.style.color = "#666";
-          }
-        }}
       >
-        {/* Active indicator bar */}
-        {isActive && (
-          <div style={{
-            position: "absolute",
-            left: 0,
-            top: "50%",
-            transform: "translateY(-50%)",
-            width: 3,
-            height: 18,
-            background: "var(--green)",
-            borderRadius: "0 3px 3px 0",
-          }} />
-        )}
-        <item.icon
-          size={14}
-          style={{
-            flexShrink: 0,
-            opacity: 0.6,
-          }}
-        />
-        <span style={{ flex: 1 }}>{item.label}</span>
+        <span className="icon">{item.icon}</span>
+        <span className="label">{item.label}</span>
         {item.badge && item.badge.value > 0 && (
           <span
             style={{
@@ -117,35 +86,65 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
   );
 }
 
-function NavLabel({ children }: { children: ReactNode }) {
+/* ── Section label ── */
+function SidebarLabel({ children }: { children: ReactNode }) {
   return (
-    <div
-      style={{
-        fontSize: 10,
-        fontWeight: 600,
-        letterSpacing: "0.12em",
-        color: "rgba(255,255,255,0.25)",
-        textTransform: "uppercase",
-        padding: "0 16px",
-        marginBottom: 5,
-        marginTop: 16,
-      }}
-    >
+    <div className="sidebar-section-label">
       {children}
     </div>
   );
 }
 
-export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) {
-  const [location, navigate] = useLocation();
+/* ── History card ── */
+function HistoryCard({ title, tags }: { title: string; tags: string[] }) {
+  return (
+    <div className="history-card">
+      <div className="title">{title}</div>
+      <div className="tags">
+        {tags.map((tag, i) => (
+          <span key={i} className="tag">{tag}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Default nav links (shown when topCenter is not provided) ── */
+function DefaultNavLinks({ activePage }: { activePage: string }) {
+  const links = [
+    { label: "Dashboard", href: "/dashboard", match: ["/dashboard", "/trades"] },
+    { label: "Commodities", href: "/lookup", match: ["/lookup", "/demurrage"] },
+    { label: "Suppliers", href: "/inbox", match: ["/inbox"] },
+    { label: "Compliance", href: "/alerts", match: ["/alerts", "/lc-check", "/templates", "/eudr"] },
+    { label: "Messages", href: "/inbox", match: [] },
+  ];
+  return (
+    <div className="top-nav-links">
+      {links.map((link) => (
+        <Link key={link.label} href={link.href}>
+          <span className={link.match.some((m) => activePage.startsWith(m)) ? "active" : ""}>
+            {link.label}
+          </span>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+export function AppShell({ children, topCenter, sidebarBottom, contentClassName }: AppShellProps) {
+  const [location] = useLocation();
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const tokenQuery = useTokenBalance();
-  const balance = tokenQuery.data?.balance ?? 0;
   const inboxBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/supplier-inbox/badge-count"] });
   const inboxBadge = inboxBadgeQuery.data?.count ?? 0;
   const alertsBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/alerts/unread-count"] });
   const alertsBadge = alertsBadgeQuery.data?.count ?? 0;
+  const tradesBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/trades/pending-count"] });
+  const tradesBadge = tradesBadgeQuery.data?.count ?? 0;
+
+  // Fetch recent lookups for history cards
+  const recentLookupsQuery = useQuery<any[]>({ queryKey: ["/api/lookups/recent"] });
+  const recentLookups = recentLookupsQuery.data?.slice(0, 3) ?? [];
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -160,32 +159,27 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
     return () => { document.body.style.overflow = ""; };
   }, [isMobile, sidebarOpen]);
 
-  const wsItems: NavItem[] = workspaceItems.map((item) => {
-    if (item.label === "My Trades" && inboxBadge > 0)
-      return { ...item, badge: { type: "amber" as const, value: inboxBadge } };
+  /* Build nav items with live badge counts */
+  const mItems: NavItem[] = menuItems.map((item) => {
+    if (item.label === "My Trades" && tradesBadge > 0)
+      return { ...item, badge: { type: "green" as const, value: tradesBadge } };
     return item;
   });
-  const tlItems: NavItem[] = toolsItems.map((item) => {
+  const cItems: NavItem[] = complianceItems.map((item) => {
+    if (item.label === "Supplier Inbox" && inboxBadge > 0)
+      return { ...item, badge: { type: "amber" as const, value: inboxBadge } };
     if (item.label === "Alerts" && alertsBadge > 0)
-      return { ...item, badge: { type: "green" as const, value: alertsBadge } };
+      return { ...item, badge: { type: "amber" as const, value: alertsBadge } };
     return item;
   });
 
   const closeSidebar = () => setSidebarOpen(false);
 
+  /* ── Sidebar content ── */
   const sidebarContent = (
     <>
-      {/* Logo area */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "20px 16px 16px",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-          marginBottom: 12,
-        }}
-      >
+      {/* Logo */}
+      <div className="sidebar-logo">
         <Link href="/">
           <div style={{ display: "flex", alignItems: "center", gap: 9, cursor: "pointer" }} data-testid="shell-logo">
             <div style={{
@@ -214,16 +208,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         {isMobile && (
           <button
             onClick={closeSidebar}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#999",
-              padding: 4,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            className="sidebar-close-btn"
             aria-label="Close menu"
           >
             <X size={20} />
@@ -231,56 +216,47 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
         )}
       </div>
 
-      {/* WORKSPACE */}
-      <NavLabel>Workspace</NavLabel>
-      {wsItems.map((item) => (
-        <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
-      ))}
+      {/* Menu section */}
+      <div className="sidebar-section">
+        <SidebarLabel>Menu</SidebarLabel>
+        {mItems.map((item) => (
+          <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+        ))}
+      </div>
 
-      {/* TOOLS */}
-      <NavLabel>Tools</NavLabel>
-      {tlItems.map((item) => (
-        <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
-      ))}
+      {/* Compliance section */}
+      <div className="sidebar-section">
+        <SidebarLabel>Compliance</SidebarLabel>
+        {cItems.map((item) => (
+          <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+        ))}
+      </div>
 
-      {/* ACCOUNT */}
-      <NavLabel>Account</NavLabel>
-      {accountItems.map((item) => (
-        <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
-      ))}
+      {/* Spacer */}
+      <div className="sidebar-spacer" />
 
-      {/* Spacer + bottom */}
-      <div style={{ flex: 1 }} />
-
-      {/* History cards placeholder */}
-      {sidebarBottom}
-
-      {/* Sidebar footer */}
-      <div style={{
-        marginTop: "auto",
-        padding: "14px 12px 16px",
-        borderTop: "1px solid rgba(255,255,255,0.06)",
-        display: "flex",
-        alignItems: "center",
-        gap: 9,
-      }}>
-        <div style={{
-          width: 30,
-          height: 30,
-          borderRadius: "50%",
-          background: "linear-gradient(135deg, var(--green), var(--teal))",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontWeight: 800,
-          fontSize: 12,
-          color: "#000",
-          fontFamily: "var(--fh)",
-          flexShrink: 0,
-        }}>T</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "#ccc" }}>Trader</div>
-          <div style={{ fontSize: 10, color: "#555" }}>TapTrao User</div>
+      {/* History section */}
+      <div className="sidebar-section">
+        <SidebarLabel>History</SidebarLabel>
+        <div className="sidebar-history">
+          {recentLookups.length > 0 ? (
+            recentLookups.map((lookup: any) => {
+              const originFlag = lookup.originFlag || "";
+              const destFlag = lookup.destinationFlag || "";
+              const originCode = lookup.originCode || "";
+              const destCode = lookup.destinationCode || "";
+              const commodity = lookup.commodityName || "Trade";
+              const title = `${originFlag} ${commodity} ${originCode} → ${destFlag} ${destCode}`;
+              const tags = ["Lookup"];
+              return <HistoryCard key={lookup.id} title={title} tags={tags} />;
+            })
+          ) : (
+            <>
+              <HistoryCard title="🇨🇮 Cashew CI → 🇬🇧 UK Q1 2026" tags={["LC Check", "$126k"]} />
+              <HistoryCard title="🇬🇭 Cocoa Beans GH → 🇪🇺 EU" tags={["LC Check", "$84k"]} />
+              <HistoryCard title="🇪🇹 Sesame Seeds ET → 🇪🇺 EU" tags={["Lookup", "$43k"]} />
+            </>
+          )}
         </div>
         <span style={{
           background: "rgba(74,140,111,0.1)",
@@ -292,6 +268,9 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
           whiteSpace: "nowrap",
         }}>{balance}</span>
       </div>
+
+      {/* Custom sidebar bottom slot */}
+      {sidebarBottom}
     </>
   );
 
@@ -307,22 +286,7 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
     >
       {/* SIDEBAR — desktop: always visible */}
       {!isMobile && (
-        <div
-          style={{
-            width: 210,
-            minWidth: 210,
-            background: "#1c1c1e",
-            borderRadius: 18,
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-            position: "sticky",
-            top: 10,
-            height: "calc(100vh - 20px)",
-            flexShrink: 0,
-            zIndex: 10,
-          }}
-        >
+        <div className="sidebar">
           {sidebarContent}
         </div>
       )}
@@ -330,32 +294,8 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
       {/* Mobile sidebar overlay */}
       {isMobile && sidebarOpen && (
         <>
-          <div
-            onClick={closeSidebar}
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0,0,0,0.6)",
-              zIndex: 998,
-            }}
-          />
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              bottom: 0,
-              width: 260,
-              maxWidth: "80vw",
-              background: "#1c1c1e",
-              borderRadius: "0 18px 18px 0",
-              zIndex: 999,
-              display: "flex",
-              flexDirection: "column",
-              overflowY: "auto",
-              boxShadow: "4px 0 24px rgba(0,0,0,0.4)",
-            }}
-          >
+          <div className="sidebar-overlay" onClick={closeSidebar} />
+          <div className="sidebar-mobile">
             {sidebarContent}
           </div>
         </>
@@ -407,37 +347,38 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
             </button>
           )}
 
-          {/* Center (breadcrumb / page title) */}
-          <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-            {topCenter}
-          </div>
+            {/* Mobile: topCenter in middle */}
+            {isMobile && (
+              <div className="top-nav-links">
+                {topCenter || <DefaultNavLinks activePage={location} />}
+              </div>
+            )}
 
-          {/* Right: token badge + buy CTA */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-            <div
-              style={{
-                background: "rgba(255,255,255,0.07)",
-                borderRadius: 8,
-                padding: "5px 10px",
-                fontSize: 11,
-                color: "rgba(255,255,255,0.45)",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-              }}
-              data-testid="shell-token-chip"
-            >
-              <span
-                style={{
-                  width: 6,
-                  height: 6,
-                  background: "var(--green)",
-                  borderRadius: "50%",
-                  display: "inline-block",
-                }}
-              />
-              <span style={{ fontWeight: 500, color: "var(--green)" }}>{balance}</span>
-              <span style={{ display: isMobile ? "none" : "inline" }}>credits</span>
+            {/* Right: icon buttons + avatar */}
+            <div className="top-nav-icons">
+              {/* Notification bell */}
+              <Link href="/alerts">
+                <div className="icon-btn" data-testid="shell-bell-icon">
+                  🔔
+                  {alertsBadge > 0 && <span className="dot" />}
+                </div>
+              </Link>
+
+              {/* Chat icon */}
+              {!isMobile && (
+                <Link href="/inbox">
+                  <div className="icon-btn">💬</div>
+                </Link>
+              )}
+
+              {/* Settings icon */}
+              {!isMobile && (
+                <Link href="/settings/profile">
+                  <div className="icon-btn">⚙️</div>
+                </Link>
+              )}
+
+              {/* User avatar — hidden, no auth system */}
             </div>
             <button
               onClick={() => navigate("/pricing")}
@@ -459,11 +400,11 @@ export function AppShell({ children, topCenter, sidebarBottom }: AppShellProps) 
               {isMobile ? "Buy" : "Buy trade pack"}
             </button>
           </div>
-        </div>
 
-        {/* Scrollable content */}
-        <div style={{ flex: 1, overflow: "auto", padding: "0 0 60px" }}>
-          {children}
+          {/* Scrollable content */}
+          <div className={contentClassName || "main-content"}>
+            {children}
+          </div>
         </div>
       </div>
     </div>

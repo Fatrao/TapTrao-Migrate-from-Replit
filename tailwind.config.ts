@@ -6,9 +6,11 @@ export default {
   theme: {
     extend: {
       borderRadius: {
-        lg: ".75rem",
-        md: ".5rem",
-        sm: ".25rem",
+        '2xl': '18px',
+        xl: '14px',
+        lg: '.75rem',
+        md: '.5rem',
+        sm: '.25rem',
       },
       colors: {
         // Flat / base colors (regular buttons)
@@ -81,11 +83,23 @@ export default {
           busy: "rgb(218 60 61)",
           offline: "rgb(156 163 175)",
         },
+        sage: '#6b9080',
+        'sage-hover': '#5a7a6b',
+        'bright-green': '#4ade80',
+        'nav-dark': '#242428',
+        'green-hero': '#0e4e45',
+        'white-card': '#ffffff',
+        amber: '#eab308',
+        'tt-red': '#ef4444',
+        'text-dark': '#1a1a1a',
+        'text-dark-secondary': '#888888',
+        'text-dark-muted': '#999999',
       },
       fontFamily: {
         sans: ["var(--font-sans)"],
         heading: ["var(--font-heading)"],
         mono: ["var(--font-mono)"],
+        clash: ["'Clash Display'", 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {

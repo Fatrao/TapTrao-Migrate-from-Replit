@@ -219,10 +219,23 @@ export default function Pricing() {
     },
   });
 
+  const lcStandaloneMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/tokens/lc-standalone-checkout");
+      return res.json();
+    },
+    onSuccess: (data) => {
+      if (data.url) window.location.href = data.url;
+    },
+    onError: (err: Error) => {
+      toast({ title: "Error", description: err.message || "Unable to start checkout", variant: "destructive" });
+    },
+  });
+
   const balance = tokenQuery.data?.balance ?? 0;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#000", fontFamily: "var(--fb)", WebkitFontSmoothing: "antialiased" }}>
+    <div style={{ minHeight: "100vh", background: "#000", fontFamily: "var(--fb)", WebkitFontSmoothing: "antialiased", flex: 1, minWidth: 0 }}>
       {/* NAV */}
       <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 12px", height: 56, borderBottom: "1px solid rgba(255,255,255,0.07)", gap: 6, overflow: "hidden" }}>
         <Link href="/">
@@ -442,12 +455,21 @@ export default function Pricing() {
                 Included free with every trade credit
               </p>
               <button
-                style={{ ...S.btnOutline, width: "100%" }}
-                onClick={() => window.location.href = "/lc-check"}
+                style={{
+                  ...S.btnOutline,
+                  width: "100%",
+                  opacity: lcStandaloneMutation.isPending ? 0.6 : 1,
+                }}
+                disabled={lcStandaloneMutation.isPending}
+                onClick={() => lcStandaloneMutation.mutate()}
                 data-testid="button-lc-standalone"
               >
-                <FileCheck style={{ width: 16, height: 16 }} />
-                Check LC only
+                {lcStandaloneMutation.isPending ? (
+                  <Loader2 style={{ width: 16, height: 16, animation: "spin 1s linear infinite" }} />
+                ) : (
+                  <FileCheck style={{ width: 16, height: 16 }} />
+                )}
+                Check LC only — $19.99
               </button>
             </div>
           </div>
@@ -501,8 +523,8 @@ export default function Pricing() {
           </div>
         </div>
 
-        {/* SECTION 6 — Monitoring (last, muted) */}
-        <div style={{ marginBottom: 64 }}>
+        {/* SECTION 6 — Monitoring (muted) */}
+        <div style={{ marginBottom: 40 }}>
           <div style={{ maxWidth: 480, margin: "0 auto" }}>
             <div style={{ ...S.card, border: "1px dashed var(--border2)", background: "transparent", opacity: 0.7 }} data-testid="card-pro-monitoring">
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
@@ -516,6 +538,26 @@ export default function Pricing() {
               </div>
               <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
                 Regulatory change alerts and compliance calendar. For frequent shippers. Not required for occasional trades.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 7 — Public API (coming soon) */}
+        <div style={{ marginBottom: 64 }}>
+          <div style={{ maxWidth: 480, margin: "0 auto" }}>
+            <div style={{ ...S.card, border: "1px dashed var(--border2)", background: "transparent", opacity: 0.7 }} data-testid="card-public-api">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <Shield style={{ width: 18, height: 18, color: "var(--t3)" }} />
+                <span style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
+                  Public API
+                </span>
+                <span style={{ ...S.badge, background: "var(--abg)", color: "var(--amber)", border: "1px solid var(--abd)" }}>
+                  Coming Soon
+                </span>
+              </div>
+              <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
+                Integrate compliance checks directly into your systems via REST API. Programmatic access to duties, document requirements, and risk scores.
               </p>
             </div>
           </div>

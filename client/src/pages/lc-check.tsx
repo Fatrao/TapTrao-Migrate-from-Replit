@@ -1,13 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { AppShell } from "@/components/AppShell";
 import { StepNav } from "@/components/StepNav";
 import { TabBar } from "@/components/TabBar";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -23,25 +21,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
-  Globe,
-  ArrowLeft,
-  ArrowRight,
-  FileText,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
-  Plus,
   Trash2,
-  Mail,
   MessageCircle,
-  Copy,
-  Check,
   Hash,
-  ClipboardCheck,
-  Hexagon,
   X,
+  XCircle,
   ExternalLink,
-  Shield,
 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useTokenBalance } from "@/hooks/use-tokens";
@@ -1225,37 +1210,21 @@ function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null })
           <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
         </div>
 
-        {timeline.map((entry, idx) => (
-          <div
-            key={idx}
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 10,
-              padding: "8px 0",
-              borderBottom: idx < timeline.length - 1 ? "1px solid var(--border)" : "none",
-            }}
-          >
-            <div style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: "var(--blue)",
-              marginTop: 3,
-              flexShrink: 0,
-            }} />
-            <div>
-              <div style={{ fontSize: 11, color: "var(--t2)" }}>{entry.event}</div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)" }}>
-                {formatFullDate(entry.timestamp)}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+import {
+  INCOTERMS,
+  CURRENCIES,
+  QUANTITY_UNITS,
+  DOC_TYPES,
+  WORKFLOW_STEPS,
+  LC_TABS,
+  LC_STEP_LABELS,
+} from "./lc-check/constants";
+import type { LcCheckResponse, LcPrefillData, UploadedFile } from "./lc-check/constants";
+import { getDocFields, mapDocNameToType, getDocEmoji, docTypeLabel } from "./lc-check/helpers";
+import { InsuranceGapAlert } from "./lc-check/InsuranceGapAlert";
+import { UploadZone, FilePill } from "./lc-check/UploadZone";
+import { SupplierDocsTab } from "./lc-check/SupplierDocsTab";
+import { TwinLogTrailTab } from "./lc-check/TwinLogTrailTab";
 
 
 export default function LcCheck() {
@@ -1289,6 +1258,8 @@ export default function LcCheck() {
   ]);
 
   const [activeDocTab, setActiveDocTab] = useState(0);
+  const [lcPdfFile, setLcPdfFile] = useState<UploadedFile | null>(null);
+  const [docFiles, setDocFiles] = useState<Record<number, UploadedFile | null>>({});
 
   useEffect(() => {
     try {
@@ -1339,6 +1310,7 @@ export default function LcCheck() {
 
   const removeDocument = useCallback((index: number) => {
     setDocuments(prev => prev.filter((_, i) => i !== index));
+    setDocFiles(prev => { const next = { ...prev }; delete next[index]; return next; });
     setActiveDocTab(prev => Math.min(prev, documents.length - 2));
   }, [documents.length]);
 
@@ -1411,35 +1383,22 @@ export default function LcCheck() {
   const [correctionTab, setCorrectionTab] = useState<"email" | "whatsapp">("email");
   const [lcActiveTab, setLcActiveTab] = useState("Check");
 
-  const WORKFLOW_STEPS = ["Lookup", "LC Check", "TwinLog Trail", "Archive"];
-  const LC_TABS = ["Check", "Supplier docs", "TwinLog Trail", "Corrections"];
+  // Group results by severity for Step 4
+  const criticalResults = checkMutation.data?.results.filter(r => r.severity === "RED") || [];
+  const warningResults = checkMutation.data?.results.filter(r => r.severity === "AMBER") || [];
+  const matchedResults = checkMutation.data?.results.filter(r => r.severity === "GREEN") || [];
 
-  const breadcrumb = prefillData ? (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--t2)" }}>
-      <span>{prefillData.commodity_name}</span>
-      <span style={{ color: "var(--t3)" }}>·</span>
-      <span>{prefillData.origin_name} → {prefillData.dest_name}</span>
-      <span style={{ color: "var(--t3)" }}>·</span>
-      <span
-        style={{
-          background: "var(--blue-dim)",
-          color: "var(--blue)",
-          fontFamily: "'DM Mono', monospace",
-          fontSize: 9,
-          fontWeight: 600,
-          padding: "3px 8px",
-          borderRadius: 4,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase" as const,
-        }}
-        data-testid="breadcrumb-step-badge"
-      >
-        LC Check
-      </span>
-    </div>
-  ) : (
-    <span style={{ fontSize: 13, color: "var(--t2)", fontWeight: 600 }}>LC Check</span>
-  );
+  const verdictClass = checkMutation.data?.summary.verdict === "COMPLIANT" ? "ok"
+    : checkMutation.data?.summary.verdict === "COMPLIANT_WITH_NOTES" ? "warn" : "fail";
+  const verdictEmoji = verdictClass === "ok" ? "\u2705" : verdictClass === "warn" ? "\u26A0\uFE0F" : "\u274C";
+  const verdictTitle = checkMutation.data?.summary.verdict === "COMPLIANT" ? "All Clear"
+    : checkMutation.data?.summary.verdict === "COMPLIANT_WITH_NOTES" ? "Compliant with Notes"
+    : "Discrepancies Found";
+  const verdictSub = checkMutation.data?.summary.criticals
+    ? `${checkMutation.data.summary.criticals} critical issue${checkMutation.data.summary.criticals > 1 ? "s" : ""} will cause bank rejection.`
+    : checkMutation.data?.summary.warnings
+      ? `${checkMutation.data.summary.warnings} warning${checkMutation.data.summary.warnings > 1 ? "s" : ""} to review.`
+      : "All fields match LC terms.";
 
   /* ── shared inline styles matching design ref ── */
   const inputS: React.CSSProperties = {
@@ -1483,7 +1442,18 @@ export default function LcCheck() {
   const docLabel = (dt: string) => DOC_TYPES.find(d => d.value === dt)?.label ?? dt;
 
   return (
-    <AppShell topCenter={breadcrumb}>
+    <AppShell
+      contentClassName="content-area"
+      topCenter={
+        <div className="top-nav-links">
+          <Link href="/dashboard"><span>Dashboard</span></Link>
+          <Link href="/lookup"><span>Commodities</span></Link>
+          <Link href="/inbox"><span>Suppliers</span></Link>
+          <Link href="/lc-check"><span className="active">Compliance</span></Link>
+          <Link href="/inbox"><span>Messages</span></Link>
+        </div>
+      }
+    >
       <StepNav steps={WORKFLOW_STEPS} currentIndex={1} completedUpTo={1} />
       <TabBar tabs={LC_TABS} activeTab={lcActiveTab} onChange={setLcActiveTab} />
 
@@ -1802,6 +1772,7 @@ export default function LcCheck() {
                     </select>
                   </div>
                 </div>
+              </div>
 
                 {/* Toggle: Partial Shipments */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 0", borderBottom: "1px solid #f5f5f5" }}>
@@ -1974,7 +1945,30 @@ export default function LcCheck() {
                             data-testid={`input-doc-${field.key}`}
                           />
                         </div>
-                      ))}
+                        {documents.length > 1 && (
+                          <button
+                            onClick={() => removeDocument(activeDocTab)}
+                            style={{ color: "var(--red)", background: "none", border: "none", cursor: "pointer", padding: 4 }}
+                            data-testid="button-remove-document"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="lc-fg2">
+                        {getDocFields(documents[activeDocTab].documentType).map(field => (
+                          <div key={field.key} className="lc-field">
+                            <label>{field.label}</label>
+                            <Input
+                              type={field.type}
+                              value={documents[activeDocTab].fields[field.key] || ""}
+                              onChange={e => updateDocField(activeDocTab, field.key, e.target.value)}
+                              data-testid={`input-doc-${field.key}`}
+                            />
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -2156,7 +2150,9 @@ export default function LcCheck() {
 
               {/* Insurance gap alert */}
               {(checkMutation.data.summary.verdict === "COMPLIANT" || checkMutation.data.summary.verdict === "COMPLIANT_WITH_NOTES") && (
-                <InsuranceGapAlert />
+                <div style={{ margin: "0 24px" }}>
+                  <InsuranceGapAlert />
+                </div>
               )}
 
               {/* Field-by-field Results */}
