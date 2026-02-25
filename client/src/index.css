@@ -90,7 +90,7 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* App shell layout: sidebar + main side by side */
+  /* App shell flex layout (sidebar + main-wrapper) */
   #root {
     min-height: 100vh;
     display: flex;
@@ -98,7 +98,7 @@
     gap: 10px;
   }
 
-  /* Homepage is the sole child — it manages its own padding */
+  /* Homepage: single child manages its own layout */
   #root:has(> .hp-page) {
     padding: 0;
     gap: 0;
@@ -273,7 +273,10 @@
   .lc-fadein { animation: lc-fadeUp .3s ease both; }
 }
 
-/* Main content gradient: green -> white (matches design HTML) */
+/* ══════════════════════════════════════════════════════
+   Gradient utility classes (outside @layer for full specificity)
+   ══════════════════════════════════════════════════════ */
+
 .main-gradient {
   background: linear-gradient(180deg,
     #0e4e45 0%, #0e4e46 2%, #0d5047 4%, #104f47 6%, #14574a 10%,
@@ -285,7 +288,6 @@
   );
 }
 
-/* Inner green header gradient */
 .green-header-gradient {
   background: linear-gradient(180deg,
     #0e4e45 0%, #104f47 6%, #14574a 12%,
