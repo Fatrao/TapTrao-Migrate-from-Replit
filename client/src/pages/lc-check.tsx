@@ -1481,7 +1481,18 @@ export default function LcCheck() {
       : "All fields match LC terms.";
 
   return (
-    <AppShell contentClassName="content-area">
+    <AppShell
+      contentClassName="content-area"
+      topCenter={
+        <div className="top-nav-links">
+          <Link href="/dashboard"><span>Dashboard</span></Link>
+          <Link href="/lookup"><span>Commodities</span></Link>
+          <Link href="/inbox"><span>Suppliers</span></Link>
+          <Link href="/lc-check"><span className="active">Compliance</span></Link>
+          <Link href="/inbox"><span>Messages</span></Link>
+        </div>
+      }
+    >
       <StepNav steps={WORKFLOW_STEPS} currentIndex={1} completedUpTo={1} />
       <TabBar tabs={LC_TABS} activeTab={lcActiveTab} onChange={setLcActiveTab} />
 

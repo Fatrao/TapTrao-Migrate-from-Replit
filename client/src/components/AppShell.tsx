@@ -14,21 +14,23 @@ interface NavItem {
 
 /* ── Section: Menu ── */
 const menuItems: NavItem[] = [
-  { icon: "\u229E", label: "Dashboard", href: "/dashboard" },
-  { icon: "\u25C9", label: "My Trades", href: "/trades" },
-  { icon: "\u25CF", label: "Lookup", href: "/lookup" },
-  { icon: "\uD83D\uDCC4", label: "LC Check", href: "/lc-check" },
+  { icon: "⊞", label: "Dashboard", href: "/dashboard" },
+  { icon: "◉", label: "My Trades", href: "/trades" },
+  { icon: "●", label: "Lookup", href: "/lookup" },
+  { icon: "📄", label: "LC Check", href: "/lc-check" },
 ];
 
 /* ── Section: Compliance ── */
 const complianceItems: NavItem[] = [
-  { icon: "\uD83D\uDCEC", label: "Supplier Inbox", href: "/inbox" },
-  { icon: "\uD83D\uDD14", label: "Alerts", href: "/alerts" },
-  { icon: "\uD83D\uDCCB", label: "Templates", href: "/templates" },
+  { icon: "📬", label: "Supplier Inbox", href: "/inbox" },
+  { icon: "🔔", label: "Alerts", href: "/alerts" },
+  { icon: "📋", label: "Templates", href: "/templates" },
 ];
 
 function isNavActive(item: NavItem, pathname: string): boolean {
-  if (item.matchPaths) return item.matchPaths.some((p) => pathname.startsWith(p));
+  if (item.matchPaths) {
+    return item.matchPaths.some((p) => pathname.startsWith(p));
+  }
   return pathname.startsWith(item.href);
 }
 
@@ -44,12 +46,12 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
   return (
     <Link href={item.href}>
       <div
-        className={`sidebar-item${isActive ? " active" : ""}`}
         onClick={onClick}
+        className={`sidebar-item${isActive ? " active" : ""}`}
         data-testid={`shell-nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
       >
         <span className="icon">{item.icon}</span>
-        {item.label}
+        <span className="label">{item.label}</span>
         {item.badge && item.badge.value > 0 && (
           <span className={`badge ${item.badge.type === "amber" ? "badge-red" : "badge-green"}`}>
             {item.badge.value}
@@ -57,6 +59,15 @@ function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: 
         )}
       </div>
     </Link>
+  );
+}
+
+/* ── Section label ── */
+function SidebarLabel({ children }: { children: ReactNode }) {
+  return (
+    <div className="sidebar-section-label">
+      {children}
+    </div>
   );
 }
 
@@ -96,26 +107,29 @@ function DefaultNavLinks({ activePage }: { activePage: string }) {
   );
 }
 
-export function AppShell({ children, topCenter, sidebarBottom, contentClassName = "content-area" }: AppShellProps) {
+export function AppShell({ children, topCenter, sidebarBottom, contentClassName }: AppShellProps) {
   const [location] = useLocation();
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  /* Badge counts */
   const inboxBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/supplier-inbox/badge-count"] });
   const inboxBadge = inboxBadgeQuery.data?.count ?? 0;
   const alertsBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/alerts/unread-count"] });
   const alertsBadge = alertsBadgeQuery.data?.count ?? 0;
 
-  /* Recent lookups for history cards */
+  // Fetch recent lookups for history cards
   const recentLookupsQuery = useQuery<any[]>({ queryKey: ["/api/lookups/recent"] });
   const recentLookups = recentLookupsQuery.data?.slice(0, 3) ?? [];
 
-  useEffect(() => { setSidebarOpen(false); }, [location]);
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location]);
 
   useEffect(() => {
-    if (isMobile && sidebarOpen) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
+    if (isMobile && sidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
     return () => { document.body.style.overflow = ""; };
   }, [isMobile, sidebarOpen]);
 
@@ -141,13 +155,17 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
       {/* Logo */}
       <div className="sidebar-logo">
         <Link href="/">
-          <span data-testid="shell-logo">
-            <img src="/logo.png" alt="TapTrao" />
+          <div className="logo-link" data-testid="shell-logo">
+            <img className="logo-img" src="/logo.png" alt="TapTrao" />
             <span>TapTrao</span>
-          </span>
+          </div>
         </Link>
         {isMobile && (
-          <button className="sidebar-close" onClick={closeSidebar} aria-label="Close menu">
+          <button
+            onClick={closeSidebar}
+            className="sidebar-close-btn"
+            aria-label="Close menu"
+          >
             <X size={20} />
           </button>
         )}
@@ -155,7 +173,7 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
 
       {/* Menu section */}
       <div className="sidebar-section">
-        <div className="sidebar-section-label">Menu</div>
+        <SidebarLabel>Menu</SidebarLabel>
         {mItems.map((item) => (
           <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
         ))}
@@ -163,18 +181,18 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
 
       {/* Compliance section */}
       <div className="sidebar-section">
-        <div className="sidebar-section-label">Compliance</div>
+        <SidebarLabel>Compliance</SidebarLabel>
         {cItems.map((item) => (
           <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
         ))}
       </div>
 
       {/* Spacer */}
-      <div style={{ flex: 1 }} />
+      <div className="sidebar-spacer" />
 
       {/* History section */}
       <div className="sidebar-section">
-        <div className="sidebar-section-label">History</div>
+        <SidebarLabel>History</SidebarLabel>
         <div className="sidebar-history">
           {recentLookups.length > 0 ? (
             recentLookups.map((lookup: any) => {
@@ -183,14 +201,15 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
               const originCode = lookup.originCode || "";
               const destCode = lookup.destinationCode || "";
               const commodity = lookup.commodityName || "Trade";
-              const title = `${originFlag} ${commodity} ${originCode} \u2192 ${destFlag} ${destCode}`;
-              return <HistoryCard key={lookup.id} title={title} tags={["Lookup"]} />;
+              const title = `${originFlag} ${commodity} ${originCode} → ${destFlag} ${destCode}`;
+              const tags = ["Lookup"];
+              return <HistoryCard key={lookup.id} title={title} tags={tags} />;
             })
           ) : (
             <>
-              <HistoryCard title="\uD83C\uDDE8\uD83C\uDDEE Cashew CI \u2192 \uD83C\uDDEC\uD83C\uDDE7 UK Q1 2026" tags={["LC Check", "$126k"]} />
-              <HistoryCard title="\uD83C\uDDEC\uD83C\uDDED Cocoa Beans GH \u2192 \uD83C\uDDEA\uD83C\uDDFA EU" tags={["LC Check", "$84k"]} />
-              <HistoryCard title="\uD83C\uDDEA\uD83C\uDDF9 Sesame Seeds ET \u2192 \uD83C\uDDEA\uD83C\uDDFA EU" tags={["Lookup", "$43k"]} />
+              <HistoryCard title="🇨🇮 Cashew CI → 🇬🇧 UK Q1 2026" tags={["LC Check", "$126k"]} />
+              <HistoryCard title="🇬🇭 Cocoa Beans GH → 🇪🇺 EU" tags={["LC Check", "$84k"]} />
+              <HistoryCard title="🇪🇹 Sesame Seeds ET → 🇪🇺 EU" tags={["Lookup", "$43k"]} />
             </>
           )}
         </div>
@@ -202,72 +221,87 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
   );
 
   return (
-    <div className="app-layout">
+    <>
       {/* SIDEBAR — desktop */}
-      {!isMobile && <aside className="sidebar">{sidebarContent}</aside>}
+      {!isMobile && (
+        <div className="sidebar">
+          {sidebarContent}
+        </div>
+      )}
 
       {/* Mobile sidebar overlay */}
       {isMobile && sidebarOpen && (
         <>
-          <div className="sidebar-backdrop" onClick={closeSidebar} />
-          <aside className="sidebar sidebar-mobile">{sidebarContent}</aside>
+          <div className="sidebar-overlay" onClick={closeSidebar} />
+          <div className="sidebar-mobile">
+            {sidebarContent}
+          </div>
         </>
       )}
 
-      {/* MAIN CONTENT */}
+      {/* MAIN WRAPPER + MAIN BOX */}
       <div className="main-wrapper">
         <div className="main-box">
-          <div className={contentClassName}>
-            {/* NAV BAR — inside content area at top */}
-            <div className="top-nav">
-              {isMobile ? (
-                <button
-                  className="hamburger-btn"
-                  onClick={() => setSidebarOpen(true)}
-                  aria-label="Open menu"
-                  data-testid="shell-hamburger"
-                >
-                  <Menu size={22} />
-                </button>
-              ) : (
-                <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-                  {topCenter || <DefaultNavLinks activePage={location} />}
-                </div>
-              )}
+          {/* NAV BAR — inside main box at top */}
+          <div className="top-nav">
+            {/* Left: hamburger on mobile, nav links on desktop */}
+            {isMobile ? (
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="hamburger-btn"
+                aria-label="Open menu"
+                data-testid="shell-hamburger"
+              >
+                <Menu size={22} />
+              </button>
+            ) : (
+              topCenter || <DefaultNavLinks activePage={location} />
+            )}
 
-              {isMobile && (
-                <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-                  {topCenter || <DefaultNavLinks activePage={location} />}
-                </div>
-              )}
+            {/* Mobile: topCenter in middle */}
+            {isMobile && (
+              <div className="top-nav-links">
+                {topCenter || <DefaultNavLinks activePage={location} />}
+              </div>
+            )}
 
-              {/* Right: icon buttons + avatar */}
-              <div className="top-nav-icons">
-                <Link href="/alerts">
-                  <div className="icon-btn" data-testid="shell-bell-icon">
-                    {"\uD83D\uDD14"}
-                    {alertsBadge > 0 && <div className="dot" />}
-                  </div>
+            {/* Right: icon buttons + avatar */}
+            <div className="top-nav-icons">
+              {/* Notification bell */}
+              <Link href="/alerts">
+                <div className="icon-btn" data-testid="shell-bell-icon">
+                  🔔
+                  {alertsBadge > 0 && <span className="dot" />}
+                </div>
+              </Link>
+
+              {/* Chat icon */}
+              {!isMobile && (
+                <Link href="/inbox">
+                  <div className="icon-btn">💬</div>
                 </Link>
-                {!isMobile && (
-                  <Link href="/inbox">
-                    <div className="icon-btn">{"\uD83D\uDCAC"}</div>
-                  </Link>
-                )}
-                {!isMobile && (
-                  <Link href="/settings/profile">
-                    <div className="icon-btn">{"\u2699\uFE0F"}</div>
-                  </Link>
-                )}
-                <div className="user-avatar" data-testid="shell-user-avatar">F</div>
+              )}
+
+              {/* Settings icon */}
+              {!isMobile && (
+                <Link href="/settings/profile">
+                  <div className="icon-btn">⚙️</div>
+                </Link>
+              )}
+
+              {/* User avatar */}
+              <div className="user-avatar" data-testid="shell-user-avatar">
+                F
               </div>
             </div>
+          </div>
 
-            {/* Scrollable content */}
+          {/* Scrollable content */}
+          <div className={contentClassName || "main-content"}>
             {children}
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
