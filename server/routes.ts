@@ -28,6 +28,7 @@ const TOKEN_PACKS: Record<string, { price: number; tokens: number; name: string 
 
 const LOOKUP_COST = 1;
 const LC_RECHECK_PRICE_CENTS = 999;
+const LC_STANDALONE_PRICE_CENTS = 1999;
 
 function getSessionId(req: Request, res: Response): string {
   let sessionId = req.cookies?.taptrao_session;
@@ -216,6 +217,52 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/tokens/lc-standalone-checkout", async (req, res) => {
+    try {
+      const stripeKey = process.env.STRIPE_SECRET_KEY;
+      if (!stripeKey) {
+        res.status(500).json({ message: "Stripe is not configured" });
+        return;
+      }
+
+      const Stripe = (await import("stripe")).default;
+      const stripe = new Stripe(stripeKey);
+      const sessionId = getSessionId(req, res);
+
+      const host = req.headers.host || "localhost:5000";
+      const protocol = req.headers["x-forwarded-proto"] || (req.secure ? "https" : "http");
+      const baseUrl = `${protocol}://${host}`;
+
+      const checkoutSession = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: "TapTrao LC Check Only",
+                description: "Standalone LC document check",
+              },
+              unit_amount: LC_STANDALONE_PRICE_CENTS,
+            },
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: `${baseUrl}/lc-check?lc_paid={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/pricing`,
+        metadata: {
+          session_id: sessionId,
+          pack: "lc_standalone",
+        },
+      });
+
+      res.json({ url: checkoutSession.url });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   app.post("/api/webhooks/stripe", async (req, res) => {
     try {
       const stripeKey = process.env.STRIPE_SECRET_KEY;
@@ -256,6 +303,17 @@ export async function registerRoutes(
               type: "PURCHASE",
               amount: 0,
               description: "LC re-check payment — $9.99",
+              stripeSessionId,
+            });
+          }
+        } else if (sessionId && pack === "lc_standalone") {
+          const alreadyProcessed = await storage.hasStripeSessionBeenProcessed(stripeSessionId);
+          if (!alreadyProcessed) {
+            await db.insert(tokenTransactions).values({
+              sessionId,
+              type: "PURCHASE",
+              amount: 0,
+              description: "LC standalone check — $19.99",
               stripeSessionId,
             });
           }
@@ -309,6 +367,19 @@ export async function registerRoutes(
             });
           }
           res.json({ success: true, packName: "LC Re-check" });
+          return;
+        } else if (sessionId && pack === "lc_standalone") {
+          const alreadyProcessed = await storage.hasStripeSessionBeenProcessed(stripeSessionId);
+          if (!alreadyProcessed) {
+            await db.insert(tokenTransactions).values({
+              sessionId,
+              type: "PURCHASE",
+              amount: 0,
+              description: "LC standalone check — $19.99",
+              stripeSessionId,
+            });
+          }
+          res.json({ success: true, packName: "LC Check Only" });
           return;
         } else if (sessionId && pack && TOKEN_PACKS[pack]) {
           const packInfo = TOKEN_PACKS[pack];

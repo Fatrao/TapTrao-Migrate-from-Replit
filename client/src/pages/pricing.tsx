@@ -219,6 +219,19 @@ export default function Pricing() {
     },
   });
 
+  const lcStandaloneMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/tokens/lc-standalone-checkout");
+      return res.json();
+    },
+    onSuccess: (data) => {
+      if (data.url) window.location.href = data.url;
+    },
+    onError: (err: Error) => {
+      toast({ title: "Error", description: err.message || "Unable to start checkout", variant: "destructive" });
+    },
+  });
+
   const balance = tokenQuery.data?.balance ?? 0;
 
   return (
@@ -445,13 +458,13 @@ export default function Pricing() {
                 style={{
                   ...S.btnOutline,
                   width: "100%",
-                  opacity: checkoutMutation.isPending ? 0.6 : 1,
+                  opacity: lcStandaloneMutation.isPending ? 0.6 : 1,
                 }}
-                disabled={checkoutMutation.isPending}
-                onClick={() => checkoutMutation.mutate("lc_standalone")}
+                disabled={lcStandaloneMutation.isPending}
+                onClick={() => lcStandaloneMutation.mutate()}
                 data-testid="button-lc-standalone"
               >
-                {checkoutMutation.isPending && checkoutMutation.variables === "lc_standalone" ? (
+                {lcStandaloneMutation.isPending ? (
                   <Loader2 style={{ width: 16, height: 16, animation: "spin 1s linear infinite" }} />
                 ) : (
                   <FileCheck style={{ width: 16, height: 16 }} />
