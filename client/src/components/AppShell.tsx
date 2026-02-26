@@ -30,6 +30,7 @@ const complianceItems: NavItem[] = [
 /* ── Section: Admin (only visible when isAdmin) ── */
 const adminItems: NavItem[] = [
   { icon: "🎟️", label: "Promo Codes", href: "/admin/promo-codes" },
+  { icon: "🔑", label: "API Keys", href: "/admin/api-keys" },
   { icon: "📢", label: "Create Alert", href: "/admin/alerts/new" },
   { icon: "🗂️", label: "Data", href: "/admin/data" },
 ];

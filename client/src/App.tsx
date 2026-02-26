@@ -24,6 +24,7 @@ import AlertsPage from "@/pages/alerts";
 import AdminAlertsPage from "@/pages/admin-alerts";
 import AdminLogin from "@/pages/admin-login";
 import AdminPromoCodes from "@/pages/admin-promo-codes";
+import AdminApiKeys from "@/pages/admin-api-keys";
 import EudrPage from "@/pages/eudr";
 import DemurragePage from "@/pages/demurrage";
 
@@ -42,6 +43,7 @@ function Router() {
       <Route path="/admin/alerts/new" component={AdminAlertsPage} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/promo-codes" component={AdminPromoCodes} />
+      <Route path="/admin/api-keys" component={AdminApiKeys} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/terms-of-service" component={TermsOfService} />
       <Route path="/settings/profile" component={SettingsProfile} />

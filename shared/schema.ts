@@ -622,3 +622,15 @@ export const promoRedemptions = pgTable(
 );
 
 export type PromoRedemption = typeof promoRedemptions.$inferSelect;
+
+export const apiKeys = pgTable("api_keys", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  sessionId: text("session_id").notNull(),
+  key: text("key").notNull().unique(),
+  name: text("name").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  lastUsedAt: timestamp("last_used_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ApiKey = typeof apiKeys.$inferSelect;

@@ -1,6 +1,6 @@
 import { db } from "./db";
 import { eq, and, sql, desc, inArray } from "drizzle-orm";
-import { createHash } from "crypto";
+import { createHash, randomBytes } from "crypto";
 import {
   destinations,
   regionalFrameworks,
@@ -49,6 +49,7 @@ import {
   promoCodes,
   promoRedemptions,
   type PromoCode,
+  apiKeys,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -136,6 +137,12 @@ export interface IStorage {
   getPromoCodeByCode(code: string): Promise<PromoCode | undefined>;
   getPromoCodes(): Promise<PromoCode[]>;
   redeemPromoCode(promoCodeId: string, sessionId: string, tradeTokens: number, lcCredits: number, code: string): Promise<{ success: boolean; message: string }>;
+  // API keys
+  createApiKey(sessionId: string, name: string): Promise<{ id: string; key: string; name: string; createdAt: Date }>;
+  getApiKeyByKey(key: string): Promise<{ id: string; sessionId: string; isActive: boolean } | undefined>;
+  getApiKeysBySession(sessionId: string): Promise<{ id: string; name: string; keyPreview: string; isActive: boolean; lastUsedAt: Date | null; createdAt: Date }[]>;
+  deactivateApiKey(id: string, sessionId: string): Promise<boolean>;
+  touchApiKey(id: string): Promise<void>;
 }
 
 export type EnrichedTrade = {
@@ -848,6 +855,46 @@ export class DatabaseStorage implements IStorage {
     if (tradeTokens > 0) parts.push(`${tradeTokens} trade token${tradeTokens > 1 ? "s" : ""}`);
     if (lcCredits > 0) parts.push(`${lcCredits} LC credit${lcCredits > 1 ? "s" : ""}`);
     return { success: true, message: `Redeemed! ${parts.join(" and ")} added.` };
+  }
+
+  // ── API Keys ──
+
+  async createApiKey(sessionId: string, name: string): Promise<{ id: string; key: string; name: string; createdAt: Date }> {
+    const key = "tt_live_" + randomBytes(32).toString("hex");
+    const [row] = await db.insert(apiKeys).values({ sessionId, key, name }).returning();
+    return { id: row.id, key: row.key, name: row.name, createdAt: row.createdAt };
+  }
+
+  async getApiKeyByKey(key: string): Promise<{ id: string; sessionId: string; isActive: boolean } | undefined> {
+    const [row] = await db.select({ id: apiKeys.id, sessionId: apiKeys.sessionId, isActive: apiKeys.isActive })
+      .from(apiKeys).where(eq(apiKeys.key, key));
+    return row;
+  }
+
+  async getApiKeysBySession(sessionId: string): Promise<{ id: string; name: string; keyPreview: string; isActive: boolean; lastUsedAt: Date | null; createdAt: Date }[]> {
+    const rows = await db.select().from(apiKeys)
+      .where(eq(apiKeys.sessionId, sessionId))
+      .orderBy(desc(apiKeys.createdAt));
+    return rows.map((r) => ({
+      id: r.id,
+      name: r.name,
+      keyPreview: r.key.slice(0, 12) + "..." + r.key.slice(-4),
+      isActive: r.isActive,
+      lastUsedAt: r.lastUsedAt,
+      createdAt: r.createdAt,
+    }));
+  }
+
+  async deactivateApiKey(id: string, sessionId: string): Promise<boolean> {
+    const [row] = await db.update(apiKeys)
+      .set({ isActive: false })
+      .where(and(eq(apiKeys.id, id), eq(apiKeys.sessionId, sessionId)))
+      .returning();
+    return !!row;
+  }
+
+  async touchApiKey(id: string): Promise<void> {
+    await db.update(apiKeys).set({ lastUsedAt: new Date() }).where(eq(apiKeys.id, id));
   }
 }
 

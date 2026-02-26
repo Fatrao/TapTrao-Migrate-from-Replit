@@ -30,6 +30,33 @@ const LOOKUP_COST = 1;
 const LC_RECHECK_PRICE_CENTS = 999;
 const LC_STANDALONE_PRICE_CENTS = 1999;
 
+// ── Rate limiter for API keys ──
+const apiRateLimits = new Map<string, { count: number; resetAt: number }>();
+const API_RATE_LIMIT = 60; // requests per minute
+function checkRateLimit(apiKeyId: string): { allowed: boolean; retryAfter?: number } {
+  const now = Date.now();
+  const entry = apiRateLimits.get(apiKeyId);
+  if (!entry || now > entry.resetAt) {
+    apiRateLimits.set(apiKeyId, { count: 1, resetAt: now + 60_000 });
+    return { allowed: true };
+  }
+  if (entry.count >= API_RATE_LIMIT) {
+    return { allowed: false, retryAfter: Math.ceil((entry.resetAt - now) / 1000) };
+  }
+  entry.count++;
+  return { allowed: true };
+}
+
+// ── API key auth helper ──
+async function getSessionFromApiKey(req: Request): Promise<{ sessionId: string; apiKeyId: string } | null> {
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith("Bearer tt_live_")) return null;
+  const key = auth.slice(7); // "Bearer " = 7 chars
+  const record = await storage.getApiKeyByKey(key);
+  if (!record || !record.isActive) return null;
+  return { sessionId: record.sessionId, apiKeyId: record.id };
+}
+
 function getSessionId(req: Request, res: Response): string {
   let sessionId = req.cookies?.taptrao_session;
   if (!sessionId) {
@@ -1846,6 +1873,260 @@ export async function registerRoutes(
       }
     });
   }
+
+  // ═══════════════════════════════════════════════════
+  // ═══ PUBLIC REST API v1 (API key authentication) ═══
+  // ═══════════════════════════════════════════════════
+
+  // Middleware helper for v1 endpoints requiring auth
+  async function requireApiKey(req: Request, res: Response): Promise<string | null> {
+    const apiAuth = await getSessionFromApiKey(req);
+    if (!apiAuth) {
+      res.status(401).json({ success: false, error: { code: "UNAUTHORIZED", message: "Invalid or missing API key. Use Authorization: Bearer tt_live_..." } });
+      return null;
+    }
+    const rateCheck = checkRateLimit(apiAuth.apiKeyId);
+    if (!rateCheck.allowed) {
+      res.status(429).set("Retry-After", String(rateCheck.retryAfter)).json({ success: false, error: { code: "RATE_LIMITED", message: `Rate limit exceeded. Retry after ${rateCheck.retryAfter}s.` } });
+      return null;
+    }
+    // Touch last used (fire-and-forget)
+    storage.touchApiKey(apiAuth.apiKeyId).catch(() => {});
+    return apiAuth.sessionId;
+  }
+
+  // ── Reference data (no auth required) ──
+
+  app.get("/api/v1/commodities", async (_req, res) => {
+    try {
+      const data = await storage.getCommodities();
+      res.json({ success: true, data });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: error.message } });
+    }
+  });
+
+  app.get("/api/v1/origins", async (_req, res) => {
+    try {
+      const data = await storage.getOriginCountries();
+      res.json({ success: true, data });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: error.message } });
+    }
+  });
+
+  app.get("/api/v1/destinations", async (_req, res) => {
+    try {
+      const data = await storage.getDestinations();
+      res.json({ success: true, data });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: error.message } });
+    }
+  });
+
+  // ── Compliance check (API key required, costs 1 credit) ──
+
+  app.post("/api/v1/compliance-check", async (req, res) => {
+    const sessionId = await requireApiKey(req, res);
+    if (!sessionId) return;
+    try {
+      const { commodityId, originId, destinationId } = req.body;
+      if (!commodityId || !originId || !destinationId) {
+        res.status(400).json({ success: false, error: { code: "INVALID_REQUEST", message: "commodityId, originId, and destinationId are required" } });
+        return;
+      }
+
+      // Token gating (same as web app)
+      const isAdmin = await storage.isAdminSession(sessionId);
+      if (!isAdmin) {
+        const { balance } = await storage.getTokenBalance(sessionId);
+        if (balance < LOOKUP_COST) {
+          res.status(402).json({ success: false, error: { code: "INSUFFICIENT_CREDITS", message: "Insufficient credits", required: LOOKUP_COST, balance } });
+          return;
+        }
+        await storage.spendTokens(sessionId, LOOKUP_COST, `API Compliance Lookup — ${commodityId}`);
+      }
+
+      const result = await runComplianceCheck(commodityId, originId, destinationId);
+      const triggers = result.triggers;
+      const hasStop = result.stopFlags && Object.keys(result.stopFlags).length > 0;
+      const hasRed = triggers.kimberley || triggers.conflict || triggers.cites;
+      const hasAmber = triggers.eudr || triggers.cbam || triggers.iuu || triggers.csddd;
+      const riskLevel = hasStop ? "STOP" : hasRed ? "HIGH" : hasAmber ? "MEDIUM" : "LOW";
+      const integrityHash = createHash("sha256").update(JSON.stringify(result) + new Date().toISOString()).digest("hex");
+
+      let lookupId: string | null = null;
+      try {
+        const saved = await storage.createLookup({
+          commodityId, originId, destinationId,
+          commodityName: result.commodity.name,
+          originName: result.origin.countryName,
+          destinationName: result.destination.countryName,
+          hsCode: result.commodity.hsCode,
+          riskLevel, resultJson: result, integrityHash,
+          readinessScore: result.readinessScore.score,
+          readinessVerdict: result.readinessScore.verdict,
+          readinessFactors: result.readinessScore.factors,
+          readinessSummary: result.readinessScore.summary,
+        });
+        lookupId = saved.id;
+      } catch (_e) {}
+
+      const { balance: creditsRemaining } = await storage.getTokenBalance(sessionId);
+      res.json({ success: true, data: { ...result, lookupId, integrityHash, riskLevel }, meta: { creditsRemaining } });
+    } catch (error: any) {
+      const msg = error.message || "";
+      if (msg.includes("not found")) {
+        res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: msg } });
+      } else {
+        res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: msg } });
+      }
+    }
+  });
+
+  // ── LC check (API key required, costs 1 credit) ──
+
+  app.post("/api/v1/lc-check", async (req, res) => {
+    const sessionId = await requireApiKey(req, res);
+    if (!sessionId) return;
+    try {
+      const parsed = lcCheckRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ success: false, error: { code: "INVALID_REQUEST", message: "Invalid request", details: parsed.error.flatten().fieldErrors } });
+        return;
+      }
+      const { lcFields, documents, sourceLookupId } = parsed.data;
+
+      // Token gating
+      const isAdmin = await storage.isAdminSession(sessionId);
+      if (!isAdmin) {
+        const { balance } = await storage.getTokenBalance(sessionId);
+        if (balance < 1) {
+          res.status(402).json({ success: false, error: { code: "INSUFFICIENT_CREDITS", message: "Insufficient credits", required: 1, balance } });
+          return;
+        }
+        await storage.spendTokens(sessionId, 1, "API LC Check");
+      }
+
+      const { results, summary } = runLcCrossCheck(lcFields, documents);
+      const timestamp = new Date().toISOString();
+      const integrityHash = computeLcHash(lcFields, documents, results, timestamp);
+      const correction = generateCorrectionEmail(lcFields, results);
+
+      const saved = await storage.createLcCheck({
+        lcFieldsJson: lcFields, documentsJson: documents,
+        resultsJson: results, summary, verdict: summary.verdict,
+        correctionEmail: correction.email || null, commsLog: null,
+        integrityHash, sourceLookupId: sourceLookupId || null, sessionId,
+      });
+
+      const { balance: creditsRemaining } = await storage.getTokenBalance(sessionId);
+      res.json({
+        success: true,
+        data: { id: saved.id, results, summary, integrityHash, timestamp, correctionEmail: correction.email, correctionWhatsApp: correction.whatsapp },
+        meta: { creditsRemaining },
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: error.message } });
+    }
+  });
+
+  // ── Lookups retrieval (API key required) ──
+
+  app.get("/api/v1/lookups", async (req, res) => {
+    const sessionId = await requireApiKey(req, res);
+    if (!sessionId) return;
+    try {
+      const data = await storage.getAllLookups();
+      res.json({ success: true, data });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: error.message } });
+    }
+  });
+
+  app.get("/api/v1/lookups/:id", async (req, res) => {
+    const sessionId = await requireApiKey(req, res);
+    if (!sessionId) return;
+    try {
+      const lookup = await storage.getLookupById(req.params.id);
+      if (!lookup) {
+        res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: "Lookup not found" } });
+        return;
+      }
+      res.json({ success: true, data: lookup });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: error.message } });
+    }
+  });
+
+  app.get("/api/v1/lc-checks/:id", async (req, res) => {
+    const sessionId = await requireApiKey(req, res);
+    if (!sessionId) return;
+    try {
+      const check = await storage.getLcCheckById(req.params.id);
+      if (!check) {
+        res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: "LC check not found" } });
+        return;
+      }
+      res.json({ success: true, data: check });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: error.message } });
+    }
+  });
+
+  // ── Account balance (API key required) ──
+
+  app.get("/api/v1/balance", async (req, res) => {
+    const sessionId = await requireApiKey(req, res);
+    if (!sessionId) return;
+    try {
+      const { balance, lcBalance, freeLookupUsed } = await storage.getTokenBalance(sessionId);
+      res.json({ success: true, data: { balance, lcBalance, freeLookupUsed } });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: error.message } });
+    }
+  });
+
+  // ═══ Admin API Key Management ═══
+
+  app.post("/api/admin/api-keys", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const isAdmin = await storage.isAdminSession(sessionId);
+      if (!isAdmin) { res.status(401).json({ message: "Unauthorized" }); return; }
+      const { name } = req.body;
+      if (!name) { res.status(400).json({ message: "name is required" }); return; }
+      const apiKey = await storage.createApiKey(sessionId, name);
+      res.json(apiKey);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/admin/api-keys", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const isAdmin = await storage.isAdminSession(sessionId);
+      if (!isAdmin) { res.status(401).json({ message: "Unauthorized" }); return; }
+      const keys = await storage.getApiKeysBySession(sessionId);
+      res.json(keys);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/admin/api-keys/:id/deactivate", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const isAdmin = await storage.isAdminSession(sessionId);
+      if (!isAdmin) { res.status(401).json({ message: "Unauthorized" }); return; }
+      const ok = await storage.deactivateApiKey(req.params.id, sessionId);
+      if (!ok) { res.status(404).json({ message: "API key not found" }); return; }
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
 
   return httpServer;
 }
