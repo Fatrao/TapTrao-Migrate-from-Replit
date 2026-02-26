@@ -52,6 +52,33 @@
 
   /* Sidebar */
   --bg-sidebar: #242428;
+
+  /* ── Homepage palette (from user's HTML mockup) ── */
+  --gable-green: #152D32;
+  --gable-deep: #0e1f23;
+  --gable-mid: #1a3a40;
+  --celadon: #BFE4B0;
+  --fern: #6DBC71;
+  --mantis: #76C45D;
+  --regent-gray: #83949C;
+  --gray-nurse: #ECF0ED;
+  --surface-card: #1c3339;
+  --surface-card-hover: #213e45;
+  --border-subtle: rgba(109,188,113,0.15);
+  --border-accent: rgba(109,188,113,0.3);
+  --hp-text-primary: #ECF0ED;
+  --hp-text-secondary: #a0b3b8;
+  --hp-text-muted: #6b8389;
+  --glow-green: rgba(118,196,93,0.15);
+  --neon-green: #4ADE80;
+  --off-white: #F6F8F6;
+  --light-gray: #EDF0ED;
+  --mid-gray: #D1D8D3;
+  --dark-text: #1a2e32;
+  --dark-text-secondary: #4a5e64;
+  --dark-text-muted: #7a8e94;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
 }
 
 
