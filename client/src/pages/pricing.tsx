@@ -391,6 +391,13 @@ export default function Pricing() {
           </div>
         </div>
 
+        {/* Pricing disclaimer */}
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <p style={{ fontSize: 11, color: "var(--t3)", margin: 0, maxWidth: 520, marginLeft: "auto", marginRight: "auto", lineHeight: 1.5 }}>
+            TapTrao does not provide legal or banking advice. Reports are informational and designed to support internal decision-making.
+          </p>
+        </div>
+
         {/* SECTION 2 — What's included (clarity block) */}
         <div style={{ marginBottom: 40 }}>
           <div style={{ ...S.card, background: "var(--card2)", padding: 28 }}>

@@ -9,8 +9,8 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   usePageTitle(
-    "Know your compliance before you commit",
-    "Trade compliance for commodity traders sourcing from Africa. No ERP. No broker. No guesswork."
+    "De-risk your next shipment before spending",
+    "The first standalone pre-shipment screening tool for commodity traders importing from Africa. No ERP. No broker. No guesswork."
   );
 
   const checkoutMutation = useMutation({
@@ -91,7 +91,7 @@ export default function Home() {
           </h1>
 
           <p className="subtitle">
-            Know your compliance before you commit. Check EUDR, customs, LC docs
+            De-risk your next shipment before spending. Check EUDR, customs, LC docs
             and trade regulations — in minutes, not weeks.
           </p>
 
@@ -101,6 +101,9 @@ export default function Home() {
                 Run Your First Check — Free
               </span>
             </Link>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: -4 }}>
+              Decision-support tool · Not legal or banking advice
+            </div>
             <a href="#how">
               <span className="btn-hero btn-hero-secondary" data-testid="button-hero-how-it-works">
                 See How It Works
@@ -124,7 +127,7 @@ export default function Home() {
             Three steps to trade with <span className="accent">confidence</span>
           </h2>
           <p className="section-sub">
-            No compliance team needed. TapTrao checks your shipment against every regulation that matters.
+            Built to support your compliance workflow. TapTrao runs automated pre-checks so you walk in prepared.
           </p>
 
           <div className="steps-grid">
@@ -137,14 +140,14 @@ export default function Home() {
             <div className="step-card">
               <div className="step-num">2</div>
               <div className="step-icon">🔍</div>
-              <h3>We Check Everything</h3>
-              <p>EUDR compliance, HS code validation, customs duties, LC document rules (UCP 600), sanctions — all cross-referenced automatically.</p>
+              <h3>We Run Automated Pre-Checks</h3>
+              <p>Shipment data screened against EUDR requirements, customs data, and LC document rules (UCP 600). Results highlight potential risks and missing information.</p>
             </div>
             <div className="step-card">
               <div className="step-num">3</div>
               <div className="step-icon">✅</div>
               <h3>Get Your Report</h3>
-              <p>A clear compliance report with flags, required documents, and next steps. Ready to share with your bank or broker.</p>
+              <p>A clear risk summary with flags, suggested documents, and next steps to support your conversations with banks or agents.</p>
             </div>
           </div>
         </div>
@@ -205,7 +208,7 @@ export default function Home() {
         <div className="section" id="trust">
           <div className="section-label">Why TapTrao</div>
           <h2>
-            Built for the traders who move <span className="accent">goods, not paper</span>
+            Manage your <span className="accent">trade risks</span>
           </h2>
           <p className="section-sub">
             We know the Africa–Europe corridor because we've lived it.
@@ -214,18 +217,18 @@ export default function Home() {
           <div className="trust-grid">
             <div className="trust-card">
               <div className="trust-icon">🛡️</div>
-              <h4>EUDR Ready</h4>
-              <p>Full EU Deforestation Regulation screening with geolocation checks</p>
+              <h4>EUDR Screening</h4>
+              <p>Screen shipment data against EUDR requirements using geolocation inputs</p>
             </div>
             <div className="trust-card">
               <div className="trust-icon">📄</div>
-              <h4>UCP 600 Compliant</h4>
-              <p>LC document checker built on international banking standards</p>
+              <h4>UCP 600-Based Checks</h4>
+              <p>LC document rules screened against UCP 600 standards for pre-submission review</p>
             </div>
             <div className="trust-card">
               <div className="trust-icon">⚡</div>
               <h4>Minutes, Not Weeks</h4>
-              <p>Get your compliance report before you commit capital to a trade</p>
+              <p>Generate a risk summary in minutes to support your internal review</p>
             </div>
             <div className="trust-card">
               <div className="trust-icon">🌍</div>
@@ -254,6 +257,7 @@ export default function Home() {
             <div className="free-banner-text">
               <h4>Your first check is free</h4>
               <p>Run one full compliance check for free — no card required. See duties, required documents, and shipment risks.</p>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 6 }}>Results are informational and intended to support your own review or discussions with banks, agents, or advisors.</p>
             </div>
           </div>
           <Link href="/lookup">
@@ -393,6 +397,9 @@ export default function Home() {
 
         {/* ── FOOTER ── */}
         <div className="footer" data-testid="section-footer">
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 16, maxWidth: 640 }}>
+            TapTrao provides automated trade and document screening for informational purposes only. Results do not constitute legal, regulatory, or banking advice and do not guarantee acceptance by authorities or financial institutions.
+          </div>
           <div className="footer-left">
             <img className="logo-img" src="/logo.png" alt="TapTrao" />
             <span className="logo-name">TapTrao</span>
