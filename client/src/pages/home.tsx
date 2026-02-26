@@ -101,14 +101,14 @@ export default function Home() {
                 Run Your First Check — Free
               </span>
             </Link>
-            <div style={{ fontSize: "0.75rem", color: "var(--hp-text-muted)", marginTop: -4 }}>
-              Decision-support tool · Not legal or banking advice
-            </div>
             <a href="#how">
               <span className="btn-hero btn-hero-secondary" data-testid="button-hero-how-it-works">
                 See How It Works
               </span>
             </a>
+          </div>
+          <div style={{ fontSize: "0.75rem", color: "var(--hp-text-muted)", marginTop: 10 }}>
+            Decision-support tool · Not legal or banking advice
           </div>
 
           <div className="hero-flags">
