@@ -24,8 +24,8 @@ export function UploadZone({ icon, title, subtitle, accept, onFileSelect }: {
       data-testid="upload-zone"
     >
       <div style={{ fontSize: 28, marginBottom: 8, color: "#bbb" }}>{icon}</div>
-      <div style={{ fontSize: 14, fontWeight: 500, color: "#333", marginBottom: 4 }}>{title}</div>
-      <div style={{ fontSize: 13, color: "#4ade80" }}>
+      <div style={{ fontSize: 14, fontWeight: 500, color: "#2a3d40", marginBottom: 4 }}>{title}</div>
+      <div style={{ fontSize: 13, color: "var(--app-acapulco)" }}>
         <em style={{ fontStyle: "normal", fontWeight: 600 }}>{subtitle}</em>
       </div>
       <input

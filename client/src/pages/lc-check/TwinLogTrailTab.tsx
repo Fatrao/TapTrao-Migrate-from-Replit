@@ -11,7 +11,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
   primaryRiskFactor: string;
 }) {
   const verdictStyles = {
-    GREEN: { bg: "rgba(74,140,111,.05)", border: "rgba(74,140,111,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--green)", label: "LOW RISK" },
+    GREEN: { bg: "rgba(113,171,145,.05)", border: "rgba(113,171,145,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--app-acapulco)", label: "LOW RISK" },
     AMBER: { bg: "rgba(234,139,67,.05)", border: "rgba(234,139,67,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", label: "MODERATE RISK" },
     RED: { bg: "rgba(218,60,61,.05)", border: "rgba(218,60,61,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", label: "HIGH RISK" },
   };
@@ -189,11 +189,11 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
           </div>
 
           {[
-            { label: "Compliance lookup", status: "\u2713 Locked", color: "var(--green)" },
+            { label: "Compliance lookup", status: "\u2713 Locked", color: "var(--app-acapulco)" },
             {
               label: "LC check results",
               status: lcCheck ? "\u2713 Locked" : "\u2014",
-              color: lcCheck ? "var(--green)" : "var(--t3)",
+              color: lcCheck ? "var(--app-acapulco)" : "var(--t3)",
             },
             {
               label: "Supplier documents",
@@ -203,7 +203,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
             {
               label: "Readiness score",
               status: lookup.readinessScore != null ? `Score: ${lookup.readinessScore}` : "\u2014",
-              color: lookup.readinessScore != null ? "var(--green)" : "var(--t3)",
+              color: lookup.readinessScore != null ? "var(--app-acapulco)" : "var(--t3)",
             },
           ].map((item, idx) => (
             <div
@@ -418,7 +418,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
           )
         ) : (
           <div style={{ marginBottom: 16, padding: "10px 14px", background: "var(--gbg)", borderRadius: 8 }} data-testid="text-template-saved-success">
-            <span style={{ fontSize: 12, color: "var(--green)", fontWeight: 600 }}>
+            <span style={{ fontSize: 12, color: "var(--app-acapulco)", fontWeight: 600 }}>
               Template saved. Find it at /templates.
             </span>
           </div>

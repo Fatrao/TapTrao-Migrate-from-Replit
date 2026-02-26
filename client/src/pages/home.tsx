@@ -185,7 +185,7 @@ export default function Home() {
                 height: 64,
                 borderRadius: "50%",
                 background: "var(--gable-green)",
-                color: "#fff",
+                color: "var(--hp-text-primary)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -269,8 +269,8 @@ export default function Home() {
 
         {/* ── TRADE PACKS HEADING ── */}
         <div className="packs-heading" style={{ padding: "32px 48px 8px" }}>
-          <div className="section-label" style={{ marginBottom: 12, color: "var(--fern)" }}>Trade Packs</div>
-          <p style={{ fontSize: "0.9rem", color: "var(--hp-text-secondary)", marginBottom: 0 }}>
+          <div className="section-label" style={{ marginBottom: 12, color: "var(--dark-text)" }}>Trade Packs</div>
+          <p style={{ fontSize: "0.9rem", color: "var(--dark-text-secondary)", marginBottom: 0 }}>
             1 credit = 1 shipment checked (compliance + LC). Buy more, save more.
           </p>
         </div>

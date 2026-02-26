@@ -50,17 +50,17 @@
   --fh: 'Inter', sans-serif;
   --fb: 'Inter', sans-serif;
 
-  /* Sidebar */
-  --bg-sidebar: #163035;
+  /* Sidebar — grey/black (not green) */
+  --bg-sidebar: #1a1a1e;
 
   /* ── App-shell palette (Gable Green / Gray Nurse / Acapulco / Regent Gray) ── */
-  --app-sidebar:          #163035;
-  --app-sidebar-mid:      #1d3d42;
-  --app-sidebar-deep:     #0f2528;
+  --app-sidebar:          #1a1a1e;
+  --app-sidebar-mid:      #222226;
+  --app-sidebar-deep:     #141417;
   --app-main-base:        #163035;
-  --app-hero-start:       #163035;
-  --app-hero-mid:         #1d4a4f;
-  --app-hero-end:         #2a5e5a;
+  --app-hero-start:       #1e4e52;
+  --app-hero-mid:         #2a6360;
+  --app-hero-end:         #3a7d6a;
   --app-gray-nurse:       #E5E8E6;
   --app-acapulco:         #71AB91;
   --app-acapulco-hover:   #5f9a80;
@@ -71,30 +71,30 @@
   --app-regent-light:     rgba(129,148,156,0.5);
   --app-regent-faint:     rgba(129,148,156,0.25);
 
-  /* ── Homepage palette (from user's HTML mockup) ── */
-  --gable-green: #152D32;
-  --gable-deep: #0e1f23;
-  --gable-mid: #1a3a40;
-  --celadon: #BFE4B0;
-  --fern: #6DBC71;
-  --mantis: #76C45D;
-  --regent-gray: #83949C;
-  --gray-nurse: #ECF0ED;
+  /* ── Homepage palette (aligned to app-shell Acapulco palette) ── */
+  --gable-green: #163035;
+  --gable-deep: #0f2528;
+  --gable-mid: #1d3d42;
+  --celadon: #E5E8E6;
+  --fern: #71AB91;
+  --mantis: #5f9a80;
+  --regent-gray: #81949C;
+  --gray-nurse: #E5E8E6;
   --surface-card: #1c3339;
   --surface-card-hover: #213e45;
-  --border-subtle: rgba(109,188,113,0.15);
-  --border-accent: rgba(109,188,113,0.3);
-  --hp-text-primary: #ECF0ED;
-  --hp-text-secondary: #a0b3b8;
-  --hp-text-muted: #6b8389;
-  --glow-green: rgba(118,196,93,0.15);
-  --neon-green: #4ADE80;
+  --border-subtle: rgba(113,171,145,0.15);
+  --border-accent: rgba(113,171,145,0.3);
+  --hp-text-primary: #E5E8E6;
+  --hp-text-secondary: #81949C;
+  --hp-text-muted: rgba(129,148,156,0.6);
+  --glow-green: rgba(113,171,145,0.15);
+  --neon-green: #71AB91;
   --off-white: #F6F8F6;
   --light-gray: #EDF0ED;
   --mid-gray: #D1D8D3;
-  --dark-text: #1a2e32;
+  --dark-text: #163035;
   --dark-text-secondary: #4a5e64;
-  --dark-text-muted: #7a8e94;
+  --dark-text-muted: #81949C;
   --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'DM Sans', sans-serif;
 }
