@@ -50,18 +50,6 @@
   --fh: 'Inter', sans-serif;
   --fb: 'Inter', sans-serif;
 
-  /* Green card system — dark green cards with visible borders */
-  --card-green:        #0c332c;
-  --card-green-border: rgba(74,222,128,0.12);
-  --card-heading:      #ffffff;
-  --card-body:         rgba(255,255,255,0.7);
-  --card-muted:        rgba(255,255,255,0.45);
-  --card-label:        rgba(255,255,255,0.5);
-  --card-inset:        rgba(255,255,255,0.06);
-  --card-inset-border: rgba(255,255,255,0.08);
-  --card-count-bg:     rgba(255,255,255,0.10);
-  --card-border-subtle:rgba(255,255,255,0.08);
-
   /* Sidebar */
   --bg-sidebar: #242428;
 }

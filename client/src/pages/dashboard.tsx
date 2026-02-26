@@ -124,7 +124,7 @@ export default function Dashboard() {
           <div className="stat-icon">🔍</div>
           <div className="stat-label">Total Lookups</div>
           <div className="stat-value" data-testid="stat-compliance-lookups">
-            {totalLookups} <span style={{ fontSize: 13, color: "var(--card-body)", fontWeight: 400, fontFamily: "var(--fb)" }}>checks</span>
+            {totalLookups} <span style={{ fontSize: 13, color: "#555", fontWeight: 400, fontFamily: "var(--fb)" }}>checks</span>
           </div>
           <div className="stat-sub">
             <span className="up">↑ 8%</span> vs prev. 28 days
@@ -135,7 +135,7 @@ export default function Dashboard() {
           <div className="stat-icon">⚠️</div>
           <div className="stat-label">Rejection Risk</div>
           <div className="stat-value">
-            7.8% <span style={{ fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 12, background: "rgba(234,179,8,0.15)", color: "#fbbf24", marginLeft: 4 }}>Moderate</span>
+            7.8% <span style={{ fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 12, background: "#fef3c7", color: "#d97706", marginLeft: 4 }}>Moderate</span>
           </div>
           <div className="stat-sub">
             <span className="down">↓ 1.7%</span> vs prev. 28 days
@@ -176,7 +176,7 @@ export default function Dashboard() {
             <tbody>
               {recentTrades.length === 0 ? (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: "center", padding: 20, color: "var(--card-muted)" }}>
+                  <td colSpan={5} style={{ textAlign: "center", padding: 20, color: "#666" }}>
                     No trades yet. Run your first compliance check.
                   </td>
                 </tr>
@@ -193,7 +193,7 @@ export default function Dashboard() {
                   </td>
                   <td>
                     {t.corridor}<br />
-                    <span style={{ fontSize: 11, color: "var(--card-muted)" }}>{t.date}</span>
+                    <span style={{ fontSize: 11, color: "#666" }}>{t.date}</span>
                   </td>
                   <td>{t.value}</td>
                   <td>
@@ -317,7 +317,7 @@ export default function Dashboard() {
                 </div>
               ))}
               {(lookupsQuery.data ?? []).length === 0 && (lcQuery.data ?? []).length === 0 && (
-                <div style={{ textAlign: "center", padding: 16, color: "var(--card-muted)", fontSize: 13 }}>No recent activity</div>
+                <div style={{ textAlign: "center", padding: 16, color: "#666", fontSize: 13 }}>No recent activity</div>
               )}
             </div>
           </div>

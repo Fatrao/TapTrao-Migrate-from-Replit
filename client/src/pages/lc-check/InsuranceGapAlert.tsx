@@ -27,7 +27,7 @@ export function InsuranceGapAlert() {
         style={{
           position: "absolute", top: 10, right: 12,
           background: "none", border: "none", cursor: "pointer",
-          color: "var(--card-muted)", fontSize: 16, lineHeight: 1,
+          color: "#666", fontSize: 16, lineHeight: 1,
         }}
       >
         <X size={14} />
@@ -35,12 +35,12 @@ export function InsuranceGapAlert() {
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
         <Shield size={16} style={{ color: "var(--green)", flexShrink: 0 }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--card-heading)" }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a" }}>
           Insurance gap — check your policy covers this trade
         </span>
       </div>
 
-      <p style={{ fontSize: 12, color: "var(--card-body)", lineHeight: 1.65, marginBottom: 12 }}>
+      <p style={{ fontSize: 12, color: "#555", lineHeight: 1.65, marginBottom: 12 }}>
         Standard cargo insurance (Institute Cargo Clauses A/B/C) covers physical
         loss and damage. It does NOT cover goods rejected at port due to regulatory
         non-compliance — which is a separate and common risk for agricultural and
@@ -49,12 +49,12 @@ export function InsuranceGapAlert() {
 
       <div style={{
         display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12,
-        background: "var(--card-inset)", borderRadius: 6, padding: "10px 14px",
+        background: "#f5f5f5", borderRadius: 6, padding: "10px 14px",
         fontFamily: "var(--fb)", fontSize: 11, marginBottom: 12,
       }}>
         <div>
-          <div style={{ fontWeight: 600, color: "var(--card-heading)", marginBottom: 6 }}>NOT covered by standard policy:</div>
-          <ul style={{ margin: 0, paddingLeft: 16, color: "var(--card-body)", lineHeight: 1.8 }}>
+          <div style={{ fontWeight: 600, color: "#1a1a1a", marginBottom: 6 }}>NOT covered by standard policy:</div>
+          <ul style={{ margin: 0, paddingLeft: 16, color: "#555", lineHeight: 1.8 }}>
             <li>Regulatory rejection at border</li>
             <li>Phytosanitary detention and destruction</li>
             <li>EUDR non-compliance refusal</li>
@@ -62,8 +62,8 @@ export function InsuranceGapAlert() {
           </ul>
         </div>
         <div>
-          <div style={{ fontWeight: 600, color: "var(--card-heading)", marginBottom: 6 }}>Ask your insurer about:</div>
-          <ul style={{ margin: 0, paddingLeft: 16, color: "var(--card-body)", lineHeight: 1.8 }}>
+          <div style={{ fontWeight: 600, color: "#1a1a1a", marginBottom: 6 }}>Ask your insurer about:</div>
+          <ul style={{ margin: 0, paddingLeft: 16, color: "#555", lineHeight: 1.8 }}>
             <li>Trade disruption insurance</li>
             <li>Rejection / condemnation clause</li>
             <li>Commodity-specific contamination cover</li>
@@ -72,7 +72,7 @@ export function InsuranceGapAlert() {
         </div>
       </div>
 
-      <p style={{ fontSize: 11, color: "var(--card-muted)", lineHeight: 1.5 }}>
+      <p style={{ fontSize: 11, color: "#666", lineHeight: 1.5 }}>
         This applies regardless of Incoterms. Even under CIF or CIP, the seller&apos;s
         insurance does not cover destination regulatory rejection.
       </p>
