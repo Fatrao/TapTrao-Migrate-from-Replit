@@ -102,7 +102,7 @@ export default function Trades() {
 
   return (
     <AppShell>
-      <div style={{ overflowY: "auto", padding: "32px 40px 60px" }}>
+      <div style={{ overflowY: "auto", padding: "32px 40px 60px", background: "linear-gradient(180deg, #1a1a1c 0%, #1c2420 10%, #1e2e28 25%, #1f3830 50%, #214232 80%, #264a38 100%)", minHeight: "100%" }}>
         {/* HEADER */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
           <div>
