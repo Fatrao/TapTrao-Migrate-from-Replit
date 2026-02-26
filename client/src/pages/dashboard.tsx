@@ -124,7 +124,7 @@ export default function Dashboard() {
           <div className="stat-icon">🔍</div>
           <div className="stat-label">Total Lookups</div>
           <div className="stat-value" data-testid="stat-compliance-lookups">
-            {totalLookups} <span style={{ fontSize: 13, color: "#555", fontWeight: 400, fontFamily: "var(--fb)" }}>checks</span>
+            {totalLookups} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>checks</span>
           </div>
           <div className="stat-sub">
             <span className="up">↑ 8%</span> vs prev. 28 days
@@ -176,7 +176,7 @@ export default function Dashboard() {
             <tbody>
               {recentTrades.length === 0 ? (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: "center", padding: 20, color: "#666" }}>
+                  <td colSpan={5} style={{ textAlign: "center", padding: 20, color: "var(--app-regent)" }}>
                     No trades yet. Run your first compliance check.
                   </td>
                 </tr>
@@ -193,7 +193,7 @@ export default function Dashboard() {
                   </td>
                   <td>
                     {t.corridor}<br />
-                    <span style={{ fontSize: 11, color: "#666" }}>{t.date}</span>
+                    <span style={{ fontSize: 11, color: "var(--app-regent)" }}>{t.date}</span>
                   </td>
                   <td>{t.value}</td>
                   <td>
@@ -300,7 +300,7 @@ export default function Dashboard() {
             <div className="activity-list">
               {(lookupsQuery.data ?? []).slice(0, 2).map((l, i) => (
                 <div key={l.id} className="activity-item">
-                  <div className="act-avatar" style={{ background: i === 0 ? "rgba(74,222,128,0.12)" : "rgba(234,179,8,0.12)", color: i === 0 ? "#16a34a" : "#d97706" }}>F</div>
+                  <div className="act-avatar" style={{ background: i === 0 ? "rgba(113,171,145,0.12)" : "rgba(234,179,8,0.12)", color: i === 0 ? "var(--app-acapulco)" : "#d97706" }}>F</div>
                   <div className="act-content">
                     <div className="act-text"><strong>You</strong> ran compliance lookup · {l.commodityName}</div>
                     <div className="act-time">{new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</div>
@@ -317,7 +317,7 @@ export default function Dashboard() {
                 </div>
               ))}
               {(lookupsQuery.data ?? []).length === 0 && (lcQuery.data ?? []).length === 0 && (
-                <div style={{ textAlign: "center", padding: 16, color: "#666", fontSize: 13 }}>No recent activity</div>
+                <div style={{ textAlign: "center", padding: 16, color: "var(--app-regent)", fontSize: 13 }}>No recent activity</div>
               )}
             </div>
           </div>

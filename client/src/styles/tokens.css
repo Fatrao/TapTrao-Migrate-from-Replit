@@ -1,7 +1,7 @@
 :root {
   /* ── Design system tokens (matches HTML design refs) ── */
   --bg:       #000000;
-  --sidebar:  #1e2726;
+  --sidebar:  #163035;
   --card:     #1c1c1e;
   --card2:    #1c1c1e;
   --border:   rgba(255,255,255,0.07);
@@ -20,11 +20,11 @@
   --t2: rgba(255,255,255,0.7);
   --t3: rgba(255,255,255,0.5);
 
-  /* Design system colors */
-  --sage:     #6b9080;
-  --sage-hover: #5a7a6b;
-  --green:    #4a8c6f;
-  --green-accent: #4ade80;
+  /* Design system colors — Acapulco palette */
+  --sage:     #71AB91;
+  --sage-hover: #5f9a80;
+  --green:    #71AB91;
+  --green-accent: #71AB91;
   --teal:     #2e8662;
   --amber:    #eab308;
   --red:      #ef4444;
@@ -51,7 +51,25 @@
   --fb: 'Inter', sans-serif;
 
   /* Sidebar */
-  --bg-sidebar: #242428;
+  --bg-sidebar: #163035;
+
+  /* ── App-shell palette (Gable Green / Gray Nurse / Acapulco / Regent Gray) ── */
+  --app-sidebar:          #163035;
+  --app-sidebar-mid:      #1d3d42;
+  --app-sidebar-deep:     #0f2528;
+  --app-main-base:        #163035;
+  --app-hero-start:       #163035;
+  --app-hero-mid:         #1d4a4f;
+  --app-hero-end:         #2a5e5a;
+  --app-gray-nurse:       #E5E8E6;
+  --app-acapulco:         #71AB91;
+  --app-acapulco-hover:   #5f9a80;
+  --app-acapulco-dim:     rgba(113,171,145,0.10);
+  --app-acapulco-border:  rgba(113,171,145,0.25);
+  --app-acapulco-glow:    rgba(113,171,145,0.06);
+  --app-regent:           #81949C;
+  --app-regent-light:     rgba(129,148,156,0.5);
+  --app-regent-faint:     rgba(129,148,156,0.25);
 
   /* ── Homepage palette (from user's HTML mockup) ── */
   --gable-green: #152D32;
@@ -108,9 +126,9 @@ input::placeholder, textarea::placeholder {
 }
 
 input:focus, textarea:focus, select:focus {
-  border-color: #4ade80;
+  border-color: var(--app-acapulco);
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(74,222,128,0.12);
+  box-shadow: 0 0 0 3px rgba(113,171,145,0.12);
 }
 
 input:hover:not(:focus), textarea:hover:not(:focus), select:hover:not(:focus) {
@@ -333,8 +351,8 @@ input[type="search"] {
 }
 
 .upload-zone:hover, .upload-zone.drag-over {
-  border-color: #4ade80;
-  background: rgba(74,222,128,0.03);
+  border-color: var(--app-acapulco);
+  background: rgba(113,171,145,0.03);
 }
 
 .upload-zone input[type="file"] {
