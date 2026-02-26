@@ -27,6 +27,12 @@ const complianceItems: NavItem[] = [
   { icon: "📋", label: "Templates", href: "/templates" },
 ];
 
+/* ── Section: Tools ── */
+const toolsItems: NavItem[] = [
+  { icon: "◫", label: "Pricing", href: "/pricing" },
+  { icon: "◬", label: "Settings", href: "/settings/profile" },
+];
+
 /* ── Section: Admin (only visible when isAdmin) ── */
 const adminItems: NavItem[] = [
   { icon: "🎟️", label: "Promo Codes", href: "/admin/promo-codes" },
@@ -191,6 +197,14 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
       <div className="sidebar-section">
         <SidebarLabel>Compliance</SidebarLabel>
         {cItems.map((item) => (
+          <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+        ))}
+      </div>
+
+      {/* Tools section */}
+      <div className="sidebar-section">
+        <SidebarLabel>Tools</SidebarLabel>
+        {toolsItems.map((item) => (
           <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
         ))}
       </div>
