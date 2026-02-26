@@ -50,6 +50,7 @@ export default function Home() {
         <div className="top-nav-center" data-testid="nav-landing-desktop">
           <a href="#" className="active">Home</a>
           <a href="#how">How It Works</a>
+          <a href="#demo">Demo</a>
           <a href="#pricing">Pricing</a>
           <Link href="/lookup">Commodities</Link>
           <a href="#trust">About</a>
@@ -145,6 +146,58 @@ export default function Home() {
               <h3>Get Your Report</h3>
               <p>A clear compliance report with flags, required documents, and next steps. Ready to share with your bank or broker.</p>
             </div>
+          </div>
+        </div>
+
+        {/* ── DEMO WALKTHROUGH ── */}
+        <div className="section" id="demo" data-testid="section-demo" style={{ textAlign: "center" }}>
+          <div className="section-label">See It In Action</div>
+          <h2>
+            Watch a compliance check <span className="accent">in real time</span>
+          </h2>
+          <p className="section-sub">
+            From commodity selection to full compliance report — in under 2 minutes.
+          </p>
+
+          <div style={{
+            maxWidth: 900,
+            margin: "0 auto",
+            borderRadius: 14,
+            overflow: "hidden",
+            border: "1px solid rgba(0,0,0,0.08)",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
+          }}>
+            <div style={{
+              background: "#fff",
+              width: "100%",
+              aspectRatio: "16 / 9",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 12,
+            }}>
+              <div style={{
+                width: 64,
+                height: 64,
+                borderRadius: "50%",
+                background: "#6b9080",
+                color: "#fff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 24,
+              }}>▶</div>
+              <p style={{ fontSize: 14, color: "#888", fontWeight: 500, margin: 0 }}>Demo video coming soon</p>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 28 }}>
+            <Link href="/lookup">
+              <span className="btn-hero btn-hero-primary">
+                Try It Yourself — Free
+              </span>
+            </Link>
           </div>
         </div>
 

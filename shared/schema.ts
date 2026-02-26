@@ -159,6 +159,7 @@ export const userTokens = pgTable("user_tokens", {
   balance: integer("balance").notNull().default(0),
   lcBalance: integer("lc_balance").notNull().default(0),
   freeLookupUsed: boolean("free_lookup_used").notNull().default(false),
+  isAdmin: boolean("is_admin").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -591,3 +592,33 @@ export type ComplianceResult = {
   complianceReadiness: ComplianceReadiness;
   readinessScore: ReadinessScoreResult;
 };
+
+/* ── Promo Codes ── */
+export const promoCodes = pgTable("promo_codes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  code: varchar("code", { length: 50 }).notNull().unique(),
+  tradeTokens: integer("trade_tokens").notNull().default(0),
+  lcCredits: integer("lc_credits").notNull().default(0),
+  maxRedemptions: integer("max_redemptions").notNull().default(1),
+  currentRedemptions: integer("current_redemptions").notNull().default(0),
+  expiresAt: timestamp("expires_at"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type PromoCode = typeof promoCodes.$inferSelect;
+
+export const promoRedemptions = pgTable(
+  "promo_redemptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    promoCodeId: uuid("promo_code_id").notNull(),
+    sessionId: text("session_id").notNull(),
+    redeemedAt: timestamp("redeemed_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("promo_redemption_unique_idx").on(table.promoCodeId, table.sessionId),
+  ]
+);
+
+export type PromoRedemption = typeof promoRedemptions.$inferSelect;

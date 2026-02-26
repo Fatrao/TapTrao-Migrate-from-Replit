@@ -5,6 +5,7 @@ import { useTokenBalance } from "@/hooks/use-tokens";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import PromoCodeRedeem from "@/components/promo-code-redeem";
 
 const tradePacks = [
   {
@@ -316,6 +317,11 @@ export default function Pricing() {
             <Search style={{ width: 16, height: 16 }} />
             Check shipment risk — Free
           </button>
+        </div>
+
+        {/* Promo Code Redemption */}
+        <div style={{ ...S.card, marginBottom: 40, background: "var(--card2)" }}>
+          <PromoCodeRedeem />
         </div>
 
         {/* SECTION 1 — Trade Packs (core product, FIRST) */}

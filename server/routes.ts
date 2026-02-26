@@ -94,7 +94,8 @@ export async function registerRoutes(
     try {
       const sessionId = getSessionId(req, res);
       const { balance, lcBalance, freeLookupUsed } = await storage.getTokenBalance(sessionId);
-      res.json({ balance, lcBalance, freeLookupUsed });
+      const isAdmin = await storage.isAdminSession(sessionId);
+      res.json({ balance, lcBalance, freeLookupUsed, isAdmin });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -410,19 +411,22 @@ export async function registerRoutes(
       }
 
       const sessionId = getSessionId(req, res);
-      const { balance, freeLookupUsed } = await storage.getTokenBalance(sessionId);
+      const isAdmin = await storage.isAdminSession(sessionId);
 
-      if (!freeLookupUsed) {
-        await storage.markDemoUsed(sessionId);
-      } else if (balance < LOOKUP_COST) {
-        res.status(402).json({
-          message: "Insufficient tokens",
-          required: LOOKUP_COST,
-          balance,
-        });
-        return;
-      } else {
-        await storage.spendTokens(sessionId, LOOKUP_COST, `Compliance Lookup — ${commodityId}`);
+      if (!isAdmin) {
+        const { balance, freeLookupUsed } = await storage.getTokenBalance(sessionId);
+        if (!freeLookupUsed) {
+          await storage.markDemoUsed(sessionId);
+        } else if (balance < LOOKUP_COST) {
+          res.status(402).json({
+            message: "Insufficient tokens",
+            required: LOOKUP_COST,
+            balance,
+          });
+          return;
+        } else {
+          await storage.spendTokens(sessionId, LOOKUP_COST, `Compliance Lookup — ${commodityId}`);
+        }
       }
 
       const result = await runComplianceCheck(commodityId, originId, destinationId);
@@ -572,88 +576,91 @@ export async function registerRoutes(
       }
 
       const sessionId = getSessionId(req, res);
-      const { balance, freeLookupUsed } = await storage.getTokenBalance(sessionId);
+      const isAdmin = await storage.isAdminSession(sessionId);
       const { lcFields, documents, sourceLookupId } = parsed.data;
       const recheckSessionId = req.body.recheckSessionId as string | undefined;
 
-      if (sourceLookupId) {
-        const alreadyHasLcCheck = await storage.hasLcCheckForLookup(sourceLookupId);
-        if (alreadyHasLcCheck) {
-          if (recheckSessionId) {
-            const alreadyUsed = await storage.hasStripeSessionBeenProcessed(recheckSessionId);
-            if (alreadyUsed) {
-              res.status(402).json({
-                message: "This re-check payment has already been used. Please purchase a new re-check.",
-                type: "lc_recheck",
-                sourceLookupId,
-              });
-              return;
-            }
-            const stripeKey = process.env.STRIPE_SECRET_KEY;
-            if (!stripeKey) {
-              res.status(500).json({ message: "Stripe is not configured" });
-              return;
-            }
-            const Stripe = (await import("stripe")).default;
-            const stripe = new Stripe(stripeKey);
-            try {
-              const stripeSession = await stripe.checkout.sessions.retrieve(recheckSessionId);
-              if (stripeSession.payment_status !== "paid" || stripeSession.metadata?.pack !== "lc_recheck") {
+      if (!isAdmin) {
+        const { balance, freeLookupUsed } = await storage.getTokenBalance(sessionId);
+        if (sourceLookupId) {
+          const alreadyHasLcCheck = await storage.hasLcCheckForLookup(sourceLookupId);
+          if (alreadyHasLcCheck) {
+            if (recheckSessionId) {
+              const alreadyUsed = await storage.hasStripeSessionBeenProcessed(recheckSessionId);
+              if (alreadyUsed) {
                 res.status(402).json({
-                  message: "Re-check payment not found. Please try again.",
+                  message: "This re-check payment has already been used. Please purchase a new re-check.",
                   type: "lc_recheck",
                   sourceLookupId,
                 });
                 return;
               }
-              await db.insert(tokenTransactions).values({
-                sessionId,
-                type: "PURCHASE",
-                amount: 0,
-                description: "LC re-check payment — $9.99",
-                stripeSessionId: recheckSessionId,
-              });
-            } catch {
+              const stripeKey = process.env.STRIPE_SECRET_KEY;
+              if (!stripeKey) {
+                res.status(500).json({ message: "Stripe is not configured" });
+                return;
+              }
+              const Stripe = (await import("stripe")).default;
+              const stripe = new Stripe(stripeKey);
+              try {
+                const stripeSession = await stripe.checkout.sessions.retrieve(recheckSessionId);
+                if (stripeSession.payment_status !== "paid" || stripeSession.metadata?.pack !== "lc_recheck") {
+                  res.status(402).json({
+                    message: "Re-check payment not found. Please try again.",
+                    type: "lc_recheck",
+                    sourceLookupId,
+                  });
+                  return;
+                }
+                await db.insert(tokenTransactions).values({
+                  sessionId,
+                  type: "PURCHASE",
+                  amount: 0,
+                  description: "LC re-check payment — $9.99",
+                  stripeSessionId: recheckSessionId,
+                });
+              } catch {
+                res.status(402).json({
+                  message: "Re-check payment verification failed. Please try again.",
+                  type: "lc_recheck",
+                  sourceLookupId,
+                });
+                return;
+              }
+            } else {
               res.status(402).json({
-                message: "Re-check payment verification failed. Please try again.",
+                message: "You've already run an LC check for this trade. Re-check after supplier corrections — $9.99.",
                 type: "lc_recheck",
                 sourceLookupId,
               });
               return;
             }
-          } else {
+          }
+          if (!freeLookupUsed) {
+            await storage.markDemoUsed(sessionId);
+          } else if (balance < 1) {
             res.status(402).json({
-              message: "You've already run an LC check for this trade. Re-check after supplier corrections — $9.99.",
-              type: "lc_recheck",
-              sourceLookupId,
+              message: "LC checks are included in trade packs. Purchase a trade pack to continue.",
+              required: 1,
+              balance,
+              type: "trade_pack",
+            });
+            return;
+          }
+        } else {
+          if (!freeLookupUsed) {
+            await storage.markDemoUsed(sessionId);
+          } else if (balance < 1) {
+            res.status(402).json({
+              message: "LC checks are included in trade packs. Purchase a trade pack to continue.",
+              required: 1,
+              balance,
+              type: "trade_pack",
             });
             return;
           }
         }
-        if (!freeLookupUsed) {
-          await storage.markDemoUsed(sessionId);
-        } else if (balance < 1) {
-          res.status(402).json({
-            message: "LC checks are included in trade packs. Purchase a trade pack to continue.",
-            required: 1,
-            balance,
-            type: "trade_pack",
-          });
-          return;
-        }
-      } else {
-        if (!freeLookupUsed) {
-          await storage.markDemoUsed(sessionId);
-        } else if (balance < 1) {
-          res.status(402).json({
-            message: "LC checks are included in trade packs. Purchase a trade pack to continue.",
-            required: 1,
-            balance,
-            type: "trade_pack",
-          });
-          return;
-        }
-      }
+      } // end if (!isAdmin)
       const { results, summary } = runLcCrossCheck(lcFields, documents);
       const timestamp = new Date().toISOString();
       const integrityHash = computeLcHash(lcFields, documents, results, timestamp);
@@ -1665,6 +1672,93 @@ export async function registerRoutes(
           });
         } catch (_e) {}
       });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ── Admin Login ──
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const { password } = req.body;
+      const adminPw = process.env.ADMIN_PASSWORD;
+      if (!adminPw || password !== adminPw) {
+        res.status(401).json({ message: "Invalid admin password" });
+        return;
+      }
+      const sessionId = getSessionId(req, res);
+      await storage.setAdminFlag(sessionId, true);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/admin/status", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const isAdmin = await storage.isAdminSession(sessionId);
+      res.json({ isAdmin });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ── Promo Codes (admin) ──
+  app.post("/api/admin/promo-codes", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const isAdmin = await storage.isAdminSession(sessionId);
+      if (!isAdmin) { res.status(401).json({ message: "Unauthorized" }); return; }
+
+      const { code, tradeTokens, lcCredits, maxRedemptions, expiresAt } = req.body;
+      if (!code) { res.status(400).json({ message: "code is required" }); return; }
+
+      const existing = await storage.getPromoCodeByCode(code);
+      if (existing) { res.status(409).json({ message: "Code already exists" }); return; }
+
+      const promoCode = await storage.createPromoCode({
+        code: code.toUpperCase().trim(),
+        tradeTokens: tradeTokens || 0,
+        lcCredits: lcCredits || 0,
+        maxRedemptions: maxRedemptions || 1,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
+      });
+      res.json({ success: true, promoCode });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/admin/promo-codes", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const isAdmin = await storage.isAdminSession(sessionId);
+      if (!isAdmin) { res.status(401).json({ message: "Unauthorized" }); return; }
+      const codes = await storage.getPromoCodes();
+      res.json(codes);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ── Promo Code Redemption (user) ──
+  app.post("/api/promo/redeem", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { code } = req.body;
+      if (!code || typeof code !== "string") { res.status(400).json({ message: "code is required" }); return; }
+
+      const promoCode = await storage.getPromoCodeByCode(code);
+      if (!promoCode) { res.status(404).json({ message: "Invalid promo code" }); return; }
+      if (!promoCode.isActive) { res.status(400).json({ message: "This promo code is no longer active" }); return; }
+      if (promoCode.expiresAt && new Date(promoCode.expiresAt) < new Date()) { res.status(400).json({ message: "This promo code has expired" }); return; }
+
+      const result = await storage.redeemPromoCode(promoCode.id, sessionId, promoCode.tradeTokens, promoCode.lcCredits, promoCode.code);
+      if (!result.success) { res.status(400).json({ message: result.message }); return; }
+
+      const { balance, lcBalance } = await storage.getTokenBalance(sessionId);
+      res.json({ success: true, message: result.message, tradeTokensGranted: promoCode.tradeTokens, lcCreditsGranted: promoCode.lcCredits, balance, lcBalance });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

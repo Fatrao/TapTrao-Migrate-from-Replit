@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { eq, sql, desc, inArray } from "drizzle-orm";
+import { eq, and, sql, desc, inArray } from "drizzle-orm";
 import { createHash } from "crypto";
 import {
   destinations,
@@ -46,6 +46,9 @@ import {
   eudrRecords,
   type EudrRecord,
   type InsertEudrRecord,
+  promoCodes,
+  promoRedemptions,
+  type PromoCode,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -126,6 +129,13 @@ export interface IStorage {
   getEudrRecordByLookupId(lookupId: string): Promise<EudrRecord | undefined>;
   updateEudrRecord(id: string, data: Partial<InsertEudrRecord>): Promise<EudrRecord | undefined>;
   markLookupEudrComplete(lookupId: string): Promise<void>;
+  // Admin & Promo
+  setAdminFlag(sessionId: string, isAdmin: boolean): Promise<void>;
+  isAdminSession(sessionId: string): Promise<boolean>;
+  createPromoCode(data: { code: string; tradeTokens: number; lcCredits: number; maxRedemptions: number; expiresAt?: Date | null }): Promise<PromoCode>;
+  getPromoCodeByCode(code: string): Promise<PromoCode | undefined>;
+  getPromoCodes(): Promise<PromoCode[]>;
+  redeemPromoCode(promoCodeId: string, sessionId: string, tradeTokens: number, lcCredits: number, code: string): Promise<{ success: boolean; message: string }>;
 }
 
 export type EnrichedTrade = {
@@ -775,6 +785,69 @@ export class DatabaseStorage implements IStorage {
     await db.update(lookups)
       .set({ eudrComplete: true })
       .where(eq(lookups.id, lookupId));
+  }
+
+  // ── Admin & Promo ──
+
+  async setAdminFlag(sessionId: string, isAdmin: boolean): Promise<void> {
+    await this.getOrCreateUserTokens(sessionId);
+    await db.update(userTokens).set({ isAdmin, updatedAt: new Date() }).where(eq(userTokens.sessionId, sessionId));
+  }
+
+  async isAdminSession(sessionId: string): Promise<boolean> {
+    const user = await this.getOrCreateUserTokens(sessionId);
+    return (user as any).isAdmin ?? false;
+  }
+
+  async createPromoCode(data: { code: string; tradeTokens: number; lcCredits: number; maxRedemptions: number; expiresAt?: Date | null }): Promise<PromoCode> {
+    const [row] = await db.insert(promoCodes).values({
+      code: data.code.toUpperCase().trim(),
+      tradeTokens: data.tradeTokens,
+      lcCredits: data.lcCredits,
+      maxRedemptions: data.maxRedemptions,
+      expiresAt: data.expiresAt ?? null,
+    }).returning();
+    return row;
+  }
+
+  async getPromoCodeByCode(code: string): Promise<PromoCode | undefined> {
+    const [row] = await db.select().from(promoCodes).where(eq(promoCodes.code, code.toUpperCase().trim()));
+    return row;
+  }
+
+  async getPromoCodes(): Promise<PromoCode[]> {
+    return db.select().from(promoCodes).orderBy(desc(promoCodes.createdAt));
+  }
+
+  async redeemPromoCode(promoCodeId: string, sessionId: string, tradeTokens: number, lcCredits: number, code: string): Promise<{ success: boolean; message: string }> {
+    // Check double-redeem
+    const [existing] = await db.select().from(promoRedemptions)
+      .where(and(eq(promoRedemptions.promoCodeId, promoCodeId), eq(promoRedemptions.sessionId, sessionId)));
+    if (existing) return { success: false, message: "You have already redeemed this code." };
+
+    // Atomic increment + check max
+    const [updated] = await db.update(promoCodes)
+      .set({ currentRedemptions: sql`${promoCodes.currentRedemptions} + 1` })
+      .where(and(eq(promoCodes.id, promoCodeId), sql`${promoCodes.currentRedemptions} < ${promoCodes.maxRedemptions}`))
+      .returning();
+    if (!updated) return { success: false, message: "This promo code has reached its maximum redemptions." };
+
+    // Record redemption
+    await db.insert(promoRedemptions).values({ promoCodeId, sessionId });
+
+    // Credit tokens
+    const syntheticId = `promo_${code}_${sessionId}`;
+    if (tradeTokens > 0) {
+      await this.creditTokens(sessionId, tradeTokens, `Promo code ${code} — ${tradeTokens} trade tokens`, syntheticId);
+    }
+    if (lcCredits > 0) {
+      await this.creditLcCredits(sessionId, lcCredits, `Promo code ${code} — ${lcCredits} LC credits`, `${syntheticId}_lc`);
+    }
+
+    const parts: string[] = [];
+    if (tradeTokens > 0) parts.push(`${tradeTokens} trade token${tradeTokens > 1 ? "s" : ""}`);
+    if (lcCredits > 0) parts.push(`${lcCredits} LC credit${lcCredits > 1 ? "s" : ""}`);
+    return { success: true, message: `Redeemed! ${parts.join(" and ")} added.` };
   }
 }
 

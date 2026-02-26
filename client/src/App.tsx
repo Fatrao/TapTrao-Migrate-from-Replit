@@ -22,6 +22,8 @@ import SupplierUploadPage from "@/pages/supplier-upload";
 import VerifyPage from "@/pages/verify";
 import AlertsPage from "@/pages/alerts";
 import AdminAlertsPage from "@/pages/admin-alerts";
+import AdminLogin from "@/pages/admin-login";
+import AdminPromoCodes from "@/pages/admin-promo-codes";
 import EudrPage from "@/pages/eudr";
 import DemurragePage from "@/pages/demurrage";
 
@@ -38,6 +40,8 @@ function Router() {
       <Route path="/tokens/success" component={TokenSuccess} />
       <Route path="/admin/data" component={AdminData} />
       <Route path="/admin/alerts/new" component={AdminAlertsPage} />
+      <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/admin/promo-codes" component={AdminPromoCodes} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/terms-of-service" component={TermsOfService} />
       <Route path="/settings/profile" component={SettingsProfile} />
