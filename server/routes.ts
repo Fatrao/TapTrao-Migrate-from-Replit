@@ -663,11 +663,9 @@ export async function registerRoutes(
               return;
             }
           }
-          if (!freeLookupUsed) {
-            await storage.markDemoUsed(sessionId);
-          } else if (balance < 1) {
+          if (balance < 1) {
             res.status(402).json({
-              message: "LC checks are included in trade packs. Purchase a trade pack to continue.",
+              message: "LC checks require a trade credit or standalone LC purchase ($19.99).",
               required: 1,
               balance,
               type: "trade_pack",
@@ -675,11 +673,9 @@ export async function registerRoutes(
             return;
           }
         } else {
-          if (!freeLookupUsed) {
-            await storage.markDemoUsed(sessionId);
-          } else if (balance < 1) {
+          if (balance < 1) {
             res.status(402).json({
-              message: "LC checks are included in trade packs. Purchase a trade pack to continue.",
+              message: "LC checks require a trade credit or standalone LC purchase ($19.99).",
               required: 1,
               balance,
               type: "trade_pack",

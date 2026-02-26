@@ -29,6 +29,8 @@ const complianceItems: NavItem[] = [
 
 /* ── Section: Tools ── */
 const toolsItems: NavItem[] = [
+  { icon: "◧", label: "LC Check", href: "/lc-check" },
+  { icon: "⧖", label: "Demurrage Calc", href: "/demurrage" },
   { icon: "◫", label: "Pricing", href: "/pricing" },
   { icon: "◬", label: "Settings", href: "/settings/profile" },
 ];
