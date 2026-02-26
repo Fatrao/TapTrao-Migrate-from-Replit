@@ -2,6 +2,8 @@ import { Link } from "wouter";
 import { useState } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { Menu, X } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -10,6 +12,26 @@ export default function Home() {
     "Know your compliance before you commit",
     "Trade compliance for commodity traders sourcing from Africa. No ERP. No broker. No guesswork."
   );
+
+  const checkoutMutation = useMutation({
+    mutationFn: async (pack: string) => {
+      const res = await apiRequest("POST", "/api/tokens/checkout", { pack });
+      return res.json();
+    },
+    onSuccess: (data) => {
+      if (data.url) window.location.href = data.url;
+    },
+  });
+
+  const lcStandaloneMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/tokens/lc-standalone-checkout");
+      return res.json();
+    },
+    onSuccess: (data) => {
+      if (data.url) window.location.href = data.url;
+    },
+  });
 
   return (
     <div className="hp-page">
@@ -212,9 +234,9 @@ export default function Home() {
               <li><span className="check">✓</span> Customs declaration data pack (CSV)</li>
               <li><span className="check">✓</span> Instructions for supplier</li>
             </ul>
-            <Link href="/pricing">
-              <span className="pack-btn pack-btn-outline">Buy Single Shipment</span>
-            </Link>
+            <button className="pack-btn pack-btn-outline" onClick={() => checkoutMutation.mutate("single_trade")} disabled={checkoutMutation.isPending}>
+              {checkoutMutation.isPending && checkoutMutation.variables === "single_trade" ? "Loading…" : "Buy Single Shipment"}
+            </button>
           </div>
 
           {/* 3 Shipments — Featured */}
@@ -229,9 +251,9 @@ export default function Home() {
               <li><span className="check">✓</span> Save as template</li>
               <li><span className="check">✓</span> 13% discount</li>
             </ul>
-            <Link href="/pricing">
-              <span className="pack-btn pack-btn-featured">Buy 3 Shipments</span>
-            </Link>
+            <button className="pack-btn pack-btn-featured" onClick={() => checkoutMutation.mutate("3_trade")} disabled={checkoutMutation.isPending}>
+              {checkoutMutation.isPending && checkoutMutation.variables === "3_trade" ? "Loading…" : "Buy 3 Shipments"}
+            </button>
           </div>
 
           {/* 10 Shipments */}
@@ -245,9 +267,9 @@ export default function Home() {
               <li><span className="check">✓</span> Stale-check & refresh</li>
               <li><span className="check">✓</span> 28% discount</li>
             </ul>
-            <Link href="/pricing">
-              <span className="pack-btn pack-btn-outline">Buy 10 Shipments</span>
-            </Link>
+            <button className="pack-btn pack-btn-outline" onClick={() => checkoutMutation.mutate("10_trade")} disabled={checkoutMutation.isPending}>
+              {checkoutMutation.isPending && checkoutMutation.variables === "10_trade" ? "Loading…" : "Buy 10 Shipments"}
+            </button>
           </div>
 
           {/* 25 Shipments */}
@@ -261,9 +283,9 @@ export default function Home() {
               <li><span className="check">✓</span> Best value for teams</li>
               <li><span className="check">✓</span> 44% discount</li>
             </ul>
-            <Link href="/pricing">
-              <span className="pack-btn pack-btn-outline">Buy 25 Shipments</span>
-            </Link>
+            <button className="pack-btn pack-btn-outline" onClick={() => checkoutMutation.mutate("25_trade")} disabled={checkoutMutation.isPending}>
+              {checkoutMutation.isPending && checkoutMutation.variables === "25_trade" ? "Loading…" : "Buy 25 Shipments"}
+            </button>
           </div>
         </div>
 
@@ -296,9 +318,9 @@ export default function Home() {
                 <li className="excluded"><span className="cross">✕</span> Document checklist</li>
               </ul>
               <div className="lc-note">Included free with every trade credit</div>
-              <Link href="/lc-check">
-                <span className="lc-btn" data-testid="button-pricing-lc">📄 Check LC only</span>
-              </Link>
+              <button className="lc-btn" data-testid="button-pricing-lc" onClick={() => lcStandaloneMutation.mutate()} disabled={lcStandaloneMutation.isPending}>
+                {lcStandaloneMutation.isPending ? "Loading…" : "📄 Check LC only — $19.99"}
+              </button>
             </div>
 
             {/* Re-check Card */}

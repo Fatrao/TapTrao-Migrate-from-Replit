@@ -240,46 +240,46 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
 
       {/* MAIN AREA */}
       <div className="main-box">
-        {/* TOP NAV */}
-        <div className="top-nav">
-          {/* Left: hamburger on mobile, nav links on desktop */}
-          {isMobile ? (
-            <button onClick={() => setSidebarOpen(true)} className="hamburger-btn" aria-label="Open menu" data-testid="shell-hamburger">
-              <Menu size={22} />
-            </button>
-          ) : (
-            <div className="top-nav-links">
-              {topCenter || <DefaultNavLinks activePage={location} />}
-            </div>
-          )}
-
-          {/* Right: icon buttons + avatar */}
-          <div className="top-nav-icons">
-            <Link href="/alerts">
-              <div className="icon-btn" data-testid="shell-bell-icon">
-                🔔
-                {alertsBadge > 0 && <span className="dot" />}
-              </div>
-            </Link>
-
-            {!isMobile && (
-              <Link href="/inbox">
-                <div className="icon-btn">💬</div>
-              </Link>
-            )}
-
-            {!isMobile && (
-              <Link href="/settings/profile">
-                <div className="icon-btn">⚙️</div>
-              </Link>
-            )}
-
-            <div className="user-avatar">F</div>
-          </div>
-        </div>
-
-        {/* Scrollable content */}
+        {/* Content area wraps BOTH nav and children — gradient flows behind nav */}
         <div className={contentClassName || "main-content"}>
+          {/* TOP NAV — inside the content area per design ref */}
+          <div className="top-nav">
+            {/* Left: hamburger on mobile, nav links on desktop */}
+            {isMobile ? (
+              <button onClick={() => setSidebarOpen(true)} className="hamburger-btn" aria-label="Open menu" data-testid="shell-hamburger">
+                <Menu size={22} />
+              </button>
+            ) : (
+              <div className="top-nav-links">
+                {topCenter || <DefaultNavLinks activePage={location} />}
+              </div>
+            )}
+
+            {/* Right: icon buttons + avatar */}
+            <div className="top-nav-icons">
+              <Link href="/alerts">
+                <div className="icon-btn" data-testid="shell-bell-icon">
+                  🔔
+                  {alertsBadge > 0 && <span className="dot" />}
+                </div>
+              </Link>
+
+              {!isMobile && (
+                <Link href="/inbox">
+                  <div className="icon-btn">💬</div>
+                </Link>
+              )}
+
+              {!isMobile && (
+                <Link href="/settings/profile">
+                  <div className="icon-btn">⚙️</div>
+                </Link>
+              )}
+
+              <div className="user-avatar">F</div>
+            </div>
+          </div>
+
           {children}
         </div>
       </div>

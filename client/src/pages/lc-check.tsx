@@ -226,18 +226,15 @@ export default function LcCheck() {
     <AppShell
       contentClassName="content-area"
       topCenter={
-        <div className="top-nav-links">
-          <Link href="/dashboard"><span>Dashboard</span></Link>
-          <Link href="/lookup"><span>Commodities</span></Link>
-          <Link href="/inbox"><span>Suppliers</span></Link>
-          <Link href="/lc-check"><span className="active">Compliance</span></Link>
-          <Link href="/inbox"><span>Messages</span></Link>
-        </div>
+        <>
+          <Link href="/dashboard"><a>Dashboard</a></Link>
+          <Link href="/lookup"><a>Commodities</a></Link>
+          <Link href="/inbox"><a>Suppliers</a></Link>
+          <Link href="/lc-check"><a className="active">Compliance</a></Link>
+          <Link href="/inbox"><a>Messages</a></Link>
+        </>
       }
     >
-      <StepNav steps={WORKFLOW_STEPS} currentIndex={1} completedUpTo={1} />
-      <TabBar tabs={LC_TABS} activeTab={lcActiveTab} onChange={setLcActiveTab} />
-
       {lcActiveTab === "Supplier docs" ? (
         <SupplierDocsTab prefillData={prefillData} />
       ) : lcActiveTab === "TwinLog Trail" ? (
@@ -249,70 +246,55 @@ export default function LcCheck() {
       ) : (
       <div data-testid="lc-check-page">
 
-        {/* ═══════ HERO ═══════ */}
-        <div className="lc-hero">
-          <div className="lc-hero-top">
-            <div>
-              <div className="lc-hero-tag">Compliance › LC Check › New Check</div>
-              <div className="lc-hero-title" data-testid="text-lc-title">
-                LC Document<br />Checker
-              </div>
-              <div className="lc-hero-sub">
-                Cross-check supplier docs against your LC — UCP 600 &amp; ISBP 745 applied.
-              </div>
-            </div>
-            <div className="lc-price-pill">
-              {isFreeCheck ? (
-                <><span style={{ background: "var(--green)", color: "#000", padding: "1px 7px", borderRadius: 20, fontSize: 10, fontWeight: 800 }}>FREE</span> First check · $19.99 after</>
-              ) : (
-                <>$19.99 per check</>
-              )}
+        {/* ═══════ HERO — matches design ref .green-hero-box ═══════ */}
+        <div className="green-hero-box">
+          <div className="hero-row">
+            <div className="breadcrumb">Compliance › LC Check › New Check</div>
+            <div className="price-pill" data-testid="text-lc-title">
+              {isFreeCheck ? "FREE" : "$19.99 per check"}
             </div>
           </div>
+          <h1>LC Document<br />Checker</h1>
+          <p className="subtitle">
+            Cross-check supplier docs against your LC — UCP 600 &amp; ISBP 745 applied.
+          </p>
         </div>
 
-        {/* ═══════ STEPPER ═══════ */}
-        <div className="lc-stepper-wrap">
-          <div className="lc-stepper">
-            {([
-              { n: 1, label: "LC Terms" },
-              { n: 2, label: "Supplier Docs" },
-              { n: 3, label: "Review" },
-              { n: 4, label: "Results" },
-            ] as const).map((s, i, arr) => {
-              const cls = step > s.n ? "done" : step === s.n ? "active" : "pend";
-              return (
-                <div key={s.n} style={{ display: "contents" }}>
-                  <div className="lc-stp">
-                    <div className={`lc-stp-n ${cls}`} data-testid={`step-indicator-${s.n}`}>
-                      {step > s.n ? "✓" : s.n}
-                    </div>
-                    <span className={`lc-stp-l ${cls}`}>{s.label}</span>
-                  </div>
-                  {i < arr.length - 1 && (
-                    <div className={`lc-stp-line${step > s.n ? " done" : ""}`} />
-                  )}
+        {/* ═══════ STEPPER — matches design ref .step-bar ═══════ */}
+        <div className="step-bar">
+          {([
+            { n: 1, label: "LC Terms" },
+            { n: 2, label: "Supplier Docs" },
+            { n: 3, label: "Review" },
+            { n: 4, label: "Results" },
+          ] as const).map((s, i, arr) => (
+            <div key={s.n} style={{ display: "contents" }}>
+              <div className={`step ${step >= s.n ? "active" : "inactive"}`}>
+                <div className="step-number" data-testid={`step-indicator-${s.n}`}>
+                  {step > s.n ? "✓" : s.n}
                 </div>
-              );
-            })}
-          </div>
+                <div className="step-label">{s.label}</div>
+              </div>
+              {i < arr.length - 1 && <div className="step-line" />}
+            </div>
+          ))}
         </div>
 
         {/* Prefill Banner */}
         {showPrefillBanner && prefillData && (
-          <div className="lc-note" style={{ margin: "14px 24px 0", borderRadius: 14, padding: "16px 20px" }} data-testid="banner-lc-prefill">
-            <ExternalLink size={18} style={{ color: "var(--green)", flexShrink: 0, marginTop: 1 }} />
+          <div className="upload-note" style={{ margin: "14px 32px 0" }} data-testid="banner-lc-prefill">
+            <ExternalLink size={18} style={{ color: "#4ade80", flexShrink: 0, marginTop: 1 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-prefill-info">
+              <p style={{ fontSize: 13, fontWeight: 600, color: "#4ade80" }} data-testid="text-prefill-info">
                 Pre-filled from your compliance lookup
               </p>
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>
+              <p style={{ fontSize: 13, color: "#555" }}>
                 {prefillData.commodity_name} — {prefillData.origin_name} → {prefillData.dest_name}
               </p>
               {prefillData.lookup_id && (
                 <Link
                   href="/trades"
-                  style={{ fontSize: 11, color: "var(--green)", textDecoration: "underline", marginTop: 4, display: "inline-block" }}
+                  style={{ fontSize: 11, color: "#4ade80", textDecoration: "underline", marginTop: 4, display: "inline-block" }}
                   data-testid="link-view-lookup"
                 >
                   View lookup →
@@ -321,7 +303,7 @@ export default function LcCheck() {
             </div>
             <button
               onClick={() => setShowPrefillBanner(false)}
-              style={{ color: "rgba(255,255,255,0.4)", background: "none", border: "none", cursor: "pointer" }}
+              style={{ color: "#999", background: "none", border: "none", cursor: "pointer" }}
               data-testid="button-dismiss-prefill-banner"
             >
               <X size={16} />
@@ -332,17 +314,13 @@ export default function LcCheck() {
         {/* ═══════ STEP 1 — LC Terms ═══════ */}
         {step === 1 && (
           <>
-            <div className="lc-wc" style={{ marginTop: 14 }}>
-              <div className="lc-wc-head">
-                <div>
-                  <div className="lc-wc-title">📋 Letter of Credit — Key Terms</div>
-                  <div className="lc-wc-sub">Enter exactly as they appear on your LC.</div>
-                </div>
-              </div>
+            <div className="form-card">
+              <div className="form-card-header"><span>📋</span><h2>Letter of Credit — Key Terms</h2></div>
+              <p className="form-card-subtitle">Enter exactly as they appear on your LC.</p>
 
               {/* Row 1: LC Reference + Issuing Bank */}
-              <div className="lc-fg2">
-                <div className="lc-field">
+              <div className="form-row cols-2">
+                <div className="form-group">
                   <label>LC Reference</label>
                   <input type="text"
                     value={lcFields.lcReference}
@@ -351,15 +329,15 @@ export default function LcCheck() {
                     data-testid="input-lc-reference"
                   />
                 </div>
-                <div className="lc-field">
+                <div className="form-group">
                   <label>Issuing Bank</label>
                   <input type="text" placeholder="e.g. Société Générale, Abidjan" />
                 </div>
               </div>
 
               {/* Row 2: Beneficiary + Applicant */}
-              <div className="lc-fg2">
-                <div className="lc-field">
+              <div className="form-row cols-2">
+                <div className="form-group">
                   <label>Beneficiary (Supplier) {req}</label>
                   <input type="text"
                     value={lcFields.beneficiaryName}
@@ -368,7 +346,7 @@ export default function LcCheck() {
                     data-testid="input-beneficiary-name"
                   />
                 </div>
-                <div className="lc-field">
+                <div className="form-group">
                   <label>Applicant (Buyer) {req}</label>
                   <input type="text"
                     value={lcFields.applicantName}
@@ -380,8 +358,8 @@ export default function LcCheck() {
               </div>
 
               {/* Goods Description (full width) */}
-              <div className="lc-fg2">
-                <div className="lc-field lc-f-full">
+              <div className="form-row cols-1">
+                <div className="form-group">
                   <label>Goods Description {req}</label>
                   <input type="text"
                     value={lcFields.goodsDescription}
@@ -393,8 +371,8 @@ export default function LcCheck() {
               </div>
 
               {/* 3-col: Quantity, LC Amount, Currency */}
-              <div className="lc-fg3">
-                <div className="lc-field">
+              <div className="form-row cols-3">
+                <div className="form-group">
                   <label>Quantity {req}</label>
                   <input type="text"
                     value={lcFields.quantity || ""}
@@ -403,7 +381,7 @@ export default function LcCheck() {
                     data-testid="input-quantity"
                   />
                 </div>
-                <div className="lc-field">
+                <div className="form-group">
                   <label>LC Amount {req}</label>
                   <input type="number"
                     value={lcFields.totalAmount || ""}
@@ -412,7 +390,7 @@ export default function LcCheck() {
                     data-testid="input-total-amount"
                   />
                 </div>
-                <div className="lc-field">
+                <div className="form-group">
                   <label>Currency</label>
                   <select
                     value={lcFields.currency}
@@ -425,8 +403,8 @@ export default function LcCheck() {
               </div>
 
               {/* 3-col: Ports + Country of Origin */}
-              <div className="lc-fg3">
-                <div className="lc-field">
+              <div className="form-row cols-3">
+                <div className="form-group">
                   <label>Port of Loading</label>
                   <input type="text"
                     value={lcFields.portOfLoading}
@@ -435,7 +413,7 @@ export default function LcCheck() {
                     data-testid="input-port-loading"
                   />
                 </div>
-                <div className="lc-field">
+                <div className="form-group">
                   <label>Port of Discharge</label>
                   <input type="text"
                     value={lcFields.portOfDischarge}
@@ -444,7 +422,7 @@ export default function LcCheck() {
                     data-testid="input-port-discharge"
                   />
                 </div>
-                <div className="lc-field">
+                <div className="form-group">
                   <label>Country of Origin</label>
                   <input type="text"
                     value={lcFields.countryOfOrigin}
@@ -456,8 +434,8 @@ export default function LcCheck() {
               </div>
 
               {/* 3-col: Dates + Incoterms */}
-              <div className="lc-fg3">
-                <div className="lc-field">
+              <div className="form-row cols-3">
+                <div className="form-group">
                   <label>Latest Shipment Date {req}</label>
                   <input type="date"
                     value={lcFields.latestShipmentDate}
@@ -465,7 +443,7 @@ export default function LcCheck() {
                     data-testid="input-latest-shipment-date"
                   />
                 </div>
-                <div className="lc-field">
+                <div className="form-group">
                   <label>LC Expiry Date {req}</label>
                   <input type="date"
                     value={lcFields.lcExpiryDate}
@@ -473,7 +451,7 @@ export default function LcCheck() {
                     data-testid="input-lc-expiry-date"
                   />
                 </div>
-                <div className="lc-field">
+                <div className="form-group">
                   <label>Incoterms</label>
                   <select
                     value={lcFields.incoterms}
@@ -486,8 +464,8 @@ export default function LcCheck() {
               </div>
 
               {/* 3-col: HS Code, Unit Price, Quantity Unit */}
-              <div className="lc-fg3">
-                <div className="lc-field">
+              <div className="form-row cols-3">
+                <div className="form-group">
                   <label>HS Code</label>
                   <input type="text"
                     value={lcFields.hsCode}
@@ -496,7 +474,7 @@ export default function LcCheck() {
                     data-testid="input-hs-code"
                   />
                 </div>
-                <div className="lc-field">
+                <div className="form-group">
                   <label>Unit Price</label>
                   <input type="number"
                     value={lcFields.unitPrice || ""}
@@ -505,7 +483,7 @@ export default function LcCheck() {
                     data-testid="input-unit-price"
                   />
                 </div>
-                <div className="lc-field">
+                <div className="form-group">
                   <label>Quantity Unit</label>
                   <select
                     value={lcFields.quantityUnit}
@@ -517,11 +495,11 @@ export default function LcCheck() {
                 </div>
               </div>
 
-              {/* Toggle: Partial Shipments */}
-              <div className="lc-tog-row">
-                <div>
-                  <div className="lc-tog-lbl">Partial Shipments Allowed</div>
-                  <div className="lc-tog-sub">UCP 600 Art. 31</div>
+              {/* Toggle: Partial Shipments — matches design ref .toggle-row */}
+              <div className="toggle-row">
+                <div className="toggle-info">
+                  <h4>Partial Shipments Allowed</h4>
+                  <p>UCP 600 Art. 31</p>
                 </div>
                 <label className="lc-tog">
                   <input type="checkbox"
@@ -534,10 +512,10 @@ export default function LcCheck() {
               </div>
 
               {/* Toggle: Transhipment */}
-              <div className="lc-tog-row">
-                <div>
-                  <div className="lc-tog-lbl">Transhipment Allowed</div>
-                  <div className="lc-tog-sub">UCP 600 Art. 20</div>
+              <div className="toggle-row">
+                <div className="toggle-info">
+                  <h4>Transhipment Allowed</h4>
+                  <p>UCP 600 Art. 20</p>
                 </div>
                 <label className="lc-tog">
                   <input type="checkbox"
@@ -550,16 +528,31 @@ export default function LcCheck() {
               </div>
             </div>
 
-            {/* Step 1 buttons */}
-            <div className="lc-btn-row">
+            {/* Upload Card — matches design ref .upload-card */}
+            <div className="upload-card">
+              <div className="upload-card-header"><span>📎</span><h2>Or Upload LC as PDF</h2></div>
+              <p className="upload-card-subtitle">Attach your LC document for reference alongside manual entry.</p>
+              <div className="upload-zone">
+                <div className="upload-icon">📄</div>
+                <div className="upload-title">Drop your LC here</div>
+                <div className="upload-link">Browse or drop PDF</div>
+              </div>
+              <div className="upload-note">
+                💡 <span><strong>Auto-extraction coming soon</strong> — enter fields manually for now.</span>
+              </div>
+            </div>
+
+            {/* Step 1 buttons — matches design ref .action-row */}
+            <div className="action-row">
               <button
-                className="lc-btn-green"
+                className="btn-primary"
                 disabled={!canProceedStep1}
                 onClick={() => goStep(2)}
                 data-testid="button-next-step-2"
               >
                 Continue to Supplier Docs →
               </button>
+              <button className="btn-secondary">Save Draft</button>
             </div>
           </>
         )}
@@ -567,13 +560,9 @@ export default function LcCheck() {
         {/* ═══════ STEP 2 — Supplier Docs ═══════ */}
         {step === 2 && (
           <>
-            <div className="lc-wc" style={{ marginTop: 14 }}>
-              <div className="lc-wc-head">
-                <div>
-                  <div className="lc-wc-title">📦 Supplier Documents</div>
-                  <div className="lc-wc-sub">Enter the key fields from each supplier document. Add up to 6 documents.</div>
-                </div>
-              </div>
+            <div className="form-card">
+              <div className="form-card-header"><span>📦</span><h2>Supplier Documents</h2></div>
+              <p className="form-card-subtitle">Enter the key fields from each supplier document. Add up to 6 documents.</p>
 
               {/* Document Tabs */}
               <div className="lc-doc-tabs">
@@ -600,7 +589,7 @@ export default function LcCheck() {
                 <div>
                   {/* Document Type selector */}
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 13 }}>
-                    <div className="lc-field" style={{ flex: 1 }}>
+                    <div className="form-group" style={{ flex: 1 }}>
                       <label>Document Type</label>
                       <select
                         value={documents[activeDocTab].documentType}
@@ -624,9 +613,9 @@ export default function LcCheck() {
                   </div>
 
                   {/* Dynamic fields */}
-                  <div className="lc-fg2">
+                  <div className="form-row cols-2">
                     {getDocFields(documents[activeDocTab].documentType).map(field => (
-                      <div key={field.key} className="lc-field">
+                      <div key={field.key} className="form-group">
                         <label>{field.label}</label>
                         <input
                           type={field.type}
@@ -642,16 +631,16 @@ export default function LcCheck() {
             </div>
 
             {/* Step 2 buttons */}
-            <div className="lc-btn-row">
+            <div className="action-row">
               <button
-                className="lc-btn-green"
+                className="btn-primary"
                 disabled={!canProceedStep2}
                 onClick={() => goStep(3)}
                 data-testid="button-next-step-3"
               >
                 Continue to Review →
               </button>
-              <button className="lc-btn-grey" onClick={() => goStep(1)}>
+              <button className="btn-secondary" onClick={() => goStep(1)}>
                 ← Back
               </button>
             </div>
@@ -661,52 +650,49 @@ export default function LcCheck() {
         {/* ═══════ STEP 3 — Review ═══════ */}
         {step === 3 && (
           <>
-            <div className="lc-wc" style={{ marginTop: 14 }}>
-              <div className="lc-wc-head">
-                <div>
-                  <div className="lc-wc-title">🔍 Review Before Check</div>
-                  <div className="lc-wc-sub">Correct any errors now — changes cannot be made after the credit is consumed.</div>
-                </div>
-              </div>
+            <div className="form-card">
+              <div className="form-card-header"><span>🔍</span><h2>Review Before Check</h2></div>
+              <p className="form-card-subtitle">Correct any errors now — changes cannot be made after the credit is consumed.</p>
 
               {/* Warning note */}
-              <div className="lc-warn-note">
-                <span className="lc-note-ic">⚠️</span>
-                <span className="lc-note-txt">
-                  Check all extracted fields carefully. Confirm dates and names match exactly what's on your LC.
-                </span>
+              <div className="upload-note" style={{ marginBottom: 20 }}>
+                ⚠️ <span>Check all extracted fields carefully. Confirm dates and names match exactly what's on your LC.</span>
               </div>
 
               {/* Summary fields in 2-col */}
-              <div className="lc-fg2">
-                <div className="lc-field">
+              <div className="form-row cols-2">
+                <div className="form-group">
                   <label>LC Reference</label>
                   <input type="text" value={lcFields.lcReference} readOnly style={{ background: "#fff" }} />
                 </div>
-                <div className="lc-field">
+                <div className="form-group">
                   <label>Beneficiary</label>
                   <input type="text" value={lcFields.beneficiaryName} readOnly style={{ background: "#fff" }} />
                 </div>
-                <div className="lc-field">
+              </div>
+              <div className="form-row cols-2">
+                <div className="form-group">
                   <label>LC Amount</label>
                   <input type="text" value={`${lcFields.currency} ${lcFields.totalAmount.toLocaleString()}`} readOnly style={{ background: "#fff" }} />
                 </div>
-                <div className="lc-field">
+                <div className="form-group">
                   <label>Goods Description</label>
                   <input type="text" value={lcFields.goodsDescription} readOnly style={{ background: "#fff" }} />
                 </div>
-                <div className="lc-field">
+              </div>
+              <div className="form-row cols-2">
+                <div className="form-group">
                   <label>Latest Shipment Date</label>
                   <input type="text" value={lcFields.latestShipmentDate} readOnly style={{ background: "#fff" }} />
                 </div>
-                <div className="lc-field">
+                <div className="form-group">
                   <label>LC Expiry Date</label>
                   <input type="text" value={lcFields.lcExpiryDate} readOnly style={{ background: "#fff" }} />
                 </div>
               </div>
 
               {/* Documents summary */}
-              <div className="lc-doc-status" style={{ background: "#f7f7f7", borderRadius: 9, padding: "12px 14px" }}>
+              <div style={{ background: "#f7f7f7", borderRadius: 9, padding: "12px 14px" }}>
                 <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8, width: "100%" }}>
                   Documents
                 </div>
@@ -719,9 +705,9 @@ export default function LcCheck() {
             </div>
 
             {/* Step 3 buttons */}
-            <div className="lc-btn-row">
+            <div className="action-row">
               <button
-                className="lc-btn-green"
+                className="btn-primary"
                 disabled={checkMutation.isPending}
                 onClick={() => {
                   checkMutation.mutate(undefined, {
@@ -736,7 +722,7 @@ export default function LcCheck() {
                   ? "▶ Run LC Check — Free"
                   : "▶ Run LC Check — $19.99"}
               </button>
-              <button className="lc-btn-grey" onClick={() => goStep(2)}>
+              <button className="btn-secondary" onClick={() => goStep(2)}>
                 ← Back
               </button>
             </div>
@@ -745,14 +731,14 @@ export default function LcCheck() {
 
         {/* ═══════ STEP 4 — Results ═══════ */}
         {step === 4 && checkMutation.data && (
-          <div style={{ marginTop: 14 }} data-testid="section-lc-results">
+          <div data-testid="section-lc-results">
 
             {/* Verdict banner */}
             {(() => {
               const v = checkMutation.data.summary.verdict;
               const cls = v === "COMPLIANT" ? "ok" : v === "COMPLIANT_WITH_NOTES" ? "warn" : "fail";
               return (
-                <div className={`lc-verdict ${cls}`}>
+                <div className={`lc-verdict ${cls}`} style={{ margin: "0 32px 24px" }}>
                   <span className="lc-v-ic">
                     {cls === "fail" ? "🔴" : cls === "warn" ? "⚠️" : "✅"}
                   </span>
@@ -788,21 +774,17 @@ export default function LcCheck() {
 
             {/* Insurance gap alert */}
             {(checkMutation.data.summary.verdict === "COMPLIANT" || checkMutation.data.summary.verdict === "COMPLIANT_WITH_NOTES") && (
-              <div style={{ margin: "0 24px" }}>
+              <div style={{ margin: "0 32px" }}>
                 <InsuranceGapAlert />
               </div>
             )}
 
             {/* Field-by-field Results */}
-            <div className="lc-wc">
-              <div className="lc-wc-head">
-                <div>
-                  <div className="lc-wc-title">📊 Field-by-Field Results</div>
-                  <div className="lc-wc-sub">
-                    Ref: TT-LC-{new Date().getFullYear()}-{checkMutation.data.integrityHash.substring(0, 6)} · {new Date(checkMutation.data.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                  </div>
-                </div>
-              </div>
+            <div className="form-card">
+              <div className="form-card-header"><span>📊</span><h2>Field-by-Field Results</h2></div>
+              <p className="form-card-subtitle">
+                Ref: TT-LC-{new Date().getFullYear()}-{checkMutation.data.integrityHash.substring(0, 6)} · {new Date(checkMutation.data.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+              </p>
 
               {/* Critical results */}
               {checkMutation.data.results.filter(r => r.severity === "RED").length > 0 && (
@@ -872,15 +854,11 @@ export default function LcCheck() {
 
             {/* Correction Email Card */}
             {checkMutation.data.summary.criticals > 0 && checkMutation.data.correctionEmail && (
-              <div className="lc-wc">
-                <div className="lc-wc-head">
-                  <div>
-                    <div className="lc-wc-title">✉️ Supplier Correction Request</div>
-                    <div className="lc-wc-sub">
-                      Ready to send — {checkMutation.data.summary.criticals} correction{checkMutation.data.summary.criticals > 1 ? "s" : ""} needed
-                    </div>
-                  </div>
-                </div>
+              <div className="form-card">
+                <div className="form-card-header"><span>✉️</span><h2>Supplier Correction Request</h2></div>
+                <p className="form-card-subtitle">
+                  Ready to send — {checkMutation.data.summary.criticals} correction{checkMutation.data.summary.criticals > 1 ? "s" : ""} needed
+                </p>
 
                 <div style={{ background: "#f7f7f7", borderRadius: 10, padding: "16px 18px", border: "1px solid #e8e8e8" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
@@ -939,12 +917,12 @@ export default function LcCheck() {
             </div>
 
             {/* Action buttons */}
-            <div className="lc-btn-row">
-              <button className="lc-btn-green" onClick={() => goStep(2)}>
+            <div className="action-row">
+              <button className="btn-primary" onClick={() => goStep(2)}>
                 Upload Corrected Docs →
               </button>
               <button
-                className="lc-btn-grey"
+                className="btn-secondary"
                 onClick={() => {
                   setStep(1);
                   checkMutation.reset();
@@ -970,9 +948,9 @@ export default function LcCheck() {
 
         {/* Error display */}
         {checkMutation.isError && checkMutation.error.message !== "Insufficient tokens" && step !== 4 && (
-          <div className="lc-verdict fail" style={{ margin: "14px 24px 0" }}>
-            <XCircle size={18} style={{ color: "var(--red)", flexShrink: 0 }} />
-            <p style={{ fontSize: 13, color: "var(--red)" }}>{checkMutation.error.message}</p>
+          <div className="lc-verdict fail" style={{ margin: "14px 32px 0" }}>
+            <XCircle size={18} style={{ color: "#ef4444", flexShrink: 0 }} />
+            <p style={{ fontSize: 13, color: "#ef4444" }}>{checkMutation.error.message}</p>
           </div>
         )}
 
