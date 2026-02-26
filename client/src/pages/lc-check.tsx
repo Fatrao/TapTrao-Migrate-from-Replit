@@ -213,62 +213,13 @@ export default function LcCheck() {
   const [correctionTab, setCorrectionTab] = useState<"email" | "whatsapp">("email");
   const [lcActiveTab, setLcActiveTab] = useState("Check");
 
-  // Group results by severity for Step 4
-  const criticalResults = checkMutation.data?.results.filter(r => r.severity === "RED") || [];
-  const warningResults = checkMutation.data?.results.filter(r => r.severity === "AMBER") || [];
-  const matchedResults = checkMutation.data?.results.filter(r => r.severity === "GREEN") || [];
-
-  const verdictClass = checkMutation.data?.summary.verdict === "COMPLIANT" ? "ok"
-    : checkMutation.data?.summary.verdict === "COMPLIANT_WITH_NOTES" ? "warn" : "fail";
-  const verdictEmoji = verdictClass === "ok" ? "\u2705" : verdictClass === "warn" ? "\u26A0\uFE0F" : "\u274C";
-  const verdictTitle = checkMutation.data?.summary.verdict === "COMPLIANT" ? "All Clear"
-    : checkMutation.data?.summary.verdict === "COMPLIANT_WITH_NOTES" ? "Compliant with Notes"
-    : "Discrepancies Found";
-  const verdictSub = checkMutation.data?.summary.criticals
-    ? `${checkMutation.data.summary.criticals} critical issue${checkMutation.data.summary.criticals > 1 ? "s" : ""} will cause bank rejection.`
-    : checkMutation.data?.summary.warnings
-      ? `${checkMutation.data.summary.warnings} warning${checkMutation.data.summary.warnings > 1 ? "s" : ""} to review.`
-      : "All fields match LC terms.";
-
-  /* ── shared inline styles matching design ref ── */
-  const inputS: React.CSSProperties = {
-    background: "#f5f5f5", border: "1px solid #e8e8e8", borderRadius: 9,
-    padding: "10px 13px", fontSize: 13, color: "#111", fontFamily: "var(--fb)",
-    outline: "none", transition: "all 0.15s", width: "100%",
-  };
-  const labelS: React.CSSProperties = {
-    fontSize: 10.5, fontWeight: 700, color: "#999",
-    textTransform: "uppercase", letterSpacing: "0.08em",
-  };
-  const wcS: React.CSSProperties = {
-    background: "#fff", borderRadius: 16, padding: "20px 22px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)",
-    marginBottom: 12, position: "relative", overflow: "hidden",
-  };
-  const wcHeadS: React.CSSProperties = {
-    display: "flex", alignItems: "flex-start", justifyContent: "space-between",
-    marginBottom: 16, paddingBottom: 13, borderBottom: "1px solid #f0f0f0",
-  };
-  const btnGreenS = (enabled: boolean): React.CSSProperties => ({
-    background: enabled ? "var(--green)" : "#ccc", color: "#000", padding: "11px 26px",
-    borderRadius: 9, fontSize: 13.5, fontWeight: 700,
-    cursor: enabled ? "pointer" : "not-allowed", fontFamily: "var(--fb)",
-    display: "flex", alignItems: "center", gap: 6, transition: "all 0.15s",
-    boxShadow: enabled ? "0 4px 18px rgba(74,140,111,0.35)" : "none", border: "none",
-  });
-  const btnGreyS: React.CSSProperties = {
-    background: "#f0f0f0", color: "#111", padding: "11px 20px", borderRadius: 9,
-    fontSize: 13.5, fontWeight: 600, cursor: "pointer", fontFamily: "var(--fb)",
-    transition: "all 0.15s", border: "1px solid #e0e0e0",
-  };
-  const req = <span style={{ color: "var(--amber)" }}>*</span>;
+  const req = <span className="req">*</span>;
 
   const goStep = (n: number) => {
     setStep(n);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  /* ── helper: get doc type label ── */
   const docLabel = (dt: string) => DOC_TYPES.find(d => d.value === dt)?.label ?? dt;
 
   return (
@@ -292,43 +243,25 @@ export default function LcCheck() {
       ) : lcActiveTab === "TwinLog Trail" ? (
         <TwinLogTrailTab prefillData={prefillData} />
       ) : lcActiveTab === "Corrections" ? (
-        <div style={{ padding: "80px 24px", textAlign: "center", color: "var(--t2)", fontSize: 14 }}>
+        <div style={{ padding: "80px 24px", textAlign: "center", color: "rgba(255,255,255,0.45)", fontSize: 14 }}>
           Coming in the next update.
         </div>
       ) : (
-      <div style={{ flex: 1, paddingBottom: 40 }} data-testid="lc-check-page">
+      <div data-testid="lc-check-page">
 
         {/* ═══════ HERO ═══════ */}
-        <div style={{
-          margin: "0 14px", borderRadius: 16, padding: "20px 24px 36px", position: "relative",
-          background: "linear-gradient(180deg, #0d2218 0%, #0f2a1e 30%, #143424 55%, #1a4030 75%, rgba(26,60,44,0.7) 88%, rgba(26,60,44,0) 100%)",
-          display: "flex", alignItems: "flex-start", justifyContent: "space-between", overflow: "hidden",
-        }}>
-          <div>
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              background: "rgba(255,255,255,0.1)", borderRadius: 24, padding: "4px 14px",
-              fontSize: 12, color: "rgba(255,255,255,0.7)", marginBottom: 12,
-              backdropFilter: "blur(6px)",
-            }}>
-              Compliance › LC Check › New Check
+        <div className="lc-hero">
+          <div className="lc-hero-top">
+            <div>
+              <div className="lc-hero-tag">Compliance › LC Check › New Check</div>
+              <div className="lc-hero-title" data-testid="text-lc-title">
+                LC Document<br />Checker
+              </div>
+              <div className="lc-hero-sub">
+                Cross-check supplier docs against your LC — UCP 600 &amp; ISBP 745 applied.
+              </div>
             </div>
-            <div style={{
-              fontFamily: "var(--fh)", fontSize: 30, fontWeight: 700, color: "#fff",
-              letterSpacing: "0", lineHeight: 1.1, marginBottom: 7,
-            }} data-testid="text-lc-title">
-              LC Document<br />Checker
-            </div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
-              Cross-check supplier docs against your LC — UCP 600 &amp; ISBP 745 applied.
-            </div>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8, paddingTop: 2, flexShrink: 0 }}>
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 7,
-              background: "rgba(74,140,111,0.15)", borderRadius: 20, padding: "5px 13px",
-              fontSize: 12, color: "var(--green)", fontWeight: 600,
-            }}>
+            <div className="lc-price-pill">
               {isFreeCheck ? (
                 <><span style={{ background: "var(--green)", color: "#000", padding: "1px 7px", borderRadius: 20, fontSize: 10, fontWeight: 800 }}>FREE</span> First check · $19.99 after</>
               ) : (
@@ -339,54 +272,35 @@ export default function LcCheck() {
         </div>
 
         {/* ═══════ STEPPER ═══════ */}
-        <div style={{ padding: "18px 28px 8px" }}>
-          <div style={{ display: "flex", alignItems: "center" }}>
+        <div className="lc-stepper-wrap">
+          <div className="lc-stepper">
             {([
               { n: 1, label: "LC Terms" },
               { n: 2, label: "Supplier Docs" },
               { n: 3, label: "Review" },
               { n: 4, label: "Results" },
-            ] as const).map((s, i, arr) => (
-              <div key={s.n} style={{ display: "contents" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div
-                    style={{
-                      width: 26, height: 26, borderRadius: "50%",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 11, fontWeight: 800, flexShrink: 0,
-                      fontFamily: "var(--fh)", transition: "all 0.2s",
-                      ...(step > s.n
-                        ? { background: "var(--green)", color: "#000" }
-                        : step === s.n
-                        ? { background: "rgba(255,255,255,0.15)", color: "#fff", border: "2px solid var(--green)" }
-                        : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.1)" }),
-                    }}
-                    data-testid={`step-indicator-${s.n}`}
-                  >
-                    {step > s.n ? "✓" : s.n}
+            ] as const).map((s, i, arr) => {
+              const cls = step > s.n ? "done" : step === s.n ? "active" : "pend";
+              return (
+                <div key={s.n} style={{ display: "contents" }}>
+                  <div className="lc-stp">
+                    <div className={`lc-stp-n ${cls}`} data-testid={`step-indicator-${s.n}`}>
+                      {step > s.n ? "✓" : s.n}
+                    </div>
+                    <span className={`lc-stp-l ${cls}`}>{s.label}</span>
                   </div>
-                  <span style={{
-                    fontSize: 12, fontWeight: 600, whiteSpace: "nowrap",
-                    color: step > s.n ? "var(--green)" : step === s.n ? "#fff" : "rgba(255,255,255,0.25)",
-                  }}>
-                    {s.label}
-                  </span>
+                  {i < arr.length - 1 && (
+                    <div className={`lc-stp-line${step > s.n ? " done" : ""}`} />
+                  )}
                 </div>
-                {i < arr.length - 1 && (
-                  <div style={{
-                    flex: 1, height: 1, margin: "0 10px", minWidth: 24,
-                    background: step > s.n ? "var(--green)" : "rgba(255,255,255,0.1)",
-                    transition: "background 0.3s",
-                  }} />
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* Prefill Banner */}
         {showPrefillBanner && prefillData && (
-          <div style={{ margin: "14px 14px 0", background: "rgba(74,140,111,0.15)", borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "flex-start", gap: 12, position: "relative" }} data-testid="banner-lc-prefill">
+          <div className="lc-note" style={{ margin: "14px 24px 0", borderRadius: 14, padding: "16px 20px" }} data-testid="banner-lc-prefill">
             <ExternalLink size={18} style={{ color: "var(--green)", flexShrink: 0, marginTop: 1 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-prefill-info">
@@ -417,472 +331,403 @@ export default function LcCheck() {
 
         {/* ═══════ STEP 1 — LC Terms ═══════ */}
         {step === 1 && (
-          <div style={{ marginTop: 14 }}>
-            <div style={{ padding: "0 14px" }}>
-              {/* LC Terms Card */}
-              <div style={wcS}>
-                <div style={wcHeadS}>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#111", display: "flex", alignItems: "center", gap: 8 }}>
-                      📋 Letter of Credit — Key Terms
-                    </div>
-                    <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
-                      Enter exactly as they appear on your LC.
-                    </div>
-                  </div>
-                </div>
-
-                {/* Row 1: LC Reference + Issuing Bank */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13, marginBottom: 13 }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>LC Reference</label>
-                    <input type="text" style={inputS}
-                      value={lcFields.lcReference}
-                      onChange={e => updateLcField("lcReference", e.target.value)}
-                      placeholder="e.g. LC/2026/0001234"
-                      data-testid="input-lc-reference"
-                    />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Issuing Bank</label>
-                    <input type="text" style={inputS}
-                      placeholder="e.g. Société Générale, Abidjan"
-                    />
-                  </div>
-
-                  {/* Row 2: Beneficiary + Applicant */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Beneficiary (Supplier) {req}</label>
-                    <input type="text" style={inputS}
-                      value={lcFields.beneficiaryName}
-                      onChange={e => updateLcField("beneficiaryName", e.target.value)}
-                      placeholder="Exact name as on LC"
-                      data-testid="input-beneficiary-name"
-                    />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Applicant (Buyer) {req}</label>
-                    <input type="text" style={inputS}
-                      value={lcFields.applicantName}
-                      onChange={e => updateLcField("applicantName", e.target.value)}
-                      placeholder="Exact name as on LC"
-                      data-testid="input-applicant-name"
-                    />
-                  </div>
-
-                  {/* Row 3: Goods Description (full width) */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5, gridColumn: "1 / -1" }}>
-                    <label style={labelS}>Goods Description {req}</label>
-                    <input type="text" style={inputS}
-                      value={lcFields.goodsDescription}
-                      onChange={e => updateLcField("goodsDescription", e.target.value)}
-                      placeholder="e.g. Raw Cashew Nuts in shell, crop 2025/26"
-                      data-testid="input-goods-description"
-                    />
-                  </div>
-                </div>
-
-                {/* 3-col: Quantity, LC Amount, Currency */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 13, marginBottom: 13 }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Quantity {req}</label>
-                    <input type="text" style={inputS}
-                      value={lcFields.quantity || ""}
-                      onChange={e => updateLcField("quantity", parseFloat(e.target.value) || 0)}
-                      placeholder="e.g. 500 MT"
-                      data-testid="input-quantity"
-                    />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>LC Amount {req}</label>
-                    <input type="number" style={inputS}
-                      value={lcFields.totalAmount || ""}
-                      onChange={e => updateLcField("totalAmount", parseFloat(e.target.value) || 0)}
-                      placeholder="e.g. 250,000.00"
-                      data-testid="input-total-amount"
-                    />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Currency</label>
-                    <select style={inputS}
-                      value={lcFields.currency}
-                      onChange={e => updateLcField("currency", e.target.value)}
-                      data-testid="select-currency"
-                    >
-                      {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </div>
-
-                  {/* Row 2 of 3-col */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Port of Loading</label>
-                    <input type="text" style={inputS}
-                      value={lcFields.portOfLoading}
-                      onChange={e => updateLcField("portOfLoading", e.target.value)}
-                      placeholder="e.g. Abidjan"
-                      data-testid="input-port-loading"
-                    />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Port of Discharge</label>
-                    <input type="text" style={inputS}
-                      value={lcFields.portOfDischarge}
-                      onChange={e => updateLcField("portOfDischarge", e.target.value)}
-                      placeholder="e.g. Felixstowe"
-                      data-testid="input-port-discharge"
-                    />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Country of Origin</label>
-                    <input type="text" style={inputS}
-                      value={lcFields.countryOfOrigin}
-                      onChange={e => updateLcField("countryOfOrigin", e.target.value)}
-                      placeholder="e.g. Côte d'Ivoire"
-                      data-testid="input-country-origin"
-                    />
-                  </div>
-
-                  {/* Row 3 of 3-col */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Latest Shipment Date {req}</label>
-                    <input type="date" style={inputS}
-                      value={lcFields.latestShipmentDate}
-                      onChange={e => updateLcField("latestShipmentDate", e.target.value)}
-                      data-testid="input-latest-shipment-date"
-                    />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>LC Expiry Date {req}</label>
-                    <input type="date" style={inputS}
-                      value={lcFields.lcExpiryDate}
-                      onChange={e => updateLcField("lcExpiryDate", e.target.value)}
-                      data-testid="input-lc-expiry-date"
-                    />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Incoterms</label>
-                    <select style={inputS}
-                      value={lcFields.incoterms}
-                      onChange={e => updateLcField("incoterms", e.target.value)}
-                      data-testid="select-incoterms"
-                    >
-                      {INCOTERMS.map(t => <option key={t} value={t}>{t}</option>)}
-                    </select>
-                  </div>
-                </div>
-
-                {/* HS Code row (single, smaller) */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 13, marginBottom: 13 }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>HS Code</label>
-                    <input type="text" style={inputS}
-                      value={lcFields.hsCode}
-                      onChange={e => updateLcField("hsCode", e.target.value)}
-                      placeholder="e.g. 1801.00"
-                      data-testid="input-hs-code"
-                    />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Unit Price</label>
-                    <input type="number" style={inputS}
-                      value={lcFields.unitPrice || ""}
-                      onChange={e => updateLcField("unitPrice", parseFloat(e.target.value) || 0)}
-                      placeholder="e.g. 2500"
-                      data-testid="input-unit-price"
-                    />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Quantity Unit</label>
-                    <select style={inputS}
-                      value={lcFields.quantityUnit}
-                      onChange={e => updateLcField("quantityUnit", e.target.value)}
-                      data-testid="select-quantity-unit"
-                    >
-                      {QUANTITY_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
-                    </select>
-                  </div>
+          <>
+            <div className="lc-wc" style={{ marginTop: 14 }}>
+              <div className="lc-wc-head">
+                <div>
+                  <div className="lc-wc-title">📋 Letter of Credit — Key Terms</div>
+                  <div className="lc-wc-sub">Enter exactly as they appear on your LC.</div>
                 </div>
               </div>
 
-                {/* Toggle: Partial Shipments */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 0", borderBottom: "1px solid #f5f5f5" }}>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#111" }}>Partial Shipments Allowed</div>
-                    <div style={{ fontSize: 11, color: "#999", marginTop: 1 }}>UCP 600 Art. 31</div>
-                  </div>
-                  <label style={{ position: "relative", width: 40, height: 22, flexShrink: 0, display: "inline-block", cursor: "pointer" }}>
-                    <input type="checkbox" style={{ opacity: 0, width: 0, height: 0, position: "absolute" }}
-                      checked={lcFields.partialShipmentsAllowed}
-                      onChange={e => updateLcField("partialShipmentsAllowed", e.target.checked)}
-                      data-testid="select-partial-shipments"
-                    />
-                    <span style={{
-                      position: "absolute", inset: 0, borderRadius: 22,
-                      background: lcFields.partialShipmentsAllowed ? "rgba(74,140,111,0.15)" : "#e8e8e8",
-                      cursor: "pointer", transition: "all 0.2s",
-                    }}>
-                      <span style={{
-                        content: "''", position: "absolute", width: 15, height: 15,
-                        left: lcFields.partialShipmentsAllowed ? 22 : 3, top: 3.5,
-                        borderRadius: "50%",
-                        background: lcFields.partialShipmentsAllowed ? "var(--green)" : "#bbb",
-                        transition: "all 0.2s",
-                      }} />
-                    </span>
-                  </label>
+              {/* Row 1: LC Reference + Issuing Bank */}
+              <div className="lc-fg2">
+                <div className="lc-field">
+                  <label>LC Reference</label>
+                  <input type="text"
+                    value={lcFields.lcReference}
+                    onChange={e => updateLcField("lcReference", e.target.value)}
+                    placeholder="e.g. LC/2026/0001234"
+                    data-testid="input-lc-reference"
+                  />
                 </div>
-
-                {/* Toggle: Transhipment */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 0" }}>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#111" }}>Transhipment Allowed</div>
-                    <div style={{ fontSize: 11, color: "#999", marginTop: 1 }}>UCP 600 Art. 20</div>
-                  </div>
-                  <label style={{ position: "relative", width: 40, height: 22, flexShrink: 0, display: "inline-block", cursor: "pointer" }}>
-                    <input type="checkbox" style={{ opacity: 0, width: 0, height: 0, position: "absolute" }}
-                      checked={lcFields.transhipmentAllowed}
-                      onChange={e => updateLcField("transhipmentAllowed", e.target.checked)}
-                      data-testid="select-transhipment"
-                    />
-                    <span style={{
-                      position: "absolute", inset: 0, borderRadius: 22,
-                      background: lcFields.transhipmentAllowed ? "rgba(74,140,111,0.15)" : "#e8e8e8",
-                      cursor: "pointer", transition: "all 0.2s",
-                    }}>
-                      <span style={{
-                        content: "''", position: "absolute", width: 15, height: 15,
-                        left: lcFields.transhipmentAllowed ? 22 : 3, top: 3.5,
-                        borderRadius: "50%",
-                        background: lcFields.transhipmentAllowed ? "var(--green)" : "#bbb",
-                        transition: "all 0.2s",
-                      }} />
-                    </span>
-                  </label>
+                <div className="lc-field">
+                  <label>Issuing Bank</label>
+                  <input type="text" placeholder="e.g. Société Générale, Abidjan" />
                 </div>
               </div>
+
+              {/* Row 2: Beneficiary + Applicant */}
+              <div className="lc-fg2">
+                <div className="lc-field">
+                  <label>Beneficiary (Supplier) {req}</label>
+                  <input type="text"
+                    value={lcFields.beneficiaryName}
+                    onChange={e => updateLcField("beneficiaryName", e.target.value)}
+                    placeholder="Exact name as on LC"
+                    data-testid="input-beneficiary-name"
+                  />
+                </div>
+                <div className="lc-field">
+                  <label>Applicant (Buyer) {req}</label>
+                  <input type="text"
+                    value={lcFields.applicantName}
+                    onChange={e => updateLcField("applicantName", e.target.value)}
+                    placeholder="Exact name as on LC"
+                    data-testid="input-applicant-name"
+                  />
+                </div>
+              </div>
+
+              {/* Goods Description (full width) */}
+              <div className="lc-fg2">
+                <div className="lc-field lc-f-full">
+                  <label>Goods Description {req}</label>
+                  <input type="text"
+                    value={lcFields.goodsDescription}
+                    onChange={e => updateLcField("goodsDescription", e.target.value)}
+                    placeholder="e.g. Raw Cashew Nuts in shell, crop 2025/26"
+                    data-testid="input-goods-description"
+                  />
+                </div>
+              </div>
+
+              {/* 3-col: Quantity, LC Amount, Currency */}
+              <div className="lc-fg3">
+                <div className="lc-field">
+                  <label>Quantity {req}</label>
+                  <input type="text"
+                    value={lcFields.quantity || ""}
+                    onChange={e => updateLcField("quantity", parseFloat(e.target.value) || 0)}
+                    placeholder="e.g. 500 MT"
+                    data-testid="input-quantity"
+                  />
+                </div>
+                <div className="lc-field">
+                  <label>LC Amount {req}</label>
+                  <input type="number"
+                    value={lcFields.totalAmount || ""}
+                    onChange={e => updateLcField("totalAmount", parseFloat(e.target.value) || 0)}
+                    placeholder="e.g. 250,000.00"
+                    data-testid="input-total-amount"
+                  />
+                </div>
+                <div className="lc-field">
+                  <label>Currency</label>
+                  <select
+                    value={lcFields.currency}
+                    onChange={e => updateLcField("currency", e.target.value)}
+                    data-testid="select-currency"
+                  >
+                    {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* 3-col: Ports + Country of Origin */}
+              <div className="lc-fg3">
+                <div className="lc-field">
+                  <label>Port of Loading</label>
+                  <input type="text"
+                    value={lcFields.portOfLoading}
+                    onChange={e => updateLcField("portOfLoading", e.target.value)}
+                    placeholder="e.g. Abidjan"
+                    data-testid="input-port-loading"
+                  />
+                </div>
+                <div className="lc-field">
+                  <label>Port of Discharge</label>
+                  <input type="text"
+                    value={lcFields.portOfDischarge}
+                    onChange={e => updateLcField("portOfDischarge", e.target.value)}
+                    placeholder="e.g. Felixstowe"
+                    data-testid="input-port-discharge"
+                  />
+                </div>
+                <div className="lc-field">
+                  <label>Country of Origin</label>
+                  <input type="text"
+                    value={lcFields.countryOfOrigin}
+                    onChange={e => updateLcField("countryOfOrigin", e.target.value)}
+                    placeholder="e.g. Côte d'Ivoire"
+                    data-testid="input-country-origin"
+                  />
+                </div>
+              </div>
+
+              {/* 3-col: Dates + Incoterms */}
+              <div className="lc-fg3">
+                <div className="lc-field">
+                  <label>Latest Shipment Date {req}</label>
+                  <input type="date"
+                    value={lcFields.latestShipmentDate}
+                    onChange={e => updateLcField("latestShipmentDate", e.target.value)}
+                    data-testid="input-latest-shipment-date"
+                  />
+                </div>
+                <div className="lc-field">
+                  <label>LC Expiry Date {req}</label>
+                  <input type="date"
+                    value={lcFields.lcExpiryDate}
+                    onChange={e => updateLcField("lcExpiryDate", e.target.value)}
+                    data-testid="input-lc-expiry-date"
+                  />
+                </div>
+                <div className="lc-field">
+                  <label>Incoterms</label>
+                  <select
+                    value={lcFields.incoterms}
+                    onChange={e => updateLcField("incoterms", e.target.value)}
+                    data-testid="select-incoterms"
+                  >
+                    {INCOTERMS.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* 3-col: HS Code, Unit Price, Quantity Unit */}
+              <div className="lc-fg3">
+                <div className="lc-field">
+                  <label>HS Code</label>
+                  <input type="text"
+                    value={lcFields.hsCode}
+                    onChange={e => updateLcField("hsCode", e.target.value)}
+                    placeholder="e.g. 1801.00"
+                    data-testid="input-hs-code"
+                  />
+                </div>
+                <div className="lc-field">
+                  <label>Unit Price</label>
+                  <input type="number"
+                    value={lcFields.unitPrice || ""}
+                    onChange={e => updateLcField("unitPrice", parseFloat(e.target.value) || 0)}
+                    placeholder="e.g. 2500"
+                    data-testid="input-unit-price"
+                  />
+                </div>
+                <div className="lc-field">
+                  <label>Quantity Unit</label>
+                  <select
+                    value={lcFields.quantityUnit}
+                    onChange={e => updateLcField("quantityUnit", e.target.value)}
+                    data-testid="select-quantity-unit"
+                  >
+                    {QUANTITY_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Toggle: Partial Shipments */}
+              <div className="lc-tog-row">
+                <div>
+                  <div className="lc-tog-lbl">Partial Shipments Allowed</div>
+                  <div className="lc-tog-sub">UCP 600 Art. 31</div>
+                </div>
+                <label className="lc-tog">
+                  <input type="checkbox"
+                    checked={lcFields.partialShipmentsAllowed}
+                    onChange={e => updateLcField("partialShipmentsAllowed", e.target.checked)}
+                    data-testid="select-partial-shipments"
+                  />
+                  <span className="lc-tog-sl" />
+                </label>
+              </div>
+
+              {/* Toggle: Transhipment */}
+              <div className="lc-tog-row">
+                <div>
+                  <div className="lc-tog-lbl">Transhipment Allowed</div>
+                  <div className="lc-tog-sub">UCP 600 Art. 20</div>
+                </div>
+                <label className="lc-tog">
+                  <input type="checkbox"
+                    checked={lcFields.transhipmentAllowed}
+                    onChange={e => updateLcField("transhipmentAllowed", e.target.checked)}
+                    data-testid="select-transhipment"
+                  />
+                  <span className="lc-tog-sl" />
+                </label>
+              </div>
+            </div>
 
             {/* Step 1 buttons */}
-            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 14px", margin: "4px 0 0" }}>
+            <div className="lc-btn-row">
               <button
+                className="lc-btn-green"
                 disabled={!canProceedStep1}
                 onClick={() => goStep(2)}
-                style={btnGreenS(canProceedStep1)}
                 data-testid="button-next-step-2"
               >
                 Continue to Supplier Docs →
               </button>
             </div>
-          </div>
+          </>
         )}
 
         {/* ═══════ STEP 2 — Supplier Docs ═══════ */}
         {step === 2 && (
-          <div style={{ marginTop: 14 }}>
-            <div style={{ padding: "0 14px" }}>
-              <div style={wcS}>
-                <div style={wcHeadS}>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#111", display: "flex", alignItems: "center", gap: 8 }}>
-                      📦 Supplier Documents
-                    </div>
-                    <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
-                      Enter the key fields from each supplier document. Add up to 6 documents.
-                    </div>
+          <>
+            <div className="lc-wc" style={{ marginTop: 14 }}>
+              <div className="lc-wc-head">
+                <div>
+                  <div className="lc-wc-title">📦 Supplier Documents</div>
+                  <div className="lc-wc-sub">Enter the key fields from each supplier document. Add up to 6 documents.</div>
+                </div>
+              </div>
+
+              {/* Document Tabs */}
+              <div className="lc-doc-tabs">
+                {documents.map((doc, i) => (
+                  <div
+                    key={i}
+                    className={`lc-dt${activeDocTab === i ? " active" : ""}`}
+                    onClick={() => setActiveDocTab(i)}
+                    data-testid={`button-doc-tab-${i}`}
+                  >
+                    <span className="lc-dtn">{i + 1}</span>
+                    {docLabel(doc.documentType)}
                   </div>
-                </div>
-
-                {/* Document Tabs */}
-                <div style={{ display: "flex", gap: 5, marginBottom: 16, flexWrap: "wrap" }}>
-                  {documents.map((doc, i) => (
-                    <div
-                      key={i}
-                      onClick={() => setActiveDocTab(i)}
-                      style={{
-                        padding: "5px 13px", borderRadius: 8, fontSize: 12, fontWeight: 600,
-                        cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
-                        transition: "all 0.15s",
-                        ...(activeDocTab === i
-                          ? { background: "var(--green)", color: "#000", border: "1px solid var(--green)" }
-                          : { background: "#f5f5f5", color: "#999", border: "1px solid #e8e8e8" }),
-                      }}
-                      data-testid={`button-doc-tab-${i}`}
-                    >
-                      <span style={{
-                        width: 16, height: 16, borderRadius: "50%",
-                        background: "rgba(0,0,0,0.1)", fontSize: 9,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                      }}>{i + 1}</span>
-                      {docLabel(doc.documentType)}
-                    </div>
-                  ))}
-                  {documents.length < 6 && (
-                    <div
-                      onClick={addDocument}
-                      style={{
-                        padding: "5px 13px", borderRadius: 8, fontSize: 12, fontWeight: 600,
-                        cursor: "pointer", background: "transparent", color: "#999",
-                        border: "1px dashed #ddd", transition: "all 0.15s",
-                      }}
-                      data-testid="button-add-document"
-                    >
-                      + Add doc
-                    </div>
-                  )}
-                </div>
-
-                {/* Active document fields */}
-                {documents[activeDocTab] && (
-                  <div>
-                    {/* Document Type selector */}
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 13 }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-                        <label style={labelS}>Document Type</label>
-                        <select style={inputS}
-                          value={documents[activeDocTab].documentType}
-                          onChange={e => updateDocType(activeDocTab, e.target.value as LcDocumentType)}
-                          data-testid="select-doc-type"
-                        >
-                          {DOC_TYPES.map(dt => (
-                            <option key={dt.value} value={dt.value}>{dt.label}</option>
-                          ))}
-                        </select>
-                      </div>
-                      {documents.length > 1 && (
-                        <button
-                          onClick={() => removeDocument(activeDocTab)}
-                          style={{
-                            background: "none", border: "none", cursor: "pointer",
-                            color: "#da3c3d", marginTop: 18, padding: 6,
-                          }}
-                          data-testid="button-remove-document"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Dynamic fields */}
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13 }}>
-                      {getDocFields(documents[activeDocTab].documentType).map(field => (
-                        <div key={field.key} style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                          <label style={labelS}>{field.label}</label>
-                          <input
-                            type={field.type}
-                            style={inputS}
-                            value={documents[activeDocTab].fields[field.key] || ""}
-                            onChange={e => updateDocField(activeDocTab, field.key, e.target.value)}
-                            data-testid={`input-doc-${field.key}`}
-                          />
-                        </div>
-                      ))}
-                    </div>
+                ))}
+                {documents.length < 6 && (
+                  <div className="lc-dt-add" onClick={addDocument} data-testid="button-add-document">
+                    + Add doc
                   </div>
                 )}
               </div>
+
+              {/* Active document fields */}
+              {documents[activeDocTab] && (
+                <div>
+                  {/* Document Type selector */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 13 }}>
+                    <div className="lc-field" style={{ flex: 1 }}>
+                      <label>Document Type</label>
+                      <select
+                        value={documents[activeDocTab].documentType}
+                        onChange={e => updateDocType(activeDocTab, e.target.value as LcDocumentType)}
+                        data-testid="select-doc-type"
+                      >
+                        {DOC_TYPES.map(dt => (
+                          <option key={dt.value} value={dt.value}>{dt.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    {documents.length > 1 && (
+                      <button
+                        onClick={() => removeDocument(activeDocTab)}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#da3c3d", marginTop: 18, padding: 6 }}
+                        data-testid="button-remove-document"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Dynamic fields */}
+                  <div className="lc-fg2">
+                    {getDocFields(documents[activeDocTab].documentType).map(field => (
+                      <div key={field.key} className="lc-field">
+                        <label>{field.label}</label>
+                        <input
+                          type={field.type}
+                          value={documents[activeDocTab].fields[field.key] || ""}
+                          onChange={e => updateDocField(activeDocTab, field.key, e.target.value)}
+                          data-testid={`input-doc-${field.key}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Step 2 buttons */}
-            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 14px", margin: "4px 0 0" }}>
+            <div className="lc-btn-row">
               <button
+                className="lc-btn-green"
                 disabled={!canProceedStep2}
                 onClick={() => goStep(3)}
-                style={btnGreenS(canProceedStep2)}
                 data-testid="button-next-step-3"
               >
                 Continue to Review →
               </button>
-              <button onClick={() => goStep(1)} style={btnGreyS}>
+              <button className="lc-btn-grey" onClick={() => goStep(1)}>
                 ← Back
               </button>
             </div>
-          </div>
+          </>
         )}
 
         {/* ═══════ STEP 3 — Review ═══════ */}
         {step === 3 && (
-          <div style={{ marginTop: 14 }}>
-            <div style={{ padding: "0 14px" }}>
-              <div style={wcS}>
-                <div style={wcHeadS}>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#111", display: "flex", alignItems: "center", gap: 8 }}>
-                      🔍 Review Before Check
-                    </div>
-                    <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
-                      Correct any errors now — changes cannot be made after the credit is consumed.
-                    </div>
-                  </div>
+          <>
+            <div className="lc-wc" style={{ marginTop: 14 }}>
+              <div className="lc-wc-head">
+                <div>
+                  <div className="lc-wc-title">🔍 Review Before Check</div>
+                  <div className="lc-wc-sub">Correct any errors now — changes cannot be made after the credit is consumed.</div>
                 </div>
+              </div>
 
-                {/* Warning note */}
-                <div style={{
-                  background: "#fffbf2", border: "1px solid #f5d8a0", borderRadius: 10,
-                  padding: "12px 15px", display: "flex", gap: 10, marginBottom: 14,
-                }}>
-                  <span style={{ fontSize: 14, flexShrink: 0 }}>⚠️</span>
-                  <span style={{ fontSize: 12, color: "#7a5020", lineHeight: 1.6 }}>
-                    Check all extracted fields carefully. Confirm dates and names match exactly what's on your LC.
+              {/* Warning note */}
+              <div className="lc-warn-note">
+                <span className="lc-note-ic">⚠️</span>
+                <span className="lc-note-txt">
+                  Check all extracted fields carefully. Confirm dates and names match exactly what's on your LC.
+                </span>
+              </div>
+
+              {/* Summary fields in 2-col */}
+              <div className="lc-fg2">
+                <div className="lc-field">
+                  <label>LC Reference</label>
+                  <input type="text" value={lcFields.lcReference} readOnly style={{ background: "#fff" }} />
+                </div>
+                <div className="lc-field">
+                  <label>Beneficiary</label>
+                  <input type="text" value={lcFields.beneficiaryName} readOnly style={{ background: "#fff" }} />
+                </div>
+                <div className="lc-field">
+                  <label>LC Amount</label>
+                  <input type="text" value={`${lcFields.currency} ${lcFields.totalAmount.toLocaleString()}`} readOnly style={{ background: "#fff" }} />
+                </div>
+                <div className="lc-field">
+                  <label>Goods Description</label>
+                  <input type="text" value={lcFields.goodsDescription} readOnly style={{ background: "#fff" }} />
+                </div>
+                <div className="lc-field">
+                  <label>Latest Shipment Date</label>
+                  <input type="text" value={lcFields.latestShipmentDate} readOnly style={{ background: "#fff" }} />
+                </div>
+                <div className="lc-field">
+                  <label>LC Expiry Date</label>
+                  <input type="text" value={lcFields.lcExpiryDate} readOnly style={{ background: "#fff" }} />
+                </div>
+              </div>
+
+              {/* Documents summary */}
+              <div className="lc-doc-status" style={{ background: "#f7f7f7", borderRadius: 9, padding: "12px 14px" }}>
+                <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8, width: "100%" }}>
+                  Documents
+                </div>
+                {documents.map((doc, i) => (
+                  <span key={i} className="lc-doc-badge filled">
+                    ✓ {docLabel(doc.documentType)}
                   </span>
-                </div>
-
-                {/* Summary fields in 2-col */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13, marginBottom: 13 }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>LC Reference</label>
-                    <input type="text" style={{ ...inputS, background: "#fff" }} value={lcFields.lcReference} readOnly />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Beneficiary</label>
-                    <input type="text" style={{ ...inputS, background: "#fff" }} value={lcFields.beneficiaryName} readOnly />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>LC Amount</label>
-                    <input type="text" style={{ ...inputS, background: "#fff" }} value={`${lcFields.currency} ${lcFields.totalAmount.toLocaleString()}`} readOnly />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Goods Description</label>
-                    <input type="text" style={{ ...inputS, background: "#fff" }} value={lcFields.goodsDescription} readOnly />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>Latest Shipment Date</label>
-                    <input type="text" style={{ ...inputS, background: "#fff" }} value={lcFields.latestShipmentDate} readOnly />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <label style={labelS}>LC Expiry Date</label>
-                    <input type="text" style={{ ...inputS, background: "#fff" }} value={lcFields.lcExpiryDate} readOnly />
-                  </div>
-                </div>
-
-                {/* Documents summary */}
-                <div style={{ background: "#f7f7f7", borderRadius: 9, padding: "12px 14px" }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
-                    Documents
-                  </div>
-                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                    {documents.map((doc, i) => (
-                      <span key={i} style={{
-                        display: "inline-flex", alignItems: "center", gap: 4,
-                        padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600,
-                        background: "rgba(74,140,111,0.1)", color: "#16a34a",
-                      }}>
-                        ✓ {docLabel(doc.documentType)}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
             {/* Step 3 buttons */}
-            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 14px", margin: "4px 0 0" }}>
+            <div className="lc-btn-row">
               <button
+                className="lc-btn-green"
                 disabled={checkMutation.isPending}
                 onClick={() => {
                   checkMutation.mutate(undefined, {
                     onSuccess: () => goStep(4),
                   });
                 }}
-                style={btnGreenS(!checkMutation.isPending)}
                 data-testid="button-run-lc-check"
               >
                 {checkMutation.isPending
@@ -891,309 +736,241 @@ export default function LcCheck() {
                   ? "▶ Run LC Check — Free"
                   : "▶ Run LC Check — $19.99"}
               </button>
-              <button onClick={() => goStep(2)} style={btnGreyS}>
+              <button className="lc-btn-grey" onClick={() => goStep(2)}>
                 ← Back
               </button>
             </div>
-          </div>
+          </>
         )}
 
         {/* ═══════ STEP 4 — Results ═══════ */}
         {step === 4 && checkMutation.data && (
           <div style={{ marginTop: 14 }} data-testid="section-lc-results">
-            <div style={{ padding: "0 14px" }}>
 
-              {/* Verdict banner */}
-              {(() => {
-                const v = checkMutation.data.summary.verdict;
-                const isOk = v === "COMPLIANT";
-                const isWarn = v === "COMPLIANT_WITH_NOTES";
-                const isFail = v === "DISCREPANCIES_FOUND";
-                const verdictStyle: React.CSSProperties = {
-                  borderRadius: 14, padding: "16px 20px", marginBottom: 12,
-                  display: "flex", alignItems: "center", gap: 14,
-                  ...(isFail ? { background: "rgba(218,60,61,0.08)", border: "1px solid rgba(218,60,61,0.2)" }
-                    : isWarn ? { background: "rgba(234,139,67,0.1)", border: "1px solid rgba(234,139,67,0.25)" }
-                    : { background: "rgba(74,140,111,0.08)", border: "1px solid rgba(74,140,111,0.2)" }),
-                };
-                return (
-                  <div style={verdictStyle}>
-                    <span style={{ fontSize: 28 }}>
-                      {isFail ? "🔴" : isWarn ? "⚠️" : "✅"}
-                    </span>
-                    <div>
-                      <div style={{
-                        fontFamily: "var(--fh)", fontSize: 18, fontWeight: 800, letterSpacing: "0",
-                        color: isFail ? "var(--red)" : isWarn ? "var(--amber)" : "var(--green)",
-                      }}>
-                        {isFail ? "Discrepancies Found" : isWarn ? "Compliant With Notes" : "Fully Compliant"}
-                      </div>
-                      <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>
-                        {checkMutation.data.summary.criticals > 0
-                          ? `${checkMutation.data.summary.criticals} critical issue${checkMutation.data.summary.criticals > 1 ? "s" : ""} will cause bank rejection.`
-                          : checkMutation.data.summary.warnings > 0
-                          ? `${checkMutation.data.summary.warnings} warning${checkMutation.data.summary.warnings > 1 ? "s" : ""} to review.`
-                          : "All fields match LC terms."}
-                      </div>
-                    </div>
-                    <div style={{ marginLeft: "auto", display: "flex", gap: 14, flexShrink: 0 }}>
-                      <div style={{ textAlign: "center" }}>
-                        <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "var(--fh)", lineHeight: 1, color: "var(--green)" }} data-testid="text-matches">{checkMutation.data.summary.matches}</div>
-                        <div style={{ fontSize: 10, color: "#999", textTransform: "uppercase", letterSpacing: "0.08em" }}>Match</div>
-                      </div>
-                      <div style={{ textAlign: "center" }}>
-                        <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "var(--fh)", lineHeight: 1, color: "var(--amber)" }} data-testid="text-warnings">{checkMutation.data.summary.warnings}</div>
-                        <div style={{ fontSize: 10, color: "#999", textTransform: "uppercase", letterSpacing: "0.08em" }}>Warning</div>
-                      </div>
-                      <div style={{ textAlign: "center" }}>
-                        <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "var(--fh)", lineHeight: 1, color: "var(--red)" }} data-testid="text-criticals">{checkMutation.data.summary.criticals}</div>
-                        <div style={{ fontSize: 10, color: "#999", textTransform: "uppercase", letterSpacing: "0.08em" }}>Critical</div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Insurance gap alert */}
-              {(checkMutation.data.summary.verdict === "COMPLIANT" || checkMutation.data.summary.verdict === "COMPLIANT_WITH_NOTES") && (
-                <div style={{ margin: "0 24px" }}>
-                  <InsuranceGapAlert />
-                </div>
-              )}
-
-              {/* Field-by-field Results */}
-              <div style={wcS}>
-                <div style={wcHeadS}>
+            {/* Verdict banner */}
+            {(() => {
+              const v = checkMutation.data.summary.verdict;
+              const cls = v === "COMPLIANT" ? "ok" : v === "COMPLIANT_WITH_NOTES" ? "warn" : "fail";
+              return (
+                <div className={`lc-verdict ${cls}`}>
+                  <span className="lc-v-ic">
+                    {cls === "fail" ? "🔴" : cls === "warn" ? "⚠️" : "✅"}
+                  </span>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#111", display: "flex", alignItems: "center", gap: 8 }}>
-                      📊 Field-by-Field Results
+                    <div className="lc-v-title">
+                      {cls === "fail" ? "Discrepancies Found" : cls === "warn" ? "Compliant With Notes" : "Fully Compliant"}
                     </div>
-                    <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
-                      Ref: TT-LC-{new Date().getFullYear()}-{checkMutation.data.integrityHash.substring(0, 6)} · {new Date(checkMutation.data.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                    <div className="lc-v-sub">
+                      {checkMutation.data.summary.criticals > 0
+                        ? `${checkMutation.data.summary.criticals} critical issue${checkMutation.data.summary.criticals > 1 ? "s" : ""} will cause bank rejection.`
+                        : checkMutation.data.summary.warnings > 0
+                        ? `${checkMutation.data.summary.warnings} warning${checkMutation.data.summary.warnings > 1 ? "s" : ""} to review.`
+                        : "All fields match LC terms."}
+                    </div>
+                  </div>
+                  <div className="lc-v-stats">
+                    <div className="lc-vs">
+                      <div className="lc-vs-n g" data-testid="text-matches">{checkMutation.data.summary.matches}</div>
+                      <div className="lc-vs-l">Match</div>
+                    </div>
+                    <div className="lc-vs">
+                      <div className="lc-vs-n a" data-testid="text-warnings">{checkMutation.data.summary.warnings}</div>
+                      <div className="lc-vs-l">Warning</div>
+                    </div>
+                    <div className="lc-vs">
+                      <div className="lc-vs-n r" data-testid="text-criticals">{checkMutation.data.summary.criticals}</div>
+                      <div className="lc-vs-l">Critical</div>
                     </div>
                   </div>
                 </div>
+              );
+            })()}
 
-                {/* Critical results */}
-                {checkMutation.data.results.filter(r => r.severity === "RED").length > 0 && (
-                  <div style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
-                      🔴 Critical — Bank will reject
-                    </div>
-                    {checkMutation.data.results.filter(r => r.severity === "RED").map((r, i) => (
-                      <div key={`fail-${i}`} style={{
-                        display: "flex", alignItems: "flex-start", gap: 10,
-                        padding: "10px 12px", borderRadius: 9, marginBottom: 5,
-                        background: "#fff5f5", border: "1px solid #f5c0c0",
-                      }} data-testid={`result-item-fail-${i}`}>
-                        <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--red)", flexShrink: 0, marginTop: 5 }} />
-                        <div>
-                          <div style={{ fontSize: 12.5, fontWeight: 700, color: "#111", marginBottom: 2 }}>{r.fieldName} — {r.documentType}</div>
-                          <div style={{ fontSize: 12, color: "#666", lineHeight: 1.5 }}>
-                            LC: <span style={{ color: "#2e8662", fontWeight: 600 }}>"{r.lcValue}"</span> · Doc: <span style={{ color: "var(--amber)", fontWeight: 600 }}>"{r.documentValue}"</span>
-                          </div>
-                          <div style={{ fontSize: 12, color: "#666", lineHeight: 1.5 }}>{r.explanation}</div>
-                          <span style={{
-                            display: "inline-block", fontSize: 10, color: "var(--teal)",
-                            background: "rgba(46,134,98,0.1)", padding: "1px 7px", borderRadius: 20,
-                            marginTop: 3, fontWeight: 600,
-                          }}>{r.ucpRule}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+            {/* Insurance gap alert */}
+            {(checkMutation.data.summary.verdict === "COMPLIANT" || checkMutation.data.summary.verdict === "COMPLIANT_WITH_NOTES") && (
+              <div style={{ margin: "0 24px" }}>
+                <InsuranceGapAlert />
+              </div>
+            )}
 
-                {/* Warning results */}
-                {checkMutation.data.results.filter(r => r.severity === "AMBER").length > 0 && (
-                  <div style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
-                      🟡 Warnings
-                    </div>
-                    {checkMutation.data.results.filter(r => r.severity === "AMBER").map((r, i) => (
-                      <div key={`warn-${i}`} style={{
-                        display: "flex", alignItems: "flex-start", gap: 10,
-                        padding: "10px 12px", borderRadius: 9, marginBottom: 5,
-                        background: "#fffaf3", border: "1px solid #f5ddb0",
-                      }} data-testid={`result-item-warn-${i}`}>
-                        <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--amber)", flexShrink: 0, marginTop: 5 }} />
-                        <div>
-                          <div style={{ fontSize: 12.5, fontWeight: 700, color: "#111", marginBottom: 2 }}>{r.fieldName} — {r.documentType}</div>
-                          <div style={{ fontSize: 12, color: "#666", lineHeight: 1.5 }}>
-                            LC: <span style={{ color: "#2e8662", fontWeight: 600 }}>"{r.lcValue}"</span> · Doc: <span style={{ color: "var(--amber)", fontWeight: 600 }}>"{r.documentValue}"</span>
-                          </div>
-                          <div style={{ fontSize: 12, color: "#666", lineHeight: 1.5 }}>{r.explanation}</div>
-                          <span style={{
-                            display: "inline-block", fontSize: 10, color: "var(--teal)",
-                            background: "rgba(46,134,98,0.1)", padding: "1px 7px", borderRadius: 20,
-                            marginTop: 3, fontWeight: 600,
-                          }}>{r.ucpRule}</span>
-                        </div>
-                      </div>
-                    ))}
+            {/* Field-by-field Results */}
+            <div className="lc-wc">
+              <div className="lc-wc-head">
+                <div>
+                  <div className="lc-wc-title">📊 Field-by-Field Results</div>
+                  <div className="lc-wc-sub">
+                    Ref: TT-LC-{new Date().getFullYear()}-{checkMutation.data.integrityHash.substring(0, 6)} · {new Date(checkMutation.data.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                   </div>
-                )}
-
-                {/* Matched results */}
-                {checkMutation.data.results.filter(r => r.severity === "GREEN").length > 0 && (
-                  <div style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
-                      🟢 Matched
-                    </div>
-                    {checkMutation.data.results.filter(r => r.severity === "GREEN").map((r, i) => (
-                      <div key={`ok-${i}`} style={{
-                        display: "flex", alignItems: "flex-start", gap: 10,
-                        padding: "10px 12px", borderRadius: 9, marginBottom: 5,
-                        background: "#f2faf4", border: "1px solid #d0ecd8",
-                      }} data-testid={`result-item-ok-${i}`}>
-                        <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--green)", flexShrink: 0, marginTop: 5 }} />
-                        <div>
-                          <div style={{ fontSize: 12.5, fontWeight: 700, color: "#111", marginBottom: 2 }}>{r.fieldName}</div>
-                          <div style={{ fontSize: 12, color: "#666", lineHeight: 1.5 }}>
-                            {r.explanation || "All fields match LC terms ✓"}
-                          </div>
-                          {r.ucpRule && (
-                            <span style={{
-                              display: "inline-block", fontSize: 10, color: "var(--teal)",
-                              background: "rgba(46,134,98,0.1)", padding: "1px 7px", borderRadius: 20,
-                              marginTop: 3, fontWeight: 600,
-                            }}>{r.ucpRule}</span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                </div>
               </div>
 
-              {/* Correction Email Card */}
-              {checkMutation.data.summary.criticals > 0 && checkMutation.data.correctionEmail && (
-                <div style={wcS}>
-                  <div style={wcHeadS}>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "#111", display: "flex", alignItems: "center", gap: 8 }}>
-                        ✉️ Supplier Correction Request
-                      </div>
-                      <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
-                        Ready to send — {checkMutation.data.summary.criticals} correction{checkMutation.data.summary.criticals > 1 ? "s" : ""} needed
+              {/* Critical results */}
+              {checkMutation.data.results.filter(r => r.severity === "RED").length > 0 && (
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                    🔴 Critical — Bank will reject
+                  </div>
+                  {checkMutation.data.results.filter(r => r.severity === "RED").map((r, i) => (
+                    <div key={`fail-${i}`} className="lc-rr fail" data-testid={`result-item-fail-${i}`}>
+                      <div className="lc-rr-dot fail" />
+                      <div>
+                        <div className="lc-rr-field">{r.fieldName} — {r.documentType}</div>
+                        <div className="lc-rr-detail">
+                          LC: <span className="lc-rr-lc">"{r.lcValue}"</span> · Doc: <span className="lc-rr-doc">"{r.documentValue}"</span>
+                        </div>
+                        <div className="lc-rr-detail">{r.explanation}</div>
+                        <span className="lc-rr-rule">{r.ucpRule}</span>
                       </div>
                     </div>
-                  </div>
-
-                  <div style={{
-                    background: "#f7f7f7", borderRadius: 10, padding: "16px 18px",
-                    border: "1px solid #e8e8e8",
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "#111" }}>
-                        {checkMutation.data.summary.criticals} amendment{checkMutation.data.summary.criticals > 1 ? "s" : ""} required
-                      </div>
-                      <div style={{ display: "flex", gap: 5 }}>
-                        <button
-                          onClick={() => setCorrectionTab("email")}
-                          style={{
-                            fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 20,
-                            cursor: "pointer", transition: "all 0.15s", border: "none",
-                            background: correctionTab === "email" ? "rgba(66,126,255,0.1)" : "transparent",
-                            color: correctionTab === "email" ? "#427EFF" : "#999",
-                          }}
-                          data-testid="button-correction-email-tab"
-                        >
-                          📋 Email
-                        </button>
-                        <button
-                          onClick={() => setCorrectionTab("whatsapp")}
-                          style={{
-                            fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 20,
-                            cursor: "pointer", transition: "all 0.15s", border: "none",
-                            background: correctionTab === "whatsapp" ? "rgba(74,140,111,0.1)" : "transparent",
-                            color: correctionTab === "whatsapp" ? "var(--green)" : "#999",
-                          }}
-                          data-testid="button-correction-whatsapp-tab"
-                        >
-                          💬 WhatsApp
-                        </button>
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 12, color: "#666", lineHeight: 1.75,
-                        whiteSpace: "pre-wrap", maxHeight: 160, overflowY: "auto",
-                      }}
-                      data-testid={`text-correction-${correctionTab}`}
-                    >
-                      {correctionTab === "email" ? (checkMutation.data.correctionEmail || "") : (checkMutation.data.correctionWhatsApp || "")}
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12 }}>
-                    <CopyBtn
-                      text={correctionTab === "email" ? (checkMutation.data.correctionEmail || "") : (checkMutation.data.correctionWhatsApp || "")}
-                      label={`correction-${correctionTab}`}
-                    />
-                  </div>
+                  ))}
                 </div>
               )}
 
-              {/* Integrity reference block */}
-              <div style={{ background: "#f7f7f7", borderRadius: 9, padding: "14px 16px", marginBottom: 12, border: "1px solid #e8e8e8" }}>
-                <div style={{ display: "flex", alignItems: "start", gap: 10 }}>
-                  <Hash size={18} style={{ color: "#999", flexShrink: 0, marginTop: 1 }} />
-                  <div style={{ minWidth: 0 }}>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-lc-check-ref">
-                      LC check ref: TT-LC-{new Date().getFullYear()}-{checkMutation.data.integrityHash.substring(0, 6).toUpperCase()}
-                    </p>
-                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#999", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
-                      Integrity hash: sha256:{checkMutation.data.integrityHash}
-                    </p>
-                    <p style={{ fontSize: 11, color: "#999" }} data-testid="text-lc-check-timestamp">
-                      Checked: {new Date(checkMutation.data.timestamp).toLocaleString()}
-                    </p>
+              {/* Warning results */}
+              {checkMutation.data.results.filter(r => r.severity === "AMBER").length > 0 && (
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                    🟡 Warnings
+                  </div>
+                  {checkMutation.data.results.filter(r => r.severity === "AMBER").map((r, i) => (
+                    <div key={`warn-${i}`} className="lc-rr warn" data-testid={`result-item-warn-${i}`}>
+                      <div className="lc-rr-dot warn" />
+                      <div>
+                        <div className="lc-rr-field">{r.fieldName} — {r.documentType}</div>
+                        <div className="lc-rr-detail">
+                          LC: <span className="lc-rr-lc">"{r.lcValue}"</span> · Doc: <span className="lc-rr-doc">"{r.documentValue}"</span>
+                        </div>
+                        <div className="lc-rr-detail">{r.explanation}</div>
+                        <span className="lc-rr-rule">{r.ucpRule}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Matched results */}
+              {checkMutation.data.results.filter(r => r.severity === "GREEN").length > 0 && (
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                    🟢 Matched
+                  </div>
+                  {checkMutation.data.results.filter(r => r.severity === "GREEN").map((r, i) => (
+                    <div key={`ok-${i}`} className="lc-rr ok" data-testid={`result-item-ok-${i}`}>
+                      <div className="lc-rr-dot ok" />
+                      <div>
+                        <div className="lc-rr-field">{r.fieldName}</div>
+                        <div className="lc-rr-detail">
+                          {r.explanation || "All fields match LC terms ✓"}
+                        </div>
+                        {r.ucpRule && <span className="lc-rr-rule">{r.ucpRule}</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Correction Email Card */}
+            {checkMutation.data.summary.criticals > 0 && checkMutation.data.correctionEmail && (
+              <div className="lc-wc">
+                <div className="lc-wc-head">
+                  <div>
+                    <div className="lc-wc-title">✉️ Supplier Correction Request</div>
+                    <div className="lc-wc-sub">
+                      Ready to send — {checkMutation.data.summary.criticals} correction{checkMutation.data.summary.criticals > 1 ? "s" : ""} needed
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Action buttons */}
-              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 0", margin: "4px 0 0" }}>
-                <button
-                  onClick={() => goStep(2)}
-                  style={btnGreenS(true)}
-                >
-                  Upload Corrected Docs →
-                </button>
-                <button
-                  onClick={() => {
-                    setStep(1);
-                    checkMutation.reset();
-                    setShowCorrection(false);
-                    setLcFields({
-                      beneficiaryName: "", applicantName: "", goodsDescription: "", hsCode: "",
-                      quantity: 0, quantityUnit: "MT", unitPrice: 0, currency: "USD", totalAmount: 0,
-                      countryOfOrigin: "", portOfLoading: "", portOfDischarge: "",
-                      latestShipmentDate: "", lcExpiryDate: "", incoterms: "FOB",
-                      partialShipmentsAllowed: false, transhipmentAllowed: false, lcReference: "",
-                    });
-                    setDocuments([{ documentType: "commercial_invoice", fields: {} }]);
-                    setActiveDocTab(0);
-                  }}
-                  style={btnGreyS}
-                  data-testid="button-new-check"
-                >
-                  New Check
-                </button>
-              </div>
+                <div style={{ background: "#f7f7f7", borderRadius: 10, padding: "16px 18px", border: "1px solid #e8e8e8" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#111" }}>
+                      {checkMutation.data.summary.criticals} amendment{checkMutation.data.summary.criticals > 1 ? "s" : ""} required
+                    </div>
+                    <div className="lc-copy-btns">
+                      <button
+                        className={`lc-copy-btn email`}
+                        onClick={() => setCorrectionTab("email")}
+                        style={correctionTab !== "email" ? { opacity: 0.5 } : {}}
+                        data-testid="button-correction-email-tab"
+                      >
+                        📋 Email
+                      </button>
+                      <button
+                        className={`lc-copy-btn whatsapp`}
+                        onClick={() => setCorrectionTab("whatsapp")}
+                        style={correctionTab !== "whatsapp" ? { opacity: 0.5 } : {}}
+                        data-testid="button-correction-whatsapp-tab"
+                      >
+                        💬 WhatsApp
+                      </button>
+                    </div>
+                  </div>
+                  <div className="lc-email-box" data-testid={`text-correction-${correctionTab}`}>
+                    {correctionTab === "email" ? (checkMutation.data.correctionEmail || "") : (checkMutation.data.correctionWhatsApp || "")}
+                  </div>
+                </div>
 
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12 }}>
+                  <CopyBtn
+                    text={correctionTab === "email" ? (checkMutation.data.correctionEmail || "") : (checkMutation.data.correctionWhatsApp || "")}
+                    label={`correction-${correctionTab}`}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Integrity reference block */}
+            <div style={{ background: "#f7f7f7", borderRadius: 9, padding: "14px 16px", margin: "0 32px 12px", border: "1px solid #e8e8e8" }}>
+              <div style={{ display: "flex", alignItems: "start", gap: 10 }}>
+                <Hash size={18} style={{ color: "#999", flexShrink: 0, marginTop: 1 }} />
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-lc-check-ref">
+                    LC check ref: TT-LC-{new Date().getFullYear()}-{checkMutation.data.integrityHash.substring(0, 6).toUpperCase()}
+                  </p>
+                  <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#999", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
+                    Integrity hash: sha256:{checkMutation.data.integrityHash}
+                  </p>
+                  <p style={{ fontSize: 11, color: "#999" }} data-testid="text-lc-check-timestamp">
+                    Checked: {new Date(checkMutation.data.timestamp).toLocaleString()}
+                  </p>
+                </div>
+              </div>
             </div>
+
+            {/* Action buttons */}
+            <div className="lc-btn-row">
+              <button className="lc-btn-green" onClick={() => goStep(2)}>
+                Upload Corrected Docs →
+              </button>
+              <button
+                className="lc-btn-grey"
+                onClick={() => {
+                  setStep(1);
+                  checkMutation.reset();
+                  setShowCorrection(false);
+                  setLcFields({
+                    beneficiaryName: "", applicantName: "", goodsDescription: "", hsCode: "",
+                    quantity: 0, quantityUnit: "MT", unitPrice: 0, currency: "USD", totalAmount: 0,
+                    countryOfOrigin: "", portOfLoading: "", portOfDischarge: "",
+                    latestShipmentDate: "", lcExpiryDate: "", incoterms: "FOB",
+                    partialShipmentsAllowed: false, transhipmentAllowed: false, lcReference: "",
+                  });
+                  setDocuments([{ documentType: "commercial_invoice", fields: {} }]);
+                  setActiveDocTab(0);
+                }}
+                data-testid="button-new-check"
+              >
+                New Check
+              </button>
+            </div>
+
           </div>
         )}
 
         {/* Error display */}
         {checkMutation.isError && checkMutation.error.message !== "Insufficient tokens" && step !== 4 && (
-          <div style={{
-            margin: "14px 14px 0",
-            background: "rgba(218,60,61,0.08)", border: "1px solid rgba(218,60,61,0.2)",
-            borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "center", gap: 12,
-          }}>
+          <div className="lc-verdict fail" style={{ margin: "14px 24px 0" }}>
             <XCircle size={18} style={{ color: "var(--red)", flexShrink: 0 }} />
             <p style={{ fontSize: 13, color: "var(--red)" }}>{checkMutation.error.message}</p>
           </div>

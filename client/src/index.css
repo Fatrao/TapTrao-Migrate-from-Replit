@@ -84,7 +84,7 @@
   body {
     margin: 0;
     padding: 0;
-    background: #f3f3f3;
+    background: #000;
     color: var(--t1);
     font-family: var(--fb);
     -webkit-font-smoothing: antialiased;

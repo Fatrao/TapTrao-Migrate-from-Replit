@@ -10,7 +10,7 @@ interface NavItem {
   label: string;
   href: string;
   matchPaths?: string[];
-  badge?: { type: "amber" | "green"; value: number };
+  badge?: { type: "red" | "green"; value: number };
 }
 
 /* ── Section: Menu ── */
@@ -42,43 +42,19 @@ interface AppShellProps {
   contentClassName?: string;
 }
 
-/* ── Sidebar nav item ── */
+/* ── Sidebar nav item — uses CSS classes from index.css ── */
 function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: boolean; onClick?: () => void }) {
   return (
     <Link href={item.href}>
       <div
         onClick={onClick}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 9,
-          padding: "8px 12px",
-          margin: "0 6px 1px",
-          borderRadius: 8,
-          fontSize: 13,
-          fontWeight: isActive ? 500 : 400,
-          color: isActive ? "var(--green)" : "#666",
-          background: isActive ? "rgba(74,140,111,0.12)" : "transparent",
-          cursor: "pointer",
-          transition: "all 0.15s",
-          position: "relative",
-        }}
+        className={`sidebar-item${isActive ? " active" : ""}`}
         data-testid={`shell-nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
       >
         <span className="icon">{item.icon}</span>
         <span className="label">{item.label}</span>
         {item.badge && item.badge.value > 0 && (
-          <span
-            style={{
-              fontSize: 10,
-              padding: "1px 6px",
-              borderRadius: 20,
-              fontWeight: 600,
-              ...(item.badge.type === "amber"
-                ? { background: "rgba(218,60,61,0.2)", color: "#f87171" }
-                : { background: "rgba(74,140,111,0.15)", color: "var(--green)" }),
-            }}
-          >
+          <span className={`badge badge-${item.badge.type}`}>
             {item.badge.value}
           </span>
         )}
@@ -120,15 +96,15 @@ function DefaultNavLinks({ activePage }: { activePage: string }) {
     { label: "Messages", href: "/inbox", match: [] },
   ];
   return (
-    <div className="top-nav-links">
+    <>
       {links.map((link) => (
         <Link key={link.label} href={link.href}>
-          <span className={link.match.some((m) => activePage.startsWith(m)) ? "active" : ""}>
+          <a className={link.match.some((m) => activePage.startsWith(m)) ? "active" : ""}>
             {link.label}
-          </span>
+          </a>
         </Link>
       ))}
-    </div>
+    </>
   );
 }
 
@@ -145,7 +121,6 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
   const tradesBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/trades/pending-count"] });
   const tradesBadge = tradesBadgeQuery.data?.count ?? 0;
 
-  // Fetch recent lookups for history cards
   const recentLookupsQuery = useQuery<any[]>({ queryKey: ["/api/lookups/recent"] });
   const recentLookups = recentLookupsQuery.data?.slice(0, 3) ?? [];
 
@@ -170,9 +145,9 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
   });
   const cItems: NavItem[] = complianceItems.map((item) => {
     if (item.label === "Supplier Inbox" && inboxBadge > 0)
-      return { ...item, badge: { type: "amber" as const, value: inboxBadge } };
+      return { ...item, badge: { type: "red" as const, value: inboxBadge } };
     if (item.label === "Alerts" && alertsBadge > 0)
-      return { ...item, badge: { type: "amber" as const, value: alertsBadge } };
+      return { ...item, badge: { type: "red" as const, value: alertsBadge } };
     return item;
   });
 
@@ -184,36 +159,13 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
       {/* Logo */}
       <div className="sidebar-logo">
         <Link href="/">
-          <div style={{ display: "flex", alignItems: "center", gap: 9, cursor: "pointer" }} data-testid="shell-logo">
-            <div style={{
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              overflow: "hidden",
-              flexShrink: 0,
-              boxShadow: "0 0 16px rgba(74,140,111,0.4)",
-            }}>
-              <img src="/taptrao-green-logo.png" alt="TapTrao" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            </div>
-            <span
-              style={{
-                fontFamily: "var(--fh)",
-                fontWeight: 800,
-                fontSize: 16,
-                color: "#fff",
-                letterSpacing: "0",
-              }}
-            >
-              TapTrao
-            </span>
+          <div className="logo-link" data-testid="shell-logo">
+            <img className="logo-img" src="/taptrao-green-logo.png" alt="TapTrao" />
+            <span>TapTrao</span>
           </div>
         </Link>
         {isMobile && (
-          <button
-            onClick={closeSidebar}
-            className="sidebar-close-btn"
-            aria-label="Close menu"
-          >
+          <button onClick={closeSidebar} className="sidebar-close-btn" aria-label="Close menu">
             <X size={20} />
           </button>
         )}
@@ -261,32 +213,14 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
             </>
           )}
         </div>
-        <span style={{
-          background: "rgba(74,140,111,0.1)",
-          borderRadius: 20,
-          padding: "2px 8px",
-          fontSize: 11,
-          color: "var(--green)",
-          fontWeight: 500,
-          whiteSpace: "nowrap",
-        }}>{balance}</span>
       </div>
 
-      {/* Custom sidebar bottom slot */}
       {sidebarBottom}
     </>
   );
 
   return (
-    <div
-      style={{
-        display: "flex",
-        padding: 10,
-        gap: 10,
-        minHeight: "100vh",
-        background: "#f3f3f3",
-      }}
-    >
+    <>
       {/* SIDEBAR — desktop: always visible */}
       {!isMobile && (
         <div className="sidebar">
@@ -304,111 +238,51 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
         </>
       )}
 
-      {/* MAIN AREA — rounded panel with green-to-white gradient */}
-      <div style={{
-        flex: 1,
-        minWidth: 0,
-        borderRadius: 18,
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        background: "linear-gradient(180deg, #0e4e45 0px, #0e4e45 400px, #1a6b5a 460px, #4a9e8a 520px, #8ac0b0 570px, #bdd9ce 610px, #e4efea 650px, #f3f3f3 700px)",
-        minHeight: "calc(100vh - 20px)",
-      }}>
-        {/* TOPNAV */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: isMobile ? "0 12px" : "0 24px",
-            height: 50,
-            flexShrink: 0,
-            background: "transparent",
-            gap: 8,
-          }}
-        >
-          {/* Left: hamburger on mobile */}
-          {isMobile && (
-            <button
-              onClick={() => setSidebarOpen(true)}
-              style={{
-                background: "none",
-                border: "none",
-                color: "rgba(255,255,255,0.7)",
-                padding: 6,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-              aria-label="Open menu"
-              data-testid="shell-hamburger"
-            >
+      {/* MAIN AREA */}
+      <div className="main-box">
+        {/* TOP NAV */}
+        <div className="top-nav">
+          {/* Left: hamburger on mobile, nav links on desktop */}
+          {isMobile ? (
+            <button onClick={() => setSidebarOpen(true)} className="hamburger-btn" aria-label="Open menu" data-testid="shell-hamburger">
               <Menu size={22} />
             </button>
+          ) : (
+            <div className="top-nav-links">
+              {topCenter || <DefaultNavLinks activePage={location} />}
+            </div>
           )}
 
-            {/* Mobile: topCenter in middle */}
-            {isMobile && (
-              <div className="top-nav-links">
-                {topCenter || <DefaultNavLinks activePage={location} />}
+          {/* Right: icon buttons + avatar */}
+          <div className="top-nav-icons">
+            <Link href="/alerts">
+              <div className="icon-btn" data-testid="shell-bell-icon">
+                🔔
+                {alertsBadge > 0 && <span className="dot" />}
               </div>
+            </Link>
+
+            {!isMobile && (
+              <Link href="/inbox">
+                <div className="icon-btn">💬</div>
+              </Link>
             )}
 
-            {/* Right: icon buttons + avatar */}
-            <div className="top-nav-icons">
-              {/* Notification bell */}
-              <Link href="/alerts">
-                <div className="icon-btn" data-testid="shell-bell-icon">
-                  🔔
-                  {alertsBadge > 0 && <span className="dot" />}
-                </div>
+            {!isMobile && (
+              <Link href="/settings/profile">
+                <div className="icon-btn">⚙️</div>
               </Link>
+            )}
 
-              {/* Chat icon */}
-              {!isMobile && (
-                <Link href="/inbox">
-                  <div className="icon-btn">💬</div>
-                </Link>
-              )}
-
-              {/* Settings icon */}
-              {!isMobile && (
-                <Link href="/settings/profile">
-                  <div className="icon-btn">⚙️</div>
-                </Link>
-              )}
-
-              {/* User avatar — hidden, no auth system */}
-            </div>
-            <button
-              onClick={() => navigate("/pricing")}
-              style={{
-                background: "var(--green)",
-                color: "#000",
-                border: "none",
-                borderRadius: 50,
-                padding: isMobile ? "6px 12px" : "6px 16px",
-                fontFamily: "var(--fb)",
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-                boxShadow: "0 4px 18px rgba(74,140,111,0.35)",
-              }}
-              data-testid="shell-buy-cta"
-            >
-              {isMobile ? "Buy" : "Buy trade pack"}
-            </button>
-          </div>
-
-          {/* Scrollable content */}
-          <div className={contentClassName || "main-content"}>
-            {children}
+            <div className="user-avatar">F</div>
           </div>
         </div>
+
+        {/* Scrollable content */}
+        <div className={contentClassName || "main-content"}>
+          {children}
+        </div>
       </div>
+    </>
   );
 }
