@@ -50,6 +50,18 @@
   --fh: 'Inter', sans-serif;
   --fb: 'Inter', sans-serif;
 
+  /* Green card system (replaces white cards) */
+  --card-green:        rgba(255,255,255,0.06);
+  --card-green-border: rgba(255,255,255,0.08);
+  --card-heading:      #ffffff;
+  --card-body:         rgba(255,255,255,0.7);
+  --card-muted:        rgba(255,255,255,0.45);
+  --card-label:        rgba(255,255,255,0.5);
+  --card-inset:        rgba(255,255,255,0.04);
+  --card-inset-border: rgba(255,255,255,0.06);
+  --card-count-bg:     rgba(255,255,255,0.08);
+  --card-border-subtle:rgba(255,255,255,0.06);
+
   /* Sidebar */
   --bg-sidebar: #242428;
 }

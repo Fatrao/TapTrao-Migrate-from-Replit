@@ -167,11 +167,11 @@ export default function Home() {
             margin: "0 auto",
             borderRadius: 14,
             overflow: "hidden",
-            border: "1px solid rgba(0,0,0,0.08)",
-            boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
           }}>
             <div style={{
-              background: "#fff",
+              background: "rgba(255,255,255,0.04)",
               width: "100%",
               aspectRatio: "16 / 9",
               display: "flex",
@@ -191,7 +191,7 @@ export default function Home() {
                 justifyContent: "center",
                 fontSize: 24,
               }}>▶</div>
-              <p style={{ fontSize: 14, color: "#555", fontWeight: 500, margin: 0 }}>Demo video coming soon</p>
+              <p style={{ fontSize: 14, color: "var(--card-body)", fontWeight: 500, margin: 0 }}>Demo video coming soon</p>
             </div>
           </div>
 

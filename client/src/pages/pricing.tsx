@@ -249,9 +249,6 @@ export default function Pricing() {
           <Link href="/lookup">
             <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" }}>Lookup</span>
           </Link>
-          <Link href="/lc-check">
-            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" }}>LC Checker</span>
-          </Link>
           <Link href="/dashboard">
             <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" }}>Dashboard</span>
           </Link>

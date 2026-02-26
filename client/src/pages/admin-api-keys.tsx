@@ -81,7 +81,7 @@ export default function AdminApiKeys() {
 
       {/* Create form */}
       <div className="form-card" style={{ margin: "0 24px 20px" }}>
-        <h2 style={{ fontFamily: "var(--fh)", fontSize: 16, fontWeight: 600, color: "#1a1a1a", margin: "0 0 16px" }}>
+        <h2 style={{ fontFamily: "var(--fh)", fontSize: 16, fontWeight: 600, color: "var(--card-heading)", margin: "0 0 16px" }}>
           Create New API Key
         </h2>
         <form
@@ -105,11 +105,11 @@ export default function AdminApiKeys() {
           {error && <div style={{ fontSize: 12, color: "var(--red)", marginBottom: 8 }}>{error}</div>}
 
           {newKey && (
-            <div style={{ marginBottom: 16, padding: 16, background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "#16a34a", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8 }}>
+            <div style={{ marginBottom: 16, padding: 16, background: "rgba(74,140,111,0.1)", border: "1px solid rgba(74,140,111,0.2)", borderRadius: 10 }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "#4ade80", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8 }}>
                 API Key Created — Copy it now, it won't be shown again
               </div>
-              <div style={{ fontFamily: "monospace", fontSize: 13, background: "#fff", padding: "10px 12px", borderRadius: 6, border: "1px solid #e5e7eb", wordBreak: "break-all", userSelect: "all" }}>
+              <div style={{ fontFamily: "monospace", fontSize: 13, background: "rgba(255,255,255,0.06)", padding: "10px 12px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.08)", color: "var(--card-heading)", wordBreak: "break-all", userSelect: "all" }}>
                 {newKey}
               </div>
             </div>
@@ -137,29 +137,29 @@ export default function AdminApiKeys() {
 
       {/* Keys table */}
       <div className="form-card" style={{ margin: "0 24px 20px" }}>
-        <h2 style={{ fontFamily: "var(--fh)", fontSize: 16, fontWeight: 600, color: "#1a1a1a", margin: "0 0 12px" }}>
+        <h2 style={{ fontFamily: "var(--fh)", fontSize: 16, fontWeight: 600, color: "var(--card-heading)", margin: "0 0 12px" }}>
           Your API Keys ({keys.length})
         </h2>
         {keys.length === 0 ? (
-          <p style={{ fontSize: 13, color: "#555" }}>No API keys yet.</p>
+          <p style={{ fontSize: 13, color: "var(--card-body)" }}>No API keys yet.</p>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid #eee", textAlign: "left" }}>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Name</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Key</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Last Used</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Status</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}></th>
+                <tr style={{ borderBottom: "1px solid var(--card-border-subtle)", textAlign: "left" }}>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "var(--card-label)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Name</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "var(--card-label)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Key</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "var(--card-label)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Last Used</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "var(--card-label)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Status</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "var(--card-label)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}></th>
                 </tr>
               </thead>
               <tbody>
                 {keys.map((k) => (
-                  <tr key={k.id} style={{ borderBottom: "1px solid #f5f5f5" }}>
+                  <tr key={k.id} style={{ borderBottom: "1px solid var(--card-border-subtle)" }}>
                     <td style={{ padding: "10px 12px", fontWeight: 600 }}>{k.name}</td>
-                    <td style={{ padding: "10px 12px", fontFamily: "monospace", fontSize: 12, color: "#666" }}>{k.keyPreview}</td>
-                    <td style={{ padding: "10px 12px", color: "#555" }}>
+                    <td style={{ padding: "10px 12px", fontFamily: "monospace", fontSize: 12, color: "var(--card-label)" }}>{k.keyPreview}</td>
+                    <td style={{ padding: "10px 12px", color: "var(--card-body)" }}>
                       {k.lastUsedAt ? new Date(k.lastUsedAt).toLocaleDateString() : "Never"}
                     </td>
                     <td style={{ padding: "10px 12px" }}>
@@ -169,8 +169,8 @@ export default function AdminApiKeys() {
                         borderRadius: 12,
                         fontSize: 11,
                         fontWeight: 600,
-                        background: k.isActive ? "#dcfce7" : "#fee2e2",
-                        color: k.isActive ? "#16a34a" : "#ef4444",
+                        background: k.isActive ? "rgba(74,140,111,0.15)" : "rgba(239,68,68,0.15)",
+                        color: k.isActive ? "#4ade80" : "#f87171",
                       }}>
                         {k.isActive ? "Active" : "Revoked"}
                       </span>
@@ -182,11 +182,11 @@ export default function AdminApiKeys() {
                           disabled={deactivateMutation.isPending}
                           style={{
                             background: "none",
-                            border: "1px solid #e5e7eb",
+                            border: "1px solid rgba(255,255,255,0.1)",
                             borderRadius: 6,
                             padding: "4px 10px",
                             fontSize: 11,
-                            color: "#555",
+                            color: "var(--card-body)",
                             cursor: "pointer",
                           }}
                         >
@@ -204,11 +204,11 @@ export default function AdminApiKeys() {
 
       {/* Usage guide */}
       <div className="form-card" style={{ margin: "0 24px 20px" }}>
-        <h2 style={{ fontFamily: "var(--fh)", fontSize: 16, fontWeight: 600, color: "#1a1a1a", margin: "0 0 12px" }}>
+        <h2 style={{ fontFamily: "var(--fh)", fontSize: 16, fontWeight: 600, color: "var(--card-heading)", margin: "0 0 12px" }}>
           Quick Start
         </h2>
-        <div style={{ fontSize: 13, color: "#555", lineHeight: 1.7 }}>
-          <p style={{ margin: "0 0 12px" }}>Use your API key in the <code style={{ background: "#f5f5f5", padding: "2px 6px", borderRadius: 4, fontSize: 12 }}>Authorization</code> header:</p>
+        <div style={{ fontSize: 13, color: "var(--card-body)", lineHeight: 1.7 }}>
+          <p style={{ margin: "0 0 12px" }}>Use your API key in the <code style={{ background: "rgba(255,255,255,0.06)", padding: "2px 6px", borderRadius: 4, fontSize: 12 }}>Authorization</code> header:</p>
           <div style={{ fontFamily: "monospace", fontSize: 12, background: "#1a1a1a", color: "#4ade80", padding: 16, borderRadius: 8, overflowX: "auto", marginBottom: 16 }}>
             <div>curl -H "Authorization: Bearer tt_live_..." \</div>
             <div>&nbsp;&nbsp;https://taptrao.com/api/v1/commodities</div>
@@ -227,10 +227,10 @@ export default function AdminApiKeys() {
                 ["GET", "/api/v1/lc-checks/:id", "Get LC check detail", "No"],
                 ["GET", "/api/v1/balance", "Check credit balance", "No"],
               ].map(([method, path, desc, cost]) => (
-                <tr key={path} style={{ borderBottom: "1px solid #f0f0f0" }}>
+                <tr key={path} style={{ borderBottom: "1px solid var(--card-border-subtle)" }}>
                   <td style={{ padding: "6px 8px", fontFamily: "monospace", fontWeight: 600, color: method === "POST" ? "#6b9080" : "#555" }}>{method}</td>
                   <td style={{ padding: "6px 8px", fontFamily: "monospace" }}>{path}</td>
-                  <td style={{ padding: "6px 8px", color: "#555" }}>{desc}</td>
+                  <td style={{ padding: "6px 8px", color: "var(--card-body)" }}>{desc}</td>
                   <td style={{ padding: "6px 8px", color: cost === "No" ? "#555" : "#6b9080", fontWeight: cost !== "No" ? 600 : 400 }}>{cost}</td>
                 </tr>
               ))}
