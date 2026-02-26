@@ -191,7 +191,7 @@ export default function Home() {
                 justifyContent: "center",
                 fontSize: 24,
               }}>▶</div>
-              <p style={{ fontSize: 14, color: "var(--card-body)", fontWeight: 500, margin: 0 }}>Demo video coming soon</p>
+              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", fontWeight: 500, margin: 0 }}>Demo video coming soon</p>
             </div>
           </div>
 
