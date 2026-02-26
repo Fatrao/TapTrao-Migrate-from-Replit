@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { Menu, X } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
@@ -7,6 +7,24 @@ import { apiRequest } from "@/lib/queryClient";
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  // Mouse-follow spotlight on hero
+  useEffect(() => {
+    const hero = heroRef.current;
+    if (!hero) return;
+    const spotlight = document.createElement('div');
+    spotlight.className = 'hero-spotlight';
+    hero.appendChild(spotlight);
+
+    const onMove = (e: MouseEvent) => {
+      const rect = hero.getBoundingClientRect();
+      spotlight.style.setProperty('--spot-x', `${e.clientX - rect.left}px`);
+      spotlight.style.setProperty('--spot-y', `${e.clientY - rect.top}px`);
+    };
+    hero.addEventListener('mousemove', onMove);
+    return () => { hero.removeEventListener('mousemove', onMove); spotlight.remove(); };
+  }, []);
 
   usePageTitle(
     "De-risk your next shipment before spending",
@@ -80,7 +98,7 @@ export default function Home() {
       <div className="main-box">
 
         {/* ── GREEN HERO ── */}
-        <div className="green-hero" data-testid="section-hero">
+        <div className="green-hero" ref={heroRef} data-testid="section-hero">
           <div className="hero-badge">
             🛡️ For SME commodity traders importing from Africa into Europe
           </div>
