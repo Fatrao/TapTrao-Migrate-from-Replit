@@ -47,17 +47,13 @@
   --rbd:      rgba(239,68,68,0.20);
 
   /* Font families */
-  --fh: 'Clash Display', sans-serif;
+  --fh: 'Inter', sans-serif;
   --fb: 'Inter', sans-serif;
 
   /* Sidebar */
   --bg-sidebar: #242428;
 }
 
-/* ── Clash Display headings — normal spacing ── */
-[style*="Clash Display"] {
-  letter-spacing: 0;
-}
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 3px; }

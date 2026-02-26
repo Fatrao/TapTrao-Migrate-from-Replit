@@ -40,7 +40,7 @@ export default function Home() {
       <div className="top-nav" data-testid="nav-header">
         <div className="top-nav-left">
           <Link href="/">
-            <img className="logo-img" src="/taptrao-green-logo.png" alt="TapTrao" />
+            <img className="logo-img" src="/logo.png" alt="TapTrao" />
           </Link>
           <Link href="/">
             <span className="logo-text">TapTrao</span>
@@ -341,7 +341,7 @@ export default function Home() {
         {/* ── FOOTER ── */}
         <div className="footer" data-testid="section-footer">
           <div className="footer-left">
-            <img className="logo-img" src="/taptrao-green-logo.png" alt="TapTrao" />
+            <img className="logo-img" src="/logo.png" alt="TapTrao" />
             <span className="logo-name">TapTrao</span>
             © 2026 FATRAO LIMITED · Trade compliance for commodity traders
           </div>

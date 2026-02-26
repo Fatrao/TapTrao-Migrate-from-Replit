@@ -31,7 +31,7 @@ export function NavBar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 px-6 h-16">
         <Link href="/" data-testid="link-home">
           <span className="flex items-center gap-2" data-testid="text-nav-logo">
-            <img src="/taptrao-green-logo.png" alt="TapTrao" className="w-8 h-8 rounded-md" />
+            <img src="/logo.png" alt="TapTrao" className="w-8 h-8 rounded-md" />
             <span className="font-heading font-extrabold text-xl text-foreground">TapTrao</span>
           </span>
         </Link>

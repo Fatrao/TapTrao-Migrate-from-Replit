@@ -159,7 +159,7 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
       <div className="sidebar-logo">
         <Link href="/">
           <div className="logo-link" data-testid="shell-logo">
-            <img className="logo-img" src="/taptrao-green-logo.png" alt="TapTrao" />
+            <img className="logo-img" src="/logo.png" alt="TapTrao" />
             <span>TapTrao</span>
           </div>
         </Link>
