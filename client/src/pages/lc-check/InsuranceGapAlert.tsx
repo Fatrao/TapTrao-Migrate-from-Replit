@@ -27,7 +27,7 @@ export function InsuranceGapAlert() {
         style={{
           position: "absolute", top: 10, right: 12,
           background: "none", border: "none", cursor: "pointer",
-          color: "#999", fontSize: 16, lineHeight: 1,
+          color: "#666", fontSize: 16, lineHeight: 1,
         }}
       >
         <X size={14} />
@@ -72,7 +72,7 @@ export function InsuranceGapAlert() {
         </div>
       </div>
 
-      <p style={{ fontSize: 11, color: "#999", lineHeight: 1.5 }}>
+      <p style={{ fontSize: 11, color: "#666", lineHeight: 1.5 }}>
         This applies regardless of Incoterms. Even under CIF or CIP, the seller&apos;s
         insurance does not cover destination regulatory rejection.
       </p>

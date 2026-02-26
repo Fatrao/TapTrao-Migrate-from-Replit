@@ -124,7 +124,7 @@ export default function Dashboard() {
           <div className="stat-icon">🔍</div>
           <div className="stat-label">Total Lookups</div>
           <div className="stat-value" data-testid="stat-compliance-lookups">
-            {totalLookups} <span style={{ fontSize: 13, color: "#888", fontWeight: 400, fontFamily: "var(--fb)" }}>checks</span>
+            {totalLookups} <span style={{ fontSize: 13, color: "#555", fontWeight: 400, fontFamily: "var(--fb)" }}>checks</span>
           </div>
           <div className="stat-sub">
             <span className="up">↑ 8%</span> vs prev. 28 days
@@ -176,7 +176,7 @@ export default function Dashboard() {
             <tbody>
               {recentTrades.length === 0 ? (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: "center", padding: 20, color: "#999" }}>
+                  <td colSpan={5} style={{ textAlign: "center", padding: 20, color: "#666" }}>
                     No trades yet. Run your first compliance check.
                   </td>
                 </tr>
@@ -193,7 +193,7 @@ export default function Dashboard() {
                   </td>
                   <td>
                     {t.corridor}<br />
-                    <span style={{ fontSize: 11, color: "#999" }}>{t.date}</span>
+                    <span style={{ fontSize: 11, color: "#666" }}>{t.date}</span>
                   </td>
                   <td>{t.value}</td>
                   <td>
@@ -317,7 +317,7 @@ export default function Dashboard() {
                 </div>
               ))}
               {(lookupsQuery.data ?? []).length === 0 && (lcQuery.data ?? []).length === 0 && (
-                <div style={{ textAlign: "center", padding: 16, color: "#999", fontSize: 13 }}>No recent activity</div>
+                <div style={{ textAlign: "center", padding: 16, color: "#666", fontSize: 13 }}>No recent activity</div>
               )}
             </div>
           </div>

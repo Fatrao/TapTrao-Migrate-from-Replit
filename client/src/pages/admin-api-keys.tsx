@@ -141,17 +141,17 @@ export default function AdminApiKeys() {
           Your API Keys ({keys.length})
         </h2>
         {keys.length === 0 ? (
-          <p style={{ fontSize: 13, color: "#888" }}>No API keys yet.</p>
+          <p style={{ fontSize: 13, color: "#555" }}>No API keys yet.</p>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid #eee", textAlign: "left" }}>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Name</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Key</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Last Used</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Status</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}></th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Name</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Key</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Last Used</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Status</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}></th>
                 </tr>
               </thead>
               <tbody>
@@ -159,7 +159,7 @@ export default function AdminApiKeys() {
                   <tr key={k.id} style={{ borderBottom: "1px solid #f5f5f5" }}>
                     <td style={{ padding: "10px 12px", fontWeight: 600 }}>{k.name}</td>
                     <td style={{ padding: "10px 12px", fontFamily: "monospace", fontSize: 12, color: "#666" }}>{k.keyPreview}</td>
-                    <td style={{ padding: "10px 12px", color: "#888" }}>
+                    <td style={{ padding: "10px 12px", color: "#555" }}>
                       {k.lastUsedAt ? new Date(k.lastUsedAt).toLocaleDateString() : "Never"}
                     </td>
                     <td style={{ padding: "10px 12px" }}>
@@ -186,7 +186,7 @@ export default function AdminApiKeys() {
                             borderRadius: 6,
                             padding: "4px 10px",
                             fontSize: 11,
-                            color: "#888",
+                            color: "#555",
                             cursor: "pointer",
                           }}
                         >
@@ -228,10 +228,10 @@ export default function AdminApiKeys() {
                 ["GET", "/api/v1/balance", "Check credit balance", "No"],
               ].map(([method, path, desc, cost]) => (
                 <tr key={path} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                  <td style={{ padding: "6px 8px", fontFamily: "monospace", fontWeight: 600, color: method === "POST" ? "#6b9080" : "#888" }}>{method}</td>
+                  <td style={{ padding: "6px 8px", fontFamily: "monospace", fontWeight: 600, color: method === "POST" ? "#6b9080" : "#555" }}>{method}</td>
                   <td style={{ padding: "6px 8px", fontFamily: "monospace" }}>{path}</td>
-                  <td style={{ padding: "6px 8px", color: "#888" }}>{desc}</td>
-                  <td style={{ padding: "6px 8px", color: cost === "No" ? "#888" : "#6b9080", fontWeight: cost !== "No" ? 600 : 400 }}>{cost}</td>
+                  <td style={{ padding: "6px 8px", color: "#555" }}>{desc}</td>
+                  <td style={{ padding: "6px 8px", color: cost === "No" ? "#555" : "#6b9080", fontWeight: cost !== "No" ? 600 : 400 }}>{cost}</td>
                 </tr>
               ))}
             </tbody>

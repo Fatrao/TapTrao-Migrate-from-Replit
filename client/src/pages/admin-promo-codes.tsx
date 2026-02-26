@@ -149,17 +149,17 @@ export default function AdminPromoCodes() {
           Existing Codes ({codes.length})
         </h2>
         {codes.length === 0 ? (
-          <p style={{ fontSize: 13, color: "#888" }}>No promo codes yet.</p>
+          <p style={{ fontSize: 13, color: "#555" }}>No promo codes yet.</p>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid #eee", textAlign: "left" }}>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Code</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Tokens</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>LC</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Used / Max</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Status</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Code</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Tokens</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>LC</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Used / Max</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Status</th>
                 </tr>
               </thead>
               <tbody>

@@ -101,7 +101,7 @@ export default function Home() {
                 Run Your First Check — Free
               </span>
             </Link>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: -4 }}>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: -4 }}>
               Decision-support tool · Not legal or banking advice
             </div>
             <a href="#how">
@@ -191,7 +191,7 @@ export default function Home() {
                 justifyContent: "center",
                 fontSize: 24,
               }}>▶</div>
-              <p style={{ fontSize: 14, color: "#888", fontWeight: 500, margin: 0 }}>Demo video coming soon</p>
+              <p style={{ fontSize: 14, color: "#555", fontWeight: 500, margin: 0 }}>Demo video coming soon</p>
             </div>
           </div>
 
@@ -257,7 +257,7 @@ export default function Home() {
             <div className="free-banner-text">
               <h4>Your first check is free</h4>
               <p>Run one full compliance check for free — no card required. See duties, required documents, and shipment risks.</p>
-              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 6 }}>Results are informational and intended to support your own review or discussions with banks, agents, or advisors.</p>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 6 }}>Results are informational and intended to support your own review or discussions with banks, agents, or advisors.</p>
             </div>
           </div>
           <Link href="/lookup">
@@ -270,7 +270,7 @@ export default function Home() {
           <h2 style={{ fontFamily: "var(--fh)", fontSize: 18, fontWeight: 600, color: "#fff", marginBottom: 6 }}>
             Trade Packs
           </h2>
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginBottom: 0 }}>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginBottom: 0 }}>
             1 credit = 1 shipment checked (compliance + LC). Buy more, save more.
           </p>
         </div>
@@ -397,7 +397,7 @@ export default function Home() {
 
         {/* ── FOOTER ── */}
         <div className="footer" data-testid="section-footer">
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 16, maxWidth: 640 }}>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", lineHeight: 1.5, marginBottom: 16, maxWidth: 640 }}>
             TapTrao provides automated trade and document screening for informational purposes only. Results do not constitute legal, regulatory, or banking advice and do not guarantee acceptance by authorities or financial institutions.
           </div>
           <div className="footer-left">

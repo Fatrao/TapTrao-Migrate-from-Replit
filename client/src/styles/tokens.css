@@ -17,8 +17,8 @@
 
   /* Text hierarchy — white at different opacities */
   --t1: rgba(255,255,255,0.95);
-  --t2: rgba(255,255,255,0.55);
-  --t3: rgba(255,255,255,0.28);
+  --t2: rgba(255,255,255,0.7);
+  --t3: rgba(255,255,255,0.5);
 
   /* Design system colors */
   --sage:     #6b9080;
@@ -30,7 +30,7 @@
   --red:      #ef4444;
   --txt:      #111111;
   --txt2:     #555555;
-  --txt3:     #999999;
+  --txt3:     #666666;
 
   /* Accent — mapped to green instead of blue */
   --blue:     #4a8c6f;

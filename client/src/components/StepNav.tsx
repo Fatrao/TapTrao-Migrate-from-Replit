@@ -47,7 +47,7 @@ export function StepNav({ steps, currentIndex, completedUpTo }: StepNavProps) {
                     ? { background: "var(--green)", color: "#000" }
                     : isActive
                       ? { background: "rgba(255,255,255,0.15)", color: "#fff", border: "2px solid var(--green)" }
-                      : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.1)" }),
+                      : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.1)" }),
                 }}
               >
                 {isDone ? <Check size={12} strokeWidth={3} /> : i + 1}
@@ -61,7 +61,7 @@ export function StepNav({ steps, currentIndex, completedUpTo }: StepNavProps) {
                     ? { color: "var(--green)" }
                     : isActive
                       ? { color: "#fff" }
-                      : { color: "rgba(255,255,255,0.25)" }),
+                      : { color: "rgba(255,255,255,0.5)" }),
                 }}
               >
                 {step}

@@ -240,7 +240,7 @@ export default function LcCheck() {
       ) : lcActiveTab === "TwinLog Trail" ? (
         <TwinLogTrailTab prefillData={prefillData} />
       ) : lcActiveTab === "Corrections" ? (
-        <div style={{ padding: "80px 24px", textAlign: "center", color: "rgba(255,255,255,0.45)", fontSize: 14 }}>
+        <div style={{ padding: "80px 24px", textAlign: "center", color: "rgba(255,255,255,0.65)", fontSize: 14 }}>
           Coming in the next update.
         </div>
       ) : (
@@ -303,7 +303,7 @@ export default function LcCheck() {
             </div>
             <button
               onClick={() => setShowPrefillBanner(false)}
-              style={{ color: "#999", background: "none", border: "none", cursor: "pointer" }}
+              style={{ color: "#666", background: "none", border: "none", cursor: "pointer" }}
               data-testid="button-dismiss-prefill-banner"
             >
               <X size={16} />
@@ -693,7 +693,7 @@ export default function LcCheck() {
 
               {/* Documents summary */}
               <div style={{ background: "#f7f7f7", borderRadius: 9, padding: "12px 14px" }}>
-                <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8, width: "100%" }}>
+                <div style={{ fontSize: 10.5, fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8, width: "100%" }}>
                   Documents
                 </div>
                 {documents.map((doc, i) => (
@@ -789,7 +789,7 @@ export default function LcCheck() {
               {/* Critical results */}
               {checkMutation.data.results.filter(r => r.severity === "RED").length > 0 && (
                 <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
                     🔴 Critical — Bank will reject
                   </div>
                   {checkMutation.data.results.filter(r => r.severity === "RED").map((r, i) => (
@@ -811,7 +811,7 @@ export default function LcCheck() {
               {/* Warning results */}
               {checkMutation.data.results.filter(r => r.severity === "AMBER").length > 0 && (
                 <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
                     🟡 Warnings
                   </div>
                   {checkMutation.data.results.filter(r => r.severity === "AMBER").map((r, i) => (
@@ -833,7 +833,7 @@ export default function LcCheck() {
               {/* Matched results */}
               {checkMutation.data.results.filter(r => r.severity === "GREEN").length > 0 && (
                 <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#999", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
                     🟢 Matched
                   </div>
                   {checkMutation.data.results.filter(r => r.severity === "GREEN").map((r, i) => (
@@ -901,15 +901,15 @@ export default function LcCheck() {
             {/* Integrity reference block */}
             <div style={{ background: "#f7f7f7", borderRadius: 9, padding: "14px 16px", margin: "0 32px 12px", border: "1px solid #e8e8e8" }}>
               <div style={{ display: "flex", alignItems: "start", gap: 10 }}>
-                <Hash size={18} style={{ color: "#999", flexShrink: 0, marginTop: 1 }} />
+                <Hash size={18} style={{ color: "#666", flexShrink: 0, marginTop: 1 }} />
                 <div style={{ minWidth: 0 }}>
                   <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-lc-check-ref">
                     LC check ref: TT-LC-{new Date().getFullYear()}-{checkMutation.data.integrityHash.substring(0, 6).toUpperCase()}
                   </p>
-                  <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#999", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
+                  <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#666", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
                     Integrity hash: sha256:{checkMutation.data.integrityHash}
                   </p>
-                  <p style={{ fontSize: 11, color: "#999" }} data-testid="text-lc-check-timestamp">
+                  <p style={{ fontSize: 11, color: "#666" }} data-testid="text-lc-check-timestamp">
                     Checked: {new Date(checkMutation.data.timestamp).toLocaleString()}
                   </p>
                 </div>

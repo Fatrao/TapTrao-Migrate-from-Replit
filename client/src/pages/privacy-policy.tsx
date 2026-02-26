@@ -28,7 +28,7 @@ export default function PrivacyPolicy() {
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 32, fontWeight: 700, color: "#fff", marginBottom: 8 }} data-testid="text-privacy-title">
           Privacy Policy
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 40 }}>Last updated: 19 February 2026</p>
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 40 }}>Last updated: 19 February 2026</p>
 
         <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 15, lineHeight: 1.7 }}>
 
@@ -110,7 +110,7 @@ export default function PrivacyPolicy() {
 
           <Section title="12. Contact">
             <p>For privacy-related queries or to exercise your rights, contact: <a href="mailto:hello@taptrao.com" style={linkStyle}>hello@taptrao.com</a></p>
-            <p style={{ marginTop: 8, fontSize: 13, color: "rgba(255,255,255,0.4)" }}>Fatrao Limited — Registered in England and Wales</p>
+            <p style={{ marginTop: 8, fontSize: 13, color: "rgba(255,255,255,0.6)" }}>Fatrao Limited — Registered in England and Wales</p>
           </Section>
         </div>
       </div>
