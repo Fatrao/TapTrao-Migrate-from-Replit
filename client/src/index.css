@@ -30,6 +30,19 @@
   font-display: swap;
 }
 
+/* Clash Display woff2 has a narrow space glyph — force normal word spacing globally */
+h1, h2, h3, h4,
+.font-clash,
+.stat-card .stat-value,
+.sidebar-logo span,
+.pack-name, .pack-price, .pack-meta, .pack-per,
+.lc-price, .lc-card-header h3,
+.hero-badge, .section-label,
+.form-card-header h2,
+.upload-card-header h2 {
+  word-spacing: 0.12em;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -1179,7 +1192,8 @@
   color: #fff;
   line-height: 1.1;
   margin-bottom: 16px;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
+  word-spacing: normal;
   position: relative;
   max-width: 700px;
   margin-left: auto;

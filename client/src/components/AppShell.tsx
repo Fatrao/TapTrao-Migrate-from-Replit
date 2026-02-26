@@ -18,7 +18,6 @@ const menuItems: NavItem[] = [
   { icon: "⊞", label: "Dashboard", href: "/dashboard" },
   { icon: "◉", label: "My Trades", href: "/trades" },
   { icon: "●", label: "Lookup", href: "/lookup" },
-  { icon: "📄", label: "LC Check", href: "/lc-check" },
 ];
 
 /* ── Section: Compliance ── */

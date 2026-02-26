@@ -393,7 +393,7 @@ function TopBar() {
       data-testid="upload-topbar"
     >
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <img src="/logo.png" alt="TapTrao" style={{ width: 28, height: 28, objectFit: "contain", borderRadius: 6 }} />
+        <img src="/taptrao-green-logo.png" alt="TapTrao" style={{ width: 28, height: 28, objectFit: "contain", borderRadius: 6 }} />
         <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 16, color: "var(--t1)" }}>
           TapTrao
         </span>
@@ -409,7 +409,7 @@ function Footer({ expiryDate }: { expiryDate: string }) {
   return (
     <div style={{ textAlign: "center", marginTop: 32, padding: "0 20px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 6 }}>
-        <img src="/logo.png" alt="" style={{ width: 20, height: 20, objectFit: "contain", borderRadius: 4 }} />
+        <img src="/taptrao-green-logo.png" alt="" style={{ width: 20, height: 20, objectFit: "contain", borderRadius: 4 }} />
         <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "var(--t2)" }}>TapTrao</span>
       </div>
       <p style={{ fontSize: 11, color: "var(--t3)", lineHeight: 1.55 }}>
@@ -436,7 +436,7 @@ function ExpiredPage({ reason }: { reason: "expired" | "invalid" }) {
       </div>
       <div style={{ textAlign: "center", marginTop: 40 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 6 }}>
-          <img src="/logo.png" alt="" style={{ width: 20, height: 20, objectFit: "contain", borderRadius: 4 }} />
+          <img src="/taptrao-green-logo.png" alt="" style={{ width: 20, height: 20, objectFit: "contain", borderRadius: 4 }} />
           <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "var(--t2)" }}>TapTrao</span>
         </div>
       </div>
