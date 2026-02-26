@@ -5,6 +5,355 @@ import { Menu, X } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 
+/* ═══════════════════════════════════════════
+   Interactive Demo — 4-step auto-advancing carousel
+   ═══════════════════════════════════════════ */
+function DemoSection() {
+  const [step, setStep] = useState(1);
+  const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const total = 4;
+
+  const startTimer = useCallback(() => {
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setStep(s => (s === total ? 1 : s + 1));
+    }, 5000);
+  }, []);
+
+  useEffect(() => {
+    startTimer();
+    return () => clearInterval(timerRef.current);
+  }, [startTimer]);
+
+  const pause = () => clearInterval(timerRef.current);
+  const resume = () => startTimer();
+
+  const goTo = (n: number) => {
+    setStep(n);
+    clearInterval(timerRef.current);
+    startTimer();
+  };
+
+  const docRow = (dot: string, name: string, auth: string) => (
+    <div className="demo-doc-row" key={name}>
+      <div className="demo-doc-dot" style={{ background: dot }} />
+      <div className="demo-doc-name">{name}</div>
+      <div className="demo-doc-auth">{auth}</div>
+    </div>
+  );
+
+  /* LC check result item */
+  const lcItem = (severity: "red" | "amber" | "green", field: string, doc: string, lcVal: string, docVal: string, rule: string) => {
+    const colors = { red: "#ef4444", amber: "#F59E0B", green: "#22C55E" };
+    return (
+      <div className="demo-lc-item" key={field + doc}>
+        <div className="demo-doc-dot" style={{ background: colors[severity], marginTop: 4 }} />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.90)", fontWeight: 600 }}>{field}</div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>{doc}</div>
+          {severity !== "green" && (
+            <div style={{ fontSize: 11, marginTop: 4, lineHeight: 1.5 }}>
+              <span style={{ color: "rgba(255,255,255,0.35)" }}>LC: </span>
+              <span style={{ color: "rgba(255,255,255,0.70)" }}>"{lcVal}"</span>
+              <span style={{ color: "rgba(255,255,255,0.35)" }}> · Doc: </span>
+              <span style={{ color: "rgba(255,255,255,0.70)" }}>"{docVal}"</span>
+            </div>
+          )}
+          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", marginTop: 3, letterSpacing: "0.03em" }}>{rule}</div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <div
+        className="demo-browser"
+        onMouseEnter={pause}
+        onMouseLeave={resume}
+      >
+        {/* Browser chrome */}
+        <div className="demo-chrome">
+          <div className="demo-dot red" />
+          <div className="demo-dot yellow" />
+          <div className="demo-dot green" />
+          <div className="demo-url">{step <= 2 ? "taptrao.com/lookup" : step === 3 ? "taptrao.com/lc-check" : "taptrao.com/lookup"}</div>
+        </div>
+
+        {/* Step tabs */}
+        <div className="demo-tabs">
+          <div className={`demo-tab ${step === 1 ? "active" : ""}`} onClick={() => goTo(1)}>① Enter trade</div>
+          <div className={`demo-tab ${step === 2 ? "active" : ""}`} onClick={() => goTo(2)}>② Pre-ship report</div>
+          <div className={`demo-tab ${step === 3 ? "active" : ""}`} onClick={() => goTo(3)}>③ LC check</div>
+          <div className={`demo-tab ${step === 4 ? "active" : ""}`} onClick={() => goTo(4)}>④ Supplier brief</div>
+        </div>
+
+        {/* Step content */}
+        <div className="demo-content">
+
+          {/* STEP 1 — Enter Trade */}
+          {step === 1 && (
+            <div>
+              <div className="demo-title">Compliance Lookup</div>
+              <div className="demo-subtitle">Enter your commodity, origin, and destination</div>
+
+              <div className="demo-grid-3a" style={{ marginBottom: 24 }}>
+                {["Commodity", "Origin Country", "Destination"].map((label, i) => (
+                  <div key={label} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <div className="demo-label">{label}</div>
+                    <div className="demo-input">
+                      {["🥜 Raw Cashew Nuts", "🇨🇮 Côte d'Ivoire", "🇬🇧 United Kingdom"][i]}
+                    </div>
+                  </div>
+                ))}
+                <button className="demo-run-btn" onClick={() => goTo(2)}>
+                  Run Check →
+                </button>
+              </div>
+
+              <div className="demo-grid-4">
+                {[
+                  { label: "Lookups Run", value: "12", color: "var(--fern)", sub: "this month" },
+                  { label: "LC Checks", value: "4", color: "rgba(255,255,255,0.95)", sub: "discrepancies caught" },
+                  { label: "Corridors", value: "3", color: "rgba(255,255,255,0.95)", sub: "saved" },
+                  { label: "Alerts", value: "2", color: "#F59E0B", sub: "new this week" },
+                ].map(s => (
+                  <div key={s.label} className="demo-stat-card">
+                    <div className="demo-label" style={{ marginBottom: 8 }}>{s.label}</div>
+                    <div className="demo-stat-value" style={{ color: s.color }}>{s.value}</div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.28)", marginTop: 6 }}>{s.sub}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2 — Pre-Shipment Compliance Report */}
+          {step === 2 && (
+            <div>
+              <div className="demo-title">Pre-Shipment Report</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.95)", fontWeight: 600, marginBottom: 20 }}>
+                🥜 Raw Cashew Nuts › 🇨🇮 Côte d'Ivoire › 🇬🇧 United Kingdom
+              </div>
+
+              <div className="demo-grid-2">
+                {/* Buyer docs */}
+                <div className="demo-card">
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                    <div className="demo-result-title">Your Side — Buyer</div>
+                    <div className="demo-badge" style={{ color: "var(--fern)", background: "var(--app-acapulco-dim)" }}>5 docs</div>
+                  </div>
+                  {docRow("#22C55E", "Customs Declaration (CDS)", "HMRC")}
+                  {docRow("#22C55E", "IPAFFS Pre-notification", "APHA")}
+                  {docRow("#22C55E", "Port Health Inspection", "Port Health")}
+                  {docRow("#F59E0B", "Import Licence (if >20MT)", "HMRC RPA")}
+                  {docRow("#22C55E", "Duty & VAT Payment", "HMRC")}
+                </div>
+
+                {/* Supplier docs */}
+                <div className="demo-card">
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                    <div className="demo-result-title">Their Side — Supplier</div>
+                    <div className="demo-badge" style={{ color: "var(--fern)", background: "var(--app-acapulco-dim)" }}>6 docs</div>
+                  </div>
+                  {docRow("#22C55E", "Certificate of Origin", "CCA (Conseil Anacarde)")}
+                  {docRow("#22C55E", "Phytosanitary Certificate", "LANADA / DPVCQ")}
+                  {docRow("#22C55E", "Commercial Invoice", "Supplier")}
+                  {docRow("#22C55E", "Bill of Lading", "Shipping Line")}
+                  {docRow("#F59E0B", "Aflatoxin Test Report", "Accredited Lab")}
+                </div>
+
+                {/* Readiness score */}
+                <div className="demo-card">
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                    <div className="demo-result-title">Readiness Score</div>
+                    <div className="demo-badge" style={{ color: "#22C55E", background: "rgba(34,197,94,0.10)" }}>Low Risk</div>
+                  </div>
+                  <div className="demo-score">87</div>
+                  <div className="demo-label" style={{ textAlign: "center" }}>Compliance Readiness</div>
+                  <div className="demo-progress-bar">
+                    <div className="demo-progress-fill" style={{ width: "87%" }} />
+                  </div>
+                  {[
+                    ["Commodity risk", "LOW", "#22C55E"],
+                    ["Origin risk", "LOW", "#22C55E"],
+                    ["Regulatory complexity", "MEDIUM", "#F59E0B"],
+                    ["Known hazards", "AFLATOXIN", "#F59E0B"],
+                  ].map(([k, v, c]) => (
+                    <div className="demo-risk-row" key={k}>
+                      <span className="demo-risk-label">{k}</span>
+                      <span className="demo-risk-value" style={{ color: c }}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Duty estimate */}
+                <div className="demo-card">
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                    <div className="demo-result-title">Duty Estimate</div>
+                    <div className="demo-badge" style={{ color: "#22C55E", background: "rgba(34,197,94,0.10)" }}>GSP rate</div>
+                  </div>
+                  {[
+                    ["MFN Tariff Rate", "0%"],
+                    ["GSP Preference", "0% (eligible)"],
+                    ["UK VAT (Import)", "20%"],
+                    ["Est. duty on $50k", "$0"],
+                    ["Est. VAT on $50k", "$10,000"],
+                  ].map(([k, v]) => (
+                    <div className="demo-duty-row" key={k}>
+                      <span className="demo-duty-label">{k}</span>
+                      <span className="demo-duty-value">{v}</span>
+                    </div>
+                  ))}
+                  <div className="demo-twinlog-ref">
+                    <span>TT-2026-a3f9c1</span>
+                    <span style={{ color: "var(--fern)" }}>sha256:a3f9c1...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3 — LC Document Check */}
+          {step === 3 && (
+            <div>
+              <div className="demo-title">LC Document Check</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.95)", fontWeight: 600, marginBottom: 20 }}>
+                📄 LC Ref: LC-2026-UK-4821 · 🇨🇮 Côte d'Ivoire → 🇬🇧 United Kingdom
+              </div>
+
+              <div className="demo-grid-2">
+                {/* Verdict panel */}
+                <div className="demo-card" style={{ gridColumn: "1 / -1" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ fontSize: 28 }}>⚠️</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "#F59E0B", fontFamily: "'Clash Display', sans-serif" }}>Discrepancies Found</div>
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.50)", marginTop: 2 }}>2 critical issues will cause bank rejection. 1 warning to review.</div>
+                    </div>
+                    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 20, fontWeight: 700, color: "#22C55E", fontFamily: "'Clash Display', sans-serif" }}>8</div>
+                        <div className="demo-label">matched</div>
+                      </div>
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 20, fontWeight: 700, color: "#F59E0B", fontFamily: "'Clash Display', sans-serif" }}>1</div>
+                        <div className="demo-label">warning</div>
+                      </div>
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 20, fontWeight: 700, color: "#ef4444", fontFamily: "'Clash Display', sans-serif" }}>2</div>
+                        <div className="demo-label">critical</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Critical discrepancies */}
+                <div className="demo-card">
+                  <div className="demo-result-title" style={{ color: "#ef4444", marginBottom: 12 }}>🔴 Critical — Bank Will Reject</div>
+                  {lcItem("red", "Beneficiary Name", "Commercial Invoice",
+                    "Ivory Coast Cashew Company Ltd", "Ivory Coast Cashew Co.",
+                    "UCP 600 Art. 14(d) — Name must match exactly"
+                  )}
+                  <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "8px 0" }} />
+                  {lcItem("red", "Invoice Amount", "Commercial Invoice",
+                    "$50,000.00 (max)", "$52,400.00",
+                    "UCP 600 Art. 18(b) — Must not exceed LC amount"
+                  )}
+                </div>
+
+                {/* Warnings + matches */}
+                <div className="demo-card">
+                  <div className="demo-result-title" style={{ color: "#F59E0B", marginBottom: 12 }}>🟡 Warning</div>
+                  {lcItem("amber", "Port of Loading", "Bill of Lading",
+                    "Port of Abidjan", "Abidjan Terminal",
+                    "UCP 600 Art. 20(a)(ii) — Partial match"
+                  )}
+                  <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "12px 0" }} />
+                  <div className="demo-result-title" style={{ color: "#22C55E", marginBottom: 10 }}>🟢 Matched (8)</div>
+                  {[
+                    "Currency (USD)", "Goods Description", "Shipment Date",
+                    "Port of Discharge", "Quantity", "Incoterms (CIF)",
+                  ].map(f => (
+                    <div key={f} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 0" }}>
+                      <div className="demo-doc-dot" style={{ background: "#22C55E" }} />
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,0.50)" }}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 4 — Supplier Brief */}
+          {step === 4 && (
+            <div>
+              <div className="demo-title">Supplier Brief</div>
+              <div className="demo-subtitle">Ready to send — email or WhatsApp</div>
+
+              <div className="demo-grid-2b">
+                {/* Email format */}
+                <div className="demo-email-card">
+                  <div className="demo-label" style={{ marginBottom: 12 }}>📧 Email Format</div>
+                  <div className="demo-email-body">
+                    <div style={{ color: "rgba(255,255,255,0.95)", fontWeight: 600, marginBottom: 8 }}>
+                      Subject: Required documents — Raw Cashew Nuts CIV → UK
+                    </div>
+                    Dear Supplier,<br /><br />
+                    Please provide the following documents:<br /><br />
+                    <span style={{ color: "rgba(255,255,255,0.90)" }}>
+                      1. Certificate of Origin<br />
+                      &nbsp;&nbsp;→ <span style={{ color: "var(--fern)" }}>CCA (Conseil du Coton et de l'Anacarde)</span><br /><br />
+                      2. Phytosanitary Certificate<br />
+                      &nbsp;&nbsp;→ <span style={{ color: "var(--fern)" }}>LANADA / DPVCQ</span><br /><br />
+                      3. Aflatoxin Test Report<br />
+                      &nbsp;&nbsp;→ Accredited laboratory
+                    </span>
+                  </div>
+                </div>
+
+                {/* WhatsApp format */}
+                <div className="demo-email-card">
+                  <div className="demo-label" style={{ marginBottom: 12 }}>💬 WhatsApp Format</div>
+                  <div className="demo-whatsapp-body">
+                    <span style={{ color: "rgba(255,255,255,0.95)", fontWeight: 700 }}>TapTrao Document Request</span><br />
+                    Raw Cashew Nuts · CIV → UK<br /><br />
+                    Please send:<br />
+                    ✅ Certificate of Origin<br />
+                    <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 11 }}>&nbsp;&nbsp;&nbsp;_(CCA — Conseil Anacarde)_</span><br />
+                    ✅ Phytosanitary Certificate<br />
+                    <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 11 }}>&nbsp;&nbsp;&nbsp;_(LANADA/DPVCQ)_</span><br />
+                    ✅ Aflatoxin Test Report
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
+                <button className="demo-copy-btn">Copy Email</button>
+                <button className="demo-copy-btn demo-copy-whatsapp">Copy WhatsApp</button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Progress dots */}
+      <div className="demo-progress-dots">
+        {[1, 2, 3, 4].map(n => (
+          <div
+            key={n}
+            className={`demo-dot-nav ${step === n ? "active" : ""}`}
+            onClick={() => goTo(n)}
+          />
+        ))}
+        <button className="demo-next-btn" onClick={() => goTo(step === total ? 1 : step + 1)}>
+          {step === total ? "Start over ↺" : "Next step →"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -174,46 +523,13 @@ export default function Home() {
         <div className="section" id="demo" data-testid="section-demo" style={{ textAlign: "center" }}>
           <div className="section-label">See It In Action</div>
           <h2>
-            Watch a compliance check <span className="accent">in real time</span>
+            From trade idea to full <span className="accent">compliance picture</span>
           </h2>
           <p className="section-sub">
-            From commodity selection to full compliance report — in under 2 minutes.
+            Three inputs. Seconds. No broker needed.
           </p>
 
-          <div style={{
-            maxWidth: 900,
-            margin: "0 auto",
-            borderRadius: 20,
-            overflow: "hidden",
-            border: "1px solid var(--mid-gray)",
-            boxShadow: "0 12px 40px rgba(0,0,0,0.08)",
-          }}>
-            <div style={{
-              background: "var(--off-white)",
-              width: "100%",
-              aspectRatio: "16 / 9",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 14,
-            }}>
-              <div style={{
-                width: 64,
-                height: 64,
-                borderRadius: "50%",
-                background: "var(--gable-green)",
-                color: "var(--hp-text-primary)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 24,
-                cursor: "pointer",
-                transition: "all 0.3s",
-              }}>▶</div>
-              <p style={{ fontSize: "0.9rem", color: "var(--dark-text-muted)", fontWeight: 500, margin: 0 }}>Demo video coming soon</p>
-            </div>
-          </div>
+          <DemoSection />
 
           <div style={{ marginTop: 28 }}>
             <Link href="/lookup">
