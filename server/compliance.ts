@@ -277,7 +277,8 @@ function buildRequirementsDetailed(
     });
   }
 
-  if (triggers.eudr && destination.iso2 !== "CH") {
+  // EUDR applies to EU and GB (UK Deforestation Regulation mirrors EUDR); CH handled separately below
+  if (triggers.eudr && (destination.iso2 === "EU" || destination.iso2 === "GB")) {
     reqs.push({
       title: "EU Deforestation Regulation (EUDR) due-diligence statement with geolocation data for production plot(s)",
       description: "Operators must submit a due-diligence statement demonstrating that commodities were not produced on land deforested after 31 December 2020. Requires GPS coordinates of all production plots.",
@@ -495,7 +496,8 @@ function buildRequirementsDetailed(
     });
   }
 
-  if (triggers.cbam) {
+  // CBAM is an EU regulation — only applies to EU-bound imports (and GB which may adopt similar)
+  if (triggers.cbam && (destination.iso2 === "EU" || destination.iso2 === "GB")) {
     reqs.push({
       title: "EU Carbon Border Adjustment Mechanism (CBAM) embedded-emissions declaration",
       description: "Declaration of the embedded greenhouse gas emissions in the imported goods, covering direct emissions from production and indirect emissions from electricity used.",
@@ -519,7 +521,8 @@ function buildRequirementsDetailed(
     });
   }
 
-  if (triggers.csddd) {
+  // CSDDD is an EU directive — applies to EU and GB (similar UK regulations)
+  if (triggers.csddd && (destination.iso2 === "EU" || destination.iso2 === "GB")) {
     reqs.push({
       title: "Corporate Sustainability Due Diligence Directive (CSDDD) human-rights & environmental risk assessment",
       description: "Companies must identify, prevent, mitigate, and account for adverse human rights and environmental impacts in their value chains, including supply chains in third countries.",
@@ -580,16 +583,19 @@ function buildRequirementsDetailed(
     });
   }
 
-  reqs.push({
-    title: `${destination.securityFiling} pre-arrival security filing for ${destination.countryName}`,
-    description: `Pre-arrival security declaration required by ${destination.countryName} customs. Includes cargo details, shipper/consignee information, and container/seal numbers.`,
-    issuedBy: "Customs Broker / Freight Forwarder",
-    whenNeeded: `Before vessel departure — typically 24-48 hours before loading`,
-    tip: "File early to avoid port delays. Incorrect data (especially container or seal numbers) can result in inspection holds.",
-    portalGuide: destPortal,
-    documentCode: null,
-    isSupplierSide: false,
-  });
+  // Skip generic security filing + customs declaration for US — coded US block has detailed versions
+  if (destination.iso2 !== "US") {
+    reqs.push({
+      title: `${destination.securityFiling} pre-arrival security filing for ${destination.countryName}`,
+      description: `Pre-arrival security declaration required by ${destination.countryName} customs. Includes cargo details, shipper/consignee information, and container/seal numbers.`,
+      issuedBy: "Customs Broker / Freight Forwarder",
+      whenNeeded: `Before vessel departure — typically 24-48 hours before loading`,
+      tip: "File early to avoid port delays. Incorrect data (especially container or seal numbers) can result of inspection holds.",
+      portalGuide: destPortal,
+      documentCode: null,
+      isSupplierSide: false,
+    });
+  }
 
   reqs.push({
     title: `Customs import declaration per ${destination.tariffSource}`,
@@ -602,20 +608,23 @@ function buildRequirementsDetailed(
     isSupplierSide: false,
   });
 
-  const destSpecial = destination.specialRules as Record<string, string> | null;
-  if (destSpecial) {
-    for (const [key, desc] of Object.entries(destSpecial)) {
-      if (shouldApplySpecialRule(key, commodity)) {
-        reqs.push({
-          title: desc,
-          description: `Special rule applicable to ${destination.countryName} for this commodity type.`,
-          issuedBy: `${destination.countryName} regulatory authority`,
-          whenNeeded: "At import — verified during customs clearance",
-          tip: "Check with your customs broker whether this special rule applies to your specific product variant.",
-          portalGuide: destPortal,
-          documentCode: null,
-          isSupplierSide: false,
-        });
+  // Apply destination special rules (skip for US — coded block above is comprehensive)
+  if (destination.iso2 !== "US") {
+    const destSpecial = destination.specialRules as Record<string, string> | null;
+    if (destSpecial) {
+      for (const [key, desc] of Object.entries(destSpecial)) {
+        if (shouldApplySpecialRule(key, commodity)) {
+          reqs.push({
+            title: desc,
+            description: `Special rule applicable to ${destination.countryName} for this commodity type.`,
+            issuedBy: `${destination.countryName} regulatory authority`,
+            whenNeeded: "At import — verified during customs clearance",
+            tip: "Check with your customs broker whether this special rule applies to your specific product variant.",
+            portalGuide: destPortal,
+            documentCode: null,
+            isSupplierSide: false,
+          });
+        }
       }
     }
   }
@@ -891,5 +900,6 @@ function shouldApplySpecialRule(ruleKey: string, commodity: Commodity): boolean 
   if (key.includes("eudr") && commodity.triggersEudr) return true;
   if (key.includes("conflict") && commodity.triggersConflict) return true;
 
-  return true;
+  // Default: do NOT apply unrecognised rules — prevents catch-all dumping
+  return false;
 }

@@ -1262,27 +1262,6 @@ function ComplianceResultDisplay({ result, freeLocked = false }: { result: Compl
         </DialogContent>
       </Dialog>
 
-      {freeLocked && (
-        <Card style={{ background: "var(--abg)" }} data-testid="banner-conversion">
-          <CardContent className="p-5 space-y-3">
-            <h3 className="font-semibold text-base font-heading">Ready to proceed with this shipment?</h3>
-            <p className="text-sm text-muted-foreground">
-              This free check shows what applies. Unlock documents, TwinLog Trail, and LC checks to proceed with confidence.
-            </p>
-            <p className="text-sm italic text-muted-foreground">
-              ~30% of LC submissions are rejected on first presentation.
-            </p>
-            <div className="flex gap-3 flex-wrap">
-              <Link href="/pricing">
-                <Button size="sm" data-testid="button-conversion-see-packs">
-                  View pricing & trade packs →
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       <NextActionsPanel
         allDocs={allDocs}
         statuses={docStatuses}
@@ -1591,6 +1570,25 @@ function ComplianceResultDisplay({ result, freeLocked = false }: { result: Compl
       <SupplierBriefSection result={result} />
 
       <EvidenceHash result={result} />
+
+      {freeLocked && (
+        <Card style={{ background: "var(--abg)" }} data-testid="banner-conversion">
+          <CardContent className="p-5 space-y-3">
+            <h3 className="font-semibold text-base font-heading">Want another corridor?</h3>
+            <p className="text-sm text-muted-foreground">
+              Unlock documents, TwinLog Trail, and LC checks with a trade pack — and run unlimited compliance checks.
+            </p>
+            <p className="text-sm italic text-muted-foreground">
+              ~30% of LC submissions are rejected on first presentation.
+            </p>
+            <Link href="/pricing">
+              <Button size="sm" data-testid="button-conversion-see-packs">
+                View pricing & trade packs →
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
@@ -1986,7 +1984,7 @@ export default function Lookup() {
                   ) : (
                     <>
                       <Search className="w-4 h-4 mr-2" />
-                      {isFreeCheck ? "Check compliance risk \u2014 Free" : "Check compliance risk \u2014 See plans"}
+                      {isFreeCheck ? "Check compliance risk — Free" : "Check compliance risk"}
                     </>
                   )}
                 </Button>
