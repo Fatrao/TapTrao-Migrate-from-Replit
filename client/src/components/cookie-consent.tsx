@@ -1,34 +1,53 @@
 import { useState, useEffect } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
+
 const COOKIE_KEY = "taptrao_cookie_consent";
-const GTAG_ID = "AW-17979733086";
+const GA4_ID = "G-HDN0GN0RVB";
+const GADS_ID = "AW-17979733086";
 
-function loadGA4() {
-  if (!GTAG_ID || GTAG_ID === "G-XXXXXXXXXX") return;
-  if (document.getElementById("ga4-script")) return;
+function loadGtag() {
+  if (document.getElementById("gtag-script")) return;
 
+  // Load gtag.js with the GA4 ID as primary
   const script = document.createElement("script");
-  script.id = "ga4-script";
+  script.id = "gtag-script";
   script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`;
   document.head.appendChild(script);
 
+  // Configure both GA4 and Google Ads
   const inline = document.createElement("script");
-  inline.id = "ga4-inline";
+  inline.id = "gtag-inline";
   inline.textContent = `
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', '${GTAG_ID}');
+    gtag('config', '${GA4_ID}', { send_page_view: false });
+    gtag('config', '${GADS_ID}');
   `;
   document.head.appendChild(inline);
 }
 
-function removeGA4() {
-  document.getElementById("ga4-script")?.remove();
-  document.getElementById("ga4-inline")?.remove();
+function removeGtag() {
+  document.getElementById("gtag-script")?.remove();
+  document.getElementById("gtag-inline")?.remove();
+}
+
+/** Send a page_view event — call on every SPA route change */
+export function trackPageView(path: string) {
+  if (typeof window.gtag === "function") {
+    window.gtag("event", "page_view", {
+      page_path: path,
+      page_title: document.title,
+    });
+  }
 }
 
 function getConsent(): string | null {
@@ -44,8 +63,16 @@ function setConsent(value: "accepted" | "rejected") {
 
 export function resetCookieConsent() {
   document.cookie = `${COOKIE_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-  removeGA4();
+  removeGtag();
   window.location.reload();
+}
+
+/** Hook: tracks SPA page views on every route change */
+export function usePageViewTracking() {
+  const [location] = useLocation();
+  useEffect(() => {
+    trackPageView(location);
+  }, [location]);
 }
 
 export function CookieConsentBanner() {
@@ -56,13 +83,13 @@ export function CookieConsentBanner() {
     if (consent === null) {
       setVisible(true);
     } else if (consent === "accepted") {
-      loadGA4();
+      loadGtag();
     }
   }, []);
 
   const handleAccept = () => {
     setConsent("accepted");
-    loadGA4();
+    loadGtag();
     setVisible(false);
   };
 
