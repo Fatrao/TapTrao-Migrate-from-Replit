@@ -777,7 +777,7 @@ function TwinLogDownloadButton({
           </div>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs text-center">
-          <p>Included in trade pack — from $24.99</p>
+          <p>Included in trade pack</p>
         </TooltipContent>
       </Tooltip>
     );
@@ -904,7 +904,7 @@ function CheckLcButton({ result, locked = false }: { result: ComplianceResult & 
           </div>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs text-center">
-          <p>Included in trade pack — from $24.99</p>
+          <p>Included in trade pack</p>
         </TooltipContent>
       </Tooltip>
     );
@@ -1273,24 +1273,9 @@ function ComplianceResultDisplay({ result, freeLocked = false }: { result: Compl
               ~30% of LC submissions are rejected on first presentation.
             </p>
             <div className="flex gap-3 flex-wrap">
-              <Button
-                size="sm"
-                onClick={async () => {
-                  try {
-                    const res = await apiRequest("POST", "/api/tokens/checkout", { pack: "single_trade" });
-                    const data = await res.json();
-                    if (data.url) window.location.href = data.url;
-                  } catch {
-                    window.location.href = "/pricing";
-                  }
-                }}
-                data-testid="button-conversion-buy-single"
-              >
-                Buy Single Trade — $24.99
-              </Button>
               <Link href="/pricing">
-                <Button variant="outline" size="sm" data-testid="button-conversion-see-packs">
-                  See all packs →
+                <Button size="sm" data-testid="button-conversion-see-packs">
+                  View pricing & trade packs →
                 </Button>
               </Link>
             </div>
@@ -2001,7 +1986,7 @@ export default function Lookup() {
                   ) : (
                     <>
                       <Search className="w-4 h-4 mr-2" />
-                      {isFreeCheck ? "Check compliance risk \u2014 Free" : "Check compliance risk \u2014 $4.99"}
+                      {isFreeCheck ? "Check compliance risk \u2014 Free" : "Check compliance risk"}
                     </>
                   )}
                 </Button>
