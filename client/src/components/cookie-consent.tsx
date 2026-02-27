@@ -3,16 +3,16 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
 const COOKIE_KEY = "taptrao_cookie_consent";
-const GA4_ID = "G-XXXXXXXXXX";
+const GTAG_ID = "AW-17979733086";
 
 function loadGA4() {
-  if (GA4_ID === "G-XXXXXXXXXX") return;
+  if (!GTAG_ID || GTAG_ID === "G-XXXXXXXXXX") return;
   if (document.getElementById("ga4-script")) return;
 
   const script = document.createElement("script");
   script.id = "ga4-script";
   script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`;
   document.head.appendChild(script);
 
   const inline = document.createElement("script");
@@ -21,7 +21,7 @@ function loadGA4() {
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', '${GA4_ID}');
+    gtag('config', '${GTAG_ID}');
   `;
   document.head.appendChild(inline);
 }

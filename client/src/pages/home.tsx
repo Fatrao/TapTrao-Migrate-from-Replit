@@ -354,10 +354,6 @@ function DemoSection() {
   );
 }
 
-/* WhatsApp number — update with your actual number (international format, no +) */
-const WHATSAPP_NUMBER = "";
-const WHATSAPP_MESSAGE = "Hi, I'm interested in TapTrao for my trade compliance needs.";
-
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -753,21 +749,6 @@ export default function Home() {
         </div>
 
       </div>
-
-      {/* ── Floating WhatsApp Button ── */}
-      <a
-        href={WHATSAPP_NUMBER
-          ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
-          : `mailto:hello@taptrao.com`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="whatsapp-float"
-        aria-label="Chat on WhatsApp"
-      >
-        <svg viewBox="0 0 32 32" width="28" height="28" fill="white">
-          <path d="M16.004 0h-.008C7.174 0 0 7.176 0 16.004c0 3.5 1.132 6.742 3.052 9.376L1.056 31.2l6.04-1.94A15.93 15.93 0 0 0 16.004 32C24.826 32 32 24.826 32 16.004 32 7.176 24.826 0 16.004 0Zm9.31 22.616c-.39 1.1-1.932 2.012-3.162 2.278-.844.178-1.946.32-5.658-1.216-4.75-1.964-7.806-6.784-8.04-7.1-.224-.316-1.888-2.516-1.888-4.798 0-2.282 1.196-3.404 1.62-3.868.39-.426.918-.598 1.218-.598.152 0 .288.008.41.014.424.018.636.042.916.71.35.832 1.202 2.928 1.306 3.14.106.214.21.5.072.796-.126.302-.236.436-.45.688-.214.252-.416.444-.63.716-.194.236-.414.488-.174.918.238.424 1.064 1.756 2.284 2.844 1.57 1.398 2.894 1.834 3.306 2.036.412.202.652.17.892-.098.248-.278 1.056-1.226 1.338-1.648.276-.424.558-.35.938-.21.384.134 2.434 1.148 2.852 1.358.418.21.696.316.798.49.1.174.1 1.012-.29 2.11Z"/>
-        </svg>
-      </a>
     </div>
   );
 }
