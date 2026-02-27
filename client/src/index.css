@@ -11,7 +11,7 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
   --background: 0 0% 95%;
-  --foreground: 0 0% 95%;
+  --foreground: 0 0% 10%;
   --border: 0 0% 12%;
   --card: 240 3% 15%;
   --card-foreground: 0 0% 95%;
@@ -2576,6 +2576,11 @@
   padding: 6px 0;
 }
 
+/* Demurrage grids */
+.demurrage-grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
+.demurrage-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.demurrage-nudge-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
 /* Global responsive */
 @media (max-width: 768px) {
   .hide-on-mobile {
@@ -2604,7 +2609,7 @@
   }
   .main-content, .content-area, .dash-content {
     min-width: 0;
-    overflow-x: hidden;
+    overflow-x: auto;
   }
   .top-nav {
     padding: 10px 12px !important;
@@ -2618,8 +2623,14 @@
   .dash-tabs { padding: 0 12px 12px; }
   .green-hero-box { margin: 0 12px; padding: 16px 16px 14px; }
   .green-hero-box h1 { font-size: 24px; }
-  .trade-table { font-size: 12px; }
+  .dash-card { overflow-x: auto; }
+  .trade-table { font-size: 12px; min-width: 500px; }
   .trade-table th { font-size: 9px; }
+
+  /* Demurrage mobile */
+  .demurrage-grid { grid-template-columns: 1fr !important; }
+  .demurrage-stats-grid { grid-template-columns: 1fr 1fr 1fr; }
+  .demurrage-nudge-grid { grid-template-columns: 1fr !important; }
 
   /* LC Checker mobile */
   .lc-hero { padding: 16px 16px 20px; margin: 4px 8px 12px; }

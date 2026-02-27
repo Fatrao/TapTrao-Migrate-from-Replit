@@ -639,7 +639,7 @@ export default function Home() {
             <div className="pack-meta">3 Shipments</div>
             <div className="pack-per">$20.00 per shipment</div>
             <ul className="pack-features">
-              <li><span className="check">✓</span> Everything in Single × 3</li>
+              <li><span className="check">✓</span> All Single Shipment features</li>
               <li><span className="check">✓</span> Save as template</li>
               <li><span className="check">✓</span> 13% discount</li>
             </ul>
@@ -655,7 +655,7 @@ export default function Home() {
             <div className="pack-meta">10 Shipments</div>
             <div className="pack-per">$17.90 per shipment</div>
             <ul className="pack-features">
-              <li><span className="check">✓</span> Everything in 3-pack × 10</li>
+              <li><span className="check">✓</span> All Single Shipment features</li>
               <li><span className="check">✓</span> Stale-check & refresh</li>
               <li><span className="check">✓</span> 28% discount</li>
             </ul>
@@ -671,7 +671,7 @@ export default function Home() {
             <div className="pack-meta">25 Shipments</div>
             <div className="pack-per">$13.96 per shipment</div>
             <ul className="pack-features">
-              <li><span className="check">✓</span> Everything in 10-pack × 25</li>
+              <li><span className="check">✓</span> All Single Shipment features</li>
               <li><span className="check">✓</span> Best value for teams</li>
               <li><span className="check">✓</span> 44% discount</li>
             </ul>

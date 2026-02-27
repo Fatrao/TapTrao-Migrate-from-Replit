@@ -106,7 +106,7 @@ export default function DemurragePage() {
           Estimate demurrage if this shipment is delayed at port
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "380px 1fr", gap: 20, alignItems: "start" }}>
+        <div className="demurrage-grid">
           {/* INPUT PANEL */}
           <div style={s.panel}>
             <div style={s.field}>
@@ -236,7 +236,7 @@ export default function DemurragePage() {
           {/* RESULTS PANEL */}
           <div>
             <div style={s.panel}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
+              <div className="demurrage-stats-grid">
                 <div style={{ textAlign: "center", padding: 12, background: "var(--card2)", borderRadius: 8 }}>
                   <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 700, color: "var(--t1)" }} data-testid="demurrage-chargeable-days">
                     {chargeableDays}
@@ -322,7 +322,7 @@ export default function DemurragePage() {
               <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t1)", marginBottom: 12 }}>
                 Next step: compare demurrage against alternatives
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+              <div className="demurrage-nudge-grid">
                 <div style={{ background: "var(--card2)", borderRadius: 8, padding: "12px 14px" }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>Re-export</div>
                   <div style={{ fontSize: 11, color: "var(--t2)" }}>Often 30–50% of cargo value</div>

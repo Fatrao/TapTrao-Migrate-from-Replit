@@ -30,7 +30,7 @@ const tradePacks = [
     lookups: 3,
     perLookup: "$20.00",
     features: [
-      "Everything in Single × 3",
+      "All Single Shipment features",
       "Save as template",
       "13% discount",
     ],
@@ -43,7 +43,7 @@ const tradePacks = [
     lookups: 10,
     perLookup: "$17.90",
     features: [
-      "Everything in 3-pack × 10",
+      "All Single Shipment features",
       "Stale-check & refresh",
       "28% discount",
     ],
@@ -55,7 +55,7 @@ const tradePacks = [
     lookups: 25,
     perLookup: "$13.96",
     features: [
-      "Everything in 10-pack × 25",
+      "All Single Shipment features",
       "Best value for teams",
       "44% discount",
     ],
