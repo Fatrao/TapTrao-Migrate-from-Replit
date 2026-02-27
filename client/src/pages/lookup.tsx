@@ -777,7 +777,7 @@ function TwinLogDownloadButton({
           </div>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs text-center">
-          <p>Included in trade pack</p>
+          <p>Included in trade pack — <a href="/pricing" style={{textDecoration:"underline"}}>see plans</a></p>
         </TooltipContent>
       </Tooltip>
     );
@@ -904,7 +904,7 @@ function CheckLcButton({ result, locked = false }: { result: ComplianceResult & 
           </div>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs text-center">
-          <p>Included in trade pack</p>
+          <p>Included in trade pack — <a href="/pricing" style={{textDecoration:"underline"}}>see plans</a></p>
         </TooltipContent>
       </Tooltip>
     );
@@ -1986,7 +1986,7 @@ export default function Lookup() {
                   ) : (
                     <>
                       <Search className="w-4 h-4 mr-2" />
-                      {isFreeCheck ? "Check compliance risk \u2014 Free" : "Check compliance risk"}
+                      {isFreeCheck ? "Check compliance risk \u2014 Free" : "Check compliance risk \u2014 See plans"}
                     </>
                   )}
                 </Button>
