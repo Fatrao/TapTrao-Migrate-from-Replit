@@ -1,24 +1,30 @@
+import { Pool } from "pg";
+import { drizzle } from "drizzle-orm/node-postgres";
 import * as schema from "@shared/schema";
 import { readFileSync, readdirSync, existsSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
+import { join } from "path";
 
 let db: any;
-let pool: any;
+let pool: any = null;
 
 if (process.env.DATABASE_URL) {
-  // Production / remote database via node-postgres
-  const { Pool } = await import("pg");
+  // Production: synchronous initialization with static imports
   pool = new Pool({ connectionString: process.env.DATABASE_URL });
-  const { drizzle: drizzlePg } = await import("drizzle-orm/node-postgres");
-  db = drizzlePg(pool, { schema });
-} else {
-  // Local development fallback — embedded PGlite (no external PostgreSQL needed)
+  db = drizzle(pool, { schema });
+}
+
+/**
+ * Initialize PGlite for local development (no DATABASE_URL needed).
+ * Must be called and awaited before any database access.
+ * No-op if DATABASE_URL is set (production mode).
+ */
+export async function initLocalDb(): Promise<void> {
+  if (db) return; // Already initialized (production or previous call)
+
   console.log("⚡ No DATABASE_URL — using embedded PGlite for local development");
   const { PGlite } = await import("@electric-sql/pglite");
   const { drizzle: drizzlePglite } = await import("drizzle-orm/pglite");
   const client = new PGlite("./pglite-data");
-  pool = null;
   db = drizzlePglite(client, { schema });
 
   // Auto-apply schema on first run: execute migration SQL if tables don't exist
@@ -26,8 +32,7 @@ if (process.env.DATABASE_URL) {
     await client.query(`SELECT 1 FROM "destinations" LIMIT 1`);
   } catch {
     console.log("📦 Creating database schema via migration...");
-    const rootDir = join(dirname(fileURLToPath(import.meta.url)), "..");
-    const migrationsDir = join(rootDir, "migrations");
+    const migrationsDir = join(process.cwd(), "migrations");
     if (existsSync(migrationsDir)) {
       const files = readdirSync(migrationsDir)
         .filter((f: string) => f.endsWith(".sql"))
