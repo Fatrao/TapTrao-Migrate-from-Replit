@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { getAvatarColour } from "@/lib/avatarColours";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { iso2ToFlag } from "@/components/CountryFlagBadge";
 
 type EnrichedTrade = {
   id: string;
@@ -309,7 +310,7 @@ export default function Trades() {
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{trade.commodityName}</div>
                           <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)" }}>
-                            {trade.originIso2} → {trade.destIso2}
+                            {iso2ToFlag(trade.originIso2)} {trade.originIso2} → {iso2ToFlag(trade.destIso2)} {trade.destIso2}
                           </div>
                         </div>
                       </div>

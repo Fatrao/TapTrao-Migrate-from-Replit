@@ -732,3 +732,156 @@ export async function seedPrompt5() {
     throw error;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   PROMPT 6 — USA destination + All 54 African countries + commodity trigger updates
+   ═══════════════════════════════════════════════════════════════════ */
+
+export async function seedPrompt6() {
+  // Guard: check if USA destination already exists
+  const [usExists] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(destinations)
+    .where(sql`iso2 = 'US'`);
+  if (Number(usExists.count) > 0) {
+    log("Prompt 6 seed: USA destination already exists, checking origins...", "seed");
+  } else {
+    // ── ADD USA DESTINATION ──
+    await db.insert(destinations).values({
+      countryName: "United States",
+      iso2: "US",
+      tariffSource: "USITC Harmonized Tariff Schedule (HTS) — hts.usitc.gov",
+      vatRate: "0.0",
+      spsRegime: "FDA / USDA APHIS",
+      securityFiling: "ISF 10+2 (Importer Security Filing) — 24h before loading",
+      specialRules: {
+        isf_10_2: "CBP requires 10 data elements from the importer and 2 from the carrier, filed electronically 24 hours before vessel departure. $5,000 penalty per violation.",
+        fda_prior_notice: "FDA Prior Notice required for all food/feed imports via PNSI system. Water: 8h pre-arrival; Air: 4h. Facility registration (FDA FURLS) also required.",
+        usda_phyto: "USDA APHIS requires phytosanitary clearance for plant and animal products. Import permits may be required. Inspected at port of entry.",
+        lacey_act: "Lacey Act requires import declaration for timber, plant products, and wildlife — genus/species, country of harvest. Electronic filing only since Jan 2026 (PPQ 505 eliminated).",
+        dodd_frank: "Dodd-Frank Section 1502 — conflict minerals (3TG) due diligence. RCOI + SEC Form SD filing for publicly traded companies.",
+        kimberley_process: "Clean Diamond Trade Act — Kimberley Process Certificate required for rough diamond imports in tamper-proof container.",
+        agoa: "African Growth and Opportunity Act — duty-free access for 1,800+ products from 32 eligible SSA countries. 35% value-add + Proof of Origin required. Reauthorized to Dec 2026. Does NOT override reciprocal tariffs.",
+        reciprocal_tariffs: "Country-specific reciprocal tariff rates (10%-32%). IEEPA struck down by SCOTUS Feb 2026; 10% Sec 122 baseline currently in effect. Rates may change.",
+        fcpa: "Foreign Corrupt Practices Act — anti-bribery compliance required for all dealings involving foreign officials.",
+        ofac_sanctions: "OFAC (Treasury) sanctions screening mandatory. Screen all parties against SDN List + sectoral programs pre-transaction. Civil penalty: $330k/violation; Criminal: $1M + 20yrs.",
+        cbp_entry: "CBP Entry Summary (Form 7501) required within 10 working days of entry. All PGA flags must be addressed.",
+        customs_bond: "Continuous or single-entry customs bond required to guarantee duty payment.",
+      },
+      preferenceSchemes: ["AGOA", "GSP"],
+      isAfcftaMember: false,
+    });
+    log("Inserted USA destination", "seed");
+  }
+
+  // ── UPDATE EXISTING 18 ORIGINS WITH NEW FIELDS ──
+  const existingUpdates: Array<{ iso2: string; status: string; flagReason?: string; flagDetails?: string; agoaStatus: string; agoaReason?: string; usTariffRate: string; keyRegulations: string; primaryExportRisk: string; region: string }> = [
+    { iso2: "CI", status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "EUDR (Cocoa); Local: CCA", primaryExportRisk: "Cocoa", region: "West Africa" },
+    { iso2: "GH", status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "EUDR (Cocoa); COCOBOD checks", primaryExportRisk: "Cocoa, Gold", region: "West Africa" },
+    { iso2: "NG", status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "14%", keyRegulations: "Off EU high-risk list Jan 2026", primaryExportRisk: "Oil", region: "West Africa" },
+    { iso2: "SN", status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "Migration-related oversight", primaryExportRisk: "Fish, Nuts", region: "West Africa" },
+    { iso2: "CM", status: "INCLUDE", agoaStatus: "Ineligible", agoaReason: "Human rights", usTariffRate: "11%", keyRegulations: "EUDR (Timber/Cocoa) - High Priority", primaryExportRisk: "Cocoa, Timber", region: "Central Africa" },
+    { iso2: "KE", status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "EUDR (Coffee); UK EPA", primaryExportRisk: "Tea, Coffee", region: "East Africa" },
+    { iso2: "TZ", status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "EUDR (Coffee); Off high-risk list", primaryExportRisk: "Coffee, Cashews", region: "East Africa" },
+    { iso2: "UG", status: "INCLUDE", agoaStatus: "Ineligible", agoaReason: "Human rights", usTariffRate: "10%", keyRegulations: "EUDR (Coffee) - Critical", primaryExportRisk: "Coffee, Tea", region: "East Africa" },
+    { iso2: "ET", status: "INCLUDE", agoaStatus: "Ineligible", agoaReason: "Human rights", usTariffRate: "10%", keyRegulations: "EUDR (Coffee) - Critical", primaryExportRisk: "Coffee", region: "East Africa" },
+    { iso2: "ZA", status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "30%", keyRegulations: "Off EU high-risk list Jan 2026", primaryExportRisk: "General", region: "Southern Africa" },
+    { iso2: "MA", status: "INCLUDE", agoaStatus: "Ineligible", agoaReason: "North Africa", usTariffRate: "10%", keyRegulations: "Association Agreement; ONSSA", primaryExportRisk: "Agri, Textiles", region: "North Africa" },
+    { iso2: "TN", status: "INCLUDE", agoaStatus: "Ineligible", agoaReason: "North Africa", usTariffRate: "28%", keyRegulations: "Association Agreement", primaryExportRisk: "General", region: "North Africa" },
+    { iso2: "CD", status: "FLAG", flagReason: "Conflict Minerals", flagDetails: "Eastern DRC conflict zones. UN Group of Experts monitoring active. Dodd-Frank 3TG due diligence mandatory for tin, tantalum, tungsten, and gold. Enhanced due diligence required.", agoaStatus: "Eligible", usTariffRate: "11%", keyRegulations: "Dodd-Frank Conflict Minerals; UN/EU EDD", primaryExportRisk: "Minerals", region: "Central Africa" },
+    { iso2: "BF", status: "FLAG", flagReason: "Military Government", flagDetails: "ECOWAS suspended membership following coup. Enhanced due diligence required. Off EU high-risk list Jan 2026.", agoaStatus: "Ineligible", agoaReason: "Rule of law", usTariffRate: "10%", keyRegulations: "EDD; ECOWAS suspended; Off EU high-risk list Jan 2026", primaryExportRisk: "Cotton, Gold", region: "West Africa" },
+    { iso2: "ML", status: "FLAG", flagReason: "Military Government", flagDetails: "EU restrictive measures in place. ECOWAS membership suspended. Enhanced due diligence required for all transactions.", agoaStatus: "Ineligible", agoaReason: "HR/rule of law", usTariffRate: "10%", keyRegulations: "EU restrictive; ECOWAS suspended", primaryExportRisk: "Gold, Cotton", region: "West Africa" },
+    { iso2: "GN", status: "FLAG", flagReason: "Military Government", flagDetails: "Political instability following 2021 coup. ECOWAS suspended. Enhanced due diligence required.", agoaStatus: "Ineligible", agoaReason: "Rule of law", usTariffRate: "10%", keyRegulations: "Political instability; EDD required", primaryExportRisk: "Bauxite", region: "West Africa" },
+    { iso2: "MZ", status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "Off EU high-risk list Jan 2026", primaryExportRisk: "Gas, Aluminium", region: "East Africa" },
+    { iso2: "RW", status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "EUDR (Coffee)", primaryExportRisk: "Tea, Coffee", region: "East Africa" },
+  ];
+
+  for (const u of existingUpdates) {
+    await db.execute(sql`
+      UPDATE origin_countries SET
+        status = ${u.status},
+        flag_reason = ${u.flagReason ?? null},
+        flag_details = ${u.flagDetails ?? null},
+        agoa_status = ${u.agoaStatus},
+        agoa_reason = ${u.agoaReason ?? null},
+        us_tariff_rate = ${u.usTariffRate},
+        key_regulations = ${u.keyRegulations},
+        primary_export_risk = ${u.primaryExportRisk},
+        region = ${u.region}
+      WHERE iso2 = ${u.iso2}
+    `);
+  }
+  log("Updated 18 existing origin countries with new fields", "seed");
+
+  // ── ADD MISSING 36 AFRICAN COUNTRIES ──
+  // First get framework IDs
+  const frameworks = await db.select().from(regionalFrameworks);
+  const fwMap: Record<string, string> = {};
+  for (const fw of frameworks) fwMap[fw.name] = fw.id;
+
+  // Check how many origins we have already
+  const [originCount] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(originCountries);
+  if (Number(originCount.count) >= 50) {
+    log("Prompt 6 seed: 50+ origins already exist, skipping new inserts", "seed");
+  } else {
+    const newOrigins = [
+      // ── WEST AFRICA (ECOWAS) ──
+      { countryName: "Algeria", iso2: "DZ", frameworkId: fwMap["UMA"], phytoAuthority: "Direction de la Protection des Végétaux (DPV)", cooIssuingBody: "Chambre Algérienne de Commerce et d'Industrie", customsAdmin: "Direction Générale des Douanes", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Ineligible", agoaReason: "North Africa", usTariffRate: "30%", keyRegulations: "Standard AML; Turkey import duty checks", primaryExportRisk: "Oil, Gas, Dates", region: "North Africa" },
+      { countryName: "Angola", iso2: "AO", frameworkId: fwMap["SADC/SACU"], phytoAuthority: "Instituto de Desenvolvimento Agrário (IDA)", cooIssuingBody: "Câmara de Comércio e Indústria de Angola", customsAdmin: "Administração Geral Tributária", commodityCouncils: { oil: "Sonangol" }, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "32%", keyRegulations: "Anti-Corruption (FCPA/UKBA) screening", primaryExportRisk: "Oil", region: "Southern Africa" },
+      { countryName: "Benin", iso2: "BJ", frameworkId: fwMap["ECOWAS/WAEMU"], phytoAuthority: "Direction de l'Agriculture (DA)", cooIssuingBody: "Chambre de Commerce et d'Industrie du Bénin", customsAdmin: "Direction Générale des Douanes et Droits Indirects", commodityCouncils: { cotton: "Association Interprofessionnelle du Coton (AIC)" }, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "EUDR (Cotton); Canada Child Labor Act", primaryExportRisk: "Cotton, Cashews", region: "West Africa" },
+      { countryName: "Botswana", iso2: "BW", frameworkId: fwMap["SADC/SACU"], phytoAuthority: "Department of Crop Production", cooIssuingBody: "Botswana Unified Revenue Service", customsAdmin: "Botswana Unified Revenue Service (BURS)", commodityCouncils: { diamonds: "Diamond Hub" }, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "15%", keyRegulations: "Kimberley Process for diamonds", primaryExportRisk: "Diamonds, Beef", region: "Southern Africa" },
+      { countryName: "Burundi", iso2: "BI", frameworkId: fwMap["EAC"], phytoAuthority: "Institut des Sciences Agronomiques du Burundi (ISABU)", cooIssuingBody: "Chambre Fédérale de Commerce et d'Industrie du Burundi", customsAdmin: "Office Burundais des Recettes (OBR)", commodityCouncils: {}, isAfcftaMember: true, status: "FLAG", flagReason: "EU/UK Restrictive Measures", flagDetails: "EU and UK restrictive measures targeting specific individuals. Sanctions screening required for all counterparties. Enhanced due diligence mandatory.", agoaStatus: "Ineligible", agoaReason: "Political violence", usTariffRate: "10%", keyRegulations: "Sanctions screening for listed individuals", primaryExportRisk: "Coffee, Tea", region: "East Africa" },
+      { countryName: "Cabo Verde", iso2: "CV", frameworkId: fwMap["ECOWAS/WAEMU"], phytoAuthority: "Instituto Nacional de Investigação e Desenvolvimento Agrário (INIDA)", cooIssuingBody: "Câmara de Comércio de Cabo Verde", customsAdmin: "Alfândegas de Cabo Verde", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "GSP+ Preference eligibility", primaryExportRisk: "General", region: "West Africa" },
+      { countryName: "Central African Republic", iso2: "CF", frameworkId: fwMap["CEMAC"], phytoAuthority: "Ministère de l'Agriculture", cooIssuingBody: "Chambre de Commerce de Centrafrique", customsAdmin: "Direction Générale des Douanes", commodityCouncils: {}, isAfcftaMember: true, status: "FLAG", flagReason: "UN/EU Sanctions", flagDetails: "UN arms embargo and asset freeze in effect. EU restrictive measures. Conflict-affected country. All transactions require comprehensive sanctions screening and enhanced due diligence.", agoaStatus: "Ineligible", agoaReason: "Human rights", usTariffRate: "10%", keyRegulations: "Arms embargo & Asset freeze checks", primaryExportRisk: "Diamonds, Timber", region: "Central Africa" },
+      { countryName: "Chad", iso2: "TD", frameworkId: fwMap["CEMAC"], phytoAuthority: "Direction de la Protection des Végétaux et du Conditionnement", cooIssuingBody: "Chambre de Commerce du Tchad", customsAdmin: "Direction Générale des Douanes et Droits Indirects", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "France: CIAN-aligned compliance", primaryExportRisk: "Oil, Cotton", region: "Central Africa" },
+      { countryName: "Comoros", iso2: "KM", frameworkId: fwMap["SADC/SACU"], phytoAuthority: "Direction Nationale de la Stratégie Agricole", cooIssuingBody: "Chambre de Commerce des Comores", customsAdmin: "Direction Générale des Douanes", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "Food safety & Phyto-certificate", primaryExportRisk: "Vanilla, Cloves", region: "East Africa" },
+      { countryName: "Republic of Congo", iso2: "CG", frameworkId: fwMap["CEMAC"], phytoAuthority: "Direction Générale de l'Agriculture", cooIssuingBody: "Chambre de Commerce de Brazzaville", customsAdmin: "Direction Générale des Douanes et Droits Indirects", commodityCouncils: { oil: "SNPC" }, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "EUDR (Timber) - Geolocation required", primaryExportRisk: "Oil, Timber", region: "Central Africa" },
+      { countryName: "Djibouti", iso2: "DJ", frameworkId: null, phytoAuthority: "Ministère de l'Agriculture", cooIssuingBody: "Chambre de Commerce de Djibouti", customsAdmin: "Direction des Douanes et Droits Indirects", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "Port security & Transshipment risk", primaryExportRisk: "Logistics Hub", region: "East Africa" },
+      { countryName: "Egypt", iso2: "EG", frameworkId: null, phytoAuthority: "Central Administration of Plant Quarantine (CAPQ)", cooIssuingBody: "Federation of Egyptian Chambers of Commerce", customsAdmin: "Egyptian Customs Authority", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Ineligible", agoaReason: "North Africa", usTariffRate: "10%", keyRegulations: "Association Agreement tariff verification", primaryExportRisk: "General", region: "North Africa" },
+      { countryName: "Equatorial Guinea", iso2: "GQ", frameworkId: fwMap["CEMAC"], phytoAuthority: "Ministerio de Agricultura", cooIssuingBody: "Cámara de Comercio de Guinea Ecuatorial", customsAdmin: "Dirección General de Aduanas", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Ineligible", agoaReason: "Income graduation", usTariffRate: "10%", keyRegulations: "AML focus", primaryExportRisk: "Oil", region: "Central Africa" },
+      { countryName: "Eritrea", iso2: "ER", frameworkId: null, phytoAuthority: "Ministry of Agriculture", cooIssuingBody: "Eritrea Chamber of Commerce", customsAdmin: "Eritrean Customs", commodityCouncils: {}, isAfcftaMember: true, status: "FLAG", flagReason: "EU Restrictive Measures", flagDetails: "EU restrictive measures targeting specific individuals and entities. Limited trade infrastructure. Enhanced due diligence required for all counterparties.", agoaStatus: "Ineligible", agoaReason: "Human rights", usTariffRate: "10%", keyRegulations: "Restrictive measures on individuals", primaryExportRisk: "Minerals", region: "East Africa" },
+      { countryName: "Eswatini", iso2: "SZ", frameworkId: fwMap["SADC/SACU"], phytoAuthority: "Ministry of Agriculture", cooIssuingBody: "Eswatini Chamber of Commerce", customsAdmin: "Eswatini Revenue Authority", commodityCouncils: { sugar: "Eswatini Sugar Association" }, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "SADC EPA", primaryExportRisk: "Sugar", region: "Southern Africa" },
+      { countryName: "Gabon", iso2: "GA", frameworkId: fwMap["CEMAC"], phytoAuthority: "Direction Générale de l'Agriculture", cooIssuingBody: "Chambre de Commerce du Gabon", customsAdmin: "Direction Générale des Douanes", commodityCouncils: { timber: "Société Nationale des Bois du Gabon" }, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Ineligible", agoaReason: "Rule of law", usTariffRate: "10%", keyRegulations: "EUDR (Timber)", primaryExportRisk: "Timber, Manganese", region: "Central Africa" },
+      { countryName: "The Gambia", iso2: "GM", frameworkId: fwMap["ECOWAS/WAEMU"], phytoAuthority: "Department of Agriculture", cooIssuingBody: "Gambia Chamber of Commerce and Industry", customsAdmin: "Gambia Revenue Authority", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "Visa-related monitoring (not trade)", primaryExportRisk: "General", region: "West Africa" },
+      { countryName: "Guinea-Bissau", iso2: "GW", frameworkId: fwMap["ECOWAS/WAEMU"], phytoAuthority: "Ministério da Agricultura", cooIssuingBody: "Câmara de Comércio da Guiné-Bissau", customsAdmin: "Direcção Geral das Alfândegas", commodityCouncils: {}, isAfcftaMember: true, status: "FLAG", flagReason: "UN Sanctions", flagDetails: "UN Peacebuilding Commission monitoring. Political instability. Arms embargo and travel ban in effect. Enhanced due diligence required.", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "Arms embargo & Travel ban", primaryExportRisk: "Cashews", region: "West Africa" },
+      { countryName: "Lesotho", iso2: "LS", frameworkId: fwMap["SADC/SACU"], phytoAuthority: "Department of Agricultural Research", cooIssuingBody: "Lesotho Chamber of Commerce", customsAdmin: "Lesotho Revenue Authority", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "15%", keyRegulations: "AGOA critical; SADC EPA", primaryExportRisk: "Textiles", region: "Southern Africa" },
+      { countryName: "Liberia", iso2: "LR", frameworkId: fwMap["ECOWAS/WAEMU"], phytoAuthority: "Ministry of Agriculture", cooIssuingBody: "Liberia Chamber of Commerce", customsAdmin: "Liberia Revenue Authority", commodityCouncils: { rubber: "Liberia Rubber Planters Association" }, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "EUDR (Timber/Rubber)", primaryExportRisk: "Rubber, Timber", region: "West Africa" },
+      { countryName: "Libya", iso2: "LY", frameworkId: fwMap["UMA"], phytoAuthority: "Ministry of Agriculture", cooIssuingBody: "Libyan Chamber of Commerce", customsAdmin: "Libyan Customs Authority", commodityCouncils: {}, isAfcftaMember: true, status: "FLAG", flagReason: "UN/EU Embargo", flagDetails: "UN arms embargo in effect. EU asset freezes on listed individuals and entities. Ongoing conflict. Very high risk — comprehensive sanctions screening and enhanced due diligence mandatory for all transactions.", agoaStatus: "Ineligible", agoaReason: "North Africa", usTariffRate: "30%", keyRegulations: "Asset freeze & individual screening", primaryExportRisk: "Oil", region: "North Africa" },
+      { countryName: "Madagascar", iso2: "MG", frameworkId: fwMap["SADC/SACU"], phytoAuthority: "Direction de la Protection des Végétaux (DPV)", cooIssuingBody: "Chambre de Commerce et d'Industrie d'Antananarivo", customsAdmin: "Direction Générale des Douanes", commodityCouncils: { vanilla: "Groupement National Vanille" }, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "15%", keyRegulations: "EUDR (Cocoa); Food Safety", primaryExportRisk: "Vanilla, Cocoa", region: "East Africa" },
+      { countryName: "Malawi", iso2: "MW", frameworkId: fwMap["SADC/SACU"], phytoAuthority: "Department of Agricultural Research Services", cooIssuingBody: "Malawi Confederation of Chambers of Commerce", customsAdmin: "Malawi Revenue Authority", commodityCouncils: { tobacco: "Tobacco Commission" }, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "Canada Forced Labor (Tobacco)", primaryExportRisk: "Tea, Tobacco", region: "East Africa" },
+      { countryName: "Mauritania", iso2: "MR", frameworkId: fwMap["UMA"], phytoAuthority: "Direction de l'Agriculture", cooIssuingBody: "Chambre de Commerce de Mauritanie", customsAdmin: "Direction Générale des Douanes", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "EU Fisheries Partnership", primaryExportRisk: "Iron, Fish", region: "West Africa" },
+      { countryName: "Mauritius", iso2: "MU", frameworkId: fwMap["SADC/SACU"], phytoAuthority: "National Plant Protection Office (NPPO)", cooIssuingBody: "Mauritius Chamber of Commerce and Industry", customsAdmin: "Mauritius Revenue Authority", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "15%", keyRegulations: "EPA; FATF monitoring", primaryExportRisk: "General", region: "East Africa" },
+      { countryName: "Namibia", iso2: "NA", frameworkId: fwMap["SADC/SACU"], phytoAuthority: "Directorate of Agricultural Research and Training", cooIssuingBody: "Namibia Chamber of Commerce and Industry", customsAdmin: "Namibia Revenue Agency (NamRA)", commodityCouncils: { beef: "Meat Board of Namibia" }, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "SADC EPA; AGOA", primaryExportRisk: "Beef, Minerals", region: "Southern Africa" },
+      { countryName: "Niger", iso2: "NE", frameworkId: fwMap["ECOWAS/WAEMU"], phytoAuthority: "Direction de la Protection des Végétaux", cooIssuingBody: "Chambre de Commerce du Niger", customsAdmin: "Direction Générale des Douanes", commodityCouncils: {}, isAfcftaMember: true, status: "FLAG", flagReason: "Military Government", flagDetails: "ECOWAS membership suspended following 2023 coup. Enhanced due diligence required. Political instability ongoing.", agoaStatus: "Ineligible", agoaReason: "Rule of law", usTariffRate: "10%", keyRegulations: "EDD; ECOWAS suspended", primaryExportRisk: "Uranium, Oil", region: "West Africa" },
+      { countryName: "São Tomé and Príncipe", iso2: "ST", frameworkId: null, phytoAuthority: "Direcção de Agricultura", cooIssuingBody: "Câmara de Comércio de São Tomé", customsAdmin: "Direcção das Alfândegas", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "EUDR (Cocoa)", primaryExportRisk: "Cocoa", region: "Central Africa" },
+      { countryName: "Seychelles", iso2: "SC", frameworkId: fwMap["SADC/SACU"], phytoAuthority: "Seychelles Agricultural Agency", cooIssuingBody: "Seychelles Chamber of Commerce and Industry", customsAdmin: "Seychelles Revenue Commission", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Ineligible", agoaReason: "Income graduation", usTariffRate: "10%", keyRegulations: "Tax transparency & AML", primaryExportRisk: "Fish", region: "East Africa" },
+      { countryName: "Sierra Leone", iso2: "SL", frameworkId: fwMap["ECOWAS/WAEMU"], phytoAuthority: "Ministry of Agriculture", cooIssuingBody: "Sierra Leone Chamber of Commerce", customsAdmin: "National Revenue Authority", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "EUDR (Cocoa)", primaryExportRisk: "Minerals, Cocoa", region: "West Africa" },
+      { countryName: "Somalia", iso2: "SO", frameworkId: fwMap["EAC"], phytoAuthority: "Ministry of Agriculture", cooIssuingBody: "Somali Chamber of Commerce", customsAdmin: "Customs Authority", commodityCouncils: {}, isAfcftaMember: true, status: "FLAG", flagReason: "UN Sanctions", flagDetails: "UN arms embargo in effect. Al-Shabaab-controlled areas. Charcoal export ban under UN Security Council resolution. OFAC restrictions apply. Very high risk — comprehensive screening required.", agoaStatus: "Ineligible", agoaReason: "Not reviewed", usTariffRate: "10%", keyRegulations: "Charcoal ban; Arms embargo", primaryExportRisk: "Livestock", region: "East Africa" },
+      { countryName: "South Sudan", iso2: "SS", frameworkId: fwMap["EAC"], phytoAuthority: "Ministry of Agriculture", cooIssuingBody: "South Sudan Chamber of Commerce", customsAdmin: "Customs Service", commodityCouncils: {}, isAfcftaMember: true, status: "FLAG", flagReason: "UN/EU Embargo", flagDetails: "UN arms embargo in effect. EU asset freezes and travel bans on listed individuals. Ongoing civil conflict. Very high risk — comprehensive sanctions screening and enhanced due diligence mandatory.", agoaStatus: "Ineligible", agoaReason: "Political violence", usTariffRate: "10%", keyRegulations: "High-risk EDD; Conflict monitoring", primaryExportRisk: "Oil", region: "East Africa" },
+      { countryName: "Sudan", iso2: "SD", frameworkId: null, phytoAuthority: "Plant Protection Directorate", cooIssuingBody: "Sudan Chamber of Commerce", customsAdmin: "Sudan Customs Authority", commodityCouncils: {}, isAfcftaMember: true, status: "FLAG", flagReason: "Civil Conflict", flagDetails: "Ongoing armed conflict between SAF and RSF. US sanctions history. EU restrictive measures. Very high risk — most trade effectively blocked. Comprehensive vetting required.", agoaStatus: "Ineligible", agoaReason: "Not reviewed", usTariffRate: "10%", keyRegulations: "Very high risk; Conflict vetting", primaryExportRisk: "Gum Arabic", region: "East Africa" },
+      { countryName: "Togo", iso2: "TG", frameworkId: fwMap["ECOWAS/WAEMU"], phytoAuthority: "Direction de la Protection des Végétaux", cooIssuingBody: "Chambre de Commerce et d'Industrie du Togo", customsAdmin: "Office Togolais des Recettes", commodityCouncils: {}, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "10%", keyRegulations: "EUDR (Coffee)", primaryExportRisk: "Coffee, Cotton", region: "West Africa" },
+      { countryName: "Zambia", iso2: "ZM", frameworkId: fwMap["SADC/SACU"], phytoAuthority: "Zambia Agriculture Research Institute (ZARI)", cooIssuingBody: "Zambia Chamber of Commerce and Industry", customsAdmin: "Zambia Revenue Authority", commodityCouncils: { copper: "Zambia Chamber of Mines" }, isAfcftaMember: true, status: "INCLUDE", agoaStatus: "Eligible", usTariffRate: "17%", keyRegulations: "Forced labor risk (mining)", primaryExportRisk: "Copper, Cobalt", region: "Southern Africa" },
+      { countryName: "Zimbabwe", iso2: "ZW", frameworkId: fwMap["SADC/SACU"], phytoAuthority: "Plant Quarantine Services Institute", cooIssuingBody: "Zimbabwe National Chamber of Commerce", customsAdmin: "Zimbabwe Revenue Authority (ZIMRA)", commodityCouncils: {}, isAfcftaMember: true, status: "FLAG", flagReason: "EU Embargo", flagDetails: "EU restrictive measures (arms embargo to Feb 2027). Targeted sanctions on specific individuals and entities. Enhanced due diligence required.", agoaStatus: "Ineligible", agoaReason: "Not eligible", usTariffRate: "15%", keyRegulations: "Arms embargo to Feb 2027", primaryExportRisk: "Tobacco, Minerals", region: "Southern Africa" },
+    ];
+
+    for (const o of newOrigins) {
+      const [exists] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(originCountries)
+        .where(sql`iso2 = ${o.iso2}`);
+      if (Number(exists.count) === 0) {
+        await db.insert(originCountries).values(o as any);
+      }
+    }
+    log(`Inserted up to ${newOrigins.length} new origin countries`, "seed");
+  }
+
+  // ── UPDATE COMMODITY TRIGGERS (Lacey Act + FDA Prior Notice) ──
+  await db.execute(sql`UPDATE commodities SET triggers_lacey_act = true WHERE commodity_type = 'forestry'`);
+  await db.execute(sql`UPDATE commodities SET triggers_fda_prior_notice = true WHERE commodity_type IN ('agricultural', 'seafood', 'livestock')`);
+  log("Updated commodity triggers: Lacey Act (forestry), FDA Prior Notice (food/agri)", "seed");
+
+  log("Prompt 6 seed completed", "seed");
+}

@@ -76,6 +76,15 @@ export const originCountries = pgTable(
     commodityCouncils: jsonb("commodity_councils"),
     operationalNotes: text("operational_notes"),
     isAfcftaMember: boolean("is_afcfta_member").default(true).notNull(),
+    status: text("status").default("INCLUDE"),
+    flagReason: text("flag_reason"),
+    flagDetails: text("flag_details"),
+    agoaStatus: text("agoa_status"),
+    agoaReason: text("agoa_reason"),
+    usTariffRate: text("us_tariff_rate"),
+    keyRegulations: text("key_regulations"),
+    primaryExportRisk: text("primary_export_risk"),
+    region: text("region"),
   },
   (table) => [index("origin_countries_iso2_idx").on(table.iso2)]
 );
@@ -95,6 +104,8 @@ export const commodities = pgTable(
     triggersCsddd: boolean("triggers_csddd").default(false).notNull(),
     triggersIuu: boolean("triggers_iuu").default(false).notNull(),
     triggersCites: boolean("triggers_cites").default(false).notNull(),
+    triggersLaceyAct: boolean("triggers_lacey_act").default(false).notNull(),
+    triggersFdaPriorNotice: boolean("triggers_fda_prior_notice").default(false).notNull(),
     knownHazards: text("known_hazards").array(),
     stopFlags: jsonb("stop_flags"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -582,6 +593,8 @@ export type ComplianceResult = {
     csddd: boolean;
     iuu: boolean;
     cites: boolean;
+    laceyAct: boolean;
+    fdaPriorNotice: boolean;
   };
   hazards: string[];
   stopFlags: Record<string, string> | null;
@@ -591,6 +604,10 @@ export type ComplianceResult = {
   afcftaRoo: AfcftaRoo | null;
   complianceReadiness: ComplianceReadiness;
   readinessScore: ReadinessScoreResult;
+  agoaEligible?: boolean;
+  originFlagged?: boolean;
+  originFlagReason?: string | null;
+  originFlagDetails?: string | null;
 };
 
 /* ── Promo Codes ── */

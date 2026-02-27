@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import CountryFlagBadge, { iso2ToFlag } from "@/components/CountryFlagBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Collapsible,
@@ -1158,6 +1159,54 @@ function ComplianceResultDisplay({ result, freeLocked = false }: { result: Compl
         />
       )}
 
+      {/* Origin flag warning banner */}
+      {result.originFlagged && (
+        <div style={{
+          background: "rgba(245,158,11,0.08)",
+          border: "1px solid rgba(245,158,11,0.25)",
+          borderRadius: 10,
+          padding: "12px 16px",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 10,
+        }}>
+          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 600, color: "#d97706", margin: 0 }}>
+              ⚠ Flagged Origin — {result.originFlagReason ?? "Sanctions / Elevated Risk"}
+            </p>
+            {result.originFlagDetails && (
+              <p style={{ fontSize: 12, color: "#92400e", margin: "4px 0 0", lineHeight: 1.5 }}>
+                {result.originFlagDetails}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* AGOA eligibility info */}
+      {result.agoaEligible && (
+        <div style={{
+          background: "rgba(74,222,128,0.06)",
+          border: "1px solid rgba(74,222,128,0.2)",
+          borderRadius: 10,
+          padding: "12px 16px",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 10,
+        }}>
+          <Shield className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 600, color: "#16a34a", margin: 0 }}>
+              AGOA Eligible — Preferential Tariff Access
+            </p>
+            <p style={{ fontSize: 12, color: "#166534", margin: "4px 0 0", lineHeight: 1.5 }}>
+              This origin qualifies under the African Growth and Opportunity Act for duty-free or reduced-tariff access to the US market. Ensure AGOA Certificate of Origin is prepared.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div style={{ textAlign: "right", margin: "4px 0 8px" }}>
         <Link href="/demurrage" data-testid="link-demurrage-calculator">
           <span style={{ fontSize: 11, color: "var(--blue)", cursor: "pointer", fontWeight: 600 }}>
@@ -1892,9 +1941,15 @@ export default function Lookup() {
                         <SelectValue placeholder="Select origin..." />
                       </SelectTrigger>
                       <SelectContent>
-                        {originsData?.map((o) => (
+                        {originsData?.map((o: any) => (
                           <SelectItem key={o.id} value={o.id}>
-                            {o.countryName} ({o.iso2})
+                            <CountryFlagBadge
+                              iso2={o.iso2}
+                              countryName={o.countryName}
+                              status={o.status}
+                              flagReason={o.flagReason}
+                              flagDetails={o.flagDetails}
+                            />
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -1918,9 +1973,9 @@ export default function Lookup() {
                         <SelectValue placeholder="Select destination..." />
                       </SelectTrigger>
                       <SelectContent>
-                        {destinationsData?.map((d) => (
+                        {destinationsData?.map((d: any) => (
                           <SelectItem key={d.id} value={d.id}>
-                            {d.countryName} ({d.iso2})
+                            {iso2ToFlag(d.iso2)} {d.countryName} ({d.iso2})
                           </SelectItem>
                         ))}
                       </SelectContent>

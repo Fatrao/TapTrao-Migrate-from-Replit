@@ -1,10 +1,12 @@
+import { useMemo } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
-import type { Lookup, LcCheck, TokenTransaction, ComplianceResult } from "@shared/schema";
+import type { Lookup, LcCheck, TokenTransaction, ComplianceResult, OriginCountry, Destination } from "@shared/schema";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { useTokenBalance } from "@/hooks/use-tokens";
 import { apiRequest } from "@/lib/queryClient";
+import { iso2ToFlag } from "@/components/CountryFlagBadge";
 
 export default function Dashboard() {
   const statsQuery = useQuery<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null }>({
@@ -14,9 +16,23 @@ export default function Dashboard() {
   const lcQuery = useQuery<LcCheck[]>({ queryKey: ["/api/lc-checks/recent"] });
   const tokenQuery = useTokenBalance();
   const txQuery = useQuery<TokenTransaction[]>({ queryKey: ["/api/tokens/transactions", "?limit=10"] });
+  const originsQuery = useQuery<OriginCountry[]>({ queryKey: ["/api/origins"] });
+  const destinationsQuery = useQuery<Destination[]>({ queryKey: ["/api/destinations"] });
   const stats = statsQuery.data;
   usePageTitle("Dashboard", "Overview of your trade compliance activity");
   const [, navigate] = useLocation();
+
+  /* Build name → iso2 maps for emoji flag display */
+  const originNameToIso2 = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const o of originsQuery.data ?? []) map[o.countryName] = o.iso2;
+    return map;
+  }, [originsQuery.data]);
+  const destNameToIso2 = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const d of destinationsQuery.data ?? []) map[d.countryName] = d.iso2;
+    return map;
+  }, [destinationsQuery.data]);
 
   const lookupIds = lookupsQuery.data?.map(l => l.id) ?? [];
   const lcLinksQuery = useQuery<Record<string, string>>({
@@ -76,7 +92,7 @@ export default function Dashboard() {
         id: l.id,
         name: l.commodityName,
         hs: `HS ${l.hsCode}`,
-        corridor: `${l.originName?.substring(0, 2).toUpperCase() ?? "?"} → ${l.destinationName?.substring(0, 2).toUpperCase() ?? "?"}`,
+        corridor: `${iso2ToFlag(originNameToIso2[l.originName] ?? "")} ${originNameToIso2[l.originName] ?? "?"} → ${iso2ToFlag(destNameToIso2[l.destinationName] ?? "")} ${destNameToIso2[l.destinationName] ?? "?"}`,
         date: new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }),
         value: "—",
         status: l.riskLevel === "LOW" ? "comp" : l.riskLevel === "MEDIUM" ? "pend" : "rev",

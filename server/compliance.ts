@@ -30,11 +30,17 @@ export async function runComplianceCheck(
     csddd: commodity.triggersCsddd,
     iuu: commodity.triggersIuu,
     cites: commodity.triggersCites,
+    laceyAct: commodity.triggersLaceyAct,
+    fdaPriorNotice: commodity.triggersFdaPriorNotice,
   };
 
   const hazards = commodity.knownHazards ?? [];
   const stopFlags = (commodity.stopFlags as Record<string, string> | null) ?? null;
   const afcftaEligible = origin.isAfcftaMember && destination.isAfcftaMember;
+  const agoaEligible = destination.iso2 === "US" && origin.agoaStatus === "Eligible";
+  const originFlagged = origin.status === "FLAG";
+  const originFlagReason = origin.flagReason ?? null;
+  const originFlagDetails = origin.flagDetails ?? null;
 
   const hsHeading = commodity.hsCode.substring(0, 4);
   let roo: AfcftaRoo | null = null;
@@ -42,7 +48,7 @@ export async function runComplianceCheck(
     roo = (await storage.getAfcftaRooByHsHeading(hsHeading)) ?? null;
   }
 
-  const rawDetailed = buildRequirementsDetailed(commodity, origin, destination, framework, triggers, afcftaEligible, roo);
+  const rawDetailed = buildRequirementsDetailed(commodity, origin, destination, framework, triggers, afcftaEligible, roo, { agoaEligible, originFlagged });
   const detailed = rawDetailed.map(r => assignDocumentMeta(r));
   const requirements = detailed.map(d => d.title);
 
@@ -73,6 +79,10 @@ export async function runComplianceCheck(
     afcftaRoo: roo,
     complianceReadiness,
     readinessScore,
+    agoaEligible,
+    originFlagged,
+    originFlagReason,
+    originFlagDetails,
   };
 }
 
@@ -81,6 +91,7 @@ function portalGuideForDestination(dest: Destination): string | null {
   if (iso === "GB") return "Submit via IPAFFS (Import of Products, Animals, Food and Feed System) — https://www.gov.uk/guidance/import-of-products-animals-food-and-feed-system";
   if (iso === "EU") return "Submit via TRACES NT (Trade Control and Expert System) — https://webgate.ec.europa.eu/tracesnt";
   if (iso === "CH") return "Submit via Swiss e-dec electronic customs declaration system — https://www.bazg.admin.ch/bazg/en/home.html";
+  if (iso === "US") return "File via ACE (Automated Commercial Environment) — https://www.cbp.gov/trade/ace";
   return null;
 }
 
@@ -115,8 +126,18 @@ function assignDocumentMeta(r: RawRequirement): RequirementDetail {
     due_by = "POST_ARRIVAL";
   } else if (titleLower.includes("vat") || titleLower.includes("gst")) {
     due_by = "POST_ARRIVAL";
-  } else if (titleLower.includes("security filing")) {
+  } else if (titleLower.includes("security filing") || titleLower.includes("isf 10+2")) {
     due_by = "BEFORE_ARRIVAL";
+  } else if (titleLower.includes("fda") || titleLower.includes("prior notice") || titleLower.includes("fsvp")) {
+    due_by = "BEFORE_ARRIVAL";
+  } else if (titleLower.includes("lacey act")) {
+    due_by = "BEFORE_ARRIVAL";
+  } else if (titleLower.includes("ofac")) {
+    due_by = "BEFORE_LOADING";
+  } else if (titleLower.includes("customs bond") || titleLower.includes("htsus classification")) {
+    due_by = "BEFORE_LOADING";
+  } else if (titleLower.includes("audit trail") || titleLower.includes("reasonable care")) {
+    due_by = "POST_ARRIVAL";
   } else {
     due_by = "BEFORE_LOADING";
   }
@@ -131,7 +152,8 @@ function buildRequirementsDetailed(
   framework: RegionalFramework | null,
   triggers: ComplianceResult["triggers"],
   afcftaEligible: boolean,
-  roo: AfcftaRoo | null
+  roo: AfcftaRoo | null,
+  extra?: { agoaEligible?: boolean; originFlagged?: boolean }
 ): RawRequirement[] {
   const reqs: RawRequirement[] = [];
   const destPortal = portalGuideForDestination(destination);
@@ -287,6 +309,150 @@ function buildRequirementsDetailed(
       whenNeeded: "Before import — prepare EUDR-equivalent documentation now as requirements will likely mirror the EU",
       tip: "Switzerland's Due Diligence Act currently covers timber and minerals. Monitor FOEN/BAFU (bafu.admin.ch) for confirmation of scope expansion to cocoa, coffee, and other EUDR commodities.",
       portalGuide: "Monitor FOEN/BAFU — https://www.bafu.admin.ch",
+      documentCode: null,
+      isSupplierSide: false,
+    });
+  }
+
+  // ── USA-SPECIFIC REQUIREMENTS ──
+  if (destination.iso2 === "US") {
+    // ISF 10+2 — always required for US-bound ocean freight
+    reqs.push({
+      title: "ISF 10+2 (Importer Security Filing) — filed 24 hours before vessel loading",
+      description: "US Customs and Border Protection (CBP) requires 10 data elements from the importer and 2 from the carrier, filed electronically via ACE at least 24 hours before vessel departure from the foreign port.",
+      issuedBy: "Importer / Licensed Customs Broker",
+      whenNeeded: "24 hours before vessel loading at foreign port",
+      tip: "Late or inaccurate ISF filing incurs a $5,000 penalty per violation. Ensure your broker files on time. Include accurate African supplier address.",
+      portalGuide: "File via ACE (Automated Commercial Environment) — https://www.cbp.gov/trade/ace",
+      documentCode: null,
+      isSupplierSide: false,
+    });
+
+    // Customs Bond
+    reqs.push({
+      title: "US Customs Bond — continuous or single-entry bond guaranteeing duty payment to CBP",
+      description: "A customs bond is required to guarantee payment of duties, taxes, and fees to CBP. Continuous bonds cover all imports for 12 months; single-entry bonds cover one shipment.",
+      issuedBy: "Surety company / Customs Broker",
+      whenNeeded: "Pre-shipment — must be in place before goods arrive",
+      tip: "Continuous bonds ($50k+) are more cost-effective for regular importers. Single-entry bonds are priced at 1-3x the duty amount.",
+      portalGuide: null,
+      documentCode: null,
+      isSupplierSide: false,
+    });
+
+    // FDA Prior Notice — food/agricultural products
+    if (triggers.fdaPriorNotice) {
+      reqs.push({
+        title: "FDA Prior Notice — food imports must be registered in FDA PNSI system (Bioterrorism Act)",
+        description: "All food and feed products entering the US require Prior Notice submitted to the FDA via the Prior Notice System Interface (PNSI). The foreign manufacturing/processing facility must also be registered in FDA FURLS.",
+        issuedBy: "Importer / FDA-registered agent",
+        whenNeeded: "Before arrival — Water: 8 hours; Air: 4 hours; Truck: 2 hours pre-arrival",
+        tip: "Register the foreign food facility first (FDA FURLS), then file Prior Notice (PNSI). Both are mandatory. FSVP documentation must name the African supplier.",
+        portalGuide: "FDA Prior Notice System — https://www.fda.gov/food/prior-notice-imported-foods",
+        documentCode: null,
+        isSupplierSide: false,
+      });
+
+      reqs.push({
+        title: "FSVP (Foreign Supplier Verification Program) documentation for food safety compliance",
+        description: "Under FSMA, US importers must verify that foreign suppliers produce food meeting US safety standards. Requires hazard analysis, supplier evaluation, and corrective action procedures.",
+        issuedBy: "Importer (FSVP Importer of record)",
+        whenNeeded: "Ongoing — documentation must be maintained and updated per supplier",
+        tip: "FSVP enforcement is increasing. Maintain supplier audit records, hazard analyses, and corrective action plans. Name the specific African supplier in FSVP records.",
+        portalGuide: null,
+        documentCode: null,
+        isSupplierSide: false,
+      });
+
+      // USDA APHIS phyto for plant-based
+      if (triggers.sps) {
+        reqs.push({
+          title: "USDA APHIS phytosanitary clearance and import permit for plant-based products",
+          description: "USDA Animal and Plant Health Inspection Service (APHIS) requires phytosanitary clearance for plant and plant-based products. An import permit may be required depending on the commodity and origin.",
+          issuedBy: "USDA APHIS",
+          whenNeeded: "Pre-arrival — import permit before shipment; inspection at port of entry",
+          tip: "Check USDA PCIT (Phytosanitary Certificate Issuance and Tracking) for commodity-specific requirements from the origin country.",
+          portalGuide: "USDA APHIS import requirements — https://www.aphis.usda.gov/plant-health/import-export",
+          documentCode: null,
+          isSupplierSide: false,
+        });
+      }
+    }
+
+    // Lacey Act — timber/plant products
+    if (triggers.laceyAct) {
+      reqs.push({
+        title: "Lacey Act Declaration — electronic plant/timber import declaration (PPQ 505 eliminated Jan 2026)",
+        description: "The Lacey Act requires an import declaration for plants and plant products identifying the scientific name (genus/species), value, quantity, and country of harvest. As of January 2026, paper PPQ 505 forms are eliminated — electronic filing only via ACE/LAWGS.",
+        issuedBy: "Importer",
+        whenNeeded: "At or before entry — filed electronically with CBP entry",
+        tip: "Ensure your supplier provides the species scientific name and country of harvest. Phase VII expanded the scope. Violations carry civil ($10k) and criminal ($250k + 5yrs) penalties.",
+        portalGuide: "File via ACE/LAWGS electronic system",
+        documentCode: null,
+        isSupplierSide: false,
+      });
+    }
+
+    // AGOA preference
+    if (extra?.agoaEligible) {
+      reqs.push({
+        title: `AGOA duty-free preference available — ${origin.countryName} is AGOA-eligible`,
+        description: "The African Growth and Opportunity Act (AGOA) provides duty-free access to the US market for over 1,800 products from 32 eligible Sub-Saharan African countries. Requires 35% value-add and proof of origin. Reauthorized to December 2026.",
+        issuedBy: "Importer — claim via HTSUS Chapter 9819",
+        whenNeeded: "At entry — claim AGOA preference on customs declaration with Certificate of Origin",
+        tip: `AGOA does NOT override reciprocal tariffs (currently ${origin.usTariffRate ?? "10%"} for ${origin.countryName}). Verify the specific product is covered under AGOA tariff lines. AGOA expires Dec 2026 — monitor reauthorization status.`,
+        portalGuide: "AGOA information — https://agoa.info",
+        documentCode: null,
+        isSupplierSide: false,
+      });
+    }
+
+    // OFAC screening for flagged origins
+    if (extra?.originFlagged) {
+      reqs.push({
+        title: `OFAC sanctions screening REQUIRED — ${origin.countryName} is flagged (${origin.flagReason ?? "Risk"})`,
+        description: `The Office of Foreign Assets Control (OFAC) administers US economic and trade sanctions. ${origin.countryName} is flagged: ${origin.flagDetails ?? "Enhanced due diligence required."}. All parties in the transaction must be screened against the SDN List.`,
+        issuedBy: "Importer / Compliance team",
+        whenNeeded: "Before any transaction — continuous screening required throughout the relationship",
+        tip: "Screen ALL parties (supplier, banks, shipping agents, beneficial owners) against the SDN list and relevant country sanctions programs. Document all screening results. Civil penalty: $330k per violation.",
+        portalGuide: "OFAC Sanctions Search — https://sanctionssearch.ofac.treas.gov",
+        documentCode: null,
+        isSupplierSide: false,
+      });
+    }
+
+    // Reciprocal tariff note
+    reqs.push({
+      title: `US reciprocal tariff of ${origin.usTariffRate ?? "10%"} applies to imports from ${origin.countryName}`,
+      description: `The US applies country-specific reciprocal tariff rates on imports from African countries under Section 122 of the Trade Act. The rate for ${origin.countryName} is ${origin.usTariffRate ?? "10%"}, applied in addition to MFN duty rates. Note: IEEPA authority struck down by SCOTUS Feb 2026; Sec 122 rates currently in effect.`,
+      issuedBy: "US CBP — calculated on Entry Summary (Form 7501)",
+      whenNeeded: "At import — duty calculated and payable on customs entry",
+      tip: "Check the HTS for product-specific MFN duty rates. AGOA-eligible products may qualify for duty-free treatment, but reciprocal tariffs still apply separately. Rates may change — monitor CBP updates.",
+      portalGuide: "US HTS search — https://hts.usitc.gov",
+      documentCode: null,
+      isSupplierSide: false,
+    });
+
+    // Hashed audit trail requirement
+    reqs.push({
+      title: "Maintain hashed audit trail for CBP 'Reasonable Care' standard (retain 5 years)",
+      description: "US importers must demonstrate 'Reasonable Care' in their import activity. TapTrao generates SHA-256 hashed compliance records that serve as immutable proof of due diligence at time of import.",
+      issuedBy: "Importer (internal compliance / TapTrao TwinLog Trail)",
+      whenNeeded: "Post-clearance — retain all records for minimum 5 years per 19 USC 1508",
+      tip: "Download the TwinLog Trail PDF for each shipment as your audit-ready compliance record. The integrity hash proves the record hasn't been altered.",
+      portalGuide: null,
+      documentCode: null,
+      isSupplierSide: false,
+    });
+
+    // HTSUS classification reminder
+    reqs.push({
+      title: `HTSUS classification for HS ${commodity.hsCode} — verify US-specific tariff treatment before contract`,
+      description: "The US Harmonized Tariff Schedule (HTSUS) may classify products differently than the international HS system at the 6+ digit level. Correct classification determines duty rates, PGA triggers, and quota eligibility.",
+      issuedBy: "Customs Broker / Importer",
+      whenNeeded: "Pre-contract — classification should be confirmed before quoting landed cost",
+      tip: "Use the USITC HTS search tool (hts.usitc.gov) to verify the correct 10-digit HTSUS code. Consider requesting a binding ruling from CBP for complex classifications.",
+      portalGuide: "USITC HTS Online — https://hts.usitc.gov",
       documentCode: null,
       isSupplierSide: false,
     });
@@ -622,6 +788,7 @@ export function computeReadinessScore(params: {
   const overlays = [
     triggers.eudr, triggers.cbam, triggers.csddd,
     triggers.kimberley, triggers.conflict, triggers.iuu, triggers.cites,
+    triggers.laceyAct, triggers.fdaPriorNotice,
   ].filter(Boolean).length;
 
   let regPenalty = 0;
