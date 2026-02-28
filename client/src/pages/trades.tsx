@@ -149,7 +149,7 @@ export default function Trades() {
 
       {/* WHITE ZONE — fades from gradient to white starting after header */}
       <div style={{
-        background: "#ffffff",
+        background: "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.5) 20px, rgba(255,255,255,0.85) 50px, #ffffff 100px)",
         padding: "0 40px 0",
       }}>
         {/* SUMMARY CARDS */}
