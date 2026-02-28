@@ -108,13 +108,13 @@ export default function Inbox() {
               key={c.label}
               style={{
                 background: c.label === "Blocking issue"
-                  ? "linear-gradient(135deg, rgba(218,60,61,.05), transparent 60%), #fff"
-                  : "#fff",
+                  ? "linear-gradient(135deg, rgba(218,60,61,.06), transparent 60%), #f7f8f9"
+                  : "#f7f8f9",
                 padding: "20px 22px",
                 borderRadius:
                   i === 0 ? "14px 0 0 14px" :
                   i === cards.length - 1 ? "0 14px 14px 0" : "0",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                border: "1px solid #e8e8e8",
               }}
               data-testid={`inbox-summary-card-${i}`}
             >
