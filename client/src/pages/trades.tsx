@@ -149,8 +149,11 @@ export default function Trades() {
 
       {/* WHITE ZONE — fades from gradient to white starting after header */}
       <div style={{
-        background: "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.5) 20px, rgba(255,255,255,0.85) 50px, #ffffff 100px)",
-        padding: "0 40px 0",
+        background: "#ffffff",
+        borderRadius: "24px 24px 0 0",
+        padding: "28px 40px 0",
+        marginTop: 4,
+        minHeight: "calc(100vh - 160px)",
       }}>
         {/* SUMMARY CARDS */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 2, marginBottom: 28 }} data-testid="summary-cards">

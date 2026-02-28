@@ -100,7 +100,7 @@ export default function Inbox() {
       </div>
 
       {/* WHITE ZONE */}
-      <div style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.5) 20px, rgba(255,255,255,0.85) 50px, #ffffff 100px)", padding: "0 40px 60px" }}>
+      <div style={{ background: "#ffffff", borderRadius: "24px 24px 0 0", padding: "28px 40px 60px", marginTop: 4, minHeight: "calc(100vh - 160px)" }}>
         {/* SUMMARY CARDS */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 2, marginBottom: 32 }} data-testid="inbox-summary-cards">
           {cards.map((c, i) => (
