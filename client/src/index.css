@@ -1060,6 +1060,8 @@
   justify-content: space-between;
   flex-shrink: 0;
   border-bottom: 1px solid var(--border-subtle);
+  position: relative;
+  z-index: 50;
 }
 
 .hp-page .top-nav-left {
@@ -1147,6 +1149,82 @@
 .hp-page .nav-btn-primary:hover {
   transform: translateY(-1px);
   box-shadow: 0 0 24px rgba(113,171,145,0.4);
+}
+
+/* Pricing link in top-right nav */
+.hp-page .nav-link-pricing {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--hp-text-secondary);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.hp-page .nav-link-pricing:hover { color: var(--hp-text-primary); }
+
+/* Nav dropdown (Menu) */
+.hp-page .nav-dropdown {
+  position: relative;
+}
+.hp-page .nav-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  font-size: 13.5px;
+  color: var(--hp-text-secondary);
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  transition: color 0.2s;
+}
+.hp-page .nav-dropdown-trigger:hover { color: var(--hp-text-primary); }
+
+.hp-page .nav-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1c2024;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 12px 0;
+  min-width: 200px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hp-page .nav-dropdown-section {
+  padding: 4px 8px;
+}
+.hp-page .nav-dropdown-section + .nav-dropdown-section {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 8px;
+}
+.hp-page .nav-dropdown-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.35);
+  padding: 4px 12px 6px;
+}
+.hp-page .nav-dropdown-panel a {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  padding: 7px 12px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.hp-page .nav-dropdown-panel a:hover {
+  color: #fff;
+  background: rgba(113,171,145,0.12);
 }
 
 /* === MAIN CONTENT BOX === */

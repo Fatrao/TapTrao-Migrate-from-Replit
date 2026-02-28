@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 
 /* ═══════════════════════════════════════════
    Interactive Demo — 4-step auto-advancing carousel
@@ -354,6 +354,7 @@ function DemoSection() {
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuDropdownOpen, setMenuDropdownOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
   // Mouse-follow spotlight on hero
@@ -395,14 +396,41 @@ export default function Home() {
 
         <div className="top-nav-center" data-testid="nav-landing-desktop">
           <a href="#" className="active">Home</a>
-          <a href="#how">How It Works</a>
+          <div className="nav-dropdown">
+            <button className="nav-dropdown-trigger" onClick={() => setMenuDropdownOpen(!menuDropdownOpen)}>
+              Menu <ChevronDown size={14} style={{ marginLeft: 4, transition: "transform .2s", transform: menuDropdownOpen ? "rotate(180deg)" : "none" }} />
+            </button>
+            {menuDropdownOpen && (
+              <div className="nav-dropdown-panel" onMouseLeave={() => setMenuDropdownOpen(false)}>
+                <div className="nav-dropdown-section">
+                  <div className="nav-dropdown-label">Main</div>
+                  <Link href="/dashboard" onClick={() => setMenuDropdownOpen(false)}>Dashboard</Link>
+                  <Link href="/trades" onClick={() => setMenuDropdownOpen(false)}>My Trades</Link>
+                  <Link href="/lookup" onClick={() => setMenuDropdownOpen(false)}>Pre-Shipment Check</Link>
+                </div>
+                <div className="nav-dropdown-section">
+                  <div className="nav-dropdown-label">Compliance</div>
+                  <Link href="/inbox" onClick={() => setMenuDropdownOpen(false)}>Supplier Inbox</Link>
+                  <Link href="/alerts" onClick={() => setMenuDropdownOpen(false)}>Alerts</Link>
+                  <Link href="/templates" onClick={() => setMenuDropdownOpen(false)}>Templates</Link>
+                </div>
+                <div className="nav-dropdown-section">
+                  <div className="nav-dropdown-label">Tools</div>
+                  <Link href="/lc-check" onClick={() => setMenuDropdownOpen(false)}>LC Document Check</Link>
+                  <Link href="/demurrage" onClick={() => setMenuDropdownOpen(false)}>Demurrage Calculator</Link>
+                </div>
+              </div>
+            )}
+          </div>
           <a href="#demo">Demo</a>
-          <a href="#pricing">Pricing</a>
           <Link href="/lookup">Commodities</Link>
           <a href="#trust">About</a>
         </div>
 
         <div className="top-nav-right">
+          <Link href="/pricing">
+            <span className="nav-link-pricing" data-testid="button-pricing">Pricing</span>
+          </Link>
           <Link href="/dashboard">
             <span className="nav-btn-ghost" data-testid="button-sign-in">Log In</span>
           </Link>
