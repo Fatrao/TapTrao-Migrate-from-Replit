@@ -32,17 +32,17 @@ type TradesSummary = {
 type FilterTab = "all" | "attention" | "progress" | "archived";
 
 function getStep(trade: EnrichedTrade): { label: string; color: string } {
-  if (!trade.lcVerdict) return { label: "Paperwork review", color: "var(--t3)" };
-  if (trade.lcVerdict === "DISCREPANCIES_FOUND") return { label: "LC review", color: "var(--blue)" };
-  if (trade.lcVerdict === "COMPLIANT" || trade.lcVerdict === "COMPLIANT_WITH_NOTES") return { label: "TwinLog Trail", color: "var(--amber)" };
-  return { label: "Paperwork review", color: "var(--t3)" };
+  if (!trade.lcVerdict) return { label: "Paperwork review", color: "#666" };
+  if (trade.lcVerdict === "DISCREPANCIES_FOUND") return { label: "LC review", color: "#2563eb" };
+  if (trade.lcVerdict === "COMPLIANT" || trade.lcVerdict === "COMPLIANT_WITH_NOTES") return { label: "TwinLog Trail", color: "#b45309" };
+  return { label: "Paperwork review", color: "#666" };
 }
 
 function getRiskTag(verdict: string | null) {
-  if (verdict === "RED") return { symbol: "\u2297", label: "Blocking", color: "var(--red)", bg: "var(--rbg)", bd: "var(--rbd)" };
-  if (verdict === "AMBER") return { symbol: "\u25CF", label: "At risk \u2014 review documents", color: "var(--amber)", bg: "var(--abg)", bd: "var(--abd)" };
-  if (verdict === "GREEN") return { symbol: "\u2713", label: "Clear", color: "var(--green)", bg: "var(--gbg)", bd: "var(--gbd)" };
-  return { symbol: "\u25CF", label: "Review", color: "var(--amber)", bg: "var(--abg)", bd: "var(--abd)" };
+  if (verdict === "RED") return { symbol: "\u2297", label: "Blocking", color: "#dc2626", bg: "#fef2f2", bd: "#fca5a5" };
+  if (verdict === "AMBER") return { symbol: "\u25CF", label: "At risk \u2014 review documents", color: "#b45309", bg: "#fefce8", bd: "#fcd34d" };
+  if (verdict === "GREEN") return { symbol: "\u2713", label: "Clear", color: "#15803d", bg: "#f0fdf4", bd: "#86efac" };
+  return { symbol: "\u25CF", label: "Review", color: "#b45309", bg: "#fefce8", bd: "#fcd34d" };
 }
 
 function formatDate(d: string | Date) {
