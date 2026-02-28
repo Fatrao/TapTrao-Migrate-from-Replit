@@ -598,7 +598,9 @@
 .step.active .step-label { color: #fff; }
 .step.inactive .step-label { color: rgba(255,255,255,0.55); }
 .step-line { flex: 1; height: 2px; background: rgba(255,255,255,0.12); margin: 0 10px; }
-.form-card { margin: 0 32px 24px; background: #fff; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05), 0 8px 32px rgba(0,0,0,0.03); padding: 28px 32px; }
+.form-card { margin: 0 32px 24px; background: #fff; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05), 0 8px 32px rgba(0,0,0,0.03); padding: 28px 32px; color: #1a1a1a; }
+.form-card table th { color: #666; }
+.form-card table td { color: #1a1a1a; }
 .form-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
 .form-card-header h2 { font-size: 17px; font-weight: 600; color: var(--app-main-base); }
 .form-card-subtitle { font-size: 13px; color: var(--app-regent); margin-bottom: 24px; }

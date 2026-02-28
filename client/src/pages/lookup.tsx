@@ -1705,6 +1705,7 @@ export default function Lookup() {
   const searchString = useSearch();
   const searchParams = new URLSearchParams(searchString);
   const templateId = searchParams.get("templateId");
+  const lookupId = searchParams.get("lookupId");
 
   const [commodityId, setCommodityId] = useState<string>("");
   const [originId, setOriginId] = useState<string>("");
@@ -1712,6 +1713,7 @@ export default function Lookup() {
   const [templateResult, setTemplateResult] = useState<ComplianceResult | null>(null);
   const [templateData, setTemplateData] = useState<Template | null>(null);
   const [templateStale, setTemplateStale] = useState<boolean | null>(null);
+  const [lookupResult, setLookupResult] = useState<ComplianceResult | null>(null);
 
   const { data: commoditiesData, isLoading: loadingCommodities } = useQuery<
     Commodity[]
@@ -1760,6 +1762,33 @@ export default function Lookup() {
       } catch {}
     })();
   }, [templateId, commoditiesData, originsData, destinationsData]);
+
+  // Load existing lookup by ID (from trades page)
+  useEffect(() => {
+    if (!lookupId || templateId || !commoditiesData || !originsData || !destinationsData) return;
+    (async () => {
+      try {
+        const res = await fetch(`/api/lookups/${lookupId}`, { credentials: "include" });
+        if (!res.ok) return;
+        const lookup = await res.json();
+        const result = lookup.resultJson as ComplianceResult;
+        if (result) {
+          // Attach lookupId so child components (LC check, TwinLog) can reference it
+          (result as any).lookupId = lookup.id;
+          (result as any).integrityHash = lookup.integrityHash;
+          setLookupResult(result);
+
+          // Pre-fill the selectors using resultJson data
+          const commodity = commoditiesData.find(c => c.id === result.commodity?.id) || commoditiesData.find(c => c.name === lookup.commodityName);
+          const origin = originsData.find(o => o.iso2 === result.origin?.iso2);
+          const dest = destinationsData.find(d => d.iso2 === result.destination?.iso2);
+          if (commodity) setCommodityId(commodity.id);
+          if (origin) setOriginId(origin.id);
+          if (dest) setDestinationId(dest.id);
+        }
+      } catch {}
+    })();
+  }, [lookupId, templateId, commoditiesData, originsData, destinationsData]);
 
   const complianceMutation = useMutation<ComplianceResult, Error, void>({
     mutationFn: async () => {
@@ -1830,7 +1859,8 @@ export default function Lookup() {
   const freeLookupUsed = tokenQuery.data?.freeLookupUsed ?? false;
   const isFreeCheck = !freeLookupUsed;
   const isTemplateMode = !!templateId && !!templateResult;
-  const displayResult = isTemplateMode ? templateResult : complianceMutation.data;
+  const isLookupMode = !!lookupId && !!lookupResult;
+  const displayResult = isTemplateMode ? templateResult : isLookupMode ? lookupResult : complianceMutation.data;
 
   return (
     <AppShell>
@@ -1899,7 +1929,7 @@ export default function Lookup() {
                     <Select
                       value={commodityId}
                       onValueChange={setCommodityId}
-                      disabled={isTemplateMode}
+                      disabled={isTemplateMode || isLookupMode}
                     >
                       <SelectTrigger data-testid="select-commodity">
                         <SelectValue placeholder="Select commodity..." />
@@ -1922,7 +1952,7 @@ export default function Lookup() {
                   {isLoading ? (
                     <Skeleton className="h-9 w-full" />
                   ) : (
-                    <Select value={originId} onValueChange={setOriginId} disabled={isTemplateMode}>
+                    <Select value={originId} onValueChange={setOriginId} disabled={isTemplateMode || isLookupMode}>
                       <SelectTrigger data-testid="select-origin">
                         <SelectValue placeholder="Select origin..." />
                       </SelectTrigger>
@@ -1953,7 +1983,7 @@ export default function Lookup() {
                     <Select
                       value={destinationId}
                       onValueChange={setDestinationId}
-                      disabled={isTemplateMode}
+                      disabled={isTemplateMode || isLookupMode}
                     >
                       <SelectTrigger data-testid="select-destination">
                         <SelectValue placeholder="Select destination..." />
@@ -2015,7 +2045,7 @@ export default function Lookup() {
             <>
               <StepNav steps={["Lookup", "LC Check", "TwinLog Trail", "Archive"]} currentIndex={0} completedUpTo={-1} />
               <ComplianceResultDisplay result={displayResult} freeLocked={freeLookupUsed && balance === 0} />
-              {!isTemplateMode && (
+              {!isTemplateMode && !isLookupMode && (
                 <SaveTemplatePrompt
                   result={displayResult}
                   commodityId={commodityId}

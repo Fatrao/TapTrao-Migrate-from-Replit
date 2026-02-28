@@ -269,7 +269,18 @@ export default function Trades() {
                       animation: `fadeUp .35s ease both`,
                       animationDelay: `${idx * 40}ms`,
                     }}
-                    onClick={() => navigate(`/lookup?lookupId=${trade.id}`)}
+                    onClick={() => {
+                      if (trade.lcVerdict === "COMPLIANT" || trade.lcVerdict === "COMPLIANT_WITH_NOTES") {
+                        // LC passed — go to TwinLog
+                        navigate(`/lookup?lookupId=${trade.id}`);
+                      } else if (trade.lcVerdict === "DISCREPANCIES_FOUND") {
+                        // LC has issues — go to LC check
+                        navigate(`/lc-check?lookupId=${trade.id}`);
+                      } else {
+                        // No LC yet — show compliance results
+                        navigate(`/lookup?lookupId=${trade.id}`);
+                      }
+                    }}
                     onMouseEnter={e => {
                       Array.from(e.currentTarget.querySelectorAll("td")).forEach(td => {
                         (td as HTMLElement).style.background = "var(--s2)";

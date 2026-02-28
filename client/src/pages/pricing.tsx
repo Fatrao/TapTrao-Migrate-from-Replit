@@ -292,7 +292,7 @@ export default function Pricing() {
               <h3 style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 16, color: "var(--t1)", margin: "0 0 4px" }}>
                 Your first check is free
               </h3>
-              <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
+              <p style={{ fontSize: 13, color: "#ffffff", margin: 0, lineHeight: 1.6 }}>
                 Run one full compliance check for free — no card required. See duties, required documents, and shipment risks.
               </p>
             </div>
@@ -492,7 +492,7 @@ export default function Pricing() {
                 </span>
                 <span style={{ color: "var(--t2)", fontSize: 13, marginLeft: 6 }}>per re-check</span>
               </div>
-              <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
+              <p style={{ fontSize: 13, color: "#ffffff", margin: 0, lineHeight: 1.6 }}>
                 If your supplier corrects documents after the first submission, you can re-check the LC before resubmitting to the bank.
               </p>
             </div>
@@ -537,7 +537,7 @@ export default function Pricing() {
                   Coming Soon
                 </span>
               </div>
-              <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
+              <p style={{ fontSize: 13, color: "#ffffff", margin: 0, lineHeight: 1.6 }}>
                 Regulatory change alerts and compliance calendar. For frequent shippers. Not required for occasional trades.
               </p>
             </div>
@@ -557,7 +557,7 @@ export default function Pricing() {
                   Coming Soon
                 </span>
               </div>
-              <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
+              <p style={{ fontSize: 13, color: "#ffffff", margin: 0, lineHeight: 1.6 }}>
                 Integrate compliance checks directly into your systems via REST API. Programmatic access to duties, document requirements, and risk scores.
               </p>
             </div>
@@ -578,7 +578,7 @@ export default function Pricing() {
                 >
                   {faq.q}
                 </h3>
-                <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
+                <p style={{ fontSize: 13, color: "#ffffff", margin: 0, lineHeight: 1.6 }}>
                   {faq.a}
                 </p>
               </div>
