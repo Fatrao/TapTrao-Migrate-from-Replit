@@ -635,7 +635,7 @@
 .upload-zone .upload-icon { font-size: 28px; margin-bottom: 8px; color: #bbb; }
 .upload-zone .upload-title { font-size: 14px; font-weight: 500; color: #333; margin-bottom: 4px; }
 .upload-zone .upload-link { font-size: 13px; color: var(--app-acapulco); }
-.upload-note { display: flex; align-items: flex-start; gap: 8px; margin-top: 14px; padding: 12px 14px; background: var(--app-acapulco-glow); border-radius: 8px; border: 1px solid rgba(113,171,145,0.12); font-size: 13px; color: var(--app-regent); line-height: 1.4; }
+.upload-note { display: flex; align-items: flex-start; gap: 8px; margin-top: 14px; padding: 12px 14px; background: var(--app-acapulco-glow); border-radius: 8px; border: 1px solid rgba(113,171,145,0.12); font-size: 13px; color: #333; line-height: 1.4; }
 .upload-note strong { color: #2a3d40; }
 .action-row { display: flex; gap: 12px; margin: 0 32px 32px; }
 .btn-primary { padding: 12px 28px; background: var(--app-acapulco); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.15s; }
