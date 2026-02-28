@@ -113,7 +113,7 @@ export default function Trades() {
 
   return (
     <AppShell>
-      <div style={{ overflowY: "auto", padding: "32px 40px 60px" }}>
+      <div style={{ padding: "32px 40px 0" }}>
         {/* HEADER */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
           <div>
@@ -415,6 +415,33 @@ export default function Trades() {
             </tbody>
           </table>
         )}
+
+      </div>
+
+      {/* WHITE ZONE — fades from gradient to white below the trade table */}
+      <div style={{
+        background: "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.4) 15%, rgba(255,255,255,0.8) 40%, #ffffff 65%)",
+        padding: "60px 40px 100px",
+      }}>
+        <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
+          <p style={{ fontSize: 13, color: "#555", margin: 0, fontWeight: 500 }}>
+            {allTrades.length} shipment{allTrades.length !== 1 ? "s" : ""} total &middot; Data refreshed on each visit
+          </p>
+          <p style={{ fontSize: 12, color: "#888", marginTop: 8, lineHeight: 1.5 }}>
+            TapTrao does not provide legal or banking advice. Reports are informational and designed to support internal decision-making.
+          </p>
+          <div style={{ marginTop: 24, display: "flex", justifyContent: "center", gap: 20 }}>
+            <Link href="/lookup">
+              <span style={{ fontSize: 12, color: "#6b9080", fontWeight: 600, cursor: "pointer" }}>+ New compliance check</span>
+            </Link>
+            <Link href="/templates">
+              <span style={{ fontSize: 12, color: "#6b9080", fontWeight: 600, cursor: "pointer" }}>Saved templates</span>
+            </Link>
+            <Link href="/alerts">
+              <span style={{ fontSize: 12, color: "#6b9080", fontWeight: 600, cursor: "pointer" }}>Alerts</span>
+            </Link>
+          </div>
+        </div>
       </div>
 
       <style>{`
