@@ -45,15 +45,15 @@ function relativeTime(dateStr: string): string {
 function getStatusTag(status: string) {
   switch (status) {
     case "blocking":
-      return { symbol: "\u2297", label: "Blocking", color: "var(--red)", bg: "var(--rbg)", bd: "var(--rbd)" };
+      return { symbol: "\u2297", label: "Blocking", color: "#dc2626", bg: "#fef2f2", bd: "#fca5a5" };
     case "waiting":
-      return { symbol: "\u25CF", label: "Waiting", color: "var(--amber)", bg: "var(--abg)", bd: "var(--abd)" };
+      return { symbol: "\u25CF", label: "Waiting", color: "#b45309", bg: "#fefce8", bd: "#fcd34d" };
     case "partial":
-      return { symbol: "\u21BB", label: "Partial", color: "var(--blue)", bg: "var(--blue-dim)", bd: "var(--blue-bd)" };
+      return { symbol: "\u21BB", label: "Partial", color: "#2563eb", bg: "#eff6ff", bd: "#93c5fd" };
     case "complete":
-      return { symbol: "\u2713", label: "Complete", color: "var(--green)", bg: "var(--gbg)", bd: "var(--gbd)" };
+      return { symbol: "\u2713", label: "Complete", color: "#15803d", bg: "#f0fdf4", bd: "#86efac" };
     default:
-      return { symbol: "\u25CF", label: status, color: "var(--t3)", bg: "var(--s3)", bd: "var(--s5)" };
+      return { symbol: "\u25CF", label: status, color: "#666", bg: "#f5f5f5", bd: "#ddd" };
   }
 }
 
@@ -79,27 +79,28 @@ export default function Inbox() {
   }, [requests]);
 
   const cards = [
-    { value: summary.awaiting, color: "var(--amber)", label: "Awaiting documents" },
-    { value: summary.blocking, color: "var(--red)", label: "Blocking issue" },
-    { value: summary.completeThisWeek, color: "var(--green)", label: "Complete this week" },
+    { value: summary.awaiting, color: "#b45309", label: "Awaiting documents" },
+    { value: summary.blocking, color: "#dc2626", label: "Blocking issue" },
+    { value: summary.completeThisWeek, color: "#15803d", label: "Complete this week" },
   ];
 
   return (
     <AppShell>
-      <div style={{ overflowY: "auto", padding: "32px 40px 60px" }}>
-        {/* HEADER */}
-        <div style={{ marginBottom: 28 }}>
-          <h1
-            style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "0", color: "var(--t1)", margin: 0, lineHeight: 1.1 }}
-            data-testid="text-inbox-title"
-          >
-            Supplier Inbox
-          </h1>
-          <p style={{ fontSize: 13, color: "var(--t2)", marginTop: 6 }} data-testid="text-inbox-subtitle">
-            {summary.awaiting + summary.blocking} suppliers waiting &middot; {summary.blocking} blocking issues
-          </p>
-        </div>
+      {/* HEADER — stays on dark gradient */}
+      <div style={{ padding: "32px 40px 24px" }}>
+        <h1
+          style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "0", color: "var(--t1)", margin: 0, lineHeight: 1.1 }}
+          data-testid="text-inbox-title"
+        >
+          Supplier Inbox
+        </h1>
+        <p style={{ fontSize: 13, color: "var(--t2)", marginTop: 6 }} data-testid="text-inbox-subtitle">
+          {summary.awaiting + summary.blocking} suppliers waiting &middot; {summary.blocking} blocking issues
+        </p>
+      </div>
 
+      {/* WHITE ZONE */}
+      <div style={{ background: "#ffffff", padding: "0 40px 60px" }}>
         {/* SUMMARY CARDS */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 2, marginBottom: 32 }} data-testid="inbox-summary-cards">
           {cards.map((c, i) => (
@@ -107,19 +108,20 @@ export default function Inbox() {
               key={c.label}
               style={{
                 background: c.label === "Blocking issue"
-                  ? `linear-gradient(135deg, rgba(218,60,61,.05), transparent 60%), var(--card)`
-                  : "var(--card)",
+                  ? "linear-gradient(135deg, rgba(218,60,61,.05), transparent 60%), #fff"
+                  : "#fff",
                 padding: "20px 22px",
                 borderRadius:
                   i === 0 ? "14px 0 0 14px" :
                   i === cards.length - 1 ? "0 14px 14px 0" : "0",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
               }}
               data-testid={`inbox-summary-card-${i}`}
             >
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 36, letterSpacing: 0, lineHeight: 1, color: c.color }}>
                 {c.value}
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)", letterSpacing: ".04em", marginTop: 4 }}>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#333", letterSpacing: ".04em", marginTop: 4 }}>
                 {c.label}
               </div>
             </div>
@@ -128,13 +130,13 @@ export default function Inbox() {
 
         {/* INBOX CARDS */}
         {requestsQuery.isLoading ? (
-          <div style={{ padding: "80px 0", textAlign: "center", color: "var(--t2)", fontSize: 14 }}>Loading inbox...</div>
+          <div style={{ padding: "80px 0", textAlign: "center", color: "#333", fontSize: 14 }}>Loading inbox...</div>
         ) : requests.length === 0 ? (
           <div style={{ padding: "80px 0", textAlign: "center" }} data-testid="inbox-empty-state">
-            <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "var(--t2)" }}>
+            <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "#1a1a1a" }}>
               No supplier requests yet.
             </div>
-            <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 8 }}>
+            <div style={{ fontSize: 13, color: "#333", marginTop: 8 }}>
               Send your first supplier brief from the LC Checker or Compliance Lookup.
             </div>
           </div>
@@ -160,7 +162,7 @@ function InboxGroup({ label, items, opacity }: { label: string; items: SupplierR
   return (
     <div style={{ marginBottom: 28, opacity: opacity ?? 1 }} data-testid={`inbox-group-${label.toLowerCase().replace(/\s+/g, "-")}`}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", whiteSpace: "nowrap" }}>
+        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "#555", whiteSpace: "nowrap" }}>
           {label}
         </span>
         <div style={{ flex: 1 }} />
@@ -187,8 +189,8 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
   return (
     <div
       style={{
-        background: "var(--card)",
-        borderLeft: request.status === "blocking" ? "3px solid var(--red)" : undefined,
+        background: "#f9f9f9",
+        borderLeft: request.status === "blocking" ? "3px solid #dc2626" : undefined,
         borderRadius: 14,
         padding: "16px 18px",
         cursor: "pointer",
@@ -197,10 +199,11 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
         flexDirection: "row",
         gap: 14,
         alignItems: "center",
+        border: "1px solid #eee",
       }}
       data-testid={`inbox-card-${request.id}`}
-      onMouseEnter={e => { e.currentTarget.style.background = "var(--card2)"; }}
-      onMouseLeave={e => { e.currentTarget.style.background = "var(--card)"; }}
+      onMouseEnter={e => { e.currentTarget.style.background = "#f0f0f0"; }}
+      onMouseLeave={e => { e.currentTarget.style.background = "#f9f9f9"; }}
     >
       {/* Avatar */}
       <div
@@ -226,12 +229,12 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
       {/* Body */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t1)" }}>{request.supplier_name}</span>
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)" }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>{request.supplier_name}</span>
+          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#555" }}>
             {request.origin_iso2} → {request.dest_iso2} · {request.commodity_name}
           </span>
         </div>
-        <div style={{ fontSize: 12, color: "var(--t2)", marginTop: 3 }}>
+        <div style={{ fontSize: 12, color: "#333", marginTop: 3 }}>
           {outstanding.length > 0
             ? `Outstanding: ${outstanding.join(", ")}`
             : "All documents received"}
@@ -248,13 +251,13 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
                   width: 22,
                   height: 4,
                   borderRadius: 2,
-                  background: received ? "var(--green)" : isBlocking ? "var(--red)" : "var(--s5)",
+                  background: received ? "#15803d" : isBlocking ? "#dc2626" : "#ddd",
                 }}
               />
             );
           })}
         </div>
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)", marginTop: 6 }}>
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#555", marginTop: 6 }}>
           {docsReceived.length}/{docsRequired.length} docs
           {blockingCount > 0 && ` · ${blockingCount} blocking`}
           {pendingCount > 0 && ` · ${pendingCount} pending`}
@@ -278,7 +281,7 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
         >
           {statusTag.symbol} {statusTag.label}
         </span>
-        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)" }}>
+        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#555" }}>
           {relativeTime(request.updated_at)}
         </span>
         {/* Send buttons */}
@@ -287,7 +290,7 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
             style={{
               background: "rgba(37,211,102,.12)",
               border: "1px solid rgba(37,211,102,.3)",
-              color: "#25D366",
+              color: "#128C7E",
               fontSize: 11,
               fontWeight: 600,
               padding: "5px 10px",
@@ -301,9 +304,9 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
           </button>
           <button
             style={{
-              background: "var(--blue-dim)",
-              border: "1px solid var(--blue-bd)",
-              color: "var(--blue)",
+              background: "#eff6ff",
+              border: "1px solid #93c5fd",
+              color: "#2563eb",
               fontSize: 11,
               fontWeight: 600,
               padding: "5px 10px",
@@ -317,9 +320,9 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
           </button>
           <button
             style={{
-              background: "var(--s3)",
-              border: "1px solid var(--s5)",
-              color: "var(--t2)",
+              background: "#f5f5f5",
+              border: "1px solid #ddd",
+              color: "#333",
               fontSize: 11,
               fontWeight: 600,
               padding: "5px 10px",
