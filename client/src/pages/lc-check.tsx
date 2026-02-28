@@ -1122,40 +1122,104 @@ export default function LcCheck() {
                   Ready to send — {checkMutation.data.summary.criticals} correction{checkMutation.data.summary.criticals > 1 ? "s" : ""} needed
                 </p>
 
+                {/* Tab toggle: Email / WhatsApp */}
+                <div style={{ display: "flex", gap: 0, marginBottom: 12 }}>
+                  <button
+                    onClick={() => setCorrectionTab("email")}
+                    data-testid="button-correction-email-tab"
+                    style={{
+                      flex: 1,
+                      padding: "10px 16px",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      border: correctionTab === "email" ? "1px solid #6b9080" : "1px solid #ddd",
+                      background: correctionTab === "email" ? "rgba(107,144,128,0.08)" : "#fff",
+                      color: correctionTab === "email" ? "#6b9080" : "#666",
+                      borderRadius: "8px 0 0 8px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    📧 Email
+                  </button>
+                  <button
+                    onClick={() => setCorrectionTab("whatsapp")}
+                    data-testid="button-correction-whatsapp-tab"
+                    style={{
+                      flex: 1,
+                      padding: "10px 16px",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      border: correctionTab === "whatsapp" ? "1px solid #25D366" : "1px solid #ddd",
+                      background: correctionTab === "whatsapp" ? "rgba(37,211,102,0.08)" : "#fff",
+                      color: correctionTab === "whatsapp" ? "#128C7E" : "#666",
+                      borderRadius: "0 8px 8px 0",
+                      borderLeft: "none",
+                      cursor: "pointer",
+                    }}
+                  >
+                    💬 WhatsApp
+                  </button>
+                </div>
+
+                {/* Correction text */}
                 <div style={{ background: "#f7f7f7", borderRadius: 10, padding: "16px 18px", border: "1px solid #e8e8e8" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-main-base)" }}>
-                      {checkMutation.data.summary.criticals} amendment{checkMutation.data.summary.criticals > 1 ? "s" : ""} required
-                    </div>
-                    <div className="lc-copy-btns">
-                      <button
-                        className={`lc-copy-btn email`}
-                        onClick={() => setCorrectionTab("email")}
-                        style={correctionTab !== "email" ? { opacity: 0.5 } : {}}
-                        data-testid="button-correction-email-tab"
-                      >
-                        📋 Email
-                      </button>
-                      <button
-                        className={`lc-copy-btn whatsapp`}
-                        onClick={() => setCorrectionTab("whatsapp")}
-                        style={correctionTab !== "whatsapp" ? { opacity: 0.5 } : {}}
-                        data-testid="button-correction-whatsapp-tab"
-                      >
-                        💬 WhatsApp
-                      </button>
-                    </div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "#555", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".05em" }}>
+                    {correctionTab === "email" ? "Email message" : "WhatsApp message"}
                   </div>
                   <div className="lc-email-box" data-testid={`text-correction-${correctionTab}`}>
                     {correctionTab === "email" ? (checkMutation.data.correctionEmail || "") : (checkMutation.data.correctionWhatsApp || "")}
                   </div>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12 }}>
+                {/* Action buttons: Copy + Send */}
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14 }}>
                   <CopyBtn
                     text={correctionTab === "email" ? (checkMutation.data.correctionEmail || "") : (checkMutation.data.correctionWhatsApp || "")}
                     label={`correction-${correctionTab}`}
                   />
+                  {correctionTab === "email" ? (
+                    <a
+                      href={`mailto:?subject=${encodeURIComponent(`Correction Request — LC ${lcFields.lcReference}`)}&body=${encodeURIComponent(checkMutation.data.correctionEmail || "")}`}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        padding: "8px 16px",
+                        background: "#6b9080",
+                        color: "#fff",
+                        borderRadius: 8,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        textDecoration: "none",
+                        cursor: "pointer",
+                      }}
+                      data-testid="button-send-email"
+                    >
+                      📧 Open Email Client
+                    </a>
+                  ) : (
+                    <a
+                      href={`https://wa.me/?text=${encodeURIComponent(checkMutation.data.correctionWhatsApp || "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        padding: "8px 16px",
+                        background: "#25D366",
+                        color: "#fff",
+                        borderRadius: 8,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        textDecoration: "none",
+                        cursor: "pointer",
+                      }}
+                      data-testid="button-send-whatsapp"
+                    >
+                      💬 Send via WhatsApp
+                    </a>
+                  )}
                 </div>
               </div>
             )}
