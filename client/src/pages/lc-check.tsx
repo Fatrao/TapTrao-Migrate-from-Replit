@@ -917,7 +917,7 @@ export default function LcCheck() {
               <p className="form-card-subtitle">Correct any errors now — changes cannot be made after the credit is consumed.</p>
 
               {/* Warning note */}
-              <div className="upload-note" style={{ marginBottom: 20 }}>
+              <div className="upload-note" style={{ marginBottom: 20, fontSize: 15, fontWeight: 600, color: "#1a1a1a", padding: "16px 18px" }}>
                 ⚠️ <span>Check all extracted fields carefully. Confirm dates and names match exactly what's on your LC.</span>
               </div>
 
