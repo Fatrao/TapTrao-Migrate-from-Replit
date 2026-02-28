@@ -81,6 +81,10 @@ export default function LcCheck() {
     partialShipmentsAllowed: false,
     transhipmentAllowed: false,
     lcReference: "",
+    issuingBank: "",
+    advisingBank: "",
+    issuingBankSwift: "",
+    advisingBankSwift: "",
   });
 
   const [documents, setDocuments] = useState<LcDocument[]>([
@@ -452,9 +456,49 @@ export default function LcCheck() {
                     data-testid="input-lc-reference"
                   />
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("issuingBank")}`}>
                   <label>Issuing Bank</label>
-                  <input type="text" placeholder="e.g. Société Générale, Abidjan" />
+                  <input type="text"
+                    value={lcFields.issuingBank}
+                    onChange={e => updateLcField("issuingBank", e.target.value)}
+                    placeholder="e.g. Société Générale, Abidjan"
+                    data-testid="input-issuing-bank"
+                  />
+                </div>
+              </div>
+
+              {/* Row 1b: Advising Bank + SWIFT Codes */}
+              <div className="form-row cols-2">
+                <div className={`form-group ${confidenceClass("advisingBank")}`}>
+                  <label>Advising / Confirming Bank</label>
+                  <input type="text"
+                    value={lcFields.advisingBank}
+                    onChange={e => updateLcField("advisingBank", e.target.value)}
+                    placeholder="e.g. ABN AMRO Bank N.V."
+                    data-testid="input-advising-bank"
+                  />
+                </div>
+                <div className="form-row cols-2" style={{ gap: 12 }}>
+                  <div className={`form-group ${confidenceClass("issuingBankSwift")}`}>
+                    <label>Issuing Bank SWIFT</label>
+                    <input type="text"
+                      value={lcFields.issuingBankSwift}
+                      onChange={e => updateLcField("issuingBankSwift", e.target.value.toUpperCase())}
+                      placeholder="e.g. ATBKCIAB"
+                      data-testid="input-issuing-swift"
+                      style={{ fontFamily: "'DM Mono', monospace", letterSpacing: ".05em" }}
+                    />
+                  </div>
+                  <div className={`form-group ${confidenceClass("advisingBankSwift")}`}>
+                    <label>Advising Bank SWIFT</label>
+                    <input type="text"
+                      value={lcFields.advisingBankSwift}
+                      onChange={e => updateLcField("advisingBankSwift", e.target.value.toUpperCase())}
+                      placeholder="e.g. ABNANL2A"
+                      data-testid="input-advising-swift"
+                      style={{ fontFamily: "'DM Mono', monospace", letterSpacing: ".05em" }}
+                    />
+                  </div>
                 </div>
               </div>
 

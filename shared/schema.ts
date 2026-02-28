@@ -268,6 +268,10 @@ export const lcFieldsSchema = z.object({
   partialShipmentsAllowed: z.boolean(),
   transhipmentAllowed: z.boolean(),
   lcReference: z.string(),
+  issuingBank: z.string().optional().default(""),
+  advisingBank: z.string().optional().default(""),
+  issuingBankSwift: z.string().optional().default(""),
+  advisingBankSwift: z.string().optional().default(""),
 });
 
 export type LcFields = z.infer<typeof lcFieldsSchema>;

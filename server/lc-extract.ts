@@ -63,6 +63,10 @@ const LC_TERMS_FIELDS: Record<string, string> = {
   partialShipmentsAllowed: "true if partial shipments are allowed/permitted, false if prohibited/not allowed. Return boolean.",
   transhipmentAllowed: "true if transhipment is allowed/permitted, false if prohibited/not allowed. Return boolean.",
   lcReference: "The LC reference number/document number as printed on the document",
+  issuingBank: "The name of the issuing bank (the bank that opened/issued the LC). Often found in the letterhead, header, or confirmation section.",
+  advisingBank: "The name of the advising or confirming bank, if present",
+  issuingBankSwift: "SWIFT/BIC code of the issuing bank (format: 8 or 11 alphanumeric characters)",
+  advisingBankSwift: "SWIFT/BIC code of the advising/confirming bank, if present",
 };
 
 const DOC_FIELDS: Record<string, Record<string, string>> = {
