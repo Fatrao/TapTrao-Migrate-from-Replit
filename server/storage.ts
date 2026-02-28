@@ -8,6 +8,7 @@ import {
   commodities,
   afcftaRoo,
   lcChecks,
+  lcCases,
   lookups,
   userTokens,
   tokenTransactions,
@@ -26,6 +27,11 @@ import {
   type AfcftaRoo,
   type LcCheck,
   type InsertLcCheck,
+  type LcCase,
+  type InsertLcCase,
+  type LcCaseStatus,
+  type CorrectionRequestEntry,
+  type CheckHistoryEntry,
   type Lookup,
   type InsertLookup,
   type UserTokens,
@@ -132,6 +138,18 @@ export interface IStorage {
   getEudrRecordByLookupId(lookupId: string): Promise<EudrRecord | undefined>;
   updateEudrRecord(id: string, data: Partial<InsertEudrRecord>): Promise<EudrRecord | undefined>;
   markLookupEudrComplete(lookupId: string): Promise<void>;
+  // LC Cases
+  createLcCase(data: InsertLcCase): Promise<LcCase>;
+  getLcCaseById(id: string): Promise<LcCase | undefined>;
+  getLcCaseByLookupId(lookupId: string): Promise<LcCase | undefined>;
+  getLcCasesBySession(sessionId: string): Promise<LcCase[]>;
+  updateLcCaseStatus(id: string, status: LcCaseStatus): Promise<LcCase>;
+  updateLcCaseLatestCheck(id: string, latestCheckId: string, recheckCount: number): Promise<LcCase>;
+  addCorrectionRequest(id: string, entry: CorrectionRequestEntry): Promise<LcCase>;
+  addCheckHistoryEntry(id: string, entry: CheckHistoryEntry): Promise<LcCase>;
+  parkLcCase(id: string): Promise<LcCase>;
+  closeLcCase(id: string, reason: string): Promise<LcCase>;
+  getActiveLcCaseCount(sessionId: string): Promise<number>;
   // Admin & Promo
   setAdminFlag(sessionId: string, isAdmin: boolean): Promise<void>;
   isAdminSession(sessionId: string): Promise<boolean>;
@@ -806,6 +824,100 @@ export class DatabaseStorage implements IStorage {
     await db.update(lookups)
       .set({ eudrComplete: true })
       .where(eq(lookups.id, lookupId));
+  }
+
+  // ── LC Cases ──
+
+  async createLcCase(data: InsertLcCase): Promise<LcCase> {
+    const [row] = await db.insert(lcCases).values(data).returning();
+    return row;
+  }
+
+  async getLcCaseById(id: string): Promise<LcCase | undefined> {
+    const [row] = await db.select().from(lcCases).where(eq(lcCases.id, id));
+    return row;
+  }
+
+  async getLcCaseByLookupId(lookupId: string): Promise<LcCase | undefined> {
+    const [row] = await db.select().from(lcCases).where(eq(lcCases.sourceLookupId, lookupId)).limit(1);
+    return row;
+  }
+
+  async getLcCasesBySession(sessionId: string): Promise<LcCase[]> {
+    return db.select().from(lcCases)
+      .where(eq(lcCases.sessionId, sessionId))
+      .orderBy(desc(lcCases.updatedAt));
+  }
+
+  async updateLcCaseStatus(id: string, status: LcCaseStatus): Promise<LcCase> {
+    const [row] = await db.update(lcCases)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(lcCases.id, id))
+      .returning();
+    return row;
+  }
+
+  async updateLcCaseLatestCheck(id: string, latestCheckId: string, recheckCount: number): Promise<LcCase> {
+    const [row] = await db.update(lcCases)
+      .set({ latestCheckId, recheckCount, updatedAt: new Date() })
+      .where(eq(lcCases.id, id))
+      .returning();
+    return row;
+  }
+
+  async addCorrectionRequest(id: string, entry: CorrectionRequestEntry): Promise<LcCase> {
+    const [row] = await db.update(lcCases)
+      .set({
+        correctionRequests: sql`${lcCases.correctionRequests} || ${JSON.stringify(entry)}::jsonb`,
+        status: "pending_correction" as LcCaseStatus,
+        updatedAt: new Date(),
+      })
+      .where(eq(lcCases.id, id))
+      .returning();
+    return row;
+  }
+
+  async addCheckHistoryEntry(id: string, entry: CheckHistoryEntry): Promise<LcCase> {
+    const [row] = await db.update(lcCases)
+      .set({
+        checkHistory: sql`${lcCases.checkHistory} || ${JSON.stringify(entry)}::jsonb`,
+        updatedAt: new Date(),
+      })
+      .where(eq(lcCases.id, id))
+      .returning();
+    return row;
+  }
+
+  async parkLcCase(id: string): Promise<LcCase> {
+    const [row] = await db.update(lcCases)
+      .set({
+        status: "pending_correction" as LcCaseStatus,
+        parkedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(lcCases.id, id))
+      .returning();
+    return row;
+  }
+
+  async closeLcCase(id: string, reason: string): Promise<LcCase> {
+    const [row] = await db.update(lcCases)
+      .set({
+        status: "closed" as LcCaseStatus,
+        closedAt: new Date(),
+        closedReason: reason,
+        updatedAt: new Date(),
+      })
+      .where(eq(lcCases.id, id))
+      .returning();
+    return row;
+  }
+
+  async getActiveLcCaseCount(sessionId: string): Promise<number> {
+    const [row] = await db.select({ count: sql<number>`count(*)` })
+      .from(lcCases)
+      .where(sql`${lcCases.sessionId} = ${sessionId} AND ${lcCases.status} IN ('discrepancy', 'pending_correction', 'rechecking')`);
+    return Number(row.count);
   }
 
   // ── Admin & Promo ──

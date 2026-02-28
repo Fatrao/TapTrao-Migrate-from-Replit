@@ -55,6 +55,7 @@ import { InsuranceGapAlert } from "./lc-check/InsuranceGapAlert";
 import { UploadZone, FilePill } from "./lc-check/UploadZone";
 import { SupplierDocsTab } from "./lc-check/SupplierDocsTab";
 import { TwinLogTrailTab } from "./lc-check/TwinLogTrailTab";
+import { CorrectionsTab } from "./lc-check/CorrectionsTab";
 
 
 export default function LcCheck() {
@@ -284,20 +285,11 @@ export default function LcCheck() {
   const freeLookupUsed = tokenQuery.data?.freeLookupUsed ?? false;
   const isFreeCheck = !freeLookupUsed;
 
-  const [showRecheckModal, setShowRecheckModal] = useState(false);
-  const [recheckLookupId, setRecheckLookupId] = useState<string | null>(null);
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const recheckPaidSessionId = urlParams.get("recheck_paid");
-
   const checkMutation = useMutation<LcCheckResponse, Error, void>({
     mutationFn: async () => {
       const payload: Record<string, unknown> = { lcFields, documents };
       if (prefillData?.lookup_id) {
         payload.sourceLookupId = prefillData.lookup_id;
-      }
-      if (recheckPaidSessionId) {
-        payload.recheckSessionId = recheckPaidSessionId;
       }
       const res = await fetch("/api/lc-checks", {
         method: "POST",
@@ -306,12 +298,6 @@ export default function LcCheck() {
         body: JSON.stringify(payload),
       });
       if (res.status === 402) {
-        const data = await res.json();
-        if (data.type === "lc_recheck") {
-          setRecheckLookupId(data.sourceLookupId);
-          setShowRecheckModal(true);
-          throw new Error("LC re-check required");
-        }
         setShowTokenModal(true);
         throw new Error("Insufficient tokens");
       }
@@ -337,6 +323,17 @@ export default function LcCheck() {
   const [showCorrection, setShowCorrection] = useState(false);
   const [correctionTab, setCorrectionTab] = useState<"email" | "whatsapp">("email");
   const [lcActiveTab, setLcActiveTab] = useState("Check");
+
+  // Listen for re-check navigation event from CorrectionsTab
+  useEffect(() => {
+    const handler = () => {
+      setLcActiveTab("Check");
+      setStep(2);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    window.addEventListener("lc-go-to-recheck", handler);
+    return () => window.removeEventListener("lc-go-to-recheck", handler);
+  }, []);
 
   const confidenceClass = (fieldKey: string) => fieldConfidence[fieldKey] ? `confidence-${fieldConfidence[fieldKey]}` : "";
 
@@ -367,9 +364,7 @@ export default function LcCheck() {
       ) : lcActiveTab === "TwinLog Trail" ? (
         <TwinLogTrailTab prefillData={prefillData} />
       ) : lcActiveTab === "Corrections" ? (
-        <div style={{ padding: "80px 24px", textAlign: "center", color: "rgba(255,255,255,0.65)", fontSize: 14 }}>
-          Coming in the next update.
-        </div>
+        <CorrectionsTab prefillData={prefillData} />
       ) : (
       <div data-testid="lc-check-page">
 
@@ -1242,32 +1237,136 @@ export default function LcCheck() {
               </div>
             </div>
 
+            {/* Re-check banner */}
+            {checkMutation.data.recheckNumber > 0 && (
+              <div style={{ margin: "0 32px 16px", padding: "12px 16px", background: "rgba(107,144,128,0.08)", border: "1px solid rgba(107,144,128,0.2)", borderRadius: 10, display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 16 }}>🔄</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "#6b9080" }}>
+                  Re-check #{checkMutation.data.recheckNumber} · {checkMutation.data.freeRechecksRemaining} free re-check{checkMutation.data.freeRechecksRemaining !== 1 ? "s" : ""} remaining
+                </span>
+              </div>
+            )}
+
             {/* Action buttons */}
-            <div className="action-row">
-              <button className="btn-primary" onClick={() => goStep(2)}>
-                Upload Corrected Docs →
-              </button>
-              <button
-                className="btn-secondary"
-                onClick={() => {
-                  setStep(1);
-                  checkMutation.reset();
-                  setShowCorrection(false);
-                  setLcFields({
-                    beneficiaryName: "", applicantName: "", goodsDescription: "", hsCode: "",
-                    quantity: 0, quantityUnit: "MT", unitPrice: 0, currency: "USD", totalAmount: 0,
-                    countryOfOrigin: "", portOfLoading: "", portOfDischarge: "",
-                    latestShipmentDate: "", lcExpiryDate: "", incoterms: "FOB",
-                    partialShipmentsAllowed: false, transhipmentAllowed: false, lcReference: "",
-                  });
-                  setDocuments([{ documentType: "commercial_invoice", fields: {} }]);
-                  setActiveDocTab(0);
-                }}
-                data-testid="button-new-check"
-              >
-                New Check
-              </button>
-            </div>
+            {checkMutation.data.summary.verdict === "DISCREPANCIES_FOUND" ? (
+              <div className="action-row" style={{ flexWrap: "wrap" }}>
+                <button
+                  className="btn-primary"
+                  onClick={async () => {
+                    if (checkMutation.data?.caseId) {
+                      try {
+                        await fetch(`/api/lc-cases/${checkMutation.data.caseId}/correction-request`, {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          credentials: "include",
+                          body: JSON.stringify({
+                            channel: correctionTab,
+                            discrepancyCount: checkMutation.data.summary.criticals,
+                          }),
+                        });
+                      } catch {}
+                    }
+                    // Scroll to correction card
+                    document.querySelector('[data-testid="button-correction-email-tab"]')?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  data-testid="button-send-correction"
+                >
+                  ✉️ Send Correction Request
+                </button>
+                <button
+                  className="btn-secondary"
+                  onClick={async () => {
+                    if (checkMutation.data?.caseId) {
+                      try {
+                        await fetch(`/api/lc-cases/${checkMutation.data.caseId}/park`, {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          credentials: "include",
+                        });
+                      } catch {}
+                    }
+                    navigate("/dashboard");
+                  }}
+                  data-testid="button-park-case"
+                >
+                  📦 Park Case
+                </button>
+                <button
+                  className="btn-secondary"
+                  onClick={() => goStep(2)}
+                  data-testid="button-upload-corrected"
+                >
+                  📄 Upload Corrected Docs
+                </button>
+                <button
+                  style={{ background: "none", border: "none", color: "#999", fontSize: 12, cursor: "pointer", padding: "6px 0" }}
+                  onClick={async () => {
+                    if (checkMutation.data?.caseId) {
+                      try {
+                        await fetch(`/api/lc-cases/${checkMutation.data.caseId}/close`, {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          credentials: "include",
+                          body: JSON.stringify({ reason: "Closed by user" }),
+                        });
+                      } catch {}
+                    }
+                    navigate("/dashboard");
+                  }}
+                  data-testid="button-close-case"
+                >
+                  Close Case
+                </button>
+              </div>
+            ) : (
+              <div className="action-row">
+                {prefillData?.lookup_id && (
+                  <button className="btn-primary" onClick={() => setLcActiveTab("TwinLog Trail")} data-testid="button-view-twinlog">
+                    View TwinLog Trail →
+                  </button>
+                )}
+                <button
+                  className="btn-secondary"
+                  onClick={() => {
+                    setStep(1);
+                    checkMutation.reset();
+                    setShowCorrection(false);
+                    setLcFields({
+                      beneficiaryName: "", applicantName: "", goodsDescription: "", hsCode: "",
+                      quantity: 0, quantityUnit: "MT", unitPrice: 0, currency: "USD", totalAmount: 0,
+                      countryOfOrigin: "", portOfLoading: "", portOfDischarge: "",
+                      latestShipmentDate: "", lcExpiryDate: "", incoterms: "FOB",
+                      partialShipmentsAllowed: false, transhipmentAllowed: false, lcReference: "",
+                      issuingBank: "", advisingBank: "", issuingBankSwift: "", advisingBankSwift: "",
+                    });
+                    setDocuments([{ documentType: "commercial_invoice", fields: {} }]);
+                    setActiveDocTab(0);
+                  }}
+                  data-testid="button-new-check"
+                >
+                  New Check
+                </button>
+                <button
+                  style={{ background: "none", border: "none", color: "#999", fontSize: 12, cursor: "pointer", padding: "6px 0" }}
+                  onClick={async () => {
+                    if (checkMutation.data?.caseId) {
+                      try {
+                        await fetch(`/api/lc-cases/${checkMutation.data.caseId}/close`, {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          credentials: "include",
+                          body: JSON.stringify({ reason: "Closed — all clear" }),
+                        });
+                      } catch {}
+                    }
+                    navigate("/dashboard");
+                  }}
+                  data-testid="button-close-case-clear"
+                >
+                  Close Case
+                </button>
+              </div>
+            )}
 
           </div>
         )}
@@ -1300,38 +1399,6 @@ export default function LcCheck() {
           </DialogContent>
         </Dialog>
 
-        {/* Recheck modal */}
-        <Dialog open={showRecheckModal} onOpenChange={setShowRecheckModal}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>LC Re-check Required</DialogTitle>
-              <DialogDescription>
-                You've already run an LC check for this trade. Re-check after supplier corrections — $9.99.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex gap-3 justify-end flex-wrap">
-              <Button variant="outline" onClick={() => setShowRecheckModal(false)} data-testid="button-recheck-modal-cancel">
-                Cancel
-              </Button>
-              <Button
-                onClick={async () => {
-                  try {
-                    const res = await apiRequest("POST", "/api/tokens/lc-recheck-checkout", {
-                      sourceLookupId: recheckLookupId,
-                    });
-                    const data = await res.json();
-                    if (data.url) window.location.href = data.url;
-                  } catch {
-                    navigate("/pricing");
-                  }
-                }}
-                data-testid="button-recheck-modal-pay"
-              >
-                Pay $9.99 and re-check
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
 
       </div>
       )}

@@ -26,7 +26,6 @@ const TOKEN_PACKS: Record<string, { price: number; tokens: number; name: string 
 };
 
 const LOOKUP_COST = 1;
-const LC_RECHECK_PRICE_CENTS = 999;
 const LC_STANDALONE_PRICE_CENTS = 4999;
 
 // ── Rate limiter for API keys ──
@@ -193,59 +192,6 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/tokens/lc-recheck-checkout", async (req, res) => {
-    try {
-      const { sourceLookupId } = req.body;
-      if (!sourceLookupId) {
-        res.status(400).json({ message: "sourceLookupId is required" });
-        return;
-      }
-
-      const stripeKey = process.env.STRIPE_SECRET_KEY;
-      if (!stripeKey) {
-        res.status(500).json({ message: "Stripe is not configured" });
-        return;
-      }
-
-      const Stripe = (await import("stripe")).default;
-      const stripe = new Stripe(stripeKey);
-      const sessionId = getSessionId(req, res);
-
-      const host = req.headers.host || "localhost:5000";
-      const protocol = req.headers["x-forwarded-proto"] || (req.secure ? "https" : "http");
-      const baseUrl = `${protocol}://${host}`;
-
-      const checkoutSession = await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        line_items: [
-          {
-            price_data: {
-              currency: "usd",
-              product_data: {
-                name: "TapTrao LC Re-check",
-                description: "Additional LC document check after supplier corrections",
-              },
-              unit_amount: LC_RECHECK_PRICE_CENTS,
-            },
-            quantity: 1,
-          },
-        ],
-        mode: "payment",
-        success_url: `${baseUrl}/lc-check?recheck_paid={CHECKOUT_SESSION_ID}&lookup_id=${sourceLookupId}`,
-        cancel_url: `${baseUrl}/lc-check`,
-        metadata: {
-          session_id: sessionId,
-          pack: "lc_recheck",
-          source_lookup_id: sourceLookupId,
-        },
-      });
-
-      res.json({ url: checkoutSession.url });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
   app.post("/api/tokens/lc-standalone-checkout", async (req, res) => {
     try {
       const stripeKey = process.env.STRIPE_SECRET_KEY;
@@ -324,18 +270,7 @@ export async function registerRoutes(
         const pack = session.metadata?.pack;
         const stripeSessionId = session.id;
 
-        if (sessionId && pack === "lc_recheck") {
-          const alreadyProcessed = await storage.hasStripeSessionBeenProcessed(stripeSessionId);
-          if (!alreadyProcessed) {
-            await db.insert(tokenTransactions).values({
-              sessionId,
-              type: "PURCHASE",
-              amount: 0,
-              description: "LC re-check payment — $9.99",
-              stripeSessionId,
-            });
-          }
-        } else if (sessionId && pack === "lc_standalone") {
+        if (sessionId && pack === "lc_standalone") {
           const alreadyProcessed = await storage.hasStripeSessionBeenProcessed(stripeSessionId);
           if (!alreadyProcessed) {
             await db.insert(tokenTransactions).values({
@@ -384,20 +319,7 @@ export async function registerRoutes(
       if (session.payment_status === "paid") {
         const sessionId = session.metadata?.session_id;
         const pack = session.metadata?.pack;
-        if (sessionId && pack === "lc_recheck") {
-          const alreadyProcessed = await storage.hasStripeSessionBeenProcessed(stripeSessionId);
-          if (!alreadyProcessed) {
-            await db.insert(tokenTransactions).values({
-              sessionId,
-              type: "PURCHASE",
-              amount: 0,
-              description: "LC re-check payment — $9.99",
-              stripeSessionId,
-            });
-          }
-          res.json({ success: true, packName: "LC Re-check" });
-          return;
-        } else if (sessionId && pack === "lc_standalone") {
+        if (sessionId && pack === "lc_standalone") {
           const alreadyProcessed = await storage.hasStripeSessionBeenProcessed(stripeSessionId);
           if (!alreadyProcessed) {
             await db.insert(tokenTransactions).values({
@@ -606,74 +528,37 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const isAdmin = await storage.isAdminSession(sessionId);
       const { lcFields, documents, sourceLookupId } = parsed.data;
-      const recheckSessionId = req.body.recheckSessionId as string | undefined;
+
+      // ── New case-based billing logic ──
+      let existingCase = sourceLookupId ? await storage.getLcCaseByLookupId(sourceLookupId) : undefined;
+      let recheckNumber = 0;
+      let freeRechecksRemaining = 3;
 
       if (!isAdmin) {
-        const { balance, freeLookupUsed } = await storage.getTokenBalance(sessionId);
-        if (sourceLookupId) {
-          const alreadyHasLcCheck = await storage.hasLcCheckForLookup(sourceLookupId);
-          if (alreadyHasLcCheck) {
-            if (recheckSessionId) {
-              const alreadyUsed = await storage.hasStripeSessionBeenProcessed(recheckSessionId);
-              if (alreadyUsed) {
-                res.status(402).json({
-                  message: "This re-check payment has already been used. Please purchase a new re-check.",
-                  type: "lc_recheck",
-                  sourceLookupId,
-                });
-                return;
-              }
-              const stripeKey = process.env.STRIPE_SECRET_KEY;
-              if (!stripeKey) {
-                res.status(500).json({ message: "Stripe is not configured" });
-                return;
-              }
-              const Stripe = (await import("stripe")).default;
-              const stripe = new Stripe(stripeKey);
-              try {
-                const stripeSession = await stripe.checkout.sessions.retrieve(recheckSessionId);
-                if (stripeSession.payment_status !== "paid" || stripeSession.metadata?.pack !== "lc_recheck") {
-                  res.status(402).json({
-                    message: "Re-check payment not found. Please try again.",
-                    type: "lc_recheck",
-                    sourceLookupId,
-                  });
-                  return;
-                }
-                await db.insert(tokenTransactions).values({
-                  sessionId,
-                  type: "PURCHASE",
-                  amount: 0,
-                  description: "LC re-check payment — $9.99",
-                  stripeSessionId: recheckSessionId,
-                });
-              } catch {
-                res.status(402).json({
-                  message: "Re-check payment verification failed. Please try again.",
-                  type: "lc_recheck",
-                  sourceLookupId,
-                });
-                return;
-              }
-            } else {
+        const { balance } = await storage.getTokenBalance(sessionId);
+
+        if (existingCase) {
+          // Re-check: free if under limit, otherwise 1 trade credit
+          recheckNumber = existingCase.recheckCount + 1;
+          freeRechecksRemaining = Math.max(0, existingCase.maxFreeRechecks - recheckNumber);
+
+          if (recheckNumber <= existingCase.maxFreeRechecks) {
+            // FREE re-check — no charge
+          } else {
+            // Paid re-check: costs 1 trade credit
+            if (balance < 1) {
               res.status(402).json({
-                message: "You've already run an LC check for this trade. Re-check after supplier corrections — $9.99.",
-                type: "lc_recheck",
-                sourceLookupId,
+                message: `Free re-checks used (${existingCase.maxFreeRechecks}). Additional re-checks cost 1 trade credit.`,
+                required: 1,
+                balance,
+                type: "trade_pack",
               });
               return;
             }
-          }
-          if (balance < 1) {
-            res.status(402).json({
-              message: "LC checks require a trade credit or standalone LC purchase ($19.99).",
-              required: 1,
-              balance,
-              type: "trade_pack",
-            });
-            return;
+            await storage.spendTokens(sessionId, 1, `LC re-check #${recheckNumber} for case ${existingCase.id}`);
           }
         } else {
+          // New check: costs 1 trade credit
           if (balance < 1) {
             res.status(402).json({
               message: "LC checks require a trade credit or standalone LC purchase ($19.99).",
@@ -685,11 +570,19 @@ export async function registerRoutes(
           }
         }
       } // end if (!isAdmin)
+
+      // ── Run the cross-check ──
       const { results, summary } = runLcCrossCheck(lcFields, documents);
       const timestamp = new Date().toISOString();
       const integrityHash = computeLcHash(lcFields, documents, results, timestamp);
       const correction = generateCorrectionEmail(lcFields, results);
 
+      // Determine case status from verdict
+      const caseStatus = summary.verdict === "COMPLIANT" || summary.verdict === "COMPLIANT_WITH_NOTES"
+        ? (existingCase ? "resolved" as const : "all_clear" as const)
+        : "discrepancy" as const;
+
+      // Save the LC check
       const saved = await storage.createLcCheck({
         lcFieldsJson: lcFields,
         documentsJson: documents,
@@ -697,11 +590,59 @@ export async function registerRoutes(
         summary,
         verdict: summary.verdict,
         correctionEmail: correction.email || null,
+        correctionWhatsApp: correction.whatsapp || null,
         commsLog: null,
         integrityHash,
         sourceLookupId: sourceLookupId || null,
         sessionId,
+        caseId: existingCase?.id || null,
       });
+
+      // ── Case management ──
+      let caseId: string | null = null;
+
+      if (existingCase) {
+        // Update existing case
+        await storage.updateLcCaseLatestCheck(existingCase.id, saved.id, recheckNumber);
+        await storage.updateLcCaseStatus(existingCase.id, caseStatus);
+        await storage.addCheckHistoryEntry(existingCase.id, {
+          checkId: saved.id,
+          verdict: summary.verdict,
+          createdAt: timestamp,
+          recheckNumber,
+          summary: `${summary.matches}/${summary.totalChecks} passed, ${summary.criticals} critical`,
+        });
+        caseId = existingCase.id;
+        freeRechecksRemaining = Math.max(0, existingCase.maxFreeRechecks - recheckNumber);
+      } else {
+        // Create new case
+        const newCase = await storage.createLcCase({
+          sessionId,
+          sourceLookupId: sourceLookupId || null,
+          status: caseStatus,
+          initialCheckId: saved.id,
+          latestCheckId: saved.id,
+          recheckCount: 0,
+          maxFreeRechecks: 3,
+          lcReference: lcFields.lcReference || null,
+          beneficiaryName: lcFields.beneficiaryName || null,
+          correctionRequests: [],
+          checkHistory: [{
+            checkId: saved.id,
+            verdict: summary.verdict,
+            createdAt: timestamp,
+            recheckNumber: 0,
+            summary: `${summary.matches}/${summary.totalChecks} passed, ${summary.criticals} critical`,
+          }],
+        });
+        caseId = newCase.id;
+        freeRechecksRemaining = 3;
+
+        // Spend the trade credit for new checks (not re-checks)
+        if (!isAdmin && !existingCase) {
+          await storage.spendTokens(sessionId, 1, `LC check for ${lcFields.lcReference || "new LC"}`);
+        }
+      }
 
       res.json({
         id: saved.id,
@@ -711,6 +652,9 @@ export async function registerRoutes(
         timestamp,
         correctionEmail: correction.email,
         correctionWhatsApp: correction.whatsapp,
+        caseId,
+        recheckNumber,
+        freeRechecksRemaining,
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -739,6 +683,108 @@ export async function registerRoutes(
         return;
       }
       res.json(check);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ── LC Cases ──
+
+  app.get("/api/lc-cases", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const cases = await storage.getLcCasesBySession(sessionId);
+      res.json(cases);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/lc-cases/:id", async (req, res) => {
+    try {
+      const lcCase = await storage.getLcCaseById(req.params.id);
+      if (!lcCase) {
+        res.status(404).json({ message: "LC case not found" });
+        return;
+      }
+      res.json(lcCase);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/lc-cases/:id/correction-request", async (req, res) => {
+    try {
+      const { channel, discrepancyCount } = req.body;
+      if (!channel || typeof discrepancyCount !== "number") {
+        res.status(400).json({ message: "channel and discrepancyCount required" });
+        return;
+      }
+      const entry = {
+        sentAt: new Date().toISOString(),
+        channel: channel as "email" | "whatsapp" | "link",
+        discrepancyCount,
+      };
+      const updated = await storage.addCorrectionRequest(req.params.id, entry);
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/lc-cases/:id/park", async (req, res) => {
+    try {
+      const updated = await storage.parkLcCase(req.params.id);
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/lc-cases/:id/close", async (req, res) => {
+    try {
+      const { reason } = req.body;
+      const updated = await storage.closeLcCase(req.params.id, reason || "Closed by user");
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/lc-cases/:id/comparison", async (req, res) => {
+    try {
+      const lcCase = await storage.getLcCaseById(req.params.id);
+      if (!lcCase) {
+        res.status(404).json({ message: "LC case not found" });
+        return;
+      }
+
+      const initialCheck = lcCase.initialCheckId ? await storage.getLcCheckById(lcCase.initialCheckId) : null;
+      const latestCheck = lcCase.latestCheckId && lcCase.latestCheckId !== lcCase.initialCheckId
+        ? await storage.getLcCheckById(lcCase.latestCheckId)
+        : null;
+
+      res.json({
+        caseId: lcCase.id,
+        status: lcCase.status,
+        recheckCount: lcCase.recheckCount,
+        initialCheck: initialCheck ? {
+          id: initialCheck.id,
+          verdict: initialCheck.verdict,
+          results: initialCheck.resultsJson,
+          summary: initialCheck.summary,
+          createdAt: initialCheck.createdAt,
+        } : null,
+        latestCheck: latestCheck ? {
+          id: latestCheck.id,
+          verdict: latestCheck.verdict,
+          results: latestCheck.resultsJson,
+          summary: latestCheck.summary,
+          createdAt: latestCheck.createdAt,
+        } : null,
+        checkHistory: lcCase.checkHistory,
+        correctionRequests: lcCase.correctionRequests,
+      });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

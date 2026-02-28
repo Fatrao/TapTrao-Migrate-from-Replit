@@ -226,6 +226,16 @@ export const lcVerdictEnum = pgEnum("lc_verdict", [
   "DISCREPANCIES_FOUND",
 ]);
 
+export const lcCaseStatusEnum = pgEnum("lc_case_status", [
+  "checking",
+  "all_clear",
+  "discrepancy",
+  "pending_correction",
+  "rechecking",
+  "resolved",
+  "closed",
+]);
+
 export const lcChecks = pgTable("lc_checks", {
   id: uuid("id").primaryKey().defaultRandom(),
   lcFieldsJson: jsonb("lc_fields_json").notNull(),
@@ -234,12 +244,41 @@ export const lcChecks = pgTable("lc_checks", {
   summary: jsonb("summary").notNull(),
   verdict: lcVerdictEnum("verdict").notNull(),
   correctionEmail: text("correction_email"),
+  correctionWhatsApp: text("correction_whatsapp"),
   commsLog: jsonb("comms_log"),
   integrityHash: text("integrity_hash"),
   sourceLookupId: uuid("source_lookup_id"),
   sessionId: text("session_id"),
+  caseId: uuid("case_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const lcCases = pgTable(
+  "lc_cases",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sessionId: text("session_id").notNull(),
+    sourceLookupId: uuid("source_lookup_id"),
+    status: lcCaseStatusEnum("status").notNull().default("checking"),
+    initialCheckId: uuid("initial_check_id"),
+    latestCheckId: uuid("latest_check_id"),
+    recheckCount: integer("recheck_count").notNull().default(0),
+    maxFreeRechecks: integer("max_free_rechecks").notNull().default(3),
+    lcReference: text("lc_reference"),
+    beneficiaryName: text("beneficiary_name"),
+    correctionRequests: jsonb("correction_requests").notNull().default([]),
+    checkHistory: jsonb("check_history").notNull().default([]),
+    parkedAt: timestamp("parked_at"),
+    closedAt: timestamp("closed_at"),
+    closedReason: text("closed_reason"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_lc_cases_session").on(table.sessionId),
+    index("idx_lc_cases_lookup").on(table.sourceLookupId),
+  ]
+);
 
 export const insertLcCheckSchema = createInsertSchema(lcChecks).omit({
   id: true,
@@ -248,6 +287,30 @@ export const insertLcCheckSchema = createInsertSchema(lcChecks).omit({
 
 export type InsertLcCheck = z.infer<typeof insertLcCheckSchema>;
 export type LcCheck = typeof lcChecks.$inferSelect;
+
+export const insertLcCaseSchema = createInsertSchema(lcCases).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertLcCase = z.infer<typeof insertLcCaseSchema>;
+export type LcCase = typeof lcCases.$inferSelect;
+export type LcCaseStatus = "checking" | "all_clear" | "discrepancy" | "pending_correction" | "rechecking" | "resolved" | "closed";
+
+export type CorrectionRequestEntry = {
+  sentAt: string;
+  channel: "email" | "whatsapp" | "link";
+  discrepancyCount: number;
+};
+
+export type CheckHistoryEntry = {
+  checkId: string;
+  verdict: "COMPLIANT" | "COMPLIANT_WITH_NOTES" | "DISCREPANCIES_FOUND";
+  createdAt: string;
+  recheckNumber: number;
+  summary: string;
+};
 
 export const lcFieldsSchema = z.object({
   beneficiaryName: z.string().min(1),

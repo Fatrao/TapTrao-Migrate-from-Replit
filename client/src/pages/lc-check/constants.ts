@@ -25,6 +25,9 @@ export type LcCheckResponse = {
   timestamp: string;
   correctionEmail: string;
   correctionWhatsApp: string;
+  caseId: string | null;
+  recheckNumber: number;
+  freeRechecksRemaining: number;
 };
 
 export type LcPrefillData = {

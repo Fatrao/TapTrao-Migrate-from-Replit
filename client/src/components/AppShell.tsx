@@ -139,6 +139,8 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
 
   const recentLookupsQuery = useQuery<any[]>({ queryKey: ["/api/lookups/recent"] });
   const recentLookups = recentLookupsQuery.data?.slice(0, 3) ?? [];
+  const lcCasesQuery = useQuery<any[]>({ queryKey: ["/api/lc-cases"] });
+  const activeLcCases = (lcCasesQuery.data ?? []).filter((c: any) => c.status === "discrepancy" || c.status === "pending_correction").length;
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -206,9 +208,14 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
       {/* Tools section */}
       <div className="sidebar-section">
         <SidebarLabel>Tools</SidebarLabel>
-        {toolsItems.map((item) => (
-          <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
-        ))}
+        {toolsItems.map((item) => {
+          const withBadge = item.label === "LC Check" && activeLcCases > 0
+            ? { ...item, badge: { type: "red" as const, value: activeLcCases } }
+            : item;
+          return (
+            <SidebarNavItem key={item.href} item={withBadge} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+          );
+        })}
       </div>
 
       {/* Admin section (only if admin) */}

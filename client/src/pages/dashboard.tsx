@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
-import type { Lookup, LcCheck, TokenTransaction, ComplianceResult, OriginCountry, Destination } from "@shared/schema";
+import type { Lookup, LcCheck, LcCase, TokenTransaction, ComplianceResult, OriginCountry, Destination } from "@shared/schema";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { useTokenBalance } from "@/hooks/use-tokens";
 import { apiRequest } from "@/lib/queryClient";
@@ -16,6 +16,7 @@ export default function Dashboard() {
   const lcQuery = useQuery<LcCheck[]>({ queryKey: ["/api/lc-checks/recent"] });
   const tokenQuery = useTokenBalance();
   const txQuery = useQuery<TokenTransaction[]>({ queryKey: ["/api/tokens/transactions", "?limit=10"] });
+  const lcCasesQuery = useQuery<LcCase[]>({ queryKey: ["/api/lc-cases"] });
   const originsQuery = useQuery<OriginCountry[]>({ queryKey: ["/api/origins"] });
   const destinationsQuery = useQuery<Destination[]>({ queryKey: ["/api/destinations"] });
   const stats = statsQuery.data;
@@ -305,6 +306,58 @@ export default function Dashboard() {
               <div className="cs-row"><span className="cs-label">🍫 Cocoa Council</span><span className="cs-value cs-green">COCOBOD</span></div>
             </div>
           </div>
+
+          {/* My LC Cases */}
+          {(lcCasesQuery.data ?? []).length > 0 && (
+            <div className="dash-card">
+              <div className="dash-card-header">
+                <h3>My LC Cases <span className="count">{(lcCasesQuery.data ?? []).filter(c => c.status !== "closed").length}</span></h3>
+                <Link href="/lc-check"><span className="link">LC Check ›</span></Link>
+              </div>
+              {(lcCasesQuery.data ?? []).slice(0, 4).map((c) => {
+                const statusColors: Record<string, { color: string; bg: string; label: string }> = {
+                  checking: { color: "#2563eb", bg: "#eff6ff", label: "Checking" },
+                  all_clear: { color: "#15803d", bg: "#f0fdf4", label: "All Clear" },
+                  discrepancy: { color: "#dc2626", bg: "#fef2f2", label: "Discrepancy" },
+                  pending_correction: { color: "#b45309", bg: "#fefce8", label: "Pending" },
+                  rechecking: { color: "#2563eb", bg: "#eff6ff", label: "Re-checking" },
+                  resolved: { color: "#15803d", bg: "#f0fdf4", label: "Resolved" },
+                  closed: { color: "#666", bg: "#f5f5f5", label: "Closed" },
+                };
+                const st = statusColors[c.status] ?? statusColors.checking;
+                const actionLabel = c.status === "discrepancy" || c.status === "pending_correction"
+                  ? "Follow Up →"
+                  : c.status === "all_clear" || c.status === "resolved"
+                  ? "View →"
+                  : "Continue →";
+                return (
+                  <div key={c.id} className="pending-item" style={{ cursor: "pointer" }} onClick={() => {
+                    if (c.sourceLookupId) {
+                      navigate(`/lookup?lookupId=${c.sourceLookupId}`);
+                    }
+                  }}>
+                    <div className="pending-icon" style={{ fontSize: 16 }}>📋</div>
+                    <div className="pending-info">
+                      <div className="pending-name" style={{ fontSize: 12.5 }}>
+                        {c.lcReference || "LC Case"}
+                      </div>
+                      <div className="pending-detail" style={{ fontSize: 11 }}>
+                        {c.beneficiaryName || "Unknown"} · {c.recheckCount} re-check{c.recheckCount !== 1 ? "s" : ""}
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                      <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 4, background: st.bg, color: st.color }}>
+                        {st.label}
+                      </span>
+                      <span style={{ fontSize: 10.5, color: "var(--app-regent)" }}>
+                        {actionLabel}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Compliance Status */}
           <div className="dash-card">
