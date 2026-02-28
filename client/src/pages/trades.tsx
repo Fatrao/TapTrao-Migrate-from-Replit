@@ -187,9 +187,9 @@ export default function Trades() {
               onClick={() => setFilter(f.key)}
               data-testid={`filter-${f.key}`}
               style={{
-                background: filter === f.key ? "rgba(107,144,128,0.1)" : "transparent",
-                border: `1px solid ${filter === f.key ? "#6b9080" : "#ddd"}`,
-                color: filter === f.key ? "#6b9080" : "#333",
+                background: filter === f.key ? "rgba(107,144,128,0.12)" : "#fff",
+                border: `1px solid ${filter === f.key ? "#6b9080" : "#ccc"}`,
+                color: filter === f.key ? "#6b9080" : "#1a1a1a",
                 borderRadius: 20,
                 padding: "5px 14px",
                 fontSize: 12,
