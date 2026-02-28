@@ -172,7 +172,7 @@ export default function Trades() {
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 36, letterSpacing: 0, lineHeight: 1, color: c.color }}>
                 {c.value}
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#888", letterSpacing: ".04em", marginTop: 4 }}>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#333", letterSpacing: ".04em", marginTop: 4 }}>
                 {c.label}
               </div>
             </div>
@@ -189,7 +189,7 @@ export default function Trades() {
               style={{
                 background: filter === f.key ? "rgba(107,144,128,0.1)" : "transparent",
                 border: `1px solid ${filter === f.key ? "#6b9080" : "#ddd"}`,
-                color: filter === f.key ? "#6b9080" : "#666",
+                color: filter === f.key ? "#6b9080" : "#333",
                 borderRadius: 20,
                 padding: "5px 14px",
                 fontSize: 12,
@@ -222,11 +222,11 @@ export default function Trades() {
 
         {/* TABLE OR EMPTY STATE */}
         {tradesQuery.isLoading ? (
-          <div style={{ padding: "80px 0", textAlign: "center", color: "#888", fontSize: 14 }}>Loading trades...</div>
+          <div style={{ padding: "80px 0", textAlign: "center", color: "#333", fontSize: 14 }}>Loading trades...</div>
         ) : filtered.length === 0 && allTrades.length === 0 ? (
           <div style={{ padding: "80px 0", textAlign: "center" }}>
-            <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "#555" }}>No trades yet.</div>
-            <div style={{ fontSize: 13, color: "#999", marginTop: 8 }}>Run your first compliance lookup to get started.</div>
+            <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "#1a1a1a" }}>No trades yet.</div>
+            <div style={{ fontSize: 13, color: "#333", marginTop: 8 }}>Run your first compliance lookup to get started.</div>
             <Link href="/lookup">
               <button
                 style={{
@@ -247,7 +247,7 @@ export default function Trades() {
             </Link>
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ padding: "80px 0", textAlign: "center", color: "#888", fontSize: 14 }}>No trades match your filter.</div>
+          <div style={{ padding: "80px 0", textAlign: "center", color: "#333", fontSize: 14 }}>No trades match your filter.</div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="trades-table">
             <thead>
@@ -260,7 +260,7 @@ export default function Trades() {
                       fontSize: 9,
                       textTransform: "uppercase",
                       letterSpacing: ".12em",
-                      color: "#999",
+                      color: "#555",
                       fontWeight: 400,
                       textAlign: h === "Score" || h === "Updated" ? "right" : "left",
                       padding: "0 12px 10px",
@@ -344,7 +344,7 @@ export default function Trades() {
                         </div>
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a" }}>{trade.commodityName}</div>
-                          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#999" }}>
+                          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#555" }}>
                             {iso2ToFlag(trade.originIso2)} {trade.originIso2} → {iso2ToFlag(trade.destIso2)} {trade.destIso2}
                           </div>
                         </div>
@@ -382,7 +382,7 @@ export default function Trades() {
                           fontSize: 14,
                           fontWeight: 700,
                           color: trade.readinessScore == null
-                            ? "#ccc"
+                            ? "#999"
                             : trade.readinessScore < 50
                               ? "var(--red)"
                               : trade.readinessScore < 80
@@ -401,7 +401,7 @@ export default function Trades() {
                     </td>
                     {/* Updated */}
                     <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>
-                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#999" }}>
+                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#555" }}>
                         {formatDate(trade.createdAt)}
                       </span>
                     </td>
@@ -425,10 +425,10 @@ export default function Trades() {
         {/* FOOTER */}
         <div style={{ marginTop: 48, paddingTop: 24, borderTop: "1px solid #e5e5e5", paddingBottom: 60 }}>
           <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
-            <p style={{ fontSize: 14, color: "#444", margin: 0, fontWeight: 600 }}>
+            <p style={{ fontSize: 14, color: "#1a1a1a", margin: 0, fontWeight: 600 }}>
               {allTrades.length} shipment{allTrades.length !== 1 ? "s" : ""} total &middot; Data refreshed on each visit
             </p>
-            <p style={{ fontSize: 13, color: "#777", marginTop: 10, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: "#333", marginTop: 10, lineHeight: 1.6 }}>
               TapTrao does not provide legal or banking advice. Reports are informational and designed to support internal decision-making.
             </p>
             <div style={{ marginTop: 32, display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
@@ -442,7 +442,7 @@ export default function Trades() {
                 <span style={{ fontSize: 13, color: "#6b9080", fontWeight: 600, cursor: "pointer" }}>Alerts</span>
               </Link>
             </div>
-            <p style={{ fontSize: 11, color: "#aaa", marginTop: 48 }}>
+            <p style={{ fontSize: 11, color: "#555", marginTop: 48 }}>
               Fatrao Limited — Registered in England and Wales
             </p>
           </div>
