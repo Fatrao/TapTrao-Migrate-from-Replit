@@ -438,8 +438,8 @@ function buildRequirementsDetailed(
       }
     }
 
-    // Lacey Act — timber/plant products
-    if (triggers.laceyAct) {
+    // Lacey Act — timber/plant products only (forestry and agricultural)
+    if (triggers.laceyAct && (commodity.commodityType === "forestry" || commodity.commodityType === "agricultural")) {
       reqs.push({
         title: "Lacey Act Declaration — electronic plant/timber import declaration (PPQ 505 eliminated Jan 2026)",
         description: "The Lacey Act requires an import declaration for plants and plant products identifying the scientific name (genus/species), value, quantity, and country of harvest. As of January 2026, paper PPQ 505 forms are eliminated — electronic filing only via ACE/LAWGS.",
@@ -545,7 +545,8 @@ function buildRequirementsDetailed(
     }
   }
 
-  if (triggers.kimberley) {
+  // Kimberley Process — only applies to rough diamonds (mineral commodity type)
+  if (triggers.kimberley && commodity.commodityType === "mineral") {
     reqs.push({
       title: "Kimberley Process Certificate (KPC) — rough diamond shipment must be sealed and accompanied by a valid KPC",
       description: "An internationally recognised certificate confirming the rough diamonds are conflict-free. The shipment must be in a tamper-proof container with a unique KPC number matching the certificate.",
@@ -558,7 +559,8 @@ function buildRequirementsDetailed(
     });
   }
 
-  if (triggers.conflict) {
+  // Conflict Minerals — only applies to minerals (3TG: tin, tantalum, tungsten, gold)
+  if (triggers.conflict && commodity.commodityType === "mineral") {
     reqs.push({
       title: "Conflict Minerals due-diligence report per EU Regulation 2017/821 or US Dodd-Frank Section 1502",
       description: "A supply chain due-diligence report demonstrating that tin, tantalum, tungsten, or gold (3TG) were not sourced from conflict-affected or high-risk areas, following OECD Due Diligence Guidance.",

@@ -271,14 +271,23 @@ export default function Trades() {
                     }}
                     onClick={() => {
                       if (trade.lcVerdict === "COMPLIANT" || trade.lcVerdict === "COMPLIANT_WITH_NOTES") {
-                        // LC passed — go to TwinLog
+                        // LC passed — go to LC check page (TwinLog tab available)
                         navigate(`/lookup?lookupId=${trade.id}`);
-                      } else if (trade.lcVerdict === "DISCREPANCIES_FOUND") {
-                        // LC has issues — go to LC check
-                        navigate(`/lc-check?lookupId=${trade.id}`);
                       } else {
-                        // No LC yet — show compliance results
-                        navigate(`/lookup?lookupId=${trade.id}`);
+                        // No LC or discrepancies — go to LC check
+                        const prefill = {
+                          lookup_id: trade.id,
+                          commodity_name: trade.commodityName,
+                          hs_code: trade.hsCode,
+                          origin_iso2: trade.originIso2,
+                          origin_name: trade.originName,
+                          dest_iso2: trade.destIso2,
+                          dest_name: trade.destName,
+                          incoterms: "FOB",
+                          required_docs: [],
+                        };
+                        sessionStorage.setItem("lc_prefill", JSON.stringify(prefill));
+                        navigate("/lc-check");
                       }
                     }}
                     onMouseEnter={e => {
