@@ -1319,6 +1319,41 @@
   margin: 0 3px;
 }
 
+/* === COST-OF-FAILURE STRIP === */
+.hp-page .cost-strip {
+  margin: 0 24px 20px;
+  padding: 32px 48px;
+  background: #111214;
+  border-radius: 14px;
+}
+.hp-page .cost-strip-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+.hp-page .cost-strip-item { text-align: center; }
+.hp-page .cost-strip-value {
+  font-family: var(--fh);
+  font-size: 26px;
+  font-weight: 700;
+  color: #eab308;
+  margin-bottom: 6px;
+}
+.hp-page .cost-strip-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.50);
+  line-height: 1.5;
+}
+.hp-page .cost-strip-footer {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.80);
+}
+
 /* === SECTION STYLES (light bg — floating rounded boxes) === */
 .hp-page .section {
   padding: 80px 48px;
@@ -2136,6 +2171,9 @@
   .hp-page .top-nav-right { display: none; }
   .hp-page .mobile-toggle { display: flex; }
   .hp-page .green-hero { padding: 60px 24px 40px; margin: 16px 16px 0; }
+  .hp-page .cost-strip { margin: 0 16px 16px; padding: 24px 20px; }
+  .hp-page .cost-strip-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+  .hp-page .cost-strip-value { font-size: 20px; }
   .hp-page .section, .hp-page .section-dark, .hp-page .lc-section { padding: 60px 24px; }
   .hp-page .steps-grid { grid-template-columns: 1fr; }
   .hp-page .packs-grid { grid-template-columns: 1fr 1fr; padding: 0 16px 20px; }

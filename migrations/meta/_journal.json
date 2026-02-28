@@ -8,6 +8,13 @@
       "when": 1772231949284,
       "tag": "0000_peaceful_sersi",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1772275888805,
+      "tag": "0001_sticky_veda",
+      "breakpoints": true
     }
   ]
 }

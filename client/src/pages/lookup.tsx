@@ -777,7 +777,7 @@ function TwinLogDownloadButton({
           </div>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs text-center">
-          <p>Included in trade pack — <a href="/pricing" style={{textDecoration:"underline"}}>see plans</a></p>
+          <p>Included with TapTrao Shield — <a href="/pricing" style={{textDecoration:"underline"}}>see plans</a></p>
         </TooltipContent>
       </Tooltip>
     );
@@ -904,7 +904,7 @@ function CheckLcButton({ result, locked = false }: { result: ComplianceResult & 
           </div>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs text-center">
-          <p>Included in trade pack — <a href="/pricing" style={{textDecoration:"underline"}}>see plans</a></p>
+          <p>Included with TapTrao Shield — <a href="/pricing" style={{textDecoration:"underline"}}>see plans</a></p>
         </TooltipContent>
       </Tooltip>
     );
@@ -1579,14 +1579,14 @@ function ComplianceResultDisplay({ result, freeLocked = false }: { result: Compl
           <CardContent className="p-5 space-y-3">
             <h3 className="font-semibold text-base font-heading">Want another corridor?</h3>
             <p className="text-sm text-muted-foreground">
-              Unlock documents, TwinLog Trail, and LC checks with a trade pack — and run unlimited compliance checks.
+              Activate TapTrao Shield for full shipment protection — LC checks, document tracking, and late-document alerts until docking.
             </p>
             <p className="text-sm italic text-muted-foreground">
               ~30% of LC submissions are rejected on first presentation.
             </p>
             <Link href="/pricing">
               <Button size="sm" data-testid="button-conversion-see-packs">
-                View pricing & trade packs →
+                View TapTrao Shield →
               </Button>
             </Link>
           </CardContent>
@@ -1880,7 +1880,7 @@ export default function Lookup() {
                 data-testid="button-refresh-live"
               >
                 <RefreshCw className="w-3 h-3 mr-1" />
-                {refreshMutation.isPending ? "Refreshing..." : "Refresh with live data — 1 credit"}
+                {refreshMutation.isPending ? "Refreshing..." : "Refresh with live data"}
               </Button>
             </div>
           )}
@@ -2038,7 +2038,7 @@ export default function Lookup() {
               </DialogHeader>
               <div className="flex items-center justify-center gap-2 my-2">
                 <Badge variant="secondary" className="gap-1">
-                  <Hexagon className="w-3 h-3" /> {balance} tokens
+                  <Hexagon className="w-3 h-3" /> {balance} Shield {balance === 1 ? "check" : "checks"}
                 </Badge>
               </div>
               <div className="flex gap-3 justify-end flex-wrap">
@@ -2046,7 +2046,7 @@ export default function Lookup() {
                   Cancel
                 </Button>
                 <Button onClick={() => navigate("/pricing")} data-testid="button-modal-buy-tokens">
-                  Buy Tokens
+                  Activate TapTrao Shield
                 </Button>
               </div>
             </DialogContent>

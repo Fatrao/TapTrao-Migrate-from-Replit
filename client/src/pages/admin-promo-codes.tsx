@@ -165,10 +165,10 @@ export default function AdminPromoCodes() {
               <tbody>
                 {codes.map((c) => (
                   <tr key={c.id} style={{ borderBottom: "1px solid #f5f5f5" }}>
-                    <td style={{ padding: "10px 12px", fontWeight: 600, fontFamily: "monospace" }}>{c.code}</td>
-                    <td style={{ padding: "10px 12px" }}>{c.tradeTokens}</td>
-                    <td style={{ padding: "10px 12px" }}>{c.lcCredits}</td>
-                    <td style={{ padding: "10px 12px" }}>{c.currentRedemptions} / {c.maxRedemptions}</td>
+                    <td style={{ padding: "10px 12px", fontWeight: 600, fontFamily: "monospace", color: "#1a1a1a" }}>{c.code}</td>
+                    <td style={{ padding: "10px 12px", color: "#1a1a1a" }}>{c.tradeTokens}</td>
+                    <td style={{ padding: "10px 12px", color: "#1a1a1a" }}>{c.lcCredits}</td>
+                    <td style={{ padding: "10px 12px", color: "#1a1a1a" }}>{c.currentRedemptions} / {c.maxRedemptions}</td>
                     <td style={{ padding: "10px 12px" }}>
                       <span style={{
                         display: "inline-block",

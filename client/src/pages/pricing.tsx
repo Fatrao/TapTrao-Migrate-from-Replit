@@ -9,91 +9,79 @@ import PromoCodeRedeem from "@/components/promo-code-redeem";
 
 const tradePacks = [
   {
-    key: "single_trade",
-    name: "Single Shipment",
-    price: "$24.99",
+    key: "shield_single",
+    name: "🛡️ TapTrao Shield: Single",
+    price: "$110",
     lookups: 1,
-    perLookup: "$24.99",
+    perLookup: "$110",
     features: [
-      "Full compliance check",
-      "Buyer & supplier document checklist",
-      "LC document check (first submission)",
-      "TwinLog score & audit trail",
-      "Customs data for broker (CSV)",
-      "Instructions for supplier",
+      "Everything in the free check, PLUS:",
+      "LC document scanning & data extraction",
+      "LC document consistency checks (UCP 600)",
+      "Sanctions & enhanced risk flags",
+      "EUDR scope & due-diligence triggers",
+      "Pre-built supplier document requests",
+      "Required documents checklist with deadlines",
+      "Late-document alerts until docking",
     ],
   },
   {
-    key: "3_trade",
-    name: "3 Shipments",
-    price: "$59.99",
+    key: "shield_3",
+    name: "🛡️ TapTrao Shield: 3-Pack",
+    price: "$299",
     lookups: 3,
-    perLookup: "$20.00",
+    perLookup: "$100",
     features: [
-      "All Single Shipment features",
-      "Save as template",
-      "13% discount",
+      "Everything in a single Shield check",
+      "Best for 1–3 shipments per month",
     ],
     popular: true,
   },
   {
-    key: "10_trade",
-    name: "10 Shipments",
-    price: "$179",
-    lookups: 10,
-    perLookup: "$17.90",
+    key: "shield_5",
+    name: "🛡️ TapTrao Shield: 5-Pack",
+    price: "$475",
+    lookups: 5,
+    perLookup: "$95",
     features: [
-      "All Single Shipment features",
-      "Stale-check & refresh",
-      "28% discount",
-    ],
-  },
-  {
-    key: "25_trade",
-    name: "25 Shipments",
-    price: "$349",
-    lookups: 25,
-    perLookup: "$13.96",
-    features: [
-      "All Single Shipment features",
-      "Best value for teams",
-      "44% discount",
+      "Everything in a single Shield check",
+      "Best for regular corridors & repeat shipments",
     ],
   },
 ];
 
 const faqs = [
   {
-    q: "What's included in a trade credit?",
-    a: "Each credit gives you one full shipment check — duties, document checklists, regulatory triggers (EUDR, CBAM, Kimberley), TwinLog score, audit trail PDF, customs data CSV, supplier brief, and one LC document check.",
+    q: "What's included in TapTrao Shield?",
+    a: "Each Shield activation gives you one full shipment check — LC document scanning & data extraction, UCP 600 consistency checks, sanctions & risk flags, EUDR scope, supplier document requests, deadline tracking, and late-document alerts until docking or bank presentation.",
   },
   {
-    q: "Is the first shipment check really free?",
-    a: "Yes. Your first compliance check costs nothing — no credit card required. Premium features like the audit trail PDF and LC checks unlock when you purchase a trade credit.",
+    q: "Is the first check really free?",
+    a: "Yes. The Pre-Shipment Regulatory Check is free and unlimited — no card required. It shows which regulations apply to your corridor. TapTrao Shield adds full protection for $110 per shipment.",
   },
   {
     q: "What if my supplier corrects documents?",
-    a: "Your first LC check per shipment is included. If your supplier updates documents and you need to re-check before resubmitting to the bank, additional checks are $9.99 each.",
+    a: "Your first LC check per shipment is included with Shield. If your supplier updates documents and you need to re-check before resubmitting to the bank, additional checks are $9.99 each.",
   },
   {
-    q: "Can I check an LC without running a compliance check?",
-    a: "Yes. A standalone LC check is available for $19.99, but it does not include compliance requirements or document checklists. It's included free with every trade credit.",
+    q: "Can I check an LC without activating Shield?",
+    a: "Yes. A standalone LC check is available for $49.99. It's included free with every TapTrao Shield activation.",
   },
   {
-    q: "Why is the LC check included with a trade credit?",
+    q: "Why is the LC check included with Shield?",
     a: "Because banks reject documents based on combined compliance and LC discrepancies. Checking them together reduces risk.",
   },
   {
     q: "Which countries are covered?",
-    a: "We cover 18 African origin countries and 6 global destinations including UK, EU, USA, China, UAE, and India. AfCFTA intra-African trade is also supported.",
+    a: "54 African origin countries. EU, UK, USA, Canada, Türkiye, and Switzerland as destinations. 90+ commodity chapters. Designed for real commodity trade.",
   },
   {
-    q: "Do credits expire?",
-    a: "No. Your trade credits never expire. Use them whenever you need a shipment check.",
+    q: "Does TapTrao Shield expire?",
+    a: "No. Your Shield activations never expire. Use them whenever you need a shipment check.",
   },
   {
     q: "What about high-volume or team needs?",
-    a: "Contact us for custom pricing, shared credits, API access, and dedicated support.",
+    a: "Running 10+ shipments per month? Contact us at hello@taptrao.com for custom pricing built around your corridors.",
   },
 ];
 
@@ -266,10 +254,10 @@ export default function Pricing() {
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h1 style={S.heading} data-testid="text-pricing-title">
-            Check a shipment before it costs you
+            Choose your level of protection
           </h1>
           <p style={S.sub}>
-            Pay per shipment. No subscriptions. Your first compliance check is free.
+            Run a free regulatory check, or activate TapTrao Shield for full shipment protection.
           </p>
           {tokenQuery.data && (
             <div style={{ marginTop: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
@@ -277,7 +265,7 @@ export default function Pricing() {
                 style={{ ...S.badge, background: "var(--card2)", color: "var(--t1)", fontSize: 12 }}
                 data-testid="badge-pricing-balance"
               >
-                <Hexagon style={{ width: 14, height: 14 }} /> {balance} trade {balance === 1 ? "credit" : "credits"}
+                <Shield style={{ width: 14, height: 14 }} /> {balance} Shield {balance === 1 ? "check" : "checks"}
               </span>
               {!tokenQuery.data.freeLookupUsed && (
                 <span
@@ -327,10 +315,10 @@ export default function Pricing() {
         {/* SECTION 1 — Trade Packs (core product, FIRST) */}
         <div style={{ marginBottom: 40 }}>
           <h2 style={S.sectionTitle} data-testid="text-trade-packs-heading">
-            Trade Packs
+            TapTrao Shield
           </h2>
           <p style={S.sectionSub}>
-            1 credit = 1 shipment checked (compliance + LC). Buy more, save more.
+            Ongoing trade risk checks until docking. Activate more, save more.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
             {tradePacks.map((pack) => (
@@ -383,7 +371,7 @@ export default function Pricing() {
                     {checkoutMutation.isPending && checkoutMutation.variables === pack.key ? (
                       <Loader2 style={{ width: 16, height: 16, animation: "spin 1s linear infinite" }} />
                     ) : null}
-                    Buy {pack.name}
+                    Activate {pack.name}
                   </button>
                 </div>
               </div>
@@ -402,7 +390,7 @@ export default function Pricing() {
         <div style={{ marginBottom: 40 }}>
           <div style={{ ...S.card, background: "var(--card2)", padding: 28 }}>
             <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 16, color: "var(--t1)", margin: "0 0 16px", textAlign: "center" }}>
-              Every trade credit includes
+              Every TapTrao Shield activation includes
             </h3>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10 }}>
               {[
@@ -428,7 +416,7 @@ export default function Pricing() {
             Already have an LC?
           </h2>
           <p style={S.sectionSub}>
-            Check your LC without running a full compliance check.
+            Standalone LC checking without activating TapTrao Shield.
           </p>
           <div style={{ maxWidth: 480, margin: "0 auto" }}>
             <div style={{ ...S.card, background: "var(--card2)", border: "1px solid var(--border2)" }} data-testid="card-lc-standalone">
@@ -440,7 +428,7 @@ export default function Pricing() {
               </div>
               <div style={{ marginBottom: 12 }}>
                 <span style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)", letterSpacing: "0" }}>
-                  $19.99
+                  $49.99
                 </span>
                 <span style={{ color: "var(--t2)", fontSize: 13, marginLeft: 6 }}>one-time</span>
               </div>
@@ -465,7 +453,7 @@ export default function Pricing() {
                 ))}
               </ul>
               <p style={{ fontSize: 11, color: "var(--green)", margin: "0 0 16px", fontStyle: "italic" }}>
-                Included free with every trade credit
+                Included free with every TapTrao Shield activation
               </p>
               <button
                 style={{
@@ -482,7 +470,7 @@ export default function Pricing() {
                 ) : (
                   <FileCheck style={{ width: 16, height: 16 }} />
                 )}
-                Check LC only — $19.99
+                Check LC only — $49.99
               </button>
             </div>
           </div>

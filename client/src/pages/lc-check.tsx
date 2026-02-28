@@ -1176,9 +1176,9 @@ export default function LcCheck() {
         <Dialog open={showTokenModal} onOpenChange={setShowTokenModal}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Trade Pack Required</DialogTitle>
+              <DialogTitle>TapTrao Shield Required</DialogTitle>
               <DialogDescription>
-                LC checks are included in every trade pack. Purchase a trade pack to run your LC check.
+                LC checks are included with every TapTrao Shield activation. Activate Shield to run your LC check.
               </DialogDescription>
             </DialogHeader>
             <div className="flex gap-3 justify-end flex-wrap">
@@ -1186,7 +1186,7 @@ export default function LcCheck() {
                 Cancel
               </Button>
               <Button onClick={() => navigate("/pricing")} data-testid="button-lc-modal-buy-tokens">
-                Buy Trade Pack
+                Activate TapTrao Shield
               </Button>
             </div>
           </DialogContent>

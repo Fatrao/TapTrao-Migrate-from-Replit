@@ -2,8 +2,6 @@ import { Link } from "wouter";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { Menu, X } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
 /* ═══════════════════════════════════════════
    Interactive Demo — 4-step auto-advancing carousel
@@ -84,8 +82,8 @@ function DemoSection() {
         <div className="demo-tabs">
           <div className={`demo-tab ${step === 1 ? "active" : ""}`} onClick={() => goTo(1)}>① Enter trade</div>
           <div className={`demo-tab ${step === 2 ? "active" : ""}`} onClick={() => goTo(2)}>② Pre-ship report</div>
-          <div className={`demo-tab ${step === 3 ? "active" : ""}`} onClick={() => goTo(3)}>③ LC check</div>
-          <div className={`demo-tab ${step === 4 ? "active" : ""}`} onClick={() => goTo(4)}>④ Supplier brief</div>
+          <div className={`demo-tab ${step === 3 ? "active" : ""}`} onClick={() => goTo(3)}>③ LC check 🛡️</div>
+          <div className={`demo-tab ${step === 4 ? "active" : ""}`} onClick={() => goTo(4)}>④ Supplier brief 🛡️</div>
         </div>
 
         {/* Step content */}
@@ -380,25 +378,6 @@ export default function Home() {
     "The first standalone pre-shipment screening tool for commodity traders importing from Africa. No ERP. No broker. No guesswork."
   );
 
-  const checkoutMutation = useMutation({
-    mutationFn: async (pack: string) => {
-      const res = await apiRequest("POST", "/api/tokens/checkout", { pack });
-      return res.json();
-    },
-    onSuccess: (data) => {
-      if (data.url) window.location.href = data.url;
-    },
-  });
-
-  const lcStandaloneMutation = useMutation({
-    mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/tokens/lc-standalone-checkout");
-      return res.json();
-    },
-    onSuccess: (data) => {
-      if (data.url) window.location.href = data.url;
-    },
-  });
 
   return (
     <div className="hp-page">
@@ -449,33 +428,31 @@ export default function Home() {
         {/* ── GREEN HERO ── */}
         <div className="green-hero" ref={heroRef} data-testid="section-hero">
           <div className="hero-badge">
-            🛡️ For SME commodity traders importing from Africa into Europe
+            🏆 For SME commodity traders · Africa → EU · UK · Türkiye · Switzerland · Canada · USA
           </div>
 
           <h1>
-            Pre-Shipment<br />
-            <span className="accent">Regulatory Check</span>
+            Know the rules.<br />
+            <span className="accent">Avoid the loss.</span>
           </h1>
 
           <p className="subtitle">
-            De-risk your next shipment before spending. Check EUDR, customs, LC docs
-            and trade regulations — in minutes, not weeks.
+            Run a free regulatory check in seconds. Activate TapTrao Shield to catch document gaps,
+            LC discrepancies, and sanctions risks while there's still time to fix them, even if documents
+            arrive late. Coverage runs until docking or bank presentation.
           </p>
 
           <div className="hero-cta-row">
             <Link href="/lookup">
               <span className="btn-hero btn-hero-primary" data-testid="button-hero-free-lookup">
-                Run Your First Check — Free
+                Run a Free Check
               </span>
             </Link>
-            <a href="#how">
+            <a href="#pricing">
               <span className="btn-hero btn-hero-secondary" data-testid="button-hero-how-it-works">
-                See How It Works
+                See TapTrao Shield
               </span>
             </a>
-          </div>
-          <div style={{ fontSize: "0.75rem", color: "var(--hp-text-muted)", marginTop: 10 }}>
-            Decision-support tool · Not legal or banking advice
           </div>
 
           <div className="hero-flags">
@@ -484,6 +461,32 @@ export default function Home() {
             {" → "}
             <span>🇪🇺</span><span>🇬🇧</span><span>🇩🇪</span><span>🇫🇷</span>
             <span>🇮🇹</span><span>🇪🇸</span><span>🇨🇭</span><span>🇦🇹</span>
+            <span>🇺🇸</span><span>🇨🇦</span><span>🇹🇷</span>
+          </div>
+        </div>
+
+        {/* ── COST-OF-FAILURE STRIP ── */}
+        <div className="cost-strip">
+          <div className="cost-strip-grid">
+            <div className="cost-strip-item">
+              <div className="cost-strip-value">$75–$300/day</div>
+              <div className="cost-strip-label">Demurrage while documents are on hold</div>
+            </div>
+            <div className="cost-strip-item">
+              <div className="cost-strip-value">$95–$160</div>
+              <div className="cost-strip-label">Bank fee for one LC discrepancy</div>
+            </div>
+            <div className="cost-strip-item">
+              <div className="cost-strip-value">$5,000</div>
+              <div className="cost-strip-label">US ISF late-filing penalty (per violation)</div>
+            </div>
+            <div className="cost-strip-item">
+              <div className="cost-strip-value">$1,500–$3,000+</div>
+              <div className="cost-strip-label">Typical cascade cost from one missing document</div>
+            </div>
+          </div>
+          <div className="cost-strip-footer">
+            One missing document. $1,500–$3,000 gone. TapTrao Shield: $110.
           </div>
         </div>
 
@@ -491,10 +494,10 @@ export default function Home() {
         <div className="section" id="how" data-testid="section-how-it-works">
           <div className="section-label">How It Works</div>
           <h2>
-            Three steps to trade with <span className="accent">confidence</span>
+            Start free. Step up <span className="accent">when it matters.</span>
           </h2>
           <p className="section-sub">
-            Built to support your compliance workflow. TapTrao runs automated pre-checks so you walk in prepared.
+            The free Pre-Shipment Check tells you what regulations apply. TapTrao Shield tells you exactly what to do about them, and tracks it until docking.
           </p>
 
           <div className="steps-grid">
@@ -502,19 +505,19 @@ export default function Home() {
               <div className="step-num">1</div>
               <div className="step-icon">📋</div>
               <h3>Enter Your Trade</h3>
-              <p>Tell us the commodity, origin country, destination, and value. Takes under 2 minutes.</p>
+              <p>Origin, destination, commodity. 54 African origins. EU, UK, USA, Canada, Türkiye, Switzerland. Free. No card required.</p>
             </div>
             <div className="step-card">
               <div className="step-num">2</div>
               <div className="step-icon">🔍</div>
-              <h3>We Run Automated Pre-Checks</h3>
-              <p>Shipment data screened against EUDR requirements, customs data, and LC document rules (UCP 600). Results highlight potential risks and missing information.</p>
+              <h3>Get Your Regulatory Snapshot</h3>
+              <p>Instantly see which rules apply to your corridor: EUDR, customs, sanctions, destination-specific requirements. This is your free preview.</p>
             </div>
             <div className="step-card">
               <div className="step-num">3</div>
-              <div className="step-icon">✅</div>
-              <h3>Get Your Report</h3>
-              <p>A clear risk summary with flags, suggested documents, and next steps to support your conversations with banks or agents.</p>
+              <div className="step-icon">🛡️</div>
+              <h3>Activate TapTrao Shield</h3>
+              <p>Turn the snapshot into protection. LC document checks, sanctions screening, supplier requests, deadlines, document scanning, and late-document alerts, monitored until docking. $110 per shipment.</p>
             </div>
           </div>
         </div>
@@ -523,7 +526,7 @@ export default function Home() {
         <div className="section" id="demo" data-testid="section-demo" style={{ textAlign: "center" }}>
           <div className="section-label">See It In Action</div>
           <h2>
-            From trade idea to full <span className="accent">compliance picture</span>
+            From free check to <span className="accent">TapTrao Shield</span>
           </h2>
           <p className="section-sub">
             Three inputs. Seconds. No broker needed.
@@ -540,11 +543,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── TRUST SIGNALS ── */}
+        {/* ── WHY TRADERS ACTIVATE TAPTRAO SHIELD ── */}
         <div className="section" id="trust">
-          <div className="section-label">Why TapTrao</div>
+          <div className="section-label">Why TapTrao Shield</div>
           <h2>
-            Manage your <span className="accent">trade risks</span>
+            Why traders activate <span className="accent">TapTrao Shield</span>
           </h2>
           <p className="section-sub">
             We know the Africa–Europe corridor because we've lived it.
@@ -552,181 +555,159 @@ export default function Home() {
 
           <div className="trust-grid">
             <div className="trust-card">
-              <div className="trust-icon">🛡️</div>
-              <h4>EUDR Screening</h4>
-              <p>Screen shipment data against EUDR requirements using geolocation inputs</p>
+              <div className="trust-icon">🎯</div>
+              <h4>Knows what's actually in scope</h4>
+              <p>Cocoa triggers EUDR. Argan oil doesn't. TapTrao scopes by HS code, not guesswork.</p>
             </div>
             <div className="trust-card">
               <div className="trust-icon">📄</div>
-              <h4>UCP 600-Based Checks</h4>
-              <p>LC document rules screened against UCP 600 standards for pre-submission review</p>
+              <h4>Catches LC problems before the bank does</h4>
+              <p>Cross-checks documents against UCP 600. Flags issues that cost $95–$160 every time they're missed.</p>
             </div>
             <div className="trust-card">
               <div className="trust-icon">⚡</div>
-              <h4>Minutes, Not Weeks</h4>
-              <p>Generate a risk summary in minutes to support your internal review</p>
+              <h4>Turns risk into action</h4>
+              <p>Not just flags. Ready-to-send supplier requests and a clear fix list. Full corridor-specific report in under 2 minutes.</p>
             </div>
             <div className="trust-card">
               <div className="trust-icon">🌍</div>
-              <h4>Africa–Europe Focus</h4>
-              <p>Purpose-built for the trade corridors that matter to you</p>
+              <h4>Built for your corridors</h4>
+              <p>54 African origins. EU, UK, USA, Canada, Türkiye, Switzerland. 90+ commodity chapters. Designed for real commodity trade, not theory.</p>
             </div>
           </div>
         </div>
 
-        {/* ── PRICING HERO ── */}
+        {/* ── PRICING ── */}
         <div className="pricing-hero" id="pricing" data-testid="section-pricing">
           <h2>
-            Check a shipment<br />
-            <span className="accent">before it costs you.</span>
+            Choose your level of<br />
+            <span className="accent">protection</span>
           </h2>
-          <p>Pay per shipment. No subscriptions. Your first compliance check is free.</p>
-          <div className="credits-pill">
-            <span className="dot" /> 0 Trade Credits
-          </div>
         </div>
 
-        {/* ── FREE BANNER ── */}
-        <div className="free-banner">
-          <div className="free-banner-left">
-            <div className="free-banner-icon">🎁</div>
-            <div className="free-banner-text">
-              <h4>Your first check is free</h4>
-              <p>Run one full compliance check for free — no card required. See duties, required documents, and shipment risks.</p>
-              <p style={{ fontSize: "0.75rem", color: "var(--hp-text-muted)", marginTop: 2 }}>Results are informational and intended to support your own review or discussions with banks, agents, or advisors.</p>
-            </div>
-          </div>
-          <Link href="/lookup">
-            <span className="free-banner-btn">🔍 Check shipment risk — Free</span>
-          </Link>
-        </div>
+        {/* ── PRICING GRID ── */}
+        <div className="packs-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
 
-        {/* ── TRADE PACKS HEADING ── */}
-        <div className="packs-heading" style={{ padding: "32px 48px 8px" }}>
-          <div className="section-label" style={{ marginBottom: 12, color: "var(--dark-text)" }}>Trade Packs</div>
-          <p style={{ fontSize: "0.9rem", color: "var(--dark-text-secondary)", marginBottom: 0 }}>
-            1 credit = 1 shipment checked (compliance + LC). Buy more, save more.
-          </p>
-        </div>
-
-        {/* ── TRADE PACKS GRID ── */}
-        <div className="packs-grid">
-          {/* Single Shipment */}
+          {/* Free — Pre-Shipment Check */}
           <div className="pack-card">
-            <div className="pack-name">Single Shipment</div>
-            <div className="pack-price">$24.99</div>
-            <div className="pack-meta">1 Shipment</div>
-            <div className="pack-per">$24.99 per shipment</div>
+            <div className="pack-name">Pre-Shipment Regulatory Check</div>
+            <div className="pack-price">Free</div>
+            <div className="pack-meta">Unlimited checks</div>
+            <div className="pack-per">No card required</div>
             <ul className="pack-features">
-              <li><span className="check">✓</span> Full compliance check</li>
-              <li><span className="check">✓</span> Buyer & supplier document checklist</li>
-              <li><span className="check">✓</span> LC document check (first submission)</li>
-              <li><span className="check">✓</span> Risk score & audit trail</li>
-              <li><span className="check">✓</span> Customs declaration data pack (CSV)</li>
-              <li><span className="check">✓</span> Instructions for supplier</li>
+              <li><span className="check">✓</span> Regulatory overview by corridor</li>
+              <li><span className="check">✓</span> EUDR, customs, sanctions scope</li>
+              <li><span className="check">✓</span> Unlimited free checks</li>
             </ul>
-            <button className="pack-btn pack-btn-outline" onClick={() => checkoutMutation.mutate("single_trade")} disabled={checkoutMutation.isPending}>
-              {checkoutMutation.isPending && checkoutMutation.variables === "single_trade" ? "Loading…" : "Buy Single Shipment"}
-            </button>
+            <Link href="/lookup">
+              <span className="pack-btn pack-btn-outline">Run a Free Check</span>
+            </Link>
           </div>
 
-          {/* 3 Shipments — Featured */}
+          {/* LC Document Check — $49.99 */}
+          <div className="pack-card">
+            <div className="pack-name">LC Document Check</div>
+            <div className="pack-price">$49.99</div>
+            <div className="pack-meta">Standalone</div>
+            <div className="pack-per">one-time</div>
+            <ul className="pack-features">
+              <li><span className="check">✓</span> LC document scanning & data extraction</li>
+              <li><span className="check">✓</span> UCP 600 consistency checks</li>
+              <li><span className="check">✓</span> Discrepancy summary & fix suggestions</li>
+            </ul>
+            <div className="lc-note" style={{ marginBottom: 12 }}>Included free with every TapTrao Shield activation</div>
+            <Link href="/pricing">
+              <span className="pack-btn pack-btn-outline" data-testid="button-pricing-lc">Check LC — $49.99</span>
+            </Link>
+          </div>
+
+          {/* Shield: Single — $110 */}
+          <div className="pack-card">
+            <div className="pack-name">🛡️ TapTrao Shield: Single</div>
+            <div className="pack-price">$110</div>
+            <div className="pack-meta">1 Shipment</div>
+            <div className="pack-per">per shipment</div>
+            <ul className="pack-features">
+              <li><span className="check">✓</span> Everything in the free check, PLUS:</li>
+              <li><span className="check">✓</span> LC document scanning & data extraction</li>
+              <li><span className="check">✓</span> LC document consistency checks (UCP 600)</li>
+              <li><span className="check">✓</span> Sanctions & enhanced risk flags</li>
+              <li><span className="check">✓</span> EUDR scope & due-diligence triggers</li>
+              <li><span className="check">✓</span> Pre-built supplier document requests</li>
+              <li><span className="check">✓</span> Required documents checklist with deadlines</li>
+              <li><span className="check">✓</span> Late-document alerts until docking</li>
+            </ul>
+            <Link href="/pricing">
+              <span className="pack-btn pack-btn-outline">Activate TapTrao Shield</span>
+            </Link>
+          </div>
+
+          {/* Shield: 3-Pack — $299 (Featured) */}
           <div className="pack-card featured">
             <div className="card-flare"><div className="flare-core" /></div>
             <div className="pack-badge">Most Popular</div>
-            <div className="pack-name">3 Shipments</div>
-            <div className="pack-price">$59.99</div>
+            <div className="pack-name">🛡️ TapTrao Shield: 3-Pack</div>
+            <div className="pack-price">$299</div>
             <div className="pack-meta">3 Shipments</div>
-            <div className="pack-per">$20.00 per shipment</div>
+            <div className="pack-per">$100 per check</div>
             <ul className="pack-features">
-              <li><span className="check">✓</span> All Single Shipment features</li>
-              <li><span className="check">✓</span> Save as template</li>
-              <li><span className="check">✓</span> 13% discount</li>
+              <li><span className="check">✓</span> Everything in a single Shield check</li>
+              <li><span className="check">✓</span> Best for 1–3 shipments per month</li>
             </ul>
-            <button className="pack-btn pack-btn-featured" onClick={() => checkoutMutation.mutate("3_trade")} disabled={checkoutMutation.isPending}>
-              {checkoutMutation.isPending && checkoutMutation.variables === "3_trade" ? "Loading…" : "Buy 3 Shipments"}
-            </button>
+            <Link href="/pricing">
+              <span className="pack-btn pack-btn-featured">Activate 3-Pack</span>
+            </Link>
           </div>
 
-          {/* 10 Shipments */}
+          {/* Shield: 5-Pack — $475 */}
           <div className="pack-card">
-            <div className="pack-name">10 Shipments</div>
-            <div className="pack-price">$179</div>
-            <div className="pack-meta">10 Shipments</div>
-            <div className="pack-per">$17.90 per shipment</div>
+            <div className="pack-name">🛡️ TapTrao Shield: 5-Pack</div>
+            <div className="pack-price">$475</div>
+            <div className="pack-meta">5 Shipments</div>
+            <div className="pack-per">$95 per check</div>
             <ul className="pack-features">
-              <li><span className="check">✓</span> All Single Shipment features</li>
-              <li><span className="check">✓</span> Stale-check & refresh</li>
-              <li><span className="check">✓</span> 28% discount</li>
+              <li><span className="check">✓</span> Everything in a single Shield check</li>
+              <li><span className="check">✓</span> Best for regular corridors & repeat shipments</li>
             </ul>
-            <button className="pack-btn pack-btn-outline" onClick={() => checkoutMutation.mutate("10_trade")} disabled={checkoutMutation.isPending}>
-              {checkoutMutation.isPending && checkoutMutation.variables === "10_trade" ? "Loading…" : "Buy 10 Shipments"}
-            </button>
+            <Link href="/pricing">
+              <span className="pack-btn pack-btn-outline">Activate 5-Pack</span>
+            </Link>
           </div>
 
-          {/* 25 Shipments */}
+          {/* Volume — Contact Us */}
           <div className="pack-card">
-            <div className="pack-name">25 Shipments</div>
-            <div className="pack-price">$349</div>
-            <div className="pack-meta">25 Shipments</div>
-            <div className="pack-per">$13.96 per shipment</div>
+            <div className="pack-name">🛡️ Volume</div>
+            <div className="pack-price">Custom</div>
+            <div className="pack-meta">10+ shipments/month</div>
+            <div className="pack-per">Custom pricing</div>
             <ul className="pack-features">
-              <li><span className="check">✓</span> All Single Shipment features</li>
-              <li><span className="check">✓</span> Best value for teams</li>
-              <li><span className="check">✓</span> 44% discount</li>
+              <li><span className="check">✓</span> Everything in a single Shield check</li>
+              <li><span className="check">✓</span> Package built around your corridors</li>
             </ul>
-            <button className="pack-btn pack-btn-outline" onClick={() => checkoutMutation.mutate("25_trade")} disabled={checkoutMutation.isPending}>
-              {checkoutMutation.isPending && checkoutMutation.variables === "25_trade" ? "Loading…" : "Buy 25 Shipments"}
-            </button>
+            <a href="mailto:hello@taptrao.com">
+              <span className="pack-btn pack-btn-outline">Contact Us</span>
+            </a>
           </div>
         </div>
 
-        {/* ── LC DOCUMENT CHECK SECTION ── */}
-        <div className="lc-section" data-testid="section-lc">
-          <div className="section-label">LC Document Check</div>
+        <div style={{ padding: "0 48px 24px", fontSize: "0.72rem", color: "var(--dark-text-muted)" }}>
+          Not legal advice. No guarantee of bank or customs acceptance.
+        </div>
+
+        {/* ── BOTTOM CTA ── */}
+        <div className="pricing-hero" style={{ marginTop: 0 }}>
           <h2>
-            Just need to check <span className="accent">an LC?</span>
+            The free check shows the risk.<br />
+            <span className="accent">TapTrao Shield helps you fix it in time.</span>
           </h2>
-          <div className="section-sub">
-            Standalone LC checking without buying a full trade credit.
-          </div>
-
-          <div className="lc-cards">
-            {/* Main LC Card */}
-            <div className="lc-card main-lc">
-              <div className="lc-card-header">
-                📄 <h3>LC Document Check</h3>
-              </div>
-              <div className="lc-price">$19.99</div>
-              <div className="lc-price-sub">one-time</div>
-              <p className="lc-desc">
-                Validate supplier documents against your Letter of Credit (UCP 600)
-                before submitting to the bank.
-              </p>
-              <ul className="lc-features">
-                <li className="included"><span className="check">✓</span> First LC submission check</li>
-                <li className="included"><span className="check">✓</span> Discrepancy summary & fix suggestions</li>
-                <li className="excluded"><span className="cross">✕</span> Compliance check</li>
-                <li className="excluded"><span className="cross">✕</span> Document checklist</li>
-              </ul>
-              <div className="lc-note">Included free with every trade credit</div>
-              <button className="lc-btn" data-testid="button-pricing-lc" onClick={() => lcStandaloneMutation.mutate()} disabled={lcStandaloneMutation.isPending}>
-                {lcStandaloneMutation.isPending ? "Loading…" : "📄 Check LC only — $19.99"}
-              </button>
-            </div>
-
-            {/* Re-check Card */}
-            <div className="lc-card recheck">
-              <div className="lc-card-header">
-                🔄 <h3>LC corrections (if documents are updated)</h3>
-              </div>
-              <div className="lc-price">$9.99</div>
-              <div className="lc-price-sub">per re-check</div>
-              <p className="lc-desc">
-                If your supplier corrects documents after the first submission,
-                re-check before resubmitting to the bank.
-              </p>
-            </div>
+          <p>One missing document can cost thousands. TapTrao Shield costs $110.</p>
+          <div className="hero-cta-row" style={{ justifyContent: "center" }}>
+            <Link href="/lookup">
+              <span className="btn-hero btn-hero-primary">Run a Free Check</span>
+            </Link>
+            <a href="#pricing">
+              <span className="btn-hero btn-hero-secondary" style={{ color: "#1a1a1a", borderColor: "rgba(0,0,0,0.25)" }}>Activate TapTrao Shield: $110</span>
+            </a>
           </div>
         </div>
 

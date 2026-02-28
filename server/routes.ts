@@ -19,16 +19,15 @@ function computeRegVersionHash(result: unknown): string {
 }
 
 const TOKEN_PACKS: Record<string, { price: number; tokens: number; name: string }> = {
-  single_trade: { price: 2499, tokens: 1, name: "Single Trade" },
-  "3_trade": { price: 5999, tokens: 3, name: "3-Trade Pack" },
-  "10_trade": { price: 17900, tokens: 10, name: "10-Trade Pack" },
-  "25_trade": { price: 34900, tokens: 25, name: "25-Trade Pack" },
-  lc_standalone: { price: 1999, tokens: 0, name: "LC Document Check" },
+  lc_standalone: { price: 4999, tokens: 0, name: "LC Document Check" },
+  shield_single: { price: 11000, tokens: 1, name: "TapTrao Shield: Single" },
+  shield_3: { price: 29900, tokens: 3, name: "TapTrao Shield: 3-Pack" },
+  shield_5: { price: 47500, tokens: 5, name: "TapTrao Shield: 5-Pack" },
 };
 
 const LOOKUP_COST = 1;
 const LC_RECHECK_PRICE_CENTS = 999;
-const LC_STANDALONE_PRICE_CENTS = 1999;
+const LC_STANDALONE_PRICE_CENTS = 4999;
 
 // ── Rate limiter for API keys ──
 const apiRateLimits = new Map<string, { count: number; resetAt: number }>();
@@ -145,7 +144,7 @@ export async function registerRoutes(
     try {
       const { pack } = req.body;
       if (!pack || !TOKEN_PACKS[pack]) {
-        res.status(400).json({ message: "Invalid pack. Choose: single_trade, 3_trade, 10_trade, 25_trade" });
+        res.status(400).json({ message: "Invalid pack. Choose: shield_single, shield_3, shield_5, lc_standalone" });
         return;
       }
 
