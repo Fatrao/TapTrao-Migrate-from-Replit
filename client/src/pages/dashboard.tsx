@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
@@ -21,6 +21,7 @@ export default function Dashboard() {
   const stats = statsQuery.data;
   usePageTitle("Dashboard", "Overview of your trade compliance activity");
   const [, navigate] = useLocation();
+  const [activeTab, setActiveTab] = useState<"overview" | "documents" | "activity">("overview");
 
   /* Build name → iso2 maps for emoji flag display */
   const originNameToIso2 = useMemo(() => {
@@ -80,19 +81,24 @@ export default function Dashboard() {
 
   /* Build recent trades from lookups */
   const recentTrades: Array<{
-    id: string; name: string; hs: string; corridor: string;
+    id: string; name: string; hs: string; hsCode: string; corridor: string;
     date: string; value: string; status: "comp" | "pend" | "rev"; statusLabel: string;
     btnLabel: string; icon: string; iconBg: string;
+    originIso2: string; originName: string; destIso2: string; destName: string;
+    lcCheckId?: string;
   }> = [];
 
   if (lookupsQuery.data) {
     for (const l of lookupsQuery.data.slice(0, 5)) {
       const ci = getCommodityIcon(l.commodityName);
+      const oIso2 = originNameToIso2[l.originName] ?? "";
+      const dIso2 = destNameToIso2[l.destinationName] ?? "";
       recentTrades.push({
         id: l.id,
         name: l.commodityName,
         hs: `HS ${l.hsCode}`,
-        corridor: `${iso2ToFlag(originNameToIso2[l.originName] ?? "")} ${originNameToIso2[l.originName] ?? "?"} → ${iso2ToFlag(destNameToIso2[l.destinationName] ?? "")} ${destNameToIso2[l.destinationName] ?? "?"}`,
+        hsCode: l.hsCode,
+        corridor: `${iso2ToFlag(oIso2)} ${oIso2 || "?"} → ${iso2ToFlag(dIso2)} ${dIso2 || "?"}`,
         date: new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }),
         value: "—",
         status: l.riskLevel === "LOW" ? "comp" : l.riskLevel === "MEDIUM" ? "pend" : "rev",
@@ -100,6 +106,11 @@ export default function Dashboard() {
         btnLabel: l.riskLevel === "LOW" ? "View" : "Review",
         icon: ci.icon,
         iconBg: ci.bg,
+        originIso2: oIso2,
+        originName: l.originName,
+        destIso2: dIso2,
+        destName: l.destinationName,
+        lcCheckId: lcLinkMap[l.id],
       });
     }
   }
@@ -120,14 +131,14 @@ export default function Dashboard() {
 
       {/* ── TABS ── */}
       <div className="dash-tabs">
-        <div className="dash-tab active">Overview</div>
-        <div className="dash-tab">Documents</div>
-        <div className="dash-tab">Activity</div>
+        <div className={`dash-tab${activeTab === "overview" ? " active" : ""}`} onClick={() => setActiveTab("overview")} style={{ cursor: "pointer" }}>Overview</div>
+        <div className={`dash-tab${activeTab === "documents" ? " active" : ""}`} onClick={() => setActiveTab("documents")} style={{ cursor: "pointer" }}>Documents</div>
+        <div className={`dash-tab${activeTab === "activity" ? " active" : ""}`} onClick={() => setActiveTab("activity")} style={{ cursor: "pointer" }}>Activity</div>
       </div>
 
       {/* ── STAT CARDS ── */}
       <div className="stat-cards">
-        <div className="stat-card">
+        <div className="stat-card stat-card-link" onClick={() => navigate("/trades?filter=attention")} style={{ cursor: "pointer" }}>
           <div className="stat-icon">🏛</div>
           <div className="stat-label">Total Trade Value at Risk</div>
           <div className="stat-value">$2,345,678</div>
@@ -136,7 +147,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="stat-card stat-card-link" onClick={() => navigate("/trades")} style={{ cursor: "pointer" }}>
           <div className="stat-icon">🔍</div>
           <div className="stat-label">Total Lookups</div>
           <div className="stat-value" data-testid="stat-compliance-lookups">
@@ -147,7 +158,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="stat-card stat-card-link" onClick={() => navigate("/trades?filter=attention")} style={{ cursor: "pointer" }}>
           <div className="stat-icon">⚠️</div>
           <div className="stat-label">Rejection Risk</div>
           <div className="stat-value">
@@ -169,7 +180,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── DASH GRID (2 columns) ── */}
+      {/* ── TAB CONTENT ── */}
+
+      {activeTab === "overview" && (
       <div className="dash-grid">
 
         {/* LEFT: Recent Trades */}
@@ -221,7 +234,25 @@ export default function Dashboard() {
                     </span>
                   </td>
                   <td>
-                    <button className="action-link">{t.btnLabel}</button>
+                    <button className="action-link" onClick={() => {
+                      if (t.lcCheckId) {
+                        navigate(`/lookup?lookupId=${t.id}`);
+                      } else {
+                        const prefill = {
+                          lookup_id: t.id,
+                          commodity_name: t.name,
+                          hs_code: t.hsCode,
+                          origin_iso2: t.originIso2,
+                          origin_name: t.originName,
+                          dest_iso2: t.destIso2,
+                          dest_name: t.destName,
+                          incoterms: "FOB",
+                          required_docs: [],
+                        };
+                        sessionStorage.setItem("lc_prefill", JSON.stringify(prefill));
+                        navigate("/lc-check");
+                      }
+                    }}>{t.btnLabel}</button>
                   </td>
                 </tr>
               ))}
@@ -279,7 +310,7 @@ export default function Dashboard() {
           <div className="dash-card">
             <div className="dash-card-header">
               <h3>Compliance Status</h3>
-              <span className="link">View All ›</span>
+              <Link href="/alerts"><span className="link">View All ›</span></Link>
             </div>
             <div className="comp-status-body">
               <div className="comp-row">
@@ -311,7 +342,7 @@ export default function Dashboard() {
           <div className="dash-card">
             <div className="dash-card-header">
               <h3>Recent Activity</h3>
-              <span className="link">View ›</span>
+              <Link href="/trades"><span className="link">View ›</span></Link>
             </div>
             <div className="activity-list">
               {(lookupsQuery.data ?? []).slice(0, 2).map((l, i) => (
@@ -341,6 +372,69 @@ export default function Dashboard() {
         </div>
 
       </div>
+      )}
+
+      {activeTab === "documents" && (
+      <div className="dash-grid" style={{ gridTemplateColumns: "1fr" }}>
+        <div className="dash-card">
+          <div className="dash-card-header">
+            <h3>Pending Compliance Documents</h3>
+            <Link href="/inbox"><span className="link">Supplier Inbox ›</span></Link>
+          </div>
+          {recentTrades.length === 0 ? (
+            <div style={{ textAlign: "center", padding: 32, color: "var(--app-regent)", fontSize: 13 }}>
+              No trades yet. Run a compliance check to see document requirements.
+            </div>
+          ) : recentTrades.map((t) => (
+            <div key={t.id} className="pending-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/lookup?lookupId=${t.id}`)}>
+              <div className="pending-icon">{t.icon}</div>
+              <div className="pending-info">
+                <div className="pending-name">{t.name}</div>
+                <div className="pending-detail">{t.corridor} · {t.hs}</div>
+              </div>
+              <div className={`pending-status pending-st-${t.status === "comp" ? "ok" : "warn"}`}>
+                {t.status === "comp" ? "✓ Ready" : t.statusLabel}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      )}
+
+      {activeTab === "activity" && (
+      <div className="dash-grid" style={{ gridTemplateColumns: "1fr" }}>
+        <div className="dash-card">
+          <div className="dash-card-header">
+            <h3>All Activity</h3>
+            <Link href="/trades"><span className="link">Trades ›</span></Link>
+          </div>
+          <div className="activity-list">
+            {(lookupsQuery.data ?? []).map((l) => (
+              <div key={l.id} className="activity-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/lookup?lookupId=${l.id}`)}>
+                <div className="act-avatar" style={{ background: "rgba(113,171,145,0.12)", color: "var(--app-acapulco)" }}>F</div>
+                <div className="act-content">
+                  <div className="act-text"><strong>You</strong> ran compliance lookup · {l.commodityName}</div>
+                  <div className="act-time">{new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</div>
+                </div>
+              </div>
+            ))}
+            {(lcQuery.data ?? []).map((lc) => (
+              <div key={lc.id} className="activity-item">
+                <div className="act-avatar" style={{ background: "rgba(20,184,166,0.12)", color: "#0d9488" }}>F</div>
+                <div className="act-content">
+                  <div className="act-text"><strong>You</strong> submitted LC check</div>
+                  <div className="act-time">{new Date(lc.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</div>
+                </div>
+              </div>
+            ))}
+            {(lookupsQuery.data ?? []).length === 0 && (lcQuery.data ?? []).length === 0 && (
+              <div style={{ textAlign: "center", padding: 32, color: "var(--app-regent)", fontSize: 13 }}>No activity yet. Start a compliance check.</div>
+            )}
+          </div>
+        </div>
+      </div>
+      )}
+
     </AppShell>
   );
 }

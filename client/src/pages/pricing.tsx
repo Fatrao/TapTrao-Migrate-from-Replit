@@ -243,9 +243,9 @@ export default function Pricing() {
           <Link href="/dashboard">
             <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" }}>Dashboard</span>
           </Link>
-          <Link href="/lookup">
-            <span style={{ background: "#4a8c6f", color: "white", padding: "7px 12px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
-              Free check →
+          <Link href="/">
+            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" }}>
+              ← Home
             </span>
           </Link>
         </div>
@@ -313,11 +313,11 @@ export default function Pricing() {
         </div>
 
         {/* SECTION 1 — Trade Packs (core product, FIRST) */}
-        <div style={{ marginBottom: 40 }}>
-          <h2 style={S.sectionTitle} data-testid="text-trade-packs-heading">
+        <div style={{ background: "#0a0a0a", borderRadius: 18, padding: "48px 32px", marginBottom: 40 }}>
+          <h2 style={{ ...S.sectionTitle, color: "#fff" }} data-testid="text-trade-packs-heading">
             TapTrao Shield
           </h2>
-          <p style={S.sectionSub}>
+          <p style={{ ...S.sectionSub, color: "rgba(255,255,255,0.5)" }}>
             Ongoing trade risk checks until docking. Activate more, save more.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
@@ -327,40 +327,40 @@ export default function Pricing() {
                 style={{ position: "relative" }}
                 data-testid={`card-pack-${pack.key}`}
               >
-                {pack.popular && <div style={S.shimmer} />}
-                <div style={{ ...S.card, position: "relative", zIndex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
+                {pack.popular && <div style={{ ...S.shimmer, background: "linear-gradient(135deg, rgba(74,222,128,0.3), rgba(74,222,128,0.08), rgba(74,222,128,0.3))" }} />}
+                <div style={{ background: "#1c1c1f", borderRadius: 14, border: pack.popular ? "1px solid rgba(74,222,128,0.35)" : "1px solid rgba(255,255,255,0.12)", padding: 24, position: "relative", zIndex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
                   {pack.popular && (
                     <div style={{ textAlign: "center", marginBottom: 12 }}>
-                      <span style={{ ...S.badge, background: "var(--blue)", color: "#fff" }}>
+                      <span style={{ ...S.badge, background: "rgba(74,222,128,0.15)", color: "#4ade80" }}>
                         Most Popular
                       </span>
                     </div>
                   )}
                   <div style={{ textAlign: "center", marginBottom: 16 }}>
-                    <div style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
+                    <div style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 16, color: "#fff" }}>
                       {pack.name}
                     </div>
-                    <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)", marginTop: 8, letterSpacing: "0" }}>
+                    <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "#fff", marginTop: 8, letterSpacing: "0" }}>
                       {pack.price}
                     </div>
-                    <div style={{ ...S.statLabel, marginTop: 6 }}>
+                    <div style={{ ...S.statLabel, marginTop: 6, color: "rgba(255,255,255,0.4)" }}>
                       {pack.lookups} {pack.lookups === 1 ? "shipment" : "shipments"}
                     </div>
-                    <div style={{ fontSize: 11, color: "var(--t3)", marginTop: 2 }}>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>
                       {pack.perLookup} per shipment
                     </div>
                   </div>
                   <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px", flex: 1 }}>
                     {pack.features.map((f) => (
-                      <li key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--t2)", marginBottom: 6 }}>
-                        <Check style={{ width: 14, height: 14, color: "var(--green)", marginTop: 2, flexShrink: 0 }} />
+                      <li key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>
+                        <Check style={{ width: 14, height: 14, color: "#4ade80", marginTop: 2, flexShrink: 0 }} />
                         <span>{f}</span>
                       </li>
                     ))}
                   </ul>
                   <button
                     style={{
-                      ...(pack.popular ? S.btnPrimary : S.btnOutline),
+                      ...(pack.popular ? { ...S.btnPrimary, background: "#4ade80", color: "#0e4e45" } : { ...S.btnOutline, borderColor: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }),
                       width: "100%",
                       opacity: checkoutMutation.isPending ? 0.6 : 1,
                     }}
@@ -565,20 +565,20 @@ export default function Pricing() {
         </div>
 
         {/* FAQ */}
-        <div style={{ maxWidth: 640, margin: "0 auto" }}>
+        <div style={{ maxWidth: 640, margin: "40px auto 0" }}>
           <h2 style={{ ...S.sectionTitle, fontSize: 24, marginBottom: 32 }} data-testid="text-faq-title">
             Frequently Asked Questions
           </h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {faqs.map((faq, i) => (
-              <div key={i} style={{ ...S.card, padding: 20 }}>
+              <div key={i} style={{ borderBottom: "1px solid var(--border2)", paddingBottom: 20 }}>
                 <h3
-                  style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 14, color: "var(--t1)", margin: "0 0 8px" }}
+                  style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 14, color: "var(--t1)", margin: "0 0 6px" }}
                   data-testid={`faq-question-${i}`}
                 >
                   {faq.q}
                 </h3>
-                <p style={{ fontSize: 13, color: "#ffffff", margin: 0, lineHeight: 1.6 }}>
+                <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
                   {faq.a}
                 </p>
               </div>

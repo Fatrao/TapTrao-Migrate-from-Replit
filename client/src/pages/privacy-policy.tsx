@@ -18,8 +18,8 @@ export default function PrivacyPolicy() {
           <Link href="/dashboard">
             <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }}>Dashboard</span>
           </Link>
-          <Link href="/lookup">
-            <span style={{ background: "#4a8c6f", color: "white", padding: "7px 12px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Free check →</span>
+          <Link href="/">
+            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }}>← Home</span>
           </Link>
         </div>
       </nav>

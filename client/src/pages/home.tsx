@@ -434,8 +434,8 @@ export default function Home() {
           <Link href="/dashboard">
             <span className="nav-btn-ghost" data-testid="button-sign-in">Log In</span>
           </Link>
-          <Link href="/lookup">
-            <span className="nav-btn-primary" data-testid="button-nav-start-free">Start Free Check</span>
+          <Link href="/pricing">
+            <span className="nav-btn-primary" data-testid="button-nav-start-free">Pricing</span>
           </Link>
           {/* Mobile hamburger */}
           <button
@@ -473,7 +473,7 @@ export default function Home() {
           <div className="hero-cta-row">
             <Link href="/lookup">
               <span className="btn-hero btn-hero-primary" data-testid="button-hero-free-lookup">
-                Run a Free Check
+                Free Pre-Shipment Check
               </span>
             </Link>
             <a href="#pricing">
@@ -731,7 +731,7 @@ export default function Home() {
           <p>One missing document can cost thousands. TapTrao Shield costs $110.</p>
           <div className="hero-cta-row" style={{ justifyContent: "center" }}>
             <Link href="/lookup">
-              <span className="btn-hero btn-hero-primary">Run a Free Check</span>
+              <span className="btn-hero btn-hero-primary">Free Pre-Shipment Check</span>
             </Link>
             <a href="#pricing">
               <span className="btn-hero btn-hero-secondary" style={{ color: "#1a1a1a", borderColor: "rgba(0,0,0,0.25)" }}>Activate TapTrao Shield: $110</span>

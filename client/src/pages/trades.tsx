@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useSearch } from "wouter";
 import { getAvatarColour } from "@/lib/avatarColours";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
@@ -57,8 +57,18 @@ function formatDate(d: string | Date) {
 export default function Trades() {
   usePageTitle("My Trades", "All your compliance checks and LC reviews in one place");
   const [, navigate] = useLocation();
+  const searchString = useSearch();
   const [filter, setFilter] = useState<FilterTab>("all");
   const [search, setSearch] = useState("");
+
+  // Parse URL filter param on mount (e.g., /trades?filter=attention)
+  useEffect(() => {
+    const params = new URLSearchParams(searchString);
+    const urlFilter = params.get("filter");
+    if (urlFilter && ["all", "attention", "progress", "archived"].includes(urlFilter)) {
+      setFilter(urlFilter as FilterTab);
+    }
+  }, []);
 
   const summaryQuery = useQuery<TradesSummary>({ queryKey: ["/api/trades/summary"] });
   const tradesQuery = useQuery<EnrichedTrade[]>({ queryKey: ["/api/trades"] });
