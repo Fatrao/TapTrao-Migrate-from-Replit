@@ -113,9 +113,9 @@ export default function Trades() {
 
   return (
     <AppShell>
-      <div style={{ padding: "32px 40px 0" }}>
-        {/* HEADER */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
+      {/* HEADER — stays on dark gradient */}
+      <div style={{ padding: "32px 40px 24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <h1
               style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "0", color: "var(--t1)", margin: 0, lineHeight: 1.1 }}
@@ -145,7 +145,13 @@ export default function Trades() {
             </button>
           </Link>
         </div>
+      </div>
 
+      {/* WHITE ZONE — fades from gradient to white starting after header */}
+      <div style={{
+        background: "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.3) 5%, rgba(255,255,255,0.6) 12%, rgba(255,255,255,0.85) 22%, #ffffff 35%)",
+        padding: "0 40px 0",
+      }}>
         {/* SUMMARY CARDS */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 2, marginBottom: 28 }} data-testid="summary-cards">
           {cards.map((c, i) => (
@@ -153,19 +159,20 @@ export default function Trades() {
               key={c.label}
               style={{
                 background: c.gradient
-                  ? `linear-gradient(135deg, rgba(218,60,61,.05), transparent 60%), var(--card)`
-                  : "var(--card)",
+                  ? "linear-gradient(135deg, rgba(218,60,61,.05), transparent 60%), #fff"
+                  : "#fff",
                 padding: "20px 22px",
                 borderRadius:
                   i === 0 ? "14px 0 0 14px" :
                   i === cards.length - 1 ? "0 14px 14px 0" : "0",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
               }}
               data-testid={`summary-card-${i}`}
             >
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 36, letterSpacing: 0, lineHeight: 1, color: c.color }}>
                 {c.value}
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)", letterSpacing: ".04em", marginTop: 4 }}>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#888", letterSpacing: ".04em", marginTop: 4 }}>
                 {c.label}
               </div>
             </div>
@@ -180,9 +187,9 @@ export default function Trades() {
               onClick={() => setFilter(f.key)}
               data-testid={`filter-${f.key}`}
               style={{
-                background: filter === f.key ? "var(--blue-dim)" : "transparent",
-                border: `1px solid ${filter === f.key ? "var(--blue-bd)" : "var(--s5)"}`,
-                color: filter === f.key ? "var(--blue)" : "var(--t2)",
+                background: filter === f.key ? "rgba(107,144,128,0.1)" : "transparent",
+                border: `1px solid ${filter === f.key ? "#6b9080" : "#ddd"}`,
+                color: filter === f.key ? "#6b9080" : "#666",
                 borderRadius: 20,
                 padding: "5px 14px",
                 fontSize: 12,
@@ -201,13 +208,13 @@ export default function Trades() {
             data-testid="input-search-trades"
             style={{
               marginLeft: "auto",
-              background: "var(--card2)",
-              border: "none",
+              background: "#f5f5f5",
+              border: "1px solid #e5e5e5",
               borderRadius: 6,
               padding: "6px 12px",
               fontSize: 12,
               width: 220,
-              color: "var(--t1)",
+              color: "#333",
               outline: "none",
             }}
           />
@@ -215,15 +222,15 @@ export default function Trades() {
 
         {/* TABLE OR EMPTY STATE */}
         {tradesQuery.isLoading ? (
-          <div style={{ padding: "80px 0", textAlign: "center", color: "var(--t2)", fontSize: 14 }}>Loading trades...</div>
+          <div style={{ padding: "80px 0", textAlign: "center", color: "#888", fontSize: 14 }}>Loading trades...</div>
         ) : filtered.length === 0 && allTrades.length === 0 ? (
           <div style={{ padding: "80px 0", textAlign: "center" }}>
-            <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "var(--t2)" }}>No trades yet.</div>
-            <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 8 }}>Run your first compliance lookup to get started.</div>
+            <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "#555" }}>No trades yet.</div>
+            <div style={{ fontSize: 13, color: "#999", marginTop: 8 }}>Run your first compliance lookup to get started.</div>
             <Link href="/lookup">
               <button
                 style={{
-                  background: "var(--blue)",
+                  background: "#6b9080",
                   color: "#fff",
                   border: "none",
                   borderRadius: 8,
@@ -240,7 +247,7 @@ export default function Trades() {
             </Link>
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ padding: "80px 0", textAlign: "center", color: "var(--t2)", fontSize: 14 }}>No trades match your filter.</div>
+          <div style={{ padding: "80px 0", textAlign: "center", color: "#888", fontSize: 14 }}>No trades match your filter.</div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="trades-table">
             <thead>
@@ -253,11 +260,11 @@ export default function Trades() {
                       fontSize: 9,
                       textTransform: "uppercase",
                       letterSpacing: ".12em",
-                      color: "var(--t3)",
+                      color: "#999",
                       fontWeight: 400,
                       textAlign: h === "Score" || h === "Updated" ? "right" : "left",
                       padding: "0 12px 10px",
-                      borderBottom: "1px solid var(--s5)",
+                      borderBottom: "1px solid #e5e5e5",
                     }}
                   >
                     {h}
@@ -281,10 +288,8 @@ export default function Trades() {
                     }}
                     onClick={() => {
                       if (trade.lcVerdict === "COMPLIANT" || trade.lcVerdict === "COMPLIANT_WITH_NOTES") {
-                        // LC passed — go to LC check page (TwinLog tab available)
                         navigate(`/lookup?lookupId=${trade.id}`);
                       } else {
-                        // No LC or discrepancies — go to LC check
                         const prefill = {
                           lookup_id: trade.id,
                           commodity_name: trade.commodityName,
@@ -302,7 +307,7 @@ export default function Trades() {
                     }}
                     onMouseEnter={e => {
                       Array.from(e.currentTarget.querySelectorAll("td")).forEach(td => {
-                        (td as HTMLElement).style.background = "var(--s2)";
+                        (td as HTMLElement).style.background = "#f5f5f5";
                       });
                       const openEl = e.currentTarget.querySelector("[data-open]") as HTMLElement;
                       if (openEl) openEl.style.opacity = "1";
@@ -338,8 +343,8 @@ export default function Trades() {
                           {trade.originIso2}
                         </div>
                         <div>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{trade.commodityName}</div>
-                          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)" }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a" }}>{trade.commodityName}</div>
+                          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#999" }}>
                             {iso2ToFlag(trade.originIso2)} {trade.originIso2} → {iso2ToFlag(trade.destIso2)} {trade.destIso2}
                           </div>
                         </div>
@@ -377,7 +382,7 @@ export default function Trades() {
                           fontSize: 14,
                           fontWeight: 700,
                           color: trade.readinessScore == null
-                            ? "var(--t3)"
+                            ? "#ccc"
                             : trade.readinessScore < 50
                               ? "var(--red)"
                               : trade.readinessScore < 80
@@ -396,7 +401,7 @@ export default function Trades() {
                     </td>
                     {/* Updated */}
                     <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>
-                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)" }}>
+                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#999" }}>
                         {formatDate(trade.createdAt)}
                       </span>
                     </td>
@@ -404,7 +409,7 @@ export default function Trades() {
                     <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>
                       <span
                         data-open
-                        style={{ fontSize: 11, fontWeight: 600, color: "var(--blue)", opacity: 0, transition: "opacity .15s", whiteSpace: "nowrap" }}
+                        style={{ fontSize: 11, fontWeight: 600, color: "#6b9080", opacity: 0, transition: "opacity .15s", whiteSpace: "nowrap" }}
                       >
                         {!trade.lcVerdict ? "Continue review →" : trade.lcVerdict === "DISCREPANCIES_FOUND" ? "Review LC →" : "View checklist →"}
                       </span>
@@ -416,34 +421,31 @@ export default function Trades() {
           </table>
         )}
 
-      </div>
-
-      {/* WHITE ZONE — fades from gradient to white below the trade table */}
-      <div style={{
-        background: "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.5) 8%, rgba(255,255,255,0.85) 20%, #ffffff 35%)",
-        padding: "80px 40px 200px",
-      }}>
-        <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
-          <p style={{ fontSize: 14, color: "#444", margin: 0, fontWeight: 600 }}>
-            {allTrades.length} shipment{allTrades.length !== 1 ? "s" : ""} total &middot; Data refreshed on each visit
-          </p>
-          <p style={{ fontSize: 13, color: "#777", marginTop: 10, lineHeight: 1.6 }}>
-            TapTrao does not provide legal or banking advice. Reports are informational and designed to support internal decision-making.
-          </p>
-          <div style={{ marginTop: 32, display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
-            <Link href="/lookup">
-              <span style={{ fontSize: 13, color: "#6b9080", fontWeight: 600, cursor: "pointer" }}>+ New compliance check</span>
-            </Link>
-            <Link href="/templates">
-              <span style={{ fontSize: 13, color: "#6b9080", fontWeight: 600, cursor: "pointer" }}>Saved templates</span>
-            </Link>
-            <Link href="/alerts">
-              <span style={{ fontSize: 13, color: "#6b9080", fontWeight: 600, cursor: "pointer" }}>Alerts</span>
-            </Link>
+        {/* FOOTER */}
+        {/* FOOTER */}
+        <div style={{ marginTop: 48, paddingTop: 24, borderTop: "1px solid #e5e5e5", paddingBottom: 60 }}>
+          <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
+            <p style={{ fontSize: 14, color: "#444", margin: 0, fontWeight: 600 }}>
+              {allTrades.length} shipment{allTrades.length !== 1 ? "s" : ""} total &middot; Data refreshed on each visit
+            </p>
+            <p style={{ fontSize: 13, color: "#777", marginTop: 10, lineHeight: 1.6 }}>
+              TapTrao does not provide legal or banking advice. Reports are informational and designed to support internal decision-making.
+            </p>
+            <div style={{ marginTop: 32, display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
+              <Link href="/lookup">
+                <span style={{ fontSize: 13, color: "#6b9080", fontWeight: 600, cursor: "pointer" }}>+ New compliance check</span>
+              </Link>
+              <Link href="/templates">
+                <span style={{ fontSize: 13, color: "#6b9080", fontWeight: 600, cursor: "pointer" }}>Saved templates</span>
+              </Link>
+              <Link href="/alerts">
+                <span style={{ fontSize: 13, color: "#6b9080", fontWeight: 600, cursor: "pointer" }}>Alerts</span>
+              </Link>
+            </div>
+            <p style={{ fontSize: 11, color: "#aaa", marginTop: 48 }}>
+              Fatrao Limited — Registered in England and Wales
+            </p>
           </div>
-          <p style={{ fontSize: 11, color: "#aaa", marginTop: 48 }}>
-            Fatrao Limited — Registered in England and Wales
-          </p>
         </div>
       </div>
 

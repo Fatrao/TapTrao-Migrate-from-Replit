@@ -453,14 +453,13 @@
   flex-shrink: 0;
 }
 .main-content {
-  flex: 1; overflow: auto; padding: 0 0 60px;
+  flex: 1; overflow: auto; padding: 0 0 0;
   background: linear-gradient(180deg,
-    #163035 0%, #17343a 2%, #1a3d42 5%, #1e474c 8%,
-    #245558 12%, #2d6360 16%, #3a7470 20%, #4a8580 25%,
-    #5c9590 30%, #6ea49a 35%, #80b2a5 40%, #93bfb0 45%,
-    #a6ccbb 50%, #b7d6c7 55%, #c7ded2 58%, #d3e3db 62%,
-    #dce7e2 66%, #e8edea 70%, #f0f3f1 75%, #f8faf9 80%,
-    #ffffff 85%
+    #163035 0%, #17343a 3%, #1a3d42 7%, #1e474c 12%,
+    #245558 18%, #2d6360 24%, #3a7470 30%, #4a8580 36%,
+    #5c9590 42%, #6ea49a 48%, #80b2a5 54%, #93bfb0 60%,
+    #a6ccbb 66%, #b7d6c7 72%, #c7ded2 78%, #d3e3db 83%,
+    #dce7e2 88%, #e8edea 92%, #f0f3f1 96%, #ffffff 100%
   );
 }
 .sidebar-item .label { flex: 1; }
