@@ -428,7 +428,7 @@ export default function Trades() {
             <p style={{ fontSize: 14, color: "#1a1a1a", margin: 0, fontWeight: 600 }}>
               {allTrades.length} shipment{allTrades.length !== 1 ? "s" : ""} total &middot; Data refreshed on each visit
             </p>
-            <p style={{ fontSize: 13, color: "#333", marginTop: 10, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: "#999", marginTop: 10, lineHeight: 1.6 }}>
               TapTrao does not provide legal or banking advice. Reports are informational and designed to support internal decision-making.
             </p>
             <div style={{ marginTop: 32, display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
