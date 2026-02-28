@@ -651,3 +651,24 @@ export const apiKeys = pgTable("api_keys", {
 });
 
 export type ApiKey = typeof apiKeys.$inferSelect;
+
+/* ── Document Extractions (LC auto-extraction audit log) ── */
+export const documentExtractions = pgTable(
+  "document_extractions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sessionId: text("session_id").notNull(),
+    documentType: text("document_type").notNull(),
+    originalFilename: text("original_filename").notNull(),
+    extractedText: text("extracted_text"),
+    extractionJson: jsonb("extraction_json"),
+    overallConfidence: text("overall_confidence"),
+    llmModel: text("llm_model"),
+    llmTokensUsed: integer("llm_tokens_used"),
+    processingTimeMs: integer("processing_time_ms"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_doc_extractions_session").on(table.sessionId)]
+);
+
+export type DocumentExtraction = typeof documentExtractions.$inferSelect;

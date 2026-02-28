@@ -50,6 +50,8 @@ import {
   promoRedemptions,
   type PromoCode,
   apiKeys,
+  documentExtractions,
+  type DocumentExtraction,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -137,6 +139,18 @@ export interface IStorage {
   getPromoCodeByCode(code: string): Promise<PromoCode | undefined>;
   getPromoCodes(): Promise<PromoCode[]>;
   redeemPromoCode(promoCodeId: string, sessionId: string, tradeTokens: number, lcCredits: number, code: string): Promise<{ success: boolean; message: string }>;
+  // Document extraction audit log
+  createDocumentExtraction(data: {
+    sessionId: string;
+    documentType: string;
+    originalFilename: string;
+    extractedText?: string | null;
+    extractionJson?: unknown;
+    overallConfidence?: string | null;
+    llmModel?: string | null;
+    llmTokensUsed?: number | null;
+    processingTimeMs?: number | null;
+  }): Promise<DocumentExtraction>;
   // API keys
   createApiKey(sessionId: string, name: string): Promise<{ id: string; key: string; name: string; createdAt: Date }>;
   getApiKeyByKey(key: string): Promise<{ id: string; sessionId: string; isActive: boolean } | undefined>;
@@ -855,6 +869,33 @@ export class DatabaseStorage implements IStorage {
     if (tradeTokens > 0) parts.push(`${tradeTokens} trade token${tradeTokens > 1 ? "s" : ""}`);
     if (lcCredits > 0) parts.push(`${lcCredits} LC credit${lcCredits > 1 ? "s" : ""}`);
     return { success: true, message: `Redeemed! ${parts.join(" and ")} added.` };
+  }
+
+  // ── Document Extraction Audit Log ──
+
+  async createDocumentExtraction(data: {
+    sessionId: string;
+    documentType: string;
+    originalFilename: string;
+    extractedText?: string | null;
+    extractionJson?: unknown;
+    overallConfidence?: string | null;
+    llmModel?: string | null;
+    llmTokensUsed?: number | null;
+    processingTimeMs?: number | null;
+  }): Promise<DocumentExtraction> {
+    const [row] = await db.insert(documentExtractions).values({
+      sessionId: data.sessionId,
+      documentType: data.documentType,
+      originalFilename: data.originalFilename,
+      extractedText: data.extractedText ?? null,
+      extractionJson: data.extractionJson ?? null,
+      overallConfidence: data.overallConfidence ?? null,
+      llmModel: data.llmModel ?? null,
+      llmTokensUsed: data.llmTokensUsed ?? null,
+      processingTimeMs: data.processingTimeMs ?? null,
+    }).returning();
+    return row;
   }
 
   // ── API Keys ──

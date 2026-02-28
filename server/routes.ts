@@ -1523,6 +1523,110 @@ export async function registerRoutes(
     }
   });
 
+  // ── LC Document Auto-Extraction ──
+
+  const extractUploadDir = path.join("/tmp", "uploads", "lc-extract");
+  const extractUpload = multer({
+    storage: multer.diskStorage({
+      destination: (_req, _file, cb) => {
+        fs.mkdirSync(extractUploadDir, { recursive: true });
+        cb(null, extractUploadDir);
+      },
+      filename: (_req, file, cb) => {
+        const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 100);
+        cb(null, `${Date.now()}-${safeName}`);
+      },
+    }),
+    limits: { fileSize: 20 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+      const allowed = [".pdf", ".jpg", ".jpeg", ".png"];
+      const ext = path.extname(file.originalname).toLowerCase();
+      if (allowed.includes(ext)) {
+        cb(null, true);
+      } else {
+        cb(new Error("Only PDF, JPG, and PNG files are allowed"));
+      }
+    },
+  });
+
+  // Rate limiter for extraction — max 20 per session per hour
+  const extractRateLimits = new Map<string, { count: number; resetAt: number }>();
+
+  app.post("/api/lc-extract", extractUpload.single("file"), async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+
+      // Rate limit check
+      const now = Date.now();
+      const rateEntry = extractRateLimits.get(sessionId);
+      if (rateEntry && now < rateEntry.resetAt) {
+        if (rateEntry.count >= 20) {
+          res.status(429).json({ error: "Too many extraction requests. Please try again later." });
+          return;
+        }
+        rateEntry.count++;
+      } else {
+        extractRateLimits.set(sessionId, { count: 1, resetAt: now + 3600_000 });
+      }
+
+      const file = req.file;
+      if (!file) {
+        res.status(400).json({ error: "No file uploaded" });
+        return;
+      }
+
+      const documentType = (req.body?.documentType as string) || "lc_terms";
+      const validTypes = ["lc_terms", "commercial_invoice", "bill_of_lading", "certificate_of_origin", "phytosanitary_certificate", "packing_list"];
+      if (!validTypes.includes(documentType)) {
+        // Clean up temp file
+        try { fs.unlinkSync(file.path); } catch {}
+        res.status(400).json({ error: "Invalid document type" });
+        return;
+      }
+
+      // Dynamically import the extraction module
+      const { extractFromPdf, cleanupTempFile } = await import("./lc-extract");
+
+      const result = await extractFromPdf(file.path, documentType);
+
+      // Clean up temp file
+      cleanupTempFile(file.path);
+
+      // Save audit log
+      try {
+        await storage.createDocumentExtraction({
+          sessionId,
+          documentType,
+          originalFilename: file.originalname,
+          extractedText: result.rawText?.substring(0, 10000) || null,
+          extractionJson: result.fields ? { fields: result.fields, overallConfidence: result.overallConfidence, warnings: result.warnings } : null,
+          overallConfidence: result.overallConfidence,
+          llmModel: "claude-sonnet-4-20250514",
+          processingTimeMs: result.processingTimeMs,
+        });
+      } catch (auditErr: any) {
+        console.error("Failed to save extraction audit log:", auditErr.message);
+        // Non-fatal — continue returning the result
+      }
+
+      res.json({
+        fields: result.fields,
+        overallConfidence: result.overallConfidence,
+        warnings: result.warnings,
+        rawText: result.rawText ? result.rawText.substring(0, 500) : null,
+        error: result.error,
+        processingTimeMs: result.processingTimeMs,
+      });
+    } catch (error: any) {
+      console.error("LC extraction endpoint error:", error.message);
+      // Clean up temp file on error
+      if (req.file?.path) {
+        try { fs.unlinkSync(req.file.path); } catch {}
+      }
+      res.status(500).json({ error: `Extraction failed: ${error.message?.substring(0, 100)}` });
+    }
+  });
+
   // ── EUDR Due Diligence ──
 
   app.get("/api/eudr/:lookupId", async (req, res) => {

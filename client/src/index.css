@@ -617,6 +617,12 @@
 .toggle-info p { font-size: 12px; color: var(--app-regent); }
 .toggle-switch { width: 42px; height: 24px; border-radius: 12px; background: #ddd; position: relative; cursor: pointer; }
 .toggle-switch::after { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; top: 3px; left: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+/* AI extraction confidence indicators */
+.form-group.confidence-high input, .form-group.confidence-high select { border-left: 3px solid #16a34a; }
+.form-group.confidence-medium input, .form-group.confidence-medium select { border-left: 3px solid #eab308; }
+.form-group.confidence-low input, .form-group.confidence-low select { border-left: 3px solid #ef4444; background: #fffbeb; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
 .upload-card { margin: 0 32px 24px; background: #fff; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 28px 32px; }
 .upload-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
 .upload-card-header h2 { font-size: 17px; font-weight: 600; color: var(--app-main-base); }

@@ -91,6 +91,127 @@ export default function LcCheck() {
   const [lcPdfFile, setLcPdfFile] = useState<UploadedFile | null>(null);
   const [docFiles, setDocFiles] = useState<Record<number, UploadedFile | null>>({});
 
+  // LC extraction state
+  type FieldConfidence = "high" | "medium" | "low";
+  const [extractionStatus, setExtractionStatus] = useState<"idle" | "extracting" | "done" | "error">("idle");
+  const [extractionError, setExtractionError] = useState<string | null>(null);
+  const [fieldConfidence, setFieldConfidence] = useState<Record<string, FieldConfidence>>({});
+  const [extractionStats, setExtractionStats] = useState<{ count: number; total: number } | null>(null);
+  const [extractionWarnings, setExtractionWarnings] = useState<string[]>([]);
+
+  // Per-document extraction state (Step 2)
+  const [docExtractionStatus, setDocExtractionStatus] = useState<Record<number, "idle" | "extracting" | "done" | "error">>({});
+  const [docExtractionError, setDocExtractionError] = useState<Record<number, string | null>>({});
+  const [docFieldConfidence, setDocFieldConfidence] = useState<Record<number, Record<string, FieldConfidence>>>({});
+
+  const handleLcExtraction = useCallback(async (file: File) => {
+    setLcPdfFile({ file, name: file.name, size: file.size });
+    setExtractionStatus("extracting");
+    setExtractionError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("documentType", "lc_terms");
+
+      const res = await fetch("/api/lc-extract", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        setExtractionStatus("error");
+        setExtractionError(data.error || "Extraction failed");
+        return;
+      }
+
+      if (data.fields) {
+        const fields = data.fields as Record<string, { value: string | number | boolean; confidence: FieldConfidence }>;
+        const confidenceMap: Record<string, FieldConfidence> = {};
+        let filledCount = 0;
+        const totalFields = Object.keys(fields).length;
+
+        setLcFields(prev => {
+          const updated = { ...prev };
+          for (const [key, field] of Object.entries(fields)) {
+            if (key in updated && field.value !== undefined && field.value !== null && field.value !== "") {
+              (updated as any)[key] = field.value;
+              confidenceMap[key] = field.confidence;
+              filledCount++;
+            }
+          }
+          return updated;
+        });
+
+        setFieldConfidence(confidenceMap);
+        setExtractionStats({ count: filledCount, total: 18 });
+        setExtractionWarnings(data.warnings || []);
+        setExtractionStatus("done");
+      } else {
+        setExtractionStatus("error");
+        setExtractionError(data.error || "No fields could be extracted");
+      }
+    } catch (err: any) {
+      setExtractionStatus("error");
+      setExtractionError(err.message || "Extraction failed");
+    }
+  }, []);
+
+  const handleDocExtraction = useCallback(async (file: File, docIndex: number, documentType: string) => {
+    setDocFiles(prev => ({ ...prev, [docIndex]: { file, name: file.name, size: file.size } }));
+    setDocExtractionStatus(prev => ({ ...prev, [docIndex]: "extracting" }));
+    setDocExtractionError(prev => ({ ...prev, [docIndex]: null }));
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("documentType", documentType);
+
+      const res = await fetch("/api/lc-extract", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        setDocExtractionStatus(prev => ({ ...prev, [docIndex]: "error" }));
+        setDocExtractionError(prev => ({ ...prev, [docIndex]: data.error || "Extraction failed" }));
+        return;
+      }
+
+      if (data.fields) {
+        const fields = data.fields as Record<string, { value: string | number | boolean; confidence: FieldConfidence }>;
+        const confidenceMap: Record<string, FieldConfidence> = {};
+
+        setDocuments(prev => prev.map((doc, i) => {
+          if (i !== docIndex) return doc;
+          const updatedFields = { ...doc.fields };
+          for (const [key, field] of Object.entries(fields)) {
+            if (field.value !== undefined && field.value !== null && field.value !== "") {
+              updatedFields[key] = String(field.value);
+              confidenceMap[key] = field.confidence;
+            }
+          }
+          return { ...doc, fields: updatedFields };
+        }));
+
+        setDocFieldConfidence(prev => ({ ...prev, [docIndex]: confidenceMap }));
+        setDocExtractionStatus(prev => ({ ...prev, [docIndex]: "done" }));
+      } else {
+        setDocExtractionStatus(prev => ({ ...prev, [docIndex]: "error" }));
+        setDocExtractionError(prev => ({ ...prev, [docIndex]: data.error || "No fields extracted" }));
+      }
+    } catch (err: any) {
+      setDocExtractionStatus(prev => ({ ...prev, [docIndex]: "error" }));
+      setDocExtractionError(prev => ({ ...prev, [docIndex]: err.message || "Extraction failed" }));
+    }
+  }, []);
+
   useEffect(() => {
     try {
       const stored = sessionStorage.getItem("lc_prefill");
@@ -213,6 +334,8 @@ export default function LcCheck() {
   const [correctionTab, setCorrectionTab] = useState<"email" | "whatsapp">("email");
   const [lcActiveTab, setLcActiveTab] = useState("Check");
 
+  const confidenceClass = (fieldKey: string) => fieldConfidence[fieldKey] ? `confidence-${fieldConfidence[fieldKey]}` : "";
+
   const req = <span className="req">*</span>;
 
   const goStep = (n: number) => {
@@ -320,7 +443,7 @@ export default function LcCheck() {
 
               {/* Row 1: LC Reference + Issuing Bank */}
               <div className="form-row cols-2">
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("lcReference")}`}>
                   <label>LC Reference</label>
                   <input type="text"
                     value={lcFields.lcReference}
@@ -337,7 +460,7 @@ export default function LcCheck() {
 
               {/* Row 2: Beneficiary + Applicant */}
               <div className="form-row cols-2">
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("beneficiaryName")}`}>
                   <label>Beneficiary (Supplier) {req}</label>
                   <input type="text"
                     value={lcFields.beneficiaryName}
@@ -346,7 +469,7 @@ export default function LcCheck() {
                     data-testid="input-beneficiary-name"
                   />
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("applicantName")}`}>
                   <label>Applicant (Buyer) {req}</label>
                   <input type="text"
                     value={lcFields.applicantName}
@@ -359,7 +482,7 @@ export default function LcCheck() {
 
               {/* Goods Description (full width) */}
               <div className="form-row cols-1">
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("goodsDescription")}`}>
                   <label>Goods Description {req}</label>
                   <input type="text"
                     value={lcFields.goodsDescription}
@@ -372,7 +495,7 @@ export default function LcCheck() {
 
               {/* 3-col: Quantity, LC Amount, Currency */}
               <div className="form-row cols-3">
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("quantity")}`}>
                   <label>Quantity {req}</label>
                   <input type="text"
                     value={lcFields.quantity || ""}
@@ -381,7 +504,7 @@ export default function LcCheck() {
                     data-testid="input-quantity"
                   />
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("totalAmount")}`}>
                   <label>LC Amount {req}</label>
                   <input type="number"
                     value={lcFields.totalAmount || ""}
@@ -390,7 +513,7 @@ export default function LcCheck() {
                     data-testid="input-total-amount"
                   />
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("currency")}`}>
                   <label>Currency</label>
                   <select
                     value={lcFields.currency}
@@ -404,7 +527,7 @@ export default function LcCheck() {
 
               {/* 3-col: Ports + Country of Origin */}
               <div className="form-row cols-3">
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("portOfLoading")}`}>
                   <label>Port of Loading</label>
                   <input type="text"
                     value={lcFields.portOfLoading}
@@ -413,7 +536,7 @@ export default function LcCheck() {
                     data-testid="input-port-loading"
                   />
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("portOfDischarge")}`}>
                   <label>Port of Discharge</label>
                   <input type="text"
                     value={lcFields.portOfDischarge}
@@ -422,7 +545,7 @@ export default function LcCheck() {
                     data-testid="input-port-discharge"
                   />
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("countryOfOrigin")}`}>
                   <label>Country of Origin</label>
                   <input type="text"
                     value={lcFields.countryOfOrigin}
@@ -435,7 +558,7 @@ export default function LcCheck() {
 
               {/* 3-col: Dates + Incoterms */}
               <div className="form-row cols-3">
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("latestShipmentDate")}`}>
                   <label>Latest Shipment Date {req}</label>
                   <input type="date"
                     value={lcFields.latestShipmentDate}
@@ -443,7 +566,7 @@ export default function LcCheck() {
                     data-testid="input-latest-shipment-date"
                   />
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("lcExpiryDate")}`}>
                   <label>LC Expiry Date {req}</label>
                   <input type="date"
                     value={lcFields.lcExpiryDate}
@@ -451,7 +574,7 @@ export default function LcCheck() {
                     data-testid="input-lc-expiry-date"
                   />
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("incoterms")}`}>
                   <label>Incoterms</label>
                   <select
                     value={lcFields.incoterms}
@@ -465,7 +588,7 @@ export default function LcCheck() {
 
               {/* 3-col: HS Code, Unit Price, Quantity Unit */}
               <div className="form-row cols-3">
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("hsCode")}`}>
                   <label>HS Code</label>
                   <input type="text"
                     value={lcFields.hsCode}
@@ -474,7 +597,7 @@ export default function LcCheck() {
                     data-testid="input-hs-code"
                   />
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("unitPrice")}`}>
                   <label>Unit Price</label>
                   <input type="number"
                     value={lcFields.unitPrice || ""}
@@ -483,7 +606,7 @@ export default function LcCheck() {
                     data-testid="input-unit-price"
                   />
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${confidenceClass("quantityUnit")}`}>
                   <label>Quantity Unit</label>
                   <select
                     value={lcFields.quantityUnit}
@@ -528,18 +651,72 @@ export default function LcCheck() {
               </div>
             </div>
 
-            {/* Upload Card — matches design ref .upload-card */}
+            {/* Upload Card — LC PDF extraction */}
             <div className="upload-card">
-              <div className="upload-card-header"><span>📎</span><h2>Or Upload LC as PDF</h2></div>
-              <p className="upload-card-subtitle">Attach your LC document for reference alongside manual entry.</p>
-              <div className="upload-zone">
-                <div className="upload-icon">📄</div>
-                <div className="upload-title">Drop your LC here</div>
-                <div className="upload-link">Browse or drop PDF</div>
-              </div>
-              <div className="upload-note">
-                💡 <span><strong>Auto-extraction coming soon</strong> — enter fields manually for now.</span>
-              </div>
+              <div className="upload-card-header"><span>📎</span><h2>Upload LC as PDF</h2></div>
+              <p className="upload-card-subtitle">Upload your LC document to auto-fill the fields above, or continue entering manually.</p>
+
+              {extractionStatus === "idle" && !lcPdfFile && (
+                <UploadZone
+                  icon="📄"
+                  title="Drop your LC here"
+                  subtitle="Browse or drop PDF"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onFileSelect={handleLcExtraction}
+                />
+              )}
+
+              {extractionStatus === "extracting" && (
+                <div className="upload-note" style={{ padding: "24px 16px", textAlign: "center" }}>
+                  <div style={{ fontSize: 22, marginBottom: 8, animation: "pulse 1.5s ease-in-out infinite" }}>🔍</div>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: "#2a3d40", marginBottom: 4 }}>Extracting fields from your LC...</div>
+                  <div style={{ fontSize: 12, color: "#888" }}>This may take 10-20 seconds</div>
+                </div>
+              )}
+
+              {extractionStatus === "done" && lcPdfFile && (
+                <>
+                  <FilePill name={lcPdfFile.name} size={lcPdfFile.size} onRemove={() => {
+                    setLcPdfFile(null);
+                    setExtractionStatus("idle");
+                    setFieldConfidence({});
+                    setExtractionStats(null);
+                    setExtractionWarnings([]);
+                  }} />
+                  <div className="upload-note" style={{ background: "#f0fdf4", borderColor: "#bbf7d0" }}>
+                    🤖 <span><strong>{extractionStats?.count} of {extractionStats?.total} fields extracted</strong> from your LC. Review highlighted fields below.</span>
+                  </div>
+                  {extractionWarnings.length > 0 && (
+                    <div className="upload-note" style={{ background: "#fffbeb", borderColor: "#fde68a", marginTop: 6 }}>
+                      ⚠️ <span>{extractionWarnings[0]}</span>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {extractionStatus === "error" && (
+                <>
+                  {lcPdfFile && (
+                    <FilePill name={lcPdfFile.name} size={lcPdfFile.size} onRemove={() => {
+                      setLcPdfFile(null);
+                      setExtractionStatus("idle");
+                      setExtractionError(null);
+                    }} />
+                  )}
+                  <div className="upload-note" style={{ background: "#fef2f2", borderColor: "#fecaca" }}>
+                    ❌ <span>{extractionError || "Extraction failed"} — enter fields manually.</span>
+                  </div>
+                  {!lcPdfFile && (
+                    <UploadZone
+                      icon="📄"
+                      title="Try again"
+                      subtitle="Browse or drop PDF"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onFileSelect={handleLcExtraction}
+                    />
+                  )}
+                </>
+              )}
             </div>
 
             {/* Step 1 buttons — matches design ref .action-row */}
@@ -612,19 +789,60 @@ export default function LcCheck() {
                     )}
                   </div>
 
+                  {/* Document upload extraction */}
+                  {documents[activeDocTab].documentType !== "other" && (
+                    <div style={{ marginBottom: 16 }}>
+                      {(!docExtractionStatus[activeDocTab] || docExtractionStatus[activeDocTab] === "idle") && !docFiles[activeDocTab] && (
+                        <UploadZone
+                          icon="📄"
+                          title={`Upload ${docLabel(documents[activeDocTab].documentType)}`}
+                          subtitle="Auto-fill fields from PDF"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onFileSelect={(file) => handleDocExtraction(file, activeDocTab, documents[activeDocTab].documentType)}
+                        />
+                      )}
+                      {docExtractionStatus[activeDocTab] === "extracting" && (
+                        <div className="upload-note" style={{ padding: "16px", textAlign: "center" }}>
+                          <span style={{ animation: "pulse 1.5s ease-in-out infinite" }}>🔍</span>
+                          <span style={{ fontWeight: 600 }}>Extracting fields...</span>
+                        </div>
+                      )}
+                      {docExtractionStatus[activeDocTab] === "done" && docFiles[activeDocTab] && (
+                        <>
+                          <FilePill name={docFiles[activeDocTab]!.name} size={docFiles[activeDocTab]!.size} onRemove={() => {
+                            setDocFiles(prev => { const next = { ...prev }; delete next[activeDocTab]; return next; });
+                            setDocExtractionStatus(prev => ({ ...prev, [activeDocTab]: "idle" }));
+                            setDocFieldConfidence(prev => { const next = { ...prev }; delete next[activeDocTab]; return next; });
+                          }} />
+                          <div className="upload-note" style={{ background: "#f0fdf4", borderColor: "#bbf7d0", marginBottom: 12 }}>
+                            🤖 <span><strong>Fields extracted</strong> — review and correct below.</span>
+                          </div>
+                        </>
+                      )}
+                      {docExtractionStatus[activeDocTab] === "error" && (
+                        <div className="upload-note" style={{ background: "#fef2f2", borderColor: "#fecaca", marginBottom: 12 }}>
+                          ❌ <span>{docExtractionError[activeDocTab] || "Extraction failed"} — enter fields manually.</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Dynamic fields */}
                   <div className="form-row cols-2">
-                    {getDocFields(documents[activeDocTab].documentType).map(field => (
-                      <div key={field.key} className="form-group">
-                        <label>{field.label}</label>
-                        <input
-                          type={field.type}
-                          value={documents[activeDocTab].fields[field.key] || ""}
-                          onChange={e => updateDocField(activeDocTab, field.key, e.target.value)}
-                          data-testid={`input-doc-${field.key}`}
-                        />
-                      </div>
-                    ))}
+                    {getDocFields(documents[activeDocTab].documentType).map(field => {
+                      const docConf = docFieldConfidence[activeDocTab]?.[field.key];
+                      return (
+                        <div key={field.key} className={`form-group${docConf ? ` confidence-${docConf}` : ""}`}>
+                          <label>{field.label}</label>
+                          <input
+                            type={field.type}
+                            value={documents[activeDocTab].fields[field.key] || ""}
+                            onChange={e => updateDocField(activeDocTab, field.key, e.target.value)}
+                            data-testid={`input-doc-${field.key}`}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
