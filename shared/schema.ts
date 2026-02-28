@@ -106,6 +106,9 @@ export const commodities = pgTable(
     triggersCites: boolean("triggers_cites").default(false).notNull(),
     triggersLaceyAct: boolean("triggers_lacey_act").default(false).notNull(),
     triggersFdaPriorNotice: boolean("triggers_fda_prior_notice").default(false).notNull(),
+    triggersReach: boolean("triggers_reach").default(false).notNull(),
+    triggersSection232: boolean("triggers_section_232").default(false).notNull(),
+    triggersFsis: boolean("triggers_fsis").default(false).notNull(),
     knownHazards: text("known_hazards").array(),
     stopFlags: jsonb("stop_flags"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -595,6 +598,9 @@ export type ComplianceResult = {
     cites: boolean;
     laceyAct: boolean;
     fdaPriorNotice: boolean;
+    reach: boolean;
+    section232: boolean;
+    fsis: boolean;
   };
   hazards: string[];
   stopFlags: Record<string, string> | null;

@@ -32,6 +32,9 @@ export async function runComplianceCheck(
     cites: commodity.triggersCites,
     laceyAct: commodity.triggersLaceyAct,
     fdaPriorNotice: commodity.triggersFdaPriorNotice,
+    reach: commodity.triggersReach,
+    section232: commodity.triggersSection232,
+    fsis: commodity.triggersFsis,
   };
 
   const hazards = commodity.knownHazards ?? [];
@@ -145,6 +148,15 @@ function assignDocumentMeta(r: RawRequirement): RequirementDetail {
   return { ...r, status: "PENDING", owner, due_by };
 }
 
+function getChedType(hsCode: string): "CHED-A" | "CHED-P" | "CHED-PP" | "CHED-D" | null {
+  const ch = parseInt(hsCode.substring(0, 2), 10);
+  if (ch === 1) return "CHED-A";                                        // Live animals
+  if ((ch >= 2 && ch <= 5) || ch === 16 || ch === 41) return "CHED-P";  // Animal products
+  if ((ch >= 6 && ch <= 14) || ch === 44) return "CHED-PP";             // Plants/wood
+  if (ch === 11 || ch === 15 || (ch >= 17 && ch <= 23)) return "CHED-D"; // Processed food/feed
+  return null;
+}
+
 function buildRequirementsDetailed(
   commodity: Commodity,
   origin: OriginCountry,
@@ -238,6 +250,52 @@ function buildRequirementsDetailed(
       documentCode: null,
       isSupplierSide: false,
     });
+  }
+
+  // EU CHED type-specific notification (CHED-A, CHED-P, CHED-PP, CHED-D)
+  if (triggers.sps && destination.iso2 === "EU") {
+    const chedType = getChedType(commodity.hsCode);
+    if (chedType) {
+      const chedDesc: Record<string, string> = {
+        "CHED-A": "Common Health Entry Document for Animals — live animal import notification via TRACES NT",
+        "CHED-P": "Common Health Entry Document for Products of animal origin — meat, fish, dairy, hides notification via TRACES NT",
+        "CHED-PP": "Common Health Entry Document for Plants and plant products — phytosanitary notification via TRACES NT",
+        "CHED-D": "Common Health Entry Document for Food/Feed of non-animal origin — processed food notification via TRACES NT",
+      };
+      reqs.push({
+        title: `${chedType} notification via TRACES NT required for EU import`,
+        description: `${chedDesc[chedType]}. Must be submitted via the EU TRACES NT system before goods arrive at the EU Border Control Post (BCP). The BCP inspectors verify the consignment against the ${chedType} at the port of entry.`,
+        issuedBy: "Importer / EU-based responsible operator via TRACES NT",
+        whenNeeded: "Minimum 24 hours before arrival at BCP (Border Control Post)",
+        tip: `This commodity requires a ${chedType} form. Register in TRACES NT early — your Border Control Post must be pre-selected. Documentary, identity, and physical checks are risk-based under the EU Official Controls Regulation.`,
+        portalGuide: "Submit via TRACES NT — https://webgate.ec.europa.eu/tracesnt",
+        documentCode: null,
+        isSupplierSide: false,
+      });
+    }
+  }
+
+  // UK IPAFFS notification (mapped from CHED types)
+  if (triggers.sps && destination.iso2 === "GB") {
+    const chedType = getChedType(commodity.hsCode);
+    if (chedType) {
+      const ipaffsMap: Record<string, string> = {
+        "CHED-A": "IPAFFS notification for live animals",
+        "CHED-P": "IPAFFS notification for Products of Animal Origin (POAO)",
+        "CHED-PP": "IPAFFS notification for plants and plant products (phytosanitary)",
+        "CHED-D": "IPAFFS notification for high-risk food/feed not of animal origin (HRFNAO)",
+      };
+      reqs.push({
+        title: `${ipaffsMap[chedType]} required for UK import`,
+        description: `UK equivalent of EU ${chedType}. Submitted via the Import of Products, Animals, Food and Feed System (IPAFFS). Required for pre-notification to Port Health Authorities under the UK Border Target Operating Model (BTOM).`,
+        issuedBy: "Importer / UK-based responsible person via IPAFFS",
+        whenNeeded: "Before arrival — notification timeline varies by product category and risk level",
+        tip: `Register in IPAFFS and ensure your Border Control Post is selected. The UK uses IPAFFS (not TRACES) for all SPS-controlled imports. Risk categorisation under BTOM determines inspection frequency.`,
+        portalGuide: "Submit via IPAFFS — https://www.gov.uk/guidance/import-of-products-animals-food-and-feed-system",
+        documentCode: null,
+        isSupplierSide: false,
+      });
+    }
   }
 
   if (destination.iso2 === "CH" && triggers.sps) {
@@ -457,6 +515,34 @@ function buildRequirementsDetailed(
       documentCode: null,
       isSupplierSide: false,
     });
+
+    // Section 232 tariff — steel and aluminum
+    if (triggers.section232) {
+      reqs.push({
+        title: "US Section 232 tariff applies — 25% on steel, 10% on aluminium (national security tariff)",
+        description: "Under Section 232 of the Trade Expansion Act of 1962, the US imposes additional tariffs on steel (25%) and aluminium (10%) imports from most countries. This is in addition to MFN duty rates and any reciprocal tariffs.",
+        issuedBy: "US CBP — calculated on Entry Summary (Form 7501)",
+        whenNeeded: "At import — tariff applied automatically on customs entry",
+        tip: "Section 232 tariffs stack on top of MFN duty and reciprocal tariffs. Verify whether any product-specific exclusion applies via the Section 232 Exclusion Portal. Some African countries may negotiate quota-based exemptions.",
+        portalGuide: "Section 232 Exclusion Portal — https://232app.azurewebsites.net",
+        documentCode: null,
+        isSupplierSide: false,
+      });
+    }
+
+    // FSIS — meat and poultry inspection (separate from FDA)
+    if (triggers.fsis) {
+      reqs.push({
+        title: "USDA FSIS inspection required — meat, poultry, and egg products must be from an approved country and establishment",
+        description: "The USDA Food Safety and Inspection Service (FSIS) regulates imported meat, poultry, and processed egg products. The exporting country must have an equivalent inspection system approved by FSIS, and the specific slaughter/processing establishment must be listed.",
+        issuedBy: "USDA FSIS",
+        whenNeeded: "Pre-shipment — country equivalence and establishment approval must be in place; re-inspection at US port of entry",
+        tip: "Very few African countries currently have FSIS equivalence approval for meat exports to the US. Namibia and Botswana (beef) and South Africa (ostrich) have some approved establishments. Check the FSIS eligible countries list before committing to the trade.",
+        portalGuide: "FSIS Import Library — https://www.fsis.usda.gov/inspection/import-export",
+        documentCode: null,
+        isSupplierSide: false,
+      });
+    }
   }
 
   if (triggers.kimberley) {
@@ -535,6 +621,131 @@ function buildRequirementsDetailed(
     });
   }
 
+  // REACH — EU/GB chemical substance registration
+  if (triggers.reach && (destination.iso2 === "EU" || destination.iso2 === "GB")) {
+    reqs.push({
+      title: "EU REACH Regulation (EC 1907/2006) — substance registration and authorisation with ECHA",
+      description: "Chemical substances imported into the EU/EEA above 1 tonne/year must be registered with the European Chemicals Agency (ECHA). The importer is the REACH registrant and must hold a registration number before placing goods on the market. Products containing Substances of Very High Concern (SVHCs) above 0.1% w/w require notification.",
+      issuedBy: "European Chemicals Agency (ECHA) / Importer as registrant",
+      whenNeeded: "Before import — registration must be in place before placing substance on the EU market",
+      tip: "REACH registration can take 6-18 months and costs EUR 1,600-31,000+ depending on tonnage band. Consider appointing an Only Representative (OR) in the EU to register on behalf of the African exporter. Safety Data Sheet (SDS) must accompany all chemical shipments.",
+      portalGuide: "ECHA REACH — https://echa.europa.eu/regulations/reach",
+      documentCode: null,
+      isSupplierSide: false,
+    });
+  }
+
+  if (triggers.reach && destination.iso2 === "CH") {
+    reqs.push({
+      title: "Swiss ChemO (Chemicals Ordinance) — substance notification for chemical imports into Switzerland",
+      description: "Switzerland administers its own chemical regulation parallel to EU REACH via the Chemicals Ordinance (ChemO/ChemV). Importers must notify the Swiss Federal Office of Public Health (FOPH/BAG) for new substances not yet in the Swiss inventory.",
+      issuedBy: "Swiss FOPH/BAG / Importer",
+      whenNeeded: "Before import — notification required for new substances. Safety Data Sheet always required.",
+      tip: "Switzerland has mutual recognition agreements with the EU for many standards, but EU REACH registration does NOT automatically transfer to Switzerland. Verify Swiss-specific requirements with FOPH/BAG.",
+      portalGuide: "Swiss FOPH/BAG Chemicals — https://www.bag.admin.ch/bag/en/home/gesund-leben/umwelt-und-gesundheit/chemikalien.html",
+      documentCode: null,
+      isSupplierSide: false,
+    });
+  }
+
+  // ── CANADA-SPECIFIC REQUIREMENTS ──
+  if (destination.iso2 === "CA") {
+    // ACI eManifest — equivalent to ISF 10+2
+    reqs.push({
+      title: "ACI eManifest (Advance Commercial Information) — pre-arrival cargo data filed to CBSA",
+      description: "Canada Border Services Agency (CBSA) requires electronic advance cargo information before goods arrive. Carriers and freight forwarders must transmit cargo, conveyance, and crew data electronically before arrival.",
+      issuedBy: "Carrier / Freight Forwarder",
+      whenNeeded: "Ocean: 24 hours before loading at foreign port. Air: varies by routing (4 hours for short-haul, pre-departure for long-haul)",
+      tip: "ACI eManifest is Canada's equivalent of the US ISF 10+2. Ensure your freight forwarder files accurately — non-compliance results in CBSA do-not-load directives and penalties.",
+      portalGuide: "CBSA eManifest — https://www.cbsa-asfc.gc.ca/prog/manif/menu-eng.html",
+      documentCode: null,
+      isSupplierSide: false,
+    });
+
+    // CFIA import requirements for food/plant/animal
+    if (triggers.sps) {
+      reqs.push({
+        title: "Canadian Food Inspection Agency (CFIA) import requirements — licence and inspection",
+        description: "CFIA regulates the import of food, plants, animals, and related products into Canada. A Safe Food for Canadians (SFC) licence is required for most food imports. All imports must comply with the Safe Food for Canadians Regulations (SFCR). Check CFIA's Automated Import Reference System (AIRS) for commodity-specific requirements.",
+        issuedBy: "CFIA (Canadian Food Inspection Agency)",
+        whenNeeded: "Before import — SFC licence must be in place; inspection at port of entry. Phytosanitary certificate from origin required.",
+        tip: "Register in the CFIA My CFIA portal first. Use the Automated Import Reference System (AIRS) to check specific commodity requirements — including whether an import permit is needed.",
+        portalGuide: "CFIA AIRS — https://airs-sari.inspection.gc.ca/",
+        documentCode: null,
+        isSupplierSide: false,
+      });
+    }
+
+    // Canada Forced Labour Act (Bill S-211) — supply chain reporting
+    reqs.push({
+      title: "Canada Fighting Against Forced Labour and Child Labour in Supply Chains Act (Bill S-211) — reporting obligation",
+      description: "Canadian entities that import goods and meet the threshold (CA$20M+ revenue or CA$10M+ assets or 250+ employees) must file annual reports on steps taken to prevent forced and child labour in their supply chains. Applies to goods imported into Canada from all origins.",
+      issuedBy: "Importing entity (annual report filed to Public Safety Canada)",
+      whenNeeded: "Annual report due May 31 each year covering the prior fiscal year",
+      tip: "Even if below the reporting threshold, major Canadian buyers increasingly require supply chain transparency documentation. Maintain supplier audit records and due diligence evidence for African supply chains.",
+      portalGuide: "Public Safety Canada — https://www.publicsafety.gc.ca/cnt/cntrng-crm/frcd-lbr-en.aspx",
+      documentCode: null,
+      isSupplierSide: false,
+    });
+
+    // CBSA CARM customs entry
+    reqs.push({
+      title: "CBSA customs declaration via CARM (Canada Assessment and Revenue Management) Client Portal",
+      description: "Since October 2024, all commercial accounting declarations must be filed through the CARM Client Portal. This replaces the legacy ACROSS/B3 paper process. Customs brokers file on behalf of importers.",
+      issuedBy: "Customs Broker / Importer via CARM Client Portal",
+      whenNeeded: "At import — accounting data due within 5 business days of release from CBSA",
+      tip: "Register in the CARM Client Portal. Ensure correct tariff classification per the Canadian Customs Tariff. Importers can check GPT (General Preferential Tariff) or LDCT (Least Developed Country Tariff) eligibility for reduced duty on African goods.",
+      portalGuide: "CARM Client Portal — https://carm-acram.cbsa-asfc.gc.ca",
+      documentCode: null,
+      isSupplierSide: false,
+    });
+  }
+
+  // ── TURKEY-SPECIFIC REQUIREMENTS ──
+  if (destination.iso2 === "TR") {
+    // Halal certification for food products
+    if (triggers.sps && (commodity.commodityType === "agricultural" || commodity.commodityType === "livestock" || commodity.commodityType === "seafood")) {
+      reqs.push({
+        title: "Halal certification may be required for food products imported into Turkey",
+        description: "Turkey's Ministry of Agriculture and Forestry may require halal certification for certain food products, particularly meat, poultry, and processed food. While not universally mandated at customs, major Turkish buyers, retailers, and food service operators typically require it as a commercial prerequisite.",
+        issuedBy: "Accredited halal certification body in origin country (recognised by Turkish authorities / Diyanet)",
+        whenNeeded: "Before shipment — certificate must accompany the goods",
+        tip: "Use a halal certification body accredited by the Turkish Standards Institute (TSE) or recognised by Turkey's Diyanet (Presidency of Religious Affairs). Common African certifiers include national Islamic councils and SANHA (South Africa).",
+        portalGuide: null,
+        documentCode: null,
+        isSupplierSide: true,
+      });
+    }
+
+    // TSE conformity for industrial/manufactured products
+    if (commodity.commodityType === "manufactured" || commodity.commodityType === "mineral") {
+      reqs.push({
+        title: "TSE (Turkish Standards Institute) conformity assessment may be required for industrial products",
+        description: "Industrial products imported into Turkey may require conformity assessment by TSE or a TSE-recognised body. Turkey's technical regulations often align with EU CE marking requirements but are administered separately through the TSE 'G' mark system.",
+        issuedBy: "TSE (Türk Standardları Enstitüsü) or recognised conformity assessment body",
+        whenNeeded: "Before import — certificate of conformity must be available for customs clearance",
+        tip: "Check whether the specific product falls under Turkey's mandatory conformity assessment regime via the TAREKS (Risk-Based Trade Control) system. Many products accept EU CE marking, but some require separate TSE approval.",
+        portalGuide: "TSE — https://www.tse.org.tr",
+        documentCode: null,
+        isSupplierSide: false,
+      });
+    }
+
+    // Gold import — Borsa Istanbul
+    if (commodity.name.toLowerCase().includes("gold")) {
+      reqs.push({
+        title: "Borsa Istanbul (BIST) membership required for gold imports into Turkey",
+        description: "Gold imports into Turkey must be conducted through Borsa Istanbul (formerly Istanbul Gold Exchange). Only authorised member banks and precious metals companies can import gold. Non-members cannot clear gold through Turkish customs.",
+        issuedBy: "Borsa Istanbul / CMB (Capital Markets Board of Turkey)",
+        whenNeeded: "Before import — BIST membership/authorisation must be in place prior to shipment",
+        tip: "This is a significant market access barrier. Only banks and authorised precious metals companies with BIST membership can import gold into Turkey. Arrange the buyer relationship accordingly and verify their BIST membership status.",
+        portalGuide: null,
+        documentCode: null,
+        isSupplierSide: false,
+      });
+    }
+  }
+
   if (triggers.iuu) {
     reqs.push({
       title: "IUU Fishing catch certificate validated by flag-state authority",
@@ -583,8 +794,8 @@ function buildRequirementsDetailed(
     });
   }
 
-  // Skip generic security filing + customs declaration for US — coded US block has detailed versions
-  if (destination.iso2 !== "US") {
+  // Skip generic security filing for US and CA — those have dedicated detailed blocks above
+  if (destination.iso2 !== "US" && destination.iso2 !== "CA") {
     reqs.push({
       title: `${destination.securityFiling} pre-arrival security filing for ${destination.countryName}`,
       description: `Pre-arrival security declaration required by ${destination.countryName} customs. Includes cargo details, shipper/consignee information, and container/seal numbers.`,
@@ -597,19 +808,22 @@ function buildRequirementsDetailed(
     });
   }
 
-  reqs.push({
-    title: `Customs import declaration per ${destination.tariffSource}`,
-    description: `Formal import declaration submitted to ${destination.countryName} customs using the applicable tariff schedule (${destination.tariffSource}). Includes HS classification, value, origin, and duty calculation.`,
-    issuedBy: "Customs Broker / Importer",
-    whenNeeded: "At import — before goods are released from customs control",
-    tip: "Double-check the HS code classification against the destination tariff schedule. Misclassification is the most common cause of customs delays and penalties.",
-    portalGuide: destPortal,
-    documentCode: null,
-    isSupplierSide: false,
-  });
+  // Generic customs declaration — skip for US (has detailed block) and CA (has CARM block)
+  if (destination.iso2 !== "US" && destination.iso2 !== "CA") {
+    reqs.push({
+      title: `Customs import declaration per ${destination.tariffSource}`,
+      description: `Formal import declaration submitted to ${destination.countryName} customs using the applicable tariff schedule (${destination.tariffSource}). Includes HS classification, value, origin, and duty calculation.`,
+      issuedBy: "Customs Broker / Importer",
+      whenNeeded: "At import — before goods are released from customs control",
+      tip: "Double-check the HS code classification against the destination tariff schedule. Misclassification is the most common cause of customs delays and penalties.",
+      portalGuide: destPortal,
+      documentCode: null,
+      isSupplierSide: false,
+    });
+  }
 
-  // Apply destination special rules (skip for US — coded block above is comprehensive)
-  if (destination.iso2 !== "US") {
+  // Apply destination special rules (skip for US and CA — coded blocks above are comprehensive)
+  if (destination.iso2 !== "US" && destination.iso2 !== "CA") {
     const destSpecial = destination.specialRules as Record<string, string> | null;
     if (destSpecial) {
       for (const [key, desc] of Object.entries(destSpecial)) {
@@ -798,6 +1012,7 @@ export function computeReadinessScore(params: {
     triggers.eudr, triggers.cbam, triggers.csddd,
     triggers.kimberley, triggers.conflict, triggers.iuu, triggers.cites,
     triggers.laceyAct, triggers.fdaPriorNotice,
+    triggers.reach, triggers.section232, triggers.fsis,
   ].filter(Boolean).length;
 
   let regPenalty = 0;

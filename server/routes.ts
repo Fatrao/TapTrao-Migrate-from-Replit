@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { randomUUID, createHash } from "crypto";
 import { storage } from "./storage";
-import { seedPrompt2, seedPrompt3A, seedPrompt3B, seedPrompt3C, seedPrompt5, seedPrompt6 } from "./seed";
+import { seedPrompt2, seedPrompt3A, seedPrompt3B, seedPrompt3C, seedPrompt5, seedPrompt6, seedPrompt7 } from "./seed";
 import { runComplianceCheck, computeReadinessScore } from "./compliance";
 import { runLcCrossCheck, computeLcHash, generateCorrectionEmail } from "./lc-engine";
 import { generateTwinlogPdf } from "./twinlog-pdf";
@@ -81,6 +81,7 @@ export async function registerRoutes(
   await seedPrompt3C();
   await seedPrompt5();
   await seedPrompt6();
+  await seedPrompt7();
 
   app.get("/download/taptrao-project.zip", (_req, res) => {
     const zipPath = path.resolve("public/taptrao-project.zip");

@@ -1373,6 +1373,9 @@ function ComplianceResultDisplay({ result, freeLocked = false }: { result: Compl
               <TriggerBadge label="CSDDD" active={result.triggers.csddd} />
               <TriggerBadge label="IUU" active={result.triggers.iuu} />
               <TriggerBadge label="CITES" active={result.triggers.cites} />
+              <TriggerBadge label="REACH" active={result.triggers.reach} />
+              <TriggerBadge label="Section 232" active={result.triggers.section232} />
+              <TriggerBadge label="FSIS" active={result.triggers.fsis} />
             </div>
           </CardContent>
         </Card>

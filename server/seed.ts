@@ -885,3 +885,89 @@ export async function seedPrompt6() {
 
   log("Prompt 6 seed completed", "seed");
 }
+
+export async function seedPrompt7() {
+  // Guard: skip if commodities already include the new batch
+  const [{ count: commodityCount }] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(commodities);
+  if (Number(commodityCount) >= 190) {
+    log("Prompt 7 seed: commodities already at 190+, skipping", "seed");
+    return;
+  }
+
+  log("Seeding new commodity categories (textiles, leather, chemicals, metals, petroleum, paper, vehicles, consumer products)...", "seed");
+
+  await db.transaction(async (tx) => {
+    await tx.insert(commodities).values([
+      // ── TEXTILES & GARMENTS (HS 50-63) ──
+      { name: "Cotton Yarn", hsCode: "5205.11", commodityType: "manufactured", triggersSps: false, triggersCsddd: true, knownHazards: ["none_significant"] },
+      { name: "Woven Cotton Fabrics", hsCode: "5208.11", commodityType: "manufactured", triggersSps: false, triggersCsddd: true, knownHazards: ["none_significant"] },
+      { name: "Knitted Garments", hsCode: "6109.10", commodityType: "manufactured", triggersSps: false, triggersCsddd: true, knownHazards: ["none_significant"] },
+      { name: "Woven Garments", hsCode: "6203.42", commodityType: "manufactured", triggersSps: false, triggersCsddd: true, knownHazards: ["none_significant"] },
+      { name: "Used Clothing", hsCode: "6309.00", commodityType: "manufactured", triggersSps: false, knownHazards: ["none_significant"] },
+      { name: "Sisal / Jute Sacks", hsCode: "6305.10", commodityType: "manufactured", triggersSps: false, knownHazards: ["none_significant"] },
+
+      // ── LEATHER & HIDES (HS 41-43) ──
+      { name: "Raw Cattle Hides", hsCode: "4101.20", commodityType: "livestock", triggersSps: true, triggersEudr: true, knownHazards: ["FMD"] },
+      { name: "Leather Bags & Articles", hsCode: "4202.21", commodityType: "manufactured", triggersSps: false, knownHazards: ["chrome_VI"] },
+      { name: "Sheepskin (tanned)", hsCode: "4105.30", commodityType: "livestock", triggersSps: true, knownHazards: ["chrome_VI"] },
+
+      // ── CHEMICALS, COSMETICS & FERTILIZERS (HS 25, 28-38) ──
+      { name: "Phosphoric Acid", hsCode: "2809.20", commodityType: "manufactured", triggersSps: false, triggersReach: true, knownHazards: ["none_significant"] },
+      { name: "Argan Cosmetics", hsCode: "3304.91", commodityType: "manufactured", triggersSps: false, triggersReach: true, knownHazards: ["none_significant"] },
+      { name: "Shea Cosmetics", hsCode: "3304.99", commodityType: "manufactured", triggersSps: false, triggersReach: true, knownHazards: ["none_significant"] },
+      { name: "Soap (manufactured)", hsCode: "3401.11", commodityType: "manufactured", triggersSps: false, triggersReach: true, knownHazards: ["none_significant"] },
+      { name: "Fertilizers (phosphate-based)", hsCode: "3103.10", commodityType: "manufactured", triggersSps: false, triggersCbam: true, triggersReach: true, knownHazards: ["cadmium"] },
+      { name: "Fertilizers (nitrogen-based)", hsCode: "3102.10", commodityType: "manufactured", triggersSps: false, triggersCbam: true, triggersReach: true, knownHazards: ["none_significant"] },
+
+      // ── METALS & ARTICLES (HS 72-76) ──
+      { name: "Steel Billets", hsCode: "7207.19", commodityType: "mineral", triggersSps: false, triggersCbam: true, triggersSection232: true, knownHazards: ["none"] },
+      { name: "Steel Bars / Rods", hsCode: "7213.10", commodityType: "mineral", triggersSps: false, triggersCbam: true, triggersSection232: true, knownHazards: ["none"] },
+      { name: "Steel Flat-Rolled Products", hsCode: "7208.10", commodityType: "mineral", triggersSps: false, triggersCbam: true, triggersSection232: true, knownHazards: ["none"] },
+      { name: "Aluminium Bars / Rods", hsCode: "7604.10", commodityType: "mineral", triggersSps: false, triggersCbam: true, triggersSection232: true, knownHazards: ["none"] },
+      { name: "Copper Wire", hsCode: "7408.11", commodityType: "mineral", triggersSps: false, knownHazards: ["none"] },
+
+      // ── PETROLEUM & GAS (HS 27) ──
+      { name: "Crude Petroleum Oil", hsCode: "2709.00", commodityType: "mineral", triggersSps: false, knownHazards: ["none"] },
+      { name: "Natural Gas (LNG)", hsCode: "2711.11", commodityType: "mineral", triggersSps: false, knownHazards: ["none"] },
+      { name: "Coal", hsCode: "2701.12", commodityType: "mineral", triggersSps: false, knownHazards: ["none"] },
+
+      // ── PAPER & PULP (HS 47-48) — EUDR SCOPE ──
+      { name: "Wood Pulp", hsCode: "4703.21", commodityType: "forestry", triggersSps: false, triggersEudr: true, triggersLaceyAct: true, knownHazards: ["none_significant"] },
+      { name: "Paper / Cardboard", hsCode: "4804.11", commodityType: "forestry", triggersSps: false, triggersEudr: true, triggersLaceyAct: true, knownHazards: ["none_significant"] },
+
+      // ── VEHICLES & MACHINERY (HS 84-87) ──
+      { name: "Motor Vehicles (assembled)", hsCode: "8703.23", commodityType: "manufactured", triggersSps: false, knownHazards: ["none_significant"] },
+      { name: "Auto Parts & Components", hsCode: "8708.29", commodityType: "manufactured", triggersSps: false, knownHazards: ["none_significant"] },
+      { name: "Mining / Construction Equipment", hsCode: "8429.52", commodityType: "manufactured", triggersSps: false, knownHazards: ["none_significant"] },
+
+      // ── CONSUMER PRODUCTS (HS 64, 69, 94) ──
+      { name: "Footwear (leather)", hsCode: "6403.59", commodityType: "manufactured", triggersSps: false, knownHazards: ["chrome_VI"] },
+      { name: "Ceramics (tableware)", hsCode: "6911.10", commodityType: "manufactured", triggersSps: false, knownHazards: ["lead"] },
+      { name: "Furniture (non-wood)", hsCode: "9401.61", commodityType: "manufactured", triggersSps: false, knownHazards: ["formaldehyde"] },
+
+      // ── BEVERAGES (HS 22) ──
+      { name: "Wine", hsCode: "2204.21", commodityType: "agricultural", triggersSps: true, triggersFdaPriorNotice: true, knownHazards: ["sulphites"] },
+      { name: "Spirits / Liquor", hsCode: "2208.40", commodityType: "agricultural", triggersSps: true, triggersFdaPriorNotice: true, knownHazards: ["methanol"] },
+      { name: "Beer", hsCode: "2203.00", commodityType: "agricultural", triggersSps: true, triggersFdaPriorNotice: true, knownHazards: ["none_significant"] },
+
+      // ── MEAT — with FSIS trigger for US (HS 02) ──
+      { name: "Beef (frozen boneless)", hsCode: "0202.30", commodityType: "livestock", triggersSps: true, triggersFsis: true, triggersFdaPriorNotice: true, knownHazards: ["FMD", "BSE"] },
+      { name: "Goat Meat (frozen)", hsCode: "0204.50", commodityType: "livestock", triggersSps: true, triggersFsis: true, triggersFdaPriorNotice: true, knownHazards: ["FMD"] },
+      { name: "Poultry Meat (frozen)", hsCode: "0207.14", commodityType: "livestock", triggersSps: true, triggersFsis: true, triggersFdaPriorNotice: true, knownHazards: ["avian_influenza", "salmonella"] },
+    ]);
+    log("Inserted 37 new commodities (textiles, leather, chemicals, metals, petroleum, paper, vehicles, consumer, beverages, meat)", "seed");
+  });
+
+  // ── UPDATE EXISTING COMMODITY TRIGGERS FOR NEW FLAGS ──
+  // Section 232 on existing steel/aluminum commodities
+  await db.execute(sql`UPDATE commodities SET triggers_section_232 = true WHERE (hs_code LIKE '72%' OR hs_code LIKE '73%' OR hs_code LIKE '76%') AND triggers_section_232 = false`);
+  log("Updated triggers_section_232 on existing steel/aluminum commodities", "seed");
+
+  // FSIS on existing meat commodities (HS 02xx livestock type)
+  await db.execute(sql`UPDATE commodities SET triggers_fsis = true WHERE hs_code LIKE '02%' AND commodity_type = 'livestock' AND triggers_fsis = false`);
+  log("Updated triggers_fsis on existing meat commodities", "seed");
+
+  log("Prompt 7 seed completed", "seed");
+}
