@@ -8,7 +8,7 @@ const allowlist = [
   "@anthropic-ai/sdk",
   "@google/generative-ai",
   "axios",
-  "connect-pg-simple",
+  // "connect-pg-simple", // excluded: reads table.sql from __dirname at runtime
   "cors",
   "date-fns",
   "drizzle-orm",
