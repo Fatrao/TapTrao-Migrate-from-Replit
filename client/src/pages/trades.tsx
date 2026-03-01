@@ -290,23 +290,7 @@ export default function Trades() {
                       animationDelay: `${idx * 40}ms`,
                     }}
                     onClick={() => {
-                      if (trade.lcVerdict === "COMPLIANT" || trade.lcVerdict === "COMPLIANT_WITH_NOTES") {
-                        navigate(`/lookup?lookupId=${trade.id}`);
-                      } else {
-                        const prefill = {
-                          lookup_id: trade.id,
-                          commodity_name: trade.commodityName,
-                          hs_code: trade.hsCode,
-                          origin_iso2: trade.originIso2,
-                          origin_name: trade.originName,
-                          dest_iso2: trade.destIso2,
-                          dest_name: trade.destName,
-                          incoterms: "FOB",
-                          required_docs: [],
-                        };
-                        sessionStorage.setItem("lc_prefill", JSON.stringify(prefill));
-                        navigate("/lc-check");
-                      }
+                      navigate(`/trades/${trade.id}`);
                     }}
                     onMouseEnter={e => {
                       Array.from(e.currentTarget.querySelectorAll("td")).forEach(td => {
@@ -414,7 +398,7 @@ export default function Trades() {
                         data-open
                         style={{ fontSize: 11, fontWeight: 600, color: "#6b9080", opacity: 0, transition: "opacity .15s", whiteSpace: "nowrap" }}
                       >
-                        {!trade.lcVerdict ? "Continue review →" : trade.lcVerdict === "DISCREPANCIES_FOUND" ? "Review LC →" : "View checklist →"}
+                        {!trade.lcVerdict ? "View results →" : trade.lcVerdict === "DISCREPANCIES_FOUND" ? "Review LC →" : "View checklist →"}
                       </span>
                     </td>
                   </tr>

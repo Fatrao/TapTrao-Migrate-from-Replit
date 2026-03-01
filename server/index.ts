@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
+import { setupAuth } from "./auth";
 import { createServer } from "http";
 import { initLocalDb } from "./db";
 
@@ -67,6 +68,9 @@ app.use((req, res, next) => {
   try {
     // Initialize PGlite for local dev if no DATABASE_URL (no-op in production)
     await initLocalDb();
+
+    // Set up auth (passport + express-session) before routes
+    setupAuth(app);
 
     await registerRoutes(httpServer, app);
 

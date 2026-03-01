@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { randomUUID, createHash } from "crypto";
 import { storage } from "./storage";
@@ -7,7 +7,10 @@ import { runComplianceCheck, computeReadinessScore } from "./compliance";
 import { runLcCrossCheck, computeLcHash, generateCorrectionEmail } from "./lc-engine";
 import { generateTwinlogPdf } from "./twinlog-pdf";
 import { generateEudrPdf } from "./eudr-pdf";
-import { lcCheckRequestSchema, tokenTransactions, type ComplianceResult, type DocumentStatus } from "@shared/schema";
+import { appendTradeEvent, getTradeAuditChain, verifyAuditChain } from "./audit";
+import { hashPassword, comparePasswords } from "./auth";
+import { lcCheckRequestSchema, registerSchema, loginSchema, tokenTransactions, type ComplianceResult, type DocumentStatus } from "@shared/schema";
+import passport from "passport";
 import { db } from "./db";
 import multer from "multer";
 import path from "path";
@@ -16,6 +19,14 @@ import fs from "fs";
 function computeRegVersionHash(result: unknown): string {
   const stable = JSON.stringify(result);
   return createHash("sha256").update(stable).digest("hex");
+}
+
+/** Middleware: requires authenticated user. Returns 401 with AUTH_REQUIRED code. */
+function requireAuth(req: Request, res: Response, next: NextFunction): void {
+  if (req.isAuthenticated?.()) {
+    return next();
+  }
+  res.status(401).json({ message: "Authentication required", code: "AUTH_REQUIRED" });
 }
 
 const TOKEN_PACKS: Record<string, { price: number; tokens: number; name: string }> = {
@@ -56,6 +67,22 @@ async function getSessionFromApiKey(req: Request): Promise<{ sessionId: string; 
 }
 
 function getSessionId(req: Request, res: Response): string {
+  // If user is authenticated via passport, use their stored sessionId
+  if (req.isAuthenticated?.() && req.user?.sessionId) {
+    const userSessionId = req.user.sessionId;
+    // Sync the taptrao_session cookie to match the user's stored sessionId
+    if (req.cookies?.taptrao_session !== userSessionId) {
+      res.cookie("taptrao_session", userSessionId, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 365 * 24 * 60 * 60 * 1000,
+      });
+    }
+    return userSessionId;
+  }
+
+  // Fallback: anonymous session via cookie
   let sessionId = req.cookies?.taptrao_session;
   if (!sessionId) {
     sessionId = randomUUID();
@@ -80,6 +107,105 @@ export async function registerRoutes(
   await seedPrompt5();
   await seedPrompt6();
   await seedPrompt7();
+
+  // ── Auth Routes ──
+
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const parsed = registerSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ message: "Invalid input", errors: parsed.error.flatten().fieldErrors });
+        return;
+      }
+
+      const { email, password, displayName } = parsed.data;
+
+      // Check if email already exists
+      const existing = await storage.getUserByEmail(email);
+      if (existing) {
+        res.status(409).json({ message: "An account with this email already exists" });
+        return;
+      }
+
+      // Get the current anonymous sessionId — this becomes the user's permanent sessionId
+      const sessionId = getSessionId(req, res);
+
+      // Check if this sessionId is already claimed by another user
+      const existingBySession = await storage.getUserBySessionId(sessionId);
+      if (existingBySession) {
+        res.status(409).json({ message: "This session is already linked to an account. Please log in." });
+        return;
+      }
+
+      const passwordHash = await hashPassword(password);
+      const user = await storage.createUser({ email, passwordHash, sessionId, displayName });
+
+      // Auto-login after registration
+      req.login(user, (err) => {
+        if (err) {
+          res.status(500).json({ message: "Registration succeeded but auto-login failed" });
+          return;
+        }
+        res.json({
+          user: { id: user.id, email: user.email, displayName: user.displayName, emailVerified: user.emailVerified },
+        });
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/auth/login", (req, res, next) => {
+    const parsed = loginSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ message: "Invalid input", errors: parsed.error.flatten().fieldErrors });
+      return;
+    }
+
+    passport.authenticate("local", (err: any, user: Express.User | false, info: any) => {
+      if (err) return next(err);
+      if (!user) {
+        return res.status(401).json({ message: info?.message || "Invalid email or password" });
+      }
+
+      req.login(user, (loginErr) => {
+        if (loginErr) return next(loginErr);
+
+        // KEY: Set the taptrao_session cookie to the user's stored sessionId
+        // This gives instant access to all their data on any device
+        res.cookie("taptrao_session", user.sessionId, {
+          httpOnly: true,
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+          maxAge: 365 * 24 * 60 * 60 * 1000,
+        });
+
+        res.json({
+          user: { id: user.id, email: user.email, displayName: user.displayName, emailVerified: user.emailVerified },
+        });
+      });
+    })(req, res, next);
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        res.status(500).json({ message: "Logout failed" });
+        return;
+      }
+      res.json({ message: "Logged out" });
+    });
+  });
+
+  app.get("/api/auth/me", (req, res) => {
+    if (req.isAuthenticated?.() && req.user) {
+      res.json({
+        user: { id: req.user.id, email: req.user.email, displayName: req.user.displayName, emailVerified: req.user.emailVerified },
+      });
+    } else {
+      res.json({ user: null });
+    }
+  });
 
   app.get("/download/taptrao-project.zip", (_req, res) => {
     const zipPath = path.resolve("public/taptrao-project.zip");
@@ -408,8 +534,22 @@ export async function registerRoutes(
           readinessVerdict: result.readinessScore.verdict,
           readinessFactors: result.readinessScore.factors,
           readinessSummary: result.readinessScore.summary,
-        });
+        }, sessionId);
         lookupId = saved.id;
+
+        // Append first event in the TwinLog audit chain
+        try {
+          await appendTradeEvent(saved.id, sessionId, "compliance_check", {
+            commodityName: result.commodity.name,
+            origin: result.origin.countryName,
+            destination: result.destination.countryName,
+            hsCode: result.commodity.hsCode,
+            riskLevel,
+            readinessScore: result.readinessScore.score,
+            readinessVerdict: result.readinessScore.verdict,
+            integrityHash,
+          });
+        } catch (_auditErr) { /* audit is non-blocking */ }
       } catch (_e) {}
 
       res.json({ ...result, lookupId, integrityHash });
@@ -441,36 +581,128 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/trades/summary", async (_req, res) => {
+  app.get("/api/trades/summary", async (req, res) => {
     try {
-      const summary = await storage.getTradesSummary();
+      const sessionId = getSessionId(req, res);
+      const summary = await storage.getTradesSummary(sessionId);
       res.json(summary);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
 
-  app.get("/api/trades", async (_req, res) => {
+  // Trade detail — unified view for /trades/:id page
+  app.get("/api/trades/:id", async (req, res) => {
     try {
-      const trades = await storage.getEnrichedTrades();
+      const sessionId = getSessionId(req, res);
+      const detail = await storage.getTradeDetail(req.params.id, sessionId);
+      if (!detail) {
+        return res.status(404).json({ message: "Trade not found" });
+      }
+      res.json(detail);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Trade audit trail only
+  app.get("/api/trades/:id/audit", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const lookup = await storage.getLookupById(req.params.id);
+      if (!lookup || lookup.sessionId !== sessionId) {
+        return res.status(404).json({ message: "Trade not found" });
+      }
+      const auditTrail = await getTradeAuditChain(req.params.id);
+      const chainResult = await verifyAuditChain(req.params.id);
+      res.json({ auditTrail, ...chainResult });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Trade lifecycle: advance status
+  app.patch("/api/trades/:id/status", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { status } = req.body;
+      const validStatuses = ["active", "in_transit", "arrived", "cleared", "closed"];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+      const lookup = await storage.getLookupById(req.params.id);
+      if (!lookup || lookup.sessionId !== sessionId) {
+        return res.status(404).json({ message: "Trade not found" });
+      }
+      const oldStatus = (lookup as any).tradeStatus || "active";
+      const updated = await storage.updateTradeStatus(req.params.id, status, sessionId);
+      if (!updated) return res.status(404).json({ message: "Trade not found" });
+      // Audit event
+      await appendTradeEvent(req.params.id, sessionId, "status_change", { from: oldStatus, to: status });
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Trade lifecycle: archive
+  app.post("/api/trades/:id/archive", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { reason } = req.body || {};
+      const updated = await storage.archiveTrade(req.params.id, sessionId);
+      if (!updated) return res.status(404).json({ message: "Trade not found" });
+      await appendTradeEvent(req.params.id, sessionId, "trade_archived", { reason: reason || "User archived" });
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Trade lifecycle: update fields (notes, ETA, arrival)
+  app.patch("/api/trades/:id", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { notes, estimatedArrival, actualArrival } = req.body;
+      const updated = await storage.updateTradeFields(req.params.id, { notes, estimatedArrival, actualArrival }, sessionId);
+      if (!updated) return res.status(404).json({ message: "Trade not found or no changes" });
+      // Audit events for date changes
+      if (estimatedArrival) {
+        await appendTradeEvent(req.params.id, sessionId, "eta_set", { date: estimatedArrival });
+      }
+      if (actualArrival) {
+        await appendTradeEvent(req.params.id, sessionId, "arrival", { date: actualArrival });
+      }
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/trades", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const trades = await storage.getEnrichedTrades(sessionId);
       res.json(trades);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
 
-  app.get("/api/lookups/recent", async (_req, res) => {
+  app.get("/api/lookups/recent", async (req, res) => {
     try {
-      const data = await storage.getRecentLookups(10);
+      const sessionId = getSessionId(req, res);
+      const data = await storage.getRecentLookups(10, sessionId);
       res.json(data);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
 
-  app.get("/api/lookups", async (_req, res) => {
+  app.get("/api/lookups", async (req, res) => {
     try {
-      const data = await storage.getAllLookups();
+      const sessionId = getSessionId(req, res);
+      const data = await storage.getAllLookups(sessionId);
       res.json(data);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -508,9 +740,10 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/dashboard/stats", async (_req, res) => {
+  app.get("/api/dashboard/stats", async (req, res) => {
     try {
-      const stats = await storage.getDashboardStats();
+      const sessionId = getSessionId(req, res);
+      const stats = await storage.getDashboardStats(sessionId);
       res.json(stats);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -561,7 +794,7 @@ export async function registerRoutes(
           // New check: costs 1 trade credit
           if (balance < 1) {
             res.status(402).json({
-              message: "LC checks require a trade credit or standalone LC purchase ($19.99).",
+              message: "LC checks require a trade credit. Purchase a trade pack to continue.",
               required: 1,
               balance,
               type: "trade_pack",
@@ -644,6 +877,31 @@ export async function registerRoutes(
         }
       }
 
+      // Audit event: append to trade's hash chain if linked to a lookup
+      if (sourceLookupId) {
+        try {
+          if (recheckNumber > 0) {
+            await appendTradeEvent(sourceLookupId, sessionId, "lc_recheck", {
+              recheckNumber,
+              newVerdict: summary.verdict,
+              previousVerdict: existingCase ? "previous" : null,
+              discrepancyCount: summary.criticals + summary.warnings,
+              integrityHash,
+            });
+          } else {
+            await appendTradeEvent(sourceLookupId, sessionId, "lc_check", {
+              verdict: summary.verdict,
+              discrepancyCount: summary.criticals + summary.warnings,
+              matches: summary.matches,
+              totalChecks: summary.totalChecks,
+              integrityHash,
+            });
+          }
+        } catch (auditErr) {
+          console.error("Audit event failed (non-fatal):", auditErr);
+        }
+      }
+
       res.json({
         id: saved.id,
         results,
@@ -700,6 +958,37 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/lc-cases/by-lookup/:lookupId", async (req, res) => {
+    try {
+      const lcCase = await storage.getLcCaseByLookupId(req.params.lookupId);
+      if (!lcCase) {
+        res.status(404).json({ message: "No LC case found for this lookup" });
+        return;
+      }
+      const checkId = lcCase.latestCheckId || lcCase.initialCheckId;
+      const check = checkId ? await storage.getLcCheckById(checkId) : null;
+      if (!check) {
+        res.status(404).json({ message: "LC check not found for case" });
+        return;
+      }
+      res.json({
+        id: check.id,
+        results: check.resultsJson,
+        summary: check.summary,
+        integrityHash: check.integrityHash || "",
+        timestamp: check.createdAt.toISOString(),
+        correctionEmail: check.correctionEmail || "",
+        correctionWhatsApp: check.correctionWhatsApp || "",
+        caseId: lcCase.id,
+        recheckNumber: lcCase.recheckCount,
+        freeRechecksRemaining: Math.max(0, lcCase.maxFreeRechecks - lcCase.recheckCount),
+        caseStatus: lcCase.status,
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   app.get("/api/lc-cases/:id", async (req, res) => {
     try {
       const lcCase = await storage.getLcCaseById(req.params.id);
@@ -726,6 +1015,18 @@ export async function registerRoutes(
         discrepancyCount,
       };
       const updated = await storage.addCorrectionRequest(req.params.id, entry);
+      // Audit event for correction
+      if (updated.sourceLookupId) {
+        try {
+          const sessionId = getSessionId(req, res);
+          await appendTradeEvent(updated.sourceLookupId, sessionId, "correction_sent", {
+            channel,
+            discrepancyCount,
+          });
+        } catch (auditErr) {
+          console.error("Audit event failed (non-fatal):", auditErr);
+        }
+      }
       res.json(updated);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -745,6 +1046,18 @@ export async function registerRoutes(
     try {
       const { reason } = req.body;
       const updated = await storage.closeLcCase(req.params.id, reason || "Closed by user");
+      // Audit event for case close
+      if (updated.sourceLookupId) {
+        try {
+          const sessionId = getSessionId(req, res);
+          await appendTradeEvent(updated.sourceLookupId, sessionId, "trade_closed", {
+            reason: reason || "Closed by user",
+            finalStatus: updated.status,
+          });
+        } catch (auditErr) {
+          console.error("Audit event failed (non-fatal):", auditErr);
+        }
+      }
       res.json(updated);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -1174,6 +1487,13 @@ export async function registerRoutes(
             documentStatuses: docStatuses,
             pdfHash,
           });
+          // Audit event: TwinLog generated
+          if (resolvedLookupId) {
+            await appendTradeEvent(resolvedLookupId, sessionId, "twinlog_generated", {
+              ref: reference,
+              pdfHash,
+            });
+          }
         } catch (_e) {}
       });
     } catch (error: any) {
@@ -1239,14 +1559,26 @@ export async function registerRoutes(
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + 30);
 
+        const docsRequired = supplierDocs.length > 0 ? supplierDocs : ["Commercial Invoice", "Certificate of Origin", "Packing List"];
         request = await storage.createSupplierRequest({
           lookupId,
           userSessionId: sessionId,
-          docsRequired: supplierDocs.length > 0 ? supplierDocs : ["Commercial Invoice", "Certificate of Origin", "Packing List"],
+          docsRequired,
           docsReceived: [],
           uploadExpiresAt: expiresAt,
           status: "waiting",
         });
+
+        // Audit event: supplier link created
+        try {
+          const uploadUrlForAudit = `/upload/${request.uploadToken}`;
+          await appendTradeEvent(lookupId, sessionId, "supplier_link_created", {
+            docsRequired,
+            uploadUrl: uploadUrlForAudit,
+          });
+        } catch (auditErr) {
+          console.error("Audit event failed (non-fatal):", auditErr);
+        }
       }
 
       const host = req.headers.host || "app.taptrao.com";
@@ -1444,6 +1776,21 @@ export async function registerRoutes(
 
       await storage.updateSupplierRequestDocsReceived(request.id, newReceived, status);
 
+      // Audit event: supplier doc uploaded
+      if (request.lookupId) {
+        try {
+          const fileHash = createHash("sha256").update(file.buffer || file.path).digest("hex");
+          await appendTradeEvent(request.lookupId, request.userSessionId, "supplier_doc_uploaded", {
+            docType,
+            filename: safeFilename,
+            fileHash: fileHash.slice(0, 16),
+            filesizeBytes: file.size,
+          });
+        } catch (auditErr) {
+          console.error("Audit event failed (non-fatal):", auditErr);
+        }
+      }
+
       res.json({ success: true, filename: file.originalname, doc_type: docType });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -1478,6 +1825,18 @@ export async function registerRoutes(
         status = "waiting";
       }
       await storage.updateSupplierRequestDocsReceived(request.id, docsReceived, status);
+
+      // Audit event: supplier submission complete
+      if (status === "complete" && request.lookupId) {
+        try {
+          await appendTradeEvent(request.lookupId, request.userSessionId, "supplier_complete", {
+            docsReceived,
+            totalUploads: uploads.length,
+          });
+        } catch (auditErr) {
+          console.error("Audit event failed (non-fatal):", auditErr);
+        }
+      }
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -1705,6 +2064,17 @@ export async function registerRoutes(
         destIso2: destIso2 || null,
         status: "draft",
       });
+      // Audit event: EUDR created
+      try {
+        await appendTradeEvent(lookupId, sessionId, "eudr_created", {
+          eudrRecordId: record.id,
+          commodityId,
+          originIso2,
+          destIso2,
+        });
+      } catch (auditErr) {
+        console.error("Audit event failed (non-fatal):", auditErr);
+      }
       res.json(record);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -2184,7 +2554,7 @@ export async function registerRoutes(
     const sessionId = await requireApiKey(req, res);
     if (!sessionId) return;
     try {
-      const data = await storage.getAllLookups();
+      const data = await storage.getAllLookups(sessionId);
       res.json({ success: true, data });
     } catch (error: any) {
       res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: error.message } });

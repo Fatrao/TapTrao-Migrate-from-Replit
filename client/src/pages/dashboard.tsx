@@ -5,10 +5,12 @@ import { Link, useLocation } from "wouter";
 import type { Lookup, LcCheck, LcCase, TokenTransaction, ComplianceResult, OriginCountry, Destination } from "@shared/schema";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { useTokenBalance } from "@/hooks/use-tokens";
+import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const statsQuery = useQuery<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null }>({
     queryKey: ["/api/dashboard/stats"],
   });
@@ -121,11 +123,16 @@ export default function Dashboard() {
 
       {/* ── GREEN HERO BOX ── */}
       <div className="green-hero-box">
-        <div className="dash-breadcrumb">Commodity › Cocoa › Ghana</div>
+        <div className="dash-breadcrumb">
+          {user ? `Welcome back, ${user.displayName || user.email.split("@")[0]}` : "Dashboard"}
+        </div>
         <div className="dash-alert">
-          <span className="alert-label">⚠ Compliance: Pending</span>
+          <span className="alert-label">
+            {totalLookups > 0 ? `${totalLookups} lookups` : "No checks yet"}
+          </span>
           <span className="alert-text">
-            {totalLookups} lookups · {stats?.totalLcChecks ?? 0} LC checks · {balance} credits remaining
+            {stats?.totalLcChecks ?? 0} LC checks · {balance} Shield {balance === 1 ? "check" : "checks"} remaining
+            {stats?.topCorridor ? ` · Top corridor: ${stats.topCorridor}` : ""}
           </span>
         </div>
       </div>
@@ -139,45 +146,47 @@ export default function Dashboard() {
 
       {/* ── STAT CARDS ── */}
       <div className="stat-cards">
-        <div className="stat-card stat-card-link" onClick={() => navigate("/trades?filter=attention")} style={{ cursor: "pointer" }}>
-          <div className="stat-icon">🏛</div>
-          <div className="stat-label">Total Trade Value at Risk</div>
-          <div className="stat-value">$2,345,678</div>
-          <div className="stat-sub">
-            <span className="up">↑ 12.5%</span> · {totalLookups} past shipments
-          </div>
-        </div>
-
         <div className="stat-card stat-card-link" onClick={() => navigate("/trades")} style={{ cursor: "pointer" }}>
           <div className="stat-icon">🔍</div>
-          <div className="stat-label">Total Lookups</div>
+          <div className="stat-label">Compliance Lookups</div>
           <div className="stat-value" data-testid="stat-compliance-lookups">
             {totalLookups} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>checks</span>
           </div>
-          <div className="stat-sub">
-            <span className="up">↑ 8%</span> vs prev. 28 days
-          </div>
+          <div className="stat-sub">All time</div>
         </div>
 
-        <div className="stat-card stat-card-link" onClick={() => navigate("/trades?filter=attention")} style={{ cursor: "pointer" }}>
-          <div className="stat-icon">⚠️</div>
-          <div className="stat-label">Rejection Risk</div>
+        <div className="stat-card stat-card-link" onClick={() => navigate("/lc-check")} style={{ cursor: "pointer" }}>
+          <div className="stat-icon">📄</div>
+          <div className="stat-label">LC Checks</div>
           <div className="stat-value">
-            7.8% <span style={{ fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 12, background: "#fef3c7", color: "#d97706", marginLeft: 4 }}>Moderate</span>
+            {stats?.totalLcChecks ?? 0} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>checks</span>
           </div>
-          <div className="stat-sub">
-            <span className="down">↓ 1.7%</span> vs prev. 28 days
+          <div className="stat-sub">Document validations</div>
+        </div>
+
+        <div className="stat-card stat-card-link" onClick={() => navigate("/pricing")} style={{ cursor: "pointer" }}>
+          <div className="stat-icon">🛡️</div>
+          <div className="stat-label">Shield Balance</div>
+          <div className="stat-value">
+            {balance} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{balance === 1 ? "check" : "checks"}</span>
           </div>
+          <div className="stat-sub">{balance === 0 ? "Buy checks to continue" : "Available for use"}</div>
         </div>
 
         <div className="stat-card ai-card">
-          <div className="ai-label">Recommended with</div>
-          <div className="ai-badge">AI</div>
-          <Link href="/lookup">
-            <button className="ai-btn" data-testid="stat-token-balance">
-              Pre-Shipment<br />Check
-            </button>
-          </Link>
+          <div className="ai-label">Quick Actions</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
+            <Link href="/new-check">
+              <button className="ai-btn" data-testid="stat-new-check" style={{ width: "100%" }}>
+                New Check
+              </button>
+            </Link>
+            <Link href="/inbox">
+              <button className="ai-btn" data-testid="stat-supplier-link" style={{ width: "100%", background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}>
+                Supplier Inbox
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -236,23 +245,7 @@ export default function Dashboard() {
                   </td>
                   <td>
                     <button className="action-link" onClick={() => {
-                      if (t.lcCheckId) {
-                        navigate(`/lookup?lookupId=${t.id}`);
-                      } else {
-                        const prefill = {
-                          lookup_id: t.id,
-                          commodity_name: t.name,
-                          hs_code: t.hsCode,
-                          origin_iso2: t.originIso2,
-                          origin_name: t.originName,
-                          dest_iso2: t.destIso2,
-                          dest_name: t.destName,
-                          incoterms: "FOB",
-                          required_docs: [],
-                        };
-                        sessionStorage.setItem("lc_prefill", JSON.stringify(prefill));
-                        navigate("/lc-check");
-                      }
+                      navigate(`/trades/${t.id}`);
                     }}>{t.btnLabel}</button>
                   </td>
                 </tr>
@@ -333,7 +326,7 @@ export default function Dashboard() {
                 return (
                   <div key={c.id} className="pending-item" style={{ cursor: "pointer" }} onClick={() => {
                     if (c.sourceLookupId) {
-                      navigate(`/lookup?lookupId=${c.sourceLookupId}`);
+                      navigate(`/trades/${c.sourceLookupId}`);
                     }
                   }}>
                     <div className="pending-icon" style={{ fontSize: 16 }}>📋</div>
@@ -439,7 +432,7 @@ export default function Dashboard() {
               No trades yet. Run a compliance check to see document requirements.
             </div>
           ) : recentTrades.map((t) => (
-            <div key={t.id} className="pending-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/lookup?lookupId=${t.id}`)}>
+            <div key={t.id} className="pending-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/trades/${t.id}`)}>
               <div className="pending-icon">{t.icon}</div>
               <div className="pending-info">
                 <div className="pending-name">{t.name}</div>
@@ -463,7 +456,7 @@ export default function Dashboard() {
           </div>
           <div className="activity-list">
             {(lookupsQuery.data ?? []).map((l) => (
-              <div key={l.id} className="activity-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/lookup?lookupId=${l.id}`)}>
+              <div key={l.id} className="activity-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/trades/${l.id}`)}>
                 <div className="act-avatar" style={{ background: "rgba(113,171,145,0.12)", color: "var(--app-acapulco)" }}>F</div>
                 <div className="act-content">
                   <div className="act-text"><strong>You</strong> ran compliance lookup · {l.commodityName}</div>

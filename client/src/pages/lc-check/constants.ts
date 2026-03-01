@@ -40,6 +40,7 @@ export type LcPrefillData = {
   dest_name: string;
   incoterms: string;
   required_docs: string[];
+  load_existing?: boolean;
 };
 
 export type TwinlogData = {

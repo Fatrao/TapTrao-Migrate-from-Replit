@@ -70,6 +70,7 @@ import {
 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useTokenBalance } from "@/hooks/use-tokens";
+import { useAuth } from "@/hooks/use-auth";
 import type {
   Commodity,
   OriginCountry,
@@ -1060,7 +1061,7 @@ function EudrAlertBlock({ lookupId, result }: { lookupId?: string; result: Compl
   );
 }
 
-function ComplianceResultDisplay({ result, freeLocked = false }: { result: ComplianceResult; freeLocked?: boolean }) {
+function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated = false }: { result: ComplianceResult; freeLocked?: boolean; isAuthenticated?: boolean }) {
   const hasStopFlags = result.stopFlags && Object.keys(result.stopFlags).length > 0;
   const triggerCount = Object.values(result.triggers).filter(Boolean).length;
 
@@ -1574,6 +1575,49 @@ function ComplianceResultDisplay({ result, freeLocked = false }: { result: Compl
 
       <EvidenceHash result={result} />
 
+      {/* Auth-aware conversion banner */}
+      {!isAuthenticated && (
+        <Card style={{
+          background: "linear-gradient(135deg, #0e4e45, #14574a, #1c6352)",
+          border: "1px solid rgba(74,222,128,0.15)",
+        }} data-testid="banner-signup-conversion">
+          <CardContent className="p-5 space-y-3">
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: "'Clash Display', sans-serif" }}>
+              Create a free account to save this check
+            </h3>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>
+              Keep your compliance results, run LC document checks, track supplier documents, and monitor your shipments — all from one dashboard.
+            </p>
+            <Link href="/register">
+              <Button
+                size="sm"
+                style={{ background: "#6b9080", color: "#fff", borderRadius: 10, marginTop: 4 }}
+                data-testid="button-conversion-register"
+              >
+                Create Account →
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
+
+      {isAuthenticated && (
+        <Card style={{
+          background: "rgba(74,222,128,0.06)",
+          border: "1px solid rgba(74,222,128,0.2)",
+        }} data-testid="banner-saved-confirmation">
+          <CardContent className="p-4 flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: "#4ade80" }} />
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "#16a34a" }}>Saved to My Trades</p>
+              <p style={{ fontSize: 12, color: "#166534" }}>
+                View in your <Link href="/trades" style={{ textDecoration: "underline" }}>trades dashboard</Link> or continue to LC check.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {freeLocked && (
         <Card style={{ background: "var(--abg)" }} data-testid="banner-conversion">
           <CardContent className="p-5 space-y-3">
@@ -1736,6 +1780,7 @@ export default function Lookup() {
   const tokenQuery = useTokenBalance();
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [, navigate] = useLocation();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (!templateId || !commoditiesData || !originsData || !destinationsData) return;
@@ -2044,7 +2089,7 @@ export default function Lookup() {
           {displayResult && (
             <>
               <StepNav steps={["Lookup", "LC Check", "TwinLog Trail", "Archive"]} currentIndex={0} completedUpTo={-1} />
-              <ComplianceResultDisplay result={displayResult} freeLocked={freeLookupUsed && balance === 0} />
+              <ComplianceResultDisplay result={displayResult} freeLocked={freeLookupUsed && balance === 0} isAuthenticated={isAuthenticated} />
               {!isTemplateMode && !isLookupMode && (
                 <SaveTemplatePrompt
                   result={displayResult}

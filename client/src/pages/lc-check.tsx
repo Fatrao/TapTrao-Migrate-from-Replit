@@ -96,6 +96,9 @@ export default function LcCheck() {
   const [lcPdfFile, setLcPdfFile] = useState<UploadedFile | null>(null);
   const [docFiles, setDocFiles] = useState<Record<number, UploadedFile | null>>({});
 
+  // Loaded existing results (when navigating from My Trades to an existing case)
+  const [loadedResults, setLoadedResults] = useState<LcCheckResponse | null>(null);
+
   // LC extraction state
   type FieldConfidence = "high" | "medium" | "low";
   const [extractionStatus, setExtractionStatus] = useState<"idle" | "extracting" | "done" | "error">("idle");
@@ -222,8 +225,23 @@ export default function LcCheck() {
       const stored = sessionStorage.getItem("lc_prefill");
       if (!stored) return;
       const data: LcPrefillData = JSON.parse(stored);
+      sessionStorage.removeItem("lc_prefill");
       setPrefillData(data);
       setShowPrefillBanner(true);
+
+      // If this is an existing case, fetch the results and jump to step 4
+      if (data.load_existing && data.lookup_id) {
+        fetch(`/api/lc-cases/by-lookup/${data.lookup_id}`, { credentials: "include" })
+          .then(res => res.ok ? res.json() : null)
+          .then(result => {
+            if (result) {
+              setLoadedResults(result as LcCheckResponse);
+              setStep(4);
+            }
+          })
+          .catch(() => {});
+        return;
+      }
 
       setLcFields(prev => ({
         ...prev,
@@ -248,8 +266,6 @@ export default function LcCheck() {
           setActiveDocTab(0);
         }
       }
-
-      sessionStorage.removeItem("lc_prefill");
     } catch {}
   }, []);
 
@@ -320,6 +336,9 @@ export default function LcCheck() {
 
   const canProceedStep2 = documents.length > 0;
 
+  // Use mutation data if available, otherwise fall back to loaded existing results
+  const resultData = checkMutation.data || loadedResults;
+
   const [showCorrection, setShowCorrection] = useState(false);
   const [correctionTab, setCorrectionTab] = useState<"email" | "whatsapp">("email");
   const [lcActiveTab, setLcActiveTab] = useState("Check");
@@ -373,7 +392,7 @@ export default function LcCheck() {
           <div className="hero-row">
             <div className="breadcrumb">Compliance › LC Check › New Check</div>
             <div className="price-pill" data-testid="text-lc-title">
-              {isFreeCheck ? "FREE" : "$19.99 per check"}
+              {isFreeCheck ? "FREE" : "1 credit per check"}
             </div>
           </div>
           <h1>LC Document<br />Checker</h1>
@@ -977,7 +996,7 @@ export default function LcCheck() {
                   ? "⏳ Checking..."
                   : isFreeCheck
                   ? "▶ Run LC Check — Free"
-                  : "▶ Run LC Check — $19.99"}
+                  : "▶ Run LC Check — 1 credit"}
               </button>
               <button className="btn-secondary" onClick={() => goStep(2)}>
                 ← Back
@@ -987,12 +1006,12 @@ export default function LcCheck() {
         )}
 
         {/* ═══════ STEP 4 — Results ═══════ */}
-        {step === 4 && checkMutation.data && (
+        {step === 4 && resultData && (
           <div data-testid="section-lc-results">
 
             {/* Verdict banner */}
             {(() => {
-              const v = checkMutation.data.summary.verdict;
+              const v = resultData.summary.verdict;
               const cls = v === "COMPLIANT" ? "ok" : v === "COMPLIANT_WITH_NOTES" ? "warn" : "fail";
               return (
                 <div className={`lc-verdict ${cls}`} style={{ margin: "0 32px 24px" }}>
@@ -1004,24 +1023,24 @@ export default function LcCheck() {
                       {cls === "fail" ? "Discrepancies Found" : cls === "warn" ? "Compliant With Notes" : "Fully Compliant"}
                     </div>
                     <div className="lc-v-sub">
-                      {checkMutation.data.summary.criticals > 0
-                        ? `${checkMutation.data.summary.criticals} critical issue${checkMutation.data.summary.criticals > 1 ? "s" : ""} will cause bank rejection.`
-                        : checkMutation.data.summary.warnings > 0
-                        ? `${checkMutation.data.summary.warnings} warning${checkMutation.data.summary.warnings > 1 ? "s" : ""} to review.`
+                      {resultData.summary.criticals > 0
+                        ? `${resultData.summary.criticals} critical issue${resultData.summary.criticals > 1 ? "s" : ""} will cause bank rejection.`
+                        : resultData.summary.warnings > 0
+                        ? `${resultData.summary.warnings} warning${resultData.summary.warnings > 1 ? "s" : ""} to review.`
                         : "All fields match LC terms."}
                     </div>
                   </div>
                   <div className="lc-v-stats">
                     <div className="lc-vs">
-                      <div className="lc-vs-n g" data-testid="text-matches">{checkMutation.data.summary.matches}</div>
+                      <div className="lc-vs-n g" data-testid="text-matches">{resultData.summary.matches}</div>
                       <div className="lc-vs-l">Match</div>
                     </div>
                     <div className="lc-vs">
-                      <div className="lc-vs-n a" data-testid="text-warnings">{checkMutation.data.summary.warnings}</div>
+                      <div className="lc-vs-n a" data-testid="text-warnings">{resultData.summary.warnings}</div>
                       <div className="lc-vs-l">Warning</div>
                     </div>
                     <div className="lc-vs">
-                      <div className="lc-vs-n r" data-testid="text-criticals">{checkMutation.data.summary.criticals}</div>
+                      <div className="lc-vs-n r" data-testid="text-criticals">{resultData.summary.criticals}</div>
                       <div className="lc-vs-l">Critical</div>
                     </div>
                   </div>
@@ -1030,7 +1049,7 @@ export default function LcCheck() {
             })()}
 
             {/* Insurance gap alert */}
-            {(checkMutation.data.summary.verdict === "COMPLIANT" || checkMutation.data.summary.verdict === "COMPLIANT_WITH_NOTES") && (
+            {(resultData.summary.verdict === "COMPLIANT" || resultData.summary.verdict === "COMPLIANT_WITH_NOTES") && (
               <div style={{ margin: "0 32px" }}>
                 <InsuranceGapAlert />
               </div>
@@ -1040,16 +1059,16 @@ export default function LcCheck() {
             <div className="form-card">
               <div className="form-card-header"><span>📊</span><h2>Field-by-Field Results</h2></div>
               <p className="form-card-subtitle">
-                Ref: TT-LC-{new Date().getFullYear()}-{checkMutation.data.integrityHash.substring(0, 6)} · {new Date(checkMutation.data.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                Ref: TT-LC-{new Date().getFullYear()}-{resultData.integrityHash.substring(0, 6)} · {new Date(resultData.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
               </p>
 
               {/* Critical results */}
-              {checkMutation.data.results.filter(r => r.severity === "RED").length > 0 && (
+              {resultData.results.filter(r => r.severity === "RED").length > 0 && (
                 <div style={{ marginBottom: 14 }}>
                   <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--app-regent)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
                     🔴 Critical — Bank will reject
                   </div>
-                  {checkMutation.data.results.filter(r => r.severity === "RED").map((r, i) => (
+                  {resultData.results.filter(r => r.severity === "RED").map((r, i) => (
                     <div key={`fail-${i}`} className="lc-rr fail" data-testid={`result-item-fail-${i}`}>
                       <div className="lc-rr-dot fail" />
                       <div>
@@ -1066,12 +1085,12 @@ export default function LcCheck() {
               )}
 
               {/* Warning results */}
-              {checkMutation.data.results.filter(r => r.severity === "AMBER").length > 0 && (
+              {resultData.results.filter(r => r.severity === "AMBER").length > 0 && (
                 <div style={{ marginBottom: 14 }}>
                   <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--app-regent)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
                     🟡 Warnings
                   </div>
-                  {checkMutation.data.results.filter(r => r.severity === "AMBER").map((r, i) => (
+                  {resultData.results.filter(r => r.severity === "AMBER").map((r, i) => (
                     <div key={`warn-${i}`} className="lc-rr warn" data-testid={`result-item-warn-${i}`}>
                       <div className="lc-rr-dot warn" />
                       <div>
@@ -1088,12 +1107,12 @@ export default function LcCheck() {
               )}
 
               {/* Matched results */}
-              {checkMutation.data.results.filter(r => r.severity === "GREEN").length > 0 && (
+              {resultData.results.filter(r => r.severity === "GREEN").length > 0 && (
                 <div style={{ marginBottom: 14 }}>
                   <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--app-regent)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
                     🟢 Matched
                   </div>
-                  {checkMutation.data.results.filter(r => r.severity === "GREEN").map((r, i) => (
+                  {resultData.results.filter(r => r.severity === "GREEN").map((r, i) => (
                     <div key={`ok-${i}`} className="lc-rr ok" data-testid={`result-item-ok-${i}`}>
                       <div className="lc-rr-dot ok" />
                       <div>
@@ -1110,11 +1129,11 @@ export default function LcCheck() {
             </div>
 
             {/* Correction Email Card */}
-            {checkMutation.data.summary.criticals > 0 && checkMutation.data.correctionEmail && (
+            {resultData.summary.criticals > 0 && resultData.correctionEmail && (
               <div className="form-card">
                 <div className="form-card-header"><span>✉️</span><h2>Supplier Correction Request</h2></div>
                 <p className="form-card-subtitle">
-                  Ready to send — {checkMutation.data.summary.criticals} correction{checkMutation.data.summary.criticals > 1 ? "s" : ""} needed
+                  Ready to send — {resultData.summary.criticals} correction{resultData.summary.criticals > 1 ? "s" : ""} needed
                 </p>
 
                 {/* Tab toggle: Email / WhatsApp */}
@@ -1162,19 +1181,19 @@ export default function LcCheck() {
                     {correctionTab === "email" ? "Email message" : "WhatsApp message"}
                   </div>
                   <div className="lc-email-box" data-testid={`text-correction-${correctionTab}`}>
-                    {correctionTab === "email" ? (checkMutation.data.correctionEmail || "") : (checkMutation.data.correctionWhatsApp || "")}
+                    {correctionTab === "email" ? (resultData.correctionEmail || "") : (resultData.correctionWhatsApp || "")}
                   </div>
                 </div>
 
                 {/* Action buttons: Copy + Send */}
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14 }}>
                   <CopyBtn
-                    text={correctionTab === "email" ? (checkMutation.data.correctionEmail || "") : (checkMutation.data.correctionWhatsApp || "")}
+                    text={correctionTab === "email" ? (resultData.correctionEmail || "") : (resultData.correctionWhatsApp || "")}
                     label={`correction-${correctionTab}`}
                   />
                   {correctionTab === "email" ? (
                     <a
-                      href={`mailto:?subject=${encodeURIComponent(`Correction Request — LC ${lcFields.lcReference}`)}&body=${encodeURIComponent(checkMutation.data.correctionEmail || "")}`}
+                      href={`mailto:?subject=${encodeURIComponent(`Correction Request — LC ${lcFields.lcReference}`)}&body=${encodeURIComponent(resultData.correctionEmail || "")}`}
                       style={{
                         display: "inline-flex",
                         alignItems: "center",
@@ -1194,7 +1213,7 @@ export default function LcCheck() {
                     </a>
                   ) : (
                     <a
-                      href={`https://wa.me/?text=${encodeURIComponent(checkMutation.data.correctionWhatsApp || "")}`}
+                      href={`https://wa.me/?text=${encodeURIComponent(resultData.correctionWhatsApp || "")}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -1225,43 +1244,43 @@ export default function LcCheck() {
                 <Hash size={18} style={{ color: "var(--app-regent)", flexShrink: 0, marginTop: 1 }} />
                 <div style={{ minWidth: 0 }}>
                   <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-lc-check-ref">
-                    LC check ref: TT-LC-{new Date().getFullYear()}-{checkMutation.data.integrityHash.substring(0, 6).toUpperCase()}
+                    LC check ref: TT-LC-{new Date().getFullYear()}-{resultData.integrityHash.substring(0, 6).toUpperCase()}
                   </p>
                   <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--app-regent)", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
-                    Integrity hash: sha256:{checkMutation.data.integrityHash}
+                    Integrity hash: sha256:{resultData.integrityHash}
                   </p>
                   <p style={{ fontSize: 11, color: "var(--app-regent)" }} data-testid="text-lc-check-timestamp">
-                    Checked: {new Date(checkMutation.data.timestamp).toLocaleString()}
+                    Checked: {new Date(resultData.timestamp).toLocaleString()}
                   </p>
                 </div>
               </div>
             </div>
 
             {/* Re-check banner */}
-            {checkMutation.data.recheckNumber > 0 && (
+            {resultData.recheckNumber > 0 && (
               <div style={{ margin: "0 32px 16px", padding: "12px 16px", background: "rgba(107,144,128,0.08)", border: "1px solid rgba(107,144,128,0.2)", borderRadius: 10, display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontSize: 16 }}>🔄</span>
                 <span style={{ fontSize: 13, fontWeight: 600, color: "#6b9080" }}>
-                  Re-check #{checkMutation.data.recheckNumber} · {checkMutation.data.freeRechecksRemaining} free re-check{checkMutation.data.freeRechecksRemaining !== 1 ? "s" : ""} remaining
+                  Re-check #{resultData.recheckNumber} · {resultData.freeRechecksRemaining} free re-check{resultData.freeRechecksRemaining !== 1 ? "s" : ""} remaining
                 </span>
               </div>
             )}
 
             {/* Action buttons */}
-            {checkMutation.data.summary.verdict === "DISCREPANCIES_FOUND" ? (
+            {resultData.summary.verdict === "DISCREPANCIES_FOUND" ? (
               <div className="action-row" style={{ flexWrap: "wrap" }}>
                 <button
                   className="btn-primary"
                   onClick={async () => {
-                    if (checkMutation.data?.caseId) {
+                    if (resultData?.caseId) {
                       try {
-                        await fetch(`/api/lc-cases/${checkMutation.data.caseId}/correction-request`, {
+                        await fetch(`/api/lc-cases/${resultData.caseId}/correction-request`, {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           credentials: "include",
                           body: JSON.stringify({
                             channel: correctionTab,
-                            discrepancyCount: checkMutation.data.summary.criticals,
+                            discrepancyCount: resultData.summary.criticals,
                           }),
                         });
                       } catch {}
@@ -1276,9 +1295,9 @@ export default function LcCheck() {
                 <button
                   className="btn-secondary"
                   onClick={async () => {
-                    if (checkMutation.data?.caseId) {
+                    if (resultData?.caseId) {
                       try {
-                        await fetch(`/api/lc-cases/${checkMutation.data.caseId}/park`, {
+                        await fetch(`/api/lc-cases/${resultData.caseId}/park`, {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           credentials: "include",
@@ -1301,9 +1320,9 @@ export default function LcCheck() {
                 <button
                   style={{ background: "none", border: "none", color: "#999", fontSize: 12, cursor: "pointer", padding: "6px 0" }}
                   onClick={async () => {
-                    if (checkMutation.data?.caseId) {
+                    if (resultData?.caseId) {
                       try {
-                        await fetch(`/api/lc-cases/${checkMutation.data.caseId}/close`, {
+                        await fetch(`/api/lc-cases/${resultData.caseId}/close`, {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           credentials: "include",
@@ -1330,6 +1349,7 @@ export default function LcCheck() {
                   onClick={() => {
                     setStep(1);
                     checkMutation.reset();
+                    setLoadedResults(null);
                     setShowCorrection(false);
                     setLcFields({
                       beneficiaryName: "", applicantName: "", goodsDescription: "", hsCode: "",
@@ -1349,9 +1369,9 @@ export default function LcCheck() {
                 <button
                   style={{ background: "none", border: "none", color: "#999", fontSize: 12, cursor: "pointer", padding: "6px 0" }}
                   onClick={async () => {
-                    if (checkMutation.data?.caseId) {
+                    if (resultData?.caseId) {
                       try {
-                        await fetch(`/api/lc-cases/${checkMutation.data.caseId}/close`, {
+                        await fetch(`/api/lc-cases/${resultData.caseId}/close`, {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           credentials: "include",

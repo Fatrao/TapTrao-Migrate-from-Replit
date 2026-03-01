@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { Menu, X, ChevronDown } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 /* ═══════════════════════════════════════════
    Interactive Demo — 4-step auto-advancing carousel
@@ -356,6 +357,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [menuDropdownOpen, setMenuDropdownOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+  const { isAuthenticated, user } = useAuth();
 
   // Mouse-follow spotlight on hero
   useEffect(() => {
@@ -431,12 +433,20 @@ export default function Home() {
           <Link href="/pricing">
             <span className="nav-link-pricing" data-testid="button-pricing">Pricing</span>
           </Link>
-          <Link href="/dashboard">
-            <span className="nav-btn-ghost" data-testid="button-sign-in">Log In</span>
-          </Link>
-          <Link href="/pricing">
-            <span className="nav-btn-primary" data-testid="button-nav-start-free">Pricing</span>
-          </Link>
+          {isAuthenticated ? (
+            <Link href="/dashboard">
+              <span className="nav-btn-primary" data-testid="button-nav-dashboard">Dashboard</span>
+            </Link>
+          ) : (
+            <>
+              <Link href="/login">
+                <span className="nav-btn-ghost" data-testid="button-sign-in">Log In</span>
+              </Link>
+              <Link href="/register">
+                <span className="nav-btn-primary" data-testid="button-nav-create-account">Create Account</span>
+              </Link>
+            </>
+          )}
           {/* Mobile hamburger */}
           <button
             className="mobile-toggle"

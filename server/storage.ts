@@ -20,6 +20,7 @@ import {
   alertSubscriptions,
   regulatoryAlerts,
   alertReads,
+  users,
   type Destination,
   type RegionalFramework,
   type OriginCountry,
@@ -58,6 +59,10 @@ import {
   apiKeys,
   documentExtractions,
   type DocumentExtraction,
+  type User,
+  type TradeStatus,
+  type TradeEvent,
+  tradeEvents,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -87,12 +92,12 @@ export interface IStorage {
   getRecentLcChecks(limit: number): Promise<LcCheck[]>;
   getLcChecksByLookupIds(lookupIds: string[]): Promise<Record<string, string>>;
   hasLcCheckForLookup(lookupId: string): Promise<boolean>;
-  createLookup(data: InsertLookup): Promise<Lookup>;
+  createLookup(data: InsertLookup, sessionId?: string): Promise<Lookup>;
   getLookupById(id: string): Promise<Lookup | undefined>;
-  getRecentLookups(limit: number): Promise<Lookup[]>;
-  getAllLookups(): Promise<Lookup[]>;
+  getRecentLookups(limit: number, sessionId?: string): Promise<Lookup[]>;
+  getAllLookups(sessionId?: string): Promise<Lookup[]>;
   getAllLcChecks(): Promise<LcCheck[]>;
-  getDashboardStats(): Promise<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null }>;
+  getDashboardStats(sessionId?: string): Promise<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null }>;
   getOrCreateUserTokens(sessionId: string): Promise<UserTokens>;
   getTokenBalance(sessionId: string): Promise<{ balance: number; lcBalance: number; freeLookupUsed: boolean }>;
   spendTokens(sessionId: string, amount: number, description: string): Promise<{ success: boolean; balance: number }>;
@@ -113,8 +118,8 @@ export interface IStorage {
   getCompanyProfile(sessionId: string): Promise<CompanyProfile | undefined>;
   upsertCompanyProfile(data: InsertCompanyProfile): Promise<CompanyProfile>;
   createTwinlogDownload(data: { lookupId?: string; sessionId: string; companyName: string; eoriNumber?: string; documentStatuses: unknown; pdfHash: string }): Promise<TwinlogDownload>;
-  getTradesSummary(): Promise<{ total: number; needAttention: number; lcPending: number; archiveReady: number }>;
-  getEnrichedTrades(): Promise<EnrichedTrade[]>;
+  getTradesSummary(sessionId?: string): Promise<{ total: number; needAttention: number; lcPending: number; archiveReady: number }>;
+  getEnrichedTrades(sessionId?: string): Promise<EnrichedTrade[]>;
   getSupplierRequestsBySession(sessionId: string): Promise<EnrichedSupplierRequest[]>;
   getSupplierInboxSummary(sessionId: string): Promise<{ awaiting: number; blocking: number; completeThisWeek: number }>;
   getSupplierInboxBadgeCount(sessionId: string): Promise<number>;
@@ -175,6 +180,17 @@ export interface IStorage {
   getApiKeysBySession(sessionId: string): Promise<{ id: string; name: string; keyPreview: string; isActive: boolean; lastUsedAt: Date | null; createdAt: Date }[]>;
   deactivateApiKey(id: string, sessionId: string): Promise<boolean>;
   touchApiKey(id: string): Promise<void>;
+  // Users (Auth)
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserById(id: string): Promise<User | undefined>;
+  getUserBySessionId(sessionId: string): Promise<User | undefined>;
+  createUser(data: { email: string; passwordHash: string; sessionId: string; displayName?: string }): Promise<User>;
+  // Trade lifecycle
+  updateTradeStatus(lookupId: string, status: TradeStatus, sessionId: string): Promise<Lookup | undefined>;
+  archiveTrade(lookupId: string, sessionId: string): Promise<Lookup | undefined>;
+  updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string }, sessionId: string): Promise<Lookup | undefined>;
+  // Trade detail (unified view)
+  getTradeDetail(lookupId: string, sessionId: string): Promise<TradeDetail | null>;
 }
 
 export type EnrichedTrade = {
@@ -189,8 +205,22 @@ export type EnrichedTrade = {
   readinessScore: number | null;
   readinessVerdict: string | null;
   createdAt: Date;
+  tradeStatus: string | null;
   lcVerdict: string | null;
   lcCheckId: string | null;
+};
+
+export type TradeDetail = {
+  lookup: Lookup;
+  lcCase: LcCase | null;
+  latestLcCheck: LcCheck | null;
+  supplierRequest: SupplierRequest | null;
+  supplierUploads: SupplierUpload[];
+  eudrRecord: EudrRecord | null;
+  twinlog: { ref: string | null; hash: string | null; lockedAt: Date | null };
+  tradeStatus: string;
+  auditTrail: TradeEvent[];
+  chainValid: boolean;
 };
 
 export class DatabaseStorage implements IStorage {
@@ -314,8 +344,9 @@ export class DatabaseStorage implements IStorage {
     return !!result;
   }
 
-  async createLookup(data: InsertLookup): Promise<Lookup> {
-    const [result] = await db.insert(lookups).values(data).returning();
+  async createLookup(data: InsertLookup, sessionId?: string): Promise<Lookup> {
+    const insertData = sessionId ? { ...data, sessionId } : data;
+    const [result] = await db.insert(lookups).values(insertData).returning();
 
     const year = new Date().getFullYear();
     const refInput = result.id + result.createdAt.toISOString();
@@ -343,11 +374,17 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async getRecentLookups(limit: number): Promise<Lookup[]> {
+  async getRecentLookups(limit: number, sessionId?: string): Promise<Lookup[]> {
+    if (sessionId) {
+      return db.select().from(lookups).where(eq(lookups.sessionId, sessionId)).orderBy(desc(lookups.createdAt)).limit(limit);
+    }
     return db.select().from(lookups).orderBy(desc(lookups.createdAt)).limit(limit);
   }
 
-  async getAllLookups(): Promise<Lookup[]> {
+  async getAllLookups(sessionId?: string): Promise<Lookup[]> {
+    if (sessionId) {
+      return db.select().from(lookups).where(eq(lookups.sessionId, sessionId)).orderBy(desc(lookups.createdAt));
+    }
     return db.select().from(lookups).orderBy(desc(lookups.createdAt));
   }
 
@@ -355,22 +392,23 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(lcChecks).orderBy(desc(lcChecks.createdAt));
   }
 
-  async getDashboardStats(): Promise<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null }> {
-    const [lookupCount] = await db.select({ count: sql<number>`count(*)` }).from(lookups);
-    const [lcCount] = await db.select({ count: sql<number>`count(*)` }).from(lcChecks);
-    const corridorRows = await db
-      .select({
-        corridor: sql<string>`origin_name || ' → ' || destination_name`,
-        count: sql<number>`count(*)`,
-      })
-      .from(lookups)
-      .groupBy(sql`origin_name || ' → ' || destination_name`)
-      .orderBy(desc(sql`count(*)`))
-      .limit(1);
+  async getDashboardStats(sessionId?: string): Promise<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null }> {
+    const sessionFilter = sessionId ? sql`WHERE session_id = ${sessionId}` : sql``;
+    const lcSessionFilter = sessionId ? sql`WHERE session_id = ${sessionId}` : sql``;
+
+    const [lookupCount] = await db.execute(sql`SELECT count(*) as count FROM lookups ${sessionFilter}`);
+    const [lcCount] = await db.execute(sql`SELECT count(*) as count FROM lc_checks ${lcSessionFilter}`);
+    const corridorRows = await db.execute(sql`
+      SELECT origin_name || ' → ' || destination_name as corridor, count(*) as count
+      FROM lookups ${sessionFilter}
+      GROUP BY origin_name || ' → ' || destination_name
+      ORDER BY count(*) DESC
+      LIMIT 1
+    `);
     return {
-      totalLookups: Number(lookupCount.count),
-      totalLcChecks: Number(lcCount.count),
-      topCorridor: corridorRows.length > 0 ? corridorRows[0].corridor : null,
+      totalLookups: Number((lookupCount as any).count),
+      totalLcChecks: Number((lcCount as any).count),
+      topCorridor: (corridorRows.rows as any[]).length > 0 ? (corridorRows.rows as any[])[0].corridor : null,
     };
   }
 
@@ -578,23 +616,24 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  async getTradesSummary(): Promise<{ total: number; needAttention: number; lcPending: number; archiveReady: number }> {
-    const [totalRow] = await db.select({ count: sql<number>`count(*)` }).from(lookups);
-    const [attentionRow] = await db.select({ count: sql<number>`count(*)` }).from(lookups)
-      .where(sql`readiness_verdict IN ('RED','AMBER')`);
-    const [lcPendingRow] = await db.select({ count: sql<number>`count(*)` }).from(lcChecks)
-      .where(eq(lcChecks.verdict, 'DISCREPANCIES_FOUND'));
-    const [archiveRow] = await db.select({ count: sql<number>`count(*)` }).from(lookups)
-      .where(sql`created_at < NOW() - INTERVAL '30 days'`);
+  async getTradesSummary(sessionId?: string): Promise<{ total: number; needAttention: number; lcPending: number; archiveReady: number }> {
+    const sessionFilter = sessionId ? sql` AND l.session_id = ${sessionId}` : sql``;
+    const lcSessionFilter = sessionId ? sql` AND lc.session_id = ${sessionId}` : sql``;
+
+    const totalRows = await db.execute(sql`SELECT count(*) as count FROM lookups l WHERE 1=1 ${sessionFilter}`);
+    const attentionRows = await db.execute(sql`SELECT count(*) as count FROM lookups l WHERE readiness_verdict IN ('RED','AMBER') ${sessionFilter}`);
+    const lcPendingRows = await db.execute(sql`SELECT count(*) as count FROM lc_checks lc WHERE verdict = 'DISCREPANCIES_FOUND' ${lcSessionFilter}`);
+    const archiveRows = await db.execute(sql`SELECT count(*) as count FROM lookups l WHERE (trade_status = 'archived' OR (trade_status IS NULL AND created_at < NOW() - INTERVAL '30 days')) ${sessionFilter}`);
     return {
-      total: Number(totalRow.count),
-      needAttention: Number(attentionRow.count),
-      lcPending: Number(lcPendingRow.count),
-      archiveReady: Number(archiveRow.count),
+      total: Number((totalRows.rows as any[])[0]?.count ?? 0),
+      needAttention: Number((attentionRows.rows as any[])[0]?.count ?? 0),
+      lcPending: Number((lcPendingRows.rows as any[])[0]?.count ?? 0),
+      archiveReady: Number((archiveRows.rows as any[])[0]?.count ?? 0),
     };
   }
 
-  async getEnrichedTrades(): Promise<EnrichedTrade[]> {
+  async getEnrichedTrades(sessionId?: string): Promise<EnrichedTrade[]> {
+    const sessionFilter = sessionId ? sql`AND l.session_id = ${sessionId}` : sql``;
     const rows = await db.execute(sql`
       SELECT DISTINCT ON (l.id)
         l.id,
@@ -608,12 +647,14 @@ export class DatabaseStorage implements IStorage {
         l.readiness_score AS "readinessScore",
         l.readiness_verdict AS "readinessVerdict",
         l.created_at AS "createdAt",
+        l.trade_status AS "tradeStatus",
         lc.verdict AS "lcVerdict",
         lc.id AS "lcCheckId"
       FROM lookups l
       INNER JOIN origin_countries o ON l.origin_id = o.id
       INNER JOIN destinations d ON l.destination_id = d.id
       LEFT JOIN lc_checks lc ON lc.source_lookup_id = l.id
+      WHERE 1=1 ${sessionFilter}
       ORDER BY l.id, lc.created_at DESC
     `);
     const sorted = (rows.rows as EnrichedTrade[]).sort(
@@ -1048,6 +1089,135 @@ export class DatabaseStorage implements IStorage {
 
   async touchApiKey(id: string): Promise<void> {
     await db.update(apiKeys).set({ lastUsedAt: new Date() }).where(eq(apiKeys.id, id));
+  }
+
+  // ── Users (Auth) ──
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [row] = await db.select().from(users).where(eq(users.email, email.toLowerCase()));
+    return row;
+  }
+
+  async getUserById(id: string): Promise<User | undefined> {
+    const [row] = await db.select().from(users).where(eq(users.id, id));
+    return row;
+  }
+
+  async getUserBySessionId(sessionId: string): Promise<User | undefined> {
+    const [row] = await db.select().from(users).where(eq(users.sessionId, sessionId));
+    return row;
+  }
+
+  async createUser(data: { email: string; passwordHash: string; sessionId: string; displayName?: string }): Promise<User> {
+    const [row] = await db.insert(users).values({
+      email: data.email.toLowerCase(),
+      passwordHash: data.passwordHash,
+      sessionId: data.sessionId,
+      displayName: data.displayName || null,
+    }).returning();
+    return row;
+  }
+
+  // ── Trade Lifecycle ──
+
+  async updateTradeStatus(lookupId: string, status: TradeStatus, sessionId: string): Promise<Lookup | undefined> {
+    const extra: Record<string, unknown> = { tradeStatus: status };
+    if (status === "closed") extra.closedAt = new Date();
+    if (status === "archived") extra.archivedAt = new Date();
+
+    const [row] = await db.update(lookups)
+      .set(extra as any)
+      .where(and(eq(lookups.id, lookupId), eq(lookups.sessionId, sessionId)))
+      .returning();
+    return row;
+  }
+
+  async archiveTrade(lookupId: string, sessionId: string): Promise<Lookup | undefined> {
+    const [row] = await db.update(lookups)
+      .set({ tradeStatus: "archived" as any, archivedAt: new Date() })
+      .where(and(eq(lookups.id, lookupId), eq(lookups.sessionId, sessionId)))
+      .returning();
+    return row;
+  }
+
+  async updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string }, sessionId: string): Promise<Lookup | undefined> {
+    const updates: Record<string, unknown> = {};
+    if (fields.notes !== undefined) updates.notes = fields.notes;
+    if (fields.estimatedArrival !== undefined) updates.estimatedArrival = fields.estimatedArrival;
+    if (fields.actualArrival !== undefined) updates.actualArrival = fields.actualArrival;
+
+    if (Object.keys(updates).length === 0) return undefined;
+
+    const [row] = await db.update(lookups)
+      .set(updates as any)
+      .where(and(eq(lookups.id, lookupId), eq(lookups.sessionId, sessionId)))
+      .returning();
+    return row;
+  }
+
+  async getTradeDetail(lookupId: string, sessionId: string): Promise<TradeDetail | null> {
+    // 1. Get the lookup and verify ownership
+    const [lookup] = await db.select().from(lookups)
+      .where(and(eq(lookups.id, lookupId), eq(lookups.sessionId, sessionId)));
+    if (!lookup) return null;
+
+    // 2. Get LC case for this lookup
+    const [lcCase] = await db.select().from(lcCases)
+      .where(eq(lcCases.sourceLookupId, lookupId)).limit(1);
+
+    // 3. Get latest LC check
+    let latestLcCheck: LcCheck | null = null;
+    if (lcCase?.latestCheckId) {
+      const [check] = await db.select().from(lcChecks)
+        .where(eq(lcChecks.id, lcCase.latestCheckId));
+      latestLcCheck = check ?? null;
+    }
+
+    // 4. Get supplier request and uploads
+    const [supplierRequest] = await db.select().from(supplierRequests)
+      .where(eq(supplierRequests.lookupId, lookupId)).limit(1);
+    let supplierUploadsList: SupplierUpload[] = [];
+    if (supplierRequest) {
+      supplierUploadsList = await db.select().from(supplierUploads)
+        .where(eq(supplierUploads.requestId, supplierRequest.id));
+    }
+
+    // 5. Get EUDR record
+    const [eudrRecord] = await db.select().from(eudrRecords)
+      .where(eq(eudrRecords.lookupId, lookupId));
+
+    // 6. Get audit trail from trade_events
+    const auditTrail = await db.select().from(tradeEvents)
+      .where(eq(tradeEvents.lookupId, lookupId))
+      .orderBy(tradeEvents.createdAt);
+
+    // 7. Verify chain integrity
+    let chainValid = true;
+    for (let i = 0; i < auditTrail.length; i++) {
+      const event = auditTrail[i];
+      const expectedPreviousHash = i === 0 ? null : auditTrail[i - 1].eventHash;
+      if (event.previousHash !== expectedPreviousHash) {
+        chainValid = false;
+        break;
+      }
+    }
+
+    return {
+      lookup,
+      lcCase: lcCase ?? null,
+      latestLcCheck,
+      supplierRequest: supplierRequest ?? null,
+      supplierUploads: supplierUploadsList,
+      eudrRecord: eudrRecord ?? null,
+      twinlog: {
+        ref: lookup.twinlogRef,
+        hash: lookup.twinlogHash,
+        lockedAt: lookup.twinlogLockedAt,
+      },
+      tradeStatus: (lookup as any).tradeStatus ?? "active",
+      auditTrail,
+      chainValid,
+    };
   }
 }
 

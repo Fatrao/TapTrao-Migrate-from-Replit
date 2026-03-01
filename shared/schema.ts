@@ -132,6 +132,15 @@ export const afcftaRoo = pgTable(
   (table) => [index("afcfta_roo_hs_heading_idx").on(table.hsHeading)]
 );
 
+export const tradeStatusEnum = pgEnum("trade_status", [
+  "active",
+  "in_transit",
+  "arrived",
+  "cleared",
+  "closed",
+  "archived",
+]);
+
 export const lookups = pgTable("lookups", {
   id: uuid("id").primaryKey().defaultRandom(),
   commodityId: uuid("commodity_id").notNull(),
@@ -152,8 +161,17 @@ export const lookups = pgTable("lookups", {
   twinlogHash: text("twinlog_hash"),
   twinlogLockedAt: timestamp("twinlog_locked_at"),
   eudrComplete: boolean("eudr_complete").default(false),
+  sessionId: text("session_id"),
+  tradeStatus: tradeStatusEnum("trade_status").default("active"),
+  archivedAt: timestamp("archived_at"),
+  closedAt: timestamp("closed_at"),
+  estimatedArrival: date("estimated_arrival"),
+  actualArrival: date("actual_arrival"),
+  notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+  index("lookups_session_idx").on(table.sessionId),
+]);
 
 export const insertLookupSchema = createInsertSchema(lookups).omit({
   id: true,
@@ -745,3 +763,67 @@ export const documentExtractions = pgTable(
 );
 
 export type DocumentExtraction = typeof documentExtractions.$inferSelect;
+
+/* ── Users (Auth) ── */
+export const users = pgTable(
+  "users",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    email: text("email").notNull().unique(),
+    passwordHash: text("password_hash").notNull(),
+    displayName: text("display_name"),
+    sessionId: text("session_id").notNull().unique(),
+    emailVerified: boolean("email_verified").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("users_email_idx").on(table.email),
+    index("users_session_idx").on(table.sessionId),
+  ]
+);
+
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  emailVerified: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const registerSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  displayName: z.string().optional(),
+});
+
+export const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type User = typeof users.$inferSelect;
+
+/* ── Trade Events (TwinLog Audit Chain) ── */
+export const tradeEvents = pgTable(
+  "trade_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    lookupId: uuid("lookup_id").notNull().references(() => lookups.id, { onDelete: "cascade" }),
+    sessionId: text("session_id").notNull(),
+    eventType: text("event_type").notNull(),
+    eventData: jsonb("event_data").notNull(),
+    previousHash: text("previous_hash"),
+    eventHash: text("event_hash").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("trade_events_lookup_idx").on(table.lookupId, table.createdAt),
+    index("trade_events_session_idx").on(table.sessionId),
+  ]
+);
+
+export type TradeEvent = typeof tradeEvents.$inferSelect;
+export type InsertTradeEvent = typeof tradeEvents.$inferInsert;
+
+export type TradeStatus = "active" | "in_transit" | "arrived" | "cleared" | "closed" | "archived";

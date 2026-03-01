@@ -1,9 +1,10 @@
 import { Link, useLocation } from "wouter";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User, Hexagon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, type ReactNode } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTokenBalance } from "@/hooks/use-tokens";
+import { useAuth } from "@/hooks/use-auth";
 
 interface NavItem {
   icon: string;
@@ -13,26 +14,25 @@ interface NavItem {
   badge?: { type: "red" | "green"; value: number };
 }
 
-/* ── Section: Menu ── */
-const menuItems: NavItem[] = [
+/* ── Section: Main ── */
+const mainItems: NavItem[] = [
   { icon: "⊞", label: "Dashboard", href: "/dashboard" },
-  { icon: "◉", label: "My Trades", href: "/trades" },
-  { icon: "●", label: "Lookup", href: "/lookup" },
-];
-
-/* ── Section: Compliance ── */
-const complianceItems: NavItem[] = [
-  { icon: "📬", label: "Supplier Inbox", href: "/inbox" },
-  { icon: "🔔", label: "Alerts", href: "/alerts" },
-  { icon: "📋", label: "Templates", href: "/templates" },
+  { icon: "✦", label: "New Check", href: "/new-check" },
+  { icon: "◉", label: "My Trades", href: "/trades", matchPaths: ["/trades"] },
+  { icon: "📬", label: "Suppliers", href: "/inbox" },
 ];
 
 /* ── Section: Tools ── */
 const toolsItems: NavItem[] = [
-  { icon: "◧", label: "LC Check", href: "/lc-check" },
   { icon: "⧖", label: "Demurrage Calc", href: "/demurrage" },
-  { icon: "◫", label: "Pricing", href: "/pricing" },
+  { icon: "📋", label: "Templates", href: "/templates" },
+  { icon: "🔔", label: "Alerts", href: "/alerts" },
+];
+
+/* ── Section: Account ── */
+const accountItems: NavItem[] = [
   { icon: "◬", label: "Settings", href: "/settings/profile" },
+  { icon: "◫", label: "Billing", href: "/pricing" },
 ];
 
 /* ── Section: Admin (only visible when isAdmin) ── */
@@ -127,9 +127,11 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
   const [location, navigate] = useLocation();
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const tokenQuery = useTokenBalance();
   const tokenData = tokenQuery.data;
   const balance = tokenData?.balance ?? 0;
+  const { user, isAuthenticated, logout } = useAuth();
   const inboxBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/supplier-inbox/badge-count"] });
   const inboxBadge = inboxBadgeQuery.data?.count ?? 0;
   const alertsBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/alerts/unread-count"] });
@@ -156,20 +158,28 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
   }, [isMobile, sidebarOpen]);
 
   /* Build nav items with live badge counts */
-  const mItems: NavItem[] = menuItems.map((item) => {
+  const mItems: NavItem[] = mainItems.map((item) => {
     if (item.label === "My Trades" && tradesBadge > 0)
       return { ...item, badge: { type: "green" as const, value: tradesBadge } };
+    if (item.label === "Suppliers" && inboxBadge > 0)
+      return { ...item, badge: { type: "red" as const, value: inboxBadge } };
     return item;
   });
-  const cItems: NavItem[] = complianceItems.map((item) => {
-    if (item.label === "Supplier Inbox" && inboxBadge > 0)
-      return { ...item, badge: { type: "red" as const, value: inboxBadge } };
+  const tItems: NavItem[] = toolsItems.map((item) => {
     if (item.label === "Alerts" && alertsBadge > 0)
       return { ...item, badge: { type: "red" as const, value: alertsBadge } };
     return item;
   });
 
   const closeSidebar = () => setSidebarOpen(false);
+
+  const userInitial = user?.displayName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "?";
+
+  const handleLogout = async () => {
+    setUserDropdownOpen(false);
+    await logout();
+    navigate("/");
+  };
 
   /* ── Sidebar content ── */
   const sidebarContent = (
@@ -189,18 +199,34 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
         )}
       </div>
 
-      {/* Menu section */}
-      <div className="sidebar-section">
-        <SidebarLabel>Menu</SidebarLabel>
-        {mItems.map((item) => (
-          <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
-        ))}
+      {/* Token balance pill */}
+      <div style={{ padding: "0 16px 8px" }}>
+        <Link href="/pricing">
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "8px 12px",
+            borderRadius: 10,
+            background: "rgba(74,222,128,0.08)",
+            border: "1px solid rgba(74,222,128,0.15)",
+            cursor: "pointer",
+          }}>
+            <Hexagon size={14} style={{ color: "#4ade80" }} />
+            <span style={{ fontSize: 12, fontWeight: 600, color: "#4ade80" }}>
+              {balance} {balance === 1 ? "check" : "checks"}
+            </span>
+            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginLeft: "auto" }}>
+              Buy More
+            </span>
+          </div>
+        </Link>
       </div>
 
-      {/* Compliance section */}
+      {/* Main section */}
       <div className="sidebar-section">
-        <SidebarLabel>Compliance</SidebarLabel>
-        {cItems.map((item) => (
+        <SidebarLabel>Main</SidebarLabel>
+        {mItems.map((item) => (
           <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
         ))}
       </div>
@@ -208,14 +234,17 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
       {/* Tools section */}
       <div className="sidebar-section">
         <SidebarLabel>Tools</SidebarLabel>
-        {toolsItems.map((item) => {
-          const withBadge = item.label === "LC Check" && activeLcCases > 0
-            ? { ...item, badge: { type: "red" as const, value: activeLcCases } }
-            : item;
-          return (
-            <SidebarNavItem key={item.href} item={withBadge} isActive={isNavActive(item, location)} onClick={closeSidebar} />
-          );
-        })}
+        {tItems.map((item) => (
+          <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+        ))}
+      </div>
+
+      {/* Account section */}
+      <div className="sidebar-section">
+        <SidebarLabel>Account</SidebarLabel>
+        {accountItems.map((item) => (
+          <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+        ))}
       </div>
 
       {/* Admin section (only if admin) */}
@@ -317,7 +346,92 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
                 </Link>
               )}
 
-              <div className="user-avatar">F</div>
+              {isAuthenticated ? (
+                <div style={{ position: "relative" }}>
+                  <div
+                    className="user-avatar"
+                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                    style={{ cursor: "pointer" }}
+                    data-testid="shell-user-avatar"
+                  >
+                    {userInitial}
+                  </div>
+                  {userDropdownOpen && (
+                    <>
+                      <div
+                        style={{ position: "fixed", inset: 0, zIndex: 40 }}
+                        onClick={() => setUserDropdownOpen(false)}
+                      />
+                      <div style={{
+                        position: "absolute",
+                        top: "calc(100% + 8px)",
+                        right: 0,
+                        background: "#242428",
+                        borderRadius: 10,
+                        padding: "6px 0",
+                        minWidth: 180,
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        zIndex: 50,
+                      }}>
+                        <div style={{ padding: "8px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>
+                            {user?.displayName || user?.email}
+                          </div>
+                          {user?.displayName && (
+                            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>
+                              {user.email}
+                            </div>
+                          )}
+                        </div>
+                        <Link href="/settings/profile">
+                          <div
+                            onClick={() => setUserDropdownOpen(false)}
+                            style={{
+                              display: "flex", alignItems: "center", gap: 8,
+                              padding: "8px 14px", cursor: "pointer", fontSize: 13,
+                              color: "rgba(255,255,255,0.7)",
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
+                            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                          >
+                            <User size={14} /> Settings
+                          </div>
+                        </Link>
+                        <div
+                          onClick={handleLogout}
+                          style={{
+                            display: "flex", alignItems: "center", gap: 8,
+                            padding: "8px 14px", cursor: "pointer", fontSize: 13,
+                            color: "rgba(255,255,255,0.7)",
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
+                          onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                        >
+                          <LogOut size={14} /> Log out
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <Link href="/login">
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: "rgba(255,255,255,0.7)",
+                      cursor: "pointer",
+                      padding: "6px 14px",
+                      borderRadius: 8,
+                      border: "1px solid rgba(255,255,255,0.15)",
+                    }}
+                    data-testid="shell-login-btn"
+                  >
+                    Log in
+                  </div>
+                </Link>
+              )}
             </div>
           </div>
 
