@@ -1725,6 +1725,7 @@ function SaveTemplatePrompt({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Cashew CI to GB"
+            className="text-gray-900"
             data-testid="input-template-name"
           />
           <div className="flex gap-3 justify-end flex-wrap">

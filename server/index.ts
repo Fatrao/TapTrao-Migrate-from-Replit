@@ -7,6 +7,12 @@ import { createServer } from "http";
 import { initLocalDb } from "./db";
 
 const app = express();
+
+// Trust Railway / Cloudflare reverse proxy so secure cookies work behind TLS termination
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 const httpServer = createServer(app);
 
 app.use(cookieParser());

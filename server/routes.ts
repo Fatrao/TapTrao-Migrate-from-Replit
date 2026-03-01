@@ -143,6 +143,7 @@ export async function registerRoutes(
       // Auto-login after registration
       req.login(user, (err) => {
         if (err) {
+          console.error("Auto-login failed after registration:", err);
           res.status(500).json({ message: "Registration succeeded but auto-login failed" });
           return;
         }
