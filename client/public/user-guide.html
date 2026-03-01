@@ -3,192 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TapTrao User Guide — Getting Started</title>
+<title>TapTrao User Guide — Complete Reference</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #f8f9fa;
-    color: #1a1a1a;
-    line-height: 1.7;
-    padding: 0;
-  }
-  .hero {
-    background: linear-gradient(135deg, #0e4e45, #14574a, #1c6352, #327462);
-    color: white;
-    padding: 60px 40px;
-    text-align: center;
-  }
-  .hero h1 { font-size: 36px; font-weight: 700; margin-bottom: 12px; }
-  .hero p { font-size: 16px; opacity: 0.8; max-width: 600px; margin: 0 auto; }
-  .hero .version { font-size: 12px; opacity: 0.5; margin-top: 16px; }
-  .container { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
-  .toc {
-    background: white;
-    border-radius: 12px;
-    padding: 28px 32px;
-    margin-bottom: 40px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-  .toc h2 { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #0e4e45; }
-  .toc ol { padding-left: 20px; }
-  .toc li { margin-bottom: 8px; }
-  .toc a { color: #0e4e45; text-decoration: none; font-weight: 500; }
-  .toc a:hover { text-decoration: underline; }
-
-  .section {
-    background: white;
-    border-radius: 12px;
-    padding: 32px;
-    margin-bottom: 32px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-  .section h2 {
-    font-size: 22px;
-    font-weight: 700;
-    color: #0e4e45;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .section h2 .num {
-    background: #0e4e45;
-    color: white;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-  .section .subtitle {
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 20px;
-  }
-  .step {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 20px;
-    align-items: flex-start;
-  }
-  .step-num {
-    background: #e8f5e9;
-    color: #0e4e45;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-  .step-content h3 {
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-  .step-content p {
-    font-size: 14px;
-    color: #555;
-  }
-  .tip {
-    background: #fff8e1;
-    border-left: 4px solid #f9a825;
-    padding: 12px 16px;
-    border-radius: 0 8px 8px 0;
-    margin: 16px 0;
-    font-size: 13px;
-    color: #5d4037;
-  }
-  .tip strong { color: #e65100; }
-  .info {
-    background: #e8f5e9;
-    border-left: 4px solid #2e7d32;
-    padding: 12px 16px;
-    border-radius: 0 8px 8px 0;
-    margin: 16px 0;
-    font-size: 13px;
-    color: #1b5e20;
-  }
-  .screenshot {
-    background: #f0f0f0;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 16px;
-    margin: 16px 0;
-    text-align: center;
-    color: #888;
-    font-size: 13px;
-    font-style: italic;
-  }
-  .field-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 16px 0;
-    font-size: 13px;
-  }
-  .field-table th {
-    background: #f5f5f5;
-    text-align: left;
-    padding: 8px 12px;
-    font-weight: 600;
-    border-bottom: 2px solid #e0e0e0;
-  }
-  .field-table td {
-    padding: 8px 12px;
-    border-bottom: 1px solid #eee;
-  }
-  .field-table td:first-child { font-weight: 500; white-space: nowrap; }
-  .badge {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
-  }
-  .badge-green { background: #dcfce7; color: #16a34a; }
-  .badge-amber { background: #fef3c7; color: #d97706; }
-  .badge-red { background: #fee2e2; color: #ef4444; }
-  .badge-free { background: #dbeafe; color: #2563eb; }
-  ul.features { list-style: none; padding: 0; }
-  ul.features li {
-    padding: 6px 0;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  ul.features li::before { content: "✓"; color: #16a34a; font-weight: 700; }
-  .footer {
-    text-align: center;
-    color: #999;
-    font-size: 12px;
-    padding: 40px 0;
-  }
-  @media print {
-    body { background: white; }
-    .hero { padding: 30px 20px; }
-    .section { box-shadow: none; border: 1px solid #eee; break-inside: avoid; }
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#f8f9fa;color:#1a1a1a;line-height:1.7;padding:0}
+.hero{background:linear-gradient(135deg,#0e4e45,#14574a,#1c6352,#327462);color:#fff;padding:60px 40px;text-align:center}
+.hero h1{font-size:36px;font-weight:700;margin-bottom:12px}
+.hero p{font-size:16px;opacity:.8;max-width:640px;margin:0 auto}
+.hero .version{font-size:12px;opacity:.5;margin-top:16px}
+.container{max-width:880px;margin:0 auto;padding:40px 24px 80px}
+.toc{background:#fff;border-radius:12px;padding:28px 32px;margin-bottom:40px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.toc h2{font-size:18px;font-weight:600;margin-bottom:16px;color:#0e4e45}
+.toc ol{padding-left:20px}
+.toc li{margin-bottom:8px}
+.toc a{color:#0e4e45;text-decoration:none;font-weight:500}
+.toc a:hover{text-decoration:underline}
+.section{background:#fff;border-radius:12px;padding:32px;margin-bottom:32px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.section h2{font-size:22px;font-weight:700;color:#0e4e45;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.section h2 .num{background:#0e4e45;color:#fff;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.section .subtitle{color:#666;font-size:14px;margin-bottom:20px}
+.section h3{font-size:15px;font-weight:600;margin:18px 0 6px;color:#1a1a1a}
+.section p,.section li{font-size:14px;color:#444;margin-bottom:8px}
+.step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start}
+.step-num{background:#e8f5e9;color:#0e4e45;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:2px}
+.step-content h3{font-size:15px;font-weight:600;margin-bottom:4px}
+.step-content p{font-size:14px;color:#555}
+.tip{background:#fff8e1;border-left:4px solid #f9a825;padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:13px;color:#5d4037}
+.tip strong{color:#e65100}
+.info{background:#e8f5e9;border-left:4px solid #2e7d32;padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:13px;color:#1b5e20}
+.warning{background:#fef2f2;border-left:4px solid #ef4444;padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:13px;color:#991b1b}
+.warning strong{color:#ef4444}
+img.screenshot{display:block;max-width:100%;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.12);margin:20px auto;border:1px solid #e0e0e0}
+.screenshot-caption{text-align:center;font-size:12px;color:#888;margin:-12px 0 20px;font-style:italic}
+.field-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+.field-table th{background:#f5f5f5;text-align:left;padding:8px 12px;font-weight:600;border-bottom:2px solid #e0e0e0}
+.field-table td{padding:8px 12px;border-bottom:1px solid #eee}
+.field-table td:first-child{font-weight:500;white-space:nowrap}
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.badge-green{background:#dcfce7;color:#16a34a}
+.badge-amber{background:#fef3c7;color:#d97706}
+.badge-red{background:#fee2e2;color:#ef4444}
+.badge-blue{background:#dbeafe;color:#2563eb}
+.badge-gray{background:#f3f4f6;color:#6b7280}
+ul.features{list-style:none;padding:0;margin:8px 0}
+ul.features li{padding:6px 0;font-size:14px;display:flex;align-items:center;gap:8px}
+ul.features li::before{content:"\2713";color:#16a34a;font-weight:700}
+ol.steps-list{padding-left:20px;margin:12px 0}
+ol.steps-list li{margin-bottom:10px;font-size:14px;color:#444}
+ol.steps-list li strong{color:#1a1a1a}
+.mockup{background:#1a1a1c;border-radius:14px;padding:0;margin:20px 0;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.18);border:1px solid #333}
+.mockup-bar{background:#111;padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #333}
+.mockup-dot{width:10px;height:10px;border-radius:50%;background:#333}
+.mockup-dot.r{background:#ff5f57}.mockup-dot.y{background:#febc2e}.mockup-dot.g{background:#28c840}
+.mockup-body{padding:20px;display:flex;gap:16px;min-height:260px}
+.mockup-sidebar{width:180px;flex-shrink:0;background:#141417;border-radius:10px;padding:14px}
+.mockup-sidebar .logo{font-size:13px;font-weight:700;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.mockup-sidebar .logo .dot{width:18px;height:18px;border-radius:5px;background:#0e4e45}
+.mockup-sidebar .nav-item{padding:6px 10px;border-radius:6px;font-size:11px;color:rgba(255,255,255,.45);margin-bottom:3px;cursor:default}
+.mockup-sidebar .nav-item.active{background:rgba(113,171,145,.1);color:#71AB91;border-left:3px solid #71AB91;padding-left:7px}
+.mockup-main{flex:1;display:flex;flex-direction:column;gap:12px}
+.mockup-hero{background:linear-gradient(135deg,#0e4e45,#1c6352,#327462);border-radius:10px;padding:16px 20px;color:#fff}
+.mockup-hero .breadcrumb{font-size:9px;color:rgba(255,255,255,.45);margin-bottom:6px}
+.mockup-hero h3{font-size:16px;font-weight:700;margin-bottom:4px}
+.mockup-hero p{font-size:10px;color:rgba(255,255,255,.55);margin:0}
+.mockup-content{flex:1;display:flex;gap:12px;flex-wrap:wrap}
+.mockup-card{background:#222226;border-radius:8px;padding:12px;flex:1;min-width:120px}
+.mockup-card .label{font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.mockup-card .value{font-size:18px;font-weight:700;color:#fff}
+.mockup-card .sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:4px}
+.mockup-table{width:100%;border-collapse:collapse;margin-top:8px}
+.mockup-table th{text-align:left;font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;padding:4px 8px;border-bottom:1px solid rgba(255,255,255,.06)}
+.mockup-table td{font-size:10px;color:rgba(255,255,255,.6);padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.04)}
+.mockup-badge{display:inline-block;padding:1px 6px;border-radius:8px;font-size:8px;font-weight:600}
+.mockup-badge.green{background:rgba(74,222,128,.12);color:#4ade80}
+.mockup-badge.amber{background:rgba(234,179,8,.12);color:#eab308}
+.mockup-badge.red{background:rgba(239,68,68,.12);color:#ef4444}
+.mockup-input{background:#2a2a2e;border:1px solid #3a3a3e;border-radius:6px;padding:6px 10px;font-size:10px;color:rgba(255,255,255,.3);margin-bottom:8px;width:100%}
+.mockup-btn{display:inline-block;background:#71AB91;color:#fff;padding:5px 14px;border-radius:6px;font-size:10px;font-weight:600;cursor:default}
+.mockup-btn.outline{background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5)}
+.mockup-step-bar{display:flex;gap:4px;margin-bottom:8px}
+.mockup-step-bar .st{flex:1;height:3px;border-radius:2px;background:#333}
+.mockup-step-bar .st.done{background:#71AB91}
+.mockup-step-bar .st.current{background:#71AB91;opacity:.6}
+.mockup-row{display:flex;gap:8px;width:100%;align-items:stretch}
+.mockup-full{width:100%}
+.mockup-annotation{position:relative}
+.mockup-label{font-size:8px;background:rgba(113,171,145,.15);color:#71AB91;padding:2px 6px;border-radius:4px;display:inline-block;margin-bottom:4px}
+.footer{text-align:center;color:#999;font-size:12px;padding:40px 0}
+@media(max-width:700px){
+  .hero{padding:40px 20px}
+  .hero h1{font-size:28px}
+  .container{padding:24px 16px 60px}
+  .section{padding:24px 20px}
+  .toc{padding:20px}
+  .mockup-body{flex-direction:column}
+  .mockup-sidebar{width:100%}
+  .mockup-content{flex-direction:column}
+  .mockup-row{flex-direction:column}
+  .field-table{font-size:12px}
+  .field-table td:first-child{white-space:normal}
+}
+@media print{
+  body{background:#fff}
+  .hero{padding:30px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .section{box-shadow:none;border:1px solid #eee;break-inside:avoid}
+  .toc{box-shadow:none;border:1px solid #eee}
+  .mockup{break-inside:avoid}
+  img.screenshot{box-shadow:none;border:1px solid #ccc}
+  .tip,.info,.warning{break-inside:avoid}
+}
 </style>
 </head>
 <body>
 
 <div class="hero">
   <h1>TapTrao User Guide</h1>
-  <p>A step-by-step guide to running compliance checks, managing trade documents, and generating audit-ready records.</p>
-  <div class="version">Version 1.0 &mdash; March 2026</div>
+  <p>A complete step-by-step guide to running compliance checks, managing trade documents, checking Letters of Credit, and generating audit-ready records for commodity shipments.</p>
+  <div class="version">Version 2.0 &mdash; March 2026</div>
 </div>
 
 <div class="container">
@@ -197,56 +131,147 @@
 <div class="toc">
   <h2>Contents</h2>
   <ol>
-    <li><a href="#getting-started">Getting Started &mdash; Your First Free Check</a></li>
-    <li><a href="#results">Understanding Your Compliance Results</a></li>
-    <li><a href="#dashboard">The Dashboard</a></li>
-    <li><a href="#trades">Managing Your Trades</a></li>
-    <li><a href="#supplier">Requesting Supplier Documents</a></li>
-    <li><a href="#verify">Verifying &amp; Flagging Documents</a></li>
+    <li><a href="#getting-started">Getting Started</a></li>
+    <li><a href="#first-check">Running Your First Compliance Check</a></li>
+    <li><a href="#results">Understanding Your Results</a></li>
+    <li><a href="#actions">Next Actions &amp; Document Checklist</a></li>
+    <li><a href="#evidence">Downloading Evidence</a></li>
+    <li><a href="#dashboard">Your Dashboard</a></li>
+    <li><a href="#trades">My Trades</a></li>
     <li><a href="#lc-check">LC Document Checker</a></li>
-    <li><a href="#twinlog">Downloading Your TwinLog Trail</a></li>
-    <li><a href="#profile">Setting Up Your Company Profile</a></li>
-    <li><a href="#pricing">Pricing &amp; Buying Credits</a></li>
+    <li><a href="#supplier">Requesting Supplier Documents</a></li>
+    <li><a href="#profile">Company Profile</a></li>
+    <li><a href="#pricing">Buying Shield Credits</a></li>
     <li><a href="#alerts">Regulatory Alerts</a></li>
+    <li><a href="#templates">Trade Templates</a></li>
     <li><a href="#demurrage">Demurrage Calculator</a></li>
-    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#faq">Frequently Asked Questions</a></li>
   </ol>
 </div>
 
+<!-- ============================================================ -->
 <!-- 1. GETTING STARTED -->
+<!-- ============================================================ -->
 <div class="section" id="getting-started">
-  <h2><span class="num">1</span> Getting Started &mdash; Your First Free Check</h2>
-  <p class="subtitle">Run a compliance check in under 60 seconds. No account or credit card needed.</p>
+  <h2><span class="num">1</span> Getting Started</h2>
+  <p class="subtitle">What TapTrao does, what you see on your first visit, and how to navigate the application.</p>
+
+  <h3>What is TapTrao?</h3>
+  <p>TapTrao is a trade compliance platform built for commodity traders who ship goods from African origin countries to international destinations. It replaces scattered spreadsheets, manual regulatory lookups, and guesswork with a structured, audit-ready compliance workflow.</p>
+  <p>With TapTrao you can:</p>
+  <ul class="features">
+    <li>Check tariffs, regulatory requirements, and compliance obligations for any commodity corridor</li>
+    <li>Cross-check Letter of Credit terms against supplier documents using UCP 600 rules</li>
+    <li>Generate TwinLog Trail PDFs &mdash; audit-ready evidence records with SHA-256 integrity hashes</li>
+    <li>Track documents from suppliers via secure, token-gated upload links</li>
+    <li>Watch trade corridors for regulatory changes with real-time alerts</li>
+    <li>Estimate demurrage costs when port delays occur</li>
+  </ul>
+
+  <h3>Your first visit</h3>
+  <p>When you open TapTrao for the first time, you land on the homepage. No account creation is required. TapTrao assigns you a session automatically via a browser cookie, and all your data is tied to that session. There is no username, password, or email to remember.</p>
+
+  <img src="/guide/01-landing.png" alt="TapTrao landing page" class="screenshot">
+  <p class="screenshot-caption">The TapTrao landing page with the green hero section and navigation bar</p>
+
+  <p>From the landing page, click <strong>"Free Pre-Shipment Check"</strong> to jump straight into your first compliance check. You can also scroll down to learn about features, pricing, and the LC Document Checker before diving in.</p>
+
+  <h3>Sidebar navigation</h3>
+  <p>Once inside the application (after clicking "Free Pre-Shipment Check" or "Dashboard"), a sidebar appears on the left side of the screen. This sidebar is your primary navigation and is organised into three groups:</p>
+
+  <table class="field-table">
+    <tr><th>Section</th><th>Items</th><th>Purpose</th></tr>
+    <tr><td>Menu</td><td>Dashboard, New Check, My Trades</td><td>Core workflow actions</td></tr>
+    <tr><td>Compliance</td><td>LC Checker, Templates, Alerts, Demurrage Calc</td><td>Specialist compliance tools</td></tr>
+    <tr><td>Account</td><td>Supplier Inbox, Settings, Buy Credits</td><td>Account management and supplier communication</td></tr>
+  </table>
+
+  <p>The sidebar also shows your recent trade history at the bottom, with trade corridor tags (e.g. "Cocoa CI &rarr; EU") so you can quickly jump back to a previous check.</p>
+
+  <div class="info">
+    <strong>No account needed.</strong> TapTrao uses a browser cookie to remember your session. Your compliance checks, documents, and credits are all preserved as long as you don't clear your browser cookies. We recommend downloading TwinLog Trail PDFs regularly as a permanent backup.
+  </div>
+
+  <div class="tip">
+    <strong>Tip:</strong> On mobile devices (screen width below 768px), the sidebar collapses into a bottom tab bar. Tap the icons to navigate between sections.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 2. RUNNING YOUR FIRST COMPLIANCE CHECK -->
+<!-- ============================================================ -->
+<div class="section" id="first-check">
+  <h2><span class="num">2</span> Running Your First Compliance Check</h2>
+  <p class="subtitle">Step-by-step: select your commodity, origin, and destination, then check compliance risk.</p>
+
+  <p>A compliance check analyses the regulatory requirements, duty rates, known hazards, document obligations, and trade restrictions for a specific trade corridor (commodity + origin country + destination market). Here is exactly how to run one:</p>
 
   <div class="step">
     <div class="step-num">1</div>
     <div class="step-content">
-      <h3>Go to taptrao.com</h3>
-      <p>Click <strong>"Free Pre-Shipment Check"</strong> on the homepage, or click <strong>"New Check"</strong> in the sidebar if you're already inside the app.</p>
+      <h3>Navigate to the compliance check form</h3>
+      <p>Click <strong>"New Check"</strong> in the sidebar, or click <strong>"Free Pre-Shipment Check"</strong> from the landing page. You will see a form with three dropdown fields on a white card.</p>
     </div>
   </div>
+
+  <img src="/guide/03-lookup-empty.png" alt="Empty compliance check form" class="screenshot">
+  <p class="screenshot-caption">The compliance check form with three dropdown fields: commodity, origin, and destination</p>
 
   <div class="step">
     <div class="step-num">2</div>
     <div class="step-content">
-      <h3>Select your commodity</h3>
-      <p>Open the <strong>"What are you shipping?"</strong> dropdown. Choose from 190+ commodities, each with their HS code shown. You can scroll or type to search.</p>
+      <h3>Select your commodity ("What are you shipping?")</h3>
+      <p>Click the first dropdown. It contains <strong>154+ commodities</strong>, each displayed with its HS code (Harmonised System code) in brackets. For example:</p>
+      <ul style="list-style:none;padding:8px 0">
+        <li style="font-size:13px;color:#555;padding:3px 0">&bull; Cocoa Beans [1801.00]</li>
+        <li style="font-size:13px;color:#555;padding:3px 0">&bull; Raw Cashew Nuts [0801.31]</li>
+        <li style="font-size:13px;color:#555;padding:3px 0">&bull; Green Coffee (Arabica) [0901.11]</li>
+        <li style="font-size:13px;color:#555;padding:3px 0">&bull; Shea Butter (refined) [1515.90]</li>
+        <li style="font-size:13px;color:#555;padding:3px 0">&bull; Gold (unwrought) [7108.12]</li>
+      </ul>
+      <p><strong>You can type to search.</strong> Start typing the commodity name or HS code and the dropdown filters automatically. For instance, typing "coco" will show Cocoa Beans, Cocoa Butter, Cocoa Paste, and Cocoa Powder.</p>
     </div>
   </div>
 
   <div class="step">
     <div class="step-num">3</div>
     <div class="step-content">
-      <h3>Select the origin country</h3>
-      <p>Under <strong>"Where are the goods coming from?"</strong>, select the African country of origin. All major African trading nations are listed with their flag emoji.</p>
+      <h3>Select the origin country ("Where from?")</h3>
+      <p>Click the second dropdown. It lists <strong>18+ African origin countries</strong>, each with a flag emoji:</p>
+      <p style="font-size:13px;color:#555;line-height:2">
+        &#x1F1EC;&#x1F1ED; Ghana &nbsp;&bull;&nbsp;
+        &#x1F1E8;&#x1F1EE; C&ocirc;te d'Ivoire &nbsp;&bull;&nbsp;
+        &#x1F1EA;&#x1F1F9; Ethiopia &nbsp;&bull;&nbsp;
+        &#x1F1F0;&#x1F1EA; Kenya &nbsp;&bull;&nbsp;
+        &#x1F1F9;&#x1F1FF; Tanzania &nbsp;&bull;&nbsp;
+        &#x1F1FA;&#x1F1EC; Uganda &nbsp;&bull;&nbsp;
+        &#x1F1F3;&#x1F1EC; Nigeria &nbsp;&bull;&nbsp;
+        &#x1F1E8;&#x1F1F2; Cameroon &nbsp;&bull;&nbsp;
+        &#x1F1F7;&#x1F1FC; Rwanda &nbsp;&bull;&nbsp;
+        &#x1F1E7;&#x1F1EF; Benin &nbsp;&bull;&nbsp;
+        &#x1F1F9;&#x1F1EC; Togo &nbsp;&bull;&nbsp;
+        &#x1F1F2;&#x1F1EC; Madagascar &nbsp;&bull;&nbsp;
+        and more
+      </p>
+      <p>Select the country where the goods are being sourced from. The origin country determines which trade agreements, rules of origin, and regulatory frameworks apply.</p>
     </div>
   </div>
 
   <div class="step">
     <div class="step-num">4</div>
     <div class="step-content">
-      <h3>Select the destination</h3>
-      <p>Under <strong>"Where are the goods going?"</strong>, choose the import destination: EU, UK, USA, Switzerland, T&uuml;rkiye, UAE, or Canada.</p>
+      <h3>Select the destination ("Where to?")</h3>
+      <p>Click the third dropdown. There are <strong>7 destination markets</strong> available:</p>
+      <table class="field-table">
+        <tr><th>Destination</th><th>Flag</th><th>Key Regulations</th></tr>
+        <tr><td>European Union</td><td>&#x1F1EA;&#x1F1FA;</td><td>EUDR, CBAM, CSDDD, EU SPS</td></tr>
+        <tr><td>United Kingdom</td><td>&#x1F1EC;&#x1F1E7;</td><td>UK REACH, UK SPS, UKGT</td></tr>
+        <tr><td>Switzerland</td><td>&#x1F1E8;&#x1F1ED;</td><td>Swiss SPS, bilateral agreements</td></tr>
+        <tr><td>United States</td><td>&#x1F1FA;&#x1F1F8;</td><td>FDA, USDA APHIS, TSCA, Lacey Act</td></tr>
+        <tr><td>China</td><td>&#x1F1E8;&#x1F1F3;</td><td>GACC registration, CIQ inspections</td></tr>
+        <tr><td>United Arab Emirates</td><td>&#x1F1E6;&#x1F1EA;</td><td>ESMA, halal certification, FIRS</td></tr>
+        <tr><td>T&uuml;rkiye</td><td>&#x1F1F9;&#x1F1F7;</td><td>Turkish SPS, conformity assessment</td></tr>
+      </table>
     </div>
   </div>
 
@@ -254,459 +279,1031 @@
     <div class="step-num">5</div>
     <div class="step-content">
       <h3>Click "Check compliance risk"</h3>
-      <p>The system analyses regulatory requirements, duty rates, known hazards, document obligations, and trade restrictions for your specific corridor. Results appear in about 2 seconds.</p>
+      <p>Once all three fields are selected, the green button at the bottom becomes active. Click it. TapTrao analyses the regulatory landscape for your specific corridor. Results appear in approximately 2 seconds.</p>
     </div>
   </div>
 
   <div class="info">
-    <strong>Your first check is always free</strong> &mdash; no card required. After that, each check uses 1 TapTrao Shield credit.
+    <strong>Your first check is always free</strong> &mdash; no credit card required. After that, each compliance check uses 1 TapTrao Shield credit. You will see a prompt to purchase credits when your balance runs out.
+  </div>
+
+  <div class="tip">
+    <strong>Tip:</strong> If you are unsure which HS code to use, type the common name of your commodity. TapTrao's database maps common trade names to their correct HS codes automatically.
   </div>
 </div>
 
-<!-- 2. UNDERSTANDING RESULTS -->
+<!-- ============================================================ -->
+<!-- 3. UNDERSTANDING YOUR RESULTS -->
+<!-- ============================================================ -->
 <div class="section" id="results">
-  <h2><span class="num">2</span> Understanding Your Compliance Results</h2>
-  <p class="subtitle">What you'll see after running a compliance check.</p>
+  <h2><span class="num">3</span> Understanding Your Results</h2>
+  <p class="subtitle">What the readiness score means, how to read the bar chart, and what regulatory warnings to watch for.</p>
+
+  <p>After running a compliance check, you are taken to the results page. This page is divided into several sections. Let us walk through each one.</p>
+
+  <h3>A. The TwinLog Readiness Score</h3>
+  <p>At the top of your results, you will see a large circular score from 0 to 100. This is the <strong>TwinLog Readiness Score</strong>. It measures how complex and risky this particular trade corridor is. A lower score means more regulatory burden and more documents to prepare.</p>
+
+  <img src="/guide/04-results-score.png" alt="Readiness score showing 39 HIGH RISK with bar chart" class="screenshot">
+  <p class="screenshot-caption">A readiness score of 39 (HIGH RISK) with the four contributing factors shown as a bar chart</p>
+
+  <p>The score is calculated from four factors, each shown as a bar in the chart:</p>
+
+  <table class="field-table">
+    <tr><th>Factor</th><th>What It Measures</th><th>Max Penalty</th></tr>
+    <tr><td>Regulatory Requirements</td><td>Number of active regulatory overlays for this corridor (SPS, EUDR, CBAM, CSDDD, etc.). More overlays = higher penalty.</td><td>30 points</td></tr>
+    <tr><td>Product Controls</td><td>Known hazards or special controls for this commodity (e.g. cadmium in cocoa, mycotoxins in nuts, pesticide MRLs).</td><td>30 points</td></tr>
+    <tr><td>Document Volume</td><td>Total number of documents you and your supplier will need to prepare. More documents = higher penalty.</td><td>20 points</td></tr>
+    <tr><td>Trade Restrictions</td><td>Sanctions, embargoes, quotas, or special authorisations that apply to this route.</td><td>20 points</td></tr>
+  </table>
+
+  <p><strong>Score interpretation:</strong></p>
+  <p>
+    <span class="badge badge-green">70&ndash;100: LOW RISK</span> &mdash; Straightforward trade with minimal regulatory burden. Few documents needed.
+  </p>
+  <p>
+    <span class="badge badge-amber">40&ndash;69: MODERATE RISK</span> &mdash; Several regulatory requirements apply. Prepare documents carefully and allow extra time.
+  </p>
+  <p>
+    <span class="badge badge-red">0&ndash;39: HIGH RISK</span> &mdash; Complex trade corridor with multiple regulatory overlays, known hazards, or restrictions. Start document preparation well in advance.
+  </p>
+
+  <h3>B. Regulatory warnings</h3>
+
+  <img src="/guide/05-results-actions.png" alt="Results showing EUDR warning and next actions" class="screenshot">
+  <p class="screenshot-caption">EUDR deforestation regulation warning banner, "Watch this corridor" button, and the Next Actions list</p>
+
+  <p>If your commodity triggers specific regulations, you will see coloured warning banners below the score:</p>
+  <ul class="features">
+    <li><strong>EUDR (EU Deforestation Regulation)</strong> &mdash; Yellow banner. Applies to cocoa, coffee, palm oil, soy, rubber, cattle, wood, and their derivatives when shipping to the EU. Click "Prepare EUDR documents" to open the geolocation data form.</li>
+    <li><strong>CBAM (Carbon Border Adjustment Mechanism)</strong> &mdash; Applies to aluminium, iron, steel, cement, fertiliser, hydrogen, and electricity when shipping to the EU.</li>
+    <li><strong>SPS (Sanitary &amp; Phytosanitary)</strong> &mdash; Applies to most agricultural products. Requires phytosanitary certificates, health certificates, or fumigation records.</li>
+    <li><strong>CSDDD (Corporate Sustainability Due Diligence Directive)</strong> &mdash; EU human rights and environmental due diligence requirement for supply chains.</li>
+  </ul>
+
+  <h3>C. Regulatory trigger badges</h3>
+  <p>Below the trade corridor cards, you will see coloured badges showing all possible regulations:</p>
+  <p>
+    <span class="badge badge-red">SPS</span>
+    <span class="badge badge-red">EUDR</span>
+    <span class="badge badge-red">CBAM</span>
+    &mdash; Red badges mean this regulation <strong>applies</strong> to your corridor.
+  </p>
+  <p>
+    <span class="badge badge-gray">CITES</span>
+    <span class="badge badge-gray">Conflict Minerals</span>
+    &mdash; Grey badges mean this regulation <strong>does not apply</strong>.
+  </p>
+
+  <h3>D. Trade corridor detail cards</h3>
+  <p>Three cards display key information about your selected corridor:</p>
+  <ul class="features">
+    <li><strong>Commodity card</strong> &mdash; Shows the product name, HS code, commodity type (agricultural/mineral/manufactured), and which regulatory triggers it activates</li>
+    <li><strong>Origin card</strong> &mdash; Shows the country name with flag, customs authority, trade bloc membership (ECOWAS, EAC, SADC, etc.), and applicable trade agreements</li>
+    <li><strong>Destination card</strong> &mdash; Shows the import market, VAT/GST rate, tariff system, and customs authority</li>
+  </ul>
+
+  <h3>E. "Watch this corridor"</h3>
+  <p>Click the <strong>"Watch this corridor"</strong> button to subscribe to regulatory alerts for this specific trade route. When regulations change, you will be notified. You can watch up to 3 corridors for free. See <a href="#alerts">Section 12: Regulatory Alerts</a> for more details.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- 4. NEXT ACTIONS & DOCUMENT CHECKLIST -->
+<!-- ============================================================ -->
+<div class="section" id="actions">
+  <h2><span class="num">4</span> Next Actions &amp; Document Checklist</h2>
+  <p class="subtitle">Understanding the pending items, your documents vs supplier documents, and how to track status.</p>
+
+  <p>Below the readiness score and warnings, you will find the <strong>Next Actions</strong> section. This is your compliance to-do list &mdash; every document and action required to make this shipment compliant.</p>
+
+  <img src="/guide/06-results-docs.png" alt="YOUR DOCUMENTS and SUPPLIER DOCUMENTS sections" class="screenshot">
+  <p class="screenshot-caption">The document checklist split into YOUR DOCUMENTS (8 items) and SUPPLIER DOCUMENTS (6 items) with Pending status badges</p>
+
+  <h3>A. How the document list is organised</h3>
+  <p>Documents are split into two groups:</p>
+
+  <table class="field-table">
+    <tr><th>Group</th><th>Who is Responsible</th><th>Examples</th></tr>
+    <tr><td><strong>YOUR DOCUMENTS</strong></td><td>You (the importer/buyer)</td><td>Import licence, customs declaration, insurance certificate, EORI registration, bank confirmation</td></tr>
+    <tr><td><strong>SUPPLIER DOCUMENTS</strong></td><td>Your supplier (the exporter)</td><td>Commercial invoice, bill of lading, certificate of origin, phytosanitary certificate, packing list, fumigation certificate</td></tr>
+  </table>
+
+  <h3>B. What each item shows</h3>
+  <p>Each line item in the document list displays:</p>
+  <ol class="steps-list">
+    <li><strong>Document name</strong> &mdash; e.g. "Phytosanitary Certificate", "EUR.1 Movement Certificate"</li>
+    <li><strong>Description</strong> &mdash; A brief explanation of what the document is and why it is required</li>
+    <li><strong>Issuing authority</strong> &mdash; Who issues this document (e.g. "National Plant Protection Organisation", "Chamber of Commerce")</li>
+    <li><strong>Timing</strong> &mdash; When it is needed: Before loading, Before arrival at destination, or Post-arrival</li>
+    <li><strong>Status badge</strong> &mdash; The current status of this document</li>
+  </ol>
+
+  <h3>C. Status badges explained</h3>
+  <p>Each document has one of these status badges:</p>
+  <p>
+    <span class="badge badge-amber">Pending</span> &mdash; Document has not been prepared or uploaded yet. This is the default state for all documents when you first run a check.
+  </p>
+  <p>
+    <span class="badge badge-green">Ready</span> &mdash; Document has been uploaded and verified. It is ready for submission.
+  </p>
+  <p>
+    <span class="badge badge-red">Flagged</span> &mdash; Document has been reviewed and an issue was found. It needs correction before it can be accepted.
+  </p>
+  <p>
+    <span class="badge badge-blue">Risk Accepted</span> &mdash; You have acknowledged a risk with this document but decided to proceed anyway. This is recorded in the audit trail.
+  </p>
+
+  <h3>D. Changing document status</h3>
+  <p>You can change the status of any document by clicking on it from the trade detail view. This opens a detail panel where you can:</p>
+  <ol class="steps-list">
+    <li>Mark it as <strong>Ready</strong> if you have the document prepared</li>
+    <li>Mark it as <strong>Flagged</strong> if there is an issue (you will be asked to enter a finding)</li>
+    <li>Mark it as <strong>Risk Accepted</strong> if you choose to proceed despite a gap</li>
+  </ol>
+  <p>Every status change is recorded in the trade's event timeline with a timestamp and a cryptographic hash, creating an immutable audit trail.</p>
+
+  <div class="tip">
+    <strong>Tip:</strong> The number shown next to "NEXT ACTIONS" (e.g. "14 pending") tells you exactly how many items still need attention. Work through them systematically before generating your TwinLog Trail.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 5. DOWNLOADING EVIDENCE -->
+<!-- ============================================================ -->
+<div class="section" id="evidence">
+  <h2><span class="num">5</span> Downloading Evidence</h2>
+  <p class="subtitle">TwinLog Trail PDF, Customs data pack CSV, compliance reference numbers, and SHA-256 integrity hashes.</p>
+
+  <img src="/guide/07-results-bottom.png" alt="Download TwinLog Trail button and compliance reference" class="screenshot">
+  <p class="screenshot-caption">The bottom of the results page showing the "Download TwinLog Trail" button, LC check link, CSV export, and the compliance reference with SHA-256 hash</p>
+
+  <h3>A. TwinLog Trail PDF</h3>
+  <p>The TwinLog Trail is your audit-ready compliance evidence package. It is a multi-page PDF that captures everything about this trade at the moment it was generated. Click the green <strong>"Download TwinLog Trail"</strong> button to generate and download it instantly.</p>
+
+  <p>The TwinLog Trail PDF contains these pages:</p>
+  <table class="field-table">
+    <tr><th>Page</th><th>Contents</th></tr>
+    <tr><td>1. Cover Page</td><td>Commodity name, HS code, trade corridor (origin &rarr; destination), your company details, TwinLog reference number, generation date</td></tr>
+    <tr><td>2. TwinLog Score</td><td>Readiness score with the four-factor breakdown (regulatory, product controls, document volume, restrictions) and bar chart</td></tr>
+    <tr><td>3. Importer Requirements</td><td>All documents and actions required of the importing party (you), with descriptions, issuing authorities, and timing</td></tr>
+    <tr><td>4. Supplier Requirements</td><td>All documents your supplier must provide, with the same detail level</td></tr>
+    <tr><td>5. Supplier Documents</td><td>Table of all uploaded documents with filename, upload date, and verification status</td></tr>
+    <tr><td>6. Regulatory Overlays</td><td>Active regulations (SPS, EUDR, CBAM, etc.) and known hazards for this commodity, with detailed descriptions</td></tr>
+    <tr><td>7. Event Timeline</td><td>Complete chronological audit trail &mdash; every check, upload, verification, flag, and status change with timestamps</td></tr>
+    <tr><td>8. Audit Record</td><td>SHA-256 integrity hash, TwinLog reference, generation timestamp, and hash chain verification data</td></tr>
+  </table>
+
+  <div class="info">
+    <strong>Important:</strong> You must set up your Company Profile (Section 10) before generating a TwinLog Trail. The PDF includes your company name, registered address, VAT number, and EORI number.
+  </div>
+
+  <h3>B. Customs data pack (CSV)</h3>
+  <p>Click <strong>"Customs data pack (CSV)"</strong> to download a spreadsheet-compatible file containing all the structured compliance data from your check. This is useful for importing into your own systems, ERP, or for sharing with your customs broker in a machine-readable format.</p>
+
+  <h3>C. Compliance reference number</h3>
+  <p>Every compliance check generates a unique reference number in the format <strong>TT-2026-XXXXXX</strong> (e.g. TT-2026-50FF2F). This reference is shown at the bottom of the results page and on every page of the TwinLog Trail PDF.</p>
+
+  <h3>D. SHA-256 integrity hash</h3>
+  <p>Below the reference number, you will see a long string of characters &mdash; this is the <strong>SHA-256 integrity hash</strong>. It is a cryptographic fingerprint of your compliance data. If any data in the record were changed after generation, the hash would not match. This provides tamper-evident assurance for auditors and regulators.</p>
+
+  <h3>E. Public verification</h3>
+  <p>Anyone can verify a TwinLog Trail by visiting <strong>taptrao.com/verify/TT-2026-XXXXXX</strong> (replacing the reference with the actual code). The verification page confirms the record exists, shows the commodity and corridor, and validates the integrity hash.</p>
+
+  <h3>F. Supplier instructions</h3>
+  <p>Click <strong>"Supplier instructions"</strong> to generate a pre-formatted message you can send to your supplier. It lists exactly which documents they need to provide, in what format, and by when. You can copy this text and paste it into an email or send it via the built-in supplier request system (see <a href="#supplier">Section 9</a>).</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- 6. YOUR DASHBOARD -->
+<!-- ============================================================ -->
+<div class="section" id="dashboard">
+  <h2><span class="num">6</span> Your Dashboard</h2>
+  <p class="subtitle">Your central hub showing compliance activity, recent trades, and pending documents at a glance.</p>
+
+  <p>Click <strong>"Dashboard"</strong> in the sidebar to access your overview. The dashboard is the first screen you see when you enter the app (after your initial visit).</p>
+
+  <!-- CSS MOCKUP: Dashboard -->
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="mockup-dot r"></div>
+      <div class="mockup-dot y"></div>
+      <div class="mockup-dot g"></div>
+    </div>
+    <div class="mockup-body">
+      <div class="mockup-sidebar">
+        <div class="logo"><div class="dot"></div> TapTrao</div>
+        <div class="nav-item active">Dashboard</div>
+        <div class="nav-item">New Check</div>
+        <div class="nav-item">My Trades</div>
+        <div style="font-size:8px;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.5px;padding:10px 10px 4px;margin-top:6px">Compliance</div>
+        <div class="nav-item">LC Checker</div>
+        <div class="nav-item">Templates</div>
+        <div class="nav-item">Alerts</div>
+      </div>
+      <div class="mockup-main">
+        <div class="mockup-hero">
+          <div class="breadcrumb">Home &rsaquo; Dashboard</div>
+          <h3>Dashboard</h3>
+          <p>Your compliance activity at a glance</p>
+        </div>
+        <div class="mockup-content">
+          <div class="mockup-card">
+            <div class="label">Compliance Lookups</div>
+            <div class="value">12</div>
+            <div class="sub">Total checks run</div>
+          </div>
+          <div class="mockup-card">
+            <div class="label">LC Checks</div>
+            <div class="value">4</div>
+            <div class="sub">Documents validated</div>
+          </div>
+          <div class="mockup-card">
+            <div class="label">Shield Balance</div>
+            <div class="value" style="color:#71AB91">7</div>
+            <div class="sub">Credits remaining</div>
+          </div>
+          <div class="mockup-card">
+            <div class="label">Pending Docs</div>
+            <div class="value" style="color:#eab308">23</div>
+            <div class="sub">Across all trades</div>
+          </div>
+        </div>
+        <div style="width:100%">
+          <div class="mockup-card" style="min-width:100%">
+            <div class="label">Recent Trades</div>
+            <table class="mockup-table">
+              <tr><th>Commodity</th><th>Corridor</th><th>Score</th><th>Status</th><th>Date</th></tr>
+              <tr><td style="color:#fff">Cocoa Beans</td><td>&#x1F1E8;&#x1F1EE; CI &rarr; &#x1F1EA;&#x1F1FA; EU</td><td>39</td><td><span class="mockup-badge red">High Risk</span></td><td>28 Feb</td></tr>
+              <tr><td style="color:#fff">Green Coffee</td><td>&#x1F1EA;&#x1F1F9; ET &rarr; &#x1F1EC;&#x1F1E7; UK</td><td>62</td><td><span class="mockup-badge amber">Moderate</span></td><td>25 Feb</td></tr>
+              <tr><td style="color:#fff">Raw Cashew</td><td>&#x1F1EC;&#x1F1ED; GH &rarr; &#x1F1E8;&#x1F1ED; CH</td><td>78</td><td><span class="mockup-badge green">Low Risk</span></td><td>22 Feb</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="screenshot-caption">Dashboard mockup showing stats cards, Shield balance, and recent trades table</p>
+
+  <h3>What the dashboard shows</h3>
+
+  <p><strong>Stats cards (top row):</strong></p>
+  <ul class="features">
+    <li><strong>Compliance Lookups</strong> &mdash; Total number of compliance checks you have run across all sessions</li>
+    <li><strong>LC Checks</strong> &mdash; Number of Letter of Credit validations you have completed</li>
+    <li><strong>Shield Balance</strong> &mdash; Your remaining TapTrao Shield credits. Shown in green. Click to buy more.</li>
+    <li><strong>Pending Docs</strong> &mdash; Total number of documents across all your trades that still have "Pending" status</li>
+  </ul>
+
+  <p><strong>Recent trades table:</strong></p>
+  <p>Below the stats, a table lists your most recent compliance checks. Each row shows the commodity name, trade corridor with flags (e.g. &#x1F1E8;&#x1F1EE; CI &rarr; &#x1F1EA;&#x1F1FA; EU), readiness score, risk badge, and the date of the check. Click any row to open that trade's full detail page.</p>
+
+  <p><strong>Quick actions:</strong></p>
+  <p>Buttons at the top right of the dashboard provide fast access to <strong>"New Check"</strong> and <strong>"Supplier Inbox"</strong>.</p>
+
+  <div class="tip">
+    <strong>Tip:</strong> The dashboard shows tabs at the top &mdash; <strong>Overview</strong>, <strong>Documents</strong>, and <strong>Activity</strong> &mdash; that let you switch between a summary view, a documents-focused view, and a chronological activity feed.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 7. MY TRADES -->
+<!-- ============================================================ -->
+<div class="section" id="trades">
+  <h2><span class="num">7</span> My Trades</h2>
+  <p class="subtitle">View all your shipments, filter by status, and access trade detail pages.</p>
+
+  <p>Click <strong>"My Trades"</strong> in the sidebar to see a list of every compliance check you have run. This is your trade register.</p>
+
+  <!-- CSS MOCKUP: My Trades -->
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="mockup-dot r"></div>
+      <div class="mockup-dot y"></div>
+      <div class="mockup-dot g"></div>
+    </div>
+    <div class="mockup-body">
+      <div class="mockup-sidebar">
+        <div class="logo"><div class="dot"></div> TapTrao</div>
+        <div class="nav-item">Dashboard</div>
+        <div class="nav-item">New Check</div>
+        <div class="nav-item active">My Trades</div>
+        <div style="font-size:8px;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.5px;padding:10px 10px 4px;margin-top:6px">Compliance</div>
+        <div class="nav-item">LC Checker</div>
+        <div class="nav-item">Templates</div>
+      </div>
+      <div class="mockup-main">
+        <div class="mockup-hero">
+          <div class="breadcrumb">Home &rsaquo; My Trades</div>
+          <h3>My Trades</h3>
+          <p>All your compliance checks in one place</p>
+        </div>
+        <div style="width:100%;display:flex;gap:6px;margin-bottom:4px">
+          <div style="background:#71AB91;color:#fff;padding:4px 12px;border-radius:6px;font-size:10px;font-weight:600">All</div>
+          <div style="background:#2a2a2e;color:rgba(255,255,255,.4);padding:4px 12px;border-radius:6px;font-size:10px">Needs Action</div>
+          <div style="background:#2a2a2e;color:rgba(255,255,255,.4);padding:4px 12px;border-radius:6px;font-size:10px">In Progress</div>
+          <div style="background:#2a2a2e;color:rgba(255,255,255,.4);padding:4px 12px;border-radius:6px;font-size:10px">Closed</div>
+        </div>
+        <div class="mockup-card" style="min-width:100%">
+          <table class="mockup-table">
+            <tr><th>Commodity &middot; Corridor</th><th>Step</th><th>Risk</th><th>Score</th><th>Updated</th></tr>
+            <tr><td style="color:#fff">Cocoa Beans &middot; &#x1F1E8;&#x1F1EE; CI &rarr; &#x1F1EA;&#x1F1FA; EU</td><td>LC Check</td><td><span class="mockup-badge red">High</span></td><td>39</td><td>2h ago</td></tr>
+            <tr><td style="color:#fff">Green Coffee &middot; &#x1F1EA;&#x1F1F9; ET &rarr; &#x1F1EC;&#x1F1E7; UK</td><td>Paperwork</td><td><span class="mockup-badge amber">Moderate</span></td><td>62</td><td>3d ago</td></tr>
+            <tr><td style="color:#fff">Raw Cashew &middot; &#x1F1EC;&#x1F1ED; GH &rarr; &#x1F1E8;&#x1F1ED; CH</td><td>TwinLog</td><td><span class="mockup-badge green">Low</span></td><td>78</td><td>1w ago</td></tr>
+            <tr><td style="color:#fff">Shea Butter &middot; &#x1F1EC;&#x1F1ED; GH &rarr; &#x1F1FA;&#x1F1F8; US</td><td>Archive</td><td><span class="mockup-badge green">Low</span></td><td>85</td><td>2w ago</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="screenshot-caption">My Trades mockup showing the trade list with filter tabs and status columns</p>
+
+  <h3>Trade list columns</h3>
+  <table class="field-table">
+    <tr><th>Column</th><th>What It Shows</th></tr>
+    <tr><td>Commodity &middot; Corridor</td><td>The product name and trade route with country flags (e.g. Cocoa Beans &middot; &#x1F1E8;&#x1F1EE; CI &rarr; &#x1F1EA;&#x1F1FA; EU)</td></tr>
+    <tr><td>Step</td><td>Current workflow stage: Paperwork Review, LC Check, TwinLog Trail, or Archive</td></tr>
+    <tr><td>Risk</td><td>Risk level badge based on the readiness score: <span class="badge badge-green">Low</span> <span class="badge badge-amber">Moderate</span> <span class="badge badge-red">High</span></td></tr>
+    <tr><td>Score</td><td>The TwinLog Readiness Score (0&ndash;100)</td></tr>
+    <tr><td>Updated</td><td>When the trade was last modified (relative timestamp)</td></tr>
+  </table>
+
+  <h3>Filter tabs</h3>
+  <p>Use the tabs at the top of the list to filter trades:</p>
+  <ul class="features">
+    <li><strong>All</strong> &mdash; Every trade you have run</li>
+    <li><strong>Needs Action</strong> &mdash; Trades with pending documents or unresolved flags</li>
+    <li><strong>In Progress</strong> &mdash; Trades currently being worked on (documents being uploaded, LC checks in progress)</li>
+    <li><strong>Closed</strong> &mdash; Completed trades with all documents verified and TwinLog Trail generated</li>
+  </ul>
+
+  <p><strong>Clicking a trade</strong> opens its full detail page where you can view the complete compliance results, manage documents, run an LC check, generate the TwinLog Trail, and track the event timeline.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- 8. LC DOCUMENT CHECKER -->
+<!-- ============================================================ -->
+<div class="section" id="lc-check">
+  <h2><span class="num">8</span> LC Document Checker</h2>
+  <p class="subtitle">Cross-check your supplier documents against the Letter of Credit terms using UCP 600 and ISBP 745 rules.</p>
+
+  <p>The LC Document Checker is a 4-step tool that compares the terms stated in your Letter of Credit against the data on your supplier's shipping documents. It catches discrepancies that could cause your bank to reject the presentation. Click <strong>"LC Checker"</strong> in the sidebar to begin.</p>
+
+  <!-- CSS MOCKUP: LC Checker -->
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="mockup-dot r"></div>
+      <div class="mockup-dot y"></div>
+      <div class="mockup-dot g"></div>
+    </div>
+    <div class="mockup-body">
+      <div class="mockup-sidebar">
+        <div class="logo"><div class="dot"></div> TapTrao</div>
+        <div class="nav-item">Dashboard</div>
+        <div class="nav-item">New Check</div>
+        <div class="nav-item">My Trades</div>
+        <div style="font-size:8px;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.5px;padding:10px 10px 4px;margin-top:6px">Compliance</div>
+        <div class="nav-item active">LC Checker</div>
+      </div>
+      <div class="mockup-main">
+        <div class="mockup-hero">
+          <div class="breadcrumb">Home &rsaquo; LC Document Checker</div>
+          <h3>LC Document Checker</h3>
+          <p>Cross-check documents against LC terms using UCP 600</p>
+        </div>
+        <div style="width:100%">
+          <div class="mockup-step-bar">
+            <div class="st done"></div>
+            <div class="st current"></div>
+            <div class="st"></div>
+            <div class="st"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+            <span style="font-size:9px;color:#71AB91;font-weight:600">1. LC Terms</span>
+            <span style="font-size:9px;color:rgba(255,255,255,.5);font-weight:600">2. Supplier Docs</span>
+            <span style="font-size:9px;color:rgba(255,255,255,.2)">3. Review</span>
+            <span style="font-size:9px;color:rgba(255,255,255,.2)">4. Results</span>
+          </div>
+        </div>
+        <div class="mockup-card" style="min-width:100%;background:#fff;padding:16px">
+          <div style="font-size:11px;font-weight:600;color:#333;margin-bottom:12px">Supplier Document Details</div>
+          <div class="mockup-input" style="background:#f5f5f5;border-color:#e0e0e0;color:#999">Commercial Invoice Number</div>
+          <div class="mockup-input" style="background:#f5f5f5;border-color:#e0e0e0;color:#999">Beneficiary Name (as on invoice)</div>
+          <div class="mockup-input" style="background:#f5f5f5;border-color:#e0e0e0;color:#999">Goods Description</div>
+          <div style="display:flex;gap:8px">
+            <div class="mockup-input" style="background:#f5f5f5;border-color:#e0e0e0;color:#999;flex:1">Amount</div>
+            <div class="mockup-input" style="background:#f5f5f5;border-color:#e0e0e0;color:#999;flex:1">Currency</div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+            <div class="mockup-btn outline" style="border-color:#ddd;color:#666">Back</div>
+            <div class="mockup-btn">Continue</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="screenshot-caption">LC Document Checker mockup showing the 4-step progress bar and the supplier document entry form (Step 2)</p>
+
+  <h3>Step 1: Enter LC Terms</h3>
+  <p>Fill in the key terms from your Letter of Credit. These are the values the bank will check against. You will need to enter:</p>
+  <table class="field-table">
+    <tr><th>Field</th><th>Description</th><th>Example</th></tr>
+    <tr><td>Beneficiary Name</td><td>The exporter/supplier named in the LC</td><td>Kumasi Cocoa Trading Ltd</td></tr>
+    <tr><td>Applicant Name</td><td>The importer/buyer (you)</td><td>European Cocoa Imports GmbH</td></tr>
+    <tr><td>Goods Description</td><td>Exactly as stated in the LC</td><td>Cocoa Beans, Grade I, Ghana Origin</td></tr>
+    <tr><td>HS Code</td><td>Harmonised System code</td><td>1801.00</td></tr>
+    <tr><td>Quantity &amp; Unit</td><td>Weight or volume</td><td>500 MT</td></tr>
+    <tr><td>Amount &amp; Currency</td><td>LC value</td><td>USD 1,250,000.00</td></tr>
+    <tr><td>Incoterms</td><td>Delivery terms</td><td>CIF Rotterdam</td></tr>
+    <tr><td>Port of Loading</td><td>Where goods are shipped from</td><td>Tema, Ghana</td></tr>
+    <tr><td>Port of Discharge</td><td>Where goods arrive</td><td>Rotterdam, Netherlands</td></tr>
+    <tr><td>Latest Shipment Date</td><td>Deadline for loading</td><td>2026-04-15</td></tr>
+    <tr><td>Expiry Date</td><td>LC expiry date</td><td>2026-05-15</td></tr>
+    <tr><td>Presentation Period</td><td>Days after shipment to present docs</td><td>21 days</td></tr>
+  </table>
+
+  <h3>Step 2: Enter Supplier Documents</h3>
+  <p>For each document your supplier has provided, enter the key data fields. The system checks these documents:</p>
+  <ul class="features">
+    <li><strong>Commercial Invoice</strong> &mdash; Invoice number, beneficiary name, goods description, amount, quantity</li>
+    <li><strong>Bill of Lading</strong> &mdash; B/L number, shipper name, consignee, notify party, ports, shipped-on-board date</li>
+    <li><strong>Certificate of Origin</strong> &mdash; Issuing authority, origin country, goods description</li>
+    <li><strong>Packing List</strong> &mdash; Number of packages, net weight, gross weight</li>
+    <li><strong>Insurance Certificate</strong> &mdash; Coverage amount (must be at least 110% of CIF value per UCP 600), currency</li>
+    <li><strong>Other documents</strong> &mdash; Phytosanitary certificate, fumigation certificate, quality/weight certificate as required</li>
+  </ul>
+
+  <h3>Step 3: Review</h3>
+  <p>Before submitting, you will see a summary of all the data you have entered for both the LC terms and the supplier documents. Review everything carefully. You can go back to either step to make corrections.</p>
+
+  <h3>Step 4: Results</h3>
+  <p>After submission, the engine applies <strong>UCP 600</strong> (Uniform Customs and Practice for Documentary Credits) and <strong>ISBP 745</strong> (International Standard Banking Practice) rules to check for discrepancies. Results show one of three verdicts:</p>
+
+  <p>
+    <span class="badge badge-green">COMPLIANT</span> &mdash; No discrepancies found. All documents match the LC terms. Safe to present to the bank.
+  </p>
+  <p>
+    <span class="badge badge-amber">COMPLIANT WITH NOTES</span> &mdash; Minor issues detected that may or may not cause rejection. Review the notes and decide whether to correct before presentation.
+  </p>
+  <p>
+    <span class="badge badge-red">DISCREPANCIES FOUND</span> &mdash; One or more discrepancies detected that are likely to cause bank rejection. Each discrepancy shows:
+  </p>
+  <ol class="steps-list">
+    <li>The <strong>UCP 600 article</strong> that is violated (e.g. "Article 18(a) &mdash; Commercial Invoice")</li>
+    <li>Which <strong>document</strong> contains the discrepancy</li>
+    <li>The <strong>LC term value</strong> vs the <strong>document value</strong></li>
+    <li>A <strong>suggested correction</strong> explaining how to fix it</li>
+  </ol>
+
+  <p>The system also generates a <strong>correction email</strong> that you can copy and send to your supplier, listing all required corrections in a clear, professional format.</p>
+
+  <div class="tip">
+    <strong>Cost:</strong> An LC Document Check uses 1 Shield credit. However, if you are running it as part of a compliance check workflow (from the trade detail page), it is <strong>included free</strong> with your existing credit. Stand-alone LC checks (without a linked compliance lookup) cost $19.99. Re-checks after corrections cost $9.99 each, with 3 free re-checks included per case.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 9. REQUESTING SUPPLIER DOCUMENTS -->
+<!-- ============================================================ -->
+<div class="section" id="supplier">
+  <h2><span class="num">9</span> Requesting Supplier Documents</h2>
+  <p class="subtitle">How the Supplier Inbox works: sending secure upload links, tracking uploads, and reviewing received documents.</p>
+
+  <p>TapTrao lets you request documents from your supplier without email attachments. Instead, you generate a secure upload link that the supplier can use to upload their documents directly into your trade record.</p>
 
   <div class="step">
-    <div class="step-num">A</div>
+    <div class="step-num">1</div>
     <div class="step-content">
-      <h3>TwinLog Score (0&ndash;100)</h3>
-      <p>A readiness score that tells you how complex this trade is. The score is based on four factors:</p>
-      <table class="field-table">
-        <tr><th>Factor</th><th>What It Measures</th><th>Max Penalty</th></tr>
-        <tr><td>Regulatory Requirements</td><td>Number of active regulatory overlays (SPS, EUDR, CBAM, etc.)</td><td>30</td></tr>
-        <tr><td>Product Controls</td><td>Known hazards for this commodity (e.g. cadmium, mycotoxins)</td><td>30</td></tr>
-        <tr><td>Document Volume</td><td>Total number of documents you'll need</td><td>20</td></tr>
-        <tr><td>Trade Restrictions</td><td>Sanctions, embargoes, or special authorisations</td><td>20</td></tr>
-      </table>
-      <p>Score interpretation:</p>
-      <p><span class="badge badge-green">70&ndash;100: LOW RISK</span> &nbsp; <span class="badge badge-amber">40&ndash;69: MODERATE RISK</span> &nbsp; <span class="badge badge-red">0&ndash;39: HIGH RISK</span></p>
+      <h3>Open your trade and click "Supplier Instructions" or "Request Documents"</h3>
+      <p>From the trade detail page (after running a compliance check), scroll to the bottom and click <strong>"Supplier instructions"</strong>. TapTrao generates a unique, token-gated upload link for this specific trade.</p>
     </div>
   </div>
 
   <div class="step">
-    <div class="step-num">B</div>
+    <div class="step-num">2</div>
     <div class="step-content">
-      <h3>EUDR Warning (if applicable)</h3>
-      <p>If your commodity triggers the EU Deforestation Regulation, you'll see a yellow banner with a link to <strong>"Prepare EUDR documents"</strong>. This takes you to a form where you can add geolocation data for your production plots.</p>
+      <h3>Share the upload link with your supplier</h3>
+      <p>Copy the generated link and send it to your supplier via email, WhatsApp, or any other channel. The link looks like: <code style="background:#f0f0f0;padding:2px 6px;border-radius:4px;font-size:12px">taptrao.com/upload/abc123def456</code></p>
+      <p>The supplier does <strong>not</strong> need a TapTrao account. The link opens a simple, clean upload form.</p>
     </div>
   </div>
 
   <div class="step">
-    <div class="step-num">C</div>
+    <div class="step-num">3</div>
     <div class="step-content">
-      <h3>Next Actions</h3>
-      <p>A prioritised list of all documents and actions required, showing:</p>
+      <h3>What the supplier sees</h3>
+      <p>When the supplier opens the link, they see a form listing exactly which documents are required for this trade (e.g. Commercial Invoice, Bill of Lading, Certificate of Origin, Phytosanitary Certificate). They upload each file and click submit. They can upload PDF, JPG, or PNG files.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h3>Track uploads in your Supplier Inbox</h3>
+      <p>Click <strong>"Suppliers"</strong> in the sidebar to see all your supplier requests and their status. Each request shows:</p>
       <ul class="features">
-        <li>Document name and description</li>
-        <li>Who is responsible (You, Supplier, or Broker)</li>
-        <li>When it's needed (Before loading, Before arrival, Post-arrival)</li>
-        <li>Current status (Pending, Ready, Risk Accepted)</li>
+        <li>The trade corridor and commodity</li>
+        <li>Whether the supplier has opened the link</li>
+        <li>Which documents have been uploaded so far</li>
+        <li>Upload timestamps</li>
       </ul>
     </div>
   </div>
 
   <div class="step">
-    <div class="step-num">D</div>
+    <div class="step-num">5</div>
     <div class="step-content">
-      <h3>Trade Corridor Details</h3>
-      <p>Three cards showing the Commodity (with HS code), Origin (with customs authority and trade bloc), and Destination (with VAT rate and tariff system).</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-num">E</div>
-    <div class="step-content">
-      <h3>Regulatory Triggers</h3>
-      <p>Red badges showing which regulations apply: <span class="badge badge-red">SPS</span> <span class="badge badge-red">EUDR</span> <span class="badge badge-red">CBAM</span> <span class="badge badge-red">CSDDD</span> and others. Grey badges show regulations that do NOT apply to this trade.</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-num">F</div>
-    <div class="step-content">
-      <h3>Watch This Corridor</h3>
-      <p>Click <strong>"Watch this corridor"</strong> to receive notifications when regulations change for this specific trade route. You can watch up to 3 corridors for free.</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-num">G</div>
-    <div class="step-content">
-      <h3>Workflow Steps</h3>
-      <p>At the top of the results, you'll see a 4-step progress indicator: <strong>Lookup &rarr; LC Check &rarr; TwinLog Trail &rarr; Archive</strong>. These guide you through the full compliance workflow for this shipment.</p>
-    </div>
-  </div>
-</div>
-
-<!-- 3. DASHBOARD -->
-<div class="section" id="dashboard">
-  <h2><span class="num">3</span> The Dashboard</h2>
-  <p class="subtitle">Your central hub for all compliance activity.</p>
-
-  <p>The Dashboard shows at a glance:</p>
-  <ul class="features">
-    <li><strong>Compliance Lookups</strong> &mdash; total checks you've run</li>
-    <li><strong>LC Checks</strong> &mdash; number of Letter of Credit validations</li>
-    <li><strong>Shield Balance</strong> &mdash; your remaining credits</li>
-    <li><strong>Recent Trades</strong> &mdash; your latest shipments with status and corridor</li>
-    <li><strong>Pending Compliance Docs</strong> &mdash; documents that still need attention</li>
-    <li><strong>Quick Actions</strong> &mdash; buttons for New Check and Supplier Inbox</li>
-  </ul>
-
-  <div class="tip">
-    <strong>Tip:</strong> Use the tabs at the top (Overview, Documents, Activity) to switch between different views of your compliance data.
-  </div>
-</div>
-
-<!-- 4. MANAGING TRADES -->
-<div class="section" id="trades">
-  <h2><span class="num">4</span> Managing Your Trades</h2>
-  <p class="subtitle">Track all your shipments in one place.</p>
-
-  <p>Click <strong>"My Trades"</strong> in the sidebar to see all your shipments. Each trade shows:</p>
-  <table class="field-table">
-    <tr><th>Column</th><th>What It Shows</th></tr>
-    <tr><td>Commodity &middot; Corridor</td><td>The product and trade route (e.g. Cocoa Beans, CI &rarr; EU)</td></tr>
-    <tr><td>Step</td><td>Current workflow step (Paperwork review, LC check, etc.)</td></tr>
-    <tr><td>Risk</td><td>Risk level badge (At risk, Blocking, Clear)</td></tr>
-    <tr><td>Score</td><td>TwinLog Score with colour coding</td></tr>
-    <tr><td>Updated</td><td>Last activity timestamp</td></tr>
-  </table>
-
-  <p>Use the filter tabs to focus on what needs attention:</p>
-  <ul class="features">
-    <li><strong>All shipments</strong> &mdash; see everything</li>
-    <li><strong>Needs action</strong> &mdash; trades requiring your attention</li>
-    <li><strong>In progress</strong> &mdash; actively being processed</li>
-    <li><strong>Closed</strong> &mdash; completed trades</li>
-  </ul>
-
-  <p>Click on any trade to open its detail page and manage the full lifecycle: status changes, document verification, supplier requests, and PDF downloads.</p>
-</div>
-
-<!-- 5. SUPPLIER DOCUMENTS -->
-<div class="section" id="supplier">
-  <h2><span class="num">5</span> Requesting Supplier Documents</h2>
-  <p class="subtitle">Ask your supplier to upload documents directly &mdash; no email attachments.</p>
-
-  <div class="step">
-    <div class="step-num">1</div>
-    <div class="step-content">
-      <h3>Open your trade and click "Request Documents"</h3>
-      <p>From the trade detail page, click the button to request documents from your supplier. TapTrao creates a secure upload link automatically.</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-num">2</div>
-    <div class="step-content">
-      <h3>Share the upload link</h3>
-      <p>Copy the generated link and send it to your supplier via email or WhatsApp. The link is unique to this trade and doesn't require the supplier to create an account.</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-num">3</div>
-    <div class="step-content">
-      <h3>Supplier uploads their documents</h3>
-      <p>Your supplier sees a simple upload form listing the required documents (Commercial Invoice, Certificate of Origin, Packing List, etc.). They upload each file and submit.</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-num">4</div>
-    <div class="step-content">
-      <h3>Review in your Supplier Inbox</h3>
-      <p>Go to <strong>"Suppliers"</strong> in the sidebar to see all received documents. Each upload shows the document type, filename, and upload timestamp.</p>
-    </div>
-  </div>
-
-  <div class="tip">
-    <strong>Tip:</strong> You can also upload documents yourself (as the buyer) from the trade detail page. This is useful for documents you prepare on your side, like a revised Commercial Invoice.
-  </div>
-</div>
-
-<!-- 6. VERIFYING DOCUMENTS -->
-<div class="section" id="verify">
-  <h2><span class="num">6</span> Verifying &amp; Flagging Documents</h2>
-  <p class="subtitle">Review supplier documents and build your audit trail.</p>
-
-  <div class="step">
-    <div class="step-num">1</div>
-    <div class="step-content">
-      <h3>Open a document for review</h3>
-      <p>From the trade detail page, find the uploaded documents section. Each document has a <strong>"Verify"</strong> button and a <strong>"Flag"</strong> button.</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-num">2</div>
-    <div class="step-content">
-      <h3>Verify correct documents</h3>
-      <p>Click <span class="badge badge-green">Verify</span> to confirm the document is correct. This adds a "Document Verified" event to the trade's audit trail.</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-num">3</div>
-    <div class="step-content">
-      <h3>Flag problematic documents</h3>
-      <p>Click <span class="badge badge-red">Flag</span> to mark a document as having an issue. You'll be asked to enter a finding (e.g. "Country of origin shows Ghana but trade corridor is Cote d'Ivoire"). This creates a "Document Flagged" event in the audit trail.</p>
+      <h3>Review uploaded documents</h3>
+      <p>Once the supplier uploads documents, they appear in the trade's document list. You can then verify or flag each document as described in <a href="#actions">Section 4</a>.</p>
     </div>
   </div>
 
   <div class="info">
-    <strong>Every action is recorded.</strong> Verifications, flags, status changes, and document uploads are all logged in the trade's event timeline with cryptographic hashes for tamper detection.
+    <strong>Security note:</strong> Supplier upload links are unique tokens. They cannot be guessed and expire after use. The supplier can only upload documents for the specific trade they were invited to &mdash; they cannot see your compliance results, TwinLog Score, or any other data.
   </div>
 </div>
 
-<!-- 7. LC CHECK -->
-<div class="section" id="lc-check">
-  <h2><span class="num">7</span> LC Document Checker</h2>
-  <p class="subtitle">Cross-check your supplier documents against the Letter of Credit terms using UCP 600 rules.</p>
-
-  <div class="step">
-    <div class="step-num">1</div>
-    <div class="step-content">
-      <h3>Enter LC Terms (Step 1)</h3>
-      <p>Fill in the key terms from your Letter of Credit: beneficiary name, applicant name, goods description, HS code, quantity, amount, currency, incoterms, ports, and shipping dates.</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-num">2</div>
-    <div class="step-content">
-      <h3>Enter Supplier Documents (Step 2)</h3>
-      <p>For each supplier document, enter the key fields. The system checks: Commercial Invoice, Bill of Lading, Certificate of Origin, Packing List, Insurance Certificate, and more.</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-num">3</div>
-    <div class="step-content">
-      <h3>Review &amp; Submit (Step 3)</h3>
-      <p>Review your entries and click submit. The engine applies UCP 600 and ISBP 745 rules to find discrepancies.</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-num">4</div>
-    <div class="step-content">
-      <h3>View Results (Step 4)</h3>
-      <p>Results show a verdict with three possible outcomes:</p>
-      <p><span class="badge badge-green">COMPLIANT</span> &mdash; No discrepancies found</p>
-      <p><span class="badge badge-amber">COMPLIANT WITH NOTES</span> &mdash; Minor issues to be aware of</p>
-      <p><span class="badge badge-red">DISCREPANCIES FOUND</span> &mdash; Issues that could cause bank rejection</p>
-      <p>Each discrepancy shows the UCP 600 article, which document is affected, and a suggested correction.</p>
-    </div>
-  </div>
-
-  <div class="tip">
-    <strong>Cost:</strong> LC Document Check uses 1 Shield credit. If linked to a compliance lookup (from the trade workflow), it's included free. Re-checks after corrections are $9.99 each, with 3 free re-checks per case.
-  </div>
-</div>
-
-<!-- 8. TWINLOG TRAIL -->
-<div class="section" id="twinlog">
-  <h2><span class="num">8</span> Downloading Your TwinLog Trail</h2>
-  <p class="subtitle">Generate an audit-ready PDF with full compliance evidence.</p>
-
-  <div class="step">
-    <div class="step-num">1</div>
-    <div class="step-content">
-      <h3>Set up your Company Profile first</h3>
-      <p>Go to <strong>Settings &rarr; Company Profile</strong> and fill in your company name, registered address, country, VAT number, and EORI number. This information appears on every TwinLog Trail.</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-num">2</div>
-    <div class="step-content">
-      <h3>Navigate to step 3 "TwinLog Trail"</h3>
-      <p>From the trade detail page (after running a compliance check), click step 3 in the workflow indicator, or scroll down to the TwinLog section.</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-num">3</div>
-    <div class="step-content">
-      <h3>Click "Download TwinLog Trail"</h3>
-      <p>The PDF is generated instantly and downloaded to your computer. It contains 8 pages:</p>
-    </div>
-  </div>
-
-  <table class="field-table">
-    <tr><th>Page</th><th>Contents</th></tr>
-    <tr><td>1. Cover</td><td>Commodity, corridor, company details, reference number</td></tr>
-    <tr><td>2. TwinLog Score</td><td>Readiness score breakdown with factors and penalties</td></tr>
-    <tr><td>3. Importer Requirements</td><td>All documents and actions required of the importing party</td></tr>
-    <tr><td>4. Supplier Requirements</td><td>Documents the supplier must provide, with issuing authorities</td></tr>
-    <tr><td>5. Supplier Documents</td><td>Table of all uploaded documents with verification status</td></tr>
-    <tr><td>6. Regulatory Overlays</td><td>Active regulations and known hazards for the commodity</td></tr>
-    <tr><td>7. Event Timeline</td><td>Complete audit trail with timestamps, events, and hash chain</td></tr>
-    <tr><td>8. Audit Record</td><td>SHA-256 integrity hash, reference, timestamps, chain verification</td></tr>
-  </table>
-
-  <div class="info">
-    <strong>Each TwinLog Trail has a unique reference</strong> (e.g. TT-2026-50FF2F) and an SHA-256 integrity hash. Anyone can verify the record at <strong>taptrao.com/verify/TT-2026-XXXXXX</strong>.
-  </div>
-</div>
-
-<!-- 9. COMPANY PROFILE -->
+<!-- ============================================================ -->
+<!-- 10. COMPANY PROFILE -->
+<!-- ============================================================ -->
 <div class="section" id="profile">
-  <h2><span class="num">9</span> Setting Up Your Company Profile</h2>
-  <p class="subtitle">Required for TwinLog Trail PDF generation.</p>
+  <h2><span class="num">10</span> Company Profile</h2>
+  <p class="subtitle">Why your company details matter and how to fill them in.</p>
 
-  <p>Go to <strong>Settings</strong> in the sidebar, then fill in:</p>
+  <p>Your Company Profile information appears on every TwinLog Trail PDF you generate. It identifies you as the compliance record holder. Go to <strong>"Settings"</strong> in the sidebar to access the profile form.</p>
+
+  <!-- CSS MOCKUP: Settings/Profile -->
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="mockup-dot r"></div>
+      <div class="mockup-dot y"></div>
+      <div class="mockup-dot g"></div>
+    </div>
+    <div class="mockup-body">
+      <div class="mockup-sidebar">
+        <div class="logo"><div class="dot"></div> TapTrao</div>
+        <div class="nav-item">Dashboard</div>
+        <div class="nav-item">New Check</div>
+        <div class="nav-item">My Trades</div>
+        <div style="font-size:8px;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.5px;padding:10px 10px 4px;margin-top:6px">Account</div>
+        <div class="nav-item">Supplier Inbox</div>
+        <div class="nav-item active">Settings</div>
+      </div>
+      <div class="mockup-main">
+        <div class="mockup-hero">
+          <div class="breadcrumb">Home &rsaquo; Settings</div>
+          <h3>Company Profile</h3>
+          <p>These details appear on your TwinLog Trail</p>
+        </div>
+        <div class="mockup-card" style="min-width:100%;background:#fff;padding:16px">
+          <div style="margin-bottom:10px">
+            <div style="font-size:9px;color:#666;text-transform:uppercase;font-weight:600;margin-bottom:4px">Company Name *</div>
+            <div class="mockup-input" style="background:#f5f5f5;border-color:#e0e0e0;color:#333">European Cocoa Imports GmbH</div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:9px;color:#666;text-transform:uppercase;font-weight:600;margin-bottom:4px">Registered Office Address *</div>
+            <div class="mockup-input" style="background:#f5f5f5;border-color:#e0e0e0;color:#333">Hafenstrasse 12, 20095 Hamburg, DE</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <div style="flex:1">
+              <div style="font-size:9px;color:#666;text-transform:uppercase;font-weight:600;margin-bottom:4px">VAT Number</div>
+              <div class="mockup-input" style="background:#f5f5f5;border-color:#e0e0e0;color:#333">DE123456789</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:9px;color:#666;text-transform:uppercase;font-weight:600;margin-bottom:4px">EORI Number</div>
+              <div class="mockup-input" style="background:#f5f5f5;border-color:#e0e0e0;color:#333">DE1234567890123</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:12px">
+            <div class="mockup-btn">Save Profile</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="screenshot-caption">Company Profile settings mockup showing the form fields</p>
+
+  <h3>Profile fields</h3>
   <table class="field-table">
-    <tr><th>Field</th><th>Description</th><th>Required</th></tr>
-    <tr><td>Company Name</td><td>As it appears on your Certificate of Incorporation</td><td>Yes</td></tr>
-    <tr><td>Registered Office Address</td><td>Full address including postcode/ZIP. Must match regulatory documents.</td><td>Yes</td></tr>
-    <tr><td>Country of Registration</td><td>Select from dropdown</td><td>Yes</td></tr>
-    <tr><td>VAT Number</td><td>Used for EU/UK trade records</td><td>No</td></tr>
-    <tr><td>EORI Number</td><td>Economic Operators Registration and Identification. Required by UK/EU customs to track every shipment.</td><td>No (but strongly recommended)</td></tr>
+    <tr><th>Field</th><th>Description</th><th>Required?</th></tr>
+    <tr><td>Company Name</td><td>Your registered company name, exactly as it appears on your Certificate of Incorporation</td><td>Yes</td></tr>
+    <tr><td>Registered Office Address</td><td>Full address including street, city, postcode/ZIP, and country code. This must match your official regulatory documents.</td><td>Yes</td></tr>
+    <tr><td>Country of Registration</td><td>The country where your company is legally registered</td><td>Yes</td></tr>
+    <tr><td>VAT Number</td><td>Your Value Added Tax identification number. Used on EU/UK trade records.</td><td>No</td></tr>
+    <tr><td>EORI Number</td><td>Economic Operators Registration and Identification number. This is what EU and UK customs authorities use to identify you on every import declaration.</td><td>No (but strongly recommended)</td></tr>
   </table>
+
+  <div class="warning">
+    <strong>Important:</strong> Without a Company Profile, TapTrao cannot generate a TwinLog Trail PDF. Fill in at least the required fields (Company Name, Address, Country) before attempting to download your first TwinLog Trail.
+  </div>
 
   <div class="tip">
     <strong>Why EORI matters:</strong> Your EORI number is what customs authorities use to identify you on every import declaration. A compliance record without an EORI cannot be linked to your customs activity. UK traders can register at <em>gov.uk</em>; EU traders via their national customs authority.
   </div>
 </div>
 
-<!-- 10. PRICING -->
+<!-- ============================================================ -->
+<!-- 11. BUYING SHIELD CREDITS -->
+<!-- ============================================================ -->
 <div class="section" id="pricing">
-  <h2><span class="num">10</span> Pricing &amp; Buying Credits</h2>
-  <p class="subtitle">How TapTrao Shield credits work.</p>
+  <h2><span class="num">11</span> Buying Shield Credits</h2>
+  <p class="subtitle">Free first check, pricing packs, promo codes, and payment.</p>
 
-  <p><span class="badge badge-free">FREE</span> &mdash; Your first compliance check is always free. No card required.</p>
+  <h3>Free first check</h3>
+  <p>Every new user gets their <strong>first compliance check for free</strong>. No credit card is required. Simply run a check and see the full results including readiness score, document list, regulatory warnings, and trade corridor details. After that, each additional check requires 1 TapTrao Shield credit.</p>
 
-  <p style="margin-top: 16px;">After your first free check, each additional check uses 1 Shield credit. Credits are purchased in packs:</p>
+  <h3>TapTrao Shield packs</h3>
+  <p>Credits are purchased in packs. Click <strong>"Buy Credits"</strong> in the sidebar or visit the Pricing page from the landing page.</p>
+
+  <!-- CSS MOCKUP: Pricing -->
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="mockup-dot r"></div>
+      <div class="mockup-dot y"></div>
+      <div class="mockup-dot g"></div>
+    </div>
+    <div class="mockup-body" style="flex-direction:column;gap:12px">
+      <div style="text-align:center;padding:8px 0">
+        <div style="font-size:16px;font-weight:700;color:#fff">TapTrao Shield</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.45)">Each credit includes a full compliance check + LC check + TwinLog Trail</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+        <div style="background:linear-gradient(160deg,#0e3d34,#0c332c);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;flex:1;min-width:140px;max-width:200px">
+          <div style="font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px">Single</div>
+          <div style="font-size:24px;font-weight:700;color:#fff;margin:6px 0">$110</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4)">1 shipment</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">$110 per check</div>
+          <div class="mockup-btn outline" style="margin-top:10px;display:block;text-align:center">Buy</div>
+        </div>
+        <div style="background:linear-gradient(160deg,#0e3d34,#0c332c);border:2px solid #71AB91;border-radius:10px;padding:16px;flex:1;min-width:140px;max-width:200px;box-shadow:0 0 20px rgba(113,171,145,.08)">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px">3-Pack</div>
+            <span class="mockup-badge green">Popular</span>
+          </div>
+          <div style="font-size:24px;font-weight:700;color:#fff;margin:6px 0">$299</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4)">3 shipments</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">~$100 per check</div>
+          <div class="mockup-btn" style="margin-top:10px;display:block;text-align:center">Buy</div>
+        </div>
+        <div style="background:linear-gradient(160deg,#0e3d34,#0c332c);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;flex:1;min-width:140px;max-width:200px">
+          <div style="font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px">5-Pack</div>
+          <div style="font-size:24px;font-weight:700;color:#fff;margin:6px 0">$475</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4)">5 shipments</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">$95 per check</div>
+          <div class="mockup-btn outline" style="margin-top:10px;display:block;text-align:center">Buy</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="screenshot-caption">Pricing packs mockup showing the Single, 3-Pack, and 5-Pack options</p>
 
   <table class="field-table">
     <tr><th>Pack</th><th>Price</th><th>Per Shipment</th><th>Includes</th></tr>
-    <tr><td>TapTrao Shield: Single</td><td>$110</td><td>$110</td><td>1 compliance check + 1 LC check</td></tr>
-    <tr><td>TapTrao Shield: 3-Pack</td><td>$299</td><td>~$100</td><td>3 compliance checks + 3 LC checks</td></tr>
-    <tr><td>TapTrao Shield: 5-Pack</td><td>$475</td><td>$95</td><td>5 compliance checks + 5 LC checks</td></tr>
+    <tr><td>TapTrao Shield: Single</td><td>$110</td><td>$110</td><td>1 compliance check + 1 LC check + 1 TwinLog Trail</td></tr>
+    <tr><td>TapTrao Shield: 3-Pack</td><td>$299</td><td>~$100</td><td>3 compliance checks + 3 LC checks + 3 TwinLog Trails</td></tr>
+    <tr><td>TapTrao Shield: 5-Pack</td><td>$475</td><td>$95</td><td>5 compliance checks + 5 LC checks + 5 TwinLog Trails</td></tr>
   </table>
 
-  <p style="margin-top: 12px;">Each Shield credit includes:</p>
+  <p><strong>Each Shield credit includes:</strong></p>
   <ul class="features">
-    <li>Full compliance lookup with all regulatory requirements</li>
-    <li>TwinLog Score and readiness assessment</li>
-    <li>LC Document Check (UCP 600 cross-check)</li>
+    <li>Full compliance lookup with all regulatory requirements, duty rates, and known hazards</li>
+    <li>TwinLog Readiness Score with four-factor breakdown</li>
+    <li>LC Document Check (UCP 600 cross-check) &mdash; included free when linked to a compliance check</li>
     <li>Supplier document upload link</li>
-    <li>TwinLog Trail PDF download</li>
-    <li>Audit trail with hash chain verification</li>
+    <li>TwinLog Trail PDF download with SHA-256 integrity hash</li>
+    <li>Customs data pack (CSV) export</li>
+    <li>Audit trail with cryptographic hash chain</li>
   </ul>
 
-  <div class="tip">
-    <strong>Promo codes:</strong> If you have a promo code, enter it on the Pricing page in the "Have a promo code?" box and click Redeem. Credits will be added to your balance instantly.
+  <h3>How to purchase</h3>
+  <ol class="steps-list">
+    <li>Click <strong>"Buy Credits"</strong> in the sidebar, or click any "Buy" button on a pricing card</li>
+    <li>You will be redirected to a <strong>Stripe Checkout</strong> page to enter your payment details</li>
+    <li>After successful payment, you are redirected back to TapTrao and your credits are added to your balance immediately</li>
+    <li>You can verify your balance on the Dashboard or in the sidebar (shown next to your credit count)</li>
+  </ol>
+
+  <h3>Promo codes</h3>
+  <p>If you have a promotional code, go to the Pricing page and look for the <strong>"Have a promo code?"</strong> section. Enter your code and click <strong>"Redeem"</strong>. If valid, credits are added to your balance instantly without any payment required.</p>
+
+  <div class="info">
+    <strong>Credits do not expire.</strong> Purchased credits remain in your balance indefinitely. They are tied to your browser session.
   </div>
 </div>
 
-<!-- 11. ALERTS -->
+<!-- ============================================================ -->
+<!-- 12. REGULATORY ALERTS -->
+<!-- ============================================================ -->
 <div class="section" id="alerts">
-  <h2><span class="num">11</span> Regulatory Alerts</h2>
-  <p class="subtitle">Stay informed when rules change for your trade corridors.</p>
+  <h2><span class="num">12</span> Regulatory Alerts</h2>
+  <p class="subtitle">Watch trade corridors and get notified when regulations change.</p>
 
+  <p>Regulations change frequently. A new SPS requirement, an updated EUDR threshold, or a revised tariff rate can affect your shipment. TapTrao's alert system watches specific corridors for you.</p>
+
+  <!-- CSS MOCKUP: Alerts -->
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="mockup-dot r"></div>
+      <div class="mockup-dot y"></div>
+      <div class="mockup-dot g"></div>
+    </div>
+    <div class="mockup-body">
+      <div class="mockup-sidebar">
+        <div class="logo"><div class="dot"></div> TapTrao</div>
+        <div class="nav-item">Dashboard</div>
+        <div class="nav-item">New Check</div>
+        <div class="nav-item">My Trades</div>
+        <div style="font-size:8px;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.5px;padding:10px 10px 4px;margin-top:6px">Compliance</div>
+        <div class="nav-item">LC Checker</div>
+        <div class="nav-item">Templates</div>
+        <div class="nav-item active" style="display:flex;justify-content:space-between;align-items:center">Alerts <span style="background:#ef4444;color:#fff;font-size:8px;padding:1px 5px;border-radius:8px">2</span></div>
+      </div>
+      <div class="mockup-main">
+        <div class="mockup-hero">
+          <div class="breadcrumb">Home &rsaquo; Regulatory Alerts</div>
+          <h3>Regulatory Alerts</h3>
+          <p>Watching 2 of 3 corridors</p>
+        </div>
+        <div class="mockup-card" style="min-width:100%">
+          <div class="label">Your Watched Corridors</div>
+          <div style="border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:10px;margin:6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-size:11px;color:#fff;font-weight:600">&#x1F1E8;&#x1F1EE; Cocoa Beans &rarr; &#x1F1EA;&#x1F1FA; EU</div>
+              <span class="mockup-badge red">1 new alert</span>
+            </div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:4px">EUDR enforcement date updated to Dec 2026</div>
+          </div>
+          <div style="border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:10px;margin:6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-size:11px;color:#fff;font-weight:600">&#x1F1EA;&#x1F1F9; Green Coffee &rarr; &#x1F1EC;&#x1F1E7; UK</div>
+              <span class="mockup-badge red">1 new alert</span>
+            </div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:4px">UK SPS import check frequency increased</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="screenshot-caption">Alerts mockup showing 2 watched corridors with new regulatory change notifications</p>
+
+  <h3>How to watch a corridor</h3>
   <div class="step">
     <div class="step-num">1</div>
     <div class="step-content">
-      <h3>Watch a corridor</h3>
-      <p>After running a compliance check, click <strong>"Watch this corridor"</strong> on the results page. You can watch up to 3 corridors for free.</p>
+      <h3>From the results page</h3>
+      <p>After running a compliance check, click <strong>"Watch this corridor"</strong> in the results page. This subscribes you to alerts for that specific commodity + origin + destination combination.</p>
     </div>
   </div>
 
   <div class="step">
     <div class="step-num">2</div>
     <div class="step-content">
-      <h3>View your alerts</h3>
-      <p>Go to <strong>"Alerts"</strong> in the sidebar to see all your watched corridors and any regulatory changes that have been detected.</p>
+      <h3>From the Alerts page</h3>
+      <p>Click <strong>"Alerts"</strong> in the sidebar to see all your active watches and any new alerts. You can also add new corridor watches from this page.</p>
     </div>
   </div>
 
   <div class="step">
     <div class="step-num">3</div>
     <div class="step-content">
-      <h3>Get notified</h3>
-      <p>When a regulation changes for one of your watched corridors, you'll see a notification badge in the sidebar and a bell icon in the top-right navigation.</p>
+      <h3>Getting notified</h3>
+      <p>When a regulation changes for one of your watched corridors, you will see:</p>
+      <ul class="features">
+        <li>A <strong>red notification badge</strong> on the "Alerts" item in the sidebar</li>
+        <li>A <strong>red dot on the bell icon</strong> in the top-right navigation bar</li>
+        <li>The alert details on the Alerts page, including what changed and when</li>
+      </ul>
     </div>
+  </div>
+
+  <div class="tip">
+    <strong>Limit:</strong> You can watch up to <strong>3 corridors</strong> for free. Choose your most critical trade routes. If a corridor is no longer relevant, you can unsubscribe from the Alerts page to free up a slot.
   </div>
 </div>
 
-<!-- 12. DEMURRAGE -->
-<div class="section" id="demurrage">
-  <h2><span class="num">12</span> Demurrage Calculator</h2>
-  <p class="subtitle">Estimate port demurrage costs to understand the financial impact of delays.</p>
+<!-- ============================================================ -->
+<!-- 13. TRADE TEMPLATES -->
+<!-- ============================================================ -->
+<div class="section" id="templates">
+  <h2><span class="num">13</span> Trade Templates</h2>
+  <p class="subtitle">Save frequently-used corridors, detect stale data, and re-run checks with one click.</p>
 
-  <p>Go to <strong>"Demurrage Calc"</strong> in the sidebar under Tools. Enter:</p>
-  <ul class="features">
-    <li>Base daily rate (from your shipping contract)</li>
-    <li>Number of chargeable days (days past the free period)</li>
-  </ul>
-  <p>The calculator uses an escalating tier model: days 1-7 at base rate, days 8-14 at 1.5x, and days 15+ at 2x. This helps you quantify the cost of document delays.</p>
+  <p>If you regularly trade the same commodity on the same corridor (e.g. Cocoa Beans from C&ocirc;te d'Ivoire to the EU), you can save it as a template to avoid re-selecting the dropdowns every time.</p>
+
+  <!-- CSS MOCKUP: Templates -->
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="mockup-dot r"></div>
+      <div class="mockup-dot y"></div>
+      <div class="mockup-dot g"></div>
+    </div>
+    <div class="mockup-body">
+      <div class="mockup-sidebar">
+        <div class="logo"><div class="dot"></div> TapTrao</div>
+        <div class="nav-item">Dashboard</div>
+        <div class="nav-item">New Check</div>
+        <div class="nav-item">My Trades</div>
+        <div style="font-size:8px;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.5px;padding:10px 10px 4px;margin-top:6px">Compliance</div>
+        <div class="nav-item">LC Checker</div>
+        <div class="nav-item active">Templates</div>
+      </div>
+      <div class="mockup-main">
+        <div class="mockup-hero">
+          <div class="breadcrumb">Home &rsaquo; Templates</div>
+          <h3>Trade Templates</h3>
+          <p>Your saved corridors</p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;width:100%">
+          <div class="mockup-card" style="flex:1;min-width:180px;border:1px solid rgba(255,255,255,.06)">
+            <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:6px">&#x1F1E8;&#x1F1EE; Cocoa &rarr; &#x1F1EA;&#x1F1FA; EU</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35)">Cocoa Beans [1801.00]</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35)">CI &rarr; European Union</div>
+            <div style="display:flex;align-items:center;gap:4px;margin-top:8px">
+              <span class="mockup-badge green">Up to date</span>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:10px">
+              <div class="mockup-btn" style="font-size:9px;padding:3px 10px">Use Template</div>
+              <div class="mockup-btn outline" style="font-size:9px;padding:3px 10px">Delete</div>
+            </div>
+          </div>
+          <div class="mockup-card" style="flex:1;min-width:180px;border:1px solid rgba(234,179,8,.2)">
+            <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:6px">&#x1F1EA;&#x1F1F9; Coffee &rarr; &#x1F1EC;&#x1F1E7; UK</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35)">Green Coffee [0901.11]</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35)">ET &rarr; United Kingdom</div>
+            <div style="display:flex;align-items:center;gap:4px;margin-top:8px">
+              <span class="mockup-badge amber">Stale &mdash; 45 days old</span>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:10px">
+              <div class="mockup-btn" style="font-size:9px;padding:3px 10px">Refresh</div>
+              <div class="mockup-btn outline" style="font-size:9px;padding:3px 10px">Delete</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="screenshot-caption">Templates mockup showing two saved corridors &mdash; one up-to-date and one flagged as stale</p>
+
+  <h3>Saving a template</h3>
+  <p>After running a compliance check, click <strong>"Save as Template"</strong> on the results page. The template stores the commodity, origin, and destination selections along with a snapshot of the compliance data at that point in time.</p>
+
+  <h3>Stale detection</h3>
+  <p>Templates include a built-in freshness check. When you view your templates, TapTrao compares the saved snapshot data against current regulatory data. If anything has changed, the template is marked with an <span class="badge badge-amber">Stale</span> badge and the age (e.g. "45 days old").</p>
+  <p>This tells you that regulations may have changed since you last checked this corridor and you should re-run the compliance check before relying on the old data.</p>
+
+  <h3>Using a template</h3>
+  <ol class="steps-list">
+    <li>Go to <strong>"Templates"</strong> in the sidebar</li>
+    <li>Find the template you want and click <strong>"Use Template"</strong></li>
+    <li>This opens the compliance check form with all three fields pre-selected</li>
+    <li>Click <strong>"Check compliance risk"</strong> to run a fresh check using this corridor</li>
+  </ol>
+
+  <h3>Refreshing a stale template</h3>
+  <p>If a template is marked as stale, click <strong>"Refresh"</strong>. TapTrao re-runs the compliance check for that corridor and updates the template's snapshot with the latest regulatory data. This uses 1 Shield credit.</p>
+
+  <h3>Deleting a template</h3>
+  <p>Click <strong>"Delete"</strong> to remove a template you no longer need. This action is permanent.</p>
 </div>
 
-<!-- 13. FAQ -->
+<!-- ============================================================ -->
+<!-- 14. DEMURRAGE CALCULATOR -->
+<!-- ============================================================ -->
+<div class="section" id="demurrage">
+  <h2><span class="num">14</span> Demurrage Calculator</h2>
+  <p class="subtitle">Estimate port demurrage costs when container delays occur.</p>
+
+  <p>Demurrage is the charge levied by shipping lines when containers are not picked up from the port within the agreed free period. Document delays &mdash; missing phytosanitary certificates, incomplete customs declarations, or LC discrepancies &mdash; are a common cause of demurrage. The Demurrage Calculator helps you estimate the financial impact.</p>
+
+  <p>Go to <strong>"Demurrage Calc"</strong> in the sidebar under the Compliance section to access the calculator.</p>
+
+  <img src="/guide/13-demurrage.png" alt="Demurrage Calculator" class="screenshot">
+  <p class="screenshot-caption">The Demurrage Calculator with input fields for port, container type, free days, days held, and cargo value</p>
+
+  <h3>Input fields</h3>
+  <table class="field-table">
+    <tr><th>Field</th><th>Description</th><th>Example</th></tr>
+    <tr><td>Port</td><td>The port where the container is being held</td><td>Rotterdam</td></tr>
+    <tr><td>Container Type</td><td>Standard container sizes: 20ft, 40ft, or 40ft HC (High Cube)</td><td>40ft</td></tr>
+    <tr><td>Free Days</td><td>Number of free days included in your shipping contract before demurrage charges begin</td><td>7</td></tr>
+    <tr><td>Days Held</td><td>Total number of days the container has been at the port</td><td>21</td></tr>
+    <tr><td>Cargo Value</td><td>The declared value of the cargo (used to calculate demurrage as a percentage of cargo value)</td><td>$125,000</td></tr>
+  </table>
+
+  <h3>How the calculation works</h3>
+  <p>The calculator uses an <strong>escalating tier model</strong> that reflects how most shipping lines structure their demurrage charges:</p>
+
+  <table class="field-table">
+    <tr><th>Period</th><th>Rate</th><th>Explanation</th></tr>
+    <tr><td>Days 1&ndash;7 (after free period)</td><td>1x base rate</td><td>Standard daily charge</td></tr>
+    <tr><td>Days 8&ndash;14</td><td>1.5x base rate</td><td>50% surcharge for extended delay</td></tr>
+    <tr><td>Days 15+</td><td>2x base rate</td><td>Double rate for prolonged delays</td></tr>
+  </table>
+
+  <p>The output shows the <strong>total estimated demurrage cost</strong> and what percentage of the cargo value it represents. This helps you quantify the cost of document delays and justify investment in proper compliance preparation.</p>
+
+  <div class="tip">
+    <strong>Tip:</strong> Use the demurrage estimate when discussing document timelines with your supplier. Showing the financial cost of a 2-week delay can be a powerful motivator for timely document submission.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 15. FAQ -->
+<!-- ============================================================ -->
 <div class="section" id="faq">
   <h2><span class="num">?</span> Frequently Asked Questions</h2>
 
   <div class="step">
     <div class="step-content">
       <h3>Do I need to create an account?</h3>
-      <p>No. TapTrao uses session-based identity. Your data is tied to your browser session automatically. No registration, no passwords.</p>
+      <p>No. TapTrao uses session-based identity via a browser cookie. Your data is tied to your browser session automatically. No registration, email, or passwords required.</p>
     </div>
   </div>
 
   <div class="step">
     <div class="step-content">
       <h3>What happens if I clear my browser cookies?</h3>
-      <p>Your session data will no longer be accessible. We recommend downloading your TwinLog Trail PDFs before clearing cookies so you always have your compliance records.</p>
+      <p>Your session data will no longer be accessible from the browser. However, any TwinLog Trail PDFs you have downloaded are yours to keep &mdash; they exist as files on your computer. We strongly recommend downloading TwinLog Trail PDFs for every trade as a permanent backup of your compliance records.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-content">
+      <h3>Can I use TapTrao on multiple devices?</h3>
+      <p>Each device (and each browser on a device) has its own session. Compliance checks, credits, and templates do not sync across devices. Run all checks for a given trade from the same browser on the same device.</p>
     </div>
   </div>
 
   <div class="step">
     <div class="step-content">
       <h3>Is the compliance data up to date?</h3>
-      <p>TapTrao's regulatory database is updated regularly. However, regulations change frequently. We recommend running a fresh compliance check before each shipment. Your TwinLog Trail reflects the regulatory state at the time it was generated.</p>
+      <p>TapTrao's regulatory database is updated regularly. However, trade regulations change frequently. We recommend running a fresh compliance check before each shipment rather than relying on old results. The TwinLog Trail records the regulatory state at the exact moment it was generated.</p>
     </div>
   </div>
 
   <div class="step">
     <div class="step-content">
       <h3>Can my supplier see my compliance results?</h3>
-      <p>No. The supplier upload link only shows the document upload form. Suppliers cannot see your compliance results, TwinLog Score, or any other data.</p>
+      <p>No. The supplier upload link only shows the document upload form. Suppliers cannot see your compliance results, TwinLog Score, readiness assessment, or any other data about your trade.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-content">
+      <h3>What HS codes does TapTrao cover?</h3>
+      <p>TapTrao's database includes 154+ commodities with their HS codes, focused on African-origin trade goods. This covers agricultural products (cocoa, coffee, cashew, tea, vanilla, shea, sesame, etc.), minerals (gold, manganese, bauxite, etc.), timber, and manufactured goods. The commodity list is expanding regularly.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-content">
+      <h3>Which trade agreements does TapTrao consider?</h3>
+      <p>TapTrao considers the AfCFTA (African Continental Free Trade Area) Rules of Origin, ECOWAS, EAC, SADC, CEMAC, and COMESA regional frameworks, as well as bilateral trade agreements between origin and destination countries (e.g. EU-Ghana EPA, UK-Kenya EPA).</p>
     </div>
   </div>
 
   <div class="step">
     <div class="step-content">
       <h3>Is TapTrao legal advice?</h3>
-      <p>No. TapTrao is a compliance information tool. It does not constitute legal or trade advice. The importing party remains responsible for ensuring all regulatory requirements are met. Always consult with your customs broker or legal advisor for specific situations.</p>
+      <p>No. TapTrao is a compliance information tool that aggregates regulatory data and provides structured checklists. It does not constitute legal, customs, or trade advice. The importing party always remains responsible for ensuring all regulatory requirements are met. Consult with your customs broker or trade compliance lawyer for binding guidance on specific situations.</p>
     </div>
   </div>
 
   <div class="step">
     <div class="step-content">
       <h3>What payment methods do you accept?</h3>
-      <p>We accept all major credit and debit cards through Stripe (Visa, Mastercard, Amex). All payments are processed securely.</p>
+      <p>TapTrao accepts all major credit and debit cards (Visa, Mastercard, American Express) through Stripe. All payments are processed securely via Stripe's PCI-compliant infrastructure. TapTrao does not store your card details.</p>
     </div>
   </div>
 
   <div class="step">
     <div class="step-content">
       <h3>Can I get a refund?</h3>
-      <p>Credits are non-refundable once a compliance check has been run. Unused credits do not expire.</p>
+      <p>Credits are non-refundable once a compliance check has been run against them. Unused credits do not expire and remain in your balance indefinitely.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-content">
+      <h3>What is the SHA-256 integrity hash?</h3>
+      <p>Every compliance check, LC check, and TwinLog Trail generates a SHA-256 cryptographic hash &mdash; a unique fingerprint of the data at that point in time. If any data were altered after generation, the hash would not match. This provides tamper-evident assurance for auditors, regulators, and counterparties. You can verify any TwinLog Trail's integrity at <strong>taptrao.com/verify/TT-2026-XXXXXX</strong>.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-content">
+      <h3>How do I contact support?</h3>
+      <p>For technical issues, compliance questions, or billing enquiries, email <strong>support@taptrao.com</strong>. We aim to respond within 24 hours on business days.</p>
     </div>
   </div>
 </div>
 
+<!-- FOOTER -->
 <div class="footer">
   <p>TapTrao &mdash; Trade Compliance for Commodity Traders</p>
   <p>taptrao.com &bull; &copy; 2026 Fatrao Limited</p>
+  <p style="margin-top:8px;font-size:11px;color:#bbb">This guide was last updated March 2026. Features and pricing may change. Always refer to the live application for the latest information.</p>
 </div>
 
-</div>
+</div><!-- end container -->
 </body>
 </html>
