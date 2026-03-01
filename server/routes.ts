@@ -1728,6 +1728,138 @@ export async function registerRoutes(
     }
   });
 
+  // ── Buyer Upload on Behalf of Supplier ──
+
+  // Uses the same multer config defined below for public supplier uploads
+  // (the `upload` const is hoisted via `var` behavior in the IIFE / function scope)
+
+  app.post("/api/supplier-requests/:requestId/buyer-upload", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { requestId } = req.params;
+      if (!requestId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(requestId)) {
+        res.status(400).json({ message: "Invalid request ID" });
+        return;
+      }
+
+      const request = await storage.getSupplierRequestById(requestId);
+      if (!request) {
+        res.status(404).json({ message: "Supplier request not found" });
+        return;
+      }
+      if (request.userSessionId !== sessionId) {
+        res.status(403).json({ message: "Not authorized" });
+        return;
+      }
+
+      // Use multer to handle the file upload
+      const uploadDir = path.join("/tmp", "uploads");
+      const buyerUpload = multer({
+        storage: multer.diskStorage({
+          destination: (_req, _file, cb) => {
+            const dir = path.join(uploadDir, "buyer-" + requestId);
+            fs.mkdirSync(dir, { recursive: true });
+            cb(null, dir);
+          },
+          filename: (_req, file, cb) => {
+            const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 100);
+            cb(null, `${Date.now()}-${safeName}`);
+          },
+        }),
+        limits: { fileSize: 20 * 1024 * 1024 },
+        fileFilter: (_req, file, cb) => {
+          const allowed = [".pdf", ".jpg", ".jpeg", ".png"];
+          const ext = path.extname(file.originalname).toLowerCase();
+          if (allowed.includes(ext)) {
+            cb(null, true);
+          } else {
+            cb(new Error("Only PDF, JPG, and PNG files are allowed"));
+          }
+        },
+      });
+
+      buyerUpload.single("file")(req, res, async (err) => {
+        if (err) {
+          res.status(400).json({ message: err.message });
+          return;
+        }
+
+        const docType = req.body?.doc_type;
+        if (!docType) {
+          res.status(400).json({ message: "doc_type is required" });
+          return;
+        }
+
+        const docsRequired = (request.docsRequired as string[]) || [];
+        if (!docsRequired.includes(docType)) {
+          res.status(400).json({ message: "Invalid document type for this request" });
+          return;
+        }
+
+        const file = req.file;
+        if (!file) {
+          res.status(400).json({ message: "No file uploaded" });
+          return;
+        }
+
+        const safeFilename = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 100);
+        const note = req.body?.note || null;
+
+        await storage.createSupplierUpload({
+          requestId: request.id,
+          docType,
+          originalFilename: safeFilename,
+          fileKey: file.path,
+          filesizeBytes: file.size,
+          mimeType: file.mimetype,
+          uploadedBy: "buyer",
+        });
+
+        // Update docsReceived and status
+        const currentReceived = (request.docsReceived as string[]) || [];
+        const newReceived = currentReceived.includes(docType)
+          ? currentReceived
+          : [...currentReceived, docType];
+
+        const uploads = await storage.getSupplierUploadsByRequestId(request.id);
+        const hasBlocking = uploads.some((u) => u.verified === false && u.finding);
+        let status: string;
+        if (newReceived.length >= docsRequired.length && !hasBlocking) {
+          status = "complete";
+        } else if (hasBlocking) {
+          status = "blocking";
+        } else if (newReceived.length > 0) {
+          status = "partial";
+        } else {
+          status = "waiting";
+        }
+
+        await storage.updateSupplierRequestDocsReceived(request.id, newReceived, status);
+
+        // Audit event
+        if (request.lookupId) {
+          try {
+            const fileHash = createHash("sha256").update(file.buffer || file.path).digest("hex");
+            await appendTradeEvent(request.lookupId, sessionId, "buyer_doc_uploaded", {
+              docType,
+              filename: safeFilename,
+              fileHash: fileHash.slice(0, 16),
+              filesizeBytes: file.size,
+              note: note || undefined,
+            });
+          } catch (auditErr) {
+            console.error("Audit event failed (non-fatal):", auditErr);
+          }
+        }
+
+        res.json({ success: true, filename: safeFilename, doc_type: docType });
+      });
+    } catch (error: any) {
+      console.error("Buyer upload error:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // ── Public Supplier Upload ──
 
   const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

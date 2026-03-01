@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useRef } from "react";
 import { useRoute, Link } from "wouter";
 import { AppShell } from "@/components/AppShell";
 import { usePageTitle } from "@/hooks/use-page-title";
@@ -87,6 +88,7 @@ const eventConfig: Record<string, { icon: typeof CheckCircle2; color: string; la
   correction_sent: { icon: ArrowRight, color: "#f59e0b", label: "Correction Sent" },
   supplier_link_created: { icon: ExternalLink, color: "#6b9080", label: "Supplier Link Created" },
   supplier_doc_uploaded: { icon: Upload, color: "#22c55e", label: "Document Uploaded" },
+  buyer_doc_uploaded: { icon: Upload, color: "#6b9080", label: "Document Uploaded (Buyer)" },
   supplier_complete: { icon: CheckCircle2, color: "#16a34a", label: "Supplier Submission Complete" },
   status_change: { icon: ArrowRight, color: "#3b82f6", label: "Status Changed" },
   eta_set: { icon: Clock, color: "#8b5cf6", label: "ETA Set" },
@@ -288,6 +290,14 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                       {event.eventData.docType} — {event.eventData.filename}
                     </div>
                   )}
+                  {event.eventType === "buyer_doc_uploaded" && event.eventData?.docType && (
+                    <div style={{ fontSize: 11, color: "var(--t2)", marginTop: 4 }}>
+                      {event.eventData.docType} — {event.eventData.filename}
+                      {event.eventData.note && (
+                        <span style={{ color: "var(--t3)", marginLeft: 6 }}>({event.eventData.note})</span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -303,10 +313,49 @@ export default function TradeDetail() {
   const [match, params] = useRoute("/trades/:id");
   const tradeId = params?.id;
 
+  const queryClient = useQueryClient();
   const { data, isLoading, error } = useQuery<TradeDetail>({
     queryKey: [`/api/trades/${tradeId}`],
     enabled: !!tradeId,
   });
+
+  // Buyer upload on behalf state
+  const [showBuyerUpload, setShowBuyerUpload] = useState(false);
+  const [buyerDocType, setBuyerDocType] = useState("");
+  const [buyerNote, setBuyerNote] = useState("");
+  const [buyerUploading, setBuyerUploading] = useState(false);
+  const buyerFileRef = useRef<HTMLInputElement>(null);
+
+  const handleBuyerUpload = async () => {
+    const file = buyerFileRef.current?.files?.[0];
+    if (!file || !buyerDocType || !data?.supplierRequest) return;
+    setBuyerUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("doc_type", buyerDocType);
+      if (buyerNote.trim()) formData.append("note", buyerNote.trim());
+      const res = await fetch(`/api/supplier-requests/${data.supplierRequest.id}/buyer-upload`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: "Upload failed" }));
+        throw new Error(err.message);
+      }
+      // Reset form and refetch
+      setShowBuyerUpload(false);
+      setBuyerDocType("");
+      setBuyerNote("");
+      if (buyerFileRef.current) buyerFileRef.current.value = "";
+      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
+    } catch (err: any) {
+      alert(err.message || "Upload failed");
+    } finally {
+      setBuyerUploading(false);
+    }
+  };
 
   usePageTitle(
     data?.lookup?.commodityName
@@ -565,13 +614,26 @@ export default function TradeDetail() {
                     <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
                       Supplier Documents
                     </h3>
-                    {!data.supplierRequest && (
-                      <Link href={`/lookup?lookupId=${data.lookup.id}`}>
-                        <Button variant="outline" size="sm" style={{ fontSize: 12 }}>
-                          Send Upload Link
+                    <div style={{ display: "flex", gap: 6 }}>
+                      {data.supplierRequest && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          style={{ fontSize: 11 }}
+                          onClick={() => setShowBuyerUpload(!showBuyerUpload)}
+                        >
+                          <Upload size={12} style={{ marginRight: 4 }} />
+                          Upload on behalf
                         </Button>
-                      </Link>
-                    )}
+                      )}
+                      {!data.supplierRequest && (
+                        <Link href={`/lookup?lookupId=${data.lookup.id}`}>
+                          <Button variant="outline" size="sm" style={{ fontSize: 12 }}>
+                            Send Upload Link
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
                   </div>
 
                   {data.supplierRequest ? (
@@ -618,12 +680,104 @@ export default function TradeDetail() {
                             }}>
                               <CheckCircle2 size={11} />
                               {upload.docType}
+                              {upload.uploadedBy === "buyer" && (
+                                <span style={{
+                                  fontSize: 9,
+                                  fontWeight: 600,
+                                  color: "var(--t3)",
+                                  background: "rgba(255,255,255,0.08)",
+                                  padding: "1px 5px",
+                                  borderRadius: 4,
+                                  marginLeft: 2,
+                                }}>
+                                  Manual
+                                </span>
+                              )}
                             </div>
                           )) : (
                             <p style={{ fontSize: 12, color: "var(--t3)" }}>None yet</p>
                           )}
                         </div>
                       </div>
+
+                      {/* Buyer upload form */}
+                      {showBuyerUpload && (
+                        <div style={{
+                          marginTop: 14,
+                          padding: 14,
+                          background: "rgba(255,255,255,0.04)",
+                          border: "1px solid rgba(255,255,255,0.08)",
+                          borderRadius: 10,
+                        }}>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--t2)", marginBottom: 10 }}>
+                            Upload document received outside TapTrao
+                          </div>
+                          <select
+                            value={buyerDocType}
+                            onChange={(e) => setBuyerDocType(e.target.value)}
+                            style={{
+                              width: "100%",
+                              background: "rgba(255,255,255,0.06)",
+                              border: "1px solid rgba(255,255,255,0.12)",
+                              color: "var(--t1)",
+                              borderRadius: 6,
+                              padding: "8px 10px",
+                              fontSize: 12,
+                              marginBottom: 8,
+                            }}
+                          >
+                            <option value="" style={{ background: "#1a1a1a" }}>Select document type...</option>
+                            {(data.supplierRequest.docsRequired as string[] || []).map((doc: string) => (
+                              <option key={doc} value={doc} style={{ background: "#1a1a1a" }}>{doc}</option>
+                            ))}
+                          </select>
+                          <input
+                            ref={buyerFileRef}
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            style={{
+                              width: "100%",
+                              fontSize: 12,
+                              color: "var(--t2)",
+                              marginBottom: 8,
+                            }}
+                          />
+                          <input
+                            type="text"
+                            placeholder="Note (optional) — e.g. Received via email"
+                            value={buyerNote}
+                            onChange={(e) => setBuyerNote(e.target.value)}
+                            style={{
+                              width: "100%",
+                              background: "rgba(255,255,255,0.06)",
+                              border: "1px solid rgba(255,255,255,0.12)",
+                              color: "var(--t1)",
+                              borderRadius: 6,
+                              padding: "8px 10px",
+                              fontSize: 12,
+                              marginBottom: 10,
+                            }}
+                          />
+                          <div style={{ display: "flex", gap: 8 }}>
+                            <Button
+                              size="sm"
+                              style={{ fontSize: 11, background: "#6b9080", color: "#fff" }}
+                              disabled={!buyerDocType || buyerUploading}
+                              onClick={handleBuyerUpload}
+                            >
+                              {buyerUploading ? "Uploading..." : "Upload"}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              style={{ fontSize: 11, color: "var(--t3)" }}
+                              onClick={() => setShowBuyerUpload(false)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <p style={{ fontSize: 13, color: "var(--t3)" }}>

@@ -131,7 +131,7 @@ export interface IStorage {
   getSupplierRequestById(id: string): Promise<SupplierRequest | undefined>;
   getSupplierUploadsByRequestId(requestId: string): Promise<SupplierUpload[]>;
   getSupplierRequestByToken(token: string): Promise<SupplierRequest | undefined>;
-  createSupplierUpload(data: { requestId: string; docType: string; originalFilename: string; fileKey: string; filesizeBytes?: number; mimeType?: string }): Promise<SupplierUpload>;
+  createSupplierUpload(data: { requestId: string; docType: string; originalFilename: string; fileKey: string; filesizeBytes?: number; mimeType?: string; uploadedBy?: string }): Promise<SupplierUpload>;
   updateSupplierRequestDocsReceived(requestId: string, docsReceived: string[], status: string): Promise<void>;
   getLookupByTwinlogRef(ref: string): Promise<Lookup | undefined>;
   createAlertSubscription(data: InsertAlertSubscription): Promise<AlertSubscription>;
@@ -750,7 +750,7 @@ export class DatabaseStorage implements IStorage {
     return row;
   }
 
-  async createSupplierUpload(data: { requestId: string; docType: string; originalFilename: string; fileKey: string; filesizeBytes?: number; mimeType?: string }): Promise<SupplierUpload> {
+  async createSupplierUpload(data: { requestId: string; docType: string; originalFilename: string; fileKey: string; filesizeBytes?: number; mimeType?: string; uploadedBy?: string }): Promise<SupplierUpload> {
     const [row] = await db.insert(supplierUploads).values({
       requestId: data.requestId,
       docType: data.docType,
@@ -758,7 +758,7 @@ export class DatabaseStorage implements IStorage {
       fileKey: data.fileKey,
       filesizeBytes: data.filesizeBytes,
       mimeType: data.mimeType,
-      uploadedBy: "supplier",
+      uploadedBy: data.uploadedBy || "supplier",
     }).returning();
     return row;
   }
