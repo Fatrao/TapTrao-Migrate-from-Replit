@@ -26,6 +26,23 @@ import {
 } from "lucide-react";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
 
+/* ── Map common country/region names to ISO2 for flag display ── */
+const nameToIso2: Record<string, string> = {
+  "European Union": "EU", "United Kingdom": "GB", "Germany": "DE", "France": "FR",
+  "Italy": "IT", "Spain": "ES", "Switzerland": "CH", "Austria": "AT",
+  "United States": "US", "China": "CN", "United Arab Emirates": "AE", "Turkey": "TR",
+  "Côte d'Ivoire": "CI", "Ghana": "GH", "Ethiopia": "ET", "Kenya": "KE",
+  "Tanzania": "TZ", "Uganda": "UG", "Nigeria": "NG", "Cameroon": "CM",
+  "Rwanda": "RW", "Senegal": "SN", "Democratic Republic of the Congo": "CD",
+  "Malawi": "MW", "Zambia": "ZM", "Zimbabwe": "ZW", "Madagascar": "MG",
+  "Mozambique": "MZ", "Burundi": "BI", "South Africa": "ZA",
+};
+function nameFlag(name: string | null | undefined): string {
+  if (!name) return "";
+  const iso2 = nameToIso2[name];
+  return iso2 ? iso2ToFlag(iso2) : "";
+}
+
 /* ── Types matching the API response ── */
 type TradeDetail = {
   lookup: any;
@@ -115,9 +132,9 @@ function StatusStepper({ current }: { current: string }) {
                 fontWeight: 600,
                 background: isArchived ? "rgba(156,163,175,0.15)" :
                   isComplete ? "#6b9080" :
-                  isCurrent ? "#4ade80" : "rgba(0,0,0,0.06)",
+                  isCurrent ? "#4ade80" : "rgba(255,255,255,0.1)",
                 color: isArchived ? "#9ca3af" :
-                  (isComplete || isCurrent) ? "#fff" : "#999",
+                  (isComplete || isCurrent) ? "#fff" : "var(--t3)",
                 transition: "all 0.2s",
               }}>
                 {isComplete ? <CheckCircle2 size={14} /> : (i + 1)}
@@ -125,7 +142,7 @@ function StatusStepper({ current }: { current: string }) {
               <span style={{
                 fontSize: 10,
                 fontWeight: isCurrent ? 600 : 400,
-                color: isCurrent ? "#1a1a1a" : "#999",
+                color: isCurrent ? "var(--t1)" : "var(--t3)",
                 textTransform: "uppercase",
                 letterSpacing: "0.03em",
               }}>
@@ -139,7 +156,7 @@ function StatusStepper({ current }: { current: string }) {
                 marginBottom: 18,
                 marginLeft: 6,
                 marginRight: 6,
-                background: isComplete ? "#6b9080" : "rgba(0,0,0,0.08)",
+                background: isComplete ? "#6b9080" : "rgba(255,255,255,0.1)",
                 borderRadius: 1,
                 transition: "background 0.2s",
               }} />
@@ -185,7 +202,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
 
       {/* Timeline */}
       {events.length === 0 ? (
-        <p style={{ fontSize: 13, color: "#999", textAlign: "center", padding: 20 }}>
+        <p style={{ fontSize: 13, color: "var(--t3)", textAlign: "center", padding: 20 }}>
           No audit events recorded yet.
         </p>
       ) : (
@@ -197,7 +214,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
             top: 8,
             bottom: 8,
             width: 2,
-            background: "rgba(0,0,0,0.06)",
+            background: "rgba(255,255,255,0.1)",
             borderRadius: 1,
           }} />
 
@@ -224,7 +241,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                   width: 24,
                   height: 24,
                   borderRadius: "50%",
-                  background: "#fff",
+                  background: "rgba(255,255,255,0.08)",
                   border: `2px solid ${cfg.color}`,
                   display: "flex",
                   alignItems: "center",
@@ -236,38 +253,38 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                 {/* Content */}
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a" }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>
                       {cfg.label}
                     </span>
                     <span style={{
                       fontSize: 10,
                       fontFamily: "monospace",
-                      color: "rgba(0,0,0,0.3)",
-                      background: "rgba(0,0,0,0.03)",
+                      color: "var(--t3)",
+                      background: "rgba(255,255,255,0.06)",
                       padding: "2px 6px",
                       borderRadius: 4,
                     }}>
                       {event.eventHash.slice(0, 8)}
                     </span>
                   </div>
-                  <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: "var(--t3)", marginTop: 2 }}>
                     {date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                     {" at "}
                     {date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
                   </div>
                   {/* Event-specific details */}
                   {event.eventType === "status_change" && event.eventData?.from && (
-                    <div style={{ fontSize: 11, color: "#666", marginTop: 4 }}>
+                    <div style={{ fontSize: 11, color: "var(--t2)", marginTop: 4 }}>
                       {event.eventData.from} → {event.eventData.to}
                     </div>
                   )}
                   {event.eventType === "lc_check" && event.eventData?.verdict && (
-                    <div style={{ fontSize: 11, color: "#666", marginTop: 4 }}>
+                    <div style={{ fontSize: 11, color: "var(--t2)", marginTop: 4 }}>
                       Verdict: {event.eventData.verdict}
                     </div>
                   )}
                   {event.eventType === "supplier_doc_uploaded" && event.eventData?.docType && (
-                    <div style={{ fontSize: 11, color: "#666", marginTop: 4 }}>
+                    <div style={{ fontSize: 11, color: "var(--t2)", marginTop: 4 }}>
                       {event.eventData.docType} — {event.eventData.filename}
                     </div>
                   )}
@@ -380,9 +397,9 @@ export default function TradeDetail() {
               color: "rgba(255,255,255,0.55)",
               margin: "6px 0 0",
             }}>
-              {iso2ToFlag(data.lookup.originName?.slice(-3, -1) || "") || ""} {data.lookup.originName}
+              {nameFlag(data.lookup.originName)} {data.lookup.originName}
               {" → "}
-              {iso2ToFlag(data.lookup.destinationName?.slice(-3, -1) || "") || ""} {data.lookup.destinationName}
+              {nameFlag(data.lookup.destinationName)} {data.lookup.destinationName}
               {data.lookup.hsCode && (
                 <span style={{ marginLeft: 10, fontFamily: "monospace", fontSize: 12, color: "rgba(255,255,255,0.35)" }}>
                   HS {data.lookup.hsCode}
@@ -436,7 +453,7 @@ export default function TradeDetail() {
               <Card>
                 <CardContent className="p-5">
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                    <h3 style={{ fontSize: 15, fontWeight: 600, color: "#1a1a1a", margin: 0 }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
                       Compliance Summary
                     </h3>
                     <Link href={`/lookup?lookupId=${data.lookup.id}`}>
@@ -460,15 +477,20 @@ export default function TradeDetail() {
                         fontFamily: "'Clash Display', sans-serif",
                         fontWeight: 700,
                         fontSize: 28,
-                        color: "#6b9080",
+                        color: "#4ade80",
                       }}>
                         {data.lookup.readinessScore}
                       </div>
                       <div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a" }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>
                           Readiness Score
                         </div>
-                        <div style={{ fontSize: 12, color: "#888" }}>
+                        <div style={{
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: data.lookup.readinessVerdict === "RED" ? "#ef4444" :
+                            data.lookup.readinessVerdict === "AMBER" ? "#eab308" : "#4ade80",
+                        }}>
                           {data.lookup.readinessVerdict || "—"}
                         </div>
                       </div>
@@ -476,7 +498,7 @@ export default function TradeDetail() {
                   )}
 
                   {data.lookup.readinessSummary && (
-                    <p style={{ fontSize: 13, color: "#666", lineHeight: 1.6, margin: 0 }}>
+                    <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6, margin: 0 }}>
                       {data.lookup.readinessSummary}
                     </p>
                   )}
@@ -488,7 +510,7 @@ export default function TradeDetail() {
                 <Card>
                   <CardContent className="p-5">
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                      <h3 style={{ fontSize: 15, fontWeight: 600, color: "#1a1a1a", margin: 0 }}>
+                      <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
                         LC Document Check
                       </h3>
                       <Link href={`/lc-check?lookupId=${data.lookup.id}`}>
@@ -516,19 +538,19 @@ export default function TradeDetail() {
                         </Badge>
 
                         {data.lcCase.recheckCount > 0 && (
-                          <p style={{ fontSize: 12, color: "#888", marginTop: 6 }}>
+                          <p style={{ fontSize: 12, color: "var(--t3)", marginTop: 6 }}>
                             {data.lcCase.recheckCount} re-check{data.lcCase.recheckCount > 1 ? "s" : ""} performed
                           </p>
                         )}
 
                         {data.lcCase.correctionRequests && (data.lcCase.correctionRequests as any[]).length > 0 && (
-                          <p style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
+                          <p style={{ fontSize: 12, color: "var(--t3)", marginTop: 4 }}>
                             {(data.lcCase.correctionRequests as any[]).length} correction request{(data.lcCase.correctionRequests as any[]).length > 1 ? "s" : ""} sent
                           </p>
                         )}
                       </div>
                     ) : (
-                      <p style={{ fontSize: 13, color: "#999" }}>
+                      <p style={{ fontSize: 13, color: "var(--t3)" }}>
                         No LC check has been run for this trade yet.
                       </p>
                     )}
@@ -540,7 +562,7 @@ export default function TradeDetail() {
               <Card>
                 <CardContent className="p-5">
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                    <h3 style={{ fontSize: 15, fontWeight: 600, color: "#1a1a1a", margin: 0 }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
                       Supplier Documents
                     </h3>
                     {!data.supplierRequest && (
@@ -572,17 +594,17 @@ export default function TradeDetail() {
                       {/* Required vs received */}
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                         <div>
-                          <div style={{ fontSize: 11, fontWeight: 600, color: "#999", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 6 }}>
+                          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 6 }}>
                             Required
                           </div>
                           {(data.supplierRequest.docsRequired as string[] || []).map((doc: string) => (
-                            <div key={doc} style={{ fontSize: 12, color: "#666", padding: "3px 0" }}>
+                            <div key={doc} style={{ fontSize: 12, color: "var(--t2)", padding: "3px 0" }}>
                               {doc}
                             </div>
                           ))}
                         </div>
                         <div>
-                          <div style={{ fontSize: 11, fontWeight: 600, color: "#999", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 6 }}>
+                          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 6 }}>
                             Received
                           </div>
                           {data.supplierUploads.length > 0 ? data.supplierUploads.map((upload: any) => (
@@ -598,13 +620,13 @@ export default function TradeDetail() {
                               {upload.docType}
                             </div>
                           )) : (
-                            <p style={{ fontSize: 12, color: "#999" }}>None yet</p>
+                            <p style={{ fontSize: 12, color: "var(--t3)" }}>None yet</p>
                           )}
                         </div>
                       </div>
                     </div>
                   ) : (
-                    <p style={{ fontSize: 13, color: "#999" }}>
+                    <p style={{ fontSize: 13, color: "var(--t3)" }}>
                       No supplier upload link has been created yet.
                     </p>
                   )}
@@ -616,7 +638,7 @@ export default function TradeDetail() {
                 <Card>
                   <CardContent className="p-5">
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                      <h3 style={{ fontSize: 15, fontWeight: 600, color: "#1a1a1a", margin: 0 }}>
+                      <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
                         EUDR Due Diligence
                       </h3>
                       <Link href={`/eudr/${data.lookup.id}`}>
@@ -643,7 +665,7 @@ export default function TradeDetail() {
             <div>
               <Card>
                 <CardContent className="p-5">
-                  <h3 style={{ fontSize: 15, fontWeight: 600, color: "#1a1a1a", margin: "0 0 16px" }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: "0 0 16px" }}>
                     TwinLog Audit Trail
                   </h3>
                   <AuditTimeline events={data.auditTrail} chainValid={data.chainValid} />
@@ -656,7 +678,7 @@ export default function TradeDetail() {
                   <CardContent className="p-4">
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                       <Hash size={14} style={{ color: "#6b9080" }} />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a" }}>TwinLog Reference</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>TwinLog Reference</span>
                     </div>
                     <div style={{
                       fontFamily: "monospace",
@@ -673,7 +695,7 @@ export default function TradeDetail() {
                       <div style={{
                         fontFamily: "monospace",
                         fontSize: 10,
-                        color: "#999",
+                        color: "var(--t3)",
                         marginTop: 6,
                       }}>
                         sha256:{data.twinlog.hash.slice(0, 12)}...
@@ -686,7 +708,7 @@ export default function TradeDetail() {
               {/* Quick Actions */}
               <Card style={{ marginTop: 16 }}>
                 <CardContent className="p-4 space-y-2">
-                  <h3 style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", marginBottom: 8 }}>
+                  <h3 style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)", marginBottom: 8 }}>
                     Actions
                   </h3>
                   <Link href={`/lookup?lookupId=${data.lookup.id}`}>
