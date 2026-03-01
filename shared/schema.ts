@@ -168,6 +168,8 @@ export const lookups = pgTable("lookups", {
   estimatedArrival: date("estimated_arrival"),
   actualArrival: date("actual_arrival"),
   notes: text("notes"),
+  tradeValue: text("trade_value"),
+  tradeValueCurrency: varchar("trade_value_currency", { length: 3 }).default("USD"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => [
   index("lookups_session_idx").on(table.sessionId),

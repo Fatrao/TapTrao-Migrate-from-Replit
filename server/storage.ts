@@ -99,7 +99,7 @@ export interface IStorage {
   getRecentLookups(limit: number, sessionId?: string): Promise<Lookup[]>;
   getAllLookups(sessionId?: string): Promise<Lookup[]>;
   getAllLcChecks(): Promise<LcCheck[]>;
-  getDashboardStats(sessionId?: string): Promise<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null }>;
+  getDashboardStats(sessionId?: string): Promise<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null; totalTradeValue: number }>;
   getOrCreateUserTokens(sessionId: string): Promise<UserTokens>;
   getTokenBalance(sessionId: string): Promise<{ balance: number; lcBalance: number; freeLookupUsed: boolean }>;
   spendTokens(sessionId: string, amount: number, description: string): Promise<{ success: boolean; balance: number }>;
@@ -198,7 +198,7 @@ export interface IStorage {
   // Trade lifecycle
   updateTradeStatus(lookupId: string, status: TradeStatus, sessionId: string): Promise<Lookup | undefined>;
   archiveTrade(lookupId: string, sessionId: string): Promise<Lookup | undefined>;
-  updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string }, sessionId: string): Promise<Lookup | undefined>;
+  updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string; tradeValue?: string; tradeValueCurrency?: string }, sessionId: string): Promise<Lookup | undefined>;
   // Trade detail (unified view)
   getTradeDetail(lookupId: string, sessionId: string): Promise<TradeDetail | null>;
 }
@@ -216,6 +216,8 @@ export type EnrichedTrade = {
   readinessVerdict: string | null;
   createdAt: Date;
   tradeStatus: string | null;
+  tradeValue: string | null;
+  tradeValueCurrency: string | null;
   lcVerdict: string | null;
   lcCheckId: string | null;
 };
@@ -402,7 +404,7 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(lcChecks).orderBy(desc(lcChecks.createdAt));
   }
 
-  async getDashboardStats(sessionId?: string): Promise<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null }> {
+  async getDashboardStats(sessionId?: string): Promise<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null; totalTradeValue: number }> {
     const sessionFilter = sessionId ? sql`WHERE session_id = ${sessionId}` : sql``;
     const lcSessionFilter = sessionId ? sql`WHERE session_id = ${sessionId}` : sql``;
 
@@ -415,6 +417,15 @@ export class DatabaseStorage implements IStorage {
       ORDER BY count(*) DESC
       LIMIT 1
     `);
+    let totalTradeValue = 0;
+    try {
+      const tradeValueResult = await db.execute(sql`
+        SELECT COALESCE(SUM(CAST(trade_value AS NUMERIC)), 0) as total
+        FROM lookups ${sessionFilter}
+      `);
+      const tvRows = tradeValueResult.rows || tradeValueResult;
+      totalTradeValue = Number((tvRows as any[])[0]?.total ?? 0);
+    } catch (_e) { /* trade_value column may not exist yet */ }
 
     const lookupRows = lookupResult.rows || lookupResult;
     const lcRows = lcResult.rows || lcResult;
@@ -424,6 +435,7 @@ export class DatabaseStorage implements IStorage {
       totalLookups: Number((lookupRows as any[])[0]?.count ?? 0),
       totalLcChecks: Number((lcRows as any[])[0]?.count ?? 0),
       topCorridor: (corridorRows as any[]).length > 0 ? (corridorRows as any[])[0].corridor : null,
+      totalTradeValue,
     };
   }
 
@@ -663,6 +675,8 @@ export class DatabaseStorage implements IStorage {
         l.readiness_verdict AS "readinessVerdict",
         l.created_at AS "createdAt",
         l.trade_status AS "tradeStatus",
+        l.trade_value AS "tradeValue",
+        l.trade_value_currency AS "tradeValueCurrency",
         lc.verdict AS "lcVerdict",
         lc.id AS "lcCheckId"
       FROM lookups l
@@ -1208,11 +1222,13 @@ export class DatabaseStorage implements IStorage {
     return row;
   }
 
-  async updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string }, sessionId: string): Promise<Lookup | undefined> {
+  async updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string; tradeValue?: string; tradeValueCurrency?: string }, sessionId: string): Promise<Lookup | undefined> {
     const updates: Record<string, unknown> = {};
     if (fields.notes !== undefined) updates.notes = fields.notes;
     if (fields.estimatedArrival !== undefined) updates.estimatedArrival = fields.estimatedArrival;
     if (fields.actualArrival !== undefined) updates.actualArrival = fields.actualArrival;
+    if (fields.tradeValue !== undefined) updates.tradeValue = fields.tradeValue;
+    if (fields.tradeValueCurrency !== undefined) updates.tradeValueCurrency = fields.tradeValueCurrency;
 
     if (Object.keys(updates).length === 0) return undefined;
 

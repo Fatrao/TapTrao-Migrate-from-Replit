@@ -775,12 +775,12 @@ export async function registerRoutes(
     }
   });
 
-  // Trade lifecycle: update fields (notes, ETA, arrival)
+  // Trade lifecycle: update fields (notes, ETA, arrival, trade value)
   app.patch("/api/trades/:id", async (req, res) => {
     try {
       const sessionId = getSessionId(req, res);
-      const { notes, estimatedArrival, actualArrival } = req.body;
-      const updated = await storage.updateTradeFields(req.params.id, { notes, estimatedArrival, actualArrival }, sessionId);
+      const { notes, estimatedArrival, actualArrival, tradeValue, tradeValueCurrency } = req.body;
+      const updated = await storage.updateTradeFields(req.params.id, { notes, estimatedArrival, actualArrival, tradeValue, tradeValueCurrency }, sessionId);
       if (!updated) return res.status(404).json({ message: "Trade not found or no changes" });
       // Audit events for date changes
       if (estimatedArrival) {
@@ -788,6 +788,9 @@ export async function registerRoutes(
       }
       if (actualArrival) {
         await appendTradeEvent(req.params.id, sessionId, "arrival", { date: actualArrival });
+      }
+      if (tradeValue) {
+        await appendTradeEvent(req.params.id, sessionId, "trade_value_set", { value: tradeValue, currency: tradeValueCurrency || "USD" });
       }
       res.json(updated);
     } catch (error: any) {

@@ -105,6 +105,7 @@ const eventConfig: Record<string, { icon: typeof CheckCircle2; color: string; la
   eudr_created: { icon: Shield, color: "#059669", label: "EUDR Record Created" },
   trade_archived: { icon: Archive, color: "#9ca3af", label: "Trade Archived" },
   trade_closed: { icon: Archive, color: "#6b7280", label: "Trade Closed" },
+  trade_value_set: { icon: Package, color: "#6b9080", label: "Trade Value Set" },
 };
 
 /* ── Status Stepper ── */
@@ -326,6 +327,11 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                       )}
                     </div>
                   )}
+                  {event.eventType === "trade_value_set" && event.eventData?.value && (
+                    <div style={{ fontSize: 11, color: "#6b9080", marginTop: 4 }}>
+                      {event.eventData.currency || "USD"} {Number(event.eventData.value).toLocaleString()}
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -361,6 +367,12 @@ export default function TradeDetail() {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [scanningId, setScanningId] = useState<string | null>(null);
   const [scanResult, setScanResult] = useState<{ uploadId: string; details: string; confidence: string } | null>(null);
+
+  // Trade value editing state
+  const [editingValue, setEditingValue] = useState(false);
+  const [tradeValueInput, setTradeValueInput] = useState("");
+  const [tradeValueCurrencyInput, setTradeValueCurrencyInput] = useState("USD");
+  const [savingValue, setSavingValue] = useState(false);
 
   const handleBuyerUpload = async () => {
     const file = buyerFileRef.current?.files?.[0];
@@ -474,6 +486,29 @@ export default function TradeDetail() {
       alert(err.message || "AI scan failed");
     } finally {
       setScanningId(null);
+    }
+  };
+
+  const handleSaveTradeValue = async () => {
+    if (!tradeId || !tradeValueInput.trim()) return;
+    setSavingValue(true);
+    try {
+      const res = await fetch(`/api/trades/${tradeId}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tradeValue: tradeValueInput.trim(),
+          tradeValueCurrency: tradeValueCurrencyInput,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save trade value");
+      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
+      setEditingValue(false);
+    } catch (err: any) {
+      alert(err.message || "Failed to save trade value");
+    } finally {
+      setSavingValue(false);
     }
   };
 
@@ -1138,8 +1173,124 @@ export default function TradeDetail() {
               )}
             </div>
 
-            {/* RIGHT COLUMN — Audit Timeline */}
+            {/* RIGHT COLUMN — Trade Info + Audit Timeline */}
             <div>
+              {/* Shipment Value */}
+              <Card style={{ marginBottom: 16 }}>
+                <CardContent className="p-5">
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
+                      Shipment Value
+                    </h3>
+                    {!editingValue && (
+                      <button
+                        onClick={() => {
+                          setTradeValueInput(data.lookup.tradeValue || "");
+                          setTradeValueCurrencyInput(data.lookup.tradeValueCurrency || "USD");
+                          setEditingValue(true);
+                        }}
+                        style={{
+                          background: "none",
+                          border: "1px solid rgba(107,144,128,0.3)",
+                          borderRadius: 6,
+                          padding: "3px 10px",
+                          fontSize: 11,
+                          color: "#6b9080",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {data.lookup.tradeValue ? "Edit" : "Add Value"}
+                      </button>
+                    )}
+                  </div>
+
+                  {editingValue ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <select
+                          value={tradeValueCurrencyInput}
+                          onChange={(e) => setTradeValueCurrencyInput(e.target.value)}
+                          style={{
+                            width: 72,
+                            padding: "6px 8px",
+                            fontSize: 13,
+                            borderRadius: 6,
+                            border: "1px solid rgba(0,0,0,0.15)",
+                            background: "#fff",
+                          }}
+                        >
+                          <option value="USD">USD</option>
+                          <option value="EUR">EUR</option>
+                          <option value="GBP">GBP</option>
+                          <option value="CHF">CHF</option>
+                        </select>
+                        <input
+                          type="number"
+                          placeholder="e.g. 125000"
+                          value={tradeValueInput}
+                          onChange={(e) => setTradeValueInput(e.target.value)}
+                          style={{
+                            flex: 1,
+                            padding: "6px 10px",
+                            fontSize: 13,
+                            borderRadius: 6,
+                            border: "1px solid rgba(0,0,0,0.15)",
+                          }}
+                          autoFocus
+                        />
+                      </div>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button
+                          onClick={handleSaveTradeValue}
+                          disabled={savingValue || !tradeValueInput.trim()}
+                          style={{
+                            flex: 1,
+                            padding: "6px 0",
+                            fontSize: 12,
+                            fontWeight: 600,
+                            borderRadius: 6,
+                            border: "none",
+                            background: "#6b9080",
+                            color: "#fff",
+                            cursor: savingValue ? "wait" : "pointer",
+                            opacity: savingValue || !tradeValueInput.trim() ? 0.5 : 1,
+                          }}
+                        >
+                          {savingValue ? "Saving..." : "Save"}
+                        </button>
+                        <button
+                          onClick={() => setEditingValue(false)}
+                          style={{
+                            padding: "6px 14px",
+                            fontSize: 12,
+                            borderRadius: 6,
+                            border: "1px solid rgba(0,0,0,0.15)",
+                            background: "#fff",
+                            color: "var(--t2)",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : data.lookup.tradeValue ? (
+                    <div style={{
+                      fontFamily: "'Clash Display', sans-serif",
+                      fontWeight: 700,
+                      fontSize: 24,
+                      color: "#4ade80",
+                    }}>
+                      {data.lookup.tradeValueCurrency || "USD"} {Number(data.lookup.tradeValue).toLocaleString()}
+                    </div>
+                  ) : (
+                    <p style={{ fontSize: 13, color: "var(--t3)", margin: 0 }}>
+                      No value set yet. Click "Add Value" to record the shipment value.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardContent className="p-5">
                   <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: "0 0 16px" }}>

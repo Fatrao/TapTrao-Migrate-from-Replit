@@ -59,6 +59,21 @@ export async function initLocalDb(): Promise<void> {
       console.error("❌ No migrations directory found. Run: DATABASE_URL=postgres://unused npx drizzle-kit generate");
     }
   }
+
+  // Incremental column migrations for existing databases
+  const columnMigrations = [
+    `ALTER TABLE "lookups" ADD COLUMN IF NOT EXISTS "trade_value" text`,
+    `ALTER TABLE "lookups" ADD COLUMN IF NOT EXISTS "trade_value_currency" varchar(3) DEFAULT 'USD'`,
+  ];
+  for (const stmt of columnMigrations) {
+    try {
+      await client.query(stmt);
+    } catch (e: any) {
+      if (!e.message?.includes("already exists")) {
+        console.warn(`⚠ Column migration warning: ${e.message?.substring(0, 120)}`);
+      }
+    }
+  }
 }
 
 export { db, pool };

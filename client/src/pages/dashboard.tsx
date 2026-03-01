@@ -11,7 +11,7 @@ import { iso2ToFlag } from "@/components/CountryFlagBadge";
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const statsQuery = useQuery<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null }>({
+  const statsQuery = useQuery<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null; totalTradeValue: number }>({
     queryKey: ["/api/dashboard/stats"],
   });
   const lookupsQuery = useQuery<Lookup[]>({ queryKey: ["/api/lookups/recent"] });
@@ -103,7 +103,7 @@ export default function Dashboard() {
         hsCode: l.hsCode,
         corridor: `${iso2ToFlag(oIso2)} ${oIso2 || "?"} → ${iso2ToFlag(dIso2)} ${dIso2 || "?"}`,
         date: new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }),
-        value: "—",
+        value: l.tradeValue ? `$${Number(l.tradeValue).toLocaleString()}` : "—",
         status: l.riskLevel === "LOW" ? "comp" : l.riskLevel === "MEDIUM" ? "pend" : "rev",
         statusLabel: l.riskLevel === "LOW" ? "Compliant" : l.riskLevel === "MEDIUM" ? "Pending" : "Review",
         btnLabel: l.riskLevel === "LOW" ? "View" : "Review",
@@ -134,6 +134,18 @@ export default function Dashboard() {
             {stats?.totalLcChecks ?? 0} LC checks · {balance} Shield {balance === 1 ? "check" : "checks"} remaining
             {stats?.topCorridor ? ` · Top corridor: ${stats.topCorridor}` : ""}
           </span>
+        </div>
+        <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+          <Link href="/new-check">
+            <button className="ai-btn" data-testid="stat-new-check" style={{ fontSize: 12, padding: "6px 16px" }}>
+              New Check
+            </button>
+          </Link>
+          <Link href="/inbox">
+            <button className="ai-btn" data-testid="stat-supplier-link" style={{ fontSize: 12, padding: "6px 16px", background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}>
+              Supplier Inbox
+            </button>
+          </Link>
         </div>
       </div>
 
@@ -173,20 +185,20 @@ export default function Dashboard() {
           <div className="stat-sub">{balance === 0 ? "Buy checks to continue" : "Available for use"}</div>
         </div>
 
-        <div className="stat-card ai-card">
-          <div className="ai-label">Quick Actions</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
-            <Link href="/new-check">
-              <button className="ai-btn" data-testid="stat-new-check" style={{ width: "100%" }}>
-                New Check
-              </button>
-            </Link>
-            <Link href="/inbox">
-              <button className="ai-btn" data-testid="stat-supplier-link" style={{ width: "100%", background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}>
-                Supplier Inbox
-              </button>
-            </Link>
+        <div className="stat-card stat-card-link" onClick={() => navigate("/trades")} style={{ cursor: "pointer" }}>
+          <div className="stat-icon">💰</div>
+          <div className="stat-label">Total Trade Value</div>
+          <div className="stat-value" data-testid="stat-total-trade-value">
+            {(stats?.totalTradeValue ?? 0) > 0
+              ? <>
+                  ${(stats!.totalTradeValue).toLocaleString()} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>USD</span>
+                </>
+              : <>
+                  — <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>not set</span>
+                </>
+            }
           </div>
+          <div className="stat-sub">{(stats?.totalTradeValue ?? 0) > 0 ? "Across all trades" : "Add values to your trades"}</div>
         </div>
       </div>
 

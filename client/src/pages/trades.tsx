@@ -18,6 +18,8 @@ type EnrichedTrade = {
   readinessScore: number | null;
   readinessVerdict: string | null;
   createdAt: string;
+  tradeValue: string | null;
+  tradeValueCurrency: string | null;
   lcVerdict: string | null;
   lcCheckId: string | null;
 };
@@ -255,7 +257,7 @@ export default function Trades() {
           <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="trades-table">
             <thead>
               <tr>
-                {["Commodity \u00B7 Corridor", "Step", "Risk", "Score", "Updated", ""].map(h => (
+                {["Commodity \u00B7 Corridor", "Step", "Risk", "Score", "Value", "Updated", ""].map(h => (
                   <th
                     key={h}
                     style={{
@@ -265,7 +267,7 @@ export default function Trades() {
                       letterSpacing: ".12em",
                       color: "#555",
                       fontWeight: 400,
-                      textAlign: h === "Score" || h === "Updated" ? "right" : "left",
+                      textAlign: h === "Score" || h === "Value" || h === "Updated" ? "right" : "left",
                       padding: "0 12px 10px",
                       borderBottom: "1px solid #e5e5e5",
                     }}
@@ -384,6 +386,14 @@ export default function Trades() {
                             : trade.readinessScore < 80
                               ? `Medium risk (${trade.readinessScore})`
                               : `Low risk (${trade.readinessScore})`}
+                      </span>
+                    </td>
+                    {/* Value */}
+                    <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>
+                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: trade.tradeValue ? 600 : 400, color: trade.tradeValue ? "#1a1a1a" : "#999" }}>
+                        {trade.tradeValue
+                          ? `${trade.tradeValueCurrency || "USD"} ${Number(trade.tradeValue).toLocaleString()}`
+                          : "\u2014"}
                       </span>
                     </td>
                     {/* Updated */}
