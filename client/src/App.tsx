@@ -49,10 +49,9 @@ function Router() {
       <Route path="/verify/:ref" component={VerifyPage} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/terms-of-service" component={TermsOfService} />
-      <Route path="/demurrage" component={DemurragePage} />
-
       {/* Protected routes — require authentication */}
       <Route path="/new-check">{() => <AuthGuard><NewCheck /></AuthGuard>}</Route>
+      <Route path="/demurrage">{() => <AuthGuard><DemurragePage /></AuthGuard>}</Route>
       <Route path="/dashboard">{() => <AuthGuard><Dashboard /></AuthGuard>}</Route>
       <Route path="/lc-check">{() => <AuthGuard><LcCheck /></AuthGuard>}</Route>
       <Route path="/trades/:id">{() => <AuthGuard><TradeDetail /></AuthGuard>}</Route>
