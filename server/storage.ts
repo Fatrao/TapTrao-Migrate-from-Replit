@@ -406,19 +406,24 @@ export class DatabaseStorage implements IStorage {
     const sessionFilter = sessionId ? sql`WHERE session_id = ${sessionId}` : sql``;
     const lcSessionFilter = sessionId ? sql`WHERE session_id = ${sessionId}` : sql``;
 
-    const [lookupCount] = await db.execute(sql`SELECT count(*) as count FROM lookups ${sessionFilter}`);
-    const [lcCount] = await db.execute(sql`SELECT count(*) as count FROM lc_checks ${lcSessionFilter}`);
-    const corridorRows = await db.execute(sql`
-      SELECT origin_name || ' → ' || destination_name as corridor, count(*) as count
+    const lookupResult = await db.execute(sql`SELECT count(*) as count FROM lookups ${sessionFilter}`);
+    const lcResult = await db.execute(sql`SELECT count(*) as count FROM lc_checks ${lcSessionFilter}`);
+    const corridorResult = await db.execute(sql`
+      SELECT origin_name || ' >> ' || destination_name as corridor, count(*) as count
       FROM lookups ${sessionFilter}
-      GROUP BY origin_name || ' → ' || destination_name
+      GROUP BY origin_name || ' >> ' || destination_name
       ORDER BY count(*) DESC
       LIMIT 1
     `);
+
+    const lookupRows = lookupResult.rows || lookupResult;
+    const lcRows = lcResult.rows || lcResult;
+    const corridorRows = corridorResult.rows || corridorResult;
+
     return {
-      totalLookups: Number((lookupCount as any).count),
-      totalLcChecks: Number((lcCount as any).count),
-      topCorridor: (corridorRows.rows as any[]).length > 0 ? (corridorRows.rows as any[])[0].corridor : null,
+      totalLookups: Number((lookupRows as any[])[0]?.count ?? 0),
+      totalLcChecks: Number((lcRows as any[])[0]?.count ?? 0),
+      topCorridor: (corridorRows as any[]).length > 0 ? (corridorRows as any[])[0].corridor : null,
     };
   }
 
