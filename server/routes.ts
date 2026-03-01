@@ -109,6 +109,21 @@ export async function registerRoutes(
   await seedPrompt6();
   await seedPrompt7();
 
+  // ── Protected User Guide (behind login wall) ──
+  app.get("/user-guide", (req, res) => {
+    if (!req.isAuthenticated?.()) {
+      // Redirect unauthenticated users to login page with return URL
+      res.redirect("/?login=required&redirect=/user-guide");
+      return;
+    }
+    const guidePath = path.resolve(__dirname, "protected", "user-guide.html");
+    if (!fs.existsSync(guidePath)) {
+      res.status(404).send("User guide not found");
+      return;
+    }
+    res.sendFile(guidePath);
+  });
+
   // ── Auth Routes ──
 
   app.post("/api/auth/register", async (req, res) => {
