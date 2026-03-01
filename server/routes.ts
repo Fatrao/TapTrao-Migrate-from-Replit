@@ -1860,6 +1860,284 @@ export async function registerRoutes(
     }
   });
 
+  // ── Manual Document Verification (Buyer) ──
+
+  app.patch("/api/supplier-uploads/:id/verify", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { id } = req.params;
+      if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+        res.status(400).json({ message: "Invalid upload ID" });
+        return;
+      }
+
+      const upload = await storage.getSupplierUploadById(id);
+      if (!upload || !upload.requestId) {
+        res.status(404).json({ message: "Upload not found" });
+        return;
+      }
+
+      // Verify ownership: the supplier request must belong to this session
+      const request = await storage.getSupplierRequestById(upload.requestId);
+      if (!request || request.userSessionId !== sessionId) {
+        res.status(403).json({ message: "Not authorized" });
+        return;
+      }
+
+      const { verified, finding, ucpRule } = req.body;
+      if (typeof verified !== "boolean") {
+        res.status(400).json({ message: "verified (boolean) is required" });
+        return;
+      }
+
+      const updated = await storage.updateSupplierUploadVerification(id, {
+        verified,
+        finding: finding || null,
+        ucpRule: ucpRule || null,
+      });
+
+      // Audit event
+      if (request.lookupId) {
+        try {
+          await appendTradeEvent(request.lookupId, sessionId, verified ? "doc_verified" : "doc_flagged", {
+            docType: upload.docType,
+            filename: upload.originalFilename,
+            verified,
+            finding: finding || undefined,
+            ucpRule: ucpRule || undefined,
+          });
+        } catch (auditErr) {
+          console.error("Audit event failed (non-fatal):", auditErr);
+        }
+      }
+
+      // Re-evaluate supplier request status after verification change
+      const uploads = await storage.getSupplierUploadsByRequestId(request.id);
+      const docsRequired = (request.docsRequired as string[]) || [];
+      const docsReceived = (request.docsReceived as string[]) || [];
+      const hasBlocking = uploads.some(u => u.verified === false && u.finding);
+      let status: string;
+      if (docsReceived.length >= docsRequired.length && !hasBlocking) {
+        status = "complete";
+      } else if (hasBlocking) {
+        status = "blocking";
+      } else if (docsReceived.length > 0) {
+        status = "partial";
+      } else {
+        status = "waiting";
+      }
+      await storage.updateSupplierRequestDocsReceived(request.id, docsReceived, status);
+
+      res.json({ success: true, upload: updated });
+    } catch (error: any) {
+      console.error("Verify upload error:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ── AI Document Scan ──
+
+  app.post("/api/supplier-uploads/:id/scan", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { id } = req.params;
+      if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+        res.status(400).json({ message: "Invalid upload ID" });
+        return;
+      }
+
+      const upload = await storage.getSupplierUploadById(id);
+      if (!upload || !upload.requestId) {
+        res.status(404).json({ message: "Upload not found" });
+        return;
+      }
+
+      const request = await storage.getSupplierRequestById(upload.requestId);
+      if (!request || request.userSessionId !== sessionId) {
+        res.status(403).json({ message: "Not authorized" });
+        return;
+      }
+
+      // Get lookup data for compliance context
+      const lookup = request.lookupId ? await storage.getLookupById(request.lookupId) : null;
+
+      // Get LC check data if available
+      let lcCheckData: any = null;
+      if (lookup) {
+        const lcCheckMap = await storage.getLcChecksByLookupIds([lookup.id]);
+        const lcCheckId = lcCheckMap[lookup.id];
+        if (lcCheckId) {
+          lcCheckData = await storage.getLcCheckById(lcCheckId);
+        }
+      }
+
+      // Read the file to analyze
+      const filePath = upload.fileKey;
+      if (!fs.existsSync(filePath)) {
+        res.status(404).json({ message: "File not found on disk" });
+        return;
+      }
+
+      const fileBuffer = fs.readFileSync(filePath);
+      const base64Content = fileBuffer.toString("base64");
+      const mimeType = upload.mimeType || "application/pdf";
+
+      // Build context for the AI scan
+      const complianceContext = lookup?.resultJson
+        ? JSON.stringify(lookup.resultJson, null, 2).slice(0, 3000)
+        : "No compliance data available";
+
+      const lcContext = lcCheckData?.resultJson
+        ? JSON.stringify(lcCheckData.resultJson, null, 2).slice(0, 3000)
+        : "No LC check data available";
+
+      // Call Anthropic API to analyze the document
+      const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+      if (!ANTHROPIC_API_KEY) {
+        res.status(503).json({ message: "AI scanning not configured. Set ANTHROPIC_API_KEY to enable.", code: "AI_NOT_CONFIGURED" });
+        return;
+      }
+
+      const systemPrompt = `You are a trade compliance document reviewer for TapTrao, a commodity trade compliance platform. Your job is to review uploaded supplier documents and check them against trade compliance requirements and LC (Letter of Credit) terms.
+
+Document type being reviewed: ${upload.docType}
+Document filename: ${upload.originalFilename}
+
+Trade compliance context:
+${complianceContext}
+
+LC check context:
+${lcContext}
+
+Analyze this document and respond with a JSON object (no markdown, just raw JSON):
+{
+  "verified": true/false,
+  "finding": "Brief description of any issues found, or null if document looks correct",
+  "ucpRule": "Relevant UCP 600 rule reference if applicable, or null",
+  "confidence": "high" | "medium" | "low",
+  "details": "Detailed analysis of the document (2-3 sentences max)"
+}
+
+Rules:
+- Set verified=true if the document appears complete, correctly formatted, and consistent with the trade details
+- Set verified=false if there are discrepancies, missing information, or formatting issues
+- For finding: be specific and actionable (e.g. "Invoice total $12,500 does not match LC amount $12,000")
+- For ucpRule: cite specific UCP 600 articles when relevant (e.g. "UCP 600 Art. 18(a)(iii)")
+- Only output the JSON object, nothing else`;
+
+      const messageBody: any = {
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1024,
+        messages: [{
+          role: "user",
+          content: [
+            {
+              type: mimeType.startsWith("image/") ? "image" : "document",
+              source: {
+                type: "base64",
+                media_type: mimeType,
+                data: base64Content,
+              },
+            },
+            {
+              type: "text",
+              text: `Review this ${upload.docType} document for trade compliance. Check for completeness, accuracy, and consistency with the trade details provided in the system context.`,
+            },
+          ],
+        }],
+        system: systemPrompt,
+      };
+
+      const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify(messageBody),
+      });
+
+      if (!anthropicRes.ok) {
+        const errorText = await anthropicRes.text();
+        console.error("Anthropic API error:", anthropicRes.status, errorText);
+        res.status(502).json({ message: "AI scan failed. Please try again or verify manually." });
+        return;
+      }
+
+      const anthropicData = await anthropicRes.json() as any;
+      const responseText = anthropicData.content?.[0]?.text || "";
+
+      // Parse the JSON response
+      let scanResult: { verified: boolean; finding: string | null; ucpRule: string | null; confidence: string; details: string };
+      try {
+        // Try to extract JSON from the response (handle possible markdown wrapping)
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error("No JSON found in response");
+        scanResult = JSON.parse(jsonMatch[0]);
+      } catch (parseErr) {
+        console.error("Failed to parse AI response:", responseText);
+        res.status(502).json({ message: "AI scan returned unparseable results. Please verify manually." });
+        return;
+      }
+
+      // Update the upload record with scan results
+      const updated = await storage.updateSupplierUploadVerification(id, {
+        verified: scanResult.verified,
+        finding: scanResult.finding,
+        ucpRule: scanResult.ucpRule,
+      });
+
+      // Audit event
+      if (request.lookupId) {
+        try {
+          await appendTradeEvent(request.lookupId, sessionId, "doc_ai_scanned", {
+            docType: upload.docType,
+            filename: upload.originalFilename,
+            verified: scanResult.verified,
+            finding: scanResult.finding || undefined,
+            ucpRule: scanResult.ucpRule || undefined,
+            confidence: scanResult.confidence,
+          });
+        } catch (auditErr) {
+          console.error("Audit event failed (non-fatal):", auditErr);
+        }
+      }
+
+      // Re-evaluate supplier request status
+      const allUploads = await storage.getSupplierUploadsByRequestId(request.id);
+      const docsRequired = (request.docsRequired as string[]) || [];
+      const docsReceived = (request.docsReceived as string[]) || [];
+      const hasBlocking = allUploads.some(u => u.verified === false && u.finding);
+      let status: string;
+      if (docsReceived.length >= docsRequired.length && !hasBlocking) {
+        status = "complete";
+      } else if (hasBlocking) {
+        status = "blocking";
+      } else if (docsReceived.length > 0) {
+        status = "partial";
+      } else {
+        status = "waiting";
+      }
+      await storage.updateSupplierRequestDocsReceived(request.id, docsReceived, status);
+
+      res.json({
+        success: true,
+        scan: {
+          verified: scanResult.verified,
+          finding: scanResult.finding,
+          ucpRule: scanResult.ucpRule,
+          confidence: scanResult.confidence,
+          details: scanResult.details,
+        },
+        upload: updated,
+      });
+    } catch (error: any) {
+      console.error("AI scan error:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // ── Public Supplier Upload ──
 
   const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

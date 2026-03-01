@@ -24,6 +24,10 @@ import {
   Anchor,
   Archive,
   ExternalLink,
+  Eye,
+  Flag,
+  Sparkles,
+  Loader2,
 } from "lucide-react";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
 
@@ -89,6 +93,9 @@ const eventConfig: Record<string, { icon: typeof CheckCircle2; color: string; la
   supplier_link_created: { icon: ExternalLink, color: "#6b9080", label: "Supplier Link Created" },
   supplier_doc_uploaded: { icon: Upload, color: "#22c55e", label: "Document Uploaded" },
   buyer_doc_uploaded: { icon: Upload, color: "#6b9080", label: "Document Uploaded (Buyer)" },
+  doc_verified: { icon: ShieldCheck, color: "#16a34a", label: "Document Verified" },
+  doc_flagged: { icon: Flag, color: "#ef4444", label: "Document Flagged" },
+  doc_ai_scanned: { icon: Sparkles, color: "#8b5cf6", label: "AI Document Scan" },
   supplier_complete: { icon: CheckCircle2, color: "#16a34a", label: "Supplier Submission Complete" },
   status_change: { icon: ArrowRight, color: "#3b82f6", label: "Status Changed" },
   eta_set: { icon: Clock, color: "#8b5cf6", label: "ETA Set" },
@@ -298,6 +305,27 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                       )}
                     </div>
                   )}
+                  {event.eventType === "doc_verified" && event.eventData?.docType && (
+                    <div style={{ fontSize: 11, color: "#16a34a", marginTop: 4 }}>
+                      {event.eventData.docType} — Verified
+                    </div>
+                  )}
+                  {event.eventType === "doc_flagged" && event.eventData?.docType && (
+                    <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>
+                      {event.eventData.docType} — {event.eventData.finding || "Issue flagged"}
+                      {event.eventData.ucpRule && (
+                        <span style={{ color: "var(--t3)", marginLeft: 6 }}>({event.eventData.ucpRule})</span>
+                      )}
+                    </div>
+                  )}
+                  {event.eventType === "doc_ai_scanned" && event.eventData?.docType && (
+                    <div style={{ fontSize: 11, color: "#8b5cf6", marginTop: 4 }}>
+                      {event.eventData.docType} — {event.eventData.verified ? "Passed" : "Issues found"}
+                      {event.eventData.confidence && (
+                        <span style={{ color: "var(--t3)", marginLeft: 6 }}>({event.eventData.confidence} confidence)</span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -325,6 +353,14 @@ export default function TradeDetail() {
   const [buyerNote, setBuyerNote] = useState("");
   const [buyerUploading, setBuyerUploading] = useState(false);
   const buyerFileRef = useRef<HTMLInputElement>(null);
+
+  // Document verification state
+  const [flaggingUploadId, setFlaggingUploadId] = useState<string | null>(null);
+  const [flagFinding, setFlagFinding] = useState("");
+  const [flagUcpRule, setFlagUcpRule] = useState("");
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
+  const [scanningId, setScanningId] = useState<string | null>(null);
+  const [scanResult, setScanResult] = useState<{ uploadId: string; details: string; confidence: string } | null>(null);
 
   const handleBuyerUpload = async () => {
     const file = buyerFileRef.current?.files?.[0];
@@ -354,6 +390,90 @@ export default function TradeDetail() {
       alert(err.message || "Upload failed");
     } finally {
       setBuyerUploading(false);
+    }
+  };
+
+  const handleVerify = async (uploadId: string) => {
+    setVerifyingId(uploadId);
+    try {
+      const res = await fetch(`/api/supplier-uploads/${uploadId}/verify`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ verified: true }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: "Verify failed" }));
+        throw new Error(err.message);
+      }
+      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
+    } catch (err: any) {
+      alert(err.message || "Verification failed");
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+
+  const handleFlag = async (uploadId: string) => {
+    if (!flagFinding.trim()) {
+      alert("Please describe the issue found");
+      return;
+    }
+    setVerifyingId(uploadId);
+    try {
+      const res = await fetch(`/api/supplier-uploads/${uploadId}/verify`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          verified: false,
+          finding: flagFinding.trim(),
+          ucpRule: flagUcpRule.trim() || null,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: "Flag failed" }));
+        throw new Error(err.message);
+      }
+      setFlaggingUploadId(null);
+      setFlagFinding("");
+      setFlagUcpRule("");
+      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
+    } catch (err: any) {
+      alert(err.message || "Flagging failed");
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+
+  const handleAiScan = async (uploadId: string) => {
+    setScanningId(uploadId);
+    setScanResult(null);
+    try {
+      const res = await fetch(`/api/supplier-uploads/${uploadId}/scan`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: "Scan failed" }));
+        if (err.code === "AI_NOT_CONFIGURED") {
+          alert("AI scanning is not configured. Please set ANTHROPIC_API_KEY on the server.");
+          return;
+        }
+        throw new Error(err.message);
+      }
+      const result = await res.json();
+      setScanResult({
+        uploadId,
+        details: result.scan?.details || "Scan complete",
+        confidence: result.scan?.confidence || "unknown",
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
+    } catch (err: any) {
+      alert(err.message || "AI scan failed");
+    } finally {
+      setScanningId(null);
     }
   };
 
@@ -653,52 +773,255 @@ export default function TradeDetail() {
                         </Badge>
                       </div>
 
-                      {/* Required vs received */}
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                        <div>
-                          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 6 }}>
-                            Required
-                          </div>
-                          {(data.supplierRequest.docsRequired as string[] || []).map((doc: string) => (
-                            <div key={doc} style={{ fontSize: 12, color: "var(--t2)", padding: "3px 0" }}>
-                              {doc}
-                            </div>
-                          ))}
+                      {/* Required docs list */}
+                      <div style={{ marginBottom: 12 }}>
+                        <div style={{ fontSize: 11, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 6 }}>
+                          Required ({(data.supplierRequest.docsRequired as string[] || []).length})
                         </div>
-                        <div>
-                          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 6 }}>
-                            Received
-                          </div>
-                          {data.supplierUploads.length > 0 ? data.supplierUploads.map((upload: any) => (
-                            <div key={upload.id} style={{
-                              fontSize: 12,
-                              color: "#16a34a",
-                              padding: "3px 0",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 4,
-                            }}>
-                              <CheckCircle2 size={11} />
-                              {upload.docType}
-                              {upload.uploadedBy === "buyer" && (
-                                <span style={{
-                                  fontSize: 9,
-                                  fontWeight: 600,
-                                  color: "var(--t3)",
-                                  background: "rgba(255,255,255,0.08)",
-                                  padding: "1px 5px",
-                                  borderRadius: 4,
-                                  marginLeft: 2,
-                                }}>
-                                  Manual
-                                </span>
-                              )}
-                            </div>
-                          )) : (
-                            <p style={{ fontSize: 12, color: "var(--t3)" }}>None yet</p>
-                          )}
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                          {(data.supplierRequest.docsRequired as string[] || []).map((doc: string) => {
+                            const received = data.supplierUploads.some((u: any) => u.docType === doc);
+                            return (
+                              <span key={doc} style={{
+                                fontSize: 11,
+                                padding: "2px 8px",
+                                borderRadius: 6,
+                                background: received ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.06)",
+                                color: received ? "#16a34a" : "var(--t3)",
+                                border: `1px solid ${received ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.08)"}`,
+                              }}>
+                                {received && <CheckCircle2 size={9} style={{ display: "inline", marginRight: 3, verticalAlign: "middle" }} />}
+                                {doc}
+                              </span>
+                            );
+                          })}
                         </div>
                       </div>
+
+                      {/* Received documents with verification */}
+                      {data.supplierUploads.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 8 }}>
+                            Received Documents
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                            {data.supplierUploads.map((upload: any) => (
+                              <div key={upload.id} style={{
+                                padding: "10px 12px",
+                                background: upload.verified === true ? "rgba(34,197,94,0.06)" :
+                                  (upload.verified === false && upload.finding) ? "rgba(239,68,68,0.06)" :
+                                  "rgba(255,255,255,0.03)",
+                                border: `1px solid ${
+                                  upload.verified === true ? "rgba(34,197,94,0.15)" :
+                                  (upload.verified === false && upload.finding) ? "rgba(239,68,68,0.15)" :
+                                  "rgba(255,255,255,0.06)"
+                                }`,
+                                borderRadius: 8,
+                              }}>
+                                {/* Doc header row */}
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                    {upload.verified === true ? (
+                                      <ShieldCheck size={13} style={{ color: "#16a34a" }} />
+                                    ) : (upload.verified === false && upload.finding) ? (
+                                      <ShieldAlert size={13} style={{ color: "#ef4444" }} />
+                                    ) : (
+                                      <FileText size={13} style={{ color: "var(--t3)" }} />
+                                    )}
+                                    <span style={{ fontSize: 12, fontWeight: 500, color: "var(--t1)" }}>
+                                      {upload.docType}
+                                    </span>
+                                    {upload.uploadedBy === "buyer" && (
+                                      <span style={{
+                                        fontSize: 9, fontWeight: 600, color: "var(--t3)",
+                                        background: "rgba(255,255,255,0.08)", padding: "1px 5px",
+                                        borderRadius: 4,
+                                      }}>
+                                        Manual
+                                      </span>
+                                    )}
+                                    {upload.verified === true && (
+                                      <span style={{
+                                        fontSize: 9, fontWeight: 600, color: "#16a34a",
+                                        background: "rgba(34,197,94,0.1)", padding: "1px 6px",
+                                        borderRadius: 4,
+                                      }}>
+                                        Verified
+                                      </span>
+                                    )}
+                                    {upload.verified === false && upload.finding && (
+                                      <span style={{
+                                        fontSize: 9, fontWeight: 600, color: "#ef4444",
+                                        background: "rgba(239,68,68,0.1)", padding: "1px 6px",
+                                        borderRadius: 4,
+                                      }}>
+                                        Flagged
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {/* Action buttons */}
+                                  <div style={{ display: "flex", gap: 4 }}>
+                                    {scanningId === upload.id ? (
+                                      <Loader2 size={14} style={{ color: "#8b5cf6", animation: "spin 1s linear infinite" }} />
+                                    ) : (
+                                      <button
+                                        onClick={() => handleAiScan(upload.id)}
+                                        title="AI Scan"
+                                        style={{
+                                          background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)",
+                                          borderRadius: 5, padding: "3px 6px", cursor: "pointer",
+                                          display: "flex", alignItems: "center", gap: 3,
+                                          fontSize: 10, color: "#8b5cf6", fontWeight: 500,
+                                        }}
+                                      >
+                                        <Sparkles size={10} /> Scan
+                                      </button>
+                                    )}
+                                    {verifyingId === upload.id ? (
+                                      <Loader2 size={14} style={{ color: "#6b9080", animation: "spin 1s linear infinite" }} />
+                                    ) : upload.verified !== true ? (
+                                      <button
+                                        onClick={() => handleVerify(upload.id)}
+                                        title="Mark as verified"
+                                        style={{
+                                          background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)",
+                                          borderRadius: 5, padding: "3px 6px", cursor: "pointer",
+                                          display: "flex", alignItems: "center", gap: 3,
+                                          fontSize: 10, color: "#16a34a", fontWeight: 500,
+                                        }}
+                                      >
+                                        <CheckCircle2 size={10} /> Verify
+                                      </button>
+                                    ) : null}
+                                    <button
+                                      onClick={() => {
+                                        if (flaggingUploadId === upload.id) {
+                                          setFlaggingUploadId(null);
+                                        } else {
+                                          setFlaggingUploadId(upload.id);
+                                          setFlagFinding(upload.finding || "");
+                                          setFlagUcpRule(upload.ucpRule || "");
+                                        }
+                                      }}
+                                      title="Flag issue"
+                                      style={{
+                                        background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)",
+                                        borderRadius: 5, padding: "3px 6px", cursor: "pointer",
+                                        display: "flex", alignItems: "center", gap: 3,
+                                        fontSize: 10, color: "#ef4444", fontWeight: 500,
+                                      }}
+                                    >
+                                      <Flag size={10} /> Flag
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* File info */}
+                                <div style={{ fontSize: 10, color: "var(--t3)", marginTop: 4 }}>
+                                  {upload.originalFilename}
+                                  {upload.filesizeBytes && (
+                                    <span style={{ marginLeft: 8 }}>
+                                      {(upload.filesizeBytes / 1024).toFixed(0)} KB
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Finding display */}
+                                {upload.finding && (
+                                  <div style={{
+                                    marginTop: 6, padding: "6px 8px", borderRadius: 6,
+                                    background: upload.verified === false ? "rgba(239,68,68,0.06)" : "rgba(34,197,94,0.06)",
+                                    fontSize: 11, color: upload.verified === false ? "#ef4444" : "#16a34a",
+                                  }}>
+                                    {upload.finding}
+                                    {upload.ucpRule && (
+                                      <span style={{ display: "block", marginTop: 2, fontSize: 10, color: "var(--t3)" }}>
+                                        {upload.ucpRule}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* AI scan result toast */}
+                                {scanResult?.uploadId === upload.id && (
+                                  <div style={{
+                                    marginTop: 6, padding: "6px 8px", borderRadius: 6,
+                                    background: "rgba(139,92,246,0.06)",
+                                    border: "1px solid rgba(139,92,246,0.12)",
+                                    fontSize: 11, color: "#8b5cf6",
+                                  }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 2 }}>
+                                      <Sparkles size={10} />
+                                      <span style={{ fontWeight: 600 }}>AI Analysis</span>
+                                      <span style={{ fontSize: 9, color: "var(--t3)" }}>({scanResult?.confidence})</span>
+                                    </div>
+                                    {scanResult?.details}
+                                  </div>
+                                )}
+
+                                {/* Flag form (inline) */}
+                                {flaggingUploadId === upload.id && (
+                                  <div style={{
+                                    marginTop: 8, padding: 10, borderRadius: 6,
+                                    background: "rgba(255,255,255,0.04)",
+                                    border: "1px solid rgba(255,255,255,0.08)",
+                                  }}>
+                                    <div style={{ fontSize: 11, fontWeight: 600, color: "var(--t2)", marginBottom: 6 }}>
+                                      Flag issue with this document
+                                    </div>
+                                    <input
+                                      type="text"
+                                      placeholder="Issue found — e.g. Invoice amount doesn't match LC"
+                                      value={flagFinding}
+                                      onChange={(e) => setFlagFinding(e.target.value)}
+                                      style={{
+                                        width: "100%", background: "rgba(255,255,255,0.06)",
+                                        border: "1px solid rgba(255,255,255,0.12)", color: "var(--t1)",
+                                        borderRadius: 6, padding: "6px 8px", fontSize: 11, marginBottom: 6,
+                                      }}
+                                    />
+                                    <input
+                                      type="text"
+                                      placeholder="UCP rule (optional) — e.g. UCP 600 Art. 18(a)(iii)"
+                                      value={flagUcpRule}
+                                      onChange={(e) => setFlagUcpRule(e.target.value)}
+                                      style={{
+                                        width: "100%", background: "rgba(255,255,255,0.06)",
+                                        border: "1px solid rgba(255,255,255,0.12)", color: "var(--t1)",
+                                        borderRadius: 6, padding: "6px 8px", fontSize: 11, marginBottom: 8,
+                                      }}
+                                    />
+                                    <div style={{ display: "flex", gap: 6 }}>
+                                      <button
+                                        onClick={() => handleFlag(upload.id)}
+                                        disabled={!flagFinding.trim()}
+                                        style={{
+                                          background: "#ef4444", color: "#fff", border: "none",
+                                          borderRadius: 6, padding: "5px 12px", fontSize: 11,
+                                          fontWeight: 500, cursor: flagFinding.trim() ? "pointer" : "not-allowed",
+                                          opacity: flagFinding.trim() ? 1 : 0.5,
+                                        }}
+                                      >
+                                        Submit Flag
+                                      </button>
+                                      <button
+                                        onClick={() => { setFlaggingUploadId(null); setFlagFinding(""); setFlagUcpRule(""); }}
+                                        style={{
+                                          background: "transparent", color: "var(--t3)", border: "1px solid rgba(255,255,255,0.1)",
+                                          borderRadius: 6, padding: "5px 12px", fontSize: 11, cursor: "pointer",
+                                        }}
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       {/* Buyer upload form */}
                       {showBuyerUpload && (

@@ -132,6 +132,8 @@ export interface IStorage {
   getSupplierUploadsByRequestId(requestId: string): Promise<SupplierUpload[]>;
   getSupplierRequestByToken(token: string): Promise<SupplierRequest | undefined>;
   createSupplierUpload(data: { requestId: string; docType: string; originalFilename: string; fileKey: string; filesizeBytes?: number; mimeType?: string; uploadedBy?: string }): Promise<SupplierUpload>;
+  getSupplierUploadById(id: string): Promise<SupplierUpload | undefined>;
+  updateSupplierUploadVerification(id: string, data: { verified: boolean; finding?: string | null; ucpRule?: string | null }): Promise<SupplierUpload | undefined>;
   updateSupplierRequestDocsReceived(requestId: string, docsReceived: string[], status: string): Promise<void>;
   getLookupByTwinlogRef(ref: string): Promise<Lookup | undefined>;
   createAlertSubscription(data: InsertAlertSubscription): Promise<AlertSubscription>;
@@ -760,6 +762,23 @@ export class DatabaseStorage implements IStorage {
       mimeType: data.mimeType,
       uploadedBy: data.uploadedBy || "supplier",
     }).returning();
+    return row;
+  }
+
+  async getSupplierUploadById(id: string): Promise<SupplierUpload | undefined> {
+    const [row] = await db.select().from(supplierUploads).where(eq(supplierUploads.id, id)).limit(1);
+    return row;
+  }
+
+  async updateSupplierUploadVerification(id: string, data: { verified: boolean; finding?: string | null; ucpRule?: string | null }): Promise<SupplierUpload | undefined> {
+    const [row] = await db.update(supplierUploads)
+      .set({
+        verified: data.verified,
+        finding: data.finding ?? null,
+        ucpRule: data.ucpRule ?? null,
+      })
+      .where(eq(supplierUploads.id, id))
+      .returning();
     return row;
   }
 
