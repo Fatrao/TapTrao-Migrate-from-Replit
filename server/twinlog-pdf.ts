@@ -2,10 +2,7 @@ import PDFDocument from "pdfkit";
 import { createHash } from "crypto";
 import type { CompanyProfile, ComplianceResult, RequirementDetail, DocumentStatus } from "@shared/schema";
 
-const OCHRE = "#C4882B";
 const FOREST_GREEN = "#1A3D2B";
-const TERRACOTTA = "#B5521A";
-const WARM_WHITE = "#FAF8F4";
 const CREAM = "#F2EDE4";
 const GREY = "#888888";
 const RED = "#DC2626";
@@ -55,13 +52,43 @@ function verdictLabel(v: string): string {
 }
 
 function drawHr(doc: PDFKit.PDFDocument, y: number): number {
+  doc.save();
   doc.moveTo(50, y).lineTo(545, y).strokeColor("#D0D0D0").lineWidth(0.5).stroke();
-  return y + 10;
+  doc.restore();
+  return y + 12;
 }
 
 function pageFooter(doc: PDFKit.PDFDocument, ref: string, companyName: string) {
-  doc.fontSize(7).fillColor(GREY)
-    .text(`TwinLog Trail — ${ref} — ${companyName}`, 50, 770, { align: "center", width: 495 });
+  doc.save();
+  doc.fontSize(7).fillColor(GREY).font("Helvetica")
+    .text(`TwinLog Trail  |  ${ref}  |  ${companyName}`, 50, 770, { align: "center", width: 495 });
+  doc.restore();
+}
+
+/** Draw label: value pair. Returns the new y after this field. */
+function drawField(
+  doc: PDFKit.PDFDocument,
+  label: string,
+  value: string,
+  y: number,
+  opts?: { valueColor?: string; fontSize?: number },
+): number {
+  const fs = opts?.fontSize ?? 10;
+  const labelX = 50;
+  const valueX = 170;
+  const valueWidth = 375;
+  const color = opts?.valueColor ?? "#333";
+
+  // Draw label
+  doc.font("Helvetica-Bold").fontSize(fs).fillColor("#333");
+  doc.text(label + ":", labelX, y);
+
+  // Measure value height (may wrap)
+  doc.font("Helvetica").fontSize(fs).fillColor(color);
+  const valH = doc.heightOfString(value, { width: valueWidth });
+  doc.text(value, valueX, y, { width: valueWidth });
+
+  return y + Math.max(fs + 4, valH) + 4;
 }
 
 export function generateTwinlogPdf(
@@ -75,8 +102,6 @@ export function generateTwinlogPdf(
   const doc = new PDFDocument({ size: "A4", margin: 50, bufferPages: true });
   const now = new Date();
   const allDocs = result.requirementsDetailed || [];
-  const importerDocs = allDocs.filter(d => !d.isSupplierSide);
-  const supplierDocs = allDocs.filter(d => d.isSupplierSide);
 
   const hash = createHash("sha256");
   doc.on("data", (chunk: Buffer) => hash.update(chunk));
@@ -84,189 +109,200 @@ export function generateTwinlogPdf(
     doc.on("end", () => resolve(hash.digest("hex")));
   });
 
-  // ── PAGE 1 — Cover ──
+  // ── PAGE 1 -- Cover ──────────────────────────────────────────────
+
+  // Brand mark
   doc.fontSize(10).fillColor(FOREST_GREEN).font("Helvetica-Bold")
-    .text("TapTrao", 50, 60);
+    .text("TapTrao", 50, 55);
 
-  doc.moveDown(3);
-  doc.fontSize(24).fillColor(FOREST_GREEN).font("Helvetica-Bold")
-    .text("SHIPPING TWIN", 50, 140);
-  doc.fontSize(14).fillColor(GREY).font("Helvetica")
-    .text("Compliance Record", 50, 170);
+  // Main title
+  doc.fontSize(26).fillColor(FOREST_GREEN).font("Helvetica-Bold")
+    .text("TWINLOG TRAIL", 50, 120);
+  doc.fontSize(13).fillColor(GREY).font("Helvetica")
+    .text("Compliance Record", 50, 152);
 
-  let y = drawHr(doc, 200);
+  let y = drawHr(doc, 180);
 
-  doc.fontSize(10).fillColor("#333").font("Helvetica");
-  const coverFields = [
-    ["Commodity", `${result.commodity.name} (HS ${result.commodity.hsCode})`],
-    ["Origin", `${result.origin.countryName} (${result.origin.iso2})`],
-    ["Destination", `${result.destination.countryName} (${result.destination.iso2})`],
-    ["Trade corridor", `${result.origin.iso2} → ${result.destination.iso2}`],
-  ];
-  for (const [label, val] of coverFields) {
-    doc.font("Helvetica-Bold").text(`${label}:`, 50, y, { continued: true, width: 130 });
-    doc.font("Helvetica").text(`  ${val}`, { width: 365 });
-    y += 20;
-  }
+  // Trade details
+  y = drawField(doc, "Commodity", `${result.commodity.name}  (HS ${result.commodity.hsCode})`, y);
+  y = drawField(doc, "Origin", `${result.origin.countryName} (${result.origin.iso2})`, y);
+  y = drawField(doc, "Destination", `${result.destination.countryName} (${result.destination.iso2})`, y);
+  y = drawField(doc, "Trade corridor", `${result.origin.iso2}  >>  ${result.destination.iso2}`, y);
+
+  y = drawHr(doc, y + 6);
+
+  // Company details
+  y = drawField(doc, "Prepared by", profile.companyName, y);
+  y = drawField(doc, "Address", profile.registeredAddress, y);
+  y = drawField(doc, "EORI", profile.eoriNumber || "NOT PROVIDED", y, {
+    valueColor: profile.eoriNumber ? "#333" : AMBER,
+  });
+  y = drawField(doc, "VAT", profile.vatNumber || "NOT PROVIDED", y, {
+    valueColor: profile.vatNumber ? "#333" : AMBER,
+  });
+
+  y += 4;
+  y = drawField(doc, "Generated", formatDate(now), y);
+  y = drawField(doc, "Reference", reference, y);
 
   y = drawHr(doc, y + 10);
 
-  const profileFields: [string, string, string | null][] = [
-    ["Prepared by", profile.companyName, null],
-    ["Address", profile.registeredAddress, null],
-    ["EORI", profile.eoriNumber || "NOT PROVIDED", profile.eoriNumber ? null : AMBER],
-    ["VAT", profile.vatNumber || "NOT PROVIDED", profile.vatNumber ? null : AMBER],
-  ];
-  for (const [label, val, color] of profileFields) {
-    doc.font("Helvetica-Bold").fillColor("#333").text(`${label}:`, 50, y, { continued: true, width: 130 });
-    doc.font("Helvetica").fillColor(color || "#333").text(`  ${val}`, { width: 365 });
-    y += 20;
-  }
-
-  y += 5;
-  doc.font("Helvetica-Bold").fillColor("#333").text("Generated:", 50, y, { continued: true, width: 130 });
-  doc.font("Helvetica").text(`  ${formatDate(now)}`, { width: 365 });
-  y += 20;
-  doc.font("Helvetica-Bold").text("Reference:", 50, y, { continued: true, width: 130 });
-  doc.font("Helvetica").text(`  ${reference}`, { width: 365 });
-
-  y = drawHr(doc, y + 30);
-
   doc.fontSize(9).fillColor(FOREST_GREEN).font("Helvetica-Bold")
-    .text("TwinLog Trail — Generated by TapTrao", 50, y);
+    .text("TwinLog Trail  --  Generated by TapTrao", 50, y);
   doc.fontSize(8).fillColor(GREY).font("Helvetica")
-    .text("Verified compliance record for regulatory audit and bank submission.", 50, y + 14);
+    .text("Verified compliance record for regulatory audit and bank submission.", 50, y + 16);
 
   pageFooter(doc, reference, profile.companyName);
 
-  // ── PAGE 2 — TwinLog Score ──
+  // ── PAGE 2 -- TwinLog Score ──────────────────────────────────────
+
   doc.addPage();
   doc.fontSize(14).fillColor(FOREST_GREEN).font("Helvetica-Bold").text("TWINLOG SCORE", 50, 50);
 
   const rs = result.readinessScore;
   const factors = rs.factors;
-  const rows = [
+
+  y = 85;
+  // Table header
+  doc.fontSize(8).fillColor(GREY).font("Helvetica-Bold");
+  doc.text("Factor", 50, y, { width: 180 });
+  doc.text("Penalty", 235, y, { width: 50, align: "right" });
+  doc.text("Max", 295, y, { width: 40, align: "right" });
+  doc.text("Notes", 350, y, { width: 195 });
+  y += 16;
+  y = drawHr(doc, y);
+
+  const scoreRows = [
     ["Regulatory Complexity", factors.regulatory_complexity.penalty, factors.regulatory_complexity.max, `${factors.regulatory_complexity.overlay_count} active overlay(s)`],
     ["Known Hazard Exposure", factors.hazard_exposure.penalty, factors.hazard_exposure.max, factors.hazard_exposure.primary_hazard || "None"],
     ["Document Volume", factors.document_volume.penalty, factors.document_volume.max, `${factors.document_volume.document_count} documents required`],
     ["Trade Restrictions", factors.trade_restriction.penalty, factors.trade_restriction.max, factors.trade_restriction.stop_triggered ? "Stop flag triggered" : "No restrictions"],
   ];
 
-  y = 80;
-  const colWidths = [180, 60, 60, 195];
-  doc.fontSize(8).fillColor(GREY).font("Helvetica-Bold");
-  doc.text("Factor", 50, y, { width: colWidths[0] });
-  doc.text("Penalty", 230, y, { width: colWidths[1], align: "center" });
-  doc.text("Max", 290, y, { width: colWidths[2], align: "center" });
-  doc.text("Notes", 350, y, { width: colWidths[3] });
-  y += 16;
-  drawHr(doc, y); y += 4;
-
   doc.font("Helvetica").fillColor("#333").fontSize(9);
-  for (const [label, penalty, max, notes] of rows) {
-    doc.text(String(label), 50, y, { width: colWidths[0] });
-    doc.text(String(penalty), 230, y, { width: colWidths[1], align: "center" });
-    doc.text(String(max), 290, y, { width: colWidths[2], align: "center" });
-    doc.text(String(notes), 350, y, { width: colWidths[3] });
-    y += 18;
+  for (const [label, penalty, max, notes] of scoreRows) {
+    doc.fillColor("#333").text(String(label), 50, y, { width: 180 });
+    doc.text(String(penalty), 235, y, { width: 50, align: "right" });
+    doc.text(String(max), 295, y, { width: 40, align: "right" });
+    doc.text(String(notes), 350, y, { width: 195 });
+    y += 20;
   }
 
-  y += 5;
-  drawHr(doc, y); y += 8;
-  doc.font("Helvetica-Bold").fontSize(9).fillColor("#333");
-  doc.text("Total penalty", 50, y, { width: colWidths[0] });
-  doc.text(String(factors.total_penalty), 230, y, { width: colWidths[1], align: "center" });
-  y += 20;
-  doc.fontSize(11).fillColor(FOREST_GREEN);
-  doc.text(`TwinLog Score: ${rs.score} / 100`, 50, y, { continued: true });
-  doc.fillColor(rs.verdict === "GREEN" ? GREEN : rs.verdict === "AMBER" ? AMBER : RED)
-    .text(`  ${verdictLabel(rs.verdict)}`);
+  y += 4;
+  y = drawHr(doc, y);
 
-  y += 30;
-  doc.roundedRect(50, y, 495, 50, 4).fillAndStroke(CREAM, "#D0D0D0");
+  doc.font("Helvetica-Bold").fontSize(9).fillColor("#333");
+  doc.text("Total penalty", 50, y, { width: 180 });
+  doc.text(String(factors.total_penalty), 235, y, { width: 50, align: "right" });
+  y += 28;
+
+  // Score display
+  doc.fontSize(12).fillColor(FOREST_GREEN).font("Helvetica-Bold");
+  doc.text(`TwinLog Score: ${rs.score} / 100`, 50, y);
+  y += 16;
+  const verdictColor = rs.verdict === "GREEN" ? GREEN : rs.verdict === "AMBER" ? AMBER : RED;
+  doc.fontSize(10).fillColor(verdictColor).font("Helvetica-Bold");
+  doc.text(verdictLabel(rs.verdict), 50, y);
+  y += 28;
+
+  // Summary box
+  const summaryHeight = doc.heightOfString(rs.summary, { width: 475, font: "Helvetica-Oblique", fontSize: 9 }) + 20;
+  doc.roundedRect(50, y, 495, summaryHeight, 4).fillAndStroke(CREAM, "#D0D0D0");
   doc.fillColor("#333").fontSize(9).font("Helvetica-Oblique")
     .text(rs.summary, 60, y + 10, { width: 475 });
 
   pageFooter(doc, reference, profile.companyName);
 
-  // ── PAGE 3 — Importer Requirements ──
+  // ── PAGE 3 -- Importer Requirements ──────────────────────────────
+
   doc.addPage();
   doc.fontSize(14).fillColor(FOREST_GREEN).font("Helvetica-Bold").text("IMPORTER REQUIREMENTS", 50, 50);
   doc.fontSize(9).fillColor(GREY).font("Helvetica")
     .text("Documents and actions required of the importing party.", 50, 70);
 
-  y = 95;
+  y = 100;
   doc.fontSize(8).fillColor(GREY).font("Helvetica-Bold");
-  doc.text("Document", 50, y, { width: 200 });
-  doc.text("Owner", 250, y, { width: 70 });
-  doc.text("Due By", 320, y, { width: 100 });
+  doc.text("Document", 50, y, { width: 190 });
+  doc.text("Owner", 245, y, { width: 65 });
+  doc.text("Due By", 315, y, { width: 95 });
   doc.text("Status", 420, y, { width: 125 });
   y += 16;
-  drawHr(doc, y); y += 4;
+  y = drawHr(doc, y);
 
   let importerReady = 0;
-  doc.fontSize(9).font("Helvetica").fillColor("#333");
   const allDocsWithOrigIdx = allDocs.map((d, i) => ({ d, i }));
   const importerWithIdx = allDocsWithOrigIdx.filter(x => !x.d.isSupplierSide);
 
+  doc.fontSize(9).font("Helvetica");
   for (const { d: rq, i: origIdx } of importerWithIdx) {
     const st = docStatuses[origIdx] || "PENDING";
     if (st !== "PENDING") importerReady++;
     const s = statusDot(st);
 
-    doc.fillColor("#333").text(rq.title, 50, y, { width: 200 });
-    doc.text(ownerName(rq.owner), 250, y, { width: 70 });
-    doc.text(dueName(rq.due_by), 320, y, { width: 100 });
-    doc.fillColor(s.color).text(`● ${s.label}`, 420, y, { width: 125 });
-    y += 18;
+    // Calculate row height based on longest text
+    const titleH = doc.heightOfString(rq.title, { width: 190 });
+    const rowH = Math.max(titleH, 14) + 6;
+
+    doc.fillColor("#333").text(rq.title, 50, y, { width: 190 });
+    doc.text(ownerName(rq.owner), 245, y, { width: 65 });
+    doc.text(dueName(rq.due_by), 315, y, { width: 95 });
+    doc.fillColor(s.color).text(`* ${s.label}`, 420, y, { width: 125 });
+    y += rowH;
     if (y > 720) { doc.addPage(); y = 50; pageFooter(doc, reference, profile.companyName); }
   }
 
-  y += 10;
+  y += 12;
   doc.fontSize(8).fillColor(GREY).font("Helvetica-Oblique")
     .text(`${importerReady} of ${importerWithIdx.length} importer requirements marked ready at time of download.`, 50, y);
 
   pageFooter(doc, reference, profile.companyName);
 
-  // ── PAGE 4 — Supplier Requirements ──
+  // ── PAGE 4 -- Supplier Requirements ──────────────────────────────
+
   doc.addPage();
   doc.fontSize(14).fillColor(FOREST_GREEN).font("Helvetica-Bold").text("SUPPLIER REQUIREMENTS", 50, 50);
   doc.fontSize(9).fillColor(GREY).font("Helvetica")
     .text("Documents the supplier must provide. Issuing authorities named.", 50, 70);
 
-  y = 95;
+  y = 100;
   doc.fontSize(8).fillColor(GREY).font("Helvetica-Bold");
-  doc.text("Document", 50, y, { width: 170 });
-  doc.text("Issuing Authority", 220, y, { width: 140 });
-  doc.text("Due By", 360, y, { width: 80 });
+  doc.text("Document", 50, y, { width: 165 });
+  doc.text("Issuing Authority", 220, y, { width: 130 });
+  doc.text("Due By", 355, y, { width: 80 });
   doc.text("Status", 440, y, { width: 105 });
   y += 16;
-  drawHr(doc, y); y += 4;
+  y = drawHr(doc, y);
 
   let supplierReady = 0;
-  doc.fontSize(9).font("Helvetica").fillColor("#333");
   const supplierWithIdx = allDocsWithOrigIdx.filter(x => x.d.isSupplierSide);
 
+  doc.fontSize(9).font("Helvetica");
   for (const { d: rq, i: origIdx } of supplierWithIdx) {
     const st = docStatuses[origIdx] || "PENDING";
     if (st !== "PENDING") supplierReady++;
     const s = statusDot(st);
 
-    doc.fillColor("#333").text(rq.title, 50, y, { width: 170 });
-    doc.text(rq.issuedBy, 220, y, { width: 140 });
-    doc.text(dueName(rq.due_by), 360, y, { width: 80 });
-    doc.fillColor(s.color).text(`● ${s.label}`, 440, y, { width: 105 });
-    y += 18;
+    // Calculate row height based on longest wrapping text
+    const titleH = doc.heightOfString(rq.title, { width: 165 });
+    const issuerH = doc.heightOfString(rq.issuedBy, { width: 130 });
+    const rowH = Math.max(titleH, issuerH, 14) + 6;
+
+    doc.fillColor("#333").text(rq.title, 50, y, { width: 165 });
+    doc.text(rq.issuedBy, 220, y, { width: 130 });
+    doc.text(dueName(rq.due_by), 355, y, { width: 80 });
+    doc.fillColor(s.color).text(`* ${s.label}`, 440, y, { width: 105 });
+    y += rowH;
     if (y > 720) { doc.addPage(); y = 50; pageFooter(doc, reference, profile.companyName); }
   }
 
-  y += 10;
+  y += 12;
   doc.fontSize(8).fillColor(GREY).font("Helvetica-Oblique")
     .text(`${supplierReady} of ${supplierWithIdx.length} supplier requirements marked ready at time of download.`, 50, y);
 
   pageFooter(doc, reference, profile.companyName);
 
-  // ── PAGE 5 — Regulatory Overlays & Risk Flags ──
+  // ── PAGE 5 -- Regulatory Overlays & Risk Flags ───────────────────
+
   doc.addPage();
 
   const hasStop = result.stopFlags && Object.keys(result.stopFlags).length > 0;
@@ -275,58 +311,62 @@ export function generateTwinlogPdf(
   if (hasStop) {
     doc.roundedRect(50, y, 495, 40, 4).fillAndStroke("#FEE2E2", RED);
     doc.fontSize(10).fillColor(RED).font("Helvetica-Bold")
-      .text("⛔ STOP FLAG — Trade may be prohibited or require special authorisation", 60, y + 12, { width: 475 });
+      .text("STOP FLAG -- Trade may be prohibited or require special authorisation", 60, y + 12, { width: 475 });
     y += 55;
   }
 
   doc.fontSize(14).fillColor(FOREST_GREEN).font("Helvetica-Bold").text("REGULATORY OVERLAYS", 50, y);
-  y += 25;
+  y += 28;
 
   doc.fontSize(8).fillColor(GREY).font("Helvetica-Bold");
   doc.text("Regulation", 50, y, { width: 200 });
-  doc.text("Status", 250, y, { width: 80 });
-  doc.text("Notes", 330, y, { width: 215 });
+  doc.text("Status", 255, y, { width: 75 });
+  doc.text("Notes", 335, y, { width: 210 });
   y += 16;
-  drawHr(doc, y); y += 4;
+  y = drawHr(doc, y);
 
   const triggers = result.triggers;
   const overlayRows: [string, boolean, string][] = [
-    ["SPS — Sanitary & Phytosanitary", triggers.sps, "IPAFFS/TRACES pre-notification required"],
-    ["EUDR — EU Deforestation Regulation", triggers.eudr, "Geolocation data and due diligence required"],
-    ["CBAM — Carbon Border Adjustment", triggers.cbam, "Carbon reporting obligations apply"],
+    ["SPS - Sanitary & Phytosanitary", triggers.sps, "IPAFFS/TRACES pre-notification required"],
+    ["EUDR - EU Deforestation Regulation", triggers.eudr, "Geolocation data and due diligence required"],
+    ["CBAM - Carbon Border Adjustment", triggers.cbam, "Carbon reporting obligations apply"],
     ["Kimberley Process", triggers.kimberley, "Kimberley Process Certificate required"],
     ["Conflict Minerals", triggers.conflict, "OECD due diligence guidelines apply"],
-    ["IUU — Illegal Fishing", triggers.iuu, "Catch certificate required"],
-    ["CITES — Endangered Species", triggers.cites, "CITES permit required"],
-    ["CSDDD — Corporate Due Diligence", triggers.csddd, "Supply chain due diligence required"],
+    ["IUU - Illegal Fishing", triggers.iuu, "Catch certificate required"],
+    ["CITES - Endangered Species", triggers.cites, "CITES permit required"],
+    ["CSDDD - Corporate Due Diligence", triggers.csddd, "Supply chain due diligence required"],
   ];
 
   doc.fontSize(9).font("Helvetica");
   for (const [reg, active, notes] of overlayRows) {
+    const regH = doc.heightOfString(reg, { width: 200 });
+    const notesH = active ? doc.heightOfString(notes, { width: 210 }) : 14;
+    const rowH = Math.max(regH, notesH, 14) + 6;
+
     doc.fillColor("#333").text(reg, 50, y, { width: 200 });
-    doc.fillColor(active ? GREEN : GREY).text(active ? "Active" : "Not triggered", 250, y, { width: 80 });
-    doc.fillColor("#333").text(active ? notes : "—", 330, y, { width: 215 });
-    y += 18;
+    doc.fillColor(active ? GREEN : GREY).text(active ? "Active" : "Not triggered", 255, y, { width: 75 });
+    doc.fillColor("#333").text(active ? notes : "-", 335, y, { width: 210 });
+    y += rowH;
   }
 
-  y += 15;
+  y += 20;
   doc.fontSize(14).fillColor(FOREST_GREEN).font("Helvetica-Bold").text("KNOWN HAZARDS", 50, y);
-  y += 25;
+  y += 28;
 
   if (result.hazards.length > 0) {
     doc.fontSize(8).fillColor(GREY).font("Helvetica-Bold");
     doc.text("Hazard", 50, y, { width: 200 });
-    doc.text("Severity", 250, y, { width: 80 });
-    doc.text("Mitigation", 330, y, { width: 215 });
+    doc.text("Severity", 255, y, { width: 75 });
+    doc.text("Mitigation", 335, y, { width: 210 });
     y += 16;
-    drawHr(doc, y); y += 4;
+    y = drawHr(doc, y);
 
     doc.fontSize(9).font("Helvetica").fillColor("#333");
     for (const h of result.hazards) {
-      doc.text(h, 50, y, { width: 200 });
-      doc.fillColor(AMBER).text("MEDIUM", 250, y, { width: 80 });
-      doc.fillColor("#333").text("See compliance requirements for mitigation details", 330, y, { width: 215 });
-      y += 18;
+      doc.fillColor("#333").text(h, 50, y, { width: 200 });
+      doc.fillColor(AMBER).text("MEDIUM", 255, y, { width: 75 });
+      doc.fillColor("#333").text("See compliance requirements for mitigation details", 335, y, { width: 210 });
+      y += 20;
     }
   } else {
     doc.fontSize(9).fillColor(GREY).font("Helvetica").text("No known hazards for this commodity.", 50, y);
@@ -334,19 +374,26 @@ export function generateTwinlogPdf(
 
   pageFooter(doc, reference, profile.companyName);
 
-  // ── PAGE 6 — Audit Footer ──
+  // ── PAGE 6 -- Audit Record ───────────────────────────────────────
+
   doc.addPage();
   doc.fontSize(14).fillColor(FOREST_GREEN).font("Helvetica-Bold").text("AUDIT RECORD", 50, 50);
-  y = 80;
+  y = 85;
 
   doc.fontSize(9).fillColor("#333").font("Helvetica")
     .text("This document was generated by TapTrao (taptrao.com) on behalf of:", 50, y);
-  y += 20;
+  y += 24;
 
-  doc.font("Helvetica-Bold").text(profile.companyName, 70, y); y += 14;
-  doc.font("Helvetica").text(profile.registeredAddress, 70, y); y += 14;
-  doc.text(`EORI: ${profile.eoriNumber || "NOT PROVIDED"}`, 70, y); y += 14;
-  doc.text(`VAT:  ${profile.vatNumber || "NOT PROVIDED"}`, 70, y); y += 25;
+  doc.font("Helvetica-Bold").text(profile.companyName, 70, y);
+  y += 16;
+  doc.font("Helvetica");
+  const addrH = doc.heightOfString(profile.registeredAddress, { width: 450 });
+  doc.text(profile.registeredAddress, 70, y, { width: 450 });
+  y += addrH + 6;
+  doc.text(`EORI:  ${profile.eoriNumber || "NOT PROVIDED"}`, 70, y);
+  y += 16;
+  doc.text(`VAT:   ${profile.vatNumber || "NOT PROVIDED"}`, 70, y);
+  y += 30;
 
   const auditRows: [string, string][] = [
     ["Compliance check reference", reference],
@@ -356,15 +403,19 @@ export function generateTwinlogPdf(
   ];
 
   for (const [label, val] of auditRows) {
-    doc.font("Helvetica-Bold").fillColor("#333").text(`${label}:`, 50, y, { width: 200 });
-    doc.font("Helvetica").text(val, 250, y, { width: 295 }); 
-    y += 16;
+    doc.font("Helvetica-Bold").fontSize(9).fillColor("#333");
+    doc.text(label + ":", 50, y);
+    y += 14;
+    doc.font("Helvetica").fontSize(9).fillColor("#555");
+    const valH = doc.heightOfString(val, { width: 475 });
+    doc.text(val, 70, y, { width: 475 });
+    y += valH + 8;
   }
 
-  y += 20;
+  y += 16;
   doc.fontSize(8).fillColor(GREY).font("Helvetica")
     .text("This record reflects the compliance status of the above trade corridor at the time of generation. Regulatory requirements are subject to change. TapTrao recommends running a fresh compliance lookup before each shipment.", 50, y, { width: 495 });
-  y += 40;
+  y += 45;
   doc.text("TapTrao is a compliance information tool. This record does not constitute legal advice. The importing party remains responsible for ensuring all regulatory requirements are met.", 50, y, { width: 495 });
 
   pageFooter(doc, reference, profile.companyName);
