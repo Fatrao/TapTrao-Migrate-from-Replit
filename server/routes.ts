@@ -1595,6 +1595,14 @@ export async function registerRoutes(
 
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+
+      // Handle PDF stream errors to prevent server crash
+      stream.on("error", (err) => {
+        console.error("PDF stream error:", err);
+        if (!res.headersSent) {
+          res.status(500).json({ message: "PDF generation failed" });
+        }
+      });
       stream.pipe(res);
 
       hashPromise.then(async (pdfHash) => {
@@ -1614,8 +1622,10 @@ export async function registerRoutes(
               pdfHash,
             });
           }
-        } catch (_e) {}
-      });
+        } catch (e) {
+          console.error("TwinLog post-generation error:", e);
+        }
+      }).catch((e) => console.error("TwinLog hash promise error:", e));
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -2737,6 +2747,13 @@ Rules:
       const filename = `EUDR-Statement-${eudrRef.replace(/[^a-zA-Z0-9-]/g, "_")}.pdf`;
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+
+      stream.on("error", (err) => {
+        console.error("EUDR PDF stream error:", err);
+        if (!res.headersSent) {
+          res.status(500).json({ message: "PDF generation failed" });
+        }
+      });
       stream.pipe(res);
 
       hashPromise.then(async (pdfHash) => {
@@ -2744,8 +2761,10 @@ Rules:
           await storage.updateEudrRecord(eudrRecord!.id, {
             statementPdfKey: pdfHash,
           });
-        } catch (_e) {}
-      });
+        } catch (e) {
+          console.error("EUDR post-generation error:", e);
+        }
+      }).catch((e) => console.error("EUDR hash promise error:", e));
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

@@ -8,6 +8,15 @@ import { initLocalDb } from "./db";
 
 const app = express();
 
+// ── Global crash prevention ─────────────────────────────────────────
+// Prevent the server from dying on unhandled errors
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION (server kept alive):", err);
+});
+process.on("unhandledRejection", (reason) => {
+  console.error("UNHANDLED REJECTION (server kept alive):", reason);
+});
+
 // Trust Railway / Cloudflare reverse proxy so secure cookies work behind TLS termination
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
@@ -79,6 +88,11 @@ app.use((req, res, next) => {
     setupAuth(app);
 
     await registerRoutes(httpServer, app);
+
+    // Health check endpoint for Railway zero-downtime deploys
+    app.get("/health", (_req, res) => {
+      res.json({ status: "ok", uptime: process.uptime() });
+    });
 
     app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
