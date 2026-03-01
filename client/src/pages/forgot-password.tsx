@@ -8,20 +8,46 @@ export default function ForgotPassword() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resent, setResent] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   usePageTitle("Forgot Password");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const sendResetEmail = async (emailAddress: string) => {
     setError("");
     setLoading(true);
     try {
-      await apiRequest("POST", "/api/auth/forgot-password", { email });
-      setSubmitted(true);
+      await apiRequest("POST", "/api/auth/forgot-password", { email: emailAddress });
+      return true;
     } catch (err: any) {
       setError(err?.message || "Something went wrong. Please try again.");
+      return false;
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const success = await sendResetEmail(email);
+    if (success) setSubmitted(true);
+  };
+
+  const handleResend = async () => {
+    const success = await sendResetEmail(email);
+    if (success) {
+      setResent(true);
+      setResendCooldown(60);
+      const interval = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            setResent(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
   };
 
@@ -40,8 +66,39 @@ export default function ForgotPassword() {
         {submitted ? (
           <div>
             <div style={{ background: "rgba(107,144,128,0.12)", border: "1px solid var(--sage)", borderRadius: 8, padding: "14px 16px", marginBottom: 16, fontSize: 13, color: "var(--sage)" }}>
-              If an account with that email exists, we've sent a password reset link. Please check your inbox.
+              {resent
+                ? "Reset link resent! Please check your inbox (and spam folder)."
+                : "If an account with that email exists, we've sent a password reset link. Please check your inbox."}
             </div>
+
+            <button
+              onClick={handleResend}
+              disabled={loading || resendCooldown > 0}
+              style={{
+                background: "transparent",
+                color: "var(--sage)",
+                border: "1px solid var(--sage)",
+                borderRadius: 10,
+                padding: "10px 24px",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: resendCooldown > 0 ? "default" : "pointer",
+                opacity: loading || resendCooldown > 0 ? 0.5 : 1,
+                width: "100%",
+                marginBottom: 12,
+              }}
+            >
+              {loading
+                ? "Sending..."
+                : resendCooldown > 0
+                  ? `Resend email (${resendCooldown}s)`
+                  : "Resend email"}
+            </button>
+
+            {error && (
+              <div style={{ fontSize: 12, color: "var(--red)", marginBottom: 12 }}>{error}</div>
+            )}
+
             <p style={{ fontSize: 13, color: "#888", textAlign: "center" }}>
               <a href="/login" style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none" }}>
                 Back to Log In
