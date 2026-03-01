@@ -21,6 +21,7 @@ import {
   regulatoryAlerts,
   alertReads,
   users,
+  passwordResetTokens,
   type Destination,
   type RegionalFramework,
   type OriginCountry,
@@ -60,6 +61,7 @@ import {
   documentExtractions,
   type DocumentExtraction,
   type User,
+  type PasswordResetToken,
   type TradeStatus,
   type TradeEvent,
   tradeEvents,
@@ -185,6 +187,12 @@ export interface IStorage {
   getUserById(id: string): Promise<User | undefined>;
   getUserBySessionId(sessionId: string): Promise<User | undefined>;
   createUser(data: { email: string; passwordHash: string; sessionId: string; displayName?: string }): Promise<User>;
+  updateUserPassword(userId: string, passwordHash: string): Promise<void>;
+  // Password reset
+  createPasswordResetToken(userId: string, token: string, expiresAt: Date): Promise<PasswordResetToken>;
+  getValidPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
+  markPasswordResetTokenUsed(id: string): Promise<void>;
+  countRecentPasswordResetTokens(userId: string, since: Date): Promise<number>;
   // Trade lifecycle
   updateTradeStatus(lookupId: string, status: TradeStatus, sessionId: string): Promise<Lookup | undefined>;
   archiveTrade(lookupId: string, sessionId: string): Promise<Lookup | undefined>;
@@ -1116,6 +1124,42 @@ export class DatabaseStorage implements IStorage {
       displayName: data.displayName || null,
     }).returning();
     return row;
+  }
+
+  async updateUserPassword(userId: string, passwordHash: string): Promise<void> {
+    await db.update(users).set({ passwordHash, updatedAt: new Date() }).where(eq(users.id, userId));
+  }
+
+  // ── Password Reset ──
+
+  async createPasswordResetToken(userId: string, token: string, expiresAt: Date): Promise<PasswordResetToken> {
+    const [row] = await db.insert(passwordResetTokens).values({ userId, token, expiresAt }).returning();
+    return row;
+  }
+
+  async getValidPasswordResetToken(token: string): Promise<PasswordResetToken | undefined> {
+    const [row] = await db.select().from(passwordResetTokens).where(
+      and(
+        eq(passwordResetTokens.token, token),
+        sql`${passwordResetTokens.expiresAt} > now()`,
+        sql`${passwordResetTokens.usedAt} IS NULL`
+      )
+    );
+    return row;
+  }
+
+  async markPasswordResetTokenUsed(id: string): Promise<void> {
+    await db.update(passwordResetTokens).set({ usedAt: new Date() }).where(eq(passwordResetTokens.id, id));
+  }
+
+  async countRecentPasswordResetTokens(userId: string, since: Date): Promise<number> {
+    const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(passwordResetTokens).where(
+      and(
+        eq(passwordResetTokens.userId, userId),
+        sql`${passwordResetTokens.createdAt} > ${since}`
+      )
+    );
+    return row?.count ?? 0;
   }
 
   // ── Trade Lifecycle ──

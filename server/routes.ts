@@ -9,7 +9,8 @@ import { generateTwinlogPdf } from "./twinlog-pdf";
 import { generateEudrPdf } from "./eudr-pdf";
 import { appendTradeEvent, getTradeAuditChain, verifyAuditChain } from "./audit";
 import { hashPassword, comparePasswords } from "./auth";
-import { lcCheckRequestSchema, registerSchema, loginSchema, tokenTransactions, type ComplianceResult, type DocumentStatus } from "@shared/schema";
+import { lcCheckRequestSchema, registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, tokenTransactions, type ComplianceResult, type DocumentStatus } from "@shared/schema";
+import { sendPasswordResetEmail } from "./email";
 import passport from "passport";
 import { db } from "./db";
 import multer from "multer";
@@ -228,6 +229,82 @@ export async function registerRoutes(
       });
     } else {
       res.json({ user: null });
+    }
+  });
+
+  // ── Password Reset ──
+
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const parsed = forgotPasswordSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ message: "Please enter a valid email address" });
+        return;
+      }
+
+      const { email } = parsed.data;
+      // Always return the same message to prevent user enumeration
+      const successMsg = "If an account with that email exists, we've sent a password reset link.";
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        res.json({ message: successMsg });
+        return;
+      }
+
+      // Rate limit: max 3 reset requests per hour
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      const recentCount = await storage.countRecentPasswordResetTokens(user.id, oneHourAgo);
+      if (recentCount >= 3) {
+        res.json({ message: successMsg });
+        return;
+      }
+
+      // Generate token and store
+      const { randomBytes } = await import("crypto");
+      const token = randomBytes(32).toString("hex");
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+      await storage.createPasswordResetToken(user.id, token, expiresAt);
+
+      // Build reset URL
+      const protocol = req.headers["x-forwarded-proto"] || req.protocol;
+      const host = req.headers["x-forwarded-host"] || req.get("host");
+      const resetUrl = `${protocol}://${host}/reset-password?token=${token}`;
+
+      // Send email (falls back to console log if no RESEND_API_KEY)
+      await sendPasswordResetEmail(user.email, resetUrl);
+
+      res.json({ message: successMsg });
+    } catch (error: any) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ message: "Something went wrong. Please try again." });
+    }
+  });
+
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const parsed = resetPasswordSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ message: "Invalid input", errors: parsed.error.flatten().fieldErrors });
+        return;
+      }
+
+      const { token, newPassword } = parsed.data;
+
+      const resetToken = await storage.getValidPasswordResetToken(token);
+      if (!resetToken) {
+        res.status(400).json({ message: "This reset link is invalid or has expired. Please request a new one." });
+        return;
+      }
+
+      const passwordHash = await hashPassword(newPassword);
+      await storage.updateUserPassword(resetToken.userId, passwordHash);
+      await storage.markPasswordResetTokenUsed(resetToken.id);
+
+      res.json({ message: "Your password has been reset. You can now log in with your new password." });
+    } catch (error: any) {
+      console.error("Reset password error:", error);
+      res.status(500).json({ message: "Something went wrong. Please try again." });
     }
   });
 

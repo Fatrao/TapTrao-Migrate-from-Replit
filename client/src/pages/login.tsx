@@ -82,6 +82,12 @@ export default function Login() {
             />
           </div>
 
+          <div style={{ textAlign: "right", marginBottom: 4 }}>
+            <a href="/forgot-password" style={{ fontSize: 12, color: "var(--sage)", textDecoration: "none" }}>
+              Forgot password?
+            </a>
+          </div>
+
           {error && (
             <div style={{ fontSize: 12, color: "var(--red)", marginBottom: 12 }}>{error}</div>
           )}

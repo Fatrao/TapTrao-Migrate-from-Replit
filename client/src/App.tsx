@@ -30,6 +30,8 @@ import EudrPage from "@/pages/eudr";
 import DemurragePage from "@/pages/demurrage";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
 import NewCheck from "@/pages/new-check";
 import TradeDetail from "@/pages/trade-detail";
 
@@ -40,6 +42,8 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route path="/lookup" component={Lookup} />
       <Route path="/upload/:token" component={SupplierUploadPage} />
       <Route path="/verify/:ref" component={VerifyPage} />
