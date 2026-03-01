@@ -105,6 +105,13 @@
     display: block;
   }
 
+  /* Supplier upload page: standalone full-width light layout */
+  #root:has(> .supplier-upload-page) {
+    padding: 0;
+    gap: 0;
+    display: block;
+  }
+
   /* AppShell wrapper — isolates sidebar + main flex layout from #root siblings */
   .app-shell {
     display: flex;

@@ -1,7 +1,6 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams } from "wouter";
-import { getAvatarColour } from "@/lib/avatarColours";
 import type { SupplierUpload } from "@shared/schema";
 
 type UploadPageData = {
@@ -23,7 +22,17 @@ type UploadPageData = {
   uploads: SupplierUpload[];
 };
 
-function getDocEmoji(docName: string): string {
+/* ── helpers ── */
+
+function iso2ToFlag(iso2: string): string {
+  if (!iso2 || iso2.length !== 2) return "";
+  const upper = iso2.toUpperCase();
+  const cp1 = 0x1f1e6 - 65 + upper.charCodeAt(0);
+  const cp2 = 0x1f1e6 - 65 + upper.charCodeAt(1);
+  return String.fromCodePoint(cp1, cp2);
+}
+
+function getDocIcon(docName: string): string {
   const lower = docName.toLowerCase();
   if (lower.includes("invoice") || lower.includes("commercial")) return "\u{1F4C4}";
   if (lower.includes("origin") || lower.includes("coo")) return "\u{1F30D}";
@@ -44,6 +53,25 @@ function formatDate(dateStr: string): string {
 function daysUntil(dateStr: string): number {
   return Math.ceil((new Date(dateStr).getTime() - Date.now()) / 86400000);
 }
+
+/* ── shared styles ── */
+
+const lightBg = "#f8f9fa";
+const cardBg = "#ffffff";
+const cardBorder = "#e5e7eb";
+const textPrimary = "#1a1a2e";
+const textSecondary = "#6b7280";
+const textMuted = "#9ca3af";
+const accentGreen = "#0e7a5e";
+const accentGreenLight = "#ecfdf5";
+const accentGreenBorder = "#a7f3d0";
+const amberBg = "#fffbeb";
+const amberBorder = "#fde68a";
+const amberText = "#b45309";
+const sage = "#6b9080";
+const sageHover = "#5a7a6b";
+
+/* ── page ── */
 
 export default function SupplierUpload() {
   const params = useParams<{ token: string }>();
@@ -72,14 +100,16 @@ export default function SupplierUpload() {
     onSuccess: () => setSubmitted(true),
   });
 
+  /* ── loading ── */
   if (dataQuery.isLoading) {
     return (
-      <div style={{ background: "var(--s0)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ color: "var(--t2)", fontSize: 14 }}>Loading...</div>
+      <div className="supplier-upload-page" style={{ background: lightBg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ color: textSecondary, fontSize: 14 }}>Loading...</div>
       </div>
     );
   }
 
+  /* ── error ── */
   if (dataQuery.isError) {
     const errMsg = (dataQuery.error as Error)?.message;
     return <ExpiredPage reason={errMsg === "expired" ? "expired" : "invalid"} />;
@@ -89,19 +119,26 @@ export default function SupplierUpload() {
   const { request, trade, uploads } = data;
   const docsRequired = request.docsRequired as string[];
   const docsReceived = request.docsReceived as string[];
-  const avatarColour = getAvatarColour(trade.originIso2);
   const daysLeft = daysUntil(request.uploadExpiresAt);
 
+  /* ── submitted success ── */
   if (submitted) {
     return (
-      <div style={{ background: "var(--s0)", minHeight: "100vh" }}>
+      <div className="supplier-upload-page" style={{ background: lightBg, minHeight: "100vh" }}>
         <TopBar />
-        <div style={{ maxWidth: 560, margin: "0 auto", padding: "80px 20px", textAlign: "center" }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>{"\u2705"}</div>
-          <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "var(--t1)", marginBottom: 8 }}>
+        <div style={{ maxWidth: 520, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
+          <div style={{
+            width: 72, height: 72, borderRadius: "50%",
+            background: accentGreenLight, border: `2px solid ${accentGreenBorder}`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 32, margin: "0 auto 20px",
+          }}>
+            {"\u2705"}
+          </div>
+          <h2 style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 22, color: textPrimary, marginBottom: 8 }}>
             Documents submitted
           </h2>
-          <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.6 }}>
+          <p style={{ fontSize: 15, color: textSecondary, lineHeight: 1.6 }}>
             The buyer has been notified. You can close this page.
           </p>
         </div>
@@ -110,6 +147,7 @@ export default function SupplierUpload() {
     );
   }
 
+  /* ── file upload handler ── */
   const handleFileUpload = async (docType: string, file: File) => {
     setUploadingDoc(docType);
     setUploadError(null);
@@ -133,161 +171,157 @@ export default function SupplierUpload() {
     }
   };
 
+  const allReceived = docsReceived.length >= docsRequired.length;
+
+  /* ── main upload page ── */
   return (
-    <div style={{ background: "var(--s0)", minHeight: "100vh", paddingBottom: 80 }}>
+    <div className="supplier-upload-page" style={{ background: lightBg, minHeight: "100vh", paddingBottom: 60 }}>
       <TopBar />
 
-      <div style={{ maxWidth: 560, margin: "0 auto", padding: "28px 20px" }}>
-        {/* Trade Context Card */}
+      <div style={{ maxWidth: 580, margin: "0 auto", padding: "32px 24px" }}>
+        {/* ── Trade context hero ── */}
         <div
           style={{
-            background: "var(--s1)",
-            border: "1px solid var(--s5)",
-            borderRadius: 12,
-            padding: "18px 20px",
-            marginBottom: 24,
+            background: "linear-gradient(135deg, #0e4e45, #14574a, #1c6352, #327462)",
+            borderRadius: 14,
+            padding: "24px 28px",
+            marginBottom: 28,
+            color: "#fff",
           }}
-          data-testid="trade-context-card"
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
-            <div
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: 10,
-                background: avatarColour.bg,
-                border: `1px solid ${avatarColour.border}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontFamily: "'DM Mono', monospace",
-                fontSize: 12,
-                fontWeight: 700,
-                color: avatarColour.text,
-                flexShrink: 0,
-              }}
-            >
-              {trade.originIso2}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+            <div style={{
+              width: 42, height: 42, borderRadius: 10,
+              background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 20, flexShrink: 0,
+            }}>
+              {iso2ToFlag(trade.originIso2)}
             </div>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--t1)" }}>{trade.commodityName}</div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)" }}>
-                {trade.originName} {"\u2192"} {trade.destName}
+              <div style={{ fontFamily: "'Clash Display', sans-serif", fontSize: 18, fontWeight: 700 }}>
+                {trade.commodityName}
+              </div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>
+                {iso2ToFlag(trade.originIso2)} {trade.originName} {"\u2192"} {iso2ToFlag(trade.destIso2)} {trade.destName}
               </div>
             </div>
           </div>
 
-          <div style={{ height: 1, background: "var(--s5)", margin: "0 -20px", marginBottom: 14, width: "calc(100% + 40px)" }} />
-
-          <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.65, marginBottom: 14 }}>
+          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", lineHeight: 1.6, margin: 0 }}>
             Please upload the documents listed below for this shipment.
-            No account needed {"\u2014"} just upload your files and they will go directly to the buyer.
+            No account needed {"\u2014"} your files go directly to the buyer.
           </p>
 
-          {daysLeft <= 7 ? (
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                background: "var(--abg)",
-                border: "1px solid var(--abd)",
-                color: "var(--amber)",
-                fontFamily: "'DM Mono', monospace",
-                fontSize: 11,
-                padding: "4px 10px",
-                borderRadius: 5,
-              }}
-              data-testid="deadline-chip"
-            >
-              {"\u23F1"} Required before {formatDate(request.uploadExpiresAt)}
+          <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 8 }}>
+            {daysLeft <= 7 ? (
+              <span style={{
+                display: "inline-flex", alignItems: "center", gap: 5,
+                background: "rgba(234,179,8,0.2)", border: "1px solid rgba(234,179,8,0.3)",
+                color: "#fcd34d", fontSize: 12, fontWeight: 600,
+                padding: "5px 12px", borderRadius: 6,
+              }}>
+                {"\u23F1"} Due by {formatDate(request.uploadExpiresAt)}
+              </span>
+            ) : (
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+                Deadline: {formatDate(request.uploadExpiresAt)}
+              </span>
+            )}
+            <span style={{
+              fontSize: 12, color: "rgba(255,255,255,0.5)", marginLeft: "auto",
+            }}>
+              {docsReceived.length}/{docsRequired.length} uploaded
             </span>
-          ) : (
-            <span style={{ fontSize: 11, color: "var(--t3)", fontFamily: "'DM Mono', monospace" }}>
-              Deadline: {formatDate(request.uploadExpiresAt)}
-            </span>
-          )}
+          </div>
         </div>
 
-        {/* Document Cards */}
+        {/* ── Document cards ── */}
         {docsRequired.map((docName, idx) => {
           const isReceived = docsReceived.includes(docName);
-          const upload = uploads.find(u => u.docType === docName);
+          const upload = uploads.find((u) => u.docType === docName);
           const isVerified = upload?.verified;
           const hasFinding = upload && !upload.verified && upload.finding;
-
-          let borderColor = "var(--s5)";
-          let statusTag: { label: string; color: string };
-          let iconBg: string;
-          let iconBd: string;
-
-          if (isVerified) {
-            borderColor = "rgba(74,140,111,.22)";
-            statusTag = { label: "\u2713 Received", color: "var(--green)" };
-            iconBg = "var(--gbg)";
-            iconBd = "var(--gbd)";
-          } else if (hasFinding) {
-            borderColor = "rgba(234,139,67,.2)";
-            statusTag = { label: "\u26A0 Amend & reupload", color: "var(--amber)" };
-            iconBg = "var(--abg)";
-            iconBd = "var(--abd)";
-          } else {
-            statusTag = { label: "Awaiting", color: "var(--t3)" };
-            iconBg = "var(--s4)";
-            iconBd = "var(--s5)";
-          }
 
           return (
             <div
               key={idx}
               style={{
-                background: "var(--s1)",
-                border: `1px solid ${borderColor}`,
+                background: cardBg,
+                border: `1px solid ${
+                  isVerified ? accentGreenBorder :
+                  hasFinding ? amberBorder :
+                  cardBorder
+                }`,
                 borderRadius: 12,
-                marginBottom: 10,
+                marginBottom: 12,
                 overflow: "hidden",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
               }}
-              data-testid={`upload-doc-card-${idx}`}
             >
               {/* Header */}
-              <div style={{ padding: "12px 14px", display: "flex", alignItems: "center", gap: 12 }}>
-                <div
-                  style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 8,
-                    background: iconBg,
-                    border: `1px solid ${iconBd}`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 16,
-                    flexShrink: 0,
-                  }}
-                >
-                  {getDocEmoji(docName)}
+              <div style={{
+                padding: "14px 18px",
+                display: "flex", alignItems: "center", gap: 12,
+                borderBottom: (!isVerified || hasFinding) ? `1px solid ${cardBorder}` : "none",
+              }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 9,
+                  background: isVerified ? accentGreenLight :
+                    hasFinding ? amberBg : "#f3f4f6",
+                  border: `1px solid ${
+                    isVerified ? accentGreenBorder :
+                    hasFinding ? amberBorder : "#e5e7eb"
+                  }`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 17, flexShrink: 0,
+                }}>
+                  {getDocIcon(docName)}
                 </div>
-                <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{docName}</div>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: statusTag.color, whiteSpace: "nowrap" }}>
-                  {statusTag.label}
+                <div style={{ flex: 1, fontSize: 14, fontWeight: 600, color: textPrimary }}>
+                  {docName}
+                </div>
+                <span style={{
+                  fontSize: 11, fontWeight: 600,
+                  color: isVerified ? accentGreen :
+                    hasFinding ? amberText :
+                    isReceived ? accentGreen : textMuted,
+                  whiteSpace: "nowrap",
+                  padding: "3px 10px", borderRadius: 6,
+                  background: isVerified ? accentGreenLight :
+                    hasFinding ? amberBg :
+                    isReceived ? accentGreenLight : "#f3f4f6",
+                }}>
+                  {isVerified ? "\u2713 Verified" :
+                    hasFinding ? "\u26A0 Amend" :
+                    isReceived ? "\u2713 Received" : "Awaiting"}
                 </span>
               </div>
 
               {/* Finding instruction */}
               {hasFinding && (
-                <div style={{ background: "var(--abg)", borderTop: "1px solid var(--abd)", padding: "10px 14px" }}>
-                  <p style={{ fontSize: 12, color: "var(--t2)", lineHeight: 1.5 }}>{upload!.finding}</p>
+                <div style={{
+                  background: amberBg, borderTop: `1px solid ${amberBorder}`,
+                  padding: "10px 18px",
+                }}>
+                  <p style={{ fontSize: 13, color: amberText, lineHeight: 1.5, margin: 0 }}>
+                    {upload!.finding}
+                  </p>
                 </div>
               )}
 
               {/* Verified file row */}
               {isVerified && upload && (
-                <div style={{ padding: "8px 14px", background: "var(--s2)", borderTop: "1px solid var(--s5)", display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)", flex: 1 }}>
+                <div style={{
+                  padding: "8px 18px", background: accentGreenLight,
+                  borderTop: `1px solid ${accentGreenBorder}`,
+                  display: "flex", alignItems: "center", gap: 8,
+                }}>
+                  <span style={{ fontSize: 12, color: textSecondary, flex: 1 }}>
                     {upload.originalFilename}
                     {upload.filesizeBytes ? ` \u00B7 ${(upload.filesizeBytes / 1024).toFixed(0)}KB` : ""}
                   </span>
-                  <span style={{ color: "var(--green)", fontSize: 14 }}>{"\u2713"}</span>
+                  <span style={{ color: accentGreen, fontSize: 14, fontWeight: 700 }}>{"\u2713"}</span>
                 </div>
               )}
 
@@ -305,68 +339,74 @@ export default function SupplierUpload() {
           );
         })}
 
-        {/* Progress Summary */}
-        <div
-          style={{
-            background: "var(--s1)",
-            border: "1px solid var(--s5)",
-            borderRadius: 10,
-            padding: "14px 16px",
-            marginTop: 24,
-          }}
-          data-testid="progress-summary"
-        >
+        {/* ── Progress summary ── */}
+        <div style={{
+          background: cardBg,
+          border: `1px solid ${cardBorder}`,
+          borderRadius: 10, padding: "16px 20px",
+          marginTop: 24,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: textMuted, marginBottom: 10 }}>
+            Upload progress
+          </div>
           {docsRequired.map((docName, idx) => {
             const isReceived = docsReceived.includes(docName);
-            const upload = uploads.find(u => u.docType === docName);
+            const upload = uploads.find((u) => u.docType === docName);
             const hasFinding = upload && !upload.verified && upload.finding;
 
             let dotColor: string;
             let label: string;
             if (upload?.verified || isReceived) {
-              dotColor = "var(--green)";
+              dotColor = accentGreen;
               label = `${docName} \u2014 received`;
             } else if (hasFinding) {
-              dotColor = "var(--amber)";
+              dotColor = amberText;
               label = `${docName} \u2014 needs amendment`;
             } else {
-              dotColor = "var(--t3)";
+              dotColor = "#d1d5db";
               label = `${docName} \u2014 not yet uploaded`;
             }
 
             return (
-              <div key={idx} style={{ display: "flex", alignItems: "center", gap: 10, padding: "4px 0" }}>
+              <div key={idx} style={{ display: "flex", alignItems: "center", gap: 10, padding: "5px 0" }}>
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: dotColor, flexShrink: 0 }} />
-                <span style={{ fontSize: 12, color: "var(--t2)" }}>{label}</span>
+                <span style={{ fontSize: 13, color: textSecondary }}>{label}</span>
               </div>
             );
           })}
         </div>
 
-        {/* Submit Button */}
+        {/* ── Submit button ── */}
         <button
           onClick={() => submitMutation.mutate()}
           disabled={submitMutation.isPending}
           style={{
             width: "100%",
-            marginTop: 20,
-            background: "var(--blue)",
-            color: "#fff",
-            fontWeight: 800,
+            marginTop: 24,
+            background: allReceived ? sage : "#d1d5db",
+            color: allReceived ? "#fff" : "#9ca3af",
+            fontWeight: 700,
             fontSize: 15,
             padding: 16,
             borderRadius: 10,
             border: "none",
-            cursor: "pointer",
+            cursor: allReceived ? "pointer" : "default",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             gap: 8,
             minHeight: 52,
+            transition: "all 0.15s",
           }}
-          data-testid="button-submit-docs"
+          onMouseEnter={(e) => {
+            if (allReceived) (e.target as HTMLButtonElement).style.background = sageHover;
+          }}
+          onMouseLeave={(e) => {
+            if (allReceived) (e.target as HTMLButtonElement).style.background = sage;
+          }}
         >
-          {submitMutation.isPending ? "Submitting..." : "Submit documents \u2192"}
+          {submitMutation.isPending ? "Submitting..." : allReceived ? "Submit documents \u2192" : `Upload all ${docsRequired.length} documents to submit`}
         </button>
 
         <Footer expiryDate={request.uploadExpiresAt} />
@@ -375,74 +415,80 @@ export default function SupplierUpload() {
   );
 }
 
+/* ── Top bar ── */
+
 function TopBar() {
   return (
-    <div
-      style={{
-        position: "sticky",
-        top: 0,
-        height: 52,
-        background: "var(--s0)",
-        borderBottom: "1px solid var(--s5)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 16px",
-        zIndex: 50,
-      }}
-      data-testid="upload-topbar"
-    >
+    <div style={{
+      position: "sticky", top: 0, height: 56,
+      background: "#ffffff",
+      borderBottom: `1px solid ${cardBorder}`,
+      display: "flex", alignItems: "center", justifyContent: "space-between",
+      padding: "0 24px",
+      zIndex: 50,
+    }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <img src="/logo.png" alt="TapTrao" style={{ width: 28, height: 28, objectFit: "contain", borderRadius: 6 }} />
-        <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 16, color: "var(--t1)" }}>
+        <span style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 16, color: textPrimary }}>
           TapTrao
         </span>
       </div>
-      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)" }}>
+      <span style={{ fontSize: 12, color: textMuted, display: "flex", alignItems: "center", gap: 5 }}>
         {"\uD83D\uDD12"} Secure upload
       </span>
     </div>
   );
 }
 
+/* ── Footer ── */
+
 function Footer({ expiryDate }: { expiryDate: string }) {
   return (
-    <div style={{ textAlign: "center", marginTop: 32, padding: "0 20px" }}>
+    <div style={{ textAlign: "center", marginTop: 40, padding: "0 20px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 6 }}>
         <img src="/logo.png" alt="" style={{ width: 20, height: 20, objectFit: "contain", borderRadius: 4 }} />
-        <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "var(--t2)" }}>TapTrao</span>
+        <span style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 14, color: textSecondary }}>
+          TapTrao
+        </span>
       </div>
-      <p style={{ fontSize: 11, color: "var(--t3)", lineHeight: 1.55 }}>
+      <p style={{ fontSize: 12, color: textMuted, lineHeight: 1.55 }}>
         Your files go directly and securely to the buyer. No TapTrao account required.
       </p>
-      <p style={{ fontSize: 11, color: "var(--t3)", lineHeight: 1.55 }}>
+      <p style={{ fontSize: 12, color: textMuted, lineHeight: 1.55, marginTop: 2 }}>
         This link expires {formatDate(expiryDate)}.
       </p>
     </div>
   );
 }
 
+/* ── Expired page ── */
+
 function ExpiredPage({ reason }: { reason: "expired" | "invalid" }) {
   return (
-    <div style={{ background: "var(--s0)", minHeight: "100vh" }}>
+    <div className="supplier-upload-page" style={{ background: lightBg, minHeight: "100vh" }}>
       <TopBar />
-      <div style={{ maxWidth: 560, margin: "0 auto", padding: "80px 20px", textAlign: "center" }}>
-        <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "var(--t1)", marginBottom: 12 }} data-testid="text-expired-title">
-          This upload link has expired or is invalid.
+      <div style={{ maxWidth: 520, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
+        <div style={{
+          width: 64, height: 64, borderRadius: "50%",
+          background: "#fef2f2", border: "2px solid #fecaca",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 28, margin: "0 auto 20px",
+        }}>
+          {"\u26A0\uFE0F"}
+        </div>
+        <h2 style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 20, color: textPrimary, marginBottom: 12 }}>
+          {reason === "expired" ? "This upload link has expired" : "Upload link not found"}
         </h2>
-        <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.6 }}>
+        <p style={{ fontSize: 15, color: textSecondary, lineHeight: 1.6 }}>
           Please contact the buyer to request a new link.
         </p>
       </div>
-      <div style={{ textAlign: "center", marginTop: 40 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 6 }}>
-          <img src="/logo.png" alt="" style={{ width: 20, height: 20, objectFit: "contain", borderRadius: 4 }} />
-          <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "var(--t2)" }}>TapTrao</span>
-        </div>
-      </div>
+      <Footer expiryDate={new Date().toISOString()} />
     </div>
   );
 }
+
+/* ── Upload zone ── */
 
 function UploadZone({
   docName,
@@ -475,48 +521,55 @@ function UploadZone({
 
   if (hasExistingUpload) {
     return (
-      <div style={{ padding: "10px 14px", background: "var(--s2)", borderTop: "1px solid var(--s5)", fontSize: 12, color: "var(--t2)" }}>
-        Uploaded {"\u2014"} pending verification
+      <div style={{
+        padding: "10px 18px",
+        background: accentGreenLight,
+        borderTop: `1px solid ${accentGreenBorder}`,
+        fontSize: 13, color: accentGreen, fontWeight: 500,
+        display: "flex", alignItems: "center", gap: 6,
+      }}>
+        {"\u2713"} Uploaded — pending verification
       </div>
     );
   }
 
   return (
-    <div style={{ padding: "8px 14px", borderTop: "1px solid var(--s5)" }}>
+    <div style={{ padding: "10px 18px" }}>
       <div
         onClick={() => inputRef.current?.click()}
         onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
         onDragLeave={() => setIsDragOver(false)}
         onDrop={handleDrop}
         style={{
-          border: `1.5px dashed ${isDragOver ? "var(--blue-bd)" : "var(--s5)"}`,
-          borderRadius: 8,
-          padding: 16,
+          border: `2px dashed ${isDragOver ? sage : "#d1d5db"}`,
+          borderRadius: 10,
+          padding: "20px 16px",
           textAlign: "center",
           cursor: "pointer",
           transition: "all .15s",
-          background: isDragOver ? "var(--blue-dim)" : "transparent",
-          minHeight: 44,
+          background: isDragOver ? "rgba(107,144,128,0.06)" : "#fafafa",
+          minHeight: 48,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
         }}
-        data-testid={`upload-zone-${docName.replace(/\s+/g, "-").toLowerCase()}`}
       >
         {isUploading ? (
-          <div style={{ fontSize: 13, color: "var(--t2)" }}>Uploading...</div>
+          <div style={{ fontSize: 13, color: textSecondary }}>Uploading...</div>
         ) : (
           <>
-            <div style={{ fontSize: 13, color: "var(--t2)", fontWeight: 500 }}>
+            <div style={{ fontSize: 14, color: textSecondary, fontWeight: 500 }}>
               {"\uD83D\uDCCE"} Drop file here or tap to choose
             </div>
-            <div style={{ fontSize: 11, color: "var(--t3)", marginTop: 4 }}>PDF, JPG, PNG {"\u00B7"} max 20MB</div>
+            <div style={{ fontSize: 12, color: textMuted, marginTop: 4 }}>
+              PDF, JPG, PNG {"\u00B7"} max 20MB
+            </div>
           </>
         )}
       </div>
       {error && (
-        <div style={{ fontSize: 11, color: "var(--red)", marginTop: 6 }}>{error}</div>
+        <div style={{ fontSize: 12, color: "#ef4444", marginTop: 6 }}>{error}</div>
       )}
       <input
         ref={inputRef}
