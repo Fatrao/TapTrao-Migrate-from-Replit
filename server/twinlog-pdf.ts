@@ -65,7 +65,7 @@ function eventLabel(eventType: string): { label: string; color: string } {
     case "compliance_check": return { label: "Compliance Check", color: FOREST_GREEN };
     case "supplier_link_created": return { label: "Supplier Link Created", color: FOREST_GREEN };
     case "supplier_doc_uploaded": return { label: "Document Uploaded", color: GREEN };
-    case "supplier_submission_complete": return { label: "Supplier Submission Complete", color: GREEN };
+    case "supplier_complete": return { label: "Supplier Submission Complete", color: GREEN };
     case "buyer_doc_uploaded": return { label: "Document Uploaded (Buyer)", color: PURPLE };
     case "status_change": return { label: "Status Changed", color: "#555" };
     case "doc_verified": return { label: "Document Verified", color: GREEN };
@@ -73,6 +73,13 @@ function eventLabel(eventType: string): { label: string; color: string } {
     case "doc_ai_scanned": return { label: "AI Document Scan", color: PURPLE };
     case "twinlog_generated": return { label: "TwinLog Generated", color: FOREST_GREEN };
     case "lc_check": return { label: "LC Check", color: FOREST_GREEN };
+    case "lc_recheck": return { label: "LC Re-check", color: FOREST_GREEN };
+    case "correction_sent": return { label: "Correction Sent", color: AMBER };
+    case "trade_closed": return { label: "Trade Closed", color: "#555" };
+    case "trade_archived": return { label: "Trade Archived", color: "#555" };
+    case "eta_set": return { label: "ETA Set", color: FOREST_GREEN };
+    case "arrival": return { label: "Arrival Recorded", color: GREEN };
+    case "eudr_created": return { label: "EUDR Record Created", color: FOREST_GREEN };
     default: return { label: eventType.replace(/_/g, " "), color: "#555" };
   }
 }
@@ -509,6 +516,9 @@ export function generateTwinlogPdf(
       } else if (ev.eventType === "doc_verified" || ev.eventType === "doc_flagged") {
         detail = evData.docType || "";
         if (evData.finding) detail += `: ${evData.finding}`.substring(0, 50);
+      } else if (ev.eventType === "supplier_complete") {
+        const count = evData.totalUploads || (Array.isArray(evData.docsReceived) ? evData.docsReceived.length : 0);
+        detail = `${count} document(s) submitted`;
       } else if (ev.eventType === "twinlog_generated") {
         detail = evData.ref || "";
       } else if (ev.eventType === "compliance_check") {
