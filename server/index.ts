@@ -24,6 +24,12 @@ if (process.env.NODE_ENV === "production") {
 
 const httpServer = createServer(app);
 
+// Health check endpoint — registered FIRST so it responds even during heavy load
+// and isn't caught by the SPA catch-all static server
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok", uptime: process.uptime() });
+});
+
 app.use(cookieParser());
 
 declare module "http" {
@@ -88,11 +94,6 @@ app.use((req, res, next) => {
     setupAuth(app);
 
     await registerRoutes(httpServer, app);
-
-    // Health check endpoint for Railway zero-downtime deploys
-    app.get("/health", (_req, res) => {
-      res.json({ status: "ok", uptime: process.uptime() });
-    });
 
     app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
