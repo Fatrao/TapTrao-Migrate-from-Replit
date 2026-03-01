@@ -141,12 +141,35 @@ export async function registerRoutes(
       const user = await storage.createUser({ email, passwordHash, sessionId, displayName });
 
       // Auto-login after registration
+      if (!req.session) {
+        console.error("No session object on req — express-session middleware may have failed");
+        // Still return success since the account was created
+        res.json({
+          user: { id: user.id, email: user.email, displayName: user.displayName, emailVerified: user.emailVerified },
+          needsLogin: true,
+        });
+        return;
+      }
+
       req.login(user, (err) => {
         if (err) {
           console.error("Auto-login failed after registration:", err);
-          res.status(500).json({ message: "Registration succeeded but auto-login failed" });
+          // Still return success since the account was created — client will redirect to login
+          res.json({
+            user: { id: user.id, email: user.email, displayName: user.displayName, emailVerified: user.emailVerified },
+            needsLogin: true,
+          });
           return;
         }
+
+        // Set the taptrao_session cookie to the user's stored sessionId
+        res.cookie("taptrao_session", user.sessionId, {
+          httpOnly: true,
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+          maxAge: 365 * 24 * 60 * 60 * 1000,
+        });
+
         res.json({
           user: { id: user.id, email: user.email, displayName: user.displayName, emailVerified: user.emailVerified },
         });

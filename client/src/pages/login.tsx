@@ -52,6 +52,11 @@ export default function Login() {
       </div>
 
       <div className="form-card" style={{ margin: "0 24px 20px", maxWidth: 420 }}>
+        {new URLSearchParams(window.location.search).get("registered") === "1" && (
+          <div style={{ background: "rgba(107,144,128,0.12)", border: "1px solid var(--sage)", borderRadius: 8, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "var(--sage)" }}>
+            ✓ Account created successfully! Please log in.
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Email</label>

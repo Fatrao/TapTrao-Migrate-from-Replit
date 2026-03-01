@@ -24,8 +24,13 @@ export default function Register() {
     e.preventDefault();
     setError("");
     try {
-      await register({ email, password, displayName: displayName || undefined });
-      navigate("/dashboard");
+      const result = await register({ email, password, displayName: displayName || undefined });
+      if (result?.needsLogin) {
+        // Account created but auto-login failed — redirect to login page
+        navigate("/login?registered=1");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err: any) {
       const msg = err?.message || "Registration failed";
       try {
