@@ -2,8 +2,27 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
-    const text = (await res.text()) || res.statusText;
-    throw new Error(`${res.status}: ${text}`);
+    let message = res.statusText;
+    try {
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const json = await res.json();
+        message = json.message || json.error || JSON.stringify(json);
+      } else {
+        const text = await res.text();
+        // If it looks like HTML (e.g. Cloudflare 502 error page), show a friendly message
+        if (text.startsWith("<!") || text.startsWith("<html") || text.includes("<!DOCTYPE")) {
+          message = res.status === 502
+            ? "Server is restarting — please try again in a moment"
+            : `Server error (${res.status})`;
+        } else {
+          message = text.substring(0, 200) || res.statusText;
+        }
+      }
+    } catch {
+      // If parsing fails, use statusText
+    }
+    throw new Error(`${res.status}: ${message}`);
   }
 }
 
