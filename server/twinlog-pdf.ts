@@ -1,6 +1,6 @@
 import PDFDocument from "pdfkit";
 import { createHash } from "crypto";
-import type { CompanyProfile, ComplianceResult, RequirementDetail, DocumentStatus } from "@shared/schema";
+import type { CompanyProfile, ComplianceResult, RequirementDetail, DocumentStatus, TradeEvent, SupplierUpload } from "@shared/schema";
 
 const FOREST_GREEN = "#1A3D2B";
 const CREAM = "#F2EDE4";
@@ -8,6 +8,7 @@ const GREY = "#888888";
 const RED = "#DC2626";
 const GREEN = "#1B7340";
 const AMBER = "#F39C12";
+const PURPLE = "#7C3AED";
 
 type DocStatuses = Record<number, DocumentStatus>;
 
@@ -17,6 +18,14 @@ function formatDate(d: Date): string {
     month: "long",
     year: "numeric",
   }) + ", " + d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" }) + " UTC";
+}
+
+function formatDateShort(d: Date): string {
+  return d.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }) + " " + d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
 }
 
 function statusDot(status: DocumentStatus): { color: string; label: string } {
@@ -51,6 +60,23 @@ function verdictLabel(v: string): string {
   return "HIGH RISK";
 }
 
+function eventLabel(eventType: string): { label: string; color: string } {
+  switch (eventType) {
+    case "compliance_check": return { label: "Compliance Check", color: FOREST_GREEN };
+    case "supplier_link_created": return { label: "Supplier Link Created", color: FOREST_GREEN };
+    case "supplier_doc_uploaded": return { label: "Document Uploaded", color: GREEN };
+    case "supplier_submission_complete": return { label: "Supplier Submission Complete", color: GREEN };
+    case "buyer_doc_uploaded": return { label: "Document Uploaded (Buyer)", color: PURPLE };
+    case "status_change": return { label: "Status Changed", color: "#555" };
+    case "doc_verified": return { label: "Document Verified", color: GREEN };
+    case "doc_flagged": return { label: "Document Flagged", color: RED };
+    case "doc_ai_scanned": return { label: "AI Document Scan", color: PURPLE };
+    case "twinlog_generated": return { label: "TwinLog Generated", color: FOREST_GREEN };
+    case "lc_check": return { label: "LC Check", color: FOREST_GREEN };
+    default: return { label: eventType.replace(/_/g, " "), color: "#555" };
+  }
+}
+
 function drawHr(doc: PDFKit.PDFDocument, y: number): number {
   doc.save();
   doc.moveTo(50, y).lineTo(545, y).strokeColor("#D0D0D0").lineWidth(0.5).stroke();
@@ -79,16 +105,24 @@ function drawField(
   const valueWidth = 375;
   const color = opts?.valueColor ?? "#333";
 
-  // Draw label
   doc.font("Helvetica-Bold").fontSize(fs).fillColor("#333");
   doc.text(label + ":", labelX, y);
 
-  // Measure value height (may wrap)
   doc.font("Helvetica").fontSize(fs).fillColor(color);
   const valH = doc.heightOfString(value, { width: valueWidth });
   doc.text(value, valueX, y, { width: valueWidth });
 
   return y + Math.max(fs + 4, valH) + 4;
+}
+
+/** Check if we need a new page, add one if so. Returns current y. */
+function checkPage(doc: PDFKit.PDFDocument, y: number, needed: number, ref: string, companyName: string): number {
+  if (y + needed > 740) {
+    pageFooter(doc, ref, companyName);
+    doc.addPage();
+    return 50;
+  }
+  return y;
 }
 
 export function generateTwinlogPdf(
@@ -98,6 +132,9 @@ export function generateTwinlogPdf(
   integrityHash: string | null,
   reference: string,
   lookupTimestamp: string,
+  auditTrail: TradeEvent[] = [],
+  supplierUploads: SupplierUpload[] = [],
+  chainValid: boolean = true,
 ): { stream: PDFKit.PDFDocument; hashPromise: Promise<string> } {
   const doc = new PDFDocument({ size: "A4", margin: 50, bufferPages: true });
   const now = new Date();
@@ -111,11 +148,9 @@ export function generateTwinlogPdf(
 
   // ── PAGE 1 -- Cover ──────────────────────────────────────────────
 
-  // Brand mark
   doc.fontSize(10).fillColor(FOREST_GREEN).font("Helvetica-Bold")
     .text("TapTrao", 50, 55);
 
-  // Main title
   doc.fontSize(26).fillColor(FOREST_GREEN).font("Helvetica-Bold")
     .text("TWINLOG TRAIL", 50, 120);
   doc.fontSize(13).fillColor(GREY).font("Helvetica")
@@ -123,7 +158,6 @@ export function generateTwinlogPdf(
 
   let y = drawHr(doc, 180);
 
-  // Trade details
   y = drawField(doc, "Commodity", `${result.commodity.name}  (HS ${result.commodity.hsCode})`, y);
   y = drawField(doc, "Origin", `${result.origin.countryName} (${result.origin.iso2})`, y);
   y = drawField(doc, "Destination", `${result.destination.countryName} (${result.destination.iso2})`, y);
@@ -131,7 +165,6 @@ export function generateTwinlogPdf(
 
   y = drawHr(doc, y + 6);
 
-  // Company details
   y = drawField(doc, "Prepared by", profile.companyName, y);
   y = drawField(doc, "Address", profile.registeredAddress, y);
   y = drawField(doc, "EORI", profile.eoriNumber || "NOT PROVIDED", y, {
@@ -163,7 +196,6 @@ export function generateTwinlogPdf(
   const factors = rs.factors;
 
   y = 85;
-  // Table header
   doc.fontSize(8).fillColor(GREY).font("Helvetica-Bold");
   doc.text("Factor", 50, y, { width: 180 });
   doc.text("Penalty", 235, y, { width: 50, align: "right" });
@@ -196,7 +228,6 @@ export function generateTwinlogPdf(
   doc.text(String(factors.total_penalty), 235, y, { width: 50, align: "right" });
   y += 28;
 
-  // Score display
   doc.fontSize(12).fillColor(FOREST_GREEN).font("Helvetica-Bold");
   doc.text(`TwinLog Score: ${rs.score} / 100`, 50, y);
   y += 16;
@@ -205,7 +236,6 @@ export function generateTwinlogPdf(
   doc.text(verdictLabel(rs.verdict), 50, y);
   y += 28;
 
-  // Summary box
   const summaryHeight = doc.heightOfString(rs.summary, { width: 475, font: "Helvetica-Oblique", fontSize: 9 }) + 20;
   doc.roundedRect(50, y, 495, summaryHeight, 4).fillAndStroke(CREAM, "#D0D0D0");
   doc.fillColor("#333").fontSize(9).font("Helvetica-Oblique")
@@ -239,16 +269,16 @@ export function generateTwinlogPdf(
     if (st !== "PENDING") importerReady++;
     const s = statusDot(st);
 
-    // Calculate row height based on longest text
     const titleH = doc.heightOfString(rq.title, { width: 190 });
     const rowH = Math.max(titleH, 14) + 6;
 
-    doc.fillColor("#333").text(rq.title, 50, y, { width: 190 });
+    y = checkPage(doc, y, rowH, reference, profile.companyName);
+    doc.fillColor("#333").font("Helvetica").fontSize(9);
+    doc.text(rq.title, 50, y, { width: 190 });
     doc.text(ownerName(rq.owner), 245, y, { width: 65 });
     doc.text(dueName(rq.due_by), 315, y, { width: 95 });
     doc.fillColor(s.color).text(`* ${s.label}`, 420, y, { width: 125 });
     y += rowH;
-    if (y > 720) { doc.addPage(); y = 50; pageFooter(doc, reference, profile.companyName); }
   }
 
   y += 12;
@@ -282,17 +312,17 @@ export function generateTwinlogPdf(
     if (st !== "PENDING") supplierReady++;
     const s = statusDot(st);
 
-    // Calculate row height based on longest wrapping text
     const titleH = doc.heightOfString(rq.title, { width: 165 });
     const issuerH = doc.heightOfString(rq.issuedBy, { width: 130 });
     const rowH = Math.max(titleH, issuerH, 14) + 6;
 
-    doc.fillColor("#333").text(rq.title, 50, y, { width: 165 });
+    y = checkPage(doc, y, rowH, reference, profile.companyName);
+    doc.fillColor("#333").font("Helvetica").fontSize(9);
+    doc.text(rq.title, 50, y, { width: 165 });
     doc.text(rq.issuedBy, 220, y, { width: 130 });
     doc.text(dueName(rq.due_by), 355, y, { width: 80 });
     doc.fillColor(s.color).text(`* ${s.label}`, 440, y, { width: 105 });
     y += rowH;
-    if (y > 720) { doc.addPage(); y = 50; pageFooter(doc, reference, profile.companyName); }
   }
 
   y += 12;
@@ -301,7 +331,78 @@ export function generateTwinlogPdf(
 
   pageFooter(doc, reference, profile.companyName);
 
-  // ── PAGE 5 -- Regulatory Overlays & Risk Flags ───────────────────
+  // ── PAGE 5 -- Supplier Documents Received ────────────────────────
+
+  if (supplierUploads.length > 0) {
+    doc.addPage();
+    doc.fontSize(14).fillColor(FOREST_GREEN).font("Helvetica-Bold").text("SUPPLIER DOCUMENTS RECEIVED", 50, 50);
+    doc.fontSize(9).fillColor(GREY).font("Helvetica")
+      .text(`${supplierUploads.length} document(s) uploaded to this trade.`, 50, 70);
+
+    y = 100;
+    doc.fontSize(8).fillColor(GREY).font("Helvetica-Bold");
+    doc.text("Document Type", 50, y, { width: 130 });
+    doc.text("Filename", 185, y, { width: 165 });
+    doc.text("Source", 355, y, { width: 55 });
+    doc.text("Verified", 415, y, { width: 55 });
+    doc.text("Finding", 475, y, { width: 70 });
+    y += 16;
+    y = drawHr(doc, y);
+
+    doc.fontSize(8).font("Helvetica");
+    for (const upload of supplierUploads) {
+      const titleH = doc.heightOfString(upload.docType, { width: 130 });
+      const fnH = doc.heightOfString(upload.originalFilename, { width: 165 });
+      const rowH = Math.max(titleH, fnH, 12) + 6;
+
+      y = checkPage(doc, y, rowH, reference, profile.companyName);
+
+      doc.fillColor("#333").text(upload.docType, 50, y, { width: 130 });
+      doc.fillColor("#555").text(upload.originalFilename, 185, y, { width: 165 });
+
+      const source = upload.uploadedBy === "buyer" ? "Buyer" : "Supplier";
+      doc.fillColor(upload.uploadedBy === "buyer" ? PURPLE : "#333").text(source, 355, y, { width: 55 });
+
+      if (upload.verified === true) {
+        doc.fillColor(GREEN).text("Yes", 415, y, { width: 55 });
+      } else if (upload.verified === false && upload.finding) {
+        doc.fillColor(RED).text("Flagged", 415, y, { width: 55 });
+      } else {
+        doc.fillColor(GREY).text("Pending", 415, y, { width: 55 });
+      }
+
+      doc.fillColor("#555").text(upload.finding || "-", 475, y, { width: 70 });
+      y += rowH;
+    }
+
+    // Show flagged findings in detail
+    const flagged = supplierUploads.filter(u => u.verified === false && u.finding);
+    if (flagged.length > 0) {
+      y += 12;
+      y = checkPage(doc, y, 40, reference, profile.companyName);
+      doc.fontSize(10).fillColor(RED).font("Helvetica-Bold").text("FLAGGED DOCUMENTS", 50, y);
+      y += 18;
+
+      for (const f of flagged) {
+        y = checkPage(doc, y, 40, reference, profile.companyName);
+        doc.fontSize(9).fillColor("#333").font("Helvetica-Bold");
+        doc.text(f.docType, 50, y);
+        y += 14;
+        doc.fontSize(8).fillColor(RED).font("Helvetica");
+        doc.text(`Finding: ${f.finding}`, 70, y, { width: 475 });
+        y += 12;
+        if (f.ucpRule) {
+          doc.fillColor("#555").text(`UCP Rule: ${f.ucpRule}`, 70, y, { width: 475 });
+          y += 12;
+        }
+        y += 6;
+      }
+    }
+
+    pageFooter(doc, reference, profile.companyName);
+  }
+
+  // ── PAGE 6 -- Regulatory Overlays & Risk Flags ───────────────────
 
   doc.addPage();
 
@@ -374,7 +475,109 @@ export function generateTwinlogPdf(
 
   pageFooter(doc, reference, profile.companyName);
 
-  // ── PAGE 6 -- Audit Record ───────────────────────────────────────
+  // ── TRADE EVENT TIMELINE ─────────────────────────────────────────
+
+  if (auditTrail.length > 0) {
+    doc.addPage();
+    doc.fontSize(14).fillColor(FOREST_GREEN).font("Helvetica-Bold").text("TRADE EVENT TIMELINE", 50, 50);
+    doc.fontSize(9).fillColor(GREY).font("Helvetica")
+      .text(`${auditTrail.length} event(s) recorded  |  Hash chain: ${chainValid ? "VALID" : "BROKEN"}`, 50, 70);
+
+    y = 100;
+
+    // Table header
+    doc.fontSize(7).fillColor(GREY).font("Helvetica-Bold");
+    doc.text("#", 50, y, { width: 20 });
+    doc.text("Timestamp", 70, y, { width: 100 });
+    doc.text("Event", 175, y, { width: 120 });
+    doc.text("Details", 300, y, { width: 150 });
+    doc.text("Hash", 455, y, { width: 90 });
+    y += 14;
+    y = drawHr(doc, y);
+
+    for (let i = 0; i < auditTrail.length; i++) {
+      const ev = auditTrail[i];
+      const evInfo = eventLabel(ev.eventType);
+      const evData = ev.eventData as Record<string, any>;
+
+      // Build a detail string from event data
+      let detail = "";
+      if (ev.eventType === "status_change") {
+        detail = `${evData.from || "?"} >> ${evData.to || "?"}`;
+      } else if (ev.eventType === "supplier_doc_uploaded" || ev.eventType === "buyer_doc_uploaded") {
+        detail = evData.docType || evData.filename || "";
+      } else if (ev.eventType === "doc_verified" || ev.eventType === "doc_flagged") {
+        detail = evData.docType || "";
+        if (evData.finding) detail += `: ${evData.finding}`.substring(0, 50);
+      } else if (ev.eventType === "twinlog_generated") {
+        detail = evData.ref || "";
+      } else if (ev.eventType === "compliance_check") {
+        detail = evData.corridor || evData.ref || "";
+      } else if (ev.eventType === "doc_ai_scanned") {
+        detail = `${evData.docType || ""} (${evData.confidence || ""})`;
+      } else {
+        // Generic: show first key-value
+        const keys = Object.keys(evData);
+        if (keys.length > 0) {
+          const firstVal = String(evData[keys[0]]);
+          detail = firstVal.length > 40 ? firstVal.substring(0, 40) + "..." : firstVal;
+        }
+      }
+
+      const hashShort = ev.eventHash.substring(0, 8);
+      const ts = ev.createdAt ? formatDateShort(new Date(ev.createdAt)) : "-";
+
+      // Calculate row height
+      const detailH = doc.fontSize(7).font("Helvetica").heightOfString(detail, { width: 150 });
+      const rowH = Math.max(detailH, 12) + 5;
+
+      y = checkPage(doc, y, rowH, reference, profile.companyName);
+      if (y === 50) {
+        // Re-draw header on new page
+        doc.fontSize(7).fillColor(GREY).font("Helvetica-Bold");
+        doc.text("#", 50, y, { width: 20 });
+        doc.text("Timestamp", 70, y, { width: 100 });
+        doc.text("Event", 175, y, { width: 120 });
+        doc.text("Details", 300, y, { width: 150 });
+        doc.text("Hash", 455, y, { width: 90 });
+        y += 14;
+        y = drawHr(doc, y);
+      }
+
+      // Row number
+      doc.fontSize(7).fillColor(GREY).font("Helvetica");
+      doc.text(String(i + 1), 50, y, { width: 20 });
+
+      // Timestamp
+      doc.fillColor("#555").text(ts, 70, y, { width: 100 });
+
+      // Event type (colored)
+      doc.fillColor(evInfo.color).font("Helvetica-Bold").text(evInfo.label, 175, y, { width: 120 });
+
+      // Details
+      doc.fillColor("#333").font("Helvetica").text(detail, 300, y, { width: 150 });
+
+      // Hash (monospace-style, shortened)
+      doc.fillColor(GREY).text(hashShort, 455, y, { width: 90 });
+
+      y += rowH;
+    }
+
+    // Chain integrity note
+    y += 12;
+    y = checkPage(doc, y, 30, reference, profile.companyName);
+    if (chainValid) {
+      doc.fontSize(8).fillColor(GREEN).font("Helvetica-Bold")
+        .text(`Hash chain integrity: VERIFIED (${auditTrail.length} events)`, 50, y);
+    } else {
+      doc.fontSize(8).fillColor(RED).font("Helvetica-Bold")
+        .text("WARNING: Hash chain integrity check FAILED -- possible tampering detected", 50, y);
+    }
+
+    pageFooter(doc, reference, profile.companyName);
+  }
+
+  // ── AUDIT RECORD (final page) ────────────────────────────────────
 
   doc.addPage();
   doc.fontSize(14).fillColor(FOREST_GREEN).font("Helvetica-Bold").text("AUDIT RECORD", 50, 50);
@@ -400,6 +603,8 @@ export function generateTwinlogPdf(
     ["Integrity hash (SHA-256)", integrityHash ? `sha256:${integrityHash}` : "N/A"],
     ["Lookup timestamp", lookupTimestamp],
     ["PDF generated", now.toISOString()],
+    ["Audit trail events", `${auditTrail.length} event(s) recorded`],
+    ["Hash chain integrity", chainValid ? "VERIFIED" : "FAILED"],
   ];
 
   for (const [label, val] of auditRows) {

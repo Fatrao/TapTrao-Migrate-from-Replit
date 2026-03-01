@@ -1565,6 +1565,22 @@ export async function registerRoutes(
       const dateStr = new Date().toISOString().split("T")[0];
       const filename = `TwinLog-Trail_${commoditySlug}_${result.origin.iso2}-${result.destination.iso2}_${dateStr}.pdf`;
 
+      // Fetch audit trail and supplier data for the PDF
+      let auditTrail: import("@shared/schema").TradeEvent[] = [];
+      let supplierUploads: import("@shared/schema").SupplierUpload[] = [];
+      let chainValid = true;
+
+      if (resolvedLookupId) {
+        auditTrail = await getTradeAuditChain(resolvedLookupId);
+        const chainResult = await verifyAuditChain(resolvedLookupId);
+        chainValid = chainResult.valid;
+
+        const supplierReq = await storage.getSupplierRequestByLookupId(resolvedLookupId);
+        if (supplierReq) {
+          supplierUploads = await storage.getSupplierUploadsByRequestId(supplierReq.id);
+        }
+      }
+
       const { stream, hashPromise } = generateTwinlogPdf(
         result,
         profile,
@@ -1572,6 +1588,9 @@ export async function registerRoutes(
         integrityHash,
         reference,
         lookupTimestamp,
+        auditTrail,
+        supplierUploads,
+        chainValid,
       );
 
       res.setHeader("Content-Type", "application/pdf");
