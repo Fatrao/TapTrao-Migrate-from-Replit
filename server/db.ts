@@ -14,12 +14,37 @@ if (process.env.DATABASE_URL) {
 }
 
 /**
+ * Run incremental column migrations that are safe (IF NOT EXISTS).
+ * Works for both production (pg Pool) and local (PGlite).
+ */
+async function runIncrementalMigrations(queryFn: (sql: string) => Promise<any>): Promise<void> {
+  const columnMigrations = [
+    `ALTER TABLE "lookups" ADD COLUMN IF NOT EXISTS "trade_value" text`,
+    `ALTER TABLE "lookups" ADD COLUMN IF NOT EXISTS "trade_value_currency" varchar(3) DEFAULT 'USD'`,
+  ];
+  for (const stmt of columnMigrations) {
+    try {
+      await queryFn(stmt);
+    } catch (e: any) {
+      if (!e.message?.includes("already exists")) {
+        console.warn(`⚠ Column migration warning: ${e.message?.substring(0, 120)}`);
+      }
+    }
+  }
+}
+
+/**
  * Initialize PGlite for local development (no DATABASE_URL needed).
  * Must be called and awaited before any database access.
- * No-op if DATABASE_URL is set (production mode).
+ * In production (DATABASE_URL set), only runs incremental migrations.
  */
 export async function initLocalDb(): Promise<void> {
-  if (db) return; // Already initialized (production or previous call)
+  if (db && pool) {
+    // Production: run incremental migrations on the real database
+    await runIncrementalMigrations((sql) => pool.query(sql));
+    return;
+  }
+  if (db) return; // Already initialized by a previous call
 
   console.log("⚡ No DATABASE_URL — using embedded PGlite for local development");
   const { PGlite } = await import("@electric-sql/pglite");
@@ -61,19 +86,7 @@ export async function initLocalDb(): Promise<void> {
   }
 
   // Incremental column migrations for existing databases
-  const columnMigrations = [
-    `ALTER TABLE "lookups" ADD COLUMN IF NOT EXISTS "trade_value" text`,
-    `ALTER TABLE "lookups" ADD COLUMN IF NOT EXISTS "trade_value_currency" varchar(3) DEFAULT 'USD'`,
-  ];
-  for (const stmt of columnMigrations) {
-    try {
-      await client.query(stmt);
-    } catch (e: any) {
-      if (!e.message?.includes("already exists")) {
-        console.warn(`⚠ Column migration warning: ${e.message?.substring(0, 120)}`);
-      }
-    }
-  }
+  await runIncrementalMigrations((sql) => client.query(sql));
 }
 
 export { db, pool };
