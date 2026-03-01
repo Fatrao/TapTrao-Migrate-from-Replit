@@ -364,7 +364,8 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const { balance, lcBalance, freeLookupUsed } = await storage.getTokenBalance(sessionId);
       const isAdmin = await storage.isAdminSession(sessionId);
-      res.json({ balance, lcBalance, freeLookupUsed, isAdmin });
+      const hasPurchased = await storage.hasPurchased(sessionId);
+      res.json({ balance, lcBalance, freeLookupUsed, isAdmin, hasPurchased });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -3207,6 +3208,61 @@ Rules:
       const ok = await storage.deactivateApiKey(req.params.id, sessionId);
       if (!ok) { res.status(404).json({ message: "API key not found" }); return; }
       res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  /* ── Feature Requests ── */
+  app.post("/api/feature-requests", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const hasPurchased = await storage.hasPurchased(sessionId);
+      if (!hasPurchased) {
+        return res.status(403).json({ message: "Feature requests are available to paying customers" });
+      }
+      const { title, description } = req.body;
+      if (!title || typeof title !== "string" || title.trim().length < 3) {
+        return res.status(400).json({ message: "Title must be at least 3 characters" });
+      }
+      const request = await storage.createFeatureRequest(sessionId, title.trim(), description?.trim());
+      res.json(request);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/feature-requests/mine", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const requests = await storage.getFeatureRequestsBySession(sessionId);
+      res.json(requests);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/admin/feature-requests", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const isAdmin = await storage.isAdminSession(sessionId);
+      if (!isAdmin) return res.status(403).json({ message: "Admin only" });
+      const requests = await storage.getFeatureRequests();
+      res.json(requests);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.patch("/api/admin/feature-requests/:id", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const isAdmin = await storage.isAdminSession(sessionId);
+      if (!isAdmin) return res.status(403).json({ message: "Admin only" });
+      const { status, adminNote } = req.body;
+      const updated = await storage.updateFeatureRequestStatus(req.params.id, status, adminNote);
+      if (!updated) return res.status(404).json({ message: "Not found" });
+      res.json(updated);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

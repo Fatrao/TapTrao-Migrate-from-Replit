@@ -22,6 +22,7 @@ import {
   alertReads,
   users,
   passwordResetTokens,
+  featureRequests,
   type Destination,
   type RegionalFramework,
   type OriginCountry,
@@ -65,6 +66,7 @@ import {
   type TradeStatus,
   type TradeEvent,
   tradeEvents,
+  type FeatureRequest,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -201,6 +203,13 @@ export interface IStorage {
   updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string; tradeValue?: string; tradeValueCurrency?: string }, sessionId: string): Promise<Lookup | undefined>;
   // Trade detail (unified view)
   getTradeDetail(lookupId: string, sessionId: string): Promise<TradeDetail | null>;
+  // Feature requests
+  createFeatureRequest(sessionId: string, title: string, description?: string): Promise<FeatureRequest>;
+  getFeatureRequests(): Promise<FeatureRequest[]>;
+  getFeatureRequestsBySession(sessionId: string): Promise<FeatureRequest[]>;
+  updateFeatureRequestStatus(id: string, status: string, adminNote?: string): Promise<FeatureRequest | undefined>;
+  // Paying customer check
+  hasPurchased(sessionId: string): Promise<boolean>;
 }
 
 export type EnrichedTrade = {
@@ -1302,6 +1311,44 @@ export class DatabaseStorage implements IStorage {
       auditTrail,
       chainValid,
     };
+  }
+
+  /* ── Feature Requests ── */
+  async createFeatureRequest(sessionId: string, title: string, description?: string): Promise<FeatureRequest> {
+    const [request] = await db.insert(featureRequests).values({
+      sessionId,
+      title,
+      description: description || null,
+    }).returning();
+    return request;
+  }
+
+  async getFeatureRequests(): Promise<FeatureRequest[]> {
+    return db.select().from(featureRequests).orderBy(desc(featureRequests.createdAt));
+  }
+
+  async getFeatureRequestsBySession(sessionId: string): Promise<FeatureRequest[]> {
+    return db.select().from(featureRequests)
+      .where(eq(featureRequests.sessionId, sessionId))
+      .orderBy(desc(featureRequests.createdAt));
+  }
+
+  async updateFeatureRequestStatus(id: string, status: string, adminNote?: string): Promise<FeatureRequest | undefined> {
+    const updates: any = { status };
+    if (adminNote !== undefined) updates.adminNote = adminNote;
+    const [updated] = await db.update(featureRequests).set(updates)
+      .where(eq(featureRequests.id, id)).returning();
+    return updated;
+  }
+
+  async hasPurchased(sessionId: string): Promise<boolean> {
+    const [result] = await db.select({ count: sql<number>`count(*)` })
+      .from(tokenTransactions)
+      .where(and(
+        eq(tokenTransactions.sessionId, sessionId),
+        eq(tokenTransactions.type, "PURCHASE"),
+      ));
+    return (result?.count ?? 0) > 0;
   }
 }
 

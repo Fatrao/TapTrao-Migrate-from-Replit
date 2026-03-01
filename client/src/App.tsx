@@ -26,6 +26,7 @@ import AdminAlertsPage from "@/pages/admin-alerts";
 import AdminLogin from "@/pages/admin-login";
 import AdminPromoCodes from "@/pages/admin-promo-codes";
 import AdminApiKeys from "@/pages/admin-api-keys";
+import AdminFeatureRequests from "@/pages/admin-feature-requests";
 import EudrPage from "@/pages/eudr";
 import DemurragePage from "@/pages/demurrage";
 import Login from "@/pages/login";
@@ -70,6 +71,7 @@ function Router() {
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/promo-codes">{() => <AuthGuard><AdminPromoCodes /></AuthGuard>}</Route>
       <Route path="/admin/api-keys">{() => <AuthGuard><AdminApiKeys /></AuthGuard>}</Route>
+      <Route path="/admin/feature-requests">{() => <AuthGuard><AdminFeatureRequests /></AuthGuard>}</Route>
 
       <Route component={NotFound} />
     </Switch>

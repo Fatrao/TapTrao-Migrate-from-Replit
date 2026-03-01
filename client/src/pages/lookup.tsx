@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link, useLocation, useSearch } from "wouter";
+import { estimateDemurrageRange } from "@/lib/demurrage-utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -1208,13 +1209,61 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         </div>
       )}
 
-      <div style={{ textAlign: "right", margin: "4px 0 8px" }}>
-        <Link href="/demurrage" data-testid="link-demurrage-calculator">
-          <span style={{ fontSize: 11, color: "var(--blue)", cursor: "pointer", fontWeight: 600 }}>
-            Demurrage Calculator →
-          </span>
-        </Link>
-      </div>
+      {/* Demurrage Exposure Estimate */}
+      {(() => {
+        const estimate = estimateDemurrageRange(
+          result.destination.iso2,
+          result.readinessScore?.verdict || "AMBER",
+        );
+        if (!estimate) return (
+          <div style={{ textAlign: "right", margin: "4px 0 8px" }}>
+            <Link href="/demurrage" data-testid="link-demurrage-calculator">
+              <span style={{ fontSize: 11, color: "var(--blue)", cursor: "pointer", fontWeight: 600 }}>
+                Demurrage Calculator →
+              </span>
+            </Link>
+          </div>
+        );
+        const verdictColor = result.readinessScore?.verdict === "RED" ? "#ef4444"
+          : result.readinessScore?.verdict === "AMBER" ? "#d97706" : "#16a34a";
+        return (
+          <div
+            data-testid="demurrage-estimate-card"
+            style={{
+              background: "rgba(107,144,128,0.06)",
+              border: "1px solid rgba(107,144,128,0.18)",
+              borderRadius: 10,
+              padding: "12px 16px",
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 10,
+              marginBottom: 4,
+            }}
+          >
+            <span style={{ fontSize: 18, marginTop: 1 }}>⚓</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "#6b9080", margin: 0 }}>
+                Estimated Port Demurrage
+              </p>
+              <p style={{ fontSize: 12, color: "#555", margin: "4px 0 0", lineHeight: 1.6 }}>
+                At <strong>{estimate.port.label}</strong>
+                {estimate.allPorts.length > 1 && (
+                  <span style={{ color: "#888", fontSize: 11 }}> (+ {estimate.allPorts.length - 1} more port{estimate.allPorts.length > 2 ? "s" : ""})</span>
+                )}
+                , if clearance is delayed by{" "}
+                <span style={{ color: verdictColor, fontWeight: 600 }}>{estimate.delayLabel}</span>{" "}
+                (based on your readiness score), a standard 20ft container could cost{" "}
+                <strong style={{ color: "#1a1a1a" }}>${estimate.minCost.toLocaleString()} – ${estimate.maxCost.toLocaleString()}</strong>.
+              </p>
+              <Link href="/demurrage">
+                <span style={{ fontSize: 11, color: "#6b9080", cursor: "pointer", fontWeight: 600, marginTop: 4, display: "inline-block" }}>
+                  Open full calculator ({estimate.allPorts.length} port{estimate.allPorts.length !== 1 ? "s" : ""}) →
+                </span>
+              </Link>
+            </div>
+          </div>
+        );
+      })()}
 
       {result.triggers.eudr && ["EU", "GB", "CH"].includes(result.destination.iso2) && (
         <EudrAlertBlock lookupId={(result as any).lookupId} result={result} />

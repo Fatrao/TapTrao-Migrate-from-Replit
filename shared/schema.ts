@@ -856,3 +856,34 @@ export type TradeEvent = typeof tradeEvents.$inferSelect;
 export type InsertTradeEvent = typeof tradeEvents.$inferInsert;
 
 export type TradeStatus = "active" | "in_transit" | "arrived" | "cleared" | "closed" | "archived";
+
+/* ── Feature Requests (Roadmap) ── */
+export const featureRequests = pgTable(
+  "feature_requests",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sessionId: text("session_id").notNull(),
+    title: text("title").notNull(),
+    description: text("description"),
+    status: text("status").notNull().default("new"), // new | reviewed | planned | shipped
+    adminNote: text("admin_note"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("feature_requests_session_idx").on(table.sessionId),
+  ]
+);
+
+export type FeatureRequest = typeof featureRequests.$inferSelect;
+
+export const insertFeatureRequestSchema = createInsertSchema(featureRequests).omit({
+  id: true,
+  status: true,
+  adminNote: true,
+  createdAt: true,
+});
+
+export const featureRequestFormSchema = z.object({
+  title: z.string().min(3, "Title must be at least 3 characters").max(120, "Title must be under 120 characters"),
+  description: z.string().max(1000, "Description must be under 1000 characters").optional(),
+});

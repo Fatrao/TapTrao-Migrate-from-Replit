@@ -30,6 +30,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
+import { estimateDemurrageRange } from "@/lib/demurrage-utils";
 
 /* ── Map common country/region names to ISO2 for flag display ── */
 const nameToIso2: Record<string, string> = {
@@ -1290,6 +1291,60 @@ export default function TradeDetail() {
                   )}
                 </CardContent>
               </Card>
+
+              {/* Demurrage Estimate */}
+              {(() => {
+                const destIso2 = nameToIso2[data.lookup.destinationName];
+                const verdict = data.lookup.readinessVerdict as "GREEN" | "AMBER" | "RED" | undefined;
+                const estimate = destIso2 ? estimateDemurrageRange(destIso2, verdict || "AMBER") : null;
+                if (!estimate) return null;
+                const tradeVal = data.lookup.tradeValue ? Number(data.lookup.tradeValue) : 0;
+                const pctOfCargo = tradeVal > 0 ? ((estimate.maxCost / tradeVal) * 100).toFixed(1) : null;
+                const verdictColor = verdict === "RED" ? "#ef4444" : verdict === "AMBER" ? "#eab308" : "#4ade80";
+                return (
+                  <Card>
+                    <CardContent className="p-5">
+                      <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: "0 0 12px", display: "flex", alignItems: "center", gap: 8 }}>
+                        <span>⚓</span> Demurrage Estimate
+                      </h3>
+                      <div style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6, marginBottom: 10 }}>
+                        <div style={{ marginBottom: 6 }}>
+                          <span style={{ color: "var(--t3)", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Port</span>
+                          <div style={{ fontWeight: 500, color: "var(--t1)" }}>
+                            {estimate.port.label}
+                            {estimate.allPorts.length > 1 && (
+                              <span style={{ color: "var(--t3)", fontSize: 11, fontWeight: 400 }}> (+ {estimate.allPorts.length - 1} more)</span>
+                            )}
+                          </div>
+                        </div>
+                        <div style={{ marginBottom: 6 }}>
+                          <span style={{ color: "var(--t3)", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Estimated delay</span>
+                          <div>
+                            <span style={{ color: verdictColor, fontWeight: 600 }}>{estimate.delayLabel}</span>
+                            <span style={{ color: "var(--t3)", fontSize: 11 }}> (based on {verdict || "AMBER"} readiness)</span>
+                          </div>
+                        </div>
+                        <div style={{ marginBottom: 6 }}>
+                          <span style={{ color: "var(--t3)", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Cost range (20ft)</span>
+                          <div style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 20, color: "#6b9080" }}>
+                            ${estimate.minCost.toLocaleString()} – ${estimate.maxCost.toLocaleString()}
+                          </div>
+                        </div>
+                        {pctOfCargo && (
+                          <div style={{ fontSize: 12, color: Number(pctOfCargo) > 5 ? "#ef4444" : "var(--t3)", marginTop: 2 }}>
+                            ≈ {pctOfCargo}% of cargo value
+                          </div>
+                        )}
+                      </div>
+                      <Link href="/demurrage">
+                        <span style={{ fontSize: 11, color: "#6b9080", cursor: "pointer", fontWeight: 600 }}>
+                          Open full calculator ({estimate.allPorts.length} port{estimate.allPorts.length !== 1 ? "s" : ""}) →
+                        </span>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                );
+              })()}
 
               <Card>
                 <CardContent className="p-5">

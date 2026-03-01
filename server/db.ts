@@ -21,6 +21,17 @@ async function runIncrementalMigrations(queryFn: (sql: string) => Promise<any>):
   const columnMigrations = [
     `ALTER TABLE "lookups" ADD COLUMN IF NOT EXISTS "trade_value" text`,
     `ALTER TABLE "lookups" ADD COLUMN IF NOT EXISTS "trade_value_currency" varchar(3) DEFAULT 'USD'`,
+    // Feature requests table
+    `CREATE TABLE IF NOT EXISTS "feature_requests" (
+      "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      "session_id" text NOT NULL,
+      "title" text NOT NULL,
+      "description" text,
+      "status" text NOT NULL DEFAULT 'new',
+      "admin_note" text,
+      "created_at" timestamp DEFAULT now() NOT NULL
+    )`,
+    `CREATE INDEX IF NOT EXISTS "feature_requests_session_idx" ON "feature_requests" ("session_id")`,
   ];
   for (const stmt of columnMigrations) {
     try {

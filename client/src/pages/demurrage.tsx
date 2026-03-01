@@ -1,59 +1,6 @@
 import { useState, useMemo } from "react";
 import { AppShell } from "@/components/AppShell";
-
-type ContainerType = "20ft" | "40ft" | "40hc" | "reefer";
-
-interface PortRate {
-  label: string;
-  rates: Record<ContainerType, number>;
-}
-
-const PORTS: PortRate[] = [
-  { label: "Felixstowe, UK", rates: { "20ft": 85, "40ft": 120, "40hc": 130, reefer: 180 } },
-  { label: "Southampton, UK", rates: { "20ft": 80, "40ft": 115, "40hc": 125, reefer: 170 } },
-  { label: "Rotterdam, Netherlands", rates: { "20ft": 75, "40ft": 105, "40hc": 115, reefer: 160 } },
-  { label: "Hamburg, Germany", rates: { "20ft": 78, "40ft": 108, "40hc": 118, reefer: 162 } },
-  { label: "Antwerp, Belgium", rates: { "20ft": 72, "40ft": 102, "40hc": 112, reefer: 155 } },
-  { label: "Abidjan, Cote d'Ivoire", rates: { "20ft": 45, "40ft": 65, "40hc": 70, reefer: 110 } },
-  { label: "Tema, Ghana", rates: { "20ft": 42, "40ft": 60, "40hc": 65, reefer: 105 } },
-  { label: "Lagos (Apapa), Nigeria", rates: { "20ft": 55, "40ft": 78, "40hc": 85, reefer: 130 } },
-  { label: "Mombasa, Kenya", rates: { "20ft": 40, "40ft": 58, "40hc": 62, reefer: 100 } },
-  { label: "Dar es Salaam, Tanzania", rates: { "20ft": 38, "40ft": 55, "40hc": 60, reefer: 95 } },
-  { label: "Durban, South Africa", rates: { "20ft": 50, "40ft": 70, "40hc": 76, reefer: 120 } },
-  { label: "Casablanca, Morocco", rates: { "20ft": 35, "40ft": 50, "40hc": 55, reefer: 90 } },
-];
-
-const CONTAINER_OPTIONS: { value: ContainerType; label: string }[] = [
-  { value: "20ft", label: "20ft standard" },
-  { value: "40ft", label: "40ft standard" },
-  { value: "40hc", label: "40ft high cube" },
-  { value: "reefer", label: "Reefer (refrigerated)" },
-];
-
-function computeDemurrage(baseRate: number, chargeableDays: number) {
-  if (chargeableDays <= 0) return { tiers: [], total: 0 };
-  const tiers: { label: string; days: number; rate: number; subtotal: number }[] = [];
-
-  const tier1Days = Math.min(chargeableDays, 7);
-  if (tier1Days > 0) {
-    tiers.push({ label: "Days 1-7", days: tier1Days, rate: baseRate, subtotal: tier1Days * baseRate });
-  }
-
-  const tier2Days = Math.min(Math.max(chargeableDays - 7, 0), 7);
-  if (tier2Days > 0) {
-    const r = baseRate * 1.5;
-    tiers.push({ label: "Days 8-14", days: tier2Days, rate: r, subtotal: tier2Days * r });
-  }
-
-  const tier3Days = Math.max(chargeableDays - 14, 0);
-  if (tier3Days > 0) {
-    const r = baseRate * 2;
-    tiers.push({ label: "Days 15+", days: tier3Days, rate: r, subtotal: tier3Days * r });
-  }
-
-  const total = tiers.reduce((s, t) => s + t.subtotal, 0);
-  return { tiers, total };
-}
+import { PORTS, CONTAINER_OPTIONS, computeDemurrage, type ContainerType } from "@/lib/demurrage-utils";
 
 const s = {
   page: { maxWidth: 960, margin: "0 auto", padding: "28px 20px" } as React.CSSProperties,
