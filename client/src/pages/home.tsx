@@ -520,7 +520,7 @@ export default function Home() {
   usePageTitle("TapTrao \u2014 Trade Compliance for Commodity Traders");
 
   return (
-    <div className="min-h-screen" style={{ background: C.gray50, fontFamily: "Nunito, sans-serif" }}>
+    <div className="hp-page min-h-screen" style={{ background: C.gray50, fontFamily: "Nunito, sans-serif" }}>
       {/* ═══ NAVIGATION ═══ */}
       <nav
         className="fixed top-0 left-0 right-0 z-50 border-b"

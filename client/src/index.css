@@ -1046,13 +1046,10 @@
 /* Page wrapper */
 .hp-page {
   min-height: 100vh;
-  background: var(--gable-deep);
-  color: var(--gray-nurse);
-  font-family: 'Inter', sans-serif;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  gap: 10px;
+  font-family: 'Nunito', sans-serif;
+  display: block;
+  padding: 0;
+  gap: 0;
   -webkit-font-smoothing: antialiased;
 }
 
