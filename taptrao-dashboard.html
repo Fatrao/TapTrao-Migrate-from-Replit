@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TapTrao — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #000;
+      color: #fff;
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+    /* ──────────────────────────────────────────
+       SIDEBAR
+    ────────────────────────────────────────── */
+    .sidebar {
+      width: 240px;
+      min-height: calc(100vh - 20px);
+      background: #242428;
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      border-radius: 18px;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      padding: 0 8px;
+    }
+    .sidebar-logo .logo-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0e4e45, #3a7d6a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Clash Display', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #fff;
+    }
+    .sidebar-logo span {
+      font-family: 'Clash Display', sans-serif;
+      font-weight: 600;
+      font-size: 17px;
+      color: #fff;
+    }
+
+    /* Token badge */
+    .token-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      margin: 0 4px 16px;
+      border-radius: 10px;
+      background: rgba(74,222,128,0.08);
+      border: 1px solid rgba(74,222,128,0.15);
+    }
+    .token-badge .hex {
+      font-size: 13px;
+      color: #4ade80;
+    }
+    .token-badge .count {
+      font-size: 12px;
+      font-weight: 600;
+      color: #4ade80;
+    }
+    .token-badge .buy-more {
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+      margin-left: auto;
+    }
+
+    /* Sidebar sections */
+    .sidebar-section { margin-bottom: 20px; }
+    .sidebar-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 6px;
+      padding-left: 10px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      border-left: 3px solid transparent;
+      margin-left: 0;
+    }
+    .sidebar-item:hover {
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.8);
+    }
+    .sidebar-item.active {
+      background: rgba(74,222,128,0.1);
+      color: #4ade80;
+      border-left-color: #4ade80;
+      padding-left: 7px;
+    }
+    .sidebar-item .icon {
+      font-size: 15px;
+      width: 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .sidebar-item .item-label { flex: 1; }
+    .sidebar-item .badge {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 10px;
+    }
+    .badge-red { background: #ef4444; color: #fff; }
+    .badge-green { background: #6b9080; color: #fff; }
+
+    .sidebar-spacer { flex: 1; }
+
+    /* Sidebar history */
+    .history-card {
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .history-card:hover { background: rgba(255,255,255,0.07); }
+    .history-card .title {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 5px;
+    }
+    .history-card .tags { display: flex; gap: 5px; }
+    .history-card .tag {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ──────────────────────────────────────────
+       MAIN BOX
+    ────────────────────────────────────────── */
+    .main-box {
+      border-radius: 18px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(180deg,
+        #1a1a1c 0%, #1c2420 3%, #1e2e28 6%, #1f3830 9%,
+        #214232 12%, #264a38 16%, #2c5540 20%, #356248 25%,
+        #3f7056 30%, #4a7e64 35%, #578d74 40%, #659b82 45%,
+        #74a890 50%, #85b49e 55%, #96bfab 60%, #a8cab8 65%,
+        #bbd5c6 70%, #cddfd3 75%, #dde8e1 80%, #eaf0ec 85%,
+        #f2f4f3 90%, #f5f5f5 95%
+      );
+      min-height: calc(100vh - 20px);
+    }
+
+    /* ── Top nav ── */
+    .top-nav {
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .top-nav-links {
+      display: flex;
+      gap: 26px;
+    }
+    .top-nav-links a {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      font-weight: 400;
+      transition: color 0.15s;
+    }
+    .top-nav-links a:hover { color: rgba(255,255,255,0.8); }
+    .top-nav-links a.active { color: #fff; font-weight: 600; }
+
+    .top-nav-icons {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .icon-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      cursor: pointer;
+      position: relative;
+    }
+    .icon-btn .dot {
+      position: absolute;
+      top: 1px;
+      right: 1px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ef4444;
+    }
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #3b82f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ── Green hero ── */
+    .green-hero {
+      margin: 4px 24px 16px;
+      padding: 28px 32px;
+      background: linear-gradient(135deg, #0e4e45, #14574a, #1c6352, #327462, #3a7d6a);
+      border-radius: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .green-hero::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: radial-gradient(ellipse at 80% 20%, rgba(74,222,128,0.06), transparent 60%);
+      pointer-events: none;
+    }
+
+    .welcome-pill {
+      display: inline-block;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.08);
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .hero-stats {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .hero-stats strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-sage {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      background: #6b9080;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-sage:hover { background: #5a7a6b; }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-ghost:hover {
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* ── Tab bar ── */
+    .tab-bar {
+      display: flex;
+      gap: 4px;
+      margin: 0 24px 16px;
+    }
+    .tab-bar .tab {
+      padding: 7px 16px;
+      font-size: 12.5px;
+      font-weight: 500;
+      border-radius: 8px;
+      color: rgba(255,255,255,0.45);
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      background: transparent;
+    }
+    .tab-bar .tab:hover {
+      color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.05);
+    }
+    .tab-bar .tab.active {
+      background: #6b9080;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* ── Stat cards row ── */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 0 24px 20px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .stat-card .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 10px;
+    }
+    .stat-card .stat-value {
+      font-family: 'Clash Display', sans-serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .stat-card .stat-sub {
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* ── Two-column layout ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 16px;
+      margin: 0 24px 20px;
+    }
+
+    /* ── Recent trades panel ── */
+    .panel {
+      background: #fff;
+      border-radius: 14px;
+      padding: 22px 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .panel-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a1a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-title .count-badge {
+      font-size: 11px;
+      font-weight: 600;
+      background: #6b9080;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .panel-link {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #6b9080;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .panel-link:hover { text-decoration: underline; }
+
+    /* Trades table */
+    .trades-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .trades-table th {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #999;
+      text-align: left;
+      padding: 0 0 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .trades-table td {
+      padding: 12px 0;
+      font-size: 13px;
+      color: #1a1a1a;
+      border-bottom: 1px solid #f5f5f5;
+      vertical-align: middle;
+    }
+    .trades-table tr:last-child td { border-bottom: none; }
+
+    .commodity-cell .commodity-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+    }
+    .commodity-cell .hs-code {
+      font-size: 11px;
+      color: #999;
+    }
+    .corridor-cell {
+      font-size: 12.5px;
+      color: #555;
+    }
+    .corridor-cell .flags {
+      font-size: 13px;
+    }
+    .corridor-cell .date {
+      display: block;
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 2px;
+    }
+    .value-cell {
+      font-size: 13px;
+      color: #aaa;
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+    }
+    .status-pending {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    .status-compliant {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+    .status-review {
+      background: #fee2e2;
+      color: #ef4444;
+    }
+
+    .action-link {
+      font-size: 12px;
+      font-weight: 500;
+      color: #6b9080;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .action-link:hover { text-decoration: underline; }
+
+    /* ── Docs panel ── */
+    .doc-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .doc-item:last-child { border-bottom: none; }
+
+    .doc-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .doc-icon.warning { background: #fef3c7; }
+    .doc-icon.success { background: #dcfce7; }
+
+    .doc-info { flex: 1; min-width: 0; }
+    .doc-info .doc-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+    }
+    .doc-info .doc-sub {
+      font-size: 11.5px;
+      color: #888;
+    }
+    .doc-badge {
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .doc-badge.warn {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    .doc-badge.ok {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+    .doc-badge.progress {
+      background: #ede9fe;
+      color: #7c3aed;
+    }
+
+    .more-docs {
+      font-size: 12px;
+      color: #888;
+      padding-top: 10px;
+    }
+
+    /* ── Ghana origin card ── */
+    .origin-card {
+      margin: 0 24px 24px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      max-width: 340px;
+    }
+    .origin-flag {
+      font-size: 28px;
+    }
+    .origin-info .origin-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+    }
+    .origin-info .origin-sub {
+      font-size: 12px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════ SIDEBAR ════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-circle">T</div>
+      <span>TapTrao</span>
+    </div>
+
+    <!-- Token badge -->
+    <div class="token-badge">
+      <span class="hex">&#x2B22;</span>
+      <span class="count">2 checks</span>
+      <span class="buy-more">Buy More</span>
+    </div>
+
+    <!-- MAIN -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">Main</div>
+      <div class="sidebar-item active">
+        <span class="icon">&#x229E;</span>
+        <span class="item-label">Dashboard</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">&#x2726;</span>
+        <span class="item-label">New Check</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">&#x25C9;</span>
+        <span class="item-label">My Trades</span>
+        <span class="badge badge-green">5</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">&#x1F4EC;</span>
+        <span class="item-label">Suppliers</span>
+      </div>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">Tools</div>
+      <div class="sidebar-item">
+        <span class="icon">&#x29D6;</span>
+        <span class="item-label">Demurrage Calc</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">&#x1F4CB;</span>
+        <span class="item-label">Templates</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">&#x1F514;</span>
+        <span class="item-label">Alerts</span>
+        <span class="badge badge-red">2</span>
+      </div>
+    </div>
+
+    <!-- ACCOUNT -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">Account</div>
+      <div class="sidebar-item">
+        <span class="icon">&#x25EC;</span>
+        <span class="item-label">Settings</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">&#x25EB;</span>
+        <span class="item-label">Billing</span>
+      </div>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+
+    <!-- HISTORY -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">History</div>
+      <div class="history-card">
+        <div class="title">&#x1F1E8;&#x1F1EE; Cashew CI &rarr; &#x1F1EC;&#x1F1E7; UK Q1 2026</div>
+        <div class="tags">
+          <span class="tag">LC Check</span>
+          <span class="tag">$126k</span>
+        </div>
+      </div>
+      <div class="history-card">
+        <div class="title">&#x1F1EC;&#x1F1ED; Cocoa Beans GH &rarr; &#x1F1EA;&#x1F1FA; EU</div>
+        <div class="tags">
+          <span class="tag">LC Check</span>
+          <span class="tag">$84k</span>
+        </div>
+      </div>
+      <div class="history-card">
+        <div class="title">&#x1F1EA;&#x1F1F9; Sesame Seeds ET &rarr; &#x1F1EA;&#x1F1FA; EU</div>
+        <div class="tags">
+          <span class="tag">Lookup</span>
+          <span class="tag">$43k</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ════════ MAIN BOX ════════ -->
+  <main class="main-box">
+
+    <!-- Top nav -->
+    <div class="top-nav">
+      <div class="top-nav-links">
+        <a href="#" class="active">Dashboard</a>
+        <a href="#">Commodities</a>
+        <a href="#">Suppliers</a>
+        <a href="#">Compliance</a>
+        <a href="#">Messages</a>
+      </div>
+      <div class="top-nav-icons">
+        <div class="icon-btn">
+          &#x1F514;
+          <span class="dot"></span>
+        </div>
+        <div class="icon-btn">&#x1F4AC;</div>
+        <div class="icon-btn">&#x2699;&#xFE0F;</div>
+        <div class="user-avatar">F</div>
+      </div>
+    </div>
+
+    <!-- Green hero -->
+    <div class="green-hero">
+      <div class="welcome-pill">Welcome back, Sahel Trading Test Co. Ltd</div>
+      <div class="hero-stats">
+        <strong>6</strong> lookups &middot; <strong>1</strong> LC checks &middot; <strong>2</strong> Shield checks remaining &middot; Top corridor: <strong>Ghana &raquo; European Union</strong>
+      </div>
+      <div class="hero-buttons">
+        <button class="btn-sage">&#x2726; New Check</button>
+        <button class="btn-ghost">&#x1F4EC; Supplier Inbox</button>
+      </div>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <button class="tab active">Overview</button>
+      <button class="tab">Documents</button>
+      <button class="tab">Activity</button>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-label">Compliance Lookups</div>
+        <div class="stat-value">6</div>
+        <div class="stat-sub">All time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">LC Checks</div>
+        <div class="stat-value">1</div>
+        <div class="stat-sub">Document validations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Shield Balance</div>
+        <div class="stat-value">2</div>
+        <div class="stat-sub">Available for use</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Trade Value</div>
+        <div class="stat-value">&mdash;</div>
+        <div class="stat-sub">not set &middot; Add values</div>
+      </div>
+    </div>
+
+    <!-- Two-column: Trades + Docs -->
+    <div class="two-col">
+
+      <!-- Recent trades -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            Recent Trades
+            <span class="count-badge">5</span>
+          </div>
+          <a class="panel-link" href="#">View All &rsaquo;</a>
+        </div>
+        <table class="trades-table">
+          <thead>
+            <tr>
+              <th>Commodity</th>
+              <th>Corridor</th>
+              <th>Value</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="commodity-cell">
+                <div class="commodity-name">Cocoa Beans</div>
+                <div class="hs-code">HS 1801.00</div>
+              </td>
+              <td class="corridor-cell">
+                <span class="flags">&#x1F1EC;&#x1F1ED;</span> GH &rarr; <span class="flags">&#x1F1EC;&#x1F1E7;</span> GB
+                <span class="date">1 Mar</span>
+              </td>
+              <td class="value-cell">&mdash;</td>
+              <td><span class="status-badge status-pending">Pending</span></td>
+              <td><a class="action-link" href="#">Review</a></td>
+            </tr>
+            <tr>
+              <td class="commodity-cell">
+                <div class="commodity-name">Cocoa Beans</div>
+                <div class="hs-code">HS 1801.00</div>
+              </td>
+              <td class="corridor-cell">
+                <span class="flags">&#x1F1EC;&#x1F1ED;</span> GH &rarr; <span class="flags">&#x1F1EA;&#x1F1FA;</span> EU
+                <span class="date">1 Mar</span>
+              </td>
+              <td class="value-cell">&mdash;</td>
+              <td><span class="status-badge status-pending">Pending</span></td>
+              <td><a class="action-link" href="#">Review</a></td>
+            </tr>
+            <tr>
+              <td class="commodity-cell">
+                <div class="commodity-name">Cocoa Beans</div>
+                <div class="hs-code">HS 1801.00</div>
+              </td>
+              <td class="corridor-cell">
+                <span class="flags">&#x1F1EC;&#x1F1ED;</span> GH &rarr; <span class="flags">&#x1F1EA;&#x1F1FA;</span> EU
+                <span class="date">1 Mar</span>
+              </td>
+              <td class="value-cell">&mdash;</td>
+              <td><span class="status-badge status-pending">Pending</span></td>
+              <td><a class="action-link" href="#">Review</a></td>
+            </tr>
+            <tr>
+              <td class="commodity-cell">
+                <div class="commodity-name">Coffee (green/unroasted)</div>
+                <div class="hs-code">HS 0901.11</div>
+              </td>
+              <td class="corridor-cell">
+                <span class="flags">&#x1F1E8;&#x1F1EE;</span> CI &rarr; <span class="flags">&#x1F1EA;&#x1F1FA;</span> EU
+                <span class="date">1 Mar</span>
+              </td>
+              <td class="value-cell">&mdash;</td>
+              <td><span class="status-badge status-pending">Pending</span></td>
+              <td><a class="action-link" href="#">Review</a></td>
+            </tr>
+            <tr>
+              <td class="commodity-cell">
+                <div class="commodity-name">Argan Oil</div>
+                <div class="hs-code">HS 1515.90</div>
+              </td>
+              <td class="corridor-cell">
+                <span class="flags">&#x1F1E9;&#x1F1FF;</span> DZ &rarr; <span class="flags">&#x1F1FA;&#x1F1F8;</span> US
+                <span class="date">1 Mar</span>
+              </td>
+              <td class="value-cell">&mdash;</td>
+              <td><span class="status-badge status-compliant">Compliant</span></td>
+              <td><a class="action-link" href="#">View</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pending compliance docs -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Pending Compliance Docs</div>
+          <a class="panel-link" href="#">All &rsaquo;</a>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon warning">&#x1F4C4;</div>
+          <div class="doc-info">
+            <div class="doc-title">Bill of Lading</div>
+            <div class="doc-sub">Cocoa Beans &middot; GH &rarr; EU</div>
+          </div>
+          <span class="doc-badge warn">&#x26A0; 3</span>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon warning">&#x1F4C4;</div>
+          <div class="doc-info">
+            <div class="doc-title">Country of Origin</div>
+            <div class="doc-sub">COCOBOD / Ghana Customs</div>
+          </div>
+          <span class="doc-badge progress">60%</span>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon warning">&#x1F4C4;</div>
+          <div class="doc-info">
+            <div class="doc-title">Inspection Certificate</div>
+            <div class="doc-sub">Port Health &middot; Felixstowe</div>
+          </div>
+          <span class="doc-badge warn">&#x26A0; 2</span>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon warning">&#x1F4C4;</div>
+          <div class="doc-info">
+            <div class="doc-title">EUDR Due Diligence</div>
+            <div class="doc-sub">Geolocation pending</div>
+          </div>
+          <span class="doc-badge warn">&#x26A0; 3</span>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon success">&#x1F4C4;</div>
+          <div class="doc-info">
+            <div class="doc-title">Customs Declaration</div>
+            <div class="doc-sub">CDS &middot; UK Import</div>
+          </div>
+          <span class="doc-badge ok">&#x2713; Ready</span>
+        </div>
+
+        <div class="more-docs">+ 2 more documents</div>
+      </div>
+    </div>
+
+    <!-- Ghana origin card -->
+    <div class="origin-card">
+      <div class="origin-flag">&#x1F1EC;&#x1F1ED;</div>
+      <div class="origin-info">
+        <div class="origin-name">Ghana</div>
+        <div class="origin-sub">Origin &middot; ECOWAS / WAEMU</div>
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>

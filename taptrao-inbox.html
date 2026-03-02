@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TapTrao — Supplier Inbox</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000;
+      padding: 10px;
+      gap: 10px;
+      display: flex;
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+    /* ══════════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════════ */
+    .sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: #242428;
+      border-radius: 18px;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      height: calc(100vh - 20px);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px 16px;
+    }
+
+    .sidebar-logo .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #0e4e45, #3a7d6a);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .sidebar-logo span {
+      font-family: 'Clash Display', sans-serif;
+      font-weight: 600;
+      font-size: 17px;
+      color: #fff;
+    }
+
+    /* Token pill */
+    .token-pill {
+      margin: 0 16px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(74, 222, 128, 0.08);
+      border: 1px solid rgba(74, 222, 128, 0.15);
+    }
+
+    .token-pill .hex {
+      color: #4ade80;
+      font-size: 14px;
+    }
+
+    .token-pill .count {
+      font-size: 12px;
+      font-weight: 600;
+      color: #4ade80;
+    }
+
+    .token-pill .buy {
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+      margin-left: auto;
+    }
+
+    /* Sidebar sections */
+    .sidebar-section {
+      padding: 8px 0 4px;
+    }
+
+    .sidebar-section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.25);
+      padding: 8px 20px 6px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 20px;
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: all 0.15s;
+      border-left: 3px solid transparent;
+      text-decoration: none;
+    }
+
+    .sidebar-item:hover {
+      color: rgba(255,255,255,0.8);
+    }
+
+    .sidebar-item.active {
+      color: #4ade80;
+      border-left-color: #4ade80;
+      background: rgba(74, 222, 128, 0.1);
+      font-weight: 600;
+    }
+
+    .sidebar-item .icon {
+      font-size: 15px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-item .badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-item .badge.red {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+    }
+
+    .sidebar-item .badge.green {
+      background: rgba(74, 222, 128, 0.12);
+      color: #4ade80;
+    }
+
+    .sidebar-spacer { flex: 1; }
+
+    /* History */
+    .sidebar-history {
+      padding: 0 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .history-card {
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .history-card .title {
+      font-size: 12px;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 6px;
+    }
+
+    .history-card .tags {
+      display: flex;
+      gap: 5px;
+    }
+
+    .history-card .tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* ══════════════════════════════════════════
+       MAIN BOX
+    ══════════════════════════════════════════ */
+    .main-box {
+      flex: 1;
+      border-radius: 18px;
+      background: linear-gradient(180deg,
+        #1a1a1c 0%, #1c2420 3%, #1e2e28 6%, #1f3830 9%,
+        #214232 12%, #264a38 16%, #2c5540 20%, #356248 25%,
+        #3f7056 30%, #4a7e64 35%, #578d74 40%, #659b82 45%,
+        #74a890 50%, #85b49e 55%, #96bfab 60%, #a8cab8 65%,
+        #bbd5c6 70%, #cddfd3 75%, #dde8e1 80%, #eaf0ec 85%,
+        #f2f4f3 90%, #f5f5f5 95%
+      );
+      overflow-y: auto;
+      height: calc(100vh - 20px);
+    }
+
+    /* ── Top Nav ── */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+    }
+
+    .top-nav-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .top-nav-links a {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      font-weight: 400;
+      transition: color 0.15s;
+    }
+
+    .top-nav-links a:hover {
+      color: rgba(255,255,255,0.7);
+    }
+
+    .top-nav-links a.active {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .top-nav-icons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.15s;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255,255,255,0.06);
+    }
+
+    .icon-btn .dot {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 7px;
+      height: 7px;
+      background: #ef4444;
+      border-radius: 50%;
+    }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #6b9080;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    /* ── Green Hero ── */
+    .green-hero {
+      margin: 4px 24px 16px;
+      padding: 28px 32px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #0e4e45, #14574a, #1c6352, #327462, #3a7d6a);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .green-hero::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 60%;
+      background: radial-gradient(ellipse at 80% 20%, rgba(74,222,128,0.06), transparent 60%);
+      pointer-events: none;
+    }
+
+    .green-hero h1 {
+      font-family: 'Clash Display', sans-serif;
+      font-weight: 600;
+      font-size: 28px;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .green-hero .subtitle {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .green-hero .subtitle .highlight {
+      color: #ef4444;
+      font-weight: 600;
+    }
+
+    /* ══════════════════════════════════════════
+       WHITE CONTENT ZONE
+    ══════════════════════════════════════════ */
+    .white-zone {
+      background: #fff;
+      border-radius: 24px 24px 0 0;
+      margin: 0 16px;
+      padding: 28px 28px 40px;
+      min-height: 500px;
+    }
+
+    /* Summary strip */
+    .summary-strip {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .summary-card {
+      flex: 1;
+      padding: 16px 18px;
+      border-radius: 14px;
+      border: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .summary-card .s-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .summary-card .s-icon.amber {
+      background: rgba(234, 179, 8, 0.1);
+    }
+
+    .summary-card .s-icon.red {
+      background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(239,68,68,0.05));
+    }
+
+    .summary-card .s-icon.green {
+      background: rgba(74, 222, 128, 0.1);
+    }
+
+    .summary-card .s-label {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 2px;
+    }
+
+    .summary-card .s-value {
+      font-family: 'Clash Display', sans-serif;
+      font-weight: 600;
+      font-size: 24px;
+      color: #1a1a1a;
+    }
+
+    .summary-card .s-value.amber { color: #d97706; }
+    .summary-card .s-value.red { color: #ef4444; }
+    .summary-card .s-value.green { color: #16a34a; }
+
+    /* Section labels */
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #999;
+      margin-bottom: 12px;
+      margin-top: 8px;
+    }
+
+    /* ── Supplier Row ── */
+    .supplier-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      border: 1px solid #eee;
+      margin-bottom: 10px;
+      transition: box-shadow 0.15s;
+      position: relative;
+    }
+
+    .supplier-row:hover {
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+
+    .supplier-row.border-red {
+      border-left: 3px solid #ef4444;
+    }
+
+    .supplier-row.border-amber {
+      border-left: 3px solid #eab308;
+    }
+
+    .supplier-row.border-blue {
+      border-left: 3px solid #3b82f6;
+    }
+
+    .supplier-row.border-green {
+      border-left: 3px solid #16a34a;
+      opacity: 0.7;
+    }
+
+    .supplier-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .supplier-avatar.green { background: #16a34a; }
+    .supplier-avatar.orange { background: #ea580c; }
+
+    .supplier-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .supplier-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 3px;
+    }
+
+    .supplier-route {
+      font-size: 12px;
+      color: #888;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .supplier-route .divider {
+      color: #ccc;
+    }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .status-badge.blocking {
+      background: rgba(239, 68, 68, 0.08);
+      color: #ef4444;
+    }
+
+    .status-badge.waiting {
+      background: rgba(234, 179, 8, 0.08);
+      color: #d97706;
+    }
+
+    .status-badge.partial {
+      background: rgba(59, 130, 246, 0.08);
+      color: #3b82f6;
+    }
+
+    .status-badge.complete {
+      background: rgba(22, 163, 74, 0.08);
+      color: #16a34a;
+    }
+
+    /* Outstanding docs */
+    .outstanding {
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .outstanding strong {
+      color: #666;
+      font-weight: 500;
+    }
+
+    /* Progress pips */
+    .progress-pips {
+      display: flex;
+      gap: 3px;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .pip {
+      width: 20px;
+      height: 5px;
+      border-radius: 3px;
+    }
+
+    .pip.green { background: #16a34a; }
+    .pip.red { background: #ef4444; }
+    .pip.amber { background: #eab308; }
+    .pip.blue { background: #3b82f6; }
+
+    .pip-label {
+      font-size: 10px;
+      color: #aaa;
+      margin-left: 6px;
+    }
+
+    /* Right-side actions */
+    .supplier-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid #e5e5e5;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .action-btn:hover {
+      background: #f5f5f5;
+      border-color: #ccc;
+    }
+
+    .action-btn.whatsapp:hover {
+      background: rgba(37, 211, 102, 0.08);
+      border-color: #25d366;
+    }
+
+    .action-btn.email:hover {
+      background: rgba(59, 130, 246, 0.08);
+      border-color: #3b82f6;
+    }
+
+    .action-btn.link:hover {
+      background: rgba(107, 144, 128, 0.08);
+      border-color: #6b9080;
+    }
+
+    .supplier-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════
+       SIDEBAR
+  ══════════════════════════════════════════ -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">T</div>
+      <span>TapTrao</span>
+    </div>
+
+    <div class="token-pill">
+      <span class="hex">&#x2B22;</span>
+      <span class="count">2 checks</span>
+      <span class="buy">Buy More</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main</div>
+      <div class="sidebar-item"><span class="icon">&#x229E;</span> Dashboard</div>
+      <div class="sidebar-item"><span class="icon">&#x2726;</span> New Check</div>
+      <div class="sidebar-item"><span class="icon">&#x25C9;</span> My Trades</div>
+      <div class="sidebar-item active">
+        <span class="icon">&#x1F4EC;</span> Suppliers
+        <span class="badge red">4</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Tools</div>
+      <div class="sidebar-item"><span class="icon">&#x29D6;</span> Demurrage Calc</div>
+      <div class="sidebar-item"><span class="icon">&#x1F4CB;</span> Templates</div>
+      <div class="sidebar-item"><span class="icon">&#x1F514;</span> Alerts</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Account</div>
+      <div class="sidebar-item"><span class="icon">&#x25EC;</span> Settings</div>
+      <div class="sidebar-item"><span class="icon">&#x25EB;</span> Billing</div>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">History</div>
+      <div class="sidebar-history">
+        <div class="history-card">
+          <div class="title">&#x1F1E8;&#x1F1EE; Cashew CI &#x2192; &#x1F1EC;&#x1F1E7; UK Q1 2026</div>
+          <div class="tags"><span class="tag">LC Check</span><span class="tag">$126k</span></div>
+        </div>
+        <div class="history-card">
+          <div class="title">&#x1F1EC;&#x1F1ED; Cocoa Beans GH &#x2192; &#x1F1EA;&#x1F1FA; EU</div>
+          <div class="tags"><span class="tag">LC Check</span><span class="tag">$84k</span></div>
+        </div>
+        <div class="history-card">
+          <div class="title">&#x1F1EA;&#x1F1F9; Sesame Seeds ET &#x2192; &#x1F1EA;&#x1F1FA; EU</div>
+          <div class="tags"><span class="tag">Lookup</span><span class="tag">$43k</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MAIN BOX
+  ══════════════════════════════════════════ -->
+  <div class="main-box">
+
+    <!-- Top Nav -->
+    <div class="top-nav">
+      <div class="top-nav-links">
+        <a href="#">Dashboard</a>
+        <a href="#">Commodities</a>
+        <a href="#" class="active">Suppliers</a>
+        <a href="#">Compliance</a>
+        <a href="#">Messages</a>
+      </div>
+      <div class="top-nav-icons">
+        <div class="icon-btn">&#x1F514;<span class="dot"></span></div>
+        <div class="icon-btn">&#x1F4AC;</div>
+        <div class="icon-btn">&#x2699;&#xFE0F;</div>
+        <div class="user-avatar">S</div>
+      </div>
+    </div>
+
+    <!-- Green Hero -->
+    <div class="green-hero">
+      <h1>Supplier Inbox</h1>
+      <div class="subtitle">3 suppliers waiting &middot; <span class="highlight">1 blocking issue</span></div>
+    </div>
+
+    <!-- White Zone -->
+    <div class="white-zone">
+
+      <!-- Summary Cards -->
+      <div class="summary-strip">
+        <div class="summary-card">
+          <div class="s-icon amber">&#x23F3;</div>
+          <div>
+            <div class="s-label">Awaiting docs</div>
+            <div class="s-value amber">2</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="s-icon red">&#x26A0;&#xFE0F;</div>
+          <div>
+            <div class="s-label">Blocking issue</div>
+            <div class="s-value red">1</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="s-icon green">&#x2714;&#xFE0F;</div>
+          <div>
+            <div class="s-label">Complete this week</div>
+            <div class="s-value green">1</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEEDS ATTENTION -->
+      <div class="section-label">Needs Attention</div>
+
+      <!-- Supplier 1 — Blocking -->
+      <div class="supplier-row border-red">
+        <div class="supplier-avatar green">GH</div>
+        <div class="supplier-info">
+          <div class="supplier-name">Kwame Mensah Exports</div>
+          <div class="supplier-route">
+            &#x1F1EC;&#x1F1ED; GH &#x2192; &#x1F1EA;&#x1F1FA; EU
+            <span class="divider">&middot;</span>
+            Cocoa Beans
+          </div>
+          <div class="outstanding"><strong>Outstanding:</strong> Bill of Lading, Phytosanitary Certificate</div>
+          <div class="progress-pips">
+            <div class="pip green"></div>
+            <div class="pip green"></div>
+            <div class="pip green"></div>
+            <div class="pip red"></div>
+            <div class="pip red"></div>
+            <span class="pip-label">2/5 docs &middot; 2 blocking</span>
+          </div>
+        </div>
+        <div class="supplier-actions">
+          <div class="supplier-meta">
+            <span class="status-badge blocking">&#x2297; Blocking</span>
+          </div>
+          <div class="action-buttons">
+            <div class="action-btn whatsapp" title="WhatsApp">&#x1F4F1;</div>
+            <div class="action-btn email" title="Email">&#x2709;&#xFE0F;</div>
+            <div class="action-btn link" title="Copy Link">&#x1F517;</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supplier 2 — Waiting -->
+      <div class="supplier-row border-amber">
+        <div class="supplier-avatar orange">CI</div>
+        <div class="supplier-info">
+          <div class="supplier-name">Abidjan Cashew Co</div>
+          <div class="supplier-route">
+            &#x1F1E8;&#x1F1EE; CI &#x2192; &#x1F1EC;&#x1F1E7; GB
+            <span class="divider">&middot;</span>
+            Cashew Nuts
+          </div>
+          <div class="outstanding"><strong>Outstanding:</strong> Certificate of Origin</div>
+          <div class="progress-pips">
+            <div class="pip green"></div>
+            <div class="pip green"></div>
+            <div class="pip amber"></div>
+            <span class="pip-label">2/3 docs &middot; 1 pending</span>
+          </div>
+        </div>
+        <div class="supplier-actions">
+          <div class="supplier-meta">
+            <span class="status-badge waiting">&#x25CF; Waiting</span>
+          </div>
+          <div class="action-buttons">
+            <div class="action-btn whatsapp" title="WhatsApp">&#x1F4F1;</div>
+            <div class="action-btn email" title="Email">&#x2709;&#xFE0F;</div>
+            <div class="action-btn link" title="Copy Link">&#x1F517;</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IN PROGRESS -->
+      <div class="section-label" style="margin-top: 24px;">In Progress</div>
+
+      <!-- Supplier 3 — Partial -->
+      <div class="supplier-row border-blue">
+        <div class="supplier-avatar green">ET</div>
+        <div class="supplier-info">
+          <div class="supplier-name">Ethiopian Coffee Union</div>
+          <div class="supplier-route">
+            &#x1F1EA;&#x1F1F9; ET &#x2192; &#x1F1E8;&#x1F1ED; CH
+            <span class="divider">&middot;</span>
+            Coffee
+          </div>
+          <div class="outstanding"><strong>Outstanding:</strong> Inspection Certificate</div>
+          <div class="progress-pips">
+            <div class="pip green"></div>
+            <div class="pip green"></div>
+            <div class="pip green"></div>
+            <div class="pip blue"></div>
+            <span class="pip-label">3/4 docs</span>
+          </div>
+        </div>
+        <div class="supplier-actions">
+          <div class="supplier-meta">
+            <span class="status-badge partial">&#x21BB; Partial</span>
+          </div>
+          <div class="action-buttons">
+            <div class="action-btn whatsapp" title="WhatsApp">&#x1F4F1;</div>
+            <div class="action-btn email" title="Email">&#x2709;&#xFE0F;</div>
+            <div class="action-btn link" title="Copy Link">&#x1F517;</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPLETE -->
+      <div class="section-label" style="margin-top: 24px;">Complete</div>
+
+      <!-- Supplier 4 — Complete -->
+      <div class="supplier-row border-green">
+        <div class="supplier-avatar orange">TZ</div>
+        <div class="supplier-info">
+          <div class="supplier-name">Tanzania Tea Board</div>
+          <div class="supplier-route">
+            &#x1F1F9;&#x1F1FF; TZ &#x2192; &#x1F1E9;&#x1F1EA; DE
+            <span class="divider">&middot;</span>
+            Black Tea
+          </div>
+          <div class="outstanding">All documents received</div>
+          <div class="progress-pips">
+            <div class="pip green"></div>
+            <div class="pip green"></div>
+            <div class="pip green"></div>
+            <div class="pip green"></div>
+            <span class="pip-label">4/4 docs</span>
+          </div>
+        </div>
+        <div class="supplier-actions">
+          <div class="supplier-meta">
+            <span class="status-badge complete">&#x2713; Complete</span>
+          </div>
+          <div class="action-buttons">
+            <div class="action-btn whatsapp" title="WhatsApp">&#x1F4F1;</div>
+            <div class="action-btn email" title="Email">&#x2709;&#xFE0F;</div>
+            <div class="action-btn link" title="Copy Link">&#x1F517;</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

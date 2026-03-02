@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TapTrao — Demurrage Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Tokens ── */
+:root {
+  --bg-body: #000000;
+  --bg-sidebar: #242428;
+  --sage: #6b9080;
+  --sage-hover: #5a7a6b;
+  --green-accent: #4ade80;
+  --green-accent-bg: rgba(74, 222, 128, 0.1);
+  --red: #ef4444;
+  --amber: #eab308;
+  --text-white: #ffffff;
+  --text-white-secondary: rgba(255,255,255,0.45);
+  --text-white-muted: rgba(255,255,255,0.25);
+  --text-dark: #1a1a1a;
+  --text-dark-secondary: #888888;
+  --text-dark-muted: #999999;
+}
+
+body {
+  background: var(--bg-body);
+  padding: 10px;
+  gap: 10px;
+  display: flex;
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: var(--bg-sidebar);
+  border-radius: 18px;
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 6px;
+  margin-bottom: 20px;
+}
+
+.sidebar-logo-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #6b9080, #4ade80);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.sidebar-logo-text {
+  font-family: 'Clash Display', sans-serif;
+  font-weight: 600;
+  font-size: 17px;
+  color: #fff;
+}
+
+.sidebar-token-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 6px 20px;
+  padding: 6px 10px;
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.15);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--green-accent);
+}
+
+.sidebar-token-pill .dot {
+  width: 6px;
+  height: 6px;
+  background: var(--green-accent);
+  border-radius: 50%;
+}
+
+.sidebar-section-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-white-muted);
+  padding: 0 6px;
+  margin: 16px 0 6px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  position: relative;
+}
+
+.sidebar-item:hover {
+  color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.03);
+}
+
+.sidebar-item.active {
+  color: var(--green-accent);
+  background: var(--green-accent-bg);
+  font-weight: 600;
+  border-left: 3px solid var(--green-accent);
+  margin-left: -3px;
+}
+
+.sidebar-item .icon {
+  width: 18px;
+  text-align: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.sidebar-item .badge {
+  margin-left: auto;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  min-width: 18px;
+  text-align: center;
+}
+
+.sidebar-item .badge-red {
+  background: var(--red);
+  color: #fff;
+}
+
+.sidebar-item .badge-green {
+  background: rgba(74, 222, 128, 0.15);
+  color: var(--green-accent);
+}
+
+/* ── Main box ── */
+.main-box {
+  flex: 1;
+  border-radius: 18px;
+  background: linear-gradient(180deg,
+    #1a1a1c 0%, #1c2420 3%, #1e2e28 6%, #1f3830 9%,
+    #214232 12%, #264a38 16%, #2c5540 20%, #356248 25%,
+    #3f7056 30%, #4a7e64 35%, #578d74 40%, #659b82 45%,
+    #74a890 50%, #85b49e 55%, #96bfab 60%, #a8cab8 65%,
+    #bbd5c6 70%, #cddfd3 75%, #dde8e1 80%, #eaf0ec 85%,
+    #f2f4f3 90%, #f5f5f5 95%
+  );
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Nav bar ── */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+}
+
+.nav-link {
+  font-size: 13.5px;
+  font-weight: 400;
+  color: var(--text-white-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.nav-link:hover {
+  color: rgba(255,255,255,0.7);
+}
+
+.nav-link.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nav-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-white-secondary);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.nav-icon:hover {
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.05);
+}
+
+.nav-icon .notification-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  background: var(--red);
+  border-radius: 50%;
+  border: 1.5px solid #1a1a1c;
+}
+
+.nav-avatar {
+  width: 32px;
+  height: 32px;
+  background: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* ── Green hero ── */
+.green-hero {
+  margin: 4px 24px 16px;
+  padding: 28px 32px;
+  background: linear-gradient(135deg, #0e4e45, #14574a, #1c6352, #327462, #3a7d6a);
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.green-hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: radial-gradient(ellipse at 80% 20%, rgba(74,222,128,0.06), transparent 60%);
+  pointer-events: none;
+}
+
+.green-hero .breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 20px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 12px;
+}
+
+.green-hero .breadcrumb .sep {
+  color: rgba(255,255,255,0.25);
+}
+
+.green-hero h1 {
+  font-family: 'Clash Display', sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  color: #fff;
+  margin-bottom: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.green-hero .subtitle {
+  font-size: 14px;
+  color: rgba(255,255,255,0.45);
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Content area ── */
+.content-area {
+  padding: 0 24px 40px;
+  flex: 1;
+}
+
+/* ── Two column grid ── */
+.demurrage-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 960px;
+}
+
+/* ── White card ── */
+.white-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+/* ── Form elements ── */
+.form-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #555;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 11px 13px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--text-dark);
+  outline: none;
+  transition: all 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-input:focus {
+  border-color: var(--sage);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(107, 144, 128, 0.12);
+}
+
+.form-input:hover:not(:focus) {
+  border-color: #ccc;
+}
+
+.form-select {
+  width: 100%;
+  padding: 11px 13px;
+  padding-right: 32px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--text-dark);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.form-select:focus {
+  border-color: var(--sage);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(107, 144, 128, 0.12);
+}
+
+.form-helper {
+  font-size: 11px;
+  color: var(--text-dark-secondary);
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+/* ── Radio buttons (2-col) ── */
+.radio-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dark-secondary);
+  transition: all 0.15s;
+}
+
+.radio-option:hover {
+  border-color: #ccc;
+}
+
+.radio-option.selected {
+  background: rgba(107, 144, 128, 0.08);
+  border-color: rgba(107, 144, 128, 0.35);
+  color: var(--sage);
+  font-weight: 600;
+}
+
+/* ── Toggle link ── */
+.toggle-link {
+  font-size: 11px;
+  color: var(--sage);
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.toggle-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Days label row ── */
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+/* ── Sage button ── */
+.btn-sage {
+  width: 100%;
+  padding: 13px 24px;
+  background: var(--sage);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-sage:hover {
+  background: var(--sage-hover);
+}
+
+/* ── Right column ── */
+.result-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Stat cards ── */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  text-align: center;
+}
+
+.stat-card .stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dark-muted);
+  margin-bottom: 6px;
+}
+
+.stat-card .stat-value {
+  font-family: 'Clash Display', sans-serif;
+  font-weight: 600;
+  font-size: 26px;
+  color: var(--text-dark);
+}
+
+.stat-card .stat-unit {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dark-secondary);
+  margin-top: 2px;
+}
+
+/* ── Breakdown table ── */
+.breakdown-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.breakdown-card h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 14px;
+}
+
+.breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.breakdown-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dark-muted);
+  text-align: left;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.breakdown-table th:last-child {
+  text-align: right;
+}
+
+.breakdown-table td {
+  font-size: 13px;
+  color: var(--text-dark);
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.breakdown-table td:last-child {
+  text-align: right;
+  font-weight: 600;
+}
+
+.breakdown-table .period {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dark-secondary);
+}
+
+.breakdown-table .rate {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text-dark-secondary);
+}
+
+/* ── Total bar ── */
+.total-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.total-bar .total-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dark-secondary);
+}
+
+.total-bar .total-amount {
+  font-family: 'Clash Display', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+}
+
+.total-bar .total-amount.amber {
+  color: var(--amber);
+}
+
+.total-bar .total-amount.red {
+  color: var(--red);
+}
+
+.total-bar .total-amount.green {
+  color: var(--sage);
+}
+
+/* ── Percent note ── */
+.percent-note {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-dark-secondary);
+  padding: 4px 0;
+}
+
+.percent-note strong {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+/* ── Decision nudge ── */
+.nudge-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.nudge-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  text-align: center;
+}
+
+.nudge-card .nudge-icon {
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.nudge-card .nudge-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.nudge-card .nudge-cost {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dark-secondary);
+}
+
+/* ── Disclaimer ── */
+.disclaimer {
+  font-size: 11px;
+  color: var(--text-dark-muted);
+  line-height: 1.6;
+  text-align: center;
+  padding: 8px 0 0;
+}
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">T</div>
+    <span class="sidebar-logo-text">TapTrao</span>
+  </div>
+
+  <div class="sidebar-token-pill">
+    <span class="dot"></span>
+    2 checks remaining
+  </div>
+
+  <div class="sidebar-section-label">Main</div>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#8862;</span> Dashboard
+  </a>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#10022;</span> New Check
+  </a>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#9673;</span> My Trades
+    <span class="badge badge-green">5</span>
+  </a>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#128236;</span> Suppliers
+  </a>
+
+  <div class="sidebar-section-label">Tools</div>
+  <a class="sidebar-item active" href="#">
+    <span class="icon">&#10695;</span> Demurrage Calc
+  </a>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#128203;</span> Templates
+  </a>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#128276;</span> Alerts
+    <span class="badge badge-red">2</span>
+  </a>
+
+  <div class="sidebar-section-label">Account</div>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#9707;</span> Settings
+  </a>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#9707;</span> Billing
+  </a>
+</aside>
+
+<!-- ── MAIN BOX ── -->
+<div class="main-box">
+
+  <!-- Nav bar -->
+  <nav class="nav-bar">
+    <div class="nav-links">
+      <a class="nav-link" href="#">Dashboard</a>
+      <a class="nav-link" href="#">Commodities</a>
+      <a class="nav-link" href="#">Suppliers</a>
+      <a class="nav-link active" href="#">Compliance</a>
+      <a class="nav-link" href="#">Messages</a>
+    </div>
+    <div class="nav-icons">
+      <div class="nav-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notification-dot"></span>
+      </div>
+      <div class="nav-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+      <div class="nav-avatar">S</div>
+    </div>
+  </nav>
+
+  <!-- Green hero -->
+  <div class="green-hero">
+    <div class="breadcrumb">
+      Tools <span class="sep">/</span> Demurrage
+    </div>
+    <h1>Demurrage Calculator</h1>
+    <div class="subtitle">Estimate port demurrage costs for delayed shipments</div>
+  </div>
+
+  <!-- Content -->
+  <div class="content-area">
+    <div class="demurrage-grid">
+
+      <!-- LEFT: Input form -->
+      <div class="white-card">
+
+        <div class="form-group">
+          <label class="form-label">Port of Discharge</label>
+          <select class="form-select">
+            <option selected>Tema, Ghana</option>
+            <option>Mombasa, Kenya</option>
+            <option>Dar es Salaam, Tanzania</option>
+            <option>Lagos (Apapa), Nigeria</option>
+            <option>Abidjan, Cote d'Ivoire</option>
+            <option>Douala, Cameroon</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Container Type</label>
+          <div class="radio-row">
+            <div class="radio-option selected">20ft Standard</div>
+            <div class="radio-option">40ft Standard</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Free Days Included</label>
+          <input type="number" class="form-input" value="7">
+          <div class="form-helper">Check your Bill of Lading. Most contracts allow 7-14 free days.</div>
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label class="form-label" style="margin-bottom: 0;">Days Held at Port</label>
+            <a class="toggle-link" href="#">Calculate from arrival date</a>
+          </div>
+          <input type="number" class="form-input" value="21">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Cargo Value (USD)</label>
+          <input type="number" class="form-input" value="85000" placeholder="e.g. 85000">
+          <div class="form-helper">Optional - used to calculate demurrage as a percentage of cargo value.</div>
+        </div>
+
+        <button class="btn-sage">Calculate Demurrage</button>
+
+      </div>
+
+      <!-- RIGHT: Results -->
+      <div class="result-column">
+
+        <!-- Stat cards -->
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-label">Billable Days</div>
+            <div class="stat-value">14</div>
+            <div class="stat-unit">days over free</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Daily Rate</div>
+            <div class="stat-value">$150</div>
+            <div class="stat-unit">per day / 20ft</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Days at Port</div>
+            <div class="stat-value">21</div>
+            <div class="stat-unit">total days</div>
+          </div>
+        </div>
+
+        <!-- Breakdown table -->
+        <div class="breakdown-card">
+          <h3>Cost Breakdown</h3>
+          <table class="breakdown-table">
+            <thead>
+              <tr>
+                <th>Period</th>
+                <th>Days</th>
+                <th>Rate / Day</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="period">Days 1 - 7</td>
+                <td>7</td>
+                <td class="rate">$150</td>
+                <td>$1,050</td>
+              </tr>
+              <tr>
+                <td class="period">Days 8 - 14</td>
+                <td>7</td>
+                <td class="rate">$225</td>
+                <td>$1,575</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Total bar -->
+        <div class="total-bar">
+          <div class="total-label">Total Demurrage</div>
+          <div class="total-amount amber">$2,625</div>
+        </div>
+
+        <!-- Percent note -->
+        <div class="percent-note">
+          Demurrage as % of cargo value: <strong>3.1%</strong>
+        </div>
+
+        <!-- Decision nudge -->
+        <div class="nudge-row">
+          <div class="nudge-card">
+            <div class="nudge-icon">&#128674;</div>
+            <div class="nudge-title">Re-export</div>
+            <div class="nudge-cost">30 - 50% of cargo</div>
+          </div>
+          <div class="nudge-card">
+            <div class="nudge-icon">&#128465;</div>
+            <div class="nudge-title">Destruction</div>
+            <div class="nudge-cost">$500 - $5,000</div>
+          </div>
+          <div class="nudge-card">
+            <div class="nudge-icon">&#9878;</div>
+            <div class="nudge-title">Appeal</div>
+            <div class="nudge-cost">$200 - $500</div>
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+          Estimates are indicative only. Actual demurrage charges vary by terminal operator, carrier, and local regulations. Verify rates with your freight forwarder or shipping line.
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
