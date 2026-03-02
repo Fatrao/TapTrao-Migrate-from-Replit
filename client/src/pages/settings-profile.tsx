@@ -158,25 +158,23 @@ export default function SettingsProfile() {
 
   return (
     <AppShell>
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <h1
-          style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "0", color: "var(--t1)", marginBottom: 8 }}
-          data-testid="text-profile-heading"
-        >
+      <div className="green-hero-box" style={{ margin: "4px 24px 16px" }}>
+        <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }}>
           Company Profile
         </h1>
-        <p style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t2)", marginBottom: 24 }} data-testid="text-profile-subtitle">
-          Your company details appear on every TwinLog Trail compliance record.
-          Required for PDF generation.
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
+          Your company details appear on every TwinLog Trail compliance record. Required for PDF generation.
         </p>
+      </div>
 
+      <div className="form-card" style={{ margin: "0 24px 20px", maxWidth: 640 }}>
         {isComplete && (
           <div
-            style={{ display: "flex", alignItems: "center", gap: 8, borderRadius: 8, background: "var(--gbg)", padding: 12, marginBottom: 24 }}
+            style={{ display: "flex", alignItems: "center", gap: 8, borderRadius: 8, background: "rgba(14,78,69,0.08)", border: "1px solid rgba(14,78,69,0.15)", padding: 12, marginBottom: 20 }}
             data-testid="banner-profile-complete"
           >
-            <CheckCircle2 style={{ width: 18, height: 18, color: "var(--green)", flexShrink: 0 }} />
-            <p style={{ fontSize: 13, color: "var(--green)", margin: 0 }}>Profile complete. You can download TwinLog Trail records.</p>
+            <CheckCircle2 style={{ width: 18, height: 18, color: "#0e4e45", flexShrink: 0 }} />
+            <p style={{ fontSize: 13, color: "#0e4e45", margin: 0 }}>Profile complete. You can download TwinLog Trail records.</p>
           </div>
         )}
 
@@ -272,13 +270,13 @@ export default function SettingsProfile() {
             />
 
             <div
-              style={{ background: "var(--blue-dim)", borderRadius: 12, padding: 16 }}
+              style={{ background: "rgba(14,78,69,0.06)", borderRadius: 12, padding: 16, border: "1px solid rgba(14,78,69,0.12)" }}
             >
               <div style={{ display: "flex", gap: 12 }}>
-                <Info style={{ width: 18, height: 18, color: "var(--blue)", flexShrink: 0, marginTop: 2 }} />
+                <Info style={{ width: 18, height: 18, color: "#0e4e45", flexShrink: 0, marginTop: 2 }} />
                 <div>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--blue)", marginBottom: 4 }}>Why EORI matters</p>
-                  <p style={{ fontSize: 13, color: "var(--t2)", margin: 0, lineHeight: 1.6 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "#0e4e45", marginBottom: 4 }}>Why EORI matters</p>
+                  <p style={{ fontSize: 13, color: "#555", margin: 0, lineHeight: 1.6 }}>
                     Your EORI number is what customs authorities use to identify you on every import declaration.
                     A compliance record without an EORI cannot be linked to your customs activity.
                     UK traders: apply at gov.uk/eori. EU traders: apply via your national customs authority.
@@ -328,5 +326,6 @@ export default function SettingsProfile() {
         </Form>
       </div>
     </AppShell>
+
   );
 }

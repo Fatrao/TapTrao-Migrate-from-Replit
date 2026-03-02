@@ -90,9 +90,9 @@ function SidebarLabel({ children }: { children: ReactNode }) {
 }
 
 /* ── History card ── */
-function HistoryCard({ title, tags }: { title: string; tags: string[] }) {
-  return (
-    <div className="history-card">
+function HistoryCard({ title, tags, href }: { title: string; tags: string[]; href?: string }) {
+  const content = (
+    <div className="history-card" style={href ? { cursor: "pointer" } : undefined}>
       <div className="title">{title}</div>
       <div className="tags">
         {tags.map((tag, i) => (
@@ -101,6 +101,10 @@ function HistoryCard({ title, tags }: { title: string; tags: string[] }) {
       </div>
     </div>
   );
+  if (href) {
+    return <Link href={href}>{content}</Link>;
+  }
+  return content;
 }
 
 /* ── Feature Request Modal ── */
@@ -223,7 +227,7 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
 function DefaultNavLinks({ activePage }: { activePage: string }) {
   const links = [
     { label: "Dashboard", href: "/dashboard", match: ["/dashboard", "/trades"] },
-    { label: "Commodities", href: "/lookup", match: ["/lookup", "/demurrage"] },
+    { label: "My Trades", href: "/trades", match: ["/trades", "/demurrage"] },
     { label: "Suppliers", href: "/inbox", match: ["/inbox"] },
     { label: "Compliance", href: "/alerts", match: ["/alerts", "/lc-check", "/templates", "/eudr"] },
     { label: "Messages", href: "/inbox", match: [] },
@@ -416,7 +420,7 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
               const commodity = lookup.commodityName || "Trade";
               const title = `${originFlag} ${commodity} ${originCode} → ${destFlag} ${destCode}`;
               const tags = ["Lookup"];
-              return <HistoryCard key={lookup.id} title={title} tags={tags} />;
+              return <HistoryCard key={lookup.id} title={title} tags={tags} href={`/trades/${lookup.id}`} />;
             })
           ) : (
             <>

@@ -183,7 +183,7 @@ function StatusStepper({ current }: { current: string }) {
 function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainValid: boolean }) {
   return (
     <div>
-      {/* Chain integrity badge */}
+      {/* Event count header */}
       <div style={{
         display: "flex",
         alignItems: "center",
@@ -191,22 +191,18 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
         marginBottom: 16,
         padding: "8px 12px",
         borderRadius: 8,
-        background: chainValid ? "rgba(93,217,193,0.06)" : "rgba(239,68,68,0.06)",
-        border: `1px solid ${chainValid ? "rgba(93,217,193,0.2)" : "rgba(239,68,68,0.2)"}`,
+        background: "rgba(93,217,193,0.06)",
+        border: "1px solid rgba(93,217,193,0.2)",
       }}>
-        {chainValid ? (
-          <ShieldCheck size={16} style={{ color: "#16a34a" }} />
-        ) : (
-          <ShieldAlert size={16} style={{ color: "#ef4444" }} />
-        )}
+        <ShieldCheck size={16} style={{ color: "#0e4e45" }} />
         <span style={{
           fontSize: 12,
           fontWeight: 600,
-          color: chainValid ? "#16a34a" : "#ef4444",
+          color: "#0e4e45",
         }}>
-          {chainValid ? "Audit Chain Verified" : "Chain Integrity Warning"}
+          Audit Trail
         </span>
-        <span style={{ fontSize: 11, color: chainValid ? "#166534" : "#991b1b", marginLeft: "auto" }}>
+        <span style={{ fontSize: 11, color: "#166534", marginLeft: "auto" }}>
           {events.length} event{events.length !== 1 ? "s" : ""}
         </span>
       </div>

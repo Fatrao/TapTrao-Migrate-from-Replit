@@ -167,7 +167,7 @@ export default function Dashboard() {
           <div className="stat-sub">All time</div>
         </div>
 
-        <div className="stat-card stat-card-link" onClick={() => navigate("/lc-check")} style={{ cursor: "pointer" }}>
+        <div className="stat-card stat-card-link" onClick={() => navigate("/trades")} style={{ cursor: "pointer" }}>
           <div className="stat-icon">📄</div>
           <div className="stat-label">LC Checks</div>
           <div className="stat-value">
@@ -317,7 +317,7 @@ export default function Dashboard() {
             <div className="dash-card">
               <div className="dash-card-header">
                 <h3>My LC Cases <span className="count">{(lcCasesQuery.data ?? []).filter(c => c.status !== "closed").length}</span></h3>
-                <Link href="/lc-check"><span className="link">LC Check ›</span></Link>
+                <Link href="/trades"><span className="link">View All ›</span></Link>
               </div>
               {(lcCasesQuery.data ?? []).slice(0, 4).map((c) => {
                 const statusColors: Record<string, { color: string; bg: string; label: string }> = {
