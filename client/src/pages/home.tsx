@@ -671,207 +671,213 @@ export default function Home() {
       </nav>
 
       {/* ═══ HERO SECTION ═══ */}
-      <section className="pt-16 min-h-[92vh] flex flex-col md:flex-row">
-        {/* Left panel — dark teal */}
-        <div
-          className="relative md:w-[52%] flex flex-col justify-center px-8 sm:px-12 lg:px-16 py-16 md:py-24 overflow-hidden"
-          style={{ background: C.primary }}
-        >
-          {/* Dot texture overlay */}
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)",
-              backgroundSize: "20px 20px",
-            }}
-          />
+      <section className="relative pt-16 min-h-[92vh] flex items-stretch overflow-hidden" style={{ background: C.white }}>
+        {/* Left dark panel */}
+        <div className="relative w-full lg:w-[52%] flex flex-col justify-center px-10 lg:px-16 py-20 lg:py-28 z-10" style={{ background: C.primary }}>
+          {/* Subtle dot texture */}
+          <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "32px 32px" }} />
           {/* Accent glow blobs */}
-          <div
-            className="absolute top-20 right-10 w-72 h-72 rounded-full blur-[100px]"
-            style={{ background: C.accent, opacity: 0.08 }}
-          />
-          <div
-            className="absolute bottom-10 left-10 w-56 h-56 rounded-full blur-[80px]"
-            style={{ background: C.accent, opacity: 0.05 }}
-          />
+          <div className="absolute -top-20 -left-20 w-72 h-72 rounded-full blur-[80px] pointer-events-none" style={{ background: C.accent, opacity: 0.2 }} />
+          <div className="absolute -bottom-16 right-0 w-56 h-56 rounded-full blur-[60px] pointer-events-none" style={{ background: C.accent, opacity: 0.1 }} />
 
-          <div className="relative z-10 max-w-xl">
-            {/* Badge pill */}
-            <div
-              className="inline-block text-xs font-medium px-4 py-2 rounded-full mb-8"
-              style={{
-                background: "rgba(93,217,193,0.1)",
-                color: C.accentLight,
-                border: "1px solid rgba(93,217,193,0.15)",
-              }}
-            >
-              SME Commodity Traders &middot; Africa &rarr; EU &middot; UK &middot; USA &middot; Canada &middot; Turkiye &middot; Switzerland
+          <div className="relative">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-8 tracking-wide" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.8)" }}>
+              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: C.accent }} />
+              SME Commodity Traders · Africa → EU · UK · USA · Canada · Türkiye · Switzerland
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6" style={{ color: C.white }}>
-              Know the rules.
-              <br />
+            {/* Headline */}
+            <h1 className="text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.05] mb-6 tracking-tight" style={{ color: C.white }}>
+              Know the rules.<br />
               <span style={{ color: C.accent }}>Avoid the loss.</span>
             </h1>
 
-            <p className="text-base sm:text-lg leading-relaxed mb-8" style={{ color: "rgba(255,255,255,0.65)" }}>
-              Run a free regulatory check in seconds. Activate TapTrao Shield to catch document gaps, LC discrepancies, and sanctions risks while there's still time to fix them.
+            <p className="text-lg lg:text-xl leading-relaxed mb-10 max-w-lg font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
+              Run a free regulatory check in seconds. Activate TapTrao Shield to catch{" "}
+              <span style={{ color: C.gold }} className="font-semibold">document gaps</span>,{" "}
+              <span style={{ color: C.gold }} className="font-semibold">LC discrepancies</span>, and{" "}
+              <span style={{ color: C.gold }} className="font-semibold">sanctions risks</span>{" "}
+              — coverage runs until docking or bank presentation.
             </p>
 
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/lookup"
-                className="inline-flex items-center text-sm font-bold py-3 px-6 rounded-full transition-all duration-200 hover:shadow-lg"
-                style={{ background: C.accent, color: C.primaryDark }}
-              >
-                Free Pre-Shipment Check &rarr;
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-10">
+              <Link href="/lookup" className="px-8 py-4 font-extrabold rounded-full transition-all hover:scale-105 cursor-pointer text-center whitespace-nowrap text-lg" style={{ background: C.accent, color: C.primary, boxShadow: `0 8px 24px ${C.accent}40` }}>
+                Free Pre-Shipment Check →
               </Link>
-              <a
-                href="#pricing"
-                className="inline-flex items-center text-sm font-semibold py-3 px-6 rounded-full transition-all duration-200"
-                style={{
-                  background: "transparent",
-                  color: "rgba(255,255,255,0.8)",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                }}
-              >
+              <a href="#pricing" className="px-8 py-4 font-bold rounded-full transition-all cursor-pointer text-center whitespace-nowrap text-lg" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.25)", color: C.white }}>
                 See TapTrao Shield
               </a>
             </div>
           </div>
         </div>
 
-        {/* Right panel — light with report card */}
-        <div
-          className="md:w-[48%] flex items-center justify-center px-6 py-12 md:py-0 relative overflow-hidden"
-          style={{ background: C.gray50 }}
-        >
-          <div className="w-full max-w-md relative">
-            {/* Report card */}
-            <div
-              className="rounded-2xl p-6 shadow-xl relative"
-              style={{
-                background: C.white,
-                border: `1px solid ${C.gray200}`,
-              }}
-            >
-              <div className="flex items-center justify-between mb-4">
+        {/* Right light panel */}
+        <div className="hidden lg:flex w-[48%] items-center justify-center px-12 py-20 relative overflow-hidden" style={{ background: C.gray50 }}>
+          {/* Background blobs */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] rounded-full" style={{ background: `${C.accent}14` }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] rounded-full" style={{ background: `${C.primary}0d` }} />
+          <div className="absolute top-8 right-8 w-24 h-24 rounded-full" style={{ background: `${C.accent}1a` }} />
+          <div className="absolute bottom-12 left-8 w-16 h-16 rounded-full" style={{ background: `${C.primary}14` }} />
+
+          <div className="relative w-full max-w-md">
+            {/* Main card */}
+            <div className="rounded-3xl shadow-2xl overflow-hidden" style={{ background: C.white, border: `1px solid ${C.gray100}` }}>
+              {/* Card header — dark teal */}
+              <div className="px-6 py-4 flex items-center justify-between" style={{ background: C.primary }}>
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: C.gray500 }}>Pre-Shipment Report</div>
-                  <div className="text-sm font-bold mt-1" style={{ color: C.dark }}>
-                    {"\u{1F95C}"} Cashew Nuts &middot; {"\u{1F1E8}\u{1F1EE}"} CI &rarr; {"\u{1F1EC}\u{1F1E7}"} UK
-                  </div>
+                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.6)" }}>Pre-Shipment Report</p>
+                  <p className="font-extrabold text-sm mt-0.5" style={{ color: C.white }}>{"\u{1F95C}"} Raw Cashew · CI → UK</p>
                 </div>
+                <span className="px-3 py-1 text-xs font-extrabold rounded-full" style={{ background: C.accent, color: C.primary }}>Live</span>
+              </div>
+
+              {/* Score row */}
+              <div className="px-6 py-5 flex items-center gap-5" style={{ borderBottom: `1px solid ${C.gray100}` }}>
                 <div className="text-center">
-                  <div className="text-3xl font-extrabold" style={{ color: C.primary }}>87</div>
-                  <div className="text-[10px] uppercase tracking-wider font-semibold" style={{ color: C.gray500 }}>Readiness</div>
+                  <div className="text-5xl font-extrabold" style={{ color: C.primary }}>87</div>
+                  <div className="text-xs font-semibold mt-0.5" style={{ color: C.gray500 }}>Readiness</div>
                 </div>
-              </div>
-
-              {/* Progress bar */}
-              <div className="h-2 rounded-full mb-5" style={{ background: C.gray100 }}>
-                <div
-                  className="h-full rounded-full transition-all duration-700"
-                  style={{ width: "87%", background: `linear-gradient(90deg, ${C.primary}, ${C.accent})` }}
-                />
-              </div>
-
-              {/* Document checklist */}
-              <div className="text-[10px] uppercase tracking-wider font-semibold mb-3" style={{ color: C.gray500 }}>Documents Required</div>
-              {[
-                { name: "Certificate of Origin", ok: true },
-                { name: "Phytosanitary Certificate", ok: true },
-                { name: "Commercial Invoice", ok: true },
-                { name: "Import Licence (>20MT)", ok: false },
-                { name: "Aflatoxin Test Report", ok: false },
-              ].map((d) => (
-                <div key={d.name} className="flex items-center gap-2.5 py-1.5">
-                  <div
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-[10px]"
-                    style={{
-                      background: d.ok ? `${C.accent}20` : `${C.gold}20`,
-                      color: d.ok ? C.primary : C.gold,
-                    }}
-                  >
-                    {d.ok ? "\u2713" : "!"}
+                <div className="flex-1">
+                  <div className="w-full h-2.5 rounded-full mb-3" style={{ background: C.gray100 }}>
+                    <div className="h-2.5 rounded-full" style={{ width: "87%", background: C.accent }} />
                   </div>
-                  <span className="text-sm" style={{ color: d.ok ? C.gray700 : C.gold }}>
-                    {d.name}
-                  </span>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                    {[
+                      { label: "Commodity risk", val: "LOW", color: "#059669" },
+                      { label: "Origin risk", val: "LOW", color: "#059669" },
+                      { label: "Regulatory", val: "MEDIUM", color: "#f59e0b" },
+                      { label: "Hazard", val: "AFLATOXIN", color: "#f97316" },
+                    ].map((r) => (
+                      <div key={r.label} className="flex justify-between">
+                        <span style={{ color: C.gray500 }}>{r.label}</span>
+                        <span className="font-bold" style={{ color: r.color }}>{r.val}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
+              </div>
+
+              {/* Docs list */}
+              <div className="px-6 py-4">
+                <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: C.gray500 }}>Required Documents</p>
+                <div className="space-y-2">
+                  {[
+                    "Certificate of Origin",
+                    "Phytosanitary Certificate",
+                    "Aflatoxin Test Report",
+                    "Bill of Lading",
+                    "Packing List",
+                  ].map((doc) => (
+                    <div key={doc} className="flex items-center gap-3 text-xs">
+                      <span className="w-5 h-5 flex items-center justify-center rounded-full text-xs font-bold flex-shrink-0" style={{ background: "#dcfce7", color: "#16a34a" }}>✓</span>
+                      <span className="font-medium" style={{ color: C.gray700 }}>{doc}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Card footer */}
+              <div className="px-6 py-4 flex items-center justify-between" style={{ background: C.gray50, borderTop: `1px solid ${C.gray100}` }}>
+                <span className="text-xs" style={{ color: C.gray500 }}>TT-2026-a3f9c1</span>
+                <span className="px-3 py-1 text-xs font-bold rounded-full" style={{ background: `${C.primary}15`, color: C.primary }}>Activate Shield →</span>
+              </div>
             </div>
 
-            {/* Floating badges */}
-            <div
-              className="absolute -top-3 -right-3 px-3 py-1.5 rounded-full text-[11px] font-bold shadow-lg"
-              style={{ background: C.accent, color: C.primaryDark }}
-            >
-              Low Risk
+            {/* Floating badge — 2 min */}
+            <div className="absolute -top-4 -right-4 rounded-2xl shadow-xl px-4 py-3 flex items-center gap-2" style={{ background: C.white, border: `1px solid ${C.gray100}` }}>
+              <span className="text-lg">⚡</span>
+              <div>
+                <p className="text-sm font-extrabold" style={{ color: C.gray900 }}>2 min</p>
+                <p className="text-xs" style={{ color: C.gray500 }}>Full report</p>
+              </div>
             </div>
-            <div
-              className="absolute -bottom-2 -left-3 px-3 py-1.5 rounded-full text-[11px] font-semibold shadow-lg"
-              style={{ background: C.white, color: C.gray700, border: `1px solid ${C.gray200}` }}
-            >
-              GSP 0% Duty
+
+            {/* Floating trust pill — Sanctions: Clear */}
+            <div className="absolute -top-6 left-6 rounded-full shadow-md px-4 py-2 flex items-center gap-2" style={{ background: "#ecfdf5", border: "1px solid #d1fae5" }}>
+              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#10b981" }} />
+              <p className="text-xs font-bold" style={{ color: "#047857" }}>Sanctions: Clear</p>
+            </div>
+
+            {/* Flags row */}
+            <div className="mt-10 pt-6" style={{ borderTop: `1px solid ${C.gray200}` }}>
+              <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: C.gray500 }}>Supported trade routes</p>
+              <div className="flex flex-wrap gap-2 text-2xl items-center">
+                <span className="font-extrabold text-base" style={{ color: C.primary }}>Africa</span>
+                <span className="font-bold text-sm mx-1" style={{ color: C.primary }}>→</span>
+                {["\u{1F1EA}\u{1F1FA}", "\u{1F1EC}\u{1F1E7}", "\u{1F1E9}\u{1F1EA}", "\u{1F1EB}\u{1F1F7}", "\u{1F1EE}\u{1F1F9}", "\u{1F1E8}\u{1F1ED}", "\u{1F1FA}\u{1F1F8}", "\u{1F1E8}\u{1F1E6}", "\u{1F1F9}\u{1F1F7}"].map((f, i) => (
+                  <span key={i} className="hover:scale-110 transition-transform cursor-default">{f}</span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* ═══ COST STRIP ═══ */}
-      <section className="py-10 px-4" style={{ background: C.gray900 }}>
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-            {[
-              { value: "$75-$300/day", label: "Demurrage while documents are on hold" },
-              { value: "$95-$160", label: "Bank fee for one LC discrepancy" },
-              { value: "$5,000", label: "US ISF late-filing penalty (per violation)" },
-              { value: "$1,500-$3,000+", label: "Typical cascade cost from one missing document" },
-            ].map((item) => (
-              <div key={item.value} className="text-center">
-                <div className="text-xl sm:text-2xl font-extrabold mb-2" style={{ color: C.gold }}>
-                  {item.value}
+      <section className="relative pt-4 pb-0" style={{ background: C.white }}>
+        <div className="mx-4 sm:mx-8 lg:mx-16 text-white rounded-[2rem] overflow-hidden shadow-2xl relative" style={{ background: `linear-gradient(to right, ${C.gray900}, ${C.gray800}, ${C.gray900})` }}>
+          {/* Decorative blobs */}
+          <div className="absolute -top-10 -left-10 w-48 h-48 rounded-full blur-[60px] pointer-events-none" style={{ background: `${C.accent}1a` }} />
+          <div className="absolute -bottom-10 -right-10 w-48 h-48 rounded-full blur-[60px] pointer-events-none" style={{ background: `${C.primary}33` }} />
+
+          <div className="relative max-w-7xl mx-auto px-6 sm:px-10 py-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+              {[
+                { value: "$75\u2013$300/day", label: "Demurrage while documents are on hold" },
+                { value: "$95\u2013$160", label: "Bank fee for one LC discrepancy" },
+                { value: "$5,000", label: "US ISF late-filing penalty (per violation)" },
+                { value: "$1,500\u2013$3,000+", label: "Typical cascade cost from one missing document" },
+              ].map((item) => (
+                <div key={item.value} className="text-center group">
+                  <div className="inline-block px-4 py-2 rounded-2xl mb-3 transition-colors" style={{ background: "rgba(255,255,255,0.05)" }}>
+                    <div className="text-3xl sm:text-4xl font-extrabold" style={{ color: C.accent }}>
+                      {item.value}
+                    </div>
+                  </div>
+                  <div className="text-base leading-snug" style={{ color: C.gray300 }}>
+                    {item.label}
+                  </div>
                 </div>
-                <div className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-                  {item.label}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div
-            className="text-center text-sm font-semibold mt-8 pt-6 border-t"
-            style={{ color: "rgba(255,255,255,0.7)", borderColor: "rgba(255,255,255,0.1)" }}
-          >
-            One missing document. $1,500-$3,000 gone. <span style={{ color: C.accent }}>TapTrao Shield: $110.</span>
+              ))}
+            </div>
+            <div className="text-center pt-6" style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+              <p className="text-lg" style={{ color: C.gray300 }}>
+                One missing document. $1,500–$3,000 gone. TapTrao Shield:{" "}
+                <strong style={{ color: C.accent }}>$110</strong>.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ═══ HOW IT WORKS ═══ */}
-      <section id="how" className="py-20 px-4" style={{ background: C.white }}>
-        <div className="max-w-6xl mx-auto text-center">
-          <div
-            className="inline-block text-[10px] uppercase tracking-widest font-bold mb-4 px-4 py-1.5 rounded-full"
-            style={{ background: `${C.primary}10`, color: C.primary }}
-          >
-            How It Works
+      <section id="how" className="py-24" style={{ background: C.white }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span
+              className="inline-block px-4 py-1.5 text-xs font-bold uppercase tracking-widest rounded-full mb-4"
+              style={{ background: `${C.primary}15`, color: C.primary }}
+            >
+              How It Works
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4" style={{ color: C.gray900 }}>
+              Start free. Step up{" "}
+              <span style={{ color: C.primary }}>when it matters.</span>
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto font-medium" style={{ color: C.gray500 }}>
+              The free Pre-Shipment Check tells you what regulations apply. TapTrao Shield tells you exactly what to do about them, and tracks it until docking.
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4" style={{ color: C.dark }}>
-            Start free. Step up{" "}
-            <span style={{ color: C.accent }}>when it matters.</span>
-          </h2>
-          <p className="text-base max-w-2xl mx-auto mb-14" style={{ color: C.gray500 }}>
-            The free Pre-Shipment Check tells you what regulations apply. TapTrao Shield tells you exactly what to do about them, and tracks it until docking.
-          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
                 num: "1",
                 icon: "\u{1F4CB}",
                 title: "Enter Your Trade",
-                body: "Origin, destination, commodity. 54 African origins. EU, UK, USA, Canada, Turkiye, Switzerland. Free. No card required.",
+                body: "Origin, destination, commodity. 54 African origins. EU, UK, USA, Canada, Türkiye, Switzerland. Free. No card required.",
               },
               {
                 num: "2",
@@ -883,26 +889,27 @@ export default function Home() {
                 num: "3",
                 icon: "\u{1F6E1}\uFE0F",
                 title: "Activate TapTrao Shield",
-                body: "Turn the snapshot into protection. LC document checks, sanctions screening, supplier requests, deadlines, and late-document alerts, monitored until docking. $110 per shipment.",
+                body: "Turn the snapshot into protection. LC document checks, sanctions screening, supplier requests, deadlines, document scanning, and late-document alerts, monitored until docking. $110 per shipment.",
               },
             ].map((step) => (
               <div
                 key={step.num}
-                className="relative rounded-2xl p-8 text-left transition-all duration-200 hover:shadow-lg"
+                className="relative rounded-[2rem] p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                 style={{
-                  background: `linear-gradient(135deg, rgba(93,217,193,0.05), rgba(14,78,69,0.03))`,
-                  border: `1px solid ${C.gray200}`,
+                  background: "linear-gradient(135deg, #f0fdfa, #ffffff, #ecfdf5)",
+                  border: "1px solid #ccfbf1",
                 }}
               >
+                {/* Floating step number bubble */}
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mb-4"
-                  style={{ background: C.primary, color: C.white }}
+                  className="absolute -top-5 left-8 w-10 h-10 rounded-full flex items-center justify-center text-base font-extrabold shadow-lg"
+                  style={{ background: C.primary, color: C.white, boxShadow: `0 4px 12px ${C.primary}4d` }}
                 >
                   {step.num}
                 </div>
-                <div className="text-3xl mb-3">{step.icon}</div>
-                <h3 className="text-lg font-bold mb-2" style={{ color: C.dark }}>{step.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: C.gray500 }}>{step.body}</p>
+                <div className="text-5xl mb-5 text-center mt-2">{step.icon}</div>
+                <h3 className="text-xl font-extrabold mb-3 text-center" style={{ color: C.gray900 }}>{step.title}</h3>
+                <p className="text-base font-medium leading-relaxed text-center" style={{ color: C.gray700 }}>{step.body}</p>
               </div>
             ))}
           </div>
@@ -941,23 +948,29 @@ export default function Home() {
       </section>
 
       {/* ═══ TRUST SECTION ═══ */}
-      <section id="trust" className="py-20 px-4" style={{ background: C.white }}>
-        <div className="max-w-6xl mx-auto text-center">
-          <div
-            className="inline-block text-[10px] uppercase tracking-widest font-bold mb-4 px-4 py-1.5 rounded-full"
-            style={{ background: `${C.primary}10`, color: C.primary }}
-          >
-            Why TapTrao Shield
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4" style={{ color: C.dark }}>
-            Why traders activate{" "}
-            <span style={{ color: C.accent }}>TapTrao Shield</span>
-          </h2>
-          <p className="text-base max-w-xl mx-auto mb-14" style={{ color: C.gray500 }}>
-            We know the Africa-Europe corridor because we've lived it.
-          </p>
+      <section id="trust" className="relative py-24 overflow-hidden" style={{ background: "linear-gradient(135deg, #f0fdfa, #ffffff, #ecfdf5)" }}>
+        {/* Decorative blobs */}
+        <div className="absolute top-0 right-0 w-72 h-72 rounded-full blur-[80px] pointer-events-none" style={{ background: `${C.accent}33`, transform: "translate(33%, -50%)" }} />
+        <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full blur-[80px] pointer-events-none" style={{ background: `${C.primary}1a`, transform: "translate(-33%, 50%)" }} />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span
+              className="inline-block px-4 py-1.5 text-xs font-bold uppercase tracking-widest rounded-full mb-4"
+              style={{ background: `${C.primary}15`, color: C.primary }}
+            >
+              Why TapTrao Shield
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4" style={{ color: C.gray900 }}>
+              Why traders activate{" "}
+              <span style={{ color: C.primary }}>TapTrao Shield</span>
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto font-medium" style={{ color: C.gray500 }}>
+              We know the Africa–Europe corridor because we've lived it.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               {
                 icon: "\u{1F3AF}",
@@ -967,7 +980,7 @@ export default function Home() {
               {
                 icon: "\u{1F4C4}",
                 title: "Catches LC problems before the bank does",
-                body: "Cross-checks documents against UCP 600. Flags issues that cost $95-$160 every time they're missed.",
+                body: "Cross-checks documents against UCP 600. Flags issues that cost $95–$160 every time they're missed.",
               },
               {
                 icon: "\u26A1",
@@ -977,16 +990,21 @@ export default function Home() {
               {
                 icon: "\u{1F30D}",
                 title: "Built for your corridors",
-                body: "54 African origins. EU, UK, USA, Canada, Turkiye, Switzerland. 90+ commodity chapters. Designed for real commodity trade.",
+                body: "54 African origins. EU, UK, USA, Canada, Türkiye, Switzerland. 90+ commodity chapters. Designed for real commodity trade, not theory.",
               },
             ].map((card) => (
               <div
                 key={card.title}
-                className="rounded-2xl p-8 text-left transition-all duration-200 hover:shadow-md"
-                style={{ background: C.gray50, border: `1px solid ${C.gray200}` }}
+                className="rounded-[2rem] p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+                style={{ background: C.white, border: "1px solid #ccfbf1" }}
               >
-                <div className="text-3xl mb-4">{card.icon}</div>
-                <h4 className="text-base font-bold mb-2" style={{ color: C.dark }}>{card.title}</h4>
+                <div
+                  className="w-14 h-14 flex items-center justify-center rounded-2xl text-3xl mb-5 group-hover:scale-110 transition-transform"
+                  style={{ background: `${C.primary}14` }}
+                >
+                  {card.icon}
+                </div>
+                <h4 className="text-xl font-extrabold mb-3" style={{ color: C.gray900 }}>{card.title}</h4>
                 <p className="text-sm leading-relaxed" style={{ color: C.gray500 }}>{card.body}</p>
               </div>
             ))}
@@ -995,75 +1013,54 @@ export default function Home() {
       </section>
 
       {/* ═══ PRICING SECTION ═══ */}
-      <section id="pricing" className="py-20 px-4" style={{ background: C.gray50 }}>
-        <div className="max-w-6xl mx-auto text-center">
-          <div
-            className="inline-block text-[10px] uppercase tracking-widest font-bold mb-4 px-4 py-1.5 rounded-full"
-            style={{ background: `${C.primary}10`, color: C.primary }}
-          >
-            Pricing
+      <section id="pricing" className="relative py-24 overflow-hidden" style={{ background: "linear-gradient(135deg, #f9fafb, #ffffff, #f0fdfa)" }}>
+        {/* Decorative blob */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-64 rounded-full blur-[80px] pointer-events-none" style={{ background: `${C.accent}1a` }} />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span
+              className="inline-block px-4 py-1.5 text-xs font-bold uppercase tracking-widest rounded-full mb-4"
+              style={{ background: `${C.primary}15`, color: C.primary }}
+            >
+              Pricing
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4" style={{ color: C.gray900 }}>
+              Choose your level of{" "}
+              <span style={{ color: C.primary }}>protection</span>
+            </h2>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4" style={{ color: C.dark }}>
-            Choose your level of
-            <br />
-            <span style={{ color: C.accent }}>protection</span>
-          </h2>
 
           {/* Pricing grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-14 max-w-5xl mx-auto">
-            {/* Free */}
-            <div className="rounded-2xl p-6 text-left" style={{ background: C.white, border: `1px solid ${C.gray200}` }}>
-              <div className="text-sm font-bold mb-3" style={{ color: C.dark }}>Pre-Shipment Regulatory Check</div>
-              <div className="text-3xl font-extrabold mb-1" style={{ color: C.primary }}>Free</div>
-              <div className="text-xs mb-1" style={{ color: C.gray500 }}>Unlimited checks</div>
-              <div className="text-xs mb-5" style={{ color: C.gray500 }}>No card required</div>
-              <ul className="space-y-2 mb-6">
-                {["Regulatory overview by corridor", "EUDR, customs, sanctions scope", "Unlimited free checks"].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm" style={{ color: C.gray600 }}>
-                    <span style={{ color: C.accent }}>{"\u2713"}</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/lookup"
-                className="block text-center text-sm font-semibold py-2.5 rounded-full transition-colors"
-                style={{ border: `1px solid ${C.gray300}`, color: C.gray700 }}
-              >
-                Run a Free Check
-              </Link>
-            </div>
-
-            {/* LC Document Check */}
-            <div className="rounded-2xl p-6 text-left" style={{ background: C.white, border: `1px solid ${C.gray200}` }}>
-              <div className="text-sm font-bold mb-3" style={{ color: C.dark }}>LC Document Check</div>
-              <div className="text-3xl font-extrabold mb-1" style={{ color: C.primary }}>$49.99</div>
-              <div className="text-xs mb-1" style={{ color: C.gray500 }}>Standalone</div>
-              <div className="text-xs mb-5" style={{ color: C.gray500 }}>one-time</div>
-              <ul className="space-y-2 mb-4">
-                {["LC document scanning & data extraction", "UCP 600 consistency checks", "Discrepancy summary & fix suggestions"].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm" style={{ color: C.gray600 }}>
-                    <span style={{ color: C.accent }}>{"\u2713"}</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <div className="text-[11px] italic mb-4" style={{ color: C.gray500 }}>Included free with every TapTrao Shield activation</div>
-              <Link
-                href="/pricing"
-                className="block text-center text-sm font-semibold py-2.5 rounded-full transition-colors"
-                style={{ border: `1px solid ${C.gray300}`, color: C.gray700 }}
-              >
-                Check LC - $49.99
-              </Link>
-            </div>
-
-            {/* Shield Single */}
-            <div className="rounded-2xl p-6 text-left" style={{ background: C.white, border: `1px solid ${C.gray200}` }}>
-              <div className="text-sm font-bold mb-3" style={{ color: C.dark }}>{"\u{1F6E1}\uFE0F"} TapTrao Shield: Single</div>
-              <div className="text-3xl font-extrabold mb-1" style={{ color: C.primary }}>$110</div>
-              <div className="text-xs mb-1" style={{ color: C.gray500 }}>1 Shipment</div>
-              <div className="text-xs mb-5" style={{ color: C.gray500 }}>per shipment</div>
-              <ul className="space-y-2 mb-6">
-                {[
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {[
+              {
+                name: "Pre-Shipment Regulatory Check",
+                price: "Free",
+                meta: "Unlimited checks",
+                per: "No card required",
+                features: ["Regulatory overview by corridor", "EUDR, customs, sanctions scope", "Unlimited free checks"],
+                cta: "Run a Free Check",
+                link: "/lookup",
+                featured: false,
+              },
+              {
+                name: "LC Document Check",
+                price: "$49.99",
+                meta: "Standalone",
+                per: "one-time",
+                features: ["LC document scanning & data extraction", "UCP 600 consistency checks", "Discrepancy summary & fix suggestions"],
+                note: "Included free with every TapTrao Shield activation",
+                cta: "Check LC — $49.99",
+                link: "/pricing",
+                featured: false,
+              },
+              {
+                name: "\u{1F6E1}\uFE0F TapTrao Shield: Single",
+                price: "$110",
+                meta: "1 Shipment",
+                per: "per shipment",
+                features: [
                   "Everything in the free check, PLUS:",
                   "LC document scanning & data extraction",
                   "LC document consistency checks (UCP 600)",
@@ -1072,169 +1069,212 @@ export default function Home() {
                   "Pre-built supplier document requests",
                   "Required documents checklist with deadlines",
                   "Late-document alerts until docking",
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm" style={{ color: C.gray600 }}>
-                    <span style={{ color: C.accent }}>{"\u2713"}</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/pricing"
-                className="block text-center text-sm font-semibold py-2.5 rounded-full transition-colors"
-                style={{ border: `1px solid ${C.gray300}`, color: C.gray700 }}
-              >
-                Activate TapTrao Shield
-              </Link>
-            </div>
-
-            {/* Shield 3-Pack (FEATURED) */}
-            <div
-              className="rounded-2xl p-6 text-left relative sm:col-span-2 lg:col-span-1 transition-transform duration-200 lg:scale-105 shadow-xl"
-              style={{ background: C.primary, border: `2px solid ${C.accent}` }}
-            >
+                ],
+                cta: "Activate TapTrao Shield",
+                link: "/pricing",
+                featured: false,
+              },
+              {
+                name: "\u{1F6E1}\uFE0F TapTrao Shield: 3-Pack",
+                price: "$299",
+                meta: "3 Shipments",
+                per: "$100 per check",
+                badge: "Most Popular",
+                features: ["Everything in a single Shield check", "Best for 1–3 shipments per month"],
+                cta: "Activate 3-Pack",
+                link: "/pricing",
+                featured: true,
+              },
+              {
+                name: "\u{1F6E1}\uFE0F TapTrao Shield: 5-Pack",
+                price: "$475",
+                meta: "5 Shipments",
+                per: "$95 per check",
+                features: ["Everything in a single Shield check", "Best for regular corridors & repeat shipments"],
+                cta: "Activate 5-Pack",
+                link: "/pricing",
+                featured: false,
+              },
+              {
+                name: "\u{1F6E1}\uFE0F Volume",
+                price: "Custom",
+                meta: "10+ shipments/month",
+                per: "Custom pricing",
+                features: ["Everything in a single Shield check", "Package built around your corridors"],
+                cta: "Contact Us",
+                link: "mailto:hello@taptrao.com",
+                featured: false,
+                external: true,
+              },
+            ].map((plan, index) => (
               <div
-                className="absolute -top-3 left-1/2 -translate-x-1/2 text-[11px] font-bold px-4 py-1 rounded-full"
-                style={{ background: C.accent, color: C.primaryDark }}
+                key={index}
+                className={`relative rounded-[2rem] p-8 transition-all duration-300 ${
+                  plan.featured
+                    ? "shadow-2xl scale-105 text-white"
+                    : "hover:shadow-xl hover:-translate-y-1"
+                }`}
+                style={
+                  plan.featured
+                    ? { background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, border: `2px solid ${C.primary}`, boxShadow: `0 8px 32px ${C.primary}4d` }
+                    : { background: C.white, border: "2px solid #2dd4bf" }
+                }
               >
-                Most Popular
-              </div>
-              <div className="text-sm font-bold mb-3" style={{ color: C.white }}>
-                {"\u{1F6E1}\uFE0F"} TapTrao Shield: 3-Pack
-              </div>
-              <div className="text-3xl font-extrabold mb-1" style={{ color: C.accent }}>$299</div>
-              <div className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.6)" }}>3 Shipments</div>
-              <div className="text-xs mb-5" style={{ color: "rgba(255,255,255,0.6)" }}>$100 per check</div>
-              <ul className="space-y-2 mb-6">
-                {["Everything in a single Shield check", "Best for 1-3 shipments per month"].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm" style={{ color: "rgba(255,255,255,0.8)" }}>
-                    <span style={{ color: C.accent }}>{"\u2713"}</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/pricing"
-                className="block text-center text-sm font-bold py-2.5 rounded-full transition-colors"
-                style={{ background: C.accent, color: C.primaryDark }}
-              >
-                Activate 3-Pack
-              </Link>
-            </div>
+                {plan.badge && (
+                  <div
+                    className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 text-xs font-extrabold rounded-full whitespace-nowrap shadow-md"
+                    style={{ background: C.accent, color: C.primary }}
+                  >
+                    {plan.badge}
+                  </div>
+                )}
 
-            {/* Shield 5-Pack */}
-            <div className="rounded-2xl p-6 text-left" style={{ background: C.white, border: `1px solid ${C.gray200}` }}>
-              <div className="text-sm font-bold mb-3" style={{ color: C.dark }}>{"\u{1F6E1}\uFE0F"} TapTrao Shield: 5-Pack</div>
-              <div className="text-3xl font-extrabold mb-1" style={{ color: C.primary }}>$475</div>
-              <div className="text-xs mb-1" style={{ color: C.gray500 }}>5 Shipments</div>
-              <div className="text-xs mb-5" style={{ color: C.gray500 }}>$95 per check</div>
-              <ul className="space-y-2 mb-6">
-                {["Everything in a single Shield check", "Best for regular corridors & repeat shipments"].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm" style={{ color: C.gray600 }}>
-                    <span style={{ color: C.accent }}>{"\u2713"}</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/pricing"
-                className="block text-center text-sm font-semibold py-2.5 rounded-full transition-colors"
-                style={{ border: `1px solid ${C.gray300}`, color: C.gray700 }}
-              >
-                Activate 5-Pack
-              </Link>
-            </div>
+                <div className="text-base font-extrabold mb-3" style={{ color: plan.featured ? C.white : C.gray900 }}>
+                  {plan.name}
+                </div>
 
-            {/* Volume */}
-            <div className="rounded-2xl p-6 text-left" style={{ background: C.white, border: `1px solid ${C.gray200}` }}>
-              <div className="text-sm font-bold mb-3" style={{ color: C.dark }}>{"\u{1F6E1}\uFE0F"} Volume</div>
-              <div className="text-3xl font-extrabold mb-1" style={{ color: C.primary }}>Custom</div>
-              <div className="text-xs mb-1" style={{ color: C.gray500 }}>10+ shipments/month</div>
-              <div className="text-xs mb-5" style={{ color: C.gray500 }}>Custom pricing</div>
-              <ul className="space-y-2 mb-6">
-                {["Everything in a single Shield check", "Package built around your corridors"].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm" style={{ color: C.gray600 }}>
-                    <span style={{ color: C.accent }}>{"\u2713"}</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <a
-                href="mailto:hello@taptrao.com"
-                className="block text-center text-sm font-semibold py-2.5 rounded-full transition-colors"
-                style={{ border: `1px solid ${C.gray300}`, color: C.gray700 }}
-              >
-                Contact Us
-              </a>
-            </div>
+                <div className="text-4xl font-extrabold mb-1" style={{ color: plan.featured ? C.accent : C.gray900 }}>
+                  {plan.price}
+                </div>
+
+                <div className="text-sm font-semibold mb-0.5" style={{ color: plan.featured ? "rgba(255,255,255,0.8)" : C.gray500 }}>
+                  {plan.meta}
+                </div>
+
+                <div className="text-xs mb-7" style={{ color: plan.featured ? "rgba(255,255,255,0.5)" : C.gray500 }}>
+                  {plan.per}
+                </div>
+
+                <ul className="space-y-2.5 mb-7">
+                  {plan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-start gap-2.5 text-sm font-bold" style={{ color: plan.featured ? "rgba(255,255,255,0.9)" : C.gray700 }}>
+                      <span className="flex-shrink-0 font-bold" style={{ color: plan.featured ? C.accent : C.primary }}>✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {plan.note && (
+                  <div className="text-xs italic mb-5 p-3 rounded-2xl" style={{ color: C.gray500, background: C.gray50 }}>
+                    {plan.note}
+                  </div>
+                )}
+
+                {plan.external ? (
+                  <a
+                    href={plan.link}
+                    className="block w-full py-3 text-center font-bold rounded-full transition-all cursor-pointer whitespace-nowrap text-sm"
+                    style={{ border: `2px solid ${C.primary}`, color: C.primary }}
+                  >
+                    {plan.cta}
+                  </a>
+                ) : (
+                  <Link
+                    href={plan.link}
+                    className="block w-full py-3 text-center font-bold rounded-full transition-all cursor-pointer whitespace-nowrap text-sm"
+                    style={
+                      plan.featured
+                        ? { background: C.accent, color: C.primary, boxShadow: `0 4px 16px ${C.accent}4d` }
+                        : { border: `2px solid ${C.primary}`, color: C.primary }
+                    }
+                  >
+                    {plan.cta}
+                  </Link>
+                )}
+              </div>
+            ))}
           </div>
 
-          <div className="text-xs mt-6" style={{ color: C.gray500 }}>
+          <div className="text-center text-xs mb-16" style={{ color: C.gray500 }}>
             Not legal advice. No guarantee of bank or customs acceptance.
           </div>
-        </div>
-      </section>
 
-      {/* ═══ BOTTOM CTA BANNER ═══ */}
-      <section className="py-16 px-4" style={{ background: `linear-gradient(135deg, ${C.dark}, ${C.darkLight})` }}>
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl font-extrabold mb-4" style={{ color: C.white }}>
-            The free check shows the risk.
-            <br />
-            <span style={{ color: C.accent }}>TapTrao Shield helps you fix it in time.</span>
-          </h2>
-          <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.5)" }}>
-            One missing document can cost thousands. TapTrao Shield costs $110.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Link
-              href="/lookup"
-              className="inline-flex items-center text-sm font-bold py-3 px-8 rounded-full transition-all duration-200 hover:shadow-lg"
-              style={{ background: C.accent, color: C.primaryDark }}
-            >
-              Free Pre-Shipment Check
-            </Link>
-            <a
-              href="#pricing"
-              className="inline-flex items-center text-sm font-semibold py-3 px-8 rounded-full transition-all duration-200"
-              style={{
-                color: "rgba(255,255,255,0.8)",
-                border: "1px solid rgba(255,255,255,0.2)",
-              }}
-            >
-              Activate TapTrao Shield: $110
-            </a>
+          {/* ═══ BOTTOM CTA BANNER ═══ */}
+          <div
+            className="rounded-[2rem] p-12 text-center text-white relative overflow-hidden"
+            style={{ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})` }}
+          >
+            <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full blur-[60px] pointer-events-none" style={{ background: "rgba(255,255,255,0.05)" }} />
+            <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full blur-[60px] pointer-events-none" style={{ background: `${C.accent}1a` }} />
+            <div className="relative">
+              <h2 className="text-3xl sm:text-4xl font-extrabold mb-4" style={{ color: C.white }}>
+                The free check shows the risk.
+                <br />
+                <span style={{ color: C.accent }}>TapTrao Shield helps you fix it in time.</span>
+              </h2>
+              <p className="text-lg font-medium mb-8" style={{ color: "rgba(255,255,255,0.75)" }}>
+                One missing document can cost thousands. TapTrao Shield costs $110.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link
+                  href="/lookup"
+                  className="w-full sm:w-auto px-9 py-4 font-extrabold rounded-full transition-all transform hover:scale-105 cursor-pointer text-center whitespace-nowrap"
+                  style={{ background: C.accent, color: C.primary, boxShadow: `0 8px 24px ${C.accent}4d` }}
+                >
+                  Free Pre-Shipment Check
+                </Link>
+                <a
+                  href="#pricing"
+                  className="w-full sm:w-auto px-9 py-4 font-extrabold rounded-full transition-all cursor-pointer text-center whitespace-nowrap"
+                  style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)", color: C.white }}
+                >
+                  Activate TapTrao Shield: $110
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ═══ FOOTER ═══ */}
-      <footer className="py-10 px-4" style={{ background: C.white, borderTop: `1px solid ${C.gray100}` }}>
-        <div className="max-w-6xl mx-auto">
-          {/* Disclaimer */}
+      <footer style={{ background: "linear-gradient(135deg, #f0fdfa, #ecfdf5)" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+          {/* Disclaimer card */}
           <div
-            className="text-xs leading-relaxed mb-6 max-w-2xl"
-            style={{ color: C.gray500 }}
+            className="rounded-3xl px-8 py-6 text-center mb-10"
+            style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid #ccfbf1" }}
           >
-            TapTrao provides automated trade and document screening for informational purposes only. Results do not constitute legal, regulatory, or banking advice and do not guarantee acceptance by authorities or financial institutions.
+            <p className="text-sm max-w-3xl mx-auto leading-relaxed" style={{ color: C.gray500 }}>
+              TapTrao provides automated trade and document screening for informational purposes only. Results do not constitute legal, regulatory, or banking advice and do not guarantee acceptance by authorities or financial institutions.
+            </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="TapTrao" className="w-7 h-7 rounded-lg" />
-              <span className="text-sm font-bold" style={{ color: C.primary }}>TapTrao</span>
-              <span className="text-xs" style={{ color: C.gray500 }}>
-                &copy; 2026 FATRAO LIMITED &middot; Trade compliance for commodity traders
-              </span>
+              <img src="/logo.png" alt="TapTrao" className="h-9 w-9 rounded-full shadow-sm" />
+              <div>
+                <div className="text-sm font-extrabold" style={{ color: C.gray900 }}>TapTrao</div>
+                <div className="text-xs" style={{ color: C.gray500 }}>&copy; 2026 FATRAO LIMITED · Trade compliance for commodity traders</div>
+              </div>
             </div>
 
-            <div className="flex items-center gap-5">
-              <Link href="/privacy-policy" className="text-xs font-medium transition-colors hover:text-teal-700" style={{ color: C.gray500 }}>
-                Privacy
-              </Link>
-              <Link href="/terms-of-service" className="text-xs font-medium transition-colors hover:text-teal-700" style={{ color: C.gray500 }}>
-                Terms
-              </Link>
-              <a href="mailto:hello@taptrao.com" className="text-xs font-medium transition-colors hover:text-teal-700" style={{ color: C.gray500 }}>
-                Contact
-              </a>
-              <span className="text-xs font-medium" style={{ color: C.gray500 }}>Docs</span>
+            <div className="flex items-center gap-2 flex-wrap justify-center">
+              {[
+                { label: "Privacy", href: "/privacy-policy", isRoute: true },
+                { label: "Terms", href: "/terms-of-service", isRoute: true },
+                { label: "Contact", href: "mailto:hello@taptrao.com", isRoute: false },
+                { label: "Docs", href: "#", isRoute: false },
+              ].map((item, i) =>
+                item.isRoute ? (
+                  <Link
+                    key={i}
+                    href={item.href}
+                    className="px-4 py-1.5 text-sm font-semibold rounded-full transition-colors hover:bg-white"
+                    style={{ color: C.gray600 }}
+                  >
+                    {item.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={i}
+                    href={item.href}
+                    className="px-4 py-1.5 text-sm font-semibold rounded-full transition-colors hover:bg-white"
+                    style={{ color: C.gray600 }}
+                  >
+                    {item.label}
+                  </a>
+                )
+              )}
             </div>
           </div>
         </div>
