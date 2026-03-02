@@ -441,6 +441,7 @@ export const companyProfiles = pgTable("company_profiles", {
   countryIso2: varchar("country_iso2", { length: 2 }).notNull(),
   vatNumber: text("vat_number"),
   eoriNumber: text("eori_number"),
+  einNumber: text("ein_number"),
   contactEmail: text("contact_email"),
   profileComplete: boolean("profile_complete").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),

@@ -1427,7 +1427,7 @@ export async function registerRoutes(
   app.post("/api/company-profile", async (req, res) => {
     try {
       const sessionId = getSessionId(req, res);
-      const { companyName, registeredAddress, countryIso2, vatNumber, eoriNumber, contactEmail } = req.body;
+      const { companyName, registeredAddress, countryIso2, vatNumber, eoriNumber, einNumber, contactEmail } = req.body;
       if (!companyName || !registeredAddress || !countryIso2) {
         res.status(400).json({ message: "companyName, registeredAddress, and countryIso2 are required" });
         return;
@@ -1439,6 +1439,7 @@ export async function registerRoutes(
         countryIso2,
         vatNumber: vatNumber || null,
         eoriNumber: eoriNumber || null,
+        einNumber: einNumber || null,
         contactEmail: contactEmail || null,
       });
       res.json(profile);

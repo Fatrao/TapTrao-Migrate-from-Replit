@@ -21,6 +21,7 @@ const profileSchema = z.object({
   countryIso2: z.string().min(2, "Country is required").max(2),
   vatNumber: z.string().optional().or(z.literal("")),
   eoriNumber: z.string().optional().or(z.literal("")),
+  einNumber: z.string().optional().or(z.literal("")),
   contactEmail: z.string().email("Must be a valid email").optional().or(z.literal("")),
 });
 
@@ -103,6 +104,7 @@ export default function SettingsProfile() {
       countryIso2: "",
       vatNumber: "",
       eoriNumber: "",
+      einNumber: "",
       contactEmail: "",
     },
   });
@@ -115,6 +117,7 @@ export default function SettingsProfile() {
         countryIso2: profileQuery.data.countryIso2 || "",
         vatNumber: profileQuery.data.vatNumber || "",
         eoriNumber: profileQuery.data.eoriNumber || "",
+        einNumber: profileQuery.data.einNumber || "",
         contactEmail: profileQuery.data.contactEmail || "",
       });
     }
@@ -128,11 +131,22 @@ export default function SettingsProfile() {
     onSuccess: (savedProfile) => {
       queryClient.invalidateQueries({ queryKey: ["/api/company-profile"] });
       const noEori = !savedProfile.eoriNumber;
-      if (noEori) {
+      const noEin = !savedProfile.einNumber;
+      if (noEori && noEin) {
         toast({
           title: "Profile saved",
-          description: "No EORI number saved. Your TwinLog Trail records will note this as incomplete. We recommend adding your EORI before sharing records with banks or customs authorities.",
+          description: "No EORI or EIN number saved. We recommend adding your EORI (EU/UK) or EIN (US) before sharing records with banks or customs authorities.",
           variant: "default",
+        });
+      } else if (noEori && !noEin) {
+        toast({
+          title: "Profile saved",
+          description: "EIN saved. If you also trade with the EU/UK, consider adding your EORI number.",
+        });
+      } else if (!noEori && noEin) {
+        toast({
+          title: "Profile saved",
+          description: "EORI saved. If you also trade with the US, consider adding your EIN.",
         });
       } else {
         toast({
@@ -287,6 +301,41 @@ export default function SettingsProfile() {
 
             <FormField
               control={form.control}
+              name="einNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>EIN (Employer Identification Number)</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="e.g. 12-3456789" data-testid="input-ein-number" />
+                  </FormControl>
+                  <FormDescription>
+                    US Federal Tax ID issued by the IRS (format: XX-XXXXXXX).
+                    Used as the Importer of Record number for US Customs and Border Protection (CBP).
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div
+              style={{ background: "rgba(14,78,69,0.06)", borderRadius: 12, padding: 16, border: "1px solid rgba(14,78,69,0.12)" }}
+            >
+              <div style={{ display: "flex", gap: 12 }}>
+                <Info style={{ width: 18, height: 18, color: "#0e4e45", flexShrink: 0, marginTop: 2 }} />
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "#0e4e45", marginBottom: 4 }}>EIN for US trade</p>
+                  <p style={{ fontSize: 13, color: "#555", margin: 0, lineHeight: 1.6 }}>
+                    The EIN is the US equivalent of the EORI number. It identifies your business on all US customs
+                    entry documents filed with CBP. If you import into the USA, your EIN serves as your Importer
+                    of Record (IOR) number. Apply at irs.gov/ein. Note: the USA does not use the EORI system —
+                    if you also ship to the EU/UK, you will need both an EIN and an EORI.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <FormField
+              control={form.control}
               name="contactEmail"
               render={({ field }) => (
                 <FormItem>
@@ -310,15 +359,15 @@ export default function SettingsProfile() {
               {saveMutation.isPending ? "Saving..." : "Save Profile"}
             </Button>
 
-            {saveMutation.isSuccess && !form.getValues("eoriNumber") && (
+            {saveMutation.isSuccess && !form.getValues("eoriNumber") && !form.getValues("einNumber") && (
               <div
-                style={{ display: "flex", alignItems: "center", gap: 8, borderRadius: 8, background: "var(--abg)", padding: 12 }}
-                data-testid="banner-eori-warning"
+                style={{ display: "flex", alignItems: "center", gap: 8, borderRadius: 8, background: "rgba(234,179,8,0.08)", padding: 12 }}
+                data-testid="banner-customs-id-warning"
               >
-                <AlertTriangle style={{ width: 18, height: 18, color: "var(--amber)", flexShrink: 0 }} />
-                <p style={{ fontSize: 13, color: "var(--amber)", margin: 0 }}>
-                  No EORI number saved. Your TwinLog Trail records will note this as incomplete.
-                  We recommend adding your EORI before sharing records with banks or customs authorities.
+                <AlertTriangle style={{ width: 18, height: 18, color: "#b45309", flexShrink: 0 }} />
+                <p style={{ fontSize: 13, color: "#b45309", margin: 0 }}>
+                  No customs identification number saved. Add your EORI (EU/UK traders) or EIN (US traders)
+                  before sharing records with banks or customs authorities.
                 </p>
               </div>
             )}
