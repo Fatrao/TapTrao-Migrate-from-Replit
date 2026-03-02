@@ -55,7 +55,7 @@ export default function CountryFlagBadge({
             </TooltipTrigger>
             <TooltipContent
               side="right"
-              className="max-w-xs bg-[#1a1a1c] border border-amber-500/30 shadow-lg z-[9999]"
+              className="max-w-xs bg-[#1a2332] border border-amber-500/30 shadow-lg z-[9999]"
               sideOffset={8}
             >
               <div className="space-y-1.5 p-1">

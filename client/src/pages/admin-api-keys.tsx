@@ -209,7 +209,7 @@ export default function AdminApiKeys() {
         </h2>
         <div style={{ fontSize: 13, color: "#555", lineHeight: 1.7 }}>
           <p style={{ margin: "0 0 12px" }}>Use your API key in the <code style={{ background: "#f5f5f5", padding: "2px 6px", borderRadius: 4, fontSize: 12 }}>Authorization</code> header:</p>
-          <div style={{ fontFamily: "monospace", fontSize: 12, background: "#1a1a1a", color: "#4ade80", padding: 16, borderRadius: 8, overflowX: "auto", marginBottom: 16 }}>
+          <div style={{ fontFamily: "monospace", fontSize: 12, background: "#1a1a1a", color: "#5dd9c1", padding: 16, borderRadius: 8, overflowX: "auto", marginBottom: 16 }}>
             <div>curl -H "Authorization: Bearer tt_live_..." \</div>
             <div>&nbsp;&nbsp;https://taptrao.com/api/v1/commodities</div>
           </div>

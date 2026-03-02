@@ -1189,8 +1189,8 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
       {/* AGOA eligibility info */}
       {result.agoaEligible && (
         <div style={{
-          background: "rgba(74,222,128,0.06)",
-          border: "1px solid rgba(74,222,128,0.2)",
+          background: "rgba(93,217,193,0.06)",
+          border: "1px solid rgba(93,217,193,0.2)",
           borderRadius: 10,
           padding: "12px 16px",
           display: "flex",
@@ -1628,7 +1628,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
       {!isAuthenticated && (
         <Card style={{
           background: "linear-gradient(135deg, #0e4e45, #14574a, #1c6352)",
-          border: "1px solid rgba(74,222,128,0.15)",
+          border: "1px solid rgba(93,217,193,0.15)",
         }} data-testid="banner-signup-conversion">
           <CardContent className="p-5 space-y-3">
             <h3 style={{ fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: "'Clash Display', sans-serif" }}>
@@ -1652,11 +1652,11 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
 
       {isAuthenticated && (
         <Card style={{
-          background: "rgba(74,222,128,0.06)",
-          border: "1px solid rgba(74,222,128,0.2)",
+          background: "rgba(93,217,193,0.06)",
+          border: "1px solid rgba(93,217,193,0.2)",
         }} data-testid="banner-saved-confirmation">
           <CardContent className="p-4 flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: "#4ade80" }} />
+            <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: "#5dd9c1" }} />
             <div>
               <p style={{ fontSize: 13, fontWeight: 600, color: "#16a34a" }}>Saved to My Trades</p>
               <p style={{ fontSize: 12, color: "#166534" }}>

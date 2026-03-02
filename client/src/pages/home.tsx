@@ -225,7 +225,7 @@ function DemoSection() {
                     { name: "Duty & VAT Payment", auth: "HMRC", ok: true },
                   ].map((d) => (
                     <div key={d.name} className="flex items-center gap-2 py-1.5">
-                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: d.ok ? "#22C55E" : C.gold }} />
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: d.ok ? "#5dd9c1" : C.gold }} />
                       <span className="text-xs flex-1" style={{ color: "rgba(255,255,255,0.75)" }}>{d.name}</span>
                       <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>{d.auth}</span>
                     </div>
@@ -246,7 +246,7 @@ function DemoSection() {
                     { name: "Aflatoxin Test Report", auth: "Accredited Lab", ok: false },
                   ].map((d) => (
                     <div key={d.name} className="flex items-center gap-2 py-1.5">
-                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: d.ok ? "#22C55E" : C.gold }} />
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: d.ok ? "#5dd9c1" : C.gold }} />
                       <span className="text-xs flex-1" style={{ color: "rgba(255,255,255,0.75)" }}>{d.name}</span>
                       <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>{d.auth}</span>
                     </div>
@@ -257,16 +257,16 @@ function DemoSection() {
                 <div className="p-4 rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.85)" }}>Readiness Score</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(34,197,94,0.10)", color: "#22C55E" }}>Low Risk</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(34,197,94,0.10)", color: "#5dd9c1" }}>Low Risk</span>
                   </div>
                   <div className="text-4xl font-bold text-center my-2" style={{ color: C.accent, fontFamily: "Nunito, sans-serif" }}>87</div>
                   <div className="text-[10px] text-center uppercase tracking-wider mb-3" style={{ color: "rgba(255,255,255,0.35)" }}>Compliance Readiness</div>
                   <div className="h-2 rounded-full mb-4" style={{ background: "rgba(255,255,255,0.08)" }}>
-                    <div className="h-full rounded-full" style={{ width: "87%", background: `linear-gradient(90deg, ${C.accent}, #22C55E)` }} />
+                    <div className="h-full rounded-full" style={{ width: "87%", background: `linear-gradient(90deg, ${C.accent}, #5dd9c1)` }} />
                   </div>
                   {[
-                    ["Commodity risk", "LOW", "#22C55E"],
-                    ["Origin risk", "LOW", "#22C55E"],
+                    ["Commodity risk", "LOW", "#5dd9c1"],
+                    ["Origin risk", "LOW", "#5dd9c1"],
                     ["Regulatory complexity", "MEDIUM", C.gold],
                     ["Known hazards", "AFLATOXIN", C.gold],
                   ].map(([k, v, c]) => (
@@ -281,7 +281,7 @@ function DemoSection() {
                 <div className="p-4 rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.85)" }}>Duty Estimate</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(34,197,94,0.10)", color: "#22C55E" }}>GSP rate</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(34,197,94,0.10)", color: "#5dd9c1" }}>GSP rate</span>
                   </div>
                   {[
                     ["MFN Tariff Rate", "0%"],
@@ -324,7 +324,7 @@ function DemoSection() {
                   </div>
                   <div className="flex gap-4">
                     {[
-                      { n: "8", label: "matched", color: "#22C55E" },
+                      { n: "8", label: "matched", color: "#5dd9c1" },
                       { n: "1", label: "warning", color: C.gold },
                       { n: "2", label: "critical", color: "#ef4444" },
                     ].map((s) => (
@@ -400,12 +400,12 @@ function DemoSection() {
                   </div>
 
                   <div className="h-px my-3" style={{ background: "rgba(255,255,255,0.06)" }} />
-                  <div className="text-xs font-semibold mb-2" style={{ color: "#22C55E" }}>
+                  <div className="text-xs font-semibold mb-2" style={{ color: "#5dd9c1" }}>
                     {"\u{1F7E2}"} Matched (8)
                   </div>
                   {["Currency (USD)", "Goods Description", "Shipment Date", "Port of Discharge", "Quantity", "Incoterms (CIF)"].map((f) => (
                     <div key={f} className="flex items-center gap-2 py-0.5">
-                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#22C55E" }} />
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#5dd9c1" }} />
                       <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.45)" }}>{f}</span>
                     </div>
                   ))}

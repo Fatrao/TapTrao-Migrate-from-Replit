@@ -327,12 +327,12 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
             gap: 8,
             padding: "8px 12px",
             borderRadius: 10,
-            background: "rgba(74,222,128,0.08)",
-            border: "1px solid rgba(74,222,128,0.15)",
+            background: "rgba(93,217,193,0.08)",
+            border: "1px solid rgba(93,217,193,0.15)",
             cursor: "pointer",
           }}>
-            <Hexagon size={14} style={{ color: "#4ade80" }} />
-            <span style={{ fontSize: 12, fontWeight: 600, color: "#4ade80" }}>
+            <Hexagon size={14} style={{ color: "#5dd9c1" }} />
+            <span style={{ fontSize: 12, fontWeight: 600, color: "#5dd9c1" }}>
               {balance} {balance === 1 ? "check" : "checks"}
             </span>
             <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginLeft: "auto" }}>
@@ -509,7 +509,7 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
                         position: "absolute",
                         top: "calc(100% + 8px)",
                         right: 0,
-                        background: "#242428",
+                        background: "#1a2332",
                         borderRadius: 10,
                         padding: "6px 0",
                         minWidth: 180,

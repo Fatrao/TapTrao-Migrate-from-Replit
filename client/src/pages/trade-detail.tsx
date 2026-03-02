@@ -76,10 +76,10 @@ type AuditEvent = {
 
 /* ── Status badge colors ── */
 const statusConfig: Record<string, { label: string; bg: string; text: string; icon: typeof Package }> = {
-  active: { label: "Active", bg: "rgba(74,222,128,0.1)", text: "#16a34a", icon: Package },
+  active: { label: "Active", bg: "rgba(93,217,193,0.1)", text: "#16a34a", icon: Package },
   in_transit: { label: "In Transit", bg: "rgba(59,130,246,0.1)", text: "#3b82f6", icon: Anchor },
   arrived: { label: "Arrived", bg: "rgba(139,92,246,0.1)", text: "#8b5cf6", icon: Anchor },
-  cleared: { label: "Cleared", bg: "rgba(34,197,94,0.1)", text: "#22c55e", icon: CheckCircle2 },
+  cleared: { label: "Cleared", bg: "rgba(34,197,94,0.1)", text: "#5dd9c1", icon: CheckCircle2 },
   closed: { label: "Closed", bg: "rgba(107,114,128,0.1)", text: "#6b7280", icon: Archive },
   archived: { label: "Archived", bg: "rgba(107,114,128,0.1)", text: "#9ca3af", icon: Archive },
 };
@@ -87,12 +87,12 @@ const statusConfig: Record<string, { label: string; bg: string; text: string; ic
 /* ── Event type display config ── */
 const eventConfig: Record<string, { icon: typeof CheckCircle2; color: string; label: string }> = {
   compliance_check: { icon: Shield, color: "#0e4e45", label: "Compliance Check" },
-  account_created: { icon: CheckCircle2, color: "#4ade80", label: "Account Created" },
+  account_created: { icon: CheckCircle2, color: "#5dd9c1", label: "Account Created" },
   lc_check: { icon: FileText, color: "#3b82f6", label: "LC Check" },
   lc_recheck: { icon: FileText, color: "#8b5cf6", label: "LC Re-check" },
   correction_sent: { icon: ArrowRight, color: "#f59e0b", label: "Correction Sent" },
   supplier_link_created: { icon: ExternalLink, color: "#0e4e45", label: "Supplier Link Created" },
-  supplier_doc_uploaded: { icon: Upload, color: "#22c55e", label: "Document Uploaded" },
+  supplier_doc_uploaded: { icon: Upload, color: "#5dd9c1", label: "Document Uploaded" },
   buyer_doc_uploaded: { icon: Upload, color: "#0e4e45", label: "Document Uploaded (Buyer)" },
   doc_verified: { icon: ShieldCheck, color: "#16a34a", label: "Document Verified" },
   doc_flagged: { icon: Flag, color: "#ef4444", label: "Document Flagged" },
@@ -100,7 +100,7 @@ const eventConfig: Record<string, { icon: typeof CheckCircle2; color: string; la
   supplier_complete: { icon: CheckCircle2, color: "#16a34a", label: "Supplier Submission Complete" },
   status_change: { icon: ArrowRight, color: "#3b82f6", label: "Status Changed" },
   eta_set: { icon: Clock, color: "#8b5cf6", label: "ETA Set" },
-  arrival: { icon: Anchor, color: "#22c55e", label: "Shipment Arrived" },
+  arrival: { icon: Anchor, color: "#5dd9c1", label: "Shipment Arrived" },
   customs_cleared: { icon: CheckCircle2, color: "#16a34a", label: "Customs Cleared" },
   twinlog_generated: { icon: Hash, color: "#0e4e45", label: "TwinLog Generated" },
   eudr_created: { icon: Shield, color: "#059669", label: "EUDR Record Created" },
@@ -143,7 +143,7 @@ function StatusStepper({ current }: { current: string }) {
                 fontWeight: 600,
                 background: isArchived ? "rgba(156,163,175,0.15)" :
                   isComplete ? "#0e4e45" :
-                  isCurrent ? "#4ade80" : "rgba(255,255,255,0.1)",
+                  isCurrent ? "#5dd9c1" : "rgba(255,255,255,0.1)",
                 color: isArchived ? "#9ca3af" :
                   (isComplete || isCurrent) ? "#fff" : "var(--t3)",
                 transition: "all 0.2s",
@@ -191,8 +191,8 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
         marginBottom: 16,
         padding: "8px 12px",
         borderRadius: 8,
-        background: chainValid ? "rgba(74,222,128,0.06)" : "rgba(239,68,68,0.06)",
-        border: `1px solid ${chainValid ? "rgba(74,222,128,0.2)" : "rgba(239,68,68,0.2)"}`,
+        background: chainValid ? "rgba(93,217,193,0.06)" : "rgba(239,68,68,0.06)",
+        border: `1px solid ${chainValid ? "rgba(93,217,193,0.2)" : "rgba(239,68,68,0.2)"}`,
       }}>
         {chainValid ? (
           <ShieldCheck size={16} style={{ color: "#16a34a" }} />
@@ -682,7 +682,7 @@ export default function TradeDetail() {
                         fontFamily: "'Clash Display', sans-serif",
                         fontWeight: 700,
                         fontSize: 28,
-                        color: "#4ade80",
+                        color: "#5dd9c1",
                       }}>
                         {data.lookup.readinessScore}
                       </div>
@@ -694,7 +694,7 @@ export default function TradeDetail() {
                           fontSize: 12,
                           fontWeight: 700,
                           color: data.lookup.readinessVerdict === "RED" ? "#ef4444" :
-                            data.lookup.readinessVerdict === "AMBER" ? "#eab308" : "#4ade80",
+                            data.lookup.readinessVerdict === "AMBER" ? "#eab308" : "#5dd9c1",
                         }}>
                           {data.lookup.readinessVerdict || "—"}
                         </div>
@@ -1280,7 +1280,7 @@ export default function TradeDetail() {
                       fontFamily: "'Clash Display', sans-serif",
                       fontWeight: 700,
                       fontSize: 24,
-                      color: "#4ade80",
+                      color: "#5dd9c1",
                     }}>
                       {data.lookup.tradeValueCurrency || "USD"} {Number(data.lookup.tradeValue).toLocaleString()}
                     </div>
@@ -1300,7 +1300,7 @@ export default function TradeDetail() {
                 if (!estimate) return null;
                 const tradeVal = data.lookup.tradeValue ? Number(data.lookup.tradeValue) : 0;
                 const pctOfCargo = tradeVal > 0 ? ((estimate.maxCost / tradeVal) * 100).toFixed(1) : null;
-                const verdictColor = verdict === "RED" ? "#ef4444" : verdict === "AMBER" ? "#eab308" : "#4ade80";
+                const verdictColor = verdict === "RED" ? "#ef4444" : verdict === "AMBER" ? "#eab308" : "#5dd9c1";
                 return (
                   <Card>
                     <CardContent className="p-5">
