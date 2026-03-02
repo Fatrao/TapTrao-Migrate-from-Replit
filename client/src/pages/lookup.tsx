@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link, useLocation, useSearch } from "wouter";
 import { estimateDemurrageRange } from "@/lib/demurrage-utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { AppShell } from "@/components/AppShell";
 import { StepNav } from "@/components/StepNav";
@@ -332,79 +332,78 @@ function NextActionsPanel({
   const allComplete = pendingCount === 0;
 
   return (
-    <Card data-testid="section-next-actions">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" as const }}>Next Actions</p>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground" data-testid="text-pending-count">
+    <div style={{ background: "#1e2a36", borderRadius: 14, border: "1px solid rgba(93,217,193,0.12)", padding: "20px 24px" }} data-testid="section-next-actions">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Next Actions</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }} data-testid="text-pending-count">
             {pendingCount} pending
           </span>
-          <span className="flex items-center gap-0.5">
+          <span style={{ display: "flex", alignItems: "center", gap: 2 }}>
             {Array.from({ length: dotsTotal }).map((_, i) => (
               <Circle
                 key={i}
                 className="w-2.5 h-2.5"
-                style={{ fill: i < dotsFilled ? "var(--amber)" : "none", color: i < dotsFilled ? "var(--amber)" : "var(--t3)" }}
+                style={{ fill: i < dotsFilled ? "#eab308" : "none", color: i < dotsFilled ? "#eab308" : "rgba(255,255,255,0.2)" }}
               />
             ))}
           </span>
         </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        {hasStop && (
-          <div className="flex items-start gap-2 mb-3 p-2 rounded" style={{ background: "var(--rbg)" }}>
-            <AlertOctagon className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "var(--red)" }} />
-            <p className="text-sm font-medium" style={{ color: "var(--red)" }}>
-              STOP flag active \u2014 resolve trade restrictions before proceeding
-            </p>
-          </div>
-        )}
+      </div>
 
-        {allComplete ? (
-          <div className="text-center py-4 space-y-3" data-testid="section-all-complete">
-            <div className="flex items-center justify-center gap-2">
-              <CheckCircle2 className="w-5 h-5" style={{ color: "var(--green)" }} />
-              <p className="text-sm font-medium" style={{ color: "var(--green)" }}>
-                All actions complete for this trade.
-              </p>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              You can now download your compliance pack.
+      {hasStop && (
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 12, padding: 8, borderRadius: 8, background: "rgba(239,68,68,0.1)" }}>
+          <AlertOctagon className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "#ef4444" }} />
+          <p style={{ fontSize: 13, fontWeight: 500, color: "#ef4444", margin: 0 }}>
+            STOP flag active {"\u2014"} resolve trade restrictions before proceeding
+          </p>
+        </div>
+      )}
+
+      {allComplete ? (
+        <div style={{ textAlign: "center", padding: "16px 0" }} data-testid="section-all-complete">
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            <CheckCircle2 className="w-5 h-5" style={{ color: "#5dd9c1" }} />
+            <p style={{ fontSize: 13, fontWeight: 500, color: "#5dd9c1", margin: 0 }}>
+              All actions complete for this trade.
             </p>
-            <Button variant="outline" size="sm" disabled data-testid="button-download-compliance-pack">
-              <Download className="w-3 h-3 mr-1" /> Download Compliance Pack
-            </Button>
           </div>
-        ) : (
-          <div className="space-y-3">
-            {showItems.map(({ doc, idx }) => (
-              <div key={idx} className="flex items-start gap-2" data-testid={`next-action-${idx}`}>
-                <Circle className="w-2.5 h-2.5 mt-1.5 shrink-0" style={{ fill: "var(--amber)", color: "var(--amber)" }} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium">{doc.title.length > 60 ? doc.title.substring(0, 60) + "..." : doc.title}</span>
-                    <span className="text-xs text-muted-foreground">{ownerLabels[doc.owner]}</span>
-                    <span className="text-xs text-muted-foreground">{dueByLabels[doc.due_by]}</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground italic mt-0.5">
-                    {getActionHint(doc)}
-                  </p>
+          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", margin: "8px 0 12px" }}>
+            You can now download your compliance pack.
+          </p>
+          <Button variant="outline" size="sm" disabled data-testid="button-download-compliance-pack">
+            <Download className="w-3 h-3 mr-1" /> Download Compliance Pack
+          </Button>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {showItems.map(({ doc, idx }) => (
+            <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 8 }} data-testid={`next-action-${idx}`}>
+              <Circle className="w-2.5 h-2.5 mt-1.5 shrink-0" style={{ fill: "#eab308", color: "#eab308" }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: "#fff" }}>{doc.title.length > 60 ? doc.title.substring(0, 60) + "..." : doc.title}</span>
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{ownerLabels[doc.owner]}</span>
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{dueByLabels[doc.due_by]}</span>
                 </div>
+                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontStyle: "italic", margin: "2px 0 0" }}>
+                  {getActionHint(doc)}
+                </p>
               </div>
-            ))}
-            {pendingCount > 5 && (
-              <button
-                className="text-sm text-primary flex items-center gap-1 hover:underline cursor-pointer"
-                onClick={() => buyerDocsRef.current?.scrollIntoView({ behavior: "smooth" })}
-                data-testid="button-see-all-pending"
-              >
-                See all {pendingCount} pending items <ArrowDown className="w-3 h-3" />
-              </button>
-            )}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+            </div>
+          ))}
+          {pendingCount > 5 && (
+            <button
+              onClick={() => buyerDocsRef.current?.scrollIntoView({ behavior: "smooth" })}
+              style={{ fontSize: 13, color: "#5dd9c1", background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, padding: 0 }}
+              data-testid="button-see-all-pending"
+            >
+              See all {pendingCount} pending items <ArrowDown className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -461,47 +460,45 @@ function SupplierBriefSection({ result }: { result: ComplianceResult }) {
   const whatsappText = generateSupplierBriefWhatsApp(result);
 
   return (
-    <Card>
-      <CardContent className="p-4 space-y-3">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => setShowBrief(!showBrief)}
-          data-testid="button-generate-supplier-brief"
-        >
-          <Mail className="w-4 h-4 mr-2" />
-          {showBrief ? "Hide supplier instructions" : `Supplier instructions (${supplierDocs.length} documents)`}
-        </Button>
+    <div style={{ background: "#1e2a36", borderRadius: 14, border: "1px solid rgba(93,217,193,0.12)", padding: "20px 24px" }}>
+      <Button
+        variant="outline"
+        className="w-full"
+        onClick={() => setShowBrief(!showBrief)}
+        data-testid="button-generate-supplier-brief"
+      >
+        <Mail className="w-4 h-4 mr-2" />
+        {showBrief ? "Hide supplier instructions" : `Supplier instructions (${supplierDocs.length} documents)`}
+      </Button>
 
-        {showBrief && (
-          <div className="space-y-3">
-            <div className="flex gap-2">
-              <Button
-                variant={activeTab === "email" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveTab("email")}
-                data-testid="button-tab-email"
-              >
-                <Mail className="w-3 h-3 mr-1" />
-                Email Format
-              </Button>
-              <Button
-                variant={activeTab === "whatsapp" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveTab("whatsapp")}
-                data-testid="button-tab-whatsapp"
-              >
-                <MessageCircle className="w-3 h-3 mr-1" />
-                WhatsApp Format
-              </Button>
-            </div>
+      {showBrief && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 12 }}>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button
+              variant={activeTab === "email" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setActiveTab("email")}
+              data-testid="button-tab-email"
+            >
+              <Mail className="w-3 h-3 mr-1" />
+              Email Format
+            </Button>
+            <Button
+              variant={activeTab === "whatsapp" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setActiveTab("whatsapp")}
+              data-testid="button-tab-whatsapp"
+            >
+              <MessageCircle className="w-3 h-3 mr-1" />
+              WhatsApp Format
+            </Button>
+          </div>
 
-            <div className="relative">
-              <pre
-                className="text-xs p-3 rounded-md whitespace-pre-wrap break-words font-mono max-h-80 overflow-y-auto"
-                style={{ background: "var(--card2)", color: "var(--t2)" }}
-                data-testid={`text-brief-${activeTab}`}
-              >
+          <div style={{ position: "relative" }}>
+            <pre
+              style={{ fontSize: 11, padding: 12, borderRadius: 8, whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "monospace", maxHeight: 320, overflowY: "auto", background: "rgba(0,0,0,0.3)", color: "rgba(255,255,255,0.6)" }}
+              data-testid={`text-brief-${activeTab}`}
+            >
                 {activeTab === "email" ? emailText : whatsappText}
               </pre>
               <div className="mt-2">
@@ -513,8 +510,7 @@ function SupplierBriefSection({ result }: { result: ComplianceResult }) {
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+    </div>
   );
 }
 
@@ -573,7 +569,7 @@ async function computeSHA256(data: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
-function EvidenceHash({ result }: { result: ComplianceResult }) {
+function EvidenceHashInline({ result }: { result: ComplianceResult }) {
   const [hash, setHash] = useState<string | null>(null);
   const [timestamp] = useState(() => new Date().toISOString());
 
@@ -596,21 +592,16 @@ function EvidenceHash({ result }: { result: ComplianceResult }) {
   const shortRef = `TT-${year}-${hash.substring(0, 6).toUpperCase()}`;
 
   return (
-    <div style={{ background: "var(--card2)", borderRadius: 7, padding: "14px 18px" }}>
-      <div className="flex items-start gap-3">
-        <Hash className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--t3)" }} />
-        <div className="space-y-1 min-w-0">
-          <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t2)" }} data-testid="text-compliance-ref">
-            Compliance check ref: <span style={{ color: "var(--blue)" }}>{shortRef}</span>
-          </p>
-          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--blue)", wordBreak: "break-all" }} data-testid="text-full-hash">
-            SHA-256: {hash}
-          </p>
-          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)" }} data-testid="text-hash-timestamp">
-            Generated: {new Date(timestamp).toLocaleString()}
-          </p>
-        </div>
-      </div>
+    <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "rgba(93,217,193,0.8)" }} data-testid="text-compliance-ref">
+        {shortRef}
+      </p>
+      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "rgba(255,255,255,0.3)", wordBreak: "break-all", marginTop: 2 }} data-testid="text-full-hash">
+        sha256:{hash}
+      </p>
+      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "rgba(255,255,255,0.25)", marginTop: 2 }} data-testid="text-hash-timestamp">
+        {new Date(timestamp).toLocaleString()}
+      </p>
     </div>
   );
 }
@@ -623,18 +614,18 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
   primaryRiskFactor: string;
 }) {
   const verdictStyles = {
-    GREEN: { bg: "rgba(14,78,69,.05)", border: "rgba(14,78,69,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--green)", label: "LOW RISK" },
-    AMBER: { bg: "rgba(234,139,67,.05)", border: "rgba(234,139,67,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", label: "ATTENTION NEEDED" },
-    RED: { bg: "rgba(218,60,61,.05)", border: "rgba(218,60,61,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", label: "HIGH RISK \u2014 ACTION REQUIRED" },
+    GREEN: { badgeBg: "rgba(93,217,193,0.12)", badgeBorder: "rgba(93,217,193,0.25)", badgeColor: "#5dd9c1", label: "LOW RISK" },
+    AMBER: { badgeBg: "rgba(234,179,8,0.12)", badgeBorder: "rgba(234,179,8,0.25)", badgeColor: "#eab308", label: "ATTENTION NEEDED" },
+    RED: { badgeBg: "rgba(239,68,68,0.12)", badgeBorder: "rgba(239,68,68,0.25)", badgeColor: "#ef4444", label: "HIGH RISK \u2014 ACTION REQUIRED" },
   };
 
   const v = verdictStyles[verdict];
 
   const barColors: Record<string, string> = {
-    regulatory_complexity: "var(--blue)",
-    hazard_exposure: "var(--amber)",
-    document_volume: "var(--t3)",
-    trade_restriction: "var(--red)",
+    regulatory_complexity: "#60a5fa",
+    hazard_exposure: "#eab308",
+    document_volume: "rgba(255,255,255,0.25)",
+    trade_restriction: "#ef4444",
   };
 
   const factorRows = [
@@ -645,15 +636,10 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
   ];
 
   return (
-    <div
-      style={{
-        borderRadius: 10,
-        background: v.bg,
-        padding: "22px 26px",
-        marginBottom: 24,
-      }}
-      data-testid="section-readiness-score"
-    >
+    <div data-testid="section-readiness-score">
+      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", marginBottom: 12 }}>
+        Readiness Score
+      </div>
       <div style={{ display: "flex", gap: 0 }}>
         <div style={{ width: 160, display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
           <div
@@ -662,7 +648,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
               fontWeight: 900,
               fontSize: "clamp(48px, 6vw, 64px)",
               letterSpacing: 0,
-              color: "var(--t1)",
+              color: "#fff",
               lineHeight: 1,
             }}
             data-testid="text-readiness-score"
@@ -689,7 +675,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
           <p
             style={{
               fontSize: 13,
-              color: "var(--t2)",
+              color: "rgba(255,255,255,0.55)",
               lineHeight: 1.65,
               marginTop: 6,
               maxWidth: 260,
@@ -710,7 +696,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
                 style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}
                 data-testid={`factor-${f.key}`}
               >
-                <span style={{ width: 120, fontSize: 11, color: "var(--t2)", textAlign: "right", flexShrink: 0 }}>
+                <span style={{ width: 120, fontSize: 11, color: "rgba(255,255,255,0.5)", textAlign: "right", flexShrink: 0 }}>
                   {f.label}
                 </span>
                 <div style={{ flex: 1, height: 3, background: "rgba(255,255,255,0.07)", borderRadius: 2, position: "relative" }}>
@@ -719,7 +705,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
                       width: `${pct}%`,
                       height: "100%",
                       borderRadius: 2,
-                      background: barColors[f.key] || "var(--t3)",
+                      background: barColors[f.key] || "rgba(255,255,255,0.25)",
                     }}
                   />
                 </div>
@@ -729,7 +715,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
                     fontSize: isPrimary ? 9 : 10,
                     width: 48,
                     textAlign: "right",
-                    color: isPrimary ? "var(--amber)" : "var(--t3)",
+                    color: isPrimary ? "#eab308" : "rgba(255,255,255,0.35)",
                     flexShrink: 0,
                   }}
                 >
@@ -1143,30 +1129,192 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
 
   const buyerDocsRef = useRef<HTMLDivElement>(null);
 
+  const dkCard: React.CSSProperties = {
+    background: "#1e2a36",
+    borderRadius: 14,
+    border: "1px solid rgba(93,217,193,0.12)",
+    padding: "20px 24px",
+  };
+
   return (
-    <div className="space-y-4 mt-6" data-testid="section-compliance-result">
-      <div className="flex justify-center">
+    <div style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: 24 }} data-testid="section-compliance-result">
+      {/* ── Title: Pre-Shipment Report ── */}
+      <div style={{ textAlign: "center" }}>
+        <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 22, color: "#fff", margin: "0 0 6px" }}>Pre-Shipment Report</h2>
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: 0 }}>
+          {"📦"} {result.commodity.name} › {result.origin.countryName} › {result.destination.countryName}
+        </p>
+      </div>
+
+      {/* ── Risk Level Badge ── */}
+      <div style={{ display: "flex", justifyContent: "center" }}>
         <Badge className="text-base px-6 py-2 no-default-hover-elevate no-default-active-elevate" style={{ ...riskInlineStyles[riskLevel], fontFamily: "'DM Mono', monospace", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, borderRadius: 4 }} data-testid="badge-risk-level">
           {riskLabels[riskLevel]}
         </Badge>
       </div>
 
-      {result.readinessScore && (
-        <ReadinessBanner
-          score={result.readinessScore.score}
-          verdict={result.readinessScore.verdict}
-          summary={result.readinessScore.summary}
-          factors={result.readinessScore.factors}
-          primaryRiskFactor={result.readinessScore.factors.primary_risk_factor}
-        />
-      )}
+      {/* ── Two-Column Document Checklist ── */}
+      <div style={{ display: "grid", gridTemplateColumns: importerIndices.length > 0 && supplierIndices.length > 0 ? "1fr 1fr" : "1fr", gap: 16 }}>
+        {/* Your Side - Buyer */}
+        {importerIndices.length > 0 && (
+          <div style={dkCard} ref={buyerDocsRef}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+              <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "#fff" }}>
+                Your Side - Buyer
+              </span>
+              <span style={{
+                fontFamily: "'DM Mono', monospace", fontSize: 10,
+                background: "rgba(93,217,193,0.12)", color: "#5dd9c1",
+                padding: "2px 8px", borderRadius: 4,
+              }}>
+                {importerIndices.length} docs
+              </span>
+              <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,0.4)" }} data-testid="text-buyer-progress">
+                {importerReadyCount}/{importerIndices.length} ready
+              </span>
+            </div>
+            {importerIndices.map(({ r, i }) => {
+              const st = docStatuses[i] || "PENDING";
+              const dotColor = st === "READY" ? "#5dd9c1" : st === "RISK_ACCEPTED" ? "#eab308" : "rgba(255,255,255,0.25)";
+              return (
+                <div key={i} style={{ marginBottom: 10 }} data-testid={`text-requirement-${i}`}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: dotColor, marginTop: 5, flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: "#fff" }}>
+                          {r.title}
+                        </span>
+                        <StatusDropdown status={st} onChange={(s) => handleStatusChange(i, s)} index={i} />
+                      </div>
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginTop: 1 }}>
+                        {r.issuedBy}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
-      {/* Origin flag warning banner */}
+        {/* Their Side - Supplier */}
+        {supplierIndices.length > 0 && (
+          <div style={dkCard}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+              <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "#fff" }}>
+                Their Side - Supplier
+              </span>
+              <span style={{
+                fontFamily: "'DM Mono', monospace", fontSize: 10,
+                background: "rgba(93,217,193,0.12)", color: "#5dd9c1",
+                padding: "2px 8px", borderRadius: 4,
+              }}>
+                {supplierIndices.length} docs
+              </span>
+              <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,0.4)" }} data-testid="text-supplier-progress">
+                {supplierReadyCount}/{supplierIndices.length} ready
+              </span>
+            </div>
+            {supplierIndices.map(({ r, i }) => {
+              const st = docStatuses[i] || "PENDING";
+              const dotColor = st === "READY" ? "#5dd9c1" : st === "RISK_ACCEPTED" ? "#eab308" : "rgba(255,255,255,0.25)";
+              return (
+                <div key={i} style={{ marginBottom: 10 }} data-testid={`text-requirement-${i}`}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: dotColor, marginTop: 5, flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: "#fff" }}>
+                          {r.title}
+                        </span>
+                        <StatusDropdown status={st} onChange={(s) => handleStatusChange(i, s)} index={i} />
+                      </div>
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginTop: 1 }}>
+                        {r.issuedBy}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── Next Step → Check LC CTA ── */}
+      <div style={{
+        ...dkCard,
+        background: "linear-gradient(135deg, #0e4e45, #1a6b5f)",
+        border: "1px solid rgba(93,217,193,0.25)",
+        textAlign: "center",
+        padding: "20px 32px",
+      }}>
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 10, margin: "0 0 10px" }}>
+          Documents look good? Check your Letter of Credit next.
+        </p>
+        <CheckLcButton result={result} locked={freeLocked} />
+      </div>
+
+      {/* ── Readiness Score + Duty Estimate (two-column) ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        {/* Readiness Score */}
+        <div style={dkCard}>
+          {result.readinessScore ? (
+            <ReadinessBanner
+              score={result.readinessScore.score}
+              verdict={result.readinessScore.verdict}
+              summary={result.readinessScore.summary}
+              factors={result.readinessScore.factors}
+              primaryRiskFactor={result.readinessScore.factors.primary_risk_factor}
+            />
+          ) : (
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>Readiness score unavailable</p>
+          )}
+        </div>
+
+        {/* Duty Estimate */}
+        <div style={dkCard}>
+          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", marginBottom: 12 }}>
+            Duty Estimate
+          </div>
+          {Array.isArray(result.destination.preferenceSchemes) && (result.destination.preferenceSchemes as string[]).length > 0 && (
+            <span style={{
+              fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em",
+              background: "rgba(93,217,193,0.12)", color: "#5dd9c1",
+              padding: "3px 8px", borderRadius: 4, display: "inline-block", marginBottom: 12,
+            }}>
+              {(result.destination.preferenceSchemes as string[]).join(" · ")}
+            </span>
+          )}
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>VAT (Import)</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{result.destination.vatRate}%</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>Tariff Source</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{result.destination.tariffSource}</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>SPS Regime</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{result.destination.spsRegime || "Standard"}</span>
+          </div>
+          {result.destination.iso2 === "CH" && (
+            <p style={{ fontSize: 11, color: "#eab308", margin: "0 0 8px", lineHeight: 1.5 }}>
+              Swiss agricultural tariffs are often specific (CHF/kg). Verify at tares.admin.ch.
+            </p>
+          )}
+          {/* Hash embedded at bottom of duty card */}
+          <EvidenceHashInline result={result} />
+        </div>
+      </div>
+
+      {/* ── Origin flag warning ── */}
       {result.originFlagged && (
         <div style={{
+          ...dkCard,
           background: "rgba(245,158,11,0.08)",
           border: "1px solid rgba(245,158,11,0.25)",
-          borderRadius: 10,
           padding: "12px 16px",
           display: "flex",
           alignItems: "flex-start",
@@ -1218,45 +1366,41 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         if (!estimate) return (
           <div style={{ textAlign: "right", margin: "4px 0 8px" }}>
             <Link href="/demurrage" data-testid="link-demurrage-calculator">
-              <span style={{ fontSize: 11, color: "var(--blue)", cursor: "pointer", fontWeight: 600 }}>
+              <span style={{ fontSize: 11, color: "#5dd9c1", cursor: "pointer", fontWeight: 600 }}>
                 Demurrage Calculator →
               </span>
             </Link>
           </div>
         );
         const verdictColor = result.readinessScore?.verdict === "RED" ? "#ef4444"
-          : result.readinessScore?.verdict === "AMBER" ? "#d97706" : "#16a34a";
+          : result.readinessScore?.verdict === "AMBER" ? "#d97706" : "#5dd9c1";
         return (
           <div
             data-testid="demurrage-estimate-card"
             style={{
-              background: "rgba(14,78,69,0.06)",
-              border: "1px solid rgba(14,78,69,0.18)",
-              borderRadius: 10,
-              padding: "12px 16px",
+              ...dkCard,
               display: "flex",
               alignItems: "flex-start",
               gap: 10,
-              marginBottom: 4,
             }}
           >
             <span style={{ fontSize: 18, marginTop: 1 }}>⚓</span>
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: "#0e4e45", margin: 0 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "#fff", margin: 0 }}>
                 Estimated Port Demurrage
               </p>
-              <p style={{ fontSize: 12, color: "#555", margin: "4px 0 0", lineHeight: 1.6 }}>
-                At <strong>{estimate.port.label}</strong>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", margin: "4px 0 0", lineHeight: 1.6 }}>
+                At <strong style={{ color: "#fff" }}>{estimate.port.label}</strong>
                 {estimate.allPorts.length > 1 && (
-                  <span style={{ color: "#888", fontSize: 11 }}> (+ {estimate.allPorts.length - 1} more port{estimate.allPorts.length > 2 ? "s" : ""})</span>
+                  <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}> (+ {estimate.allPorts.length - 1} more port{estimate.allPorts.length > 2 ? "s" : ""})</span>
                 )}
                 , if clearance is delayed by{" "}
                 <span style={{ color: verdictColor, fontWeight: 600 }}>{estimate.delayLabel}</span>{" "}
                 (based on your readiness score), a standard 20ft container could cost{" "}
-                <strong style={{ color: "#1a1a1a" }}>${estimate.minCost.toLocaleString()} – ${estimate.maxCost.toLocaleString()}</strong>.
+                <strong style={{ color: "#fff" }}>${estimate.minCost.toLocaleString()} – ${estimate.maxCost.toLocaleString()}</strong>.
               </p>
               <Link href="/demurrage">
-                <span style={{ fontSize: 11, color: "#0e4e45", cursor: "pointer", fontWeight: 600, marginTop: 4, display: "inline-block" }}>
+                <span style={{ fontSize: 11, color: "#5dd9c1", cursor: "pointer", fontWeight: 600, marginTop: 4, display: "inline-block" }}>
                   Open full calculator ({estimate.allPorts.length} port{estimate.allPorts.length !== 1 ? "s" : ""}) →
                 </span>
               </Link>
@@ -1320,370 +1464,312 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
       />
 
       {hasStopFlags && (
-        <Card style={{ background: "var(--rbg)" }}>
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <AlertOctagon className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "var(--red)" }} />
-              <div className="space-y-2">
-                <p style={{ fontWeight: 600, color: "var(--red)", fontSize: 13 }}>
-                  STOP FLAGS — Trade Restrictions Apply
+        <div style={{ ...dkCard, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+            <AlertOctagon className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "#ef4444" }} />
+            <div>
+              <p style={{ fontWeight: 600, color: "#ef4444", fontSize: 13, margin: "0 0 8px" }}>
+                STOP FLAGS — Trade Restrictions Apply
+              </p>
+              {Object.entries(result.stopFlags!).map(([key, value]) => (
+                <p key={key} style={{ fontSize: 13, color: "#ef4444", opacity: 0.8, margin: "0 0 4px" }}>
+                  <span style={{ fontWeight: 600 }}>{key}:</span> {value as string}
                 </p>
-                {Object.entries(result.stopFlags!).map(([key, value]) => (
-                  <p key={key} style={{ fontSize: 13, color: "var(--red)", opacity: 0.8 }}>
-                    <span className="font-medium">{key}:</span> {value as string}
-                  </p>
-                ))}
-              </div>
+              ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Leaf className="w-4 h-4" style={{ color: "var(--t3)" }} />
-            <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" as const }}>Commodity</p>
-          </CardHeader>
-          <CardContent className="space-y-2 pt-0">
-            <p style={{ fontWeight: 600, color: "var(--t1)" }} data-testid="text-result-commodity">{result.commodity.name}</p>
-            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "var(--t3)", textTransform: "uppercase" as const }}>
-              HS {result.commodity.hsCode} &middot;{" "}
-              {result.commodity.commodityType}
-            </p>
-          </CardContent>
-        </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+        <div style={dkCard}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+            <Leaf className="w-4 h-4" style={{ color: "#5dd9c1" }} />
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Commodity</span>
+          </div>
+          <p style={{ fontWeight: 600, color: "#fff", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-commodity">{result.commodity.name}</p>
+          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase" as const, margin: 0 }}>
+            HS {result.commodity.hsCode} · {result.commodity.commodityType}
+          </p>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Globe className="w-4 h-4" style={{ color: "var(--t3)" }} />
-            <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" as const }}>Origin</p>
-          </CardHeader>
-          <CardContent className="space-y-2 pt-0">
-            <p style={{ fontWeight: 600, color: "var(--t1)" }} data-testid="text-result-origin">{result.origin.countryName}</p>
-            <p style={{ fontSize: 12, color: "var(--t3)" }}>
-              {result.origin.customsAdmin}
-            </p>
-            {result.origin.framework && (
-              <Badge variant="secondary" className="text-xs">
-                {result.origin.framework.name}
-              </Badge>
-            )}
-          </CardContent>
-        </Card>
+        <div style={dkCard}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+            <Globe className="w-4 h-4" style={{ color: "#5dd9c1" }} />
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Origin</span>
+          </div>
+          <p style={{ fontWeight: 600, color: "#fff", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-origin">{result.origin.countryName}</p>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", margin: "0 0 4px" }}>
+            {result.origin.customsAdmin}
+          </p>
+          {result.origin.framework && (
+            <span style={{
+              fontFamily: "'DM Mono', monospace", fontSize: 9,
+              background: "rgba(93,217,193,0.12)", color: "#5dd9c1",
+              padding: "2px 8px", borderRadius: 4, display: "inline-block",
+            }}>
+              {result.origin.framework.name}
+            </span>
+          )}
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <FileCheck className="w-4 h-4" style={{ color: "var(--t3)" }} />
-            <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" as const }}>Destination</p>
-          </CardHeader>
-          <CardContent className="space-y-2 pt-0">
-            <p style={{ fontWeight: 600, color: "var(--t1)" }} data-testid="text-result-destination">{result.destination.countryName}</p>
-            <p style={{ fontSize: 12, color: "var(--t3)" }}>
-              VAT: {result.destination.vatRate}% &middot;{" "}
-              {result.destination.tariffSource}
-            </p>
-            {result.destination.iso2 === "CH" && (
-              <div
-                data-testid="swiss-tariff-note"
-                style={{
-                  marginTop: 8,
-                  padding: "10px 12px",
-                  background: "var(--abg, rgba(234,139,67,0.08))",
-                  borderRadius: ".5rem",
-                  fontSize: 12,
-                  color: "var(--amber)",
-                  lineHeight: 1.5,
-                }}
-              >
-                Swiss agricultural tariffs are often specific (CHF/kg) not ad valorem.
-                TARES API provides exact rates — estimate may be indicative for food commodities.
-                Verify at <span style={{ fontWeight: 600 }}>tares.admin.ch</span> before quoting landed cost.
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <div style={dkCard}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+            <FileCheck className="w-4 h-4" style={{ color: "#5dd9c1" }} />
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Destination</span>
+          </div>
+          <p style={{ fontWeight: 600, color: "#fff", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-destination">{result.destination.countryName}</p>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", margin: 0 }}>
+            VAT: {result.destination.vatRate}% · {result.destination.tariffSource}
+          </p>
+          {result.destination.iso2 === "CH" && (
+            <div
+              data-testid="swiss-tariff-note"
+              style={{
+                marginTop: 8,
+                padding: "10px 12px",
+                background: "rgba(234,179,8,0.08)",
+                borderRadius: 8,
+                fontSize: 12,
+                color: "#eab308",
+                lineHeight: 1.5,
+              }}
+            >
+              Swiss agricultural tariffs are often specific (CHF/kg) not ad valorem.
+              TARES API provides exact rates — estimate may be indicative for food commodities.
+              Verify at <span style={{ fontWeight: 600 }}>tares.admin.ch</span> before quoting landed cost.
+            </div>
+          )}
+        </div>
       </div>
 
       {triggerCount > 0 && (
-        <Card>
-          <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Shield className="w-4 h-4" style={{ color: "var(--t3)" }} />
-            <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" as const }}>
+        <div style={dkCard}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
+            <Shield className="w-4 h-4" style={{ color: "#5dd9c1" }} />
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
               Regulatory Triggers ({triggerCount})
-            </p>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="flex flex-wrap gap-2">
-              <TriggerBadge label="SPS" active={result.triggers.sps} />
-              <TriggerBadge label="EUDR" active={result.triggers.eudr} />
-              <TriggerBadge label="Kimberley" active={result.triggers.kimberley} />
-              <TriggerBadge label="Conflict Minerals" active={result.triggers.conflict} />
-              <TriggerBadge label="CBAM" active={result.triggers.cbam} />
-              <TriggerBadge label="CSDDD" active={result.triggers.csddd} />
-              <TriggerBadge label="IUU" active={result.triggers.iuu} />
-              <TriggerBadge label="CITES" active={result.triggers.cites} />
-              <TriggerBadge label="REACH" active={result.triggers.reach} />
-              <TriggerBadge label="Section 232" active={result.triggers.section232} />
-              <TriggerBadge label="FSIS" active={result.triggers.fsis} />
-            </div>
-          </CardContent>
-        </Card>
+            </span>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <TriggerBadge label="SPS" active={result.triggers.sps} />
+            <TriggerBadge label="EUDR" active={result.triggers.eudr} />
+            <TriggerBadge label="Kimberley" active={result.triggers.kimberley} />
+            <TriggerBadge label="Conflict Minerals" active={result.triggers.conflict} />
+            <TriggerBadge label="CBAM" active={result.triggers.cbam} />
+            <TriggerBadge label="CSDDD" active={result.triggers.csddd} />
+            <TriggerBadge label="IUU" active={result.triggers.iuu} />
+            <TriggerBadge label="CITES" active={result.triggers.cites} />
+            <TriggerBadge label="REACH" active={result.triggers.reach} />
+            <TriggerBadge label="Section 232" active={result.triggers.section232} />
+            <TriggerBadge label="FSIS" active={result.triggers.fsis} />
+          </div>
+        </div>
       )}
 
       {result.hazards.length > 0 &&
         !result.hazards.every((h) => h === "none_significant" || h === "none") && (
-          <Card>
-            <CardHeader className="flex flex-row items-center gap-2 pb-2">
-              <AlertTriangle className="w-4 h-4" style={{ color: "var(--t3)" }} />
-              <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" as const }}>Known Hazards</p>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="flex flex-wrap gap-2">
-                {result.hazards
-                  .filter((h) => h !== "none_significant" && h !== "none")
-                  .map((hazard) => (
-                    <Badge
-                      key={hazard}
-                      variant="outline"
-                      className="text-xs"
-                      data-testid={`badge-hazard-${hazard}`}
-                    >
-                      {hazard.replace(/_/g, " ")}
-                    </Badge>
-                  ))}
-              </div>
-            </CardContent>
-          </Card>
+          <div style={dkCard}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
+              <AlertTriangle className="w-4 h-4" style={{ color: "#eab308" }} />
+              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Known Hazards</span>
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {result.hazards
+                .filter((h) => h !== "none_significant" && h !== "none")
+                .map((hazard) => (
+                  <span
+                    key={hazard}
+                    style={{
+                      fontSize: 11,
+                      fontFamily: "'DM Mono', monospace",
+                      background: "rgba(234,179,8,0.1)",
+                      color: "#eab308",
+                      padding: "3px 10px",
+                      borderRadius: 4,
+                      border: "1px solid rgba(234,179,8,0.2)",
+                    }}
+                    data-testid={`badge-hazard-${hazard}`}
+                  >
+                    {hazard.replace(/_/g, " ")}
+                  </span>
+                ))}
+            </div>
+          </div>
         )}
 
-      {importerIndices.length > 0 && (
-        <div ref={buyerDocsRef}>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4" style={{ color: "var(--amber)" }} />
-                <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" as const }}>
-                  Your documents (you provide these)
-                </p>
-              </div>
-              <span className="text-xs text-muted-foreground" data-testid="text-buyer-progress">
-                {importerReadyCount} of {importerIndices.length} ready
-              </span>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <p className="text-xs text-muted-foreground mb-3">
-                Click any document to expand details. Use the status badge to track progress.
-              </p>
-              <ul className="space-y-2">
-                {importerIndices.map(({ r, i }) => (
-                  <InteractiveRequirement
-                    key={i}
-                    req={r}
-                    index={i}
-                    status={docStatuses[i] || "PENDING"}
-                    onStatusChange={(s) => handleStatusChange(i, s)}
-                  />
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {/* Old buyer/supplier doc sections removed — replaced by two-column layout above */}
 
-      {supplierIndices.length > 0 && (
-        <div>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4" style={{ color: "var(--green)" }} />
-                <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" as const }}>
-                  Supplier documents (you must request these)
-                </p>
-              </div>
-              <span className="text-xs text-muted-foreground" data-testid="text-supplier-progress">
-                {supplierReadyCount} of {supplierIndices.length} ready
-              </span>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <p className="text-xs text-muted-foreground mb-3">
-                Click any document to expand details. Use the status badge to track progress.
-              </p>
-              <ul className="space-y-2">
-                {supplierIndices.map(({ r, i }) => (
-                  <InteractiveRequirement
-                    key={i}
-                    req={r}
-                    index={i}
-                    status={docStatuses[i] || "PENDING"}
-                    onStatusChange={(s) => handleStatusChange(i, s)}
-                  />
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <Info className="w-5 h-5 shrink-0" style={{ color: "var(--t3)" }} />
-            <div>
-              <p className="text-sm font-medium">
-                AfCFTA Eligibility:{" "}
-                {result.afcftaEligible ? (
-                  <span style={{ color: "var(--green)" }}>
-                    Both countries are AfCFTA members — preferential treatment may apply
-                  </span>
-                ) : (
-                  <span className="text-muted-foreground">
-                    Not applicable — destination is not an AfCFTA member
-                  </span>
-                )}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <div style={{ ...dkCard, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
+        <Info className="w-5 h-5 shrink-0" style={{ color: "#5dd9c1" }} />
+        <p style={{ fontSize: 13, fontWeight: 500, color: "#fff", margin: 0 }}>
+          AfCFTA Eligibility:{" "}
+          {result.afcftaEligible ? (
+            <span style={{ color: "#5dd9c1" }}>
+              Both countries are AfCFTA members — preferential treatment may apply
+            </span>
+          ) : (
+            <span style={{ color: "rgba(255,255,255,0.45)" }}>
+              Not applicable — destination is not an AfCFTA member
+            </span>
+          )}
+        </p>
+      </div>
 
       {result.afcftaRoo && (
-        <Card data-testid="card-afcfta-roo">
-          <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Scale className="w-4 h-4" style={{ color: "var(--t3)" }} />
-            <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", letterSpacing: "0.03em", textTransform: "uppercase" as const }}>
+        <div style={dkCard} data-testid="card-afcfta-roo">
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
+            <Scale className="w-4 h-4" style={{ color: "#5dd9c1" }} />
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
               AfCFTA Rules of Origin — HS {result.afcftaRoo.hsHeading}
+            </span>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
+            <span
+              style={{
+                fontFamily: "'DM Mono', monospace", fontSize: 10,
+                background: "rgba(93,217,193,0.12)", color: "#5dd9c1",
+                padding: "3px 10px", borderRadius: 4,
+              }}
+              data-testid="badge-roo-rule"
+            >
+              {ruleLabels[result.afcftaRoo.generalRule] || result.afcftaRoo.generalRule}
+            </span>
+            {result.afcftaRoo.minValueAddPct && (
+              <span
+                style={{
+                  fontFamily: "'DM Mono', monospace", fontSize: 10,
+                  background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.6)",
+                  padding: "3px 10px", borderRadius: 4, border: "1px solid rgba(255,255,255,0.1)",
+                }}
+                data-testid="badge-roo-value-add"
+              >
+                Min {result.afcftaRoo.minValueAddPct}% value addition
+              </span>
+            )}
+          </div>
+          {result.afcftaRoo.specificProcess && (
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", margin: "0 0 8px", lineHeight: 1.5 }} data-testid="text-roo-specific-process">
+              {result.afcftaRoo.specificProcess}
             </p>
-          </CardHeader>
-          <CardContent className="pt-0 space-y-3">
-            <div className="flex flex-wrap gap-2 items-center">
-              <Badge variant="secondary" data-testid="badge-roo-rule">
-                {ruleLabels[result.afcftaRoo.generalRule] || result.afcftaRoo.generalRule}
-              </Badge>
-              {result.afcftaRoo.minValueAddPct && (
-                <Badge variant="outline" data-testid="badge-roo-value-add">
-                  Min {result.afcftaRoo.minValueAddPct}% value addition
-                </Badge>
-              )}
+          )}
+          {result.afcftaRoo.notes && (
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", margin: "0 0 8px", lineHeight: 1.5 }} data-testid="text-roo-notes">
+              {String(result.afcftaRoo.notes)}
+            </p>
+          )}
+          {result.afcftaRoo.alternativeCriteria != null && (
+            <div style={{ fontSize: 13, marginBottom: 8 }} data-testid="text-roo-alt-criteria">
+              <span style={{ fontWeight: 500, color: "#fff" }}>Alternative: </span>
+              <span style={{ color: "rgba(255,255,255,0.55)" }}>
+                {(() => {
+                  const criteria = result.afcftaRoo!.alternativeCriteria as Record<string, string>;
+                  return Object.values(criteria).join("; ");
+                })()}
+              </span>
             </div>
-            {result.afcftaRoo.specificProcess && (
-              <p className="text-sm text-muted-foreground" data-testid="text-roo-specific-process">
-                {result.afcftaRoo.specificProcess}
-              </p>
-            )}
-            {result.afcftaRoo.notes && (
-              <p className="text-sm text-muted-foreground" data-testid="text-roo-notes">
-                {String(result.afcftaRoo.notes)}
-              </p>
-            )}
-            {result.afcftaRoo.alternativeCriteria != null && (
-              <div className="text-sm" data-testid="text-roo-alt-criteria">
-                <span className="font-medium">Alternative: </span>
-                <span className="text-muted-foreground">
-                  {(() => {
-                    const criteria = result.afcftaRoo!.alternativeCriteria as Record<string, string>;
-                    return Object.values(criteria).join("; ");
-                  })()}
-                </span>
-              </div>
-            )}
-            <p className="text-xs text-muted-foreground">
-              Source: {String(result.afcftaRoo.sourceRef)}
-            </p>
-          </CardContent>
-        </Card>
+          )}
+          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", margin: 0 }}>
+            Source: {String(result.afcftaRoo.sourceRef)}
+          </p>
+        </div>
       )}
 
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <TwinLogDownloadButton result={result} docStatuses={docStatuses} locked={freeLocked} />
-            <CheckLcButton result={result} locked={freeLocked} />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                const csv = generateCustomsCSV(result);
-                const filename = `TapTrao_CustomsDataPack_${result.commodity.hsCode}_${result.origin.iso2}_${result.destination.iso2}.csv`;
-                downloadCSV(csv, filename);
-              }}
-              data-testid="button-download-customs-pack"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Customs data pack (CSV)
-            </Button>
-            <p style={{ fontSize: 11, color: "var(--t2)", textAlign: "center", marginTop: 4, fontStyle: "italic" }}>Use directly or share with a broker if you have one</p>
-            <SupplierBriefButton result={result} />
-          </div>
-        </CardContent>
-      </Card>
+      <div style={dkCard}>
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", marginBottom: 14 }}>
+          Actions
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          <TwinLogDownloadButton result={result} docStatuses={docStatuses} locked={freeLocked} />
+          <CheckLcButton result={result} locked={freeLocked} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 10 }}>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => {
+              const csv = generateCustomsCSV(result);
+              const filename = `TapTrao_CustomsDataPack_${result.commodity.hsCode}_${result.origin.iso2}_${result.destination.iso2}.csv`;
+              downloadCSV(csv, filename);
+            }}
+            data-testid="button-download-customs-pack"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Customs data pack (CSV)
+          </Button>
+          <SupplierBriefButton result={result} />
+        </div>
+        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", textAlign: "center", marginTop: 8, fontStyle: "italic" }}>Use directly or share with a broker if you have one</p>
+      </div>
 
       <SupplierBriefSection result={result} />
 
-      <EvidenceHash result={result} />
+      {/* Hash now embedded in Duty Estimate card above */}
 
       {/* Auth-aware conversion banner */}
       {!isAuthenticated && (
-        <Card style={{
+        <div style={{
+          ...dkCard,
           background: "linear-gradient(135deg, #0e4e45, #14574a, #1c6352)",
           border: "1px solid rgba(93,217,193,0.15)",
         }} data-testid="banner-signup-conversion">
-          <CardContent className="p-5 space-y-3">
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: "'Clash Display', sans-serif" }}>
-              Create a free account to save this check
-            </h3>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>
-              Keep your compliance results, run LC document checks, track supplier documents, and monitor your shipments — all from one dashboard.
-            </p>
-            <Link href="/register">
-              <Button
-                size="sm"
-                style={{ background: "#0e4e45", color: "#fff", borderRadius: 10, marginTop: 4 }}
-                data-testid="button-conversion-register"
-              >
-                Create Account →
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+          <h3 style={{ fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: "'Clash Display', sans-serif", margin: "0 0 8px" }}>
+            Create a free account to save this check
+          </h3>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, margin: "0 0 12px" }}>
+            Keep your compliance results, run LC document checks, track supplier documents, and monitor your shipments — all from one dashboard.
+          </p>
+          <Link href="/register">
+            <Button
+              size="sm"
+              style={{ background: "rgba(255,255,255,0.12)", color: "#fff", borderRadius: 10, border: "1px solid rgba(255,255,255,0.2)" }}
+              data-testid="button-conversion-register"
+            >
+              Create Account →
+            </Button>
+          </Link>
+        </div>
       )}
 
       {isAuthenticated && (
-        <Card style={{
+        <div style={{
+          ...dkCard,
           background: "rgba(93,217,193,0.06)",
           border: "1px solid rgba(93,217,193,0.2)",
+          padding: "14px 20px",
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
         }} data-testid="banner-saved-confirmation">
-          <CardContent className="p-4 flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: "#5dd9c1" }} />
-            <div>
-              <p style={{ fontSize: 13, fontWeight: 600, color: "#16a34a" }}>Saved to My Trades</p>
-              <p style={{ fontSize: 12, color: "#166534" }}>
-                View in your <Link href="/trades" style={{ textDecoration: "underline" }}>trades dashboard</Link> or continue to LC check.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+          <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: "#5dd9c1" }} />
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 600, color: "#5dd9c1", margin: 0 }}>Saved to My Trades</p>
+            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", margin: "2px 0 0" }}>
+              View in your <Link href="/trades" style={{ textDecoration: "underline", color: "#5dd9c1" }}>trades dashboard</Link> or continue to LC check.
+            </p>
+          </div>
+        </div>
       )}
 
       {freeLocked && (
-        <Card style={{ background: "var(--abg)" }} data-testid="banner-conversion">
-          <CardContent className="p-5 space-y-3">
-            <h3 className="font-semibold text-base font-heading">Want another corridor?</h3>
-            <p className="text-sm text-muted-foreground">
-              Activate TapTrao Shield for full shipment protection — LC checks, document tracking, and late-document alerts until docking.
-            </p>
-            <p className="text-sm italic text-muted-foreground">
-              ~30% of LC submissions are rejected on first presentation.
-            </p>
-            <Link href="/pricing">
-              <Button size="sm" data-testid="button-conversion-see-packs">
-                View TapTrao Shield →
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+        <div style={{
+          ...dkCard,
+          background: "rgba(234,179,8,0.06)",
+          border: "1px solid rgba(234,179,8,0.15)",
+        }} data-testid="banner-conversion">
+          <h3 style={{ fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: "'Clash Display', sans-serif", margin: "0 0 8px" }}>Want another corridor?</h3>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.6, margin: "0 0 6px" }}>
+            Activate TapTrao Shield for full shipment protection — LC checks, document tracking, and late-document alerts until docking.
+          </p>
+          <p style={{ fontSize: 13, fontStyle: "italic", color: "rgba(255,255,255,0.4)", margin: "0 0 12px" }}>
+            ~30% of LC submissions are rejected on first presentation.
+          </p>
+          <Link href="/pricing">
+            <Button size="sm" data-testid="button-conversion-see-packs">
+              View TapTrao Shield →
+            </Button>
+          </Link>
+        </div>
       )}
     </div>
   );
@@ -1729,15 +1815,20 @@ function SaveTemplatePrompt({
     },
   });
 
+  const dkCardLocal: React.CSSProperties = {
+    background: "#1e2a36",
+    borderRadius: 14,
+    border: "1px solid rgba(93,217,193,0.12)",
+    padding: "14px 20px",
+  };
+
   if (alreadySaved || saved) {
     if (saved) {
       return (
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: "var(--green)" }} />
-            <p className="text-sm">Template saved. Find it in My Templates.</p>
-          </CardContent>
-        </Card>
+        <div style={{ ...dkCardLocal, display: "flex", alignItems: "center", gap: 12 }}>
+          <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: "#5dd9c1" }} />
+          <p style={{ fontSize: 13, color: "#fff", margin: 0 }}>Template saved. Find it in My Templates.</p>
+        </div>
       );
     }
     return null;
@@ -1745,22 +1836,20 @@ function SaveTemplatePrompt({
 
   return (
     <>
-      <Card>
-        <CardContent className="p-4 flex items-center justify-between gap-3 flex-wrap">
-          <p className="text-sm text-muted-foreground">
-            Save this trade as a template for next time? It's free.
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowModal(true)}
-            data-testid="button-save-template-prompt"
-          >
-            <Bookmark className="w-3 h-3 mr-1" />
-            Save as Template
-          </Button>
-        </CardContent>
-      </Card>
+      <div style={{ ...dkCardLocal, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", margin: 0 }}>
+          Save this trade as a template for next time? It's free.
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowModal(true)}
+          data-testid="button-save-template-prompt"
+        >
+          <Bookmark className="w-3 h-3 mr-1" />
+          Save as Template
+        </Button>
+      </div>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent>
@@ -2126,19 +2215,17 @@ export default function Lookup() {
           </Card>
 
           {complianceMutation.isError && complianceMutation.error.message !== "Insufficient tokens" && (
-            <Card style={{ background: "var(--rbg)" }}>
-              <CardContent className="p-4 flex items-center gap-3">
-                <XCircle className="w-5 h-5 shrink-0" style={{ color: "var(--red)" }} />
-                <p style={{ fontSize: 13, color: "var(--red)" }}>
-                  {complianceMutation.error.message}
-                </p>
-              </CardContent>
-            </Card>
+            <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 14, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
+              <XCircle className="w-5 h-5 shrink-0" style={{ color: "#ef4444" }} />
+              <p style={{ fontSize: 13, color: "#ef4444", margin: 0 }}>
+                {complianceMutation.error.message}
+              </p>
+            </div>
           )}
 
           {displayResult && (
             <>
-              <StepNav steps={["Lookup", "LC Check", "TwinLog Trail", "Archive"]} currentIndex={0} completedUpTo={-1} />
+              <StepNav steps={["Enter trade", "Pre-ship report", "LC check 🔒", "Supplier brief 🔒"]} currentIndex={1} completedUpTo={1} />
               <ComplianceResultDisplay result={displayResult} freeLocked={freeLookupUsed && balance === 0} isAuthenticated={isAuthenticated} />
               {!isTemplateMode && !isLookupMode && (
                 <SaveTemplatePrompt

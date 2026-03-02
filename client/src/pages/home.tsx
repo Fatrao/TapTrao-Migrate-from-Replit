@@ -1226,6 +1226,34 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══ COMING SOON ═══ */}
+      <section style={{ background: "linear-gradient(135deg, #f0fdfa, #ecfdf5)", paddingTop: 48, paddingBottom: 0 }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h3 className="text-center text-lg font-bold mb-2" style={{ color: C.gray900 }}>Coming Soon</h3>
+          <p className="text-center text-sm mb-8" style={{ color: C.gray500 }}>We're building more tools for commodity traders.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto pb-8">
+            <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid #ccfbf1" }}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-sm font-bold" style={{ color: C.gray900 }}>Pro Monitoring</span>
+                <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded" style={{ background: "rgba(234,179,8,0.12)", color: "#b45309" }}>Coming Soon</span>
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: C.gray500 }}>
+                Regulatory change alerts and compliance calendar. For frequent shippers.
+              </p>
+            </div>
+            <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid #ccfbf1" }}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-sm font-bold" style={{ color: C.gray900 }}>Public API</span>
+                <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded" style={{ background: "rgba(234,179,8,0.12)", color: "#b45309" }}>Coming Soon</span>
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: C.gray500 }}>
+                Integrate compliance checks directly into your systems via REST API.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ FOOTER ═══ */}
       <footer style={{ background: "linear-gradient(135deg, #f0fdfa, #ecfdf5)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
