@@ -184,7 +184,7 @@ const S = {
     position: "absolute" as const,
     inset: -1,
     borderRadius: 15,
-    background: "linear-gradient(135deg, var(--blue-bd), var(--blue-dim), var(--blue-bd))",
+    background: "linear-gradient(135deg, rgba(93,217,193,0.3), rgba(93,217,193,0.08), rgba(93,217,193,0.3))",
     zIndex: 0,
     pointerEvents: "none" as const,
   } as React.CSSProperties,
@@ -224,7 +224,7 @@ export default function Pricing() {
   const balance = tokenQuery.data?.balance ?? 0;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#000", fontFamily: "var(--fb)", WebkitFontSmoothing: "antialiased", flex: 1, minWidth: 0 }}>
+    <div style={{ minHeight: "100vh", background: "#1a2332", fontFamily: "var(--fb)", WebkitFontSmoothing: "antialiased", flex: 1, minWidth: 0 }}>
       {/* NAV */}
       <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 12px", height: 56, borderBottom: "1px solid rgba(255,255,255,0.07)", gap: 6, overflow: "hidden" }}>
         <Link href="/">
@@ -262,7 +262,7 @@ export default function Pricing() {
           {tokenQuery.data && (
             <div style={{ marginTop: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
               <span
-                style={{ ...S.badge, background: "var(--card2)", color: "var(--t1)", fontSize: 12 }}
+                style={{ ...S.badge, background: "#2a3442", color: "var(--t1)", fontSize: 12 }}
                 data-testid="badge-pricing-balance"
               >
                 <Shield style={{ width: 14, height: 14 }} /> {balance} Shield {balance === 1 ? "check" : "checks"}
@@ -285,7 +285,7 @@ export default function Pricing() {
           data-testid="card-free-lookup-banner"
         >
           <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
-            <div style={{ padding: 12, borderRadius: "50%", background: "rgba(74,140,111,0.12)", flexShrink: 0 }}>
+            <div style={{ padding: 12, borderRadius: "50%", background: "rgba(14,78,69,0.12)", flexShrink: 0 }}>
               <Gift style={{ width: 24, height: 24, color: "var(--green)" }} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -308,12 +308,12 @@ export default function Pricing() {
         </div>
 
         {/* Promo Code Redemption */}
-        <div style={{ ...S.card, marginBottom: 40, background: "var(--card2)" }}>
+        <div style={{ ...S.card, marginBottom: 40, background: "#2a3442", border: "1px solid rgba(93,217,193,0.1)" }}>
           <PromoCodeRedeem />
         </div>
 
         {/* SECTION 1 — Trade Packs (core product, FIRST) */}
-        <div style={{ background: "#0a0a0a", borderRadius: 18, padding: "48px 32px", marginBottom: 40 }}>
+        <div style={{ background: "linear-gradient(160deg, #1a2332, #1e2838)", borderRadius: 18, padding: "48px 32px", marginBottom: 40 }}>
           <h2 style={{ ...S.sectionTitle, color: "#fff" }} data-testid="text-trade-packs-heading">
             TapTrao Shield
           </h2>
@@ -327,11 +327,11 @@ export default function Pricing() {
                 style={{ position: "relative" }}
                 data-testid={`card-pack-${pack.key}`}
               >
-                {pack.popular && <div style={{ ...S.shimmer, background: "linear-gradient(135deg, rgba(74,222,128,0.3), rgba(74,222,128,0.08), rgba(74,222,128,0.3))" }} />}
-                <div style={{ background: "#1c1c1f", borderRadius: 14, border: pack.popular ? "1px solid rgba(74,222,128,0.35)" : "1px solid rgba(255,255,255,0.12)", padding: 24, position: "relative", zIndex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
+                {pack.popular && <div style={{ ...S.shimmer, background: "linear-gradient(135deg, rgba(93,217,193,0.35), rgba(93,217,193,0.1), rgba(93,217,193,0.35))" }} />}
+                <div style={{ background: pack.popular ? "linear-gradient(160deg, #0e4e45, #0a3a33)" : "#2a3442", borderRadius: 14, border: pack.popular ? "1px solid rgba(93,217,193,0.4)" : "1px solid rgba(93,217,193,0.2)", padding: 24, position: "relative", zIndex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
                   {pack.popular && (
                     <div style={{ textAlign: "center", marginBottom: 12 }}>
-                      <span style={{ ...S.badge, background: "rgba(74,222,128,0.15)", color: "#4ade80" }}>
+                      <span style={{ ...S.badge, background: "#5dd9c1", color: "#0e4e45", fontWeight: 700 }}>
                         Most Popular
                       </span>
                     </div>
@@ -353,14 +353,14 @@ export default function Pricing() {
                   <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px", flex: 1 }}>
                     {pack.features.map((f) => (
                       <li key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>
-                        <Check style={{ width: 14, height: 14, color: "#4ade80", marginTop: 2, flexShrink: 0 }} />
+                        <Check style={{ width: 14, height: 14, color: "#5dd9c1", marginTop: 2, flexShrink: 0 }} />
                         <span>{f}</span>
                       </li>
                     ))}
                   </ul>
                   <button
                     style={{
-                      ...(pack.popular ? { ...S.btnPrimary, background: "#4ade80", color: "#0e4e45" } : { ...S.btnOutline, borderColor: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }),
+                      ...(pack.popular ? { ...S.btnPrimary, background: "#5dd9c1", color: "#0e4e45", fontWeight: 700 } : { ...S.btnOutline, borderColor: "rgba(93,217,193,0.25)", color: "rgba(255,255,255,0.7)" }),
                       width: "100%",
                       opacity: checkoutMutation.isPending ? 0.6 : 1,
                     }}
@@ -388,7 +388,7 @@ export default function Pricing() {
 
         {/* SECTION 2 — What's included (clarity block) */}
         <div style={{ marginBottom: 40 }}>
-          <div style={{ ...S.card, background: "var(--card2)", padding: 28 }}>
+          <div style={{ ...S.card, background: "#2a3442", border: "1px solid rgba(93,217,193,0.12)", padding: 28 }}>
             <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 16, color: "var(--t1)", margin: "0 0 16px", textAlign: "center" }}>
               Every TapTrao Shield activation includes
             </h3>
@@ -419,7 +419,7 @@ export default function Pricing() {
             Standalone LC checking without activating TapTrao Shield.
           </p>
           <div style={{ maxWidth: 480, margin: "0 auto" }}>
-            <div style={{ ...S.card, background: "var(--card2)", border: "1px solid var(--border2)" }} data-testid="card-lc-standalone">
+            <div style={{ ...S.card, background: "#2a3442", border: "1px solid rgba(93,217,193,0.15)" }} data-testid="card-lc-standalone">
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
                 <FileCheck style={{ width: 20, height: 20, color: "var(--blue)" }} />
                 <span style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 16, color: "var(--t1)" }}>
@@ -479,7 +479,7 @@ export default function Pricing() {
         {/* SECTION 4 — LC Corrections (add-on) */}
         <div style={{ marginBottom: 40 }}>
           <div style={{ maxWidth: 480, margin: "0 auto" }}>
-            <div style={{ ...S.card, border: "1px solid var(--border2)" }} data-testid="card-lc-recheck-addon">
+            <div style={{ ...S.card, background: "#2a3442", border: "1px solid rgba(93,217,193,0.12)" }} data-testid="card-lc-recheck-addon">
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                 <RefreshCw style={{ width: 18, height: 18, color: "var(--blue)" }} />
                 <span style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
@@ -502,7 +502,7 @@ export default function Pricing() {
         {/* SECTION 5 — High volume (de-emphasised) */}
         <div style={{ marginBottom: 40 }}>
           <div style={{ maxWidth: 480, margin: "0 auto" }}>
-            <div style={{ ...S.card, border: "1px dashed var(--border2)", background: "transparent" }} data-testid="card-enterprise">
+            <div style={{ ...S.card, border: "1px dashed rgba(93,217,193,0.2)", background: "transparent" }} data-testid="card-enterprise">
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                 <Building2 style={{ width: 18, height: 18, color: "var(--t2)" }} />
                 <span style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
@@ -527,7 +527,7 @@ export default function Pricing() {
         {/* SECTION 6 — Monitoring (muted) */}
         <div style={{ marginBottom: 40 }}>
           <div style={{ maxWidth: 480, margin: "0 auto" }}>
-            <div style={{ ...S.card, border: "1px dashed var(--border2)", background: "transparent", opacity: 0.7 }} data-testid="card-pro-monitoring">
+            <div style={{ ...S.card, border: "1px dashed rgba(93,217,193,0.15)", background: "transparent", opacity: 0.7 }} data-testid="card-pro-monitoring">
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                 <Bell style={{ width: 18, height: 18, color: "var(--t3)" }} />
                 <span style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
@@ -547,7 +547,7 @@ export default function Pricing() {
         {/* SECTION 7 — Public API (coming soon) */}
         <div style={{ marginBottom: 64 }}>
           <div style={{ maxWidth: 480, margin: "0 auto" }}>
-            <div style={{ ...S.card, border: "1px dashed var(--border2)", background: "transparent", opacity: 0.7 }} data-testid="card-public-api">
+            <div style={{ ...S.card, border: "1px dashed rgba(93,217,193,0.15)", background: "transparent", opacity: 0.7 }} data-testid="card-public-api">
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                 <Shield style={{ width: 18, height: 18, color: "var(--t3)" }} />
                 <span style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 14, color: "var(--t1)" }}>
@@ -571,7 +571,7 @@ export default function Pricing() {
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {faqs.map((faq, i) => (
-              <div key={i} style={{ borderBottom: "1px solid var(--border2)", paddingBottom: 20 }}>
+              <div key={i} style={{ borderBottom: "1px solid rgba(93,217,193,0.1)", paddingBottom: 20 }}>
                 <h3
                   style={{ fontFamily: "var(--fb)", fontWeight: 600, fontSize: 14, color: "var(--t1)", margin: "0 0 6px" }}
                   data-testid={`faq-question-${i}`}

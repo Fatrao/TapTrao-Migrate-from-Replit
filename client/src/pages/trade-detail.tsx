@@ -86,14 +86,14 @@ const statusConfig: Record<string, { label: string; bg: string; text: string; ic
 
 /* ── Event type display config ── */
 const eventConfig: Record<string, { icon: typeof CheckCircle2; color: string; label: string }> = {
-  compliance_check: { icon: Shield, color: "#6b9080", label: "Compliance Check" },
+  compliance_check: { icon: Shield, color: "#0e4e45", label: "Compliance Check" },
   account_created: { icon: CheckCircle2, color: "#4ade80", label: "Account Created" },
   lc_check: { icon: FileText, color: "#3b82f6", label: "LC Check" },
   lc_recheck: { icon: FileText, color: "#8b5cf6", label: "LC Re-check" },
   correction_sent: { icon: ArrowRight, color: "#f59e0b", label: "Correction Sent" },
-  supplier_link_created: { icon: ExternalLink, color: "#6b9080", label: "Supplier Link Created" },
+  supplier_link_created: { icon: ExternalLink, color: "#0e4e45", label: "Supplier Link Created" },
   supplier_doc_uploaded: { icon: Upload, color: "#22c55e", label: "Document Uploaded" },
-  buyer_doc_uploaded: { icon: Upload, color: "#6b9080", label: "Document Uploaded (Buyer)" },
+  buyer_doc_uploaded: { icon: Upload, color: "#0e4e45", label: "Document Uploaded (Buyer)" },
   doc_verified: { icon: ShieldCheck, color: "#16a34a", label: "Document Verified" },
   doc_flagged: { icon: Flag, color: "#ef4444", label: "Document Flagged" },
   doc_ai_scanned: { icon: Sparkles, color: "#8b5cf6", label: "AI Document Scan" },
@@ -102,11 +102,11 @@ const eventConfig: Record<string, { icon: typeof CheckCircle2; color: string; la
   eta_set: { icon: Clock, color: "#8b5cf6", label: "ETA Set" },
   arrival: { icon: Anchor, color: "#22c55e", label: "Shipment Arrived" },
   customs_cleared: { icon: CheckCircle2, color: "#16a34a", label: "Customs Cleared" },
-  twinlog_generated: { icon: Hash, color: "#6b9080", label: "TwinLog Generated" },
+  twinlog_generated: { icon: Hash, color: "#0e4e45", label: "TwinLog Generated" },
   eudr_created: { icon: Shield, color: "#059669", label: "EUDR Record Created" },
   trade_archived: { icon: Archive, color: "#9ca3af", label: "Trade Archived" },
   trade_closed: { icon: Archive, color: "#6b7280", label: "Trade Closed" },
-  trade_value_set: { icon: Package, color: "#6b9080", label: "Trade Value Set" },
+  trade_value_set: { icon: Package, color: "#0e4e45", label: "Trade Value Set" },
 };
 
 /* ── Status Stepper ── */
@@ -142,7 +142,7 @@ function StatusStepper({ current }: { current: string }) {
                 fontSize: 12,
                 fontWeight: 600,
                 background: isArchived ? "rgba(156,163,175,0.15)" :
-                  isComplete ? "#6b9080" :
+                  isComplete ? "#0e4e45" :
                   isCurrent ? "#4ade80" : "rgba(255,255,255,0.1)",
                 color: isArchived ? "#9ca3af" :
                   (isComplete || isCurrent) ? "#fff" : "var(--t3)",
@@ -167,7 +167,7 @@ function StatusStepper({ current }: { current: string }) {
                 marginBottom: 18,
                 marginLeft: 6,
                 marginRight: 6,
-                background: isComplete ? "#6b9080" : "rgba(255,255,255,0.1)",
+                background: isComplete ? "#0e4e45" : "rgba(255,255,255,0.1)",
                 borderRadius: 1,
                 transition: "background 0.2s",
               }} />
@@ -329,7 +329,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                     </div>
                   )}
                   {event.eventType === "trade_value_set" && event.eventData?.value && (
-                    <div style={{ fontSize: 11, color: "#6b9080", marginTop: 4 }}>
+                    <div style={{ fontSize: 11, color: "#0e4e45", marginTop: 4 }}>
                       {event.eventData.currency || "USD"} {Number(event.eventData.value).toLocaleString()}
                     </div>
                   )}
@@ -675,7 +675,7 @@ export default function TradeDetail() {
                       gap: 16,
                       padding: "12px 16px",
                       borderRadius: 10,
-                      background: "rgba(107,144,128,0.06)",
+                      background: "rgba(14,78,69,0.06)",
                       marginBottom: 12,
                     }}>
                       <div style={{
@@ -915,7 +915,7 @@ export default function TradeDetail() {
                                       </button>
                                     )}
                                     {verifyingId === upload.id ? (
-                                      <Loader2 size={14} style={{ color: "#6b9080", animation: "spin 1s linear infinite" }} />
+                                      <Loader2 size={14} style={{ color: "#0e4e45", animation: "spin 1s linear infinite" }} />
                                     ) : upload.verified !== true ? (
                                       <button
                                         onClick={() => handleVerify(upload.id)}
@@ -1120,7 +1120,7 @@ export default function TradeDetail() {
                           <div style={{ display: "flex", gap: 8 }}>
                             <Button
                               size="sm"
-                              style={{ fontSize: 11, background: "#6b9080", color: "#fff" }}
+                              style={{ fontSize: 11, background: "#0e4e45", color: "#fff" }}
                               disabled={!buyerDocType || buyerUploading}
                               onClick={handleBuyerUpload}
                             >
@@ -1192,11 +1192,11 @@ export default function TradeDetail() {
                         }}
                         style={{
                           background: "none",
-                          border: "1px solid rgba(107,144,128,0.3)",
+                          border: "1px solid rgba(14,78,69,0.3)",
                           borderRadius: 6,
                           padding: "3px 10px",
                           fontSize: 11,
-                          color: "#6b9080",
+                          color: "#0e4e45",
                           cursor: "pointer",
                         }}
                       >
@@ -1251,7 +1251,7 @@ export default function TradeDetail() {
                             fontWeight: 600,
                             borderRadius: 6,
                             border: "none",
-                            background: "#6b9080",
+                            background: "#0e4e45",
                             color: "#fff",
                             cursor: savingValue ? "wait" : "pointer",
                             opacity: savingValue || !tradeValueInput.trim() ? 0.5 : 1,
@@ -1326,7 +1326,7 @@ export default function TradeDetail() {
                         </div>
                         <div style={{ marginBottom: 6 }}>
                           <span style={{ color: "var(--t3)", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Cost range (20ft)</span>
-                          <div style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 20, color: "#6b9080" }}>
+                          <div style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 20, color: "#0e4e45" }}>
                             ${estimate.minCost.toLocaleString()} – ${estimate.maxCost.toLocaleString()}
                           </div>
                         </div>
@@ -1337,7 +1337,7 @@ export default function TradeDetail() {
                         )}
                       </div>
                       <Link href="/demurrage">
-                        <span style={{ fontSize: 11, color: "#6b9080", cursor: "pointer", fontWeight: 600 }}>
+                        <span style={{ fontSize: 11, color: "#0e4e45", cursor: "pointer", fontWeight: 600 }}>
                           Open full calculator ({estimate.allPorts.length} port{estimate.allPorts.length !== 1 ? "s" : ""}) →
                         </span>
                       </Link>
@@ -1360,14 +1360,14 @@ export default function TradeDetail() {
                 <Card style={{ marginTop: 16 }}>
                   <CardContent className="p-4">
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                      <Hash size={14} style={{ color: "#6b9080" }} />
+                      <Hash size={14} style={{ color: "#0e4e45" }} />
                       <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>TwinLog Reference</span>
                     </div>
                     <div style={{
                       fontFamily: "monospace",
                       fontSize: 12,
-                      color: "#6b9080",
-                      background: "rgba(107,144,128,0.06)",
+                      color: "#0e4e45",
+                      background: "rgba(14,78,69,0.06)",
                       padding: "8px 12px",
                       borderRadius: 8,
                       wordBreak: "break-all",

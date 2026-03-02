@@ -228,10 +228,10 @@ export default function AdminApiKeys() {
                 ["GET", "/api/v1/balance", "Check credit balance", "No"],
               ].map(([method, path, desc, cost]) => (
                 <tr key={path} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                  <td style={{ padding: "6px 8px", fontFamily: "monospace", fontWeight: 600, color: method === "POST" ? "#6b9080" : "#555" }}>{method}</td>
+                  <td style={{ padding: "6px 8px", fontFamily: "monospace", fontWeight: 600, color: method === "POST" ? "#0e4e45" : "#555" }}>{method}</td>
                   <td style={{ padding: "6px 8px", fontFamily: "monospace" }}>{path}</td>
                   <td style={{ padding: "6px 8px", color: "#555" }}>{desc}</td>
-                  <td style={{ padding: "6px 8px", color: cost === "No" ? "#555" : "#6b9080", fontWeight: cost !== "No" ? 600 : 400 }}>{cost}</td>
+                  <td style={{ padding: "6px 8px", color: cost === "No" ? "#555" : "#0e4e45", fontWeight: cost !== "No" ? 600 : 400 }}>{cost}</td>
                 </tr>
               ))}
             </tbody>

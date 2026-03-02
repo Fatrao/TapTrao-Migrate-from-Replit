@@ -134,7 +134,7 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
       <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 100 }} onClick={onClose} />
       <div style={{
         position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
-        background: "#1a1a1e", borderRadius: 14, padding: 28, width: "min(440px, 90vw)",
+        background: "#1a2332", borderRadius: 14, padding: 28, width: "min(440px, 90vw)",
         border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 16px 48px rgba(0,0,0,0.5)",
         zIndex: 101,
       }}>
@@ -200,7 +200,7 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
                 disabled={title.trim().length < 3 || mutation.isPending}
                 style={{
                   padding: "8px 20px", borderRadius: 8, fontSize: 13, fontWeight: 600,
-                  background: title.trim().length < 3 ? "rgba(107,144,128,0.4)" : "#6b9080",
+                  background: title.trim().length < 3 ? "rgba(14,78,69,0.4)" : "#0e4e45",
                   border: "none", color: "#fff", cursor: title.trim().length < 3 ? "not-allowed" : "pointer",
                   opacity: mutation.isPending ? 0.7 : 1,
                 }}>
@@ -374,12 +374,12 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
             style={{
               display: "flex", alignItems: "center", gap: 8,
               padding: "9px 12px", borderRadius: 10, cursor: "pointer",
-              background: "rgba(107,144,128,0.1)",
-              border: "1px solid rgba(107,144,128,0.2)",
+              background: "rgba(14,78,69,0.1)",
+              border: "1px solid rgba(14,78,69,0.2)",
               transition: "background 0.15s",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(107,144,128,0.18)")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(107,144,128,0.1)")}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(14,78,69,0.18)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(14,78,69,0.1)")}
             data-testid="sidebar-feature-request-btn"
           >
             <span style={{ fontSize: 14 }}>🗳️</span>

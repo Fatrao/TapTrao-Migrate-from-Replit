@@ -192,9 +192,9 @@ export default function Trades() {
               onClick={() => setFilter(f.key)}
               data-testid={`filter-${f.key}`}
               style={{
-                background: filter === f.key ? "rgba(107,144,128,0.12)" : "#fff",
-                border: `1px solid ${filter === f.key ? "#6b9080" : "#ccc"}`,
-                color: filter === f.key ? "#6b9080" : "#1a1a1a",
+                background: filter === f.key ? "rgba(14,78,69,0.12)" : "#fff",
+                border: `1px solid ${filter === f.key ? "#0e4e45" : "#ccc"}`,
+                color: filter === f.key ? "#0e4e45" : "#1a1a1a",
                 borderRadius: 20,
                 padding: "5px 14px",
                 fontSize: 12,
@@ -235,7 +235,7 @@ export default function Trades() {
             <Link href="/lookup">
               <button
                 style={{
-                  background: "#6b9080",
+                  background: "#0e4e45",
                   color: "#fff",
                   border: "none",
                   borderRadius: 8,
@@ -406,7 +406,7 @@ export default function Trades() {
                     <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>
                       <span
                         data-open
-                        style={{ fontSize: 11, fontWeight: 600, color: "#6b9080", opacity: 0, transition: "opacity .15s", whiteSpace: "nowrap" }}
+                        style={{ fontSize: 11, fontWeight: 600, color: "#0e4e45", opacity: 0, transition: "opacity .15s", whiteSpace: "nowrap" }}
                       >
                         {!trade.lcVerdict ? "View results →" : trade.lcVerdict === "DISCREPANCIES_FOUND" ? "Review LC →" : "View checklist →"}
                       </span>
@@ -430,13 +430,13 @@ export default function Trades() {
             </p>
             <div style={{ marginTop: 32, display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
               <Link href="/lookup">
-                <span style={{ fontSize: 13, color: "#6b9080", fontWeight: 600, cursor: "pointer" }}>+ New compliance check</span>
+                <span style={{ fontSize: 13, color: "#0e4e45", fontWeight: 600, cursor: "pointer" }}>+ New compliance check</span>
               </Link>
               <Link href="/templates">
-                <span style={{ fontSize: 13, color: "#6b9080", fontWeight: 600, cursor: "pointer" }}>Saved templates</span>
+                <span style={{ fontSize: 13, color: "#0e4e45", fontWeight: 600, cursor: "pointer" }}>Saved templates</span>
               </Link>
               <Link href="/alerts">
-                <span style={{ fontSize: 13, color: "#6b9080", fontWeight: 600, cursor: "pointer" }}>Alerts</span>
+                <span style={{ fontSize: 13, color: "#0e4e45", fontWeight: 600, cursor: "pointer" }}>Alerts</span>
               </Link>
             </div>
             <p style={{ fontSize: 11, color: "#555", marginTop: 48 }}>

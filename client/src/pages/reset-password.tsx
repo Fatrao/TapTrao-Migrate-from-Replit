@@ -73,7 +73,7 @@ export default function ResetPassword() {
       <div className="form-card" style={{ margin: "0 24px 20px", maxWidth: 420 }}>
         {success ? (
           <div>
-            <div style={{ background: "rgba(107,144,128,0.12)", border: "1px solid var(--sage)", borderRadius: 8, padding: "14px 16px", marginBottom: 16, fontSize: 13, color: "var(--sage)" }}>
+            <div style={{ background: "rgba(14,78,69,0.12)", border: "1px solid var(--sage)", borderRadius: 8, padding: "14px 16px", marginBottom: 16, fontSize: 13, color: "var(--sage)" }}>
               Your password has been reset successfully.
             </div>
             <a

@@ -190,8 +190,8 @@ export function CorrectionsTab({ prefillData }: { prefillData: LcPrefillData | n
 
       {/* Re-check prompt */}
       {(lcCase.status === "discrepancy" || lcCase.status === "pending_correction") && (
-        <div style={{ background: "rgba(107,144,128,0.08)", borderRadius: 14, border: "1px solid rgba(107,144,128,0.2)", padding: "20px 22px", textAlign: "center" }}>
-          <p style={{ fontSize: 14, fontWeight: 600, color: "#6b9080", marginBottom: 8 }}>
+        <div style={{ background: "rgba(14,78,69,0.08)", borderRadius: 14, border: "1px solid rgba(14,78,69,0.2)", padding: "20px 22px", textAlign: "center" }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: "#0e4e45", marginBottom: 8 }}>
             Supplier sent corrected documents?
           </p>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginBottom: 14 }}>
@@ -199,7 +199,7 @@ export function CorrectionsTab({ prefillData }: { prefillData: LcPrefillData | n
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 10 }}>
             <button
-              style={{ padding: "10px 20px", background: "#6b9080", color: "#fff", borderRadius: 8, fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer" }}
+              style={{ padding: "10px 20px", background: "#0e4e45", color: "#fff", borderRadius: 8, fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer" }}
               onClick={() => {
                 // Navigate to the Check tab and go to step 2 (upload docs)
                 window.dispatchEvent(new CustomEvent("lc-go-to-recheck"));

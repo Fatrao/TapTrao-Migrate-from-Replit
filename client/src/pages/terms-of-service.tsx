@@ -132,7 +132,7 @@ export default function TermsOfService() {
   );
 }
 
-const linkStyle: React.CSSProperties = { color: "#6b9080", textDecoration: "underline" };
+const linkStyle: React.CSSProperties = { color: "#0e4e45", textDecoration: "underline" };
 const ulStyle: React.CSSProperties = { paddingLeft: 24, margin: 0, display: "flex", flexDirection: "column", gap: 6 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

@@ -26,7 +26,7 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string): Prom
         <p style="font-size: 14px; color: #555; line-height: 1.6; margin: 0 0 24px;">
           We received a request to reset your password. Click the button below to choose a new one. This link expires in 1 hour.
         </p>
-        <a href="${resetUrl}" style="display: inline-block; background: #6b9080; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 600;">
+        <a href="${resetUrl}" style="display: inline-block; background: #0e4e45; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 600;">
           Reset Password
         </a>
         <p style="font-size: 12px; color: #999; margin-top: 32px; line-height: 1.5;">

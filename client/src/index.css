@@ -16,20 +16,20 @@
   --card: 240 3% 15%;
   --card-foreground: 0 0% 95%;
   --card-border: 0 0% 12%;
-  --sidebar: 189 38% 15%;
+  --sidebar: 218 32% 15%;
   --sidebar-foreground: 0 0% 95%;
   --sidebar-border: 0 0% 12%;
-  --sidebar-primary: 153 23% 56%;
-  --sidebar-primary-foreground: 0 0% 0%;
+  --sidebar-primary: 168 62% 61%;
+  --sidebar-primary-foreground: 172 82% 18%;
   --sidebar-accent: 0 0% 13%;
   --sidebar-accent-foreground: 0 0% 95%;
-  --sidebar-ring: 153 23% 56%;
+  --sidebar-ring: 168 62% 61%;
   --popover: 0 0% 11%;
   --popover-foreground: 0 0% 95%;
   --popover-border: 0 0% 12%;
-  --primary: 153 23% 56%;
-  --primary-foreground: 0 0% 0%;
-  --secondary: 153 30% 40%;
+  --primary: 172 82% 18%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 171 61% 26%;
   --secondary-foreground: 0 0% 100%;
   --muted: 0 0% 13%;
   --muted-foreground: 0 0% 55%;
@@ -38,9 +38,9 @@
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
   --input: 0 0% 12%;
-  --ring: 153 23% 56%;
-  --chart-1: 153 23% 56%;
-  --chart-2: 153 30% 40%;
+  --ring: 172 82% 18%;
+  --chart-1: 168 62% 61%;
+  --chart-2: 171 61% 26%;
   --chart-3: 27 80% 56%;
   --chart-4: 0 63% 55%;
   --chart-5: 0 0% 60%;
@@ -285,7 +285,7 @@
   /* Main content gradient: teal → light (holds dark teal for 400px) */
   .main-gradient {
     background: linear-gradient(180deg,
-      #163035 0px, #163035 400px, #2d6360 460px,
+      #0e4e45 0px, #0e4e45 400px, #2d6360 460px,
       #5c9590 520px, #93bfb0 570px, #c7ded2 610px,
       #dce7e2 650px, #E5E8E6 700px
     );
@@ -299,7 +299,7 @@
 
 .main-gradient {
   background: linear-gradient(180deg,
-    #163035 0%, #17343a 3%, #1a3d42 7%, #1e474c 12%,
+    #0e4e45 0%, #17343a 3%, #1a3d42 7%, #1e474c 12%,
     #245558 18%, #2d6360 24%, #3a7470 30%, #4a8580 36%,
     #5c9590 42%, #6ea49a 48%, #80b2a5 54%, #93bfb0 60%,
     #a6ccbb 66%, #b7d6c7 72%, #c7ded2 78%, #d3e3db 83%,
@@ -309,7 +309,7 @@
 
 .green-header-gradient {
   background: linear-gradient(180deg,
-    #163035 0%, #17343a 6%, #1a3d42 12%,
+    #0e4e45 0%, #17343a 6%, #1a3d42 12%,
     #1e474c 20%, #2d6360 35%, rgba(45,99,96,0.7) 55%, rgba(45,99,96,0) 100%
   );
 }
@@ -462,7 +462,7 @@
 .main-content {
   flex: 1; overflow: auto; padding: 0 0 0;
   background: linear-gradient(180deg,
-    #163035 0%, #17343a 3%, #1a3d42 7%, #1e474c 12%,
+    #0e4e45 0%, #17343a 3%, #1a3d42 7%, #1e474c 12%,
     #245558 18%, #2d6360 24%, #3a7470 30%, #4a8580 36%,
     #5c9590 42%, #6ea49a 48%, #80b2a5 54%, #93bfb0 60%,
     #a6ccbb 66%, #b7d6c7 72%, #c7ded2 78%, #d3e3db 83%,
@@ -478,7 +478,7 @@
 .dash-content {
   flex: 1;
   background: linear-gradient(180deg,
-    #163035 0%, #1a3d42 6%, #245558 14%, #3a7470 24%,
+    #0e4e45 0%, #1a3d42 6%, #245558 14%, #3a7470 24%,
     #4a8580 32%, #5c9590 40%, #6ea49a 48%, #80b2a5 54%,
     #93bfb0 60%, #a6ccbb 66%, #b7d6c7 72%, #c7ded2 78%,
     #dce7e2 85%, #e8edea 90%, #f0f3f1 95%, #ffffff 100%
@@ -589,7 +589,7 @@
 .content-area {
   flex: 1;
   background: linear-gradient(180deg,
-    #163035 0%, #17343a 3%, #1a3d42 7%, #1e474c 12%,
+    #0e4e45 0%, #17343a 3%, #1a3d42 7%, #1e474c 12%,
     #245558 18%, #2d6360 24%, #3a7470 30%, #4a8580 36%,
     #5c9590 42%, #6ea49a 48%, #80b2a5 54%, #93bfb0 60%,
     #a6ccbb 66%, #b7d6c7 72%, #c7ded2 78%, #d3e3db 83%,
@@ -1242,7 +1242,7 @@
   overflow: hidden;
   position: relative;
   background: linear-gradient(180deg,
-    #163035 0%, #17343a 3%, #1a3d42 7%, #1e474c 12%,
+    #0e4e45 0%, #17343a 3%, #1a3d42 7%, #1e474c 12%,
     #245558 18%, #2d6360 24%, #3a7470 30%, #4a8580 36%,
     #5c9590 42%, #6ea49a 48%, #80b2a5 54%, #93bfb0 60%,
     #a6ccbb 66%, #b7d6c7 72%, #c7ded2 78%, #d3e3db 83%,

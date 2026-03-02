@@ -11,7 +11,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
   primaryRiskFactor: string;
 }) {
   const verdictStyles = {
-    GREEN: { bg: "rgba(113,171,145,.05)", border: "rgba(113,171,145,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--app-acapulco)", label: "LOW RISK" },
+    GREEN: { bg: "rgba(93,217,193,.05)", border: "rgba(93,217,193,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--app-acapulco)", label: "LOW RISK" },
     AMBER: { bg: "rgba(234,139,67,.05)", border: "rgba(234,139,67,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", label: "MODERATE RISK" },
     RED: { bg: "rgba(218,60,61,.05)", border: "rgba(218,60,61,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", label: "HIGH RISK" },
   };

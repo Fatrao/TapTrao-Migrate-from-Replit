@@ -79,7 +79,7 @@ export default function Dashboard() {
     for (const [key, val] of Object.entries(commodityIcons)) {
       if (lower.includes(key)) return val;
     }
-    return { icon: "📦", bg: "rgba(107,144,128,0.1)" };
+    return { icon: "📦", bg: "rgba(14,78,69,0.1)" };
   }
 
   /* Build recent trades from lookups */
@@ -405,7 +405,7 @@ export default function Dashboard() {
             <div className="activity-list">
               {(lookupsQuery.data ?? []).slice(0, 2).map((l, i) => (
                 <div key={l.id} className="activity-item">
-                  <div className="act-avatar" style={{ background: i === 0 ? "rgba(113,171,145,0.12)" : "rgba(234,179,8,0.12)", color: i === 0 ? "var(--app-acapulco)" : "#d97706" }}>F</div>
+                  <div className="act-avatar" style={{ background: i === 0 ? "rgba(93,217,193,0.12)" : "rgba(234,179,8,0.12)", color: i === 0 ? "var(--app-acapulco)" : "#d97706" }}>F</div>
                   <div className="act-content">
                     <div className="act-text"><strong>You</strong> ran compliance lookup · {l.commodityName}</div>
                     <div className="act-time">{new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</div>
@@ -469,7 +469,7 @@ export default function Dashboard() {
           <div className="activity-list">
             {(lookupsQuery.data ?? []).map((l) => (
               <div key={l.id} className="activity-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/trades/${l.id}`)}>
-                <div className="act-avatar" style={{ background: "rgba(113,171,145,0.12)", color: "var(--app-acapulco)" }}>F</div>
+                <div className="act-avatar" style={{ background: "rgba(93,217,193,0.12)", color: "var(--app-acapulco)" }}>F</div>
                 <div className="act-content">
                   <div className="act-text"><strong>You</strong> ran compliance lookup · {l.commodityName}</div>
                   <div className="act-time">{new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</div>

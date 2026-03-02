@@ -117,7 +117,7 @@ export default function AdminFeatureRequests() {
                           <div style={{
                             marginTop: 8, padding: "6px 10px", borderRadius: 6,
                             background: "#f8f8f8", fontSize: 12, color: "#555",
-                            borderLeft: "3px solid #6b9080",
+                            borderLeft: "3px solid #0e4e45",
                           }}>
                             <strong>Note:</strong> {req.adminNote}
                           </div>
@@ -162,7 +162,7 @@ export default function AdminFeatureRequests() {
                           onClick={() => updateMutation.mutate({ id: req.id, status: req.status, adminNote: editNote })}
                           style={{
                             padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600,
-                            background: "#6b9080", color: "#fff", border: "none", cursor: "pointer",
+                            background: "#0e4e45", color: "#fff", border: "none", cursor: "pointer",
                           }}
                         >Save</button>
                         <button
@@ -177,7 +177,7 @@ export default function AdminFeatureRequests() {
                       <button
                         onClick={() => { setEditingId(req.id); setEditNote(req.adminNote || ""); }}
                         style={{
-                          marginTop: 8, fontSize: 11, color: "#6b9080", background: "none",
+                          marginTop: 8, fontSize: 11, color: "#0e4e45", background: "none",
                           border: "none", cursor: "pointer", padding: 0, fontWeight: 500,
                         }}
                       >

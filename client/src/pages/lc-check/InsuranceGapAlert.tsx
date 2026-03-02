@@ -14,7 +14,7 @@ export function InsuranceGapAlert() {
     <div
       data-testid="insurance-gap-alert"
       style={{
-        background: "rgba(113,171,145,.06)",
+        background: "rgba(93,217,193,.06)",
         borderRadius: 14,
         padding: "14px 18px",
         marginBottom: 20,

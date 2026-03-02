@@ -68,7 +68,7 @@ const accentGreenBorder = "#a7f3d0";
 const amberBg = "#fffbeb";
 const amberBorder = "#fde68a";
 const amberText = "#b45309";
-const sage = "#6b9080";
+const sage = "#0e4e45";
 const sageHover = "#5a7a6b";
 
 /* ── page ── */
@@ -547,7 +547,7 @@ function UploadZone({
           textAlign: "center",
           cursor: "pointer",
           transition: "all .15s",
-          background: isDragOver ? "rgba(107,144,128,0.06)" : "#fafafa",
+          background: isDragOver ? "rgba(14,78,69,0.06)" : "#fafafa",
           minHeight: 48,
           display: "flex",
           flexDirection: "column",

@@ -623,7 +623,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
   primaryRiskFactor: string;
 }) {
   const verdictStyles = {
-    GREEN: { bg: "rgba(74,140,111,.05)", border: "rgba(74,140,111,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--green)", label: "LOW RISK" },
+    GREEN: { bg: "rgba(14,78,69,.05)", border: "rgba(14,78,69,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--green)", label: "LOW RISK" },
     AMBER: { bg: "rgba(234,139,67,.05)", border: "rgba(234,139,67,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", label: "ATTENTION NEEDED" },
     RED: { bg: "rgba(218,60,61,.05)", border: "rgba(218,60,61,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", label: "HIGH RISK \u2014 ACTION REQUIRED" },
   };
@@ -1230,8 +1230,8 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <div
             data-testid="demurrage-estimate-card"
             style={{
-              background: "rgba(107,144,128,0.06)",
-              border: "1px solid rgba(107,144,128,0.18)",
+              background: "rgba(14,78,69,0.06)",
+              border: "1px solid rgba(14,78,69,0.18)",
               borderRadius: 10,
               padding: "12px 16px",
               display: "flex",
@@ -1242,7 +1242,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           >
             <span style={{ fontSize: 18, marginTop: 1 }}>⚓</span>
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: "#6b9080", margin: 0 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "#0e4e45", margin: 0 }}>
                 Estimated Port Demurrage
               </p>
               <p style={{ fontSize: 12, color: "#555", margin: "4px 0 0", lineHeight: 1.6 }}>
@@ -1256,7 +1256,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                 <strong style={{ color: "#1a1a1a" }}>${estimate.minCost.toLocaleString()} – ${estimate.maxCost.toLocaleString()}</strong>.
               </p>
               <Link href="/demurrage">
-                <span style={{ fontSize: 11, color: "#6b9080", cursor: "pointer", fontWeight: 600, marginTop: 4, display: "inline-block" }}>
+                <span style={{ fontSize: 11, color: "#0e4e45", cursor: "pointer", fontWeight: 600, marginTop: 4, display: "inline-block" }}>
                   Open full calculator ({estimate.allPorts.length} port{estimate.allPorts.length !== 1 ? "s" : ""}) →
                 </span>
               </Link>
@@ -1640,7 +1640,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             <Link href="/register">
               <Button
                 size="sm"
-                style={{ background: "#6b9080", color: "#fff", borderRadius: 10, marginTop: 4 }}
+                style={{ background: "#0e4e45", color: "#fff", borderRadius: 10, marginTop: 4 }}
                 data-testid="button-conversion-register"
               >
                 Create Account →
@@ -2011,7 +2011,7 @@ export default function Lookup() {
           )}
 
           <Card style={{ position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(74,140,111,0.3), transparent)" }} />
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(14,78,69,0.3), transparent)" }} />
             <CardContent className="p-6 space-y-6">
               <div className="space-y-6">
                 <div className="space-y-2">
@@ -2101,7 +2101,7 @@ export default function Lookup() {
                   size="lg"
                   disabled={!canSubmit || complianceMutation.isPending}
                   onClick={() => complianceMutation.mutate()}
-                  style={{ backgroundColor: 'var(--blue, #4a8c6f)', color: 'white' }}
+                  style={{ backgroundColor: 'var(--blue, #0e4e45)', color: 'white' }}
                   data-testid="button-run-check"
                 >
                   {complianceMutation.isPending ? (

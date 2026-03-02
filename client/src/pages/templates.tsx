@@ -22,9 +22,9 @@ function relativeTime(date: string | Date) {
 
 function originAvatar(iso2: string) {
   const colors: Record<string, string> = {
-    CI: "#ea8b43", GH: "#4a8c6f", CD: "#da3c3d", KE: "#4a8c6f",
-    NG: "#4a8c6f", TZ: "#ea8b43", ET: "#4a8c6f", ZA: "#da3c3d",
-    SN: "#4a8c6f", CM: "#ea8b43", UG: "#4a8c6f", MZ: "#4a8c6f",
+    CI: "#ea8b43", GH: "#0e4e45", CD: "#da3c3d", KE: "#0e4e45",
+    NG: "#0e4e45", TZ: "#ea8b43", ET: "#0e4e45", ZA: "#da3c3d",
+    SN: "#0e4e45", CM: "#ea8b43", UG: "#0e4e45", MZ: "#0e4e45",
   };
   const color = colors[iso2] || "var(--blue)";
   return (
