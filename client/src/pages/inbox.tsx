@@ -121,7 +121,7 @@ export default function Inbox() {
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 36, letterSpacing: 0, lineHeight: 1, color: c.color }}>
                 {c.value}
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#333", letterSpacing: ".04em", marginTop: 4 }}>
+              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "#333", letterSpacing: ".04em", marginTop: 4 }}>
                 {c.label}
               </div>
             </div>
@@ -162,7 +162,7 @@ function InboxGroup({ label, items, opacity }: { label: string; items: SupplierR
   return (
     <div style={{ marginBottom: 28, opacity: opacity ?? 1 }} data-testid={`inbox-group-${label.toLowerCase().replace(/\s+/g, "-")}`}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "#555", whiteSpace: "nowrap" }}>
+        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "#555", whiteSpace: "nowrap" }}>
           {label}
         </span>
         <div style={{ flex: 1 }} />
@@ -216,7 +216,7 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: "'DM Mono', monospace",
+          fontFamily: "'Inter', sans-serif",
           fontSize: 11,
           fontWeight: 800,
           color: avatar.text,
@@ -230,7 +230,7 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>{request.supplier_name}</span>
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#555" }}>
+          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "#555" }}>
             {request.origin_iso2} → {request.dest_iso2} · {request.commodity_name}
           </span>
         </div>
@@ -257,7 +257,7 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
             );
           })}
         </div>
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#555", marginTop: 6 }}>
+        <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "#555", marginTop: 6 }}>
           {docsReceived.length}/{docsRequired.length} docs
           {blockingCount > 0 && ` · ${blockingCount} blocking`}
           {pendingCount > 0 && ` · ${pendingCount} pending`}
@@ -268,7 +268,7 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flexShrink: 0 }}>
         <span
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 9,
             fontWeight: 600,
             padding: "2px 8px",
@@ -281,7 +281,7 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
         >
           {statusTag.symbol} {statusTag.label}
         </span>
-        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#555" }}>
+        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "#555" }}>
           {relativeTime(request.updated_at)}
         </span>
         {/* Send buttons */}

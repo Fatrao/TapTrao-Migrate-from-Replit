@@ -64,7 +64,7 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
     >
       <span
         style={{
-          fontFamily: "'DM Mono', monospace",
+          fontFamily: "'Inter', sans-serif",
           fontSize: 9,
           fontWeight: 600,
           textTransform: "uppercase",
@@ -92,14 +92,14 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
       </p>
 
       {alert.hsCodesAffected && alert.hsCodesAffected.length > 0 && (
-        <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)", margin: "2px 0" }}>
+        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "var(--t3)", margin: "2px 0" }}>
           HS: {alert.hsCodesAffected.slice(0, 6).join(", ")}
           {alert.hsCodesAffected.length > 6 && ` +${alert.hsCodesAffected.length - 6} more`}
         </p>
       )}
 
       {effectiveDateStr && (
-        <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)", margin: "2px 0" }}>
+        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "var(--t3)", margin: "2px 0" }}>
           Effective {effectiveDateStr}
         </p>
       )}

@@ -95,8 +95,8 @@
   --dark-text: #0e4e45;
   --dark-text-secondary: #1a6b5f;
   --dark-text-muted: #81949C;
-  --font-display: 'Nunito', sans-serif;
-  --font-body: 'Nunito', sans-serif;
+  --font-display: 'Clash Display', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
 }
 
 

@@ -1349,8 +1349,8 @@ export async function registerRoutes(
         return;
       }
 
-      const { balance, demoUsed } = await storage.getTokenBalance(sessionId);
-      if (demoUsed && balance < LOOKUP_COST) {
+      const { balance, freeLookupUsed } = await storage.getTokenBalance(sessionId);
+      if (freeLookupUsed && balance < LOOKUP_COST) {
         res.status(402).json({ message: "Insufficient tokens", required: LOOKUP_COST, balance });
         return;
       }
@@ -1371,7 +1371,7 @@ export async function registerRoutes(
         return;
       }
 
-      if (!demoUsed) {
+      if (!freeLookupUsed) {
         await storage.markDemoUsed(sessionId);
       } else {
         await storage.spendTokens(sessionId, LOOKUP_COST, `Template refresh — ${commodity.name} ${template.originIso2}\u2192${template.destIso2}`);
@@ -1618,7 +1618,7 @@ export async function registerRoutes(
       res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
 
       // Handle PDF stream errors to prevent server crash
-      stream.on("error", (err) => {
+      stream.on("error", (err: Error) => {
         console.error("PDF stream error:", err);
         if (!res.headersSent) {
           res.status(500).json({ message: "PDF generation failed" });
@@ -2250,7 +2250,7 @@ Rules:
   const upload = multer({
     storage: multer.diskStorage({
       destination: (req, _file, cb) => {
-        const tokenDir = path.join(uploadDir, req.params.token || "unknown");
+        const tokenDir = path.join(uploadDir, (req.params.token as string) || "unknown");
         fs.mkdirSync(tokenDir, { recursive: true });
         cb(null, tokenDir);
       },
@@ -2273,7 +2273,7 @@ Rules:
 
   app.post("/api/upload/:token/file", upload.single("file"), async (req, res) => {
     try {
-      const { token } = req.params;
+      const token = req.params.token as string;
       if (!UUID_REGEX.test(token)) {
         res.status(404).json({ message: "Upload link not found" });
         return;
@@ -2862,7 +2862,7 @@ Rules:
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
 
-      stream.on("error", (err) => {
+      stream.on("error", (err: Error) => {
         console.error("EUDR PDF stream error:", err);
         if (!res.headersSent) {
           res.status(500).json({ message: "PDF generation failed" });

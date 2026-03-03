@@ -501,7 +501,7 @@ export default function LcCheck() {
                       onChange={e => updateLcField("issuingBankSwift", e.target.value.toUpperCase())}
                       placeholder="e.g. ATBKCIAB"
                       data-testid="input-issuing-swift"
-                      style={{ fontFamily: "'DM Mono', monospace", letterSpacing: ".05em" }}
+                      style={{ fontFamily: "'Inter', sans-serif", letterSpacing: ".05em" }}
                     />
                   </div>
                   <div className={`form-group ${confidenceClass("advisingBankSwift")}`}>
@@ -511,7 +511,7 @@ export default function LcCheck() {
                       onChange={e => updateLcField("advisingBankSwift", e.target.value.toUpperCase())}
                       placeholder="e.g. ABNANL2A"
                       data-testid="input-advising-swift"
-                      style={{ fontFamily: "'DM Mono', monospace", letterSpacing: ".05em" }}
+                      style={{ fontFamily: "'Inter', sans-serif", letterSpacing: ".05em" }}
                     />
                   </div>
                 </div>
@@ -1272,7 +1272,7 @@ export default function LcCheck() {
                   <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-lc-check-ref">
                     LC check ref: TT-LC-{new Date().getFullYear()}-{resultData.integrityHash.substring(0, 6).toUpperCase()}
                   </p>
-                  <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--app-regent)", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
+                  <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "var(--app-regent)", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
                     Integrity hash: sha256:{resultData.integrityHash}
                   </p>
                   <p style={{ fontSize: 11, color: "var(--app-regent)" }} data-testid="text-lc-check-timestamp">

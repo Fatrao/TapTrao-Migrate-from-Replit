@@ -117,13 +117,13 @@ export default function VerifyPage() {
               }}
             >
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>
+                <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>
                   Trade
                 </div>
                 <div style={{ fontSize: 14, color: "var(--t1)", fontWeight: 600 }}>
                   {query.data.commodityName}
                 </div>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)", marginTop: 2 }}>
+                <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "var(--t3)", marginTop: 2 }}>
                   {query.data.originName} {"\u2192"} {query.data.destinationName}
                 </div>
               </div>
@@ -132,25 +132,25 @@ export default function VerifyPage() {
 
               <div style={{ display: "grid", gap: 12 }}>
                 <div>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
                     Reference
                   </div>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 14, color: "var(--blue)", fontWeight: 700 }} data-testid="text-verify-ref">
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--blue)", fontWeight: 700 }} data-testid="text-verify-ref">
                     {query.data.twinlogRef}
                   </div>
                 </div>
 
                 <div>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
                     Hash
                   </div>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)", wordBreak: "break-all" }} data-testid="text-verify-hash">
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "var(--t3)", wordBreak: "break-all" }} data-testid="text-verify-hash">
                     sha256:{query.data.twinlogHash}
                   </div>
                 </div>
 
                 <div>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
                     Locked
                   </div>
                   <div style={{ fontSize: 12, color: "var(--t2)" }}>
@@ -160,7 +160,7 @@ export default function VerifyPage() {
 
                 {query.data.readinessScore != null && (
                   <div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
+                    <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
                       Score
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -168,7 +168,7 @@ export default function VerifyPage() {
                         {query.data.readinessScore}
                       </span>
                       <span style={{
-                        fontFamily: "'DM Mono', monospace",
+                        fontFamily: "'Inter', sans-serif",
                         fontSize: 10,
                         fontWeight: 700,
                         color: query.data.readinessVerdict === "GREEN" ? "var(--green)" :

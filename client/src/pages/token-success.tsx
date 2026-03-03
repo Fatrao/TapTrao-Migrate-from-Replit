@@ -86,7 +86,7 @@ export default function TokenSuccess() {
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
                 <span
                   style={{
-                    fontFamily: "'DM Mono', monospace", fontSize: 13, fontWeight: 700,
+                    fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 700,
                     padding: "4px 12px", borderRadius: 4, background: "var(--gbg)",
                     border: "1px solid var(--gbd)", color: "var(--green)",
                   }}
@@ -96,7 +96,7 @@ export default function TokenSuccess() {
                 </span>
                 <span
                   style={{
-                    fontFamily: "'DM Mono', monospace", fontSize: 12,
+                    fontFamily: "'Inter', sans-serif", fontSize: 12,
                     padding: "4px 12px", borderRadius: 4, background: "var(--card2)",
                     color: "var(--t2)", display: "flex", alignItems: "center", gap: 4,
                   }}

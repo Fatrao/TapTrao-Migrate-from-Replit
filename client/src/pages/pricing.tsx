@@ -46,7 +46,7 @@ const S = {
     padding: 24,
   } as React.CSSProperties,
   badge: {
-    fontFamily: "'DM Mono', monospace",
+    fontFamily: "'Inter', sans-serif",
     fontSize: 9,
     letterSpacing: "0.08em",
     textTransform: "uppercase" as const,
@@ -156,7 +156,7 @@ export default function Pricing() {
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, color: "#fff", lineHeight: 1 }}>
                 {balance}
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
+              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
                 Shield {balance === 1 ? "check" : "checks"}
               </div>
             </div>
@@ -179,7 +179,7 @@ export default function Pricing() {
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, color: "#fff", lineHeight: 1 }}>
                 {lcBalance}
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
+              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
                 LC {lcBalance === 1 ? "credit" : "credits"}
               </div>
             </div>
@@ -214,10 +214,10 @@ export default function Pricing() {
             <div data-testid="table-transactions">
               {/* Header row */}
               <div style={{ display: "grid", gridTemplateColumns: "110px 80px 1fr 80px", gap: 12, padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>Date</span>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>Type</span>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>Description</span>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", textAlign: "right" }}>Amount</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>Date</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>Type</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>Description</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", textAlign: "right" }}>Amount</span>
               </div>
               {/* Transaction rows */}
               {transactions.map((t, idx) => {
@@ -256,7 +256,7 @@ export default function Pricing() {
                     <span style={{
                       fontSize: 13,
                       fontWeight: 600,
-                      fontFamily: "'DM Mono', monospace",
+                      fontFamily: "'Inter', sans-serif",
                       textAlign: "right",
                       color: isPurchase ? "#5dd9c1" : "rgba(255,255,255,0.5)",
                       display: "flex",

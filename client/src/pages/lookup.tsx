@@ -181,7 +181,7 @@ function StatusDropdown({
         <button
           className="inline-flex items-center gap-1 shrink-0 cursor-pointer"
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 9,
             letterSpacing: "0.08em",
             padding: "3px 8px",
@@ -335,7 +335,7 @@ function NextActionsPanel({
   return (
     <div style={{ background: "#1e2a36", borderRadius: 14, border: "1px solid rgba(93,217,193,0.12)", padding: "20px 24px" }} data-testid="section-next-actions">
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Next Actions</span>
+        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Next Actions</span>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }} data-testid="text-pending-count">
             {pendingCount} pending
@@ -594,13 +594,13 @@ function EvidenceHashInline({ result }: { result: ComplianceResult }) {
 
   return (
     <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "rgba(93,217,193,0.8)" }} data-testid="text-compliance-ref">
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "rgba(93,217,193,0.8)" }} data-testid="text-compliance-ref">
         {shortRef}
       </p>
-      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "rgba(255,255,255,0.3)", wordBreak: "break-all", marginTop: 2 }} data-testid="text-full-hash">
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "rgba(255,255,255,0.3)", wordBreak: "break-all", marginTop: 2 }} data-testid="text-full-hash">
         sha256:{hash}
       </p>
-      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "rgba(255,255,255,0.25)", marginTop: 2 }} data-testid="text-hash-timestamp">
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "rgba(255,255,255,0.25)", marginTop: 2 }} data-testid="text-hash-timestamp">
         {new Date(timestamp).toLocaleString()}
       </p>
     </div>
@@ -638,7 +638,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
 
   return (
     <div data-testid="section-readiness-score">
-      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", marginBottom: 12 }}>
+      <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", marginBottom: 12 }}>
         Readiness Score
       </div>
       <div style={{ display: "flex", gap: 0 }}>
@@ -659,7 +659,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
           <span
             style={{
               display: "inline-block",
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 10,
               fontWeight: 600,
               padding: "3px 10px",
@@ -712,7 +712,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
                 </div>
                 <span
                   style={{
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: isPrimary ? 9 : 10,
                     width: 48,
                     textAlign: "right",
@@ -1254,7 +1254,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
           </p>
         </div>
         <span style={{
-          fontFamily: "'DM Mono', monospace", fontSize: 10,
+          fontFamily: "'Inter', sans-serif", fontSize: 10,
           background: validCount === readiness.length ? "rgba(34,197,94,0.15)" : "rgba(93,217,193,0.12)",
           color: validCount === readiness.length ? "#22c55e" : "#5dd9c1",
           padding: "3px 10px", borderRadius: 4,
@@ -1539,7 +1539,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
 
       {/* ── Risk Level Badge ── */}
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <Badge className="text-base px-6 py-2 no-default-hover-elevate no-default-active-elevate" style={{ ...riskInlineStyles[riskLevel], fontFamily: "'DM Mono', monospace", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, borderRadius: 4 }} data-testid="badge-risk-level">
+        <Badge className="text-base px-6 py-2 no-default-hover-elevate no-default-active-elevate" style={{ ...riskInlineStyles[riskLevel], fontFamily: "'Inter', sans-serif", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, borderRadius: 4 }} data-testid="badge-risk-level">
           {riskLabels[riskLevel]}
         </Badge>
       </div>
@@ -1554,7 +1554,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                 Your Side - Buyer
               </span>
               <span style={{
-                fontFamily: "'DM Mono', monospace", fontSize: 10,
+                fontFamily: "'Inter', sans-serif", fontSize: 10,
                 background: "rgba(93,217,193,0.12)", color: "#5dd9c1",
                 padding: "2px 8px", borderRadius: 4,
               }}>
@@ -1597,7 +1597,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                 Their Side - Supplier
               </span>
               <span style={{
-                fontFamily: "'DM Mono', monospace", fontSize: 10,
+                fontFamily: "'Inter', sans-serif", fontSize: 10,
                 background: "rgba(93,217,193,0.12)", color: "#5dd9c1",
                 padding: "2px 8px", borderRadius: 4,
               }}>
@@ -1666,12 +1666,12 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
 
         {/* Duty Estimate */}
         <div style={dkCard}>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", marginBottom: 12 }}>
+          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", marginBottom: 12 }}>
             Duty Estimate
           </div>
           {Array.isArray(result.destination.preferenceSchemes) && (result.destination.preferenceSchemes as string[]).length > 0 && (
             <span style={{
-              fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em",
+              fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em",
               background: "rgba(93,217,193,0.12)", color: "#5dd9c1",
               padding: "3px 8px", borderRadius: 4, display: "inline-block", marginBottom: 12,
             }}>
@@ -1812,7 +1812,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             background: "transparent",
             border: "none",
             cursor: watchState === "watching" ? "default" : "pointer",
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 11,
             color: watchState === "watching" ? "var(--green)" : "var(--t2)",
             padding: "6px 12px",
@@ -1825,7 +1825,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             : "◎ Watch this corridor"}
         </button>
         {watchState !== "watching" && (
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)" }}>
+          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "var(--t3)" }}>
             Get notified when regulations change for {result.commodity.name} → {result.destination.iso2}
           </span>
         )}
@@ -1876,10 +1876,10 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <Leaf className="w-4 h-4" style={{ color: "#5dd9c1" }} />
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Commodity</span>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Commodity</span>
           </div>
           <p style={{ fontWeight: 600, color: "#fff", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-commodity">{result.commodity.name}</p>
-          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase" as const, margin: 0 }}>
+          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase" as const, margin: 0 }}>
             HS {result.commodity.hsCode} · {result.commodity.commodityType}
           </p>
         </div>
@@ -1887,7 +1887,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <Globe className="w-4 h-4" style={{ color: "#5dd9c1" }} />
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Origin</span>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Origin</span>
           </div>
           <p style={{ fontWeight: 600, color: "#fff", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-origin">{result.origin.countryName}</p>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", margin: "0 0 4px" }}>
@@ -1895,7 +1895,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           </p>
           {result.origin.framework && (
             <span style={{
-              fontFamily: "'DM Mono', monospace", fontSize: 9,
+              fontFamily: "'Inter', sans-serif", fontSize: 9,
               background: "rgba(93,217,193,0.12)", color: "#5dd9c1",
               padding: "2px 8px", borderRadius: 4, display: "inline-block",
             }}>
@@ -1907,7 +1907,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <FileCheck className="w-4 h-4" style={{ color: "#5dd9c1" }} />
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Destination</span>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Destination</span>
           </div>
           <p style={{ fontWeight: 600, color: "#fff", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-destination">{result.destination.countryName}</p>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", margin: 0 }}>
@@ -1938,7 +1938,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
             <Shield className="w-4 h-4" style={{ color: "#5dd9c1" }} />
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
               Regulatory Triggers ({triggerCount})
             </span>
           </div>
@@ -1963,7 +1963,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <div style={dkCard}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
               <AlertTriangle className="w-4 h-4" style={{ color: "#eab308" }} />
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Known Hazards</span>
+              <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Known Hazards</span>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {result.hazards
@@ -1973,7 +1973,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                     key={hazard}
                     style={{
                       fontSize: 11,
-                      fontFamily: "'DM Mono', monospace",
+                      fontFamily: "'Inter', sans-serif",
                       background: "rgba(234,179,8,0.1)",
                       color: "#eab308",
                       padding: "3px 10px",
@@ -2011,14 +2011,14 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard} data-testid="card-afcfta-roo">
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
             <Scale className="w-4 h-4" style={{ color: "#5dd9c1" }} />
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
               AfCFTA Rules of Origin — HS {result.afcftaRoo.hsHeading}
             </span>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
             <span
               style={{
-                fontFamily: "'DM Mono', monospace", fontSize: 10,
+                fontFamily: "'Inter', sans-serif", fontSize: 10,
                 background: "rgba(93,217,193,0.12)", color: "#5dd9c1",
                 padding: "3px 10px", borderRadius: 4,
               }}
@@ -2029,7 +2029,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             {result.afcftaRoo.minValueAddPct && (
               <span
                 style={{
-                  fontFamily: "'DM Mono', monospace", fontSize: 10,
+                  fontFamily: "'Inter', sans-serif", fontSize: 10,
                   background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.6)",
                   padding: "3px 10px", borderRadius: 4, border: "1px solid rgba(255,255,255,0.1)",
                 }}
@@ -2067,7 +2067,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
       )}
 
       <div style={dkCard}>
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", marginBottom: 14 }}>
+        <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", marginBottom: 14 }}>
           Actions
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
@@ -2476,7 +2476,7 @@ export default function Lookup() {
                 {isAuthenticated ? "Back to Dashboard" : "Back to Home"}
               </button>
             </Link>
-            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }}>TapTrao / Pre-shipment Compliance Check</p>
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }}>TapTrao / Pre-shipment Compliance Check</p>
             <h1 style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)" }} data-testid="text-lookup-title">
               Pre-shipment compliance check
             </h1>
@@ -2529,7 +2529,7 @@ export default function Lookup() {
             <CardContent className="p-6 space-y-6">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.95)" }} htmlFor="commodity">
+                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.95)" }} htmlFor="commodity">
                     What are you shipping?
                   </label>
                   {isLoading ? (
@@ -2555,7 +2555,7 @@ export default function Lookup() {
                 </div>
 
                 <div className="space-y-2">
-                  <label style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.95)" }} htmlFor="origin">
+                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.95)" }} htmlFor="origin">
                     Where are the goods coming from?
                   </label>
                   {isLoading ? (
@@ -2583,7 +2583,7 @@ export default function Lookup() {
                 </div>
 
                 <div className="space-y-2">
-                  <label style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.95)" }} htmlFor="destination">
+                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.95)" }} htmlFor="destination">
                     Where are the goods going?
                   </label>
                   {isLoading ? (

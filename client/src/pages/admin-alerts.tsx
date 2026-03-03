@@ -61,7 +61,7 @@ export default function AdminAlertsPage() {
 
   const labelStyle = {
     display: "block",
-    fontFamily: "'DM Mono', monospace",
+    fontFamily: "'Inter', sans-serif",
     fontSize: 9,
     color: "var(--t3)",
     marginBottom: 4,

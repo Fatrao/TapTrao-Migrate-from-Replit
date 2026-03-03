@@ -130,7 +130,7 @@ function DemoSection() {
             <div>
               <h3
                 className="text-lg font-bold mb-1"
-                style={{ color: C.white, fontFamily: "Nunito, sans-serif" }}
+                style={{ color: C.white, fontFamily: "Inter, sans-serif" }}
               >
                 Compliance Lookup
               </h3>
@@ -188,7 +188,7 @@ function DemoSection() {
                     <div className="text-[10px] uppercase tracking-wider font-semibold mb-2" style={{ color: "rgba(255,255,255,0.35)" }}>
                       {s.label}
                     </div>
-                    <div className="text-xl font-bold" style={{ color: s.color, fontFamily: "Nunito, sans-serif" }}>
+                    <div className="text-xl font-bold" style={{ color: s.color, fontFamily: "Inter, sans-serif" }}>
                       {s.value}
                     </div>
                     <div className="text-[11px] mt-1" style={{ color: "rgba(255,255,255,0.25)" }}>
@@ -203,7 +203,7 @@ function DemoSection() {
           {/* STEP 2 — Pre-Shipment Report */}
           {activeTab === 2 && (
             <div>
-              <h3 className="text-lg font-bold mb-1" style={{ color: C.white, fontFamily: "Nunito, sans-serif" }}>
+              <h3 className="text-lg font-bold mb-1" style={{ color: C.white, fontFamily: "Inter, sans-serif" }}>
                 Pre-Shipment Report
               </h3>
               <p className="text-xs font-semibold mb-5" style={{ color: "rgba(255,255,255,0.85)" }}>
@@ -259,7 +259,7 @@ function DemoSection() {
                     <span className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.85)" }}>Readiness Score</span>
                     <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(34,197,94,0.10)", color: "#5dd9c1" }}>Low Risk</span>
                   </div>
-                  <div className="text-4xl font-bold text-center my-2" style={{ color: C.accent, fontFamily: "Nunito, sans-serif" }}>87</div>
+                  <div className="text-4xl font-bold text-center my-2" style={{ color: C.accent, fontFamily: "Inter, sans-serif" }}>87</div>
                   <div className="text-[10px] text-center uppercase tracking-wider mb-3" style={{ color: "rgba(255,255,255,0.35)" }}>Compliance Readiness</div>
                   <div className="h-2 rounded-full mb-4" style={{ background: "rgba(255,255,255,0.08)" }}>
                     <div className="h-full rounded-full" style={{ width: "87%", background: `linear-gradient(90deg, ${C.accent}, #5dd9c1)` }} />
@@ -307,7 +307,7 @@ function DemoSection() {
           {/* STEP 3 — LC Document Check */}
           {activeTab === 3 && (
             <div>
-              <h3 className="text-lg font-bold mb-1" style={{ color: C.white, fontFamily: "Nunito, sans-serif" }}>
+              <h3 className="text-lg font-bold mb-1" style={{ color: C.white, fontFamily: "Inter, sans-serif" }}>
                 LC Document Check
               </h3>
               <p className="text-xs font-semibold mb-5" style={{ color: "rgba(255,255,255,0.85)" }}>
@@ -319,7 +319,7 @@ function DemoSection() {
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{"\u26A0\uFE0F"}</span>
                   <div className="flex-1">
-                    <div className="text-sm font-bold" style={{ color: C.gold, fontFamily: "Nunito, sans-serif" }}>Discrepancies Found</div>
+                    <div className="text-sm font-bold" style={{ color: C.gold, fontFamily: "Inter, sans-serif" }}>Discrepancies Found</div>
                     <div className="text-[11px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>2 critical issues will cause bank rejection. 1 warning to review.</div>
                   </div>
                   <div className="flex gap-4">
@@ -329,7 +329,7 @@ function DemoSection() {
                       { n: "2", label: "critical", color: "#ef4444" },
                     ].map((s) => (
                       <div key={s.label} className="text-center">
-                        <div className="text-lg font-bold" style={{ color: s.color, fontFamily: "Nunito, sans-serif" }}>{s.n}</div>
+                        <div className="text-lg font-bold" style={{ color: s.color, fontFamily: "Inter, sans-serif" }}>{s.n}</div>
                         <div className="text-[9px] uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.35)" }}>{s.label}</div>
                       </div>
                     ))}
@@ -417,7 +417,7 @@ function DemoSection() {
           {/* STEP 4 — Supplier Brief */}
           {activeTab === 4 && (
             <div>
-              <h3 className="text-lg font-bold mb-1" style={{ color: C.white, fontFamily: "Nunito, sans-serif" }}>
+              <h3 className="text-lg font-bold mb-1" style={{ color: C.white, fontFamily: "Inter, sans-serif" }}>
                 Supplier Brief
               </h3>
               <p className="text-xs mb-5" style={{ color: "rgba(255,255,255,0.45)" }}>
@@ -523,7 +523,7 @@ export default function Home() {
   usePageTitle("TapTrao \u2014 Trade Compliance for Commodity Traders");
 
   return (
-    <div className="hp-page min-h-screen" style={{ background: C.gray50, fontFamily: "Nunito, sans-serif" }}>
+    <div className="hp-page min-h-screen" style={{ background: C.gray50, fontFamily: "Inter, sans-serif" }}>
       {/* ═══ NAVIGATION ═══ */}
       <nav
         className="fixed top-0 left-0 right-0 z-50 border-b"

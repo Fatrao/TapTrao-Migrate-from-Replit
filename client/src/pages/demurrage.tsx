@@ -5,7 +5,7 @@ import { PORTS, CONTAINER_OPTIONS, computeDemurrage, type ContainerType } from "
 const s = {
   page: { maxWidth: 960, margin: "0 auto", padding: "28px 20px" } as React.CSSProperties,
   panel: { background: "var(--card)", borderRadius: 14, padding: 24 } as React.CSSProperties,
-  label: { fontFamily: "'DM Mono', monospace", fontSize: 9, fontWeight: 600, color: "var(--t3)", marginBottom: 4, display: "block", textTransform: "uppercase", letterSpacing: ".08em" } as React.CSSProperties,
+  label: { fontFamily: "'Inter', sans-serif", fontSize: 9, fontWeight: 600, color: "var(--t3)", marginBottom: 4, display: "block", textTransform: "uppercase", letterSpacing: ".08em" } as React.CSSProperties,
   helper: { fontSize: 11, color: "var(--t3)", marginTop: 3 } as React.CSSProperties,
   input: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "none", borderRadius: ".5rem", color: "var(--t1)", fontSize: 14, outline: "none" } as React.CSSProperties,
   select: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "none", borderRadius: ".5rem", color: "var(--t1)", fontSize: 14, outline: "none", appearance: "none" as const } as React.CSSProperties,
@@ -185,19 +185,19 @@ export default function DemurragePage() {
             <div style={s.panel}>
               <div className="demurrage-stats-grid">
                 <div style={{ textAlign: "center", padding: 12, background: "var(--card2)", borderRadius: 8 }}>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 700, color: "var(--t1)" }} data-testid="demurrage-chargeable-days">
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 22, fontWeight: 700, color: "var(--t1)" }} data-testid="demurrage-chargeable-days">
                     {chargeableDays}
                   </div>
                   <div style={{ fontSize: 11, color: "var(--t3)" }}>Billable days</div>
                 </div>
                 <div style={{ textAlign: "center", padding: 12, background: "var(--card2)", borderRadius: 8 }}>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 700, color: "var(--t1)" }} data-testid="demurrage-daily-rate">
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 22, fontWeight: 700, color: "var(--t1)" }} data-testid="demurrage-daily-rate">
                     ${baseRate}
                   </div>
                   <div style={{ fontSize: 11, color: "var(--t3)" }}>Daily rate</div>
                 </div>
                 <div style={{ textAlign: "center", padding: 12, background: "var(--card2)", borderRadius: 8 }}>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 700, color: "var(--t1)" }}>
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 22, fontWeight: 700, color: "var(--t1)" }}>
                     {effectiveDaysHeld}
                   </div>
                   <div style={{ fontSize: 11, color: "var(--t3)" }}>Days at port</div>
@@ -221,9 +221,9 @@ export default function DemurragePage() {
                       {tiers.map((t, i) => (
                         <tr key={i} style={{ borderBottom: "1px solid var(--s5)" }}>
                           <td style={{ padding: "8px 0", color: "var(--t2)" }}>{t.label}</td>
-                          <td style={{ textAlign: "right", padding: "8px 0", color: "var(--t1)", fontFamily: "'DM Mono', monospace" }}>{t.days}</td>
-                          <td style={{ textAlign: "right", padding: "8px 0", color: "var(--t2)", fontFamily: "'DM Mono', monospace" }}>${t.rate}</td>
-                          <td style={{ textAlign: "right", padding: "8px 0", color: "var(--t1)", fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>${t.subtotal.toLocaleString()}</td>
+                          <td style={{ textAlign: "right", padding: "8px 0", color: "var(--t1)", fontFamily: "'Inter', sans-serif" }}>{t.days}</td>
+                          <td style={{ textAlign: "right", padding: "8px 0", color: "var(--t2)", fontFamily: "'Inter', sans-serif" }}>${t.rate}</td>
+                          <td style={{ textAlign: "right", padding: "8px 0", color: "var(--t1)", fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>${t.subtotal.toLocaleString()}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -283,7 +283,7 @@ export default function DemurragePage() {
                   <div style={{ fontSize: 11, color: "var(--t2)" }}>Re-testing fee typically $200-500 + additional storage</div>
                 </div>
               </div>
-              <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)", marginTop: 12, lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "var(--t3)", marginTop: 12, lineHeight: 1.5 }}>
                 Rates are indicative based on published port tariffs. Actual rates vary by
                 carrier, season, and contract terms. Confirm final charges with your freight agent.
               </p>

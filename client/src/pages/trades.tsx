@@ -177,7 +177,7 @@ export default function Trades() {
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 36, letterSpacing: 0, lineHeight: 1, color: c.color }}>
                 {c.value}
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#333", letterSpacing: ".04em", marginTop: 4 }}>
+              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "#333", letterSpacing: ".04em", marginTop: 4 }}>
                 {c.label}
               </div>
             </div>
@@ -261,7 +261,7 @@ export default function Trades() {
                   <th
                     key={h}
                     style={{
-                      fontFamily: "'DM Mono', monospace",
+                      fontFamily: "'Inter', sans-serif",
                       fontSize: 9,
                       textTransform: "uppercase",
                       letterSpacing: ".12em",
@@ -322,7 +322,7 @@ export default function Trades() {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            fontFamily: "'DM Mono', monospace",
+                            fontFamily: "'Inter', sans-serif",
                             fontSize: 10,
                             fontWeight: 800,
                             color: avatar.text,
@@ -333,7 +333,7 @@ export default function Trades() {
                         </div>
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a" }}>{trade.commodityName}</div>
-                          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#555" }}>
+                          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "#555" }}>
                             {iso2ToFlag(trade.originIso2)} {trade.originIso2} → {iso2ToFlag(trade.destIso2)} {trade.destIso2}
                           </div>
                         </div>
@@ -350,7 +350,7 @@ export default function Trades() {
                     <td style={{ padding: "12px 12px", verticalAlign: "middle" }}>
                       <span
                         style={{
-                          fontFamily: "'DM Mono', monospace",
+                          fontFamily: "'Inter', sans-serif",
                           fontSize: 9,
                           padding: "2px 8px",
                           borderRadius: 4,
@@ -367,7 +367,7 @@ export default function Trades() {
                     <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>
                       <span
                         style={{
-                          fontFamily: "'DM Mono', monospace",
+                          fontFamily: "'Inter', sans-serif",
                           fontSize: 14,
                           fontWeight: 700,
                           color: trade.readinessScore == null
@@ -390,7 +390,7 @@ export default function Trades() {
                     </td>
                     {/* Value */}
                     <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>
-                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: trade.tradeValue ? 600 : 400, color: trade.tradeValue ? "#1a1a1a" : "#999" }}>
+                      <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, fontWeight: trade.tradeValue ? 600 : 400, color: trade.tradeValue ? "#1a1a1a" : "#999" }}>
                         {trade.tradeValue
                           ? `${trade.tradeValueCurrency || "USD"} ${Number(trade.tradeValue).toLocaleString()}`
                           : "\u2014"}
@@ -398,7 +398,7 @@ export default function Trades() {
                     </td>
                     {/* Updated */}
                     <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>
-                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#555" }}>
+                      <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "#555" }}>
                         {formatDate(trade.createdAt)}
                       </span>
                     </td>

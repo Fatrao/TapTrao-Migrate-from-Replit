@@ -99,7 +99,7 @@ export default {
         sans: ["var(--font-sans)"],
         heading: ["var(--font-heading)"],
         mono: ["var(--font-mono)"],
-        clash: ["'Inter'", 'sans-serif'],
+        clash: ["'Clash Display'", "'Inter'", 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {

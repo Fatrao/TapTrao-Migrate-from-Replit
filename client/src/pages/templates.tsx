@@ -34,7 +34,7 @@ function originAvatar(iso2: string) {
         background: `color-mix(in srgb, ${color} 15%, transparent)`,
         border: `1px solid color-mix(in srgb, ${color} 30%, transparent)`,
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 700, color,
+        fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color,
       }}
     >
       {iso2}
@@ -77,7 +77,7 @@ function TemplateCard({
             <span style={{ fontSize: 14, fontWeight: 700, color: "var(--t1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} data-testid={`text-template-name-${template.id}`}>
               {template.name}
             </span>
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--t3)", whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "var(--t3)", whiteSpace: "nowrap" }}>
               {template.originIso2} → {template.destIso2}
             </span>
           </div>
@@ -87,7 +87,7 @@ function TemplateCard({
         </div>
       </div>
 
-      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--t3)", marginTop: 8 }}>
+      <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "var(--t3)", marginTop: 8 }}>
         Used {template.timesUsed} time{template.timesUsed !== 1 ? "s" : ""}
         {template.lastUsedAt ? ` · Last used ${relativeTime(template.lastUsedAt)}` : ""}
       </div>

@@ -20,7 +20,7 @@ export async function seedPrompt2() {
   }
 
   try {
-    await db.transaction(async (tx) => {
+    await db.transaction(async (tx: any) => {
       // ── DESTINATIONS (6) ──
       await tx.insert(destinations).values([
         {
@@ -372,7 +372,7 @@ export async function seedPrompt3A() {
   }
 
   try {
-    await db.transaction(async (tx) => {
+    await db.transaction(async (tx: any) => {
       await tx.insert(commodities).values([
         { name: "Raw Cashew Nuts", hsCode: "0801.31", commodityType: "agricultural", triggersSps: true, knownHazards: ["aflatoxin", "moisture_damage"] },
         { name: "Shelled Cashew Nuts", hsCode: "0801.32", commodityType: "agricultural", triggersSps: true, knownHazards: ["aflatoxin"] },
@@ -489,7 +489,7 @@ export async function seedPrompt3B() {
   }
 
   try {
-    await db.transaction(async (tx) => {
+    await db.transaction(async (tx: any) => {
       await tx.insert(commodities).values([
         // ── SEAFOOD (13) — commodity_type = "seafood", triggers_sps = true, triggers_iuu = true ──
         { name: "Tuna (fresh/chilled)", hsCode: "0302.35", commodityType: "seafood", triggersSps: true, triggersIuu: true, knownHazards: ["histamine", "mercury"] },
@@ -551,7 +551,7 @@ export async function seedPrompt3C() {
   }
 
   try {
-    await db.transaction(async (tx) => {
+    await db.transaction(async (tx: any) => {
       await tx.insert(commodities).values([
         { name: "Gold (unwrought)", hsCode: "7108.12", commodityType: "mineral", triggersSps: false, triggersConflict: true, stopFlags: { gold_to_TR: "Borsa Istanbul membership required for gold imports to Turkey" }, knownHazards: ["mercury_contamination"] },
         { name: "Gold (semi-manufactured)", hsCode: "7108.13", commodityType: "mineral", triggersSps: false, triggersConflict: true, knownHazards: ["none"] },
@@ -602,7 +602,7 @@ export async function seedPrompt5() {
   const REF = "AfCFTA Protocol on Rules of Origin, Annex 2";
 
   try {
-    await db.transaction(async (tx) => {
+    await db.transaction(async (tx: any) => {
       await tx.insert(afcftaRoo).values([
         // ── AGRICULTURAL RAW (WHOLLY_OBTAINED) ──
         { hsHeading: "0102", generalRule: "WHOLLY_OBTAINED", notes: "Live cattle must be born and raised in an AfCFTA State Party", sourceRef: REF },
@@ -899,7 +899,7 @@ export async function seedPrompt7() {
 
   log("Seeding new commodity categories (textiles, leather, chemicals, metals, petroleum, paper, vehicles, consumer products)...", "seed");
 
-  await db.transaction(async (tx) => {
+  await db.transaction(async (tx: any) => {
     await tx.insert(commodities).values([
       // ── TEXTILES & GARMENTS (HS 50-63) ──
       { name: "Cotton Yarn", hsCode: "5205.11", commodityType: "manufactured", triggersSps: false, triggersCsddd: true, knownHazards: ["none_significant"] },

@@ -1189,7 +1189,7 @@ export class DatabaseStorage implements IStorage {
     const rows = await db.select().from(apiKeys)
       .where(eq(apiKeys.sessionId, sessionId))
       .orderBy(desc(apiKeys.createdAt));
-    return rows.map((r) => ({
+    return rows.map((r: any) => ({
       id: r.id,
       name: r.name,
       keyPreview: r.key.slice(0, 12) + "..." + r.key.slice(-4),
