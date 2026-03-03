@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -65,7 +65,7 @@ function Router() {
       <Route path="/settings/profile">{() => <AuthGuard><SettingsProfile /></AuthGuard>}</Route>
       <Route path="/inbox">{() => <AuthGuard><Inbox /></AuthGuard>}</Route>
       <Route path="/alerts">{() => <AuthGuard><AlertsPage /></AuthGuard>}</Route>
-      <Route path="/eudr/:lookupId">{() => <AuthGuard><EudrPage /></AuthGuard>}</Route>
+      <Route path="/eudr/:lookupId">{(params) => <Redirect to={`/trades/${params.lookupId}`} />}</Route>
 
       {/* Admin routes */}
       <Route path="/admin/data">{() => <AuthGuard><AdminData /></AuthGuard>}</Route>

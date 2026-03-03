@@ -22,7 +22,25 @@ type EnrichedTrade = {
   tradeValueCurrency: string | null;
   lcVerdict: string | null;
   lcCheckId: string | null;
+  // Regulatory assessment badges
+  eudrApplicable: boolean | null;
+  eudrScore: number | null;
+  eudrBand: string | null;
+  cbamApplicable: boolean | null;
+  cbamScore: number | null;
+  cbamBand: string | null;
 };
+
+function getRegulatoryBadge(applicable: boolean | null, score: number | null, band: string | null): { label: string; bg: string; color: string; bd: string } {
+  if (applicable === false) return { label: "N/A", bg: "#f5f5f5", color: "#999", bd: "#e5e5e5" };
+  if (applicable == null) return { label: "—", bg: "#f5f5f5", color: "#999", bd: "#e5e5e5" };
+  if (score == null || !band) return { label: "Not assessed", bg: "#eff6ff", color: "#2563eb", bd: "#93c5fd" };
+  if (band === "negligible") return { label: `${score} Negligible`, bg: "#f0fdf4", color: "#15803d", bd: "#86efac" };
+  if (band === "low") return { label: `${score} Low`, bg: "#fefce8", color: "#a16207", bd: "#fcd34d" };
+  if (band === "medium") return { label: `${score} Medium`, bg: "#fff7ed", color: "#c2410c", bd: "#fdba74" };
+  if (band === "high") return { label: `${score} High`, bg: "#fef2f2", color: "#dc2626", bd: "#fca5a5" };
+  return { label: `${score}`, bg: "#f5f5f5", color: "#999", bd: "#e5e5e5" };
+}
 
 type TradesSummary = {
   total: number;
@@ -257,7 +275,7 @@ export default function Trades() {
           <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="trades-table">
             <thead>
               <tr>
-                {["Commodity \u00B7 Corridor", "Step", "Risk", "Score", "Value", "Updated", ""].map(h => (
+                {["Commodity \u00B7 Corridor", "Step", "Risk", "Score", "EUDR", "CBAM", "Value", "Updated", ""].map(h => (
                   <th
                     key={h}
                     style={{
@@ -267,7 +285,7 @@ export default function Trades() {
                       letterSpacing: ".12em",
                       color: "#555",
                       fontWeight: 400,
-                      textAlign: h === "Score" || h === "Value" || h === "Updated" ? "right" : "left",
+                      textAlign: h === "Score" || h === "Value" || h === "Updated" ? "right" : h === "EUDR" || h === "CBAM" ? "center" : "left",
                       padding: "0 12px 10px",
                       borderBottom: "1px solid #e5e5e5",
                     }}
@@ -387,6 +405,28 @@ export default function Trades() {
                               ? `Medium risk (${trade.readinessScore})`
                               : `Low risk (${trade.readinessScore})`}
                       </span>
+                    </td>
+                    {/* EUDR */}
+                    <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "center" }}>
+                      {(() => {
+                        const b = getRegulatoryBadge(trade.eudrApplicable, trade.eudrScore, trade.eudrBand);
+                        return (
+                          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, padding: "2px 8px", borderRadius: 4, background: b.bg, border: `1px solid ${b.bd}`, color: b.color, whiteSpace: "nowrap" }}>
+                            {b.label}
+                          </span>
+                        );
+                      })()}
+                    </td>
+                    {/* CBAM */}
+                    <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "center" }}>
+                      {(() => {
+                        const b = getRegulatoryBadge(trade.cbamApplicable, trade.cbamScore, trade.cbamBand);
+                        return (
+                          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, padding: "2px 8px", borderRadius: 4, background: b.bg, border: `1px solid ${b.bd}`, color: b.color, whiteSpace: "nowrap" }}>
+                            {b.label}
+                          </span>
+                        );
+                      })()}
                     </td>
                     {/* Value */}
                     <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>

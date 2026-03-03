@@ -7,6 +7,7 @@ import { runComplianceCheck, computeReadinessScore } from "./compliance";
 import { runLcCrossCheck, computeLcHash, generateCorrectionEmail } from "./lc-engine";
 import { generateTwinlogPdf } from "./twinlog-pdf";
 import { generateEudrPdf } from "./eudr-pdf";
+import { runEudrAssessment, runCbamAssessment } from "./regulatory-assess";
 import { appendTradeEvent, getTradeAuditChain, verifyAuditChain } from "./audit";
 import { hashPassword, comparePasswords } from "./auth";
 import { lcCheckRequestSchema, registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, tokenTransactions, leadCaptureSchema, type ComplianceResult, type DocumentStatus } from "@shared/schema";
@@ -2879,6 +2880,190 @@ Rules:
           console.error("EUDR post-generation error:", e);
         }
       }).catch((e) => console.error("EUDR hash promise error:", e));
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ── EUDR Assessment (risk scoring) ──
+
+  app.post("/api/eudr/:lookupId/assess", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { lookupId } = req.params;
+
+      // 1. Verify ownership
+      const lookup = await storage.getLookupById(lookupId);
+      if (!lookup || lookup.sessionId !== sessionId) {
+        res.status(404).json({ message: "Trade not found" });
+        return;
+      }
+
+      // 2. Get commodity trigger info
+      const commodity = lookup.commodityId ? await storage.getCommodityById(lookup.commodityId) : null;
+      const destination = lookup.destinationId ? await storage.getDestinationById(lookup.destinationId) : null;
+      const destIso2 = destination?.iso2 || "";
+
+      // 3. Get EUDR record
+      const eudrRecord = await storage.getEudrRecordByLookupId(lookupId) || null;
+
+      // 4. Get latest LC check cross-check results
+      const lcCase = await storage.getLcCaseByLookupId?.(lookupId);
+      let latestLcCheck = null;
+      if (lcCase?.latestCheckId) {
+        latestLcCheck = await storage.getLcCheckById(lcCase.latestCheckId);
+      }
+      const crossCheckResults = (latestLcCheck?.resultsJson as any[]) || [];
+
+      // 5. Run the assessment engine
+      const result = runEudrAssessment({
+        lookup,
+        eudrRecord,
+        lcCheck: latestLcCheck || null,
+        crossCheckResults,
+        commodityTriggersEudr: commodity?.triggersEudr ?? false,
+        destinationIso2: destIso2,
+      });
+
+      // 6. Upsert to eudr_assessments
+      const assessment = await storage.createOrUpdateEudrAssessment({
+        lookupId,
+        applicable: result.applicable,
+        score: result.score,
+        band: result.band,
+        canConcludeNegligibleRisk: result.canConcludeNegligibleRisk,
+        breakdown: result.breakdown,
+        topDrivers: result.topDrivers,
+        checksRun: result.checksRun,
+      });
+
+      // 7. Audit event
+      await appendTradeEvent(lookupId, sessionId, "eudr_assessed", {
+        score: result.score,
+        band: result.band,
+        applicable: result.applicable,
+        canConcludeNegligibleRisk: result.canConcludeNegligibleRisk,
+      });
+
+      res.json(assessment);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ── CBAM CRUD + Assessment ──
+
+  app.get("/api/cbam/:lookupId", async (req, res) => {
+    try {
+      const record = await storage.getCbamRecordByLookupId(req.params.lookupId);
+      res.json(record || null);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/cbam", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { lookupId } = req.body;
+      if (!lookupId) {
+        res.status(400).json({ message: "lookupId is required" });
+        return;
+      }
+      const existing = await storage.getCbamRecordByLookupId(lookupId);
+      if (existing) {
+        res.json(existing);
+        return;
+      }
+      const record = await storage.createCbamRecord({
+        lookupId,
+        userSessionId: sessionId,
+        status: "draft",
+      });
+
+      // Audit event
+      await appendTradeEvent(lookupId, sessionId, "cbam_created", {
+        cbamRecordId: record.id,
+      });
+
+      res.json(record);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.patch("/api/cbam/:id", async (req, res) => {
+    try {
+      const updated = await storage.updateCbamRecord(req.params.id, req.body);
+      if (updated) {
+        res.json(updated);
+      } else {
+        res.status(404).json({ message: "CBAM record not found" });
+      }
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/cbam/:lookupId/assess", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { lookupId } = req.params;
+
+      // 1. Verify ownership
+      const lookup = await storage.getLookupById(lookupId);
+      if (!lookup || lookup.sessionId !== sessionId) {
+        res.status(404).json({ message: "Trade not found" });
+        return;
+      }
+
+      // 2. Get commodity trigger info
+      const commodity = lookup.commodityId ? await storage.getCommodityById(lookup.commodityId) : null;
+      const destination = lookup.destinationId ? await storage.getDestinationById(lookup.destinationId) : null;
+      const destIso2 = destination?.iso2 || "";
+
+      // 3. Get CBAM record
+      const cbamRecord = await storage.getCbamRecordByLookupId(lookupId) || null;
+
+      // 4. Get latest LC check cross-check results
+      const lcCase = await storage.getLcCaseByLookupId?.(lookupId);
+      let latestLcCheck = null;
+      if (lcCase?.latestCheckId) {
+        latestLcCheck = await storage.getLcCheckById(lcCase.latestCheckId);
+      }
+      const crossCheckResults = (latestLcCheck?.resultsJson as any[]) || [];
+
+      // 5. Run the assessment engine
+      const result = runCbamAssessment({
+        lookup,
+        cbamRecord,
+        lcCheck: latestLcCheck || null,
+        crossCheckResults,
+        commodityTriggersCbam: commodity?.triggersCbam ?? false,
+        destinationIso2: destIso2,
+      });
+
+      // 6. Upsert to cbam_assessments
+      const assessment = await storage.createOrUpdateCbamAssessment({
+        lookupId,
+        applicable: result.applicable,
+        score: result.score,
+        band: result.band,
+        canConcludeCbamCompliant: result.canConcludeCbamCompliant,
+        breakdown: result.breakdown,
+        topDrivers: result.topDrivers,
+        checksRun: result.checksRun,
+      });
+
+      // 7. Audit event
+      await appendTradeEvent(lookupId, sessionId, "cbam_assessed", {
+        score: result.score,
+        band: result.band,
+        applicable: result.applicable,
+        canConcludeCbamCompliant: result.canConcludeCbamCompliant,
+      });
+
+      res.json(assessment);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

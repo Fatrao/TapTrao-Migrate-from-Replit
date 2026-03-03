@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
+import { apiRequest } from "@/lib/queryClient";
 import { useRoute, Link } from "wouter";
 import { AppShell } from "@/components/AppShell";
 import { usePageTitle } from "@/hooks/use-page-title";
@@ -28,6 +29,18 @@ import {
   Flag,
   Sparkles,
   Loader2,
+  ChevronDown,
+  ChevronUp,
+  Leaf,
+  Factory,
+  RefreshCw,
+  MapPin,
+  Calendar,
+  Users,
+  Boxes,
+  Flame,
+  Building2,
+  DollarSign,
 } from "lucide-react";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
 import { estimateDemurrageRange } from "@/lib/demurrage-utils";
@@ -57,6 +70,9 @@ type TradeDetail = {
   supplierRequest: any | null;
   supplierUploads: any[];
   eudrRecord: any | null;
+  eudrAssessment: any | null;
+  cbamRecord: any | null;
+  cbamAssessment: any | null;
   twinlog: { ref: string | null; hash: string | null; lockedAt: string | null };
   tradeStatus: string;
   auditTrail: AuditEvent[];
@@ -104,6 +120,9 @@ const eventConfig: Record<string, { icon: typeof CheckCircle2; color: string; la
   customs_cleared: { icon: CheckCircle2, color: "#16a34a", label: "Customs Cleared" },
   twinlog_generated: { icon: Hash, color: "#0e4e45", label: "TwinLog Generated" },
   eudr_created: { icon: Shield, color: "#059669", label: "EUDR Record Created" },
+  eudr_assessed: { icon: ShieldCheck, color: "#059669", label: "EUDR Assessment Run" },
+  cbam_created: { icon: Shield, color: "#2563eb", label: "CBAM Record Created" },
+  cbam_assessed: { icon: ShieldCheck, color: "#2563eb", label: "CBAM Assessment Run" },
   trade_archived: { icon: Archive, color: "#9ca3af", label: "Trade Archived" },
   trade_closed: { icon: Archive, color: "#6b7280", label: "Trade Closed" },
   trade_value_set: { icon: Package, color: "#0e4e45", label: "Trade Value Set" },
@@ -336,6 +355,571 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
         </div>
       )}
     </div>
+  );
+}
+
+/* ── Shared regulatory helpers ── */
+
+const BAND_COLORS: Record<string, { bg: string; color: string; bar: string }> = {
+  negligible: { bg: "#f0fdf4", color: "#15803d", bar: "#22c55e" },
+  low: { bg: "#fefce8", color: "#a16207", bar: "#eab308" },
+  medium: { bg: "#fff7ed", color: "#c2410c", bar: "#f97316" },
+  high: { bg: "#fef2f2", color: "#dc2626", bar: "#ef4444" },
+};
+
+function ScoreBar({ score, band }: { score: number | null; band: string | null }) {
+  if (score == null || !band) return null;
+  const c = BAND_COLORS[band] || BAND_COLORS.medium;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8 }}>
+      <div style={{ flex: 1, height: 8, borderRadius: 4, background: "#e5e5e5", overflow: "hidden" }}>
+        <div style={{ width: `${Math.min(score, 100)}%`, height: "100%", borderRadius: 4, background: c.bar, transition: "width 0.3s ease" }} />
+      </div>
+      <span style={{ fontSize: 13, fontWeight: 700, color: c.color, minWidth: 60, textAlign: "right" }}>
+        {score}/100
+      </span>
+    </div>
+  );
+}
+
+function ChecksList({ checks }: { checks: any[] }) {
+  const [open, setOpen] = useState(false);
+  if (!checks || checks.length === 0) return null;
+  const passed = checks.filter(c => c.passed).length;
+  return (
+    <div style={{ marginTop: 12 }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, padding: 0, fontSize: 12, fontWeight: 500, color: "#555" }}
+      >
+        {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        All {checks.length} checks ({passed} passed, {checks.length - passed} failed)
+      </button>
+      {open && (
+        <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
+          {checks.map((c: any) => (
+            <div key={c.id} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 11, color: c.passed ? "#15803d" : c.severity === "critical" ? "#dc2626" : "#d97706" }}>
+              <span style={{ flexShrink: 0, marginTop: 1 }}>{c.passed ? "✅" : c.severity === "critical" ? "❌" : "⚠️"}</span>
+              <div>
+                <span style={{ fontWeight: 500 }}>{c.label}</span>
+                <span style={{ color: "#888", marginLeft: 6 }}>{c.detail}</span>
+                {!c.passed && c.fixSuggestion && (
+                  <div style={{ fontSize: 10, color: "#0e4e45", marginTop: 2 }}>💡 {c.fixSuggestion}</div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TopDrivers({ drivers }: { drivers: any[] }) {
+  if (!drivers || drivers.length === 0) return null;
+  return (
+    <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
+      <span style={{ fontSize: 11, fontWeight: 600, color: "#555", textTransform: "uppercase", letterSpacing: ".08em" }}>Top Issues</span>
+      {drivers.map((d: any, i: number) => (
+        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 12 }}>
+          <span style={{ flexShrink: 0 }}>{d.severity === "critical" ? "🔴" : "🟠"}</span>
+          <div>
+            <span style={{ fontWeight: 500, color: "#1a1a1a" }}>{d.reason}</span>
+            <span style={{ color: "#999", marginLeft: 4 }}>({d.points} pts)</span>
+            <div style={{ fontSize: 11, color: "#0e4e45" }}>→ {d.fix}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BreakdownRow({ breakdown }: { breakdown: any }) {
+  if (!breakdown) return null;
+  const items = [
+    { label: "Completeness", val: breakdown.completeness, max: 55 },
+    { label: "Integrity", val: breakdown.deterministic, max: 30 },
+    { label: "Cross-doc", val: breakdown.crossDocument, max: 35 },
+    { label: "Mentions", val: breakdown.mentions, max: 10 },
+  ];
+  return (
+    <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
+      {items.map(item => (
+        <div key={item.label} style={{ fontSize: 11, color: "#555" }}>
+          <span style={{ fontWeight: 500 }}>{item.label}</span>
+          <span style={{ marginLeft: 4, fontWeight: 700, color: item.val > 0 ? "#c2410c" : "#15803d" }}>{item.val}</span>
+          <span style={{ color: "#bbb" }}>/{item.max}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Collapsible form section ── */
+function FormSection({ title, icon: Icon, children, defaultOpen = false }: { title: string; icon: any; children: React.ReactNode; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: 12 }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, padding: 0, width: "100%", textAlign: "left" }}
+      >
+        <Icon className="w-4 h-4" style={{ color: "#555", flexShrink: 0 }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", flex: 1 }}>{title}</span>
+        {open ? <ChevronUp className="w-3.5 h-3.5" style={{ color: "#999" }} /> : <ChevronDown className="w-3.5 h-3.5" style={{ color: "#999" }} />}
+      </button>
+      {open && <div style={{ marginTop: 12, paddingLeft: 28 }}>{children}</div>}
+    </div>
+  );
+}
+
+function FormField({ label, value, onChange, type = "text", placeholder, disabled = false }: {
+  label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string; disabled?: boolean;
+}) {
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <label style={{ fontSize: 11, fontWeight: 500, color: "#555", display: "block", marginBottom: 4 }}>{label}</label>
+      <input
+        type={type}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        disabled={disabled}
+        style={{ width: "100%", fontSize: 13, padding: "6px 10px", border: "1px solid #ddd", borderRadius: 6, background: disabled ? "#f9f9f9" : "#fff", color: "#1a1a1a" }}
+      />
+    </div>
+  );
+}
+
+/* ── EUDR Inline Box ── */
+function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }) {
+  const queryClient = useQueryClient();
+  const [expanded, setExpanded] = useState(false);
+  const [assessing, setAssessing] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const eudr = data.eudrRecord;
+  const assessment = data.eudrAssessment;
+  const bandC = assessment?.band ? BAND_COLORS[assessment.band] || BAND_COLORS.medium : null;
+
+  // Init EUDR record if it doesn't exist
+  const initEudr = useCallback(async () => {
+    if (eudr) return;
+    try {
+      await apiRequest("POST", "/api/eudr", { lookupId: tradeId });
+      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
+    } catch {}
+  }, [eudr, tradeId, queryClient]);
+
+  const handleExpand = () => {
+    if (!expanded) initEudr();
+    setExpanded(!expanded);
+  };
+
+  const saveEudrField = async (fields: Record<string, any>) => {
+    if (!eudr) return;
+    setSaving(true);
+    try {
+      await apiRequest("PATCH", `/api/eudr/${eudr.id}`, fields);
+      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const runAssessment = async () => {
+    setAssessing(true);
+    try {
+      await apiRequest("POST", `/api/eudr/${tradeId}/assess`);
+      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
+    } finally {
+      setAssessing(false);
+    }
+  };
+
+  // Form state — synced from eudr record
+  const [plotCoords, setPlotCoords] = useState(eudr?.plotCoordinates ? JSON.stringify(eudr.plotCoordinates) : "");
+  const [plotCountry, setPlotCountry] = useState(eudr?.plotCountryIso2 || "");
+  const [evidenceType, setEvidenceType] = useState(eudr?.evidenceType || "");
+  const [evidenceRef, setEvidenceRef] = useState(eudr?.evidenceReference || "");
+  const [evidenceDate, setEvidenceDate] = useState(eudr?.evidenceDate || "");
+  const [cutoffDate, setCutoffDate] = useState(eudr?.cutoffDate || "");
+  const [supplierName, setSupplierName] = useState(eudr?.supplierName || "");
+  const [supplierAddr, setSupplierAddr] = useState(eudr?.supplierAddress || "");
+  const [supplierReg, setSupplierReg] = useState(eudr?.supplierRegNumber || "");
+  const [riskLevel, setRiskLevel] = useState(eudr?.riskLevel || "standard");
+
+  return (
+    <Card>
+      <CardContent className="p-5">
+        {/* Collapsed header */}
+        <div
+          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}
+          onClick={handleExpand}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Leaf className="w-4 h-4" style={{ color: "#059669" }} />
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
+              EUDR Due Diligence
+            </h3>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {assessment && assessment.applicable && assessment.score != null && (
+              <span style={{
+                fontSize: 11, fontWeight: 600, padding: "2px 10px", borderRadius: 4,
+                background: bandC?.bg || "#f5f5f5",
+                color: bandC?.color || "#999",
+              }}>
+                {assessment.score} · {assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : ""}
+              </span>
+            )}
+            {assessment && assessment.applicable === false && (
+              <span style={{ fontSize: 11, color: "#999", fontWeight: 500 }}>N/A</span>
+            )}
+            {!assessment && (
+              <span style={{ fontSize: 11, color: "#2563eb", fontWeight: 500 }}>Not assessed</span>
+            )}
+            {expanded ? <ChevronUp className="w-4 h-4" style={{ color: "#999" }} /> : <ChevronDown className="w-4 h-4" style={{ color: "#999" }} />}
+          </div>
+        </div>
+
+        {/* Collapsed subtitle */}
+        {!expanded && assessment && assessment.applicable && (
+          <div style={{ fontSize: 11, color: "#888", marginTop: 4, marginLeft: 28 }}>
+            {assessment.canConcludeNegligibleRisk
+              ? "✅ Can conclude negligible risk"
+              : "❌ Cannot conclude negligible risk"}
+            {assessment.assessedAt && (
+              <span style={{ marginLeft: 8 }}>
+                · Last assessed {new Date(assessment.assessedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Expanded content */}
+        {expanded && (
+          <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+
+            {/* 1. Geolocation */}
+            <FormSection title="Geolocation" icon={MapPin}>
+              <FormField label="Plot coordinates (JSON)" value={plotCoords} onChange={setPlotCoords} placeholder='[{"lat": 6.5, "lng": -1.5}]' />
+              <FormField label="Plot country (ISO2)" value={plotCountry} onChange={setPlotCountry} placeholder="GH" />
+              <Button size="sm" disabled={saving} onClick={() => saveEudrField({
+                plotCoordinates: plotCoords ? JSON.parse(plotCoords) : null,
+                plotCountryIso2: plotCountry || null,
+              })} style={{ fontSize: 11, marginTop: 4 }}>
+                {saving ? "Saving..." : "Save"}
+              </Button>
+            </FormSection>
+
+            {/* 2. Evidence */}
+            <FormSection title="Evidence & Timeline" icon={Calendar}>
+              <div style={{ marginBottom: 10 }}>
+                <label style={{ fontSize: 11, fontWeight: 500, color: "#555", display: "block", marginBottom: 4 }}>Evidence type</label>
+                <select
+                  value={evidenceType}
+                  onChange={e => setEvidenceType(e.target.value)}
+                  style={{ width: "100%", fontSize: 13, padding: "6px 10px", border: "1px solid #ddd", borderRadius: 6, background: "#fff" }}
+                >
+                  <option value="">Select...</option>
+                  <option value="satellite_imagery">Satellite imagery</option>
+                  <option value="field_audit">Field audit report</option>
+                  <option value="certification">Certification (e.g., Rainforest Alliance)</option>
+                  <option value="government_permit">Government permit</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <FormField label="Evidence reference" value={evidenceRef} onChange={setEvidenceRef} placeholder="REF-12345" />
+              <FormField label="Evidence date" value={evidenceDate} onChange={setEvidenceDate} type="date" />
+              <FormField label="Deforestation-free since (must be ≤ 31 Dec 2020)" value={cutoffDate} onChange={setCutoffDate} type="date" />
+              <Button size="sm" disabled={saving} onClick={() => saveEudrField({
+                evidenceType: evidenceType || null,
+                evidenceReference: evidenceRef || null,
+                evidenceDate: evidenceDate || null,
+                cutoffDate: cutoffDate || null,
+              })} style={{ fontSize: 11, marginTop: 4 }}>
+                {saving ? "Saving..." : "Save"}
+              </Button>
+            </FormSection>
+
+            {/* 3. Supplier */}
+            <FormSection title="Supplier" icon={Users}>
+              <FormField label="Supplier name" value={supplierName} onChange={setSupplierName} />
+              <FormField label="Supplier address" value={supplierAddr} onChange={setSupplierAddr} />
+              <FormField label="Registration number" value={supplierReg} onChange={setSupplierReg} />
+              <Button size="sm" disabled={saving} onClick={() => saveEudrField({
+                supplierName: supplierName || null,
+                supplierAddress: supplierAddr || null,
+                supplierRegNumber: supplierReg || null,
+              })} style={{ fontSize: 11, marginTop: 4 }}>
+                {saving ? "Saving..." : "Save"}
+              </Button>
+            </FormSection>
+
+            {/* 4. Risk Level */}
+            <FormSection title="Risk Level" icon={ShieldAlert}>
+              <div style={{ marginBottom: 10 }}>
+                <label style={{ fontSize: 11, fontWeight: 500, color: "#555", display: "block", marginBottom: 4 }}>Risk classification</label>
+                <select
+                  value={riskLevel}
+                  onChange={e => setRiskLevel(e.target.value)}
+                  style={{ width: "100%", fontSize: 13, padding: "6px 10px", border: "1px solid #ddd", borderRadius: 6, background: "#fff" }}
+                >
+                  <option value="low">Low</option>
+                  <option value="standard">Standard</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+              <Button size="sm" disabled={saving} onClick={() => saveEudrField({
+                riskLevel,
+              })} style={{ fontSize: 11, marginTop: 4 }}>
+                {saving ? "Saving..." : "Save"}
+              </Button>
+            </FormSection>
+
+            {/* Assessment Section */}
+            <div style={{ borderTop: "2px solid #e5e5e5", paddingTop: 16, marginTop: 4 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+                <Button size="sm" onClick={runAssessment} disabled={assessing} style={{ fontSize: 12 }}>
+                  {assessing ? (
+                    <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> Assessing...</>
+                  ) : (
+                    <><RefreshCw className="w-3 h-3 mr-1" /> Run Assessment</>
+                  )}
+                </Button>
+                {eudr && (
+                  <Link href={`/eudr/${tradeId}`}>
+                    <Button variant="outline" size="sm" style={{ fontSize: 11 }}>
+                      Generate PDF Statement
+                    </Button>
+                  </Link>
+                )}
+              </div>
+
+              {assessment && assessment.applicable && (
+                <div style={{ marginTop: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: bandC?.color || "#999" }}>
+                      Score: {assessment.score}/100 · {assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : ""}
+                    </span>
+                    <span style={{ fontSize: 12, color: "#555" }}>
+                      {assessment.canConcludeNegligibleRisk ? "✅ Can conclude negligible" : "❌ Cannot conclude negligible"}
+                    </span>
+                  </div>
+                  <ScoreBar score={assessment.score} band={assessment.band} />
+                  <BreakdownRow breakdown={assessment.breakdown} />
+                  <TopDrivers drivers={assessment.topDrivers as any[]} />
+                  <ChecksList checks={assessment.checksRun as any[]} />
+                </div>
+              )}
+
+              {assessment && assessment.applicable === false && (
+                <div style={{ marginTop: 12, fontSize: 12, color: "#888", padding: "8px 12px", background: "#f9f9f9", borderRadius: 8 }}>
+                  EUDR does not apply to this trade corridor (commodity or destination not in scope).
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ── CBAM Inline Box ── */
+function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }) {
+  const queryClient = useQueryClient();
+  const [expanded, setExpanded] = useState(false);
+  const [assessing, setAssessing] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const cbam = data.cbamRecord;
+  const assessment = data.cbamAssessment;
+  const bandC = assessment?.band ? BAND_COLORS[assessment.band] || BAND_COLORS.medium : null;
+
+  // Init CBAM record if it doesn't exist
+  const initCbam = useCallback(async () => {
+    if (cbam) return;
+    try {
+      await apiRequest("POST", "/api/cbam", { lookupId: tradeId });
+      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
+    } catch {}
+  }, [cbam, tradeId, queryClient]);
+
+  const handleExpand = () => {
+    if (!expanded) initCbam();
+    setExpanded(!expanded);
+  };
+
+  const saveCbamField = async (fields: Record<string, any>) => {
+    if (!cbam) return;
+    setSaving(true);
+    try {
+      await apiRequest("PATCH", `/api/cbam/${cbam.id}`, fields);
+      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const runAssessment = async () => {
+    setAssessing(true);
+    try {
+      await apiRequest("POST", `/api/cbam/${tradeId}/assess`);
+      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
+    } finally {
+      setAssessing(false);
+    }
+  };
+
+  // Form state
+  const [emissions, setEmissions] = useState(cbam?.embeddedEmissions || "");
+  const [quantity, setQuantity] = useState(cbam?.quantity || "");
+  const [installName, setInstallName] = useState(cbam?.installationName || "");
+  const [installCountry, setInstallCountry] = useState(cbam?.installationCountry || "");
+  const [reportingPeriod, setReportingPeriod] = useState(cbam?.reportingPeriod || "");
+  const [carbonPrice, setCarbonPrice] = useState(cbam?.carbonPricePaid || "");
+  const [carbonCurrency, setCarbonCurrency] = useState(cbam?.carbonPriceCurrency || "EUR");
+
+  return (
+    <Card>
+      <CardContent className="p-5">
+        {/* Collapsed header */}
+        <div
+          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}
+          onClick={handleExpand}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Factory className="w-4 h-4" style={{ color: "#2563eb" }} />
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
+              CBAM Assessment
+            </h3>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {assessment && assessment.applicable && assessment.score != null && (
+              <span style={{
+                fontSize: 11, fontWeight: 600, padding: "2px 10px", borderRadius: 4,
+                background: bandC?.bg || "#f5f5f5",
+                color: bandC?.color || "#999",
+              }}>
+                {assessment.score} · {assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : ""}
+              </span>
+            )}
+            {assessment && assessment.applicable === false && (
+              <span style={{ fontSize: 11, color: "#999", fontWeight: 500 }}>N/A</span>
+            )}
+            {!assessment && (
+              <span style={{ fontSize: 11, color: "#2563eb", fontWeight: 500 }}>Not assessed</span>
+            )}
+            {expanded ? <ChevronUp className="w-4 h-4" style={{ color: "#999" }} /> : <ChevronDown className="w-4 h-4" style={{ color: "#999" }} />}
+          </div>
+        </div>
+
+        {/* Collapsed subtitle */}
+        {!expanded && assessment && assessment.applicable && (
+          <div style={{ fontSize: 11, color: "#888", marginTop: 4, marginLeft: 28 }}>
+            {assessment.canConcludeCbamCompliant
+              ? "✅ Compliant"
+              : "❌ Compliance issues detected"}
+            {assessment.assessedAt && (
+              <span style={{ marginLeft: 8 }}>
+                · Last assessed {new Date(assessment.assessedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Expanded content */}
+        {expanded && (
+          <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+
+            {/* 1. Emissions Data */}
+            <FormSection title="Emissions Data" icon={Flame}>
+              <FormField label="Embedded emissions (tCO₂e per ton)" value={emissions} onChange={setEmissions} type="number" placeholder="0.00" />
+              <FormField label="Quantity (tons)" value={quantity} onChange={setQuantity} type="number" placeholder="0" />
+              <Button size="sm" disabled={saving} onClick={() => saveCbamField({
+                embeddedEmissions: emissions || null,
+                quantity: quantity || null,
+              })} style={{ fontSize: 11, marginTop: 4 }}>
+                {saving ? "Saving..." : "Save"}
+              </Button>
+            </FormSection>
+
+            {/* 2. Installation */}
+            <FormSection title="Installation" icon={Building2}>
+              <FormField label="Installation name" value={installName} onChange={setInstallName} />
+              <FormField label="Installation country (ISO2)" value={installCountry} onChange={setInstallCountry} placeholder="NG" />
+              <FormField label="Reporting period" value={reportingPeriod} onChange={setReportingPeriod} placeholder="2026-Q1" />
+              <Button size="sm" disabled={saving} onClick={() => saveCbamField({
+                installationName: installName || null,
+                installationCountry: installCountry || null,
+                reportingPeriod: reportingPeriod || null,
+              })} style={{ fontSize: 11, marginTop: 4 }}>
+                {saving ? "Saving..." : "Save"}
+              </Button>
+            </FormSection>
+
+            {/* 3. Carbon Price */}
+            <FormSection title="Carbon Price" icon={DollarSign}>
+              <FormField label="Carbon price paid (EUR/tCO₂e)" value={carbonPrice} onChange={setCarbonPrice} type="number" placeholder="0.00" />
+              <div style={{ marginBottom: 10 }}>
+                <label style={{ fontSize: 11, fontWeight: 500, color: "#555", display: "block", marginBottom: 4 }}>Currency</label>
+                <select
+                  value={carbonCurrency}
+                  onChange={e => setCarbonCurrency(e.target.value)}
+                  style={{ width: "100%", fontSize: 13, padding: "6px 10px", border: "1px solid #ddd", borderRadius: 6, background: "#fff" }}
+                >
+                  <option value="EUR">EUR</option>
+                  <option value="USD">USD</option>
+                  <option value="GBP">GBP</option>
+                </select>
+              </div>
+              <Button size="sm" disabled={saving} onClick={() => saveCbamField({
+                carbonPricePaid: carbonPrice || null,
+                carbonPriceCurrency: carbonCurrency,
+              })} style={{ fontSize: 11, marginTop: 4 }}>
+                {saving ? "Saving..." : "Save"}
+              </Button>
+            </FormSection>
+
+            {/* Assessment Section */}
+            <div style={{ borderTop: "2px solid #e5e5e5", paddingTop: 16, marginTop: 4 }}>
+              <Button size="sm" onClick={runAssessment} disabled={assessing} style={{ fontSize: 12 }}>
+                {assessing ? (
+                  <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> Assessing...</>
+                ) : (
+                  <><RefreshCw className="w-3 h-3 mr-1" /> Run Assessment</>
+                )}
+              </Button>
+
+              {assessment && assessment.applicable && (
+                <div style={{ marginTop: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: bandC?.color || "#999" }}>
+                      Score: {assessment.score}/100 · {assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : ""}
+                    </span>
+                    <span style={{ fontSize: 12, color: "#555" }}>
+                      {assessment.canConcludeCbamCompliant ? "✅ Compliant" : "❌ Compliance issues"}
+                    </span>
+                  </div>
+                  <ScoreBar score={assessment.score} band={assessment.band} />
+                  <BreakdownRow breakdown={assessment.breakdown} />
+                  <TopDrivers drivers={assessment.topDrivers as any[]} />
+                  <ChecksList checks={assessment.checksRun as any[]} />
+                </div>
+              )}
+
+              {assessment && assessment.applicable === false && (
+                <div style={{ marginTop: 12, fontSize: 12, color: "#888", padding: "8px 12px", background: "#f9f9f9", borderRadius: 8 }}>
+                  CBAM does not apply to this trade corridor (commodity or destination not in scope).
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -1142,32 +1726,11 @@ export default function TradeDetail() {
                 </CardContent>
               </Card>
 
-              {/* EUDR Status (if applicable) */}
-              {data.eudrRecord && (
-                <Card>
-                  <CardContent className="p-5">
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                      <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
-                        EUDR Due Diligence
-                      </h3>
-                      <Link href={`/eudr/${data.lookup.id}`}>
-                        <Button variant="outline" size="sm" style={{ fontSize: 12 }}>
-                          View / Edit
-                        </Button>
-                      </Link>
-                    </div>
-                    <Badge style={{
-                      background: data.eudrRecord.status === "approved" ? "rgba(34,197,94,0.1)" :
-                        "rgba(245,158,11,0.1)",
-                      color: data.eudrRecord.status === "approved" ? "#16a34a" : "#d97706",
-                      border: "none",
-                      fontSize: 11,
-                    }}>
-                      {data.eudrRecord.status}
-                    </Badge>
-                  </CardContent>
-                </Card>
-              )}
+              {/* EUDR Due Diligence — Inline Box */}
+              <EudrInlineBox data={data} tradeId={tradeId!} />
+
+              {/* CBAM Assessment — Inline Box */}
+              <CbamInlineBox data={data} tradeId={tradeId!} />
             </div>
 
             {/* RIGHT COLUMN — Trade Info + Audit Timeline */}

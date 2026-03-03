@@ -55,6 +55,15 @@ import {
   eudrRecords,
   type EudrRecord,
   type InsertEudrRecord,
+  cbamRecords,
+  type CbamRecord,
+  type InsertCbamRecord,
+  eudrAssessments,
+  type EudrAssessment,
+  type InsertEudrAssessment,
+  cbamAssessments,
+  type CbamAssessment,
+  type InsertCbamAssessment,
   promoCodes,
   promoRedemptions,
   type PromoCode,
@@ -169,6 +178,16 @@ export interface IStorage {
   getEudrRecordByLookupId(lookupId: string): Promise<EudrRecord | undefined>;
   updateEudrRecord(id: string, data: Partial<InsertEudrRecord>): Promise<EudrRecord | undefined>;
   markLookupEudrComplete(lookupId: string): Promise<void>;
+  // CBAM Records (manual data entry)
+  createCbamRecord(data: InsertCbamRecord): Promise<CbamRecord>;
+  getCbamRecordByLookupId(lookupId: string): Promise<CbamRecord | undefined>;
+  updateCbamRecord(id: string, data: Partial<InsertCbamRecord>): Promise<CbamRecord | undefined>;
+  // EUDR Assessments (computed risk scores)
+  createOrUpdateEudrAssessment(data: InsertEudrAssessment): Promise<EudrAssessment>;
+  getEudrAssessmentByLookupId(lookupId: string): Promise<EudrAssessment | undefined>;
+  // CBAM Assessments (computed risk scores)
+  createOrUpdateCbamAssessment(data: InsertCbamAssessment): Promise<CbamAssessment>;
+  getCbamAssessmentByLookupId(lookupId: string): Promise<CbamAssessment | undefined>;
   // LC Cases
   createLcCase(data: InsertLcCase): Promise<LcCase>;
   getLcCaseById(id: string): Promise<LcCase | undefined>;
@@ -265,6 +284,13 @@ export type EnrichedTrade = {
   tradeValueCurrency: string | null;
   lcVerdict: string | null;
   lcCheckId: string | null;
+  // Regulatory assessment badges
+  eudrApplicable: boolean | null;
+  eudrScore: number | null;
+  eudrBand: string | null;
+  cbamApplicable: boolean | null;
+  cbamScore: number | null;
+  cbamBand: string | null;
 };
 
 export type TradeDetail = {
@@ -274,6 +300,9 @@ export type TradeDetail = {
   supplierRequest: SupplierRequest | null;
   supplierUploads: SupplierUpload[];
   eudrRecord: EudrRecord | null;
+  eudrAssessment: EudrAssessment | null;
+  cbamRecord: CbamRecord | null;
+  cbamAssessment: CbamAssessment | null;
   twinlog: { ref: string | null; hash: string | null; lockedAt: Date | null };
   tradeStatus: string;
   auditTrail: TradeEvent[];
@@ -752,11 +781,19 @@ export class DatabaseStorage implements IStorage {
         l.trade_value AS "tradeValue",
         l.trade_value_currency AS "tradeValueCurrency",
         lc.verdict AS "lcVerdict",
-        lc.id AS "lcCheckId"
+        lc.id AS "lcCheckId",
+        ea.applicable AS "eudrApplicable",
+        ea.score AS "eudrScore",
+        ea.band AS "eudrBand",
+        ca.applicable AS "cbamApplicable",
+        ca.score AS "cbamScore",
+        ca.band AS "cbamBand"
       FROM lookups l
       INNER JOIN origin_countries o ON l.origin_id = o.id
       INNER JOIN destinations d ON l.destination_id = d.id
       LEFT JOIN lc_checks lc ON lc.source_lookup_id = l.id
+      LEFT JOIN eudr_assessments ea ON ea.lookup_id = l.id
+      LEFT JOIN cbam_assessments ca ON ca.lookup_id = l.id
       WHERE 1=1 ${sessionFilter}
       ORDER BY l.id, lc.created_at DESC
     `);
@@ -985,6 +1022,92 @@ export class DatabaseStorage implements IStorage {
     await db.update(lookups)
       .set({ eudrComplete: true })
       .where(eq(lookups.id, lookupId));
+  }
+
+  // ── CBAM Records (manual data entry) ──
+
+  async createCbamRecord(data: InsertCbamRecord): Promise<CbamRecord> {
+    const [row] = await db.insert(cbamRecords).values(data).returning();
+    return row;
+  }
+
+  async getCbamRecordByLookupId(lookupId: string): Promise<CbamRecord | undefined> {
+    const [row] = await db.select().from(cbamRecords).where(eq(cbamRecords.lookupId, lookupId));
+    return row;
+  }
+
+  async updateCbamRecord(id: string, data: Partial<InsertCbamRecord>): Promise<CbamRecord | undefined> {
+    const [row] = await db.update(cbamRecords)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(cbamRecords.id, id))
+      .returning();
+    return row;
+  }
+
+  // ── EUDR Assessments (computed risk scores) ──
+
+  async createOrUpdateEudrAssessment(data: InsertEudrAssessment): Promise<EudrAssessment> {
+    // Upsert: if assessment exists for this lookupId, update it; otherwise insert
+    const existing = await this.getEudrAssessmentByLookupId(data.lookupId);
+    if (existing) {
+      const [row] = await db.update(eudrAssessments)
+        .set({
+          applicable: data.applicable,
+          score: data.score,
+          band: data.band,
+          canConcludeNegligibleRisk: data.canConcludeNegligibleRisk,
+          breakdown: data.breakdown,
+          topDrivers: data.topDrivers,
+          checksRun: data.checksRun,
+          assessedAt: new Date(),
+        })
+        .where(eq(eudrAssessments.id, existing.id))
+        .returning();
+      return row;
+    }
+    const [row] = await db.insert(eudrAssessments).values({
+      ...data,
+      assessedAt: new Date(),
+    }).returning();
+    return row;
+  }
+
+  async getEudrAssessmentByLookupId(lookupId: string): Promise<EudrAssessment | undefined> {
+    const [row] = await db.select().from(eudrAssessments).where(eq(eudrAssessments.lookupId, lookupId));
+    return row;
+  }
+
+  // ── CBAM Assessments (computed risk scores) ──
+
+  async createOrUpdateCbamAssessment(data: InsertCbamAssessment): Promise<CbamAssessment> {
+    // Upsert: if assessment exists for this lookupId, update it; otherwise insert
+    const existing = await this.getCbamAssessmentByLookupId(data.lookupId);
+    if (existing) {
+      const [row] = await db.update(cbamAssessments)
+        .set({
+          applicable: data.applicable,
+          score: data.score,
+          band: data.band,
+          canConcludeCbamCompliant: data.canConcludeCbamCompliant,
+          breakdown: data.breakdown,
+          topDrivers: data.topDrivers,
+          checksRun: data.checksRun,
+          assessedAt: new Date(),
+        })
+        .where(eq(cbamAssessments.id, existing.id))
+        .returning();
+      return row;
+    }
+    const [row] = await db.insert(cbamAssessments).values({
+      ...data,
+      assessedAt: new Date(),
+    }).returning();
+    return row;
+  }
+
+  async getCbamAssessmentByLookupId(lookupId: string): Promise<CbamAssessment | undefined> {
+    const [row] = await db.select().from(cbamAssessments).where(eq(cbamAssessments.lookupId, lookupId));
+    return row;
   }
 
   // ── LC Cases ──
@@ -1340,9 +1463,17 @@ export class DatabaseStorage implements IStorage {
         .where(eq(supplierUploads.requestId, supplierRequest.id));
     }
 
-    // 5. Get EUDR record
+    // 5. Get EUDR record + assessment
     const [eudrRecord] = await db.select().from(eudrRecords)
       .where(eq(eudrRecords.lookupId, lookupId));
+    const [eudrAssessment] = await db.select().from(eudrAssessments)
+      .where(eq(eudrAssessments.lookupId, lookupId));
+
+    // 5b. Get CBAM record + assessment
+    const [cbamRecord] = await db.select().from(cbamRecords)
+      .where(eq(cbamRecords.lookupId, lookupId));
+    const [cbamAssessment] = await db.select().from(cbamAssessments)
+      .where(eq(cbamAssessments.lookupId, lookupId));
 
     // 6. Get audit trail from trade_events
     const auditTrail = await db.select().from(tradeEvents)
@@ -1367,6 +1498,9 @@ export class DatabaseStorage implements IStorage {
       supplierRequest: supplierRequest ?? null,
       supplierUploads: supplierUploadsList,
       eudrRecord: eudrRecord ?? null,
+      eudrAssessment: eudrAssessment ?? null,
+      cbamRecord: cbamRecord ?? null,
+      cbamAssessment: cbamAssessment ?? null,
       twinlog: {
         ref: lookup.twinlogRef,
         hash: lookup.twinlogHash,

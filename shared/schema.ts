@@ -719,6 +719,120 @@ export const insertEudrRecordSchema = createInsertSchema(eudrRecords).omit({
 export type InsertEudrRecord = z.infer<typeof insertEudrRecordSchema>;
 export type EudrRecord = typeof eudrRecords.$inferSelect;
 
+/* ── CBAM Records (manual data entry, mirrors eudr_records pattern) ── */
+
+export const cbamRecords = pgTable(
+  "cbam_records",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    lookupId: uuid("lookup_id").references(() => lookups.id, { onDelete: "cascade" }),
+    userSessionId: text("user_session_id").notNull(),
+    embeddedEmissions: numeric("embedded_emissions"),       // tCO₂e per ton of product
+    quantity: numeric("quantity"),                           // tons
+    installationName: text("installation_name"),
+    installationCountry: varchar("installation_country", { length: 2 }),
+    reportingPeriod: text("reporting_period"),               // e.g. "2026-Q1"
+    carbonPricePaid: numeric("carbon_price_paid"),           // EUR/tCO₂e, nullable
+    carbonPriceCurrency: varchar("carbon_price_currency", { length: 3 }).default("EUR"),
+    status: text("status").default("draft"),                 // draft | complete
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_cbam_lookup").on(table.lookupId),
+    index("idx_cbam_session").on(table.userSessionId),
+  ]
+);
+
+export const insertCbamRecordSchema = createInsertSchema(cbamRecords).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCbamRecord = z.infer<typeof insertCbamRecordSchema>;
+export type CbamRecord = typeof cbamRecords.$inferSelect;
+
+/* ── EUDR Assessments (computed risk scores) ── */
+
+export const eudrAssessments = pgTable(
+  "eudr_assessments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    lookupId: uuid("lookup_id").notNull().unique().references(() => lookups.id, { onDelete: "cascade" }),
+    applicable: boolean("applicable").notNull(),
+    score: integer("score"),                                  // 0-100
+    band: text("band"),                                       // negligible | low | medium | high
+    canConcludeNegligibleRisk: boolean("can_conclude_negligible_risk"),
+    breakdown: jsonb("breakdown"),                            // RegulatoryScoreBreakdown
+    topDrivers: jsonb("top_drivers"),                         // RegulatoryTopDriver[]
+    checksRun: jsonb("checks_run"),                           // RegulatoryCheckResult[]
+    assessedAt: timestamp("assessed_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_eudr_assess_lookup").on(table.lookupId),
+  ]
+);
+
+export type EudrAssessment = typeof eudrAssessments.$inferSelect;
+export type InsertEudrAssessment = typeof eudrAssessments.$inferInsert;
+
+/* ── CBAM Assessments (computed risk scores, same shape as EUDR) ── */
+
+export const cbamAssessments = pgTable(
+  "cbam_assessments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    lookupId: uuid("lookup_id").notNull().unique().references(() => lookups.id, { onDelete: "cascade" }),
+    applicable: boolean("applicable").notNull(),
+    score: integer("score"),                                  // 0-100
+    band: text("band"),                                       // negligible | low | medium | high
+    canConcludeCbamCompliant: boolean("can_conclude_cbam_compliant"),
+    breakdown: jsonb("breakdown"),                            // RegulatoryScoreBreakdown
+    topDrivers: jsonb("top_drivers"),                         // RegulatoryTopDriver[]
+    checksRun: jsonb("checks_run"),                           // RegulatoryCheckResult[]
+    assessedAt: timestamp("assessed_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_cbam_assess_lookup").on(table.lookupId),
+  ]
+);
+
+export type CbamAssessment = typeof cbamAssessments.$inferSelect;
+export type InsertCbamAssessment = typeof cbamAssessments.$inferInsert;
+
+/* ── Shared Regulatory Assessment Types ── */
+
+export type RegulatoryCheckResult = {
+  id: string;
+  domain: "eudr" | "cbam";
+  group: string;
+  label: string;
+  severity: "critical" | "warning";
+  weight: number;
+  passed: boolean;
+  detail: string;
+  fixSuggestion?: string;
+};
+
+export type RegulatoryScoreBreakdown = {
+  completeness: number;
+  deterministic: number;
+  crossDocument: number;
+  mentions: number;
+};
+
+export type RegulatoryTopDriver = {
+  reason: string;
+  severity: "critical" | "warning";
+  points: number;
+  fix: string;
+};
+
+export type RegulatoryRiskBand = "negligible" | "low" | "medium" | "high";
+
 export type DocumentStatus = "PENDING" | "READY" | "RISK_ACCEPTED";
 export type DocumentOwner = "IMPORTER" | "SUPPLIER" | "BROKER";
 export type DocumentDueBy = "BEFORE_LOADING" | "BEFORE_ARRIVAL" | "POST_ARRIVAL";
