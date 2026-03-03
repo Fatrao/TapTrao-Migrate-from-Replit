@@ -2541,7 +2541,11 @@ Rules:
       }
 
       const documentType = (req.body?.documentType as string) || "lc_terms";
-      const validTypes = ["lc_terms", "commercial_invoice", "bill_of_lading", "certificate_of_origin", "phytosanitary_certificate", "packing_list"];
+
+      // Dynamically import the extraction module
+      const { extractFromPdf, extractFromPdfWithAutoDetect, cleanupTempFile, ALL_DOC_TYPES } = await import("./lc-extract");
+
+      const validTypes = [...ALL_DOC_TYPES, "auto"];
       if (!validTypes.includes(documentType)) {
         // Clean up temp file
         try { fs.unlinkSync(file.path); } catch {}
@@ -2549,10 +2553,18 @@ Rules:
         return;
       }
 
-      // Dynamically import the extraction module
-      const { extractFromPdf, cleanupTempFile } = await import("./lc-extract");
+      let result: any;
+      let finalDocType = documentType;
 
-      const result = await extractFromPdf(file.path, documentType);
+      if (documentType === "auto") {
+        // Auto-detect: classify + extract in a single Claude call
+        const autoResult = await extractFromPdfWithAutoDetect(file.path);
+        finalDocType = autoResult.detectedDocumentType;
+        result = autoResult;
+      } else {
+        // Explicit type: use the existing extraction path
+        result = await extractFromPdf(file.path, documentType);
+      }
 
       // Clean up temp file
       cleanupTempFile(file.path);
@@ -2561,7 +2573,7 @@ Rules:
       try {
         await storage.createDocumentExtraction({
           sessionId,
-          documentType,
+          documentType: finalDocType,
           originalFilename: file.originalname,
           extractedText: result.rawText?.substring(0, 10000) || null,
           extractionJson: result.fields ? { fields: result.fields, overallConfidence: result.overallConfidence, warnings: result.warnings } : null,
@@ -2575,12 +2587,16 @@ Rules:
       }
 
       res.json({
+        documentType: finalDocType,
         fields: result.fields,
         overallConfidence: result.overallConfidence,
         warnings: result.warnings,
         rawText: result.rawText ? result.rawText.substring(0, 500) : null,
         error: result.error,
         processingTimeMs: result.processingTimeMs,
+        ...(documentType === "auto" ? {
+          classificationConfidence: result.classificationConfidence,
+        } : {}),
       });
     } catch (error: any) {
       console.error("LC extraction endpoint error:", error.message);

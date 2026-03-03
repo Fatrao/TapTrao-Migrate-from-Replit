@@ -34,6 +34,16 @@ export const generalRuleEnum = pgEnum("general_rule", [
   "SPECIFIC_PROCESS",
 ]);
 
+/**
+ * Express-session table managed by connect-pg-simple.
+ * Defined here so Drizzle recognises it and doesn't try to drop it.
+ */
+export const pgSessions = pgTable("session", {
+  sid: varchar("sid").primaryKey(),
+  sess: jsonb("sess").notNull(),
+  expire: timestamp("expire", { precision: 6, withTimezone: true }).notNull(),
+});
+
 export const destinations = pgTable(
   "destinations",
   {
@@ -370,10 +380,22 @@ export type LcDocumentType =
   | "certificate_of_origin"
   | "phytosanitary_certificate"
   | "packing_list"
+  | "insurance_certificate"
+  | "quality_certificate"
+  | "weight_certificate"
+  | "eudr_declaration"
+  | "cbam_declaration"
+  | "traceability_certificate"
   | "other";
 
 export const lcDocumentSchema = z.object({
-  documentType: z.enum(["commercial_invoice", "bill_of_lading", "certificate_of_origin", "phytosanitary_certificate", "packing_list", "other"]),
+  documentType: z.enum([
+    "commercial_invoice", "bill_of_lading", "certificate_of_origin",
+    "phytosanitary_certificate", "packing_list",
+    "insurance_certificate", "quality_certificate", "weight_certificate",
+    "eudr_declaration", "cbam_declaration", "traceability_certificate",
+    "other",
+  ]),
   fields: z.record(z.string()),
 });
 

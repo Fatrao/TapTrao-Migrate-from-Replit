@@ -10,6 +10,12 @@ export const DOC_TYPES: { value: LcDocumentType; label: string }[] = [
   { value: "certificate_of_origin", label: "Certificate of Origin" },
   { value: "phytosanitary_certificate", label: "Phytosanitary Certificate" },
   { value: "packing_list", label: "Packing List" },
+  { value: "insurance_certificate", label: "Insurance Certificate" },
+  { value: "quality_certificate", label: "Quality Certificate" },
+  { value: "weight_certificate", label: "Weight Certificate" },
+  { value: "eudr_declaration", label: "EUDR Declaration" },
+  { value: "cbam_declaration", label: "CBAM Declaration" },
+  { value: "traceability_certificate", label: "Traceability Certificate" },
   { value: "other", label: "Other" },
 ];
 
