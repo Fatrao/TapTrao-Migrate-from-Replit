@@ -9,7 +9,7 @@ import { generateTwinlogPdf } from "./twinlog-pdf";
 import { generateEudrPdf } from "./eudr-pdf";
 import { appendTradeEvent, getTradeAuditChain, verifyAuditChain } from "./audit";
 import { hashPassword, comparePasswords } from "./auth";
-import { lcCheckRequestSchema, registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, tokenTransactions, type ComplianceResult, type DocumentStatus } from "@shared/schema";
+import { lcCheckRequestSchema, registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, tokenTransactions, leadCaptureSchema, type ComplianceResult, type DocumentStatus } from "@shared/schema";
 import { sendPasswordResetEmail } from "./email";
 import passport from "passport";
 import { db } from "./db";
@@ -3264,6 +3264,72 @@ Rules:
       const updated = await storage.updateFeatureRequestStatus(req.params.id, status, adminNote);
       if (!updated) return res.status(404).json({ message: "Not found" });
       res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ═══ UTM Tracking ═══
+  app.post("/api/session/utm", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { utm_source, utm_medium, utm_campaign, utm_content, utm_term } = req.body || {};
+      if (utm_source || utm_medium || utm_campaign) {
+        await storage.setUtmParams(sessionId, { utm_source, utm_medium, utm_campaign, utm_content, utm_term });
+      }
+      res.json({ ok: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ═══ Lead Capture ═══
+  app.post("/api/leads", async (req, res) => {
+    try {
+      const parsed = leadCaptureSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Invalid input", errors: parsed.error.flatten().fieldErrors });
+      }
+      const sessionId = getSessionId(req, res);
+      const { email, companyName, source, lookupId, commodityName, corridorDescription } = parsed.data;
+
+      // Deduplicate: don't create duplicate leads for same email+session
+      const existing = await storage.getLeadByEmailAndSession(email, sessionId);
+      if (existing) {
+        return res.json({ ok: true, deduplicated: true });
+      }
+
+      // Pull UTM data from session record
+      const tokenRecord = await storage.getOrCreateUserTokens(sessionId);
+
+      await storage.createLead({
+        sessionId,
+        email,
+        companyName: companyName || null,
+        source,
+        lookupId: lookupId || null,
+        commodityName: commodityName || null,
+        corridorDescription: corridorDescription || null,
+        utmSource: tokenRecord.utmSource,
+        utmMedium: tokenRecord.utmMedium,
+        utmCampaign: tokenRecord.utmCampaign,
+        utmContent: tokenRecord.utmContent,
+        utmTerm: tokenRecord.utmTerm,
+      });
+
+      res.json({ ok: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/admin/leads", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const isAdmin = await storage.isAdminSession(sessionId);
+      if (!isAdmin) return res.status(403).json({ message: "Admin only" });
+      const allLeads = await storage.getLeads(500);
+      res.json({ leads: allLeads });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

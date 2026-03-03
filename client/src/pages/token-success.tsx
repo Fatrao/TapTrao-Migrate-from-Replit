@@ -4,6 +4,7 @@ import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { trackEvent } from "@/lib/analytics";
 import { useEffect } from "react";
 
 export default function TokenSuccess() {
@@ -29,6 +30,10 @@ export default function TokenSuccess() {
   useEffect(() => {
     if (verifyQuery.data?.success) {
       queryClient.invalidateQueries({ queryKey: ["/api/tokens/balance"] });
+      trackEvent("purchase_completed", {
+        pack: verifyQuery.data.packName || "",
+        tokens_added: String(verifyQuery.data.tokensAdded || 0),
+      });
     }
   }, [verifyQuery.data?.success]);
 

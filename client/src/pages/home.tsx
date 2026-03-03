@@ -516,6 +516,9 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [menuDropdownOpen, setMenuDropdownOpen] = useState(false);
   const { isAuthenticated } = useAuth();
+  const [footerEmail, setFooterEmail] = useState("");
+  const [footerSubmitted, setFooterSubmitted] = useState(false);
+  const [footerLoading, setFooterLoading] = useState(false);
 
   usePageTitle("TapTrao \u2014 Trade Compliance for Commodity Traders");
 
@@ -1250,6 +1253,64 @@ export default function Home() {
                 Integrate compliance checks directly into your systems via REST API.
               </p>
             </div>
+          </div>
+
+          {/* Email capture */}
+          <div className="max-w-md mx-auto pb-8">
+            <p className="text-center text-sm mb-3" style={{ color: C.gray500 }}>
+              Get notified when new features launch:
+            </p>
+            {footerSubmitted ? (
+              <p className="text-sm text-center font-medium" style={{ color: C.primary }}>
+                Thanks! We'll keep you posted.
+              </p>
+            ) : (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!footerEmail) return;
+                  setFooterLoading(true);
+                  try {
+                    await fetch("/api/leads", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      credentials: "include",
+                      body: JSON.stringify({ email: footerEmail, source: "footer_signup" }),
+                    });
+                    setFooterSubmitted(true);
+                    if (typeof (window as any).gtag === "function") {
+                      const utm = JSON.parse(sessionStorage.getItem("taptrao_utm") || "{}");
+                      (window as any).gtag("event", "lead_captured", { source: "footer_signup", ...utm });
+                    }
+                  } catch {} finally { setFooterLoading(false); }
+                }}
+                className="flex gap-2"
+              >
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={footerEmail}
+                  onChange={(e) => setFooterEmail(e.target.value)}
+                  required
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm"
+                  style={{ background: "rgba(255,255,255,0.8)", border: "1px solid #ccfbf1", color: C.gray900 }}
+                  data-testid="input-footer-email"
+                />
+                <button
+                  type="submit"
+                  disabled={footerLoading}
+                  className="px-5 py-2.5 rounded-xl text-sm font-bold transition-colors"
+                  style={{ background: C.primary, color: "#fff" }}
+                  data-testid="button-footer-notify"
+                >
+                  {footerLoading ? "..." : "Notify Me"}
+                </button>
+                <p className="text-[11px] text-center mt-2 w-full" style={{ color: C.gray500 }}>
+                  By submitting, you agree to our{" "}
+                  <Link href="/privacy-policy" className="underline" style={{ color: C.gray600 }}>Privacy Policy</Link>.
+                </p>
+              </form>
+            )}
           </div>
         </div>
       </section>

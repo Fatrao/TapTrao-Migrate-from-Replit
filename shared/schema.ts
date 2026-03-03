@@ -194,6 +194,11 @@ export const userTokens = pgTable("user_tokens", {
   lcBalance: integer("lc_balance").notNull().default(0),
   freeLookupUsed: boolean("free_lookup_used").notNull().default(false),
   isAdmin: boolean("is_admin").notNull().default(false),
+  utmSource: text("utm_source"),
+  utmMedium: text("utm_medium"),
+  utmCampaign: text("utm_campaign"),
+  utmContent: text("utm_content"),
+  utmTerm: text("utm_term"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -887,4 +892,41 @@ export const insertFeatureRequestSchema = createInsertSchema(featureRequests).om
 export const featureRequestFormSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters").max(120, "Title must be under 120 characters"),
   description: z.string().max(1000, "Description must be under 1000 characters").optional(),
+});
+
+// ── Lead Capture ───────────────────────────────────────
+export const leads = pgTable(
+  "leads",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sessionId: text("session_id").notNull(),
+    email: text("email").notNull(),
+    companyName: text("company_name"),
+    source: text("source").notNull().default("post_check"), // post_check | footer_signup
+    lookupId: uuid("lookup_id"),
+    commodityName: text("commodity_name"),
+    corridorDescription: text("corridor_description"),
+    utmSource: text("utm_source"),
+    utmMedium: text("utm_medium"),
+    utmCampaign: text("utm_campaign"),
+    utmContent: text("utm_content"),
+    utmTerm: text("utm_term"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("leads_session_idx").on(table.sessionId),
+    index("leads_email_idx").on(table.email),
+  ]
+);
+
+export type Lead = typeof leads.$inferSelect;
+export type InsertLead = typeof leads.$inferInsert;
+
+export const leadCaptureSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  companyName: z.string().optional(),
+  source: z.enum(["post_check", "footer_signup"]).default("post_check"),
+  lookupId: z.string().uuid().optional(),
+  commodityName: z.string().optional(),
+  corridorDescription: z.string().optional(),
 });

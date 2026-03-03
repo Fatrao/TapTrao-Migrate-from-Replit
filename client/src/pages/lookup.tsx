@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link, useLocation, useSearch } from "wouter";
 import { estimateDemurrageRange } from "@/lib/demurrage-utils";
+import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -1048,6 +1049,111 @@ function EudrAlertBlock({ lookupId, result }: { lookupId?: string; result: Compl
   );
 }
 
+function LeadCaptureCard({ result }: { result: ComplianceResult }) {
+  const [email, setEmail] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setLoading(true);
+    try {
+      await apiRequest("POST", "/api/leads", {
+        email,
+        companyName: companyName || undefined,
+        source: "post_check",
+        lookupId: (result as any).lookupId || undefined,
+        commodityName: result.commodity.name,
+        corridorDescription: `${result.commodity.name}: ${result.origin.iso2} → ${result.destination.iso2}`,
+      });
+      setSubmitted(true);
+      trackEvent("lead_captured", {
+        source: "post_check",
+        corridor: `${result.origin.iso2}-${result.destination.iso2}`,
+      });
+    } catch {
+      // silently fail — don't block user
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (submitted) {
+    return (
+      <div
+        style={{
+          background: "rgba(93,217,193,0.06)",
+          border: "1px solid rgba(93,217,193,0.2)",
+          borderRadius: 14,
+          padding: "14px 20px",
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+        }}
+        data-testid="lead-capture-success"
+      >
+        <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: "#5dd9c1" }} />
+        <p style={{ fontSize: 13, color: "#5dd9c1", margin: 0 }}>
+          Thanks! We'll send regulatory updates for this corridor.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        background: "linear-gradient(135deg, #0e4e45, #14574a, #1c6352)",
+        border: "1px solid rgba(93,217,193,0.15)",
+        borderRadius: 14,
+        padding: "20px 24px",
+      }}
+      data-testid="lead-capture-card"
+    >
+      <h3 style={{ fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: "'Clash Display', sans-serif", margin: "0 0 6px" }}>
+        Save this compliance check
+      </h3>
+      <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, margin: "0 0 14px" }}>
+        Enter your email to get regulatory updates for this corridor.
+      </p>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <Input
+          type="email"
+          placeholder="work@company.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", borderRadius: 8 }}
+          data-testid="input-lead-email"
+        />
+        <Input
+          type="text"
+          placeholder="Company name (optional)"
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+          style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", borderRadius: 8 }}
+          data-testid="input-lead-company"
+        />
+        <Button
+          type="submit"
+          disabled={loading || !email}
+          size="sm"
+          style={{ background: "rgba(255,255,255,0.12)", color: "#fff", borderRadius: 10, border: "1px solid rgba(255,255,255,0.2)", alignSelf: "flex-start", marginTop: 4 }}
+          data-testid="button-lead-submit"
+        >
+          {loading ? "Saving..." : "Save & Get Updates →"}
+        </Button>
+        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", margin: "6px 0 0" }}>
+          By submitting, you agree to our{" "}
+          <Link href="/privacy-policy" style={{ color: "rgba(255,255,255,0.5)", textDecoration: "underline" }}>Privacy Policy</Link>.
+        </p>
+      </form>
+    </div>
+  );
+}
+
 function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated = false }: { result: ComplianceResult; freeLocked?: boolean; isAuthenticated?: boolean }) {
   const hasStopFlags = result.stopFlags && Object.keys(result.stopFlags).length > 0;
   const triggerCount = Object.values(result.triggers).filter(Boolean).length;
@@ -1706,6 +1812,9 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
 
       {/* Hash now embedded in Duty Estimate card above */}
 
+      {/* Lead capture — show for unauthenticated users after seeing results */}
+      {!isAuthenticated && <LeadCaptureCard result={result} />}
+
       {/* Auth-aware conversion banner */}
       {!isAuthenticated && (
         <div style={{
@@ -1997,6 +2106,14 @@ export default function Lookup() {
       setTemplateData(null);
       setTemplateStale(null);
       queryClient.invalidateQueries({ queryKey: ["/api/tokens/balance"] });
+      // Track free check completion for attribution
+      if (isFreeCheck) {
+        trackEvent("free_check_completed", {
+          commodity: commodityId,
+          origin: originId,
+          destination: destinationId,
+        });
+      }
     },
   });
 
@@ -2051,6 +2168,26 @@ export default function Lookup() {
       <div className="flex-1 py-10 px-4">
         <div className="max-w-2xl mx-auto space-y-8">
           <div className="space-y-3">
+            <Link href={isAuthenticated ? "/dashboard" : "/"}>
+              <button
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: 13,
+                  color: "rgba(255,255,255,0.5)",
+                  padding: 0,
+                  marginBottom: 4,
+                }}
+                data-testid="button-back"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                {isAuthenticated ? "Back to Dashboard" : "Back to Home"}
+              </button>
+            </Link>
             <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }}>TapTrao / Pre-shipment Compliance Check</p>
             <h1 style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)" }} data-testid="text-lookup-title">
               Pre-shipment compliance check

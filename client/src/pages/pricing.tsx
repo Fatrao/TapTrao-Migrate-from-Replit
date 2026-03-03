@@ -1,6 +1,8 @@
 import { Link } from "wouter";
+import { useEffect } from "react";
 import { Shield, FileCheck, Loader2, Check, Building2, Mail, RefreshCw, Clock, ArrowUpRight, ArrowDownRight, Gift } from "lucide-react";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { trackEvent } from "@/lib/analytics";
 import { useTokenBalance } from "@/hooks/use-tokens";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -91,6 +93,7 @@ const S = {
 
 export default function Pricing() {
   usePageTitle("Credits & Billing");
+  useEffect(() => { trackEvent("pricing_page_viewed"); }, []);
   const tokenQuery = useTokenBalance();
   const { toast } = useToast();
 
@@ -100,6 +103,7 @@ export default function Pricing() {
 
   const checkoutMutation = useMutation({
     mutationFn: async (pack: string) => {
+      trackEvent("checkout_started", { pack });
       const res = await apiRequest("POST", "/api/tokens/checkout", { pack });
       return res.json();
     },

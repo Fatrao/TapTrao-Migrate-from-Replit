@@ -19,7 +19,7 @@ export default function PrivacyPolicy() {
             <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }}>Dashboard</span>
           </Link>
           <Link href="/">
-            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }}>← Home</span>
+            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }}>&larr; Home</span>
           </Link>
         </div>
       </nav>
@@ -28,98 +28,255 @@ export default function PrivacyPolicy() {
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 32, fontWeight: 700, color: "#fff", marginBottom: 8 }} data-testid="text-privacy-title">
           Privacy Policy
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 40 }}>Last updated: 19 February 2026</p>
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 40 }}>Last updated: 3 March 2026</p>
 
         <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 15, lineHeight: 1.7 }}>
 
-          <Section title="1. Who We Are">
-            <p>TapTrao is operated by Fatrao Limited, a company registered in England and Wales. TapTrao provides a trade compliance information platform for commodity importers trading in corridors out of Africa. Our registered contact email is <a href="mailto:hello@taptrao.com" style={linkStyle}>hello@taptrao.com</a>.</p>
+          <Section title="1. Data Controller">
+            <p>
+              TapTrao is operated by <strong>Fatrao Limited</strong>, a company incorporated in England and Wales
+              (Company Number: 16513622).
+            </p>
+            <p style={{ marginTop: 12 }}>
+              Registered office:<br />
+              71–75 Shelton Street<br />
+              Covent Garden<br />
+              London<br />
+              United Kingdom<br />
+              WC2H 9JQ
+            </p>
+            <p style={{ marginTop: 12 }}>Director: Fatime Traore</p>
+            <p style={{ marginTop: 12 }}>
+              For the purposes of the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018,
+              Fatrao Limited is the data controller of the personal data described in this Privacy Policy.
+            </p>
+            <p style={{ marginTop: 12 }}>
+              Contact email: <a href="mailto:Legal@taptrao.com" style={linkStyle}>Legal@taptrao.com</a>
+            </p>
           </Section>
 
-          <Section title="2. What Data We Collect">
-            <p style={{ marginBottom: 8 }}>We collect the following personal data when you use TapTrao:</p>
+          <Section title="2. Scope of This Policy">
+            <p style={{ marginBottom: 8 }}>
+              This Privacy Policy explains how we collect, use, store, and protect personal data when you:
+            </p>
             <ul style={ulStyle}>
-              <li><strong>Account information:</strong> name, email address, and password (encrypted) when you register</li>
-              <li><strong>Usage data:</strong> compliance lookups you perform, features accessed, and session information</li>
-              <li><strong>Payment data:</strong> processed securely by Stripe. We do not store card numbers or full payment details on our servers</li>
-              <li><strong>Technical data:</strong> IP address, browser type, device type, and approximate location</li>
-              <li><strong>Communications:</strong> any messages you send to hello@taptrao.com</li>
+              <li>Create or use a TapTrao account</li>
+              <li>Submit information through our website forms</li>
+              <li>Use our trade compliance platform</li>
+              <li>Interact with our marketing communications</li>
+              <li>Visit our website</li>
             </ul>
           </Section>
 
-          <Section title="3. How We Use Your Data">
-            <p style={{ marginBottom: 8 }}>We use your data to:</p>
+          <Section title="3. Personal Data We Collect">
+            <h3 style={h3Style}>3.1 Account Information</h3>
             <ul style={ulStyle}>
-              <li>Provide and operate the TapTrao platform and your account</li>
+              <li>Name</li>
+              <li>Email address</li>
+              <li>Encrypted password</li>
+            </ul>
+
+            <h3 style={h3Style}>3.2 Lead Capture Information</h3>
+            <ul style={ulStyle}>
+              <li>Email address</li>
+              <li>Company name (optional)</li>
+            </ul>
+
+            <h3 style={h3Style}>3.3 Usage Data</h3>
+            <ul style={ulStyle}>
+              <li>Compliance lookups performed</li>
+              <li>Features accessed</li>
+              <li>Session timestamps</li>
+              <li>Platform interaction data</li>
+            </ul>
+
+            <h3 style={h3Style}>3.4 Marketing Attribution Data</h3>
+            <p>
+              When you access TapTrao via external links (e.g., LinkedIn, email campaigns, industry forums),
+              we collect UTM parameters such as source, medium, campaign, content, and term.
+              These are associated with your browser session and stored server-side for marketing performance analysis.
+            </p>
+
+            <h3 style={h3Style}>3.5 Payment Data</h3>
+            <p>
+              Payments are processed securely by Stripe. We do not store full card numbers or complete payment credentials on our servers.
+            </p>
+
+            <h3 style={h3Style}>3.6 Technical Data</h3>
+            <ul style={ulStyle}>
+              <li>IP address</li>
+              <li>Browser type</li>
+              <li>Device type</li>
+              <li>Approximate geographic location</li>
+            </ul>
+
+            <h3 style={h3Style}>3.7 Communications Data</h3>
+            <p>
+              Any correspondence sent to <a href="mailto:Legal@taptrao.com" style={linkStyle}>Legal@taptrao.com</a> or through our website.
+            </p>
+          </Section>
+
+          <Section title="4. How We Use Personal Data">
+            <ul style={ulStyle}>
+              <li>Provide, operate, and maintain the TapTrao platform</li>
+              <li>Authenticate users and manage accounts</li>
               <li>Process payments via Stripe</li>
-              <li>Send transactional emails (account confirmations, billing receipts)</li>
-              <li>Monitor and improve platform performance and security</li>
-              <li>Comply with legal obligations</li>
+              <li>Send transactional communications</li>
+              <li>Deliver regulatory updates where requested</li>
+              <li>Analyse platform usage and improve performance</li>
+              <li>Measure marketing channel effectiveness</li>
+              <li>Detect and prevent fraud</li>
+              <li>Comply with legal and regulatory obligations</li>
             </ul>
-            <p style={{ marginTop: 12 }}>We will not sell, rent, or share your personal data with third parties for marketing purposes.</p>
-          </Section>
-
-          <Section title="4. Analytics">
-            <p>We intend to use Google Analytics to understand how users interact with TapTrao. This tool uses cookies to collect anonymised usage data. Analytics cookies are only placed if you explicitly opt in via the cookie consent banner. You may withdraw consent at any time via the Cookie Settings link in the footer.</p>
+            <p style={{ marginTop: 12 }}>We do not sell, rent, or trade personal data for advertising purposes.</p>
           </Section>
 
           <Section title="5. Legal Basis for Processing (UK GDPR)">
-            <p style={{ marginBottom: 8 }}>We process your personal data under the following legal bases:</p>
-            <ul style={ulStyle}>
-              <li><strong>Contract performance:</strong> to provide the services you have signed up for</li>
-              <li><strong>Legitimate interests:</strong> to improve our platform and prevent fraud</li>
-              <li><strong>Legal obligation:</strong> where required by applicable law</li>
-              <li><strong>Consent:</strong> for non-essential analytics cookies</li>
-            </ul>
+            <h3 style={h3Style}>Contract Performance</h3>
+            <p>Where processing is necessary to provide services you have requested.</p>
+
+            <h3 style={h3Style}>Legitimate Interests</h3>
+            <p>
+              Including improving platform functionality, ensuring security, preventing fraud,
+              and understanding marketing performance. We rely on legitimate interests only where
+              such interests do not override your fundamental rights and freedoms.
+            </p>
+
+            <h3 style={h3Style}>Legal Obligation</h3>
+            <p>Where required by applicable law.</p>
+
+            <h3 style={h3Style}>Consent</h3>
+            <p>
+              Required for non-essential analytics cookies and certain marketing communications.
+              Consent may be withdrawn at any time via the Cookie Settings link, unsubscribe link,
+              or by contacting <a href="mailto:Legal@taptrao.com" style={linkStyle}>Legal@taptrao.com</a>.
+            </p>
           </Section>
 
-          <Section title="6. Data Retention">
-            <p>We retain your account data for as long as your account is active. If you close your account, we will delete your personal data within 90 days, except where we are required to retain it for legal or tax purposes (typically up to 7 years for financial records under UK law).</p>
+          <Section title="6. Analytics and Tracking">
+            <h3 style={h3Style}>Google Analytics (GA4)</h3>
+            <p>
+              We use Google Analytics 4 to collect pseudonymised analytics data including page views,
+              feature usage, and conversion events. Analytics cookies are placed only after explicit consent.
+            </p>
+
+            <h3 style={h3Style}>UTM Attribution</h3>
+            <p>
+              UTM parameters are collected to evaluate marketing performance and are not used for profiling
+              or third-party advertising.
+            </p>
+
+            <h3 style={h3Style}>Custom Event Tracking</h3>
+            <p>With analytics consent, we track anonymised product interaction events.</p>
           </Section>
 
-          <Section title="7. Your Rights">
-            <p style={{ marginBottom: 8 }}>Under UK GDPR and applicable Canadian privacy law (PIPEDA), you have the right to:</p>
+          <Section title="7. Data Retention">
             <ul style={ulStyle}>
-              <li>Access the personal data we hold about you</li>
-              <li>Request correction of inaccurate data</li>
-              <li>Request deletion of your data (subject to legal retention obligations)</li>
-              <li>Object to or restrict certain processing</li>
-              <li>Data portability — receive your data in a structured, machine-readable format</li>
-              <li>Withdraw consent for analytics cookies at any time</li>
+              <li><strong>Account data:</strong> retained while account is active</li>
+              <li><strong>Post-closure deletion:</strong> within 90 days (unless legal retention applies)</li>
+              <li><strong>Financial records:</strong> up to 7 years</li>
+              <li><strong>Lead capture data:</strong> up to 24 months</li>
+              <li><strong>Session attribution data:</strong> up to 12 months</li>
             </ul>
-            <p style={{ marginTop: 12 }}>To exercise any of these rights, contact us at <a href="mailto:hello@taptrao.com" style={linkStyle}>hello@taptrao.com</a>. We will respond within 30 days. You also have the right to lodge a complaint with the UK Information Commissioner's Office (ICO) at <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer" style={linkStyle}>ico.org.uk</a>.</p>
           </Section>
 
           <Section title="8. International Transfers">
-            <p>TapTrao is operated from the United Kingdom. We use Stripe for payment processing, which may process data in the United States under Standard Contractual Clauses or equivalent safeguards. Where your data is transferred outside the UK or EEA, we ensure appropriate safeguards are in place in accordance with UK GDPR requirements.</p>
+            <p>
+              Some service providers, including Stripe and Google, may process data outside the UK.
+              Where transfers occur, we rely on appropriate safeguards including the UK International
+              Data Transfer Addendum or Standard Contractual Clauses.
+            </p>
+            <p style={{ marginTop: 12 }}>
+              You may request further information about transfer safeguards by contacting{" "}
+              <a href="mailto:Legal@taptrao.com" style={linkStyle}>Legal@taptrao.com</a>.
+            </p>
           </Section>
 
-          <Section title="9. Security">
-            <p>We implement appropriate technical and organisational measures to protect your personal data against unauthorised access, loss, or disclosure. However, no internet transmission is completely secure and we cannot guarantee absolute security.</p>
+          <Section title="9. Data Sharing">
+            <p style={{ marginBottom: 8 }}>We may share data with:</p>
+            <ul style={ulStyle}>
+              <li>Payment processors</li>
+              <li>Analytics providers</li>
+              <li>Hosting providers</li>
+              <li>Professional advisers</li>
+              <li>Regulators or law enforcement where required</li>
+            </ul>
+            <p style={{ marginTop: 12 }}>
+              All third-party processors are subject to contractual data protection obligations.
+            </p>
           </Section>
 
-          <Section title="10. Cookies">
-            <p style={{ marginBottom: 12 }}>We use essential cookies to operate your session and account login. These are strictly necessary and do not require your consent.</p>
-            <p style={{ marginBottom: 12 }}>We intend to implement Google Analytics, which uses non-essential analytics cookies. These are only placed after you explicitly opt in via our cookie banner. You may withdraw consent at any time via the Cookie Settings link in the footer or through your browser settings.</p>
-            <p>We do not use cookies for advertising or marketing purposes.</p>
+          <Section title="10. Security">
+            <p>
+              We implement appropriate technical and organisational measures including encrypted password storage,
+              HTTPS encryption, secure infrastructure, and access controls. While we take reasonable steps to protect
+              personal data, no transmission method over the internet is completely secure.
+            </p>
           </Section>
 
-          <Section title="11. Changes to This Policy">
-            <p>We may update this Privacy Policy from time to time. We will notify registered users of material changes by email. Continued use of TapTrao after changes constitutes acceptance of the updated policy.</p>
+          <Section title="11. Your Rights">
+            <p>
+              Under UK GDPR and applicable Canadian privacy laws, you have the right to access, correct, delete,
+              restrict, object to processing, request portability, and withdraw consent.
+            </p>
+            <p style={{ marginTop: 12 }}>
+              You may contact <a href="mailto:Legal@taptrao.com" style={linkStyle}>Legal@taptrao.com</a> to exercise these rights.
+              We respond within one month.
+            </p>
+            <p style={{ marginTop: 12 }}>
+              You may also lodge a complaint with the UK Information Commissioner's Office (ICO).
+            </p>
           </Section>
 
-          <Section title="12. Contact">
-            <p>For privacy-related queries or to exercise your rights, contact: <a href="mailto:hello@taptrao.com" style={linkStyle}>hello@taptrao.com</a></p>
-            <p style={{ marginTop: 8, fontSize: 13, color: "rgba(255,255,255,0.6)" }}>Fatrao Limited — Registered in England and Wales</p>
+          <Section title="12. Cookies">
+            <h3 style={h3Style}>Essential Cookies</h3>
+            <p>Required for login and core platform functionality.</p>
+
+            <h3 style={h3Style}>Analytics Cookies</h3>
+            <p>Used only with explicit consent.</p>
+
+            <h3 style={h3Style}>Session Storage</h3>
+            <p>
+              Browser session storage is used to temporarily hold UTM parameters and is cleared when your browser closes.
+            </p>
           </Section>
+
+          <Section title="13. Children's Data">
+            <p>
+              TapTrao is not directed at individuals under 18 and we do not knowingly collect data from minors.
+            </p>
+          </Section>
+
+          <Section title="14. Automated Decision-Making">
+            <p>
+              TapTrao does not engage in automated decision-making producing legal or similarly significant effects under UK GDPR Article 22.
+            </p>
+          </Section>
+
+          <Section title="15. Changes to This Policy">
+            <p>
+              We may update this Privacy Policy from time to time. Where changes are material, we will notify registered users
+              and obtain renewed consent where legally required.
+            </p>
+          </Section>
+
+          <div style={{ marginTop: 40, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>
+              Fatrao Limited — Company Number: 16513622 — Registered in England and Wales
+            </p>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
+              71–75 Shelton Street, Covent Garden, London WC2H 9JQ
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-const linkStyle: React.CSSProperties = { color: "#0e4e45", textDecoration: "underline" };
+const linkStyle: React.CSSProperties = { color: "#5dd9c1", textDecoration: "underline" };
 const ulStyle: React.CSSProperties = { paddingLeft: 24, margin: 0, display: "flex", flexDirection: "column", gap: 6 };
+const h3Style: React.CSSProperties = { fontFamily: "var(--fh)", fontSize: 15, fontWeight: 600, color: "rgba(255,255,255,0.95)", marginTop: 20, marginBottom: 8 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (

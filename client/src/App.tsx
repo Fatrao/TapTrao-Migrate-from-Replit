@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CookieConsentBanner, usePageViewTracking } from "@/components/cookie-consent";
+import { initUtmTracking } from "@/lib/analytics";
 import { AuthGuard } from "@/components/AuthGuard";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
@@ -82,6 +83,9 @@ function PageViewTracker() {
   usePageViewTracking();
   return null;
 }
+
+// Parse & persist UTM params on first load (runs once)
+initUtmTracking();
 
 function App() {
   return (

@@ -67,6 +67,9 @@ import {
   type TradeEvent,
   tradeEvents,
   type FeatureRequest,
+  leads,
+  type Lead,
+  type InsertLead,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -210,6 +213,12 @@ export interface IStorage {
   updateFeatureRequestStatus(id: string, status: string, adminNote?: string): Promise<FeatureRequest | undefined>;
   // Paying customer check
   hasPurchased(sessionId: string): Promise<boolean>;
+  // UTM tracking
+  setUtmParams(sessionId: string, utm: { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string; utm_term?: string }): Promise<void>;
+  // Lead capture
+  createLead(data: InsertLead): Promise<Lead>;
+  getLeadByEmailAndSession(email: string, sessionId: string): Promise<Lead | undefined>;
+  getLeads(limit?: number): Promise<Lead[]>;
 }
 
 export type EnrichedTrade = {
@@ -1349,6 +1358,34 @@ export class DatabaseStorage implements IStorage {
         eq(tokenTransactions.type, "PURCHASE"),
       ));
     return (result?.count ?? 0) > 0;
+  }
+
+  async setUtmParams(sessionId: string, utm: { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string; utm_term?: string }): Promise<void> {
+    await this.getOrCreateUserTokens(sessionId);
+    await db.update(userTokens)
+      .set({
+        utmSource: utm.utm_source || null,
+        utmMedium: utm.utm_medium || null,
+        utmCampaign: utm.utm_campaign || null,
+        utmContent: utm.utm_content || null,
+        utmTerm: utm.utm_term || null,
+      })
+      .where(eq(userTokens.sessionId, sessionId));
+  }
+
+  async createLead(data: InsertLead): Promise<Lead> {
+    const [lead] = await db.insert(leads).values(data).returning();
+    return lead;
+  }
+
+  async getLeadByEmailAndSession(email: string, sessionId: string): Promise<Lead | undefined> {
+    const [lead] = await db.select().from(leads)
+      .where(and(eq(leads.email, email), eq(leads.sessionId, sessionId)));
+    return lead;
+  }
+
+  async getLeads(limit = 100): Promise<Lead[]> {
+    return db.select().from(leads).orderBy(desc(leads.createdAt)).limit(limit);
   }
 }
 
