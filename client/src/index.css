@@ -112,6 +112,13 @@
     display: block;
   }
 
+  /* Admin standalone pages: full-width, no sidebar flex */
+  #root:has(> .admin-standalone) {
+    padding: 0;
+    gap: 0;
+    display: block;
+  }
+
   /* AppShell wrapper — isolates sidebar + main flex layout from #root siblings */
   .app-shell {
     display: flex;
