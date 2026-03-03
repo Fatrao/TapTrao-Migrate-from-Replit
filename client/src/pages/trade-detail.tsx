@@ -361,10 +361,10 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
 /* ── Shared regulatory helpers ── */
 
 const BAND_COLORS: Record<string, { bg: string; color: string; bar: string }> = {
-  negligible: { bg: "#f0fdf4", color: "#15803d", bar: "#22c55e" },
-  low: { bg: "#fefce8", color: "#a16207", bar: "#eab308" },
-  medium: { bg: "#fff7ed", color: "#c2410c", bar: "#f97316" },
-  high: { bg: "#fef2f2", color: "#dc2626", bar: "#ef4444" },
+  negligible: { bg: "rgba(34,197,94,0.12)", color: "#5dd9c1", bar: "#22c55e" },
+  low: { bg: "rgba(234,179,8,0.12)", color: "#eab308", bar: "#eab308" },
+  medium: { bg: "rgba(249,115,22,0.12)", color: "#f97316", bar: "#f97316" },
+  high: { bg: "rgba(239,68,68,0.12)", color: "#ef4444", bar: "#ef4444" },
 };
 
 function ScoreBar({ score, band }: { score: number | null; band: string | null }) {
@@ -372,7 +372,7 @@ function ScoreBar({ score, band }: { score: number | null; band: string | null }
   const c = BAND_COLORS[band] || BAND_COLORS.medium;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8 }}>
-      <div style={{ flex: 1, height: 8, borderRadius: 4, background: "#e5e5e5", overflow: "hidden" }}>
+      <div style={{ flex: 1, height: 8, borderRadius: 4, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
         <div style={{ width: `${Math.min(score, 100)}%`, height: "100%", borderRadius: 4, background: c.bar, transition: "width 0.3s ease" }} />
       </div>
       <span style={{ fontSize: 13, fontWeight: 700, color: c.color, minWidth: 60, textAlign: "right" }}>
@@ -390,7 +390,7 @@ function ChecksList({ checks }: { checks: any[] }) {
     <div style={{ marginTop: 12 }}>
       <button
         onClick={() => setOpen(!open)}
-        style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, padding: 0, fontSize: 12, fontWeight: 500, color: "#555" }}
+        style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, padding: 0, fontSize: 12, fontWeight: 500, color: "var(--t3)" }}
       >
         {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
         All {checks.length} checks ({passed} passed, {checks.length - passed} failed)
@@ -398,13 +398,13 @@ function ChecksList({ checks }: { checks: any[] }) {
       {open && (
         <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
           {checks.map((c: any) => (
-            <div key={c.id} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 11, color: c.passed ? "#15803d" : c.severity === "critical" ? "#dc2626" : "#d97706" }}>
+            <div key={c.id} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 11, color: c.passed ? "#5dd9c1" : c.severity === "critical" ? "#ef4444" : "#eab308" }}>
               <span style={{ flexShrink: 0, marginTop: 1 }}>{c.passed ? "✅" : c.severity === "critical" ? "❌" : "⚠️"}</span>
               <div>
                 <span style={{ fontWeight: 500 }}>{c.label}</span>
-                <span style={{ color: "#888", marginLeft: 6 }}>{c.detail}</span>
+                <span style={{ color: "var(--t3)", marginLeft: 6 }}>{c.detail}</span>
                 {!c.passed && c.fixSuggestion && (
-                  <div style={{ fontSize: 10, color: "#0e4e45", marginTop: 2 }}>💡 {c.fixSuggestion}</div>
+                  <div style={{ fontSize: 10, color: "var(--app-acapulco)", marginTop: 2 }}>💡 {c.fixSuggestion}</div>
                 )}
               </div>
             </div>
@@ -419,14 +419,14 @@ function TopDrivers({ drivers }: { drivers: any[] }) {
   if (!drivers || drivers.length === 0) return null;
   return (
     <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
-      <span style={{ fontSize: 11, fontWeight: 600, color: "#555", textTransform: "uppercase", letterSpacing: ".08em" }}>Top Issues</span>
+      <span style={{ fontSize: 11, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: ".08em" }}>Top Issues</span>
       {drivers.map((d: any, i: number) => (
         <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 12 }}>
           <span style={{ flexShrink: 0 }}>{d.severity === "critical" ? "🔴" : "🟠"}</span>
           <div>
-            <span style={{ fontWeight: 500, color: "#1a1a1a" }}>{d.reason}</span>
-            <span style={{ color: "#999", marginLeft: 4 }}>({d.points} pts)</span>
-            <div style={{ fontSize: 11, color: "#0e4e45" }}>→ {d.fix}</div>
+            <span style={{ fontWeight: 500, color: "var(--t1)" }}>{d.reason}</span>
+            <span style={{ color: "var(--t3)", marginLeft: 4 }}>({d.points} pts)</span>
+            <div style={{ fontSize: 11, color: "var(--app-acapulco)" }}>→ {d.fix}</div>
           </div>
         </div>
       ))}
@@ -445,10 +445,10 @@ function BreakdownRow({ breakdown }: { breakdown: any }) {
   return (
     <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
       {items.map(item => (
-        <div key={item.label} style={{ fontSize: 11, color: "#555" }}>
+        <div key={item.label} style={{ fontSize: 11, color: "var(--t3)" }}>
           <span style={{ fontWeight: 500 }}>{item.label}</span>
-          <span style={{ marginLeft: 4, fontWeight: 700, color: item.val > 0 ? "#c2410c" : "#15803d" }}>{item.val}</span>
-          <span style={{ color: "#bbb" }}>/{item.max}</span>
+          <span style={{ marginLeft: 4, fontWeight: 700, color: item.val > 0 ? "#ef4444" : "#5dd9c1" }}>{item.val}</span>
+          <span style={{ color: "rgba(255,255,255,0.3)" }}>/{item.max}</span>
         </div>
       ))}
     </div>
@@ -459,14 +459,14 @@ function BreakdownRow({ breakdown }: { breakdown: any }) {
 function FormSection({ title, icon: Icon, children, defaultOpen = false }: { title: string; icon: any; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: 12 }}>
+    <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 12 }}>
       <button
         onClick={() => setOpen(!open)}
         style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, padding: 0, width: "100%", textAlign: "left" }}
       >
-        <Icon className="w-4 h-4" style={{ color: "#555", flexShrink: 0 }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", flex: 1 }}>{title}</span>
-        {open ? <ChevronUp className="w-3.5 h-3.5" style={{ color: "#999" }} /> : <ChevronDown className="w-3.5 h-3.5" style={{ color: "#999" }} />}
+        <Icon className="w-4 h-4" style={{ color: "var(--t3)", flexShrink: 0 }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)", flex: 1 }}>{title}</span>
+        {open ? <ChevronUp className="w-3.5 h-3.5" style={{ color: "var(--t3)" }} /> : <ChevronDown className="w-3.5 h-3.5" style={{ color: "var(--t3)" }} />}
       </button>
       {open && <div style={{ marginTop: 12, paddingLeft: 28 }}>{children}</div>}
     </div>
@@ -477,15 +477,14 @@ function FormField({ label, value, onChange, type = "text", placeholder, disable
   label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string; disabled?: boolean;
 }) {
   return (
-    <div style={{ marginBottom: 10 }}>
-      <label style={{ fontSize: 11, fontWeight: 500, color: "#555", display: "block", marginBottom: 4 }}>{label}</label>
+    <div className="form-group" style={{ marginBottom: 10 }}>
+      <label>{label}</label>
       <input
         type={type}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
         disabled={disabled}
-        style={{ width: "100%", fontSize: 13, padding: "6px 10px", border: "1px solid #ddd", borderRadius: 6, background: disabled ? "#f9f9f9" : "#fff", color: "#1a1a1a" }}
       />
     </div>
   );
@@ -567,25 +566,25 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
             {assessment && assessment.applicable && assessment.score != null && (
               <span style={{
                 fontSize: 11, fontWeight: 600, padding: "2px 10px", borderRadius: 4,
-                background: bandC?.bg || "#f5f5f5",
-                color: bandC?.color || "#999",
+                background: bandC?.bg || "rgba(255,255,255,0.08)",
+                color: bandC?.color || "var(--t3)",
               }}>
                 {assessment.score} · {assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : ""}
               </span>
             )}
             {assessment && assessment.applicable === false && (
-              <span style={{ fontSize: 11, color: "#999", fontWeight: 500 }}>N/A</span>
+              <span style={{ fontSize: 11, color: "var(--t3)", fontWeight: 500 }}>N/A</span>
             )}
             {!assessment && (
-              <span style={{ fontSize: 11, color: "#2563eb", fontWeight: 500 }}>Not assessed</span>
+              <span style={{ fontSize: 11, color: "var(--app-acapulco)", fontWeight: 500 }}>Not assessed</span>
             )}
-            {expanded ? <ChevronUp className="w-4 h-4" style={{ color: "#999" }} /> : <ChevronDown className="w-4 h-4" style={{ color: "#999" }} />}
+            {expanded ? <ChevronUp className="w-4 h-4" style={{ color: "var(--t3)" }} /> : <ChevronDown className="w-4 h-4" style={{ color: "var(--t3)" }} />}
           </div>
         </div>
 
         {/* Collapsed subtitle */}
         {!expanded && assessment && assessment.applicable && (
-          <div style={{ fontSize: 11, color: "#888", marginTop: 4, marginLeft: 28 }}>
+          <div style={{ fontSize: 11, color: "var(--t3)", marginTop: 4, marginLeft: 28 }}>
             {assessment.canConcludeNegligibleRisk
               ? "✅ Can conclude negligible risk"
               : "❌ Cannot conclude negligible risk"}
@@ -615,12 +614,11 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
 
             {/* 2. Evidence */}
             <FormSection title="Evidence & Timeline" icon={Calendar}>
-              <div style={{ marginBottom: 10 }}>
-                <label style={{ fontSize: 11, fontWeight: 500, color: "#555", display: "block", marginBottom: 4 }}>Evidence type</label>
+              <div className="form-group" style={{ marginBottom: 10 }}>
+                <label>Evidence type</label>
                 <select
                   value={evidenceType}
                   onChange={e => setEvidenceType(e.target.value)}
-                  style={{ width: "100%", fontSize: 13, padding: "6px 10px", border: "1px solid #ddd", borderRadius: 6, background: "#fff" }}
                 >
                   <option value="">Select...</option>
                   <option value="satellite_imagery">Satellite imagery</option>
@@ -659,12 +657,11 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
 
             {/* 4. Risk Level */}
             <FormSection title="Risk Level" icon={ShieldAlert}>
-              <div style={{ marginBottom: 10 }}>
-                <label style={{ fontSize: 11, fontWeight: 500, color: "#555", display: "block", marginBottom: 4 }}>Risk classification</label>
+              <div className="form-group" style={{ marginBottom: 10 }}>
+                <label>Risk classification</label>
                 <select
                   value={riskLevel}
                   onChange={e => setRiskLevel(e.target.value)}
-                  style={{ width: "100%", fontSize: 13, padding: "6px 10px", border: "1px solid #ddd", borderRadius: 6, background: "#fff" }}
                 >
                   <option value="low">Low</option>
                   <option value="standard">Standard</option>
@@ -679,7 +676,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
             </FormSection>
 
             {/* Assessment Section */}
-            <div style={{ borderTop: "2px solid #e5e5e5", paddingTop: 16, marginTop: 4 }}>
+            <div style={{ borderTop: "2px solid rgba(255,255,255,0.12)", paddingTop: 16, marginTop: 4 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
                 <Button size="sm" onClick={runAssessment} disabled={assessing} style={{ fontSize: 12 }}>
                   {assessing ? (
@@ -700,10 +697,10 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               {assessment && assessment.applicable && (
                 <div style={{ marginTop: 16 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: bandC?.color || "#999" }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: bandC?.color || "var(--t3)" }}>
                       Score: {assessment.score}/100 · {assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : ""}
                     </span>
-                    <span style={{ fontSize: 12, color: "#555" }}>
+                    <span style={{ fontSize: 12, color: "var(--t2)" }}>
                       {assessment.canConcludeNegligibleRisk ? "✅ Can conclude negligible" : "❌ Cannot conclude negligible"}
                     </span>
                   </div>
@@ -715,7 +712,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               )}
 
               {assessment && assessment.applicable === false && (
-                <div style={{ marginTop: 12, fontSize: 12, color: "#888", padding: "8px 12px", background: "#f9f9f9", borderRadius: 8 }}>
+                <div style={{ marginTop: 12, fontSize: 12, color: "var(--t3)", padding: "8px 12px", background: "rgba(255,255,255,0.05)", borderRadius: 8 }}>
                   EUDR does not apply to this trade corridor (commodity or destination not in scope).
                 </div>
               )}
@@ -800,25 +797,25 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
             {assessment && assessment.applicable && assessment.score != null && (
               <span style={{
                 fontSize: 11, fontWeight: 600, padding: "2px 10px", borderRadius: 4,
-                background: bandC?.bg || "#f5f5f5",
-                color: bandC?.color || "#999",
+                background: bandC?.bg || "rgba(255,255,255,0.08)",
+                color: bandC?.color || "var(--t3)",
               }}>
                 {assessment.score} · {assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : ""}
               </span>
             )}
             {assessment && assessment.applicable === false && (
-              <span style={{ fontSize: 11, color: "#999", fontWeight: 500 }}>N/A</span>
+              <span style={{ fontSize: 11, color: "var(--t3)", fontWeight: 500 }}>N/A</span>
             )}
             {!assessment && (
-              <span style={{ fontSize: 11, color: "#2563eb", fontWeight: 500 }}>Not assessed</span>
+              <span style={{ fontSize: 11, color: "var(--app-acapulco)", fontWeight: 500 }}>Not assessed</span>
             )}
-            {expanded ? <ChevronUp className="w-4 h-4" style={{ color: "#999" }} /> : <ChevronDown className="w-4 h-4" style={{ color: "#999" }} />}
+            {expanded ? <ChevronUp className="w-4 h-4" style={{ color: "var(--t3)" }} /> : <ChevronDown className="w-4 h-4" style={{ color: "var(--t3)" }} />}
           </div>
         </div>
 
         {/* Collapsed subtitle */}
         {!expanded && assessment && assessment.applicable && (
-          <div style={{ fontSize: 11, color: "#888", marginTop: 4, marginLeft: 28 }}>
+          <div style={{ fontSize: 11, color: "var(--t3)", marginTop: 4, marginLeft: 28 }}>
             {assessment.canConcludeCbamCompliant
               ? "✅ Compliant"
               : "❌ Compliance issues detected"}
@@ -863,12 +860,11 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
             {/* 3. Carbon Price */}
             <FormSection title="Carbon Price" icon={DollarSign}>
               <FormField label="Carbon price paid (EUR/tCO₂e)" value={carbonPrice} onChange={setCarbonPrice} type="number" placeholder="0.00" />
-              <div style={{ marginBottom: 10 }}>
-                <label style={{ fontSize: 11, fontWeight: 500, color: "#555", display: "block", marginBottom: 4 }}>Currency</label>
+              <div className="form-group" style={{ marginBottom: 10 }}>
+                <label>Currency</label>
                 <select
                   value={carbonCurrency}
                   onChange={e => setCarbonCurrency(e.target.value)}
-                  style={{ width: "100%", fontSize: 13, padding: "6px 10px", border: "1px solid #ddd", borderRadius: 6, background: "#fff" }}
                 >
                   <option value="EUR">EUR</option>
                   <option value="USD">USD</option>
@@ -884,7 +880,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
             </FormSection>
 
             {/* Assessment Section */}
-            <div style={{ borderTop: "2px solid #e5e5e5", paddingTop: 16, marginTop: 4 }}>
+            <div style={{ borderTop: "2px solid rgba(255,255,255,0.12)", paddingTop: 16, marginTop: 4 }}>
               <Button size="sm" onClick={runAssessment} disabled={assessing} style={{ fontSize: 12 }}>
                 {assessing ? (
                   <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> Assessing...</>
@@ -896,10 +892,10 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               {assessment && assessment.applicable && (
                 <div style={{ marginTop: 16 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: bandC?.color || "#999" }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: bandC?.color || "var(--t3)" }}>
                       Score: {assessment.score}/100 · {assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : ""}
                     </span>
-                    <span style={{ fontSize: 12, color: "#555" }}>
+                    <span style={{ fontSize: 12, color: "var(--t2)" }}>
                       {assessment.canConcludeCbamCompliant ? "✅ Compliant" : "❌ Compliance issues"}
                     </span>
                   </div>
@@ -911,7 +907,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               )}
 
               {assessment && assessment.applicable === false && (
-                <div style={{ marginTop: 12, fontSize: 12, color: "#888", padding: "8px 12px", background: "#f9f9f9", borderRadius: 8 }}>
+                <div style={{ marginTop: 12, fontSize: 12, color: "var(--t3)", padding: "8px 12px", background: "rgba(255,255,255,0.05)", borderRadius: 8 }}>
                   CBAM does not apply to this trade corridor (commodity or destination not in scope).
                 </div>
               )}
