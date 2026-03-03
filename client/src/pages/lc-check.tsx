@@ -86,6 +86,7 @@ export default function LcCheck() {
     advisingBank: "",
     issuingBankSwift: "",
     advisingBankSwift: "",
+    tolerancePercent: 5,
   });
 
   const [documents, setDocuments] = useState<LcDocument[]>([
@@ -707,6 +708,21 @@ export default function LcCheck() {
                   <span className="lc-tog-sl" />
                 </label>
               </div>
+
+              {/* Quantity Tolerance — SWIFT 39A/39B */}
+              <div className="form-group" style={{ marginTop: 12 }}>
+                <label>Quantity Tolerance % <span style={{ fontSize: 11, color: "#888" }}>(SWIFT 39A — default 5%)</span></label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={lcFields.tolerancePercent ?? 5}
+                  onChange={e => updateLcField("tolerancePercent", Math.max(0, Math.min(100, Number(e.target.value) || 0)))}
+                  data-testid="select-tolerance"
+                  style={{ maxWidth: 120 }}
+                />
+              </div>
             </div>
 
             {/* Upload Card — LC PDF extraction */}
@@ -967,6 +983,17 @@ export default function LcCheck() {
                 </div>
               </div>
 
+              <div className="form-row cols-2">
+                <div className="form-group">
+                  <label>Incoterms</label>
+                  <input type="text" value={lcFields.incoterms} readOnly style={{ background: "#fff" }} />
+                </div>
+                <div className="form-group">
+                  <label>Quantity Tolerance</label>
+                  <input type="text" value={`±${lcFields.tolerancePercent ?? 5}%`} readOnly style={{ background: "#fff" }} />
+                </div>
+              </div>
+
               {/* Documents summary */}
               <div style={{ background: "#f7f7f7", borderRadius: 9, padding: "12px 14px" }}>
                 <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--app-regent)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8, width: "100%" }}>
@@ -1062,70 +1089,69 @@ export default function LcCheck() {
                 Ref: TT-LC-{new Date().getFullYear()}-{resultData.integrityHash.substring(0, 6)} · {new Date(resultData.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
               </p>
 
-              {/* Critical results */}
-              {resultData.results.filter(r => r.severity === "RED").length > 0 && (
-                <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--app-regent)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
-                    🔴 Critical — Bank will reject
-                  </div>
-                  {resultData.results.filter(r => r.severity === "RED").map((r, i) => (
-                    <div key={`fail-${i}`} className="lc-rr fail" data-testid={`result-item-fail-${i}`}>
-                      <div className="lc-rr-dot fail" />
-                      <div>
-                        <div className="lc-rr-field">{r.fieldName} — {r.documentType}</div>
-                        <div className="lc-rr-detail">
-                          LC: <span className="lc-rr-lc">"{r.lcValue}"</span> · Doc: <span className="lc-rr-doc">"{r.documentValue}"</span>
-                        </div>
-                        <div className="lc-rr-detail">{r.explanation}</div>
-                        <span className="lc-rr-rule">{r.ucpRule}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              {/* Render a severity section with sub-grouping by checkCategory */}
+              {(["RED", "AMBER", "GREEN"] as const).map(severity => {
+                const items = resultData.results.filter(r => r.severity === severity);
+                if (items.length === 0) return null;
+                const lcItems = items.filter(r => r.checkCategory !== "cross_document");
+                const crossItems = items.filter(r => r.checkCategory === "cross_document");
+                const label = severity === "RED" ? "\uD83D\uDD34 Critical \u2014 Bank will reject" : severity === "AMBER" ? "\uD83D\uDFE1 Warnings" : "\uD83D\uDFE2 Matched";
+                const cssClass = severity === "RED" ? "fail" : severity === "AMBER" ? "warn" : "ok";
 
-              {/* Warning results */}
-              {resultData.results.filter(r => r.severity === "AMBER").length > 0 && (
-                <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--app-regent)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
-                    🟡 Warnings
-                  </div>
-                  {resultData.results.filter(r => r.severity === "AMBER").map((r, i) => (
-                    <div key={`warn-${i}`} className="lc-rr warn" data-testid={`result-item-warn-${i}`}>
-                      <div className="lc-rr-dot warn" />
-                      <div>
-                        <div className="lc-rr-field">{r.fieldName} — {r.documentType}</div>
-                        <div className="lc-rr-detail">
-                          LC: <span className="lc-rr-lc">"{r.lcValue}"</span> · Doc: <span className="lc-rr-doc">"{r.documentValue}"</span>
-                        </div>
-                        <div className="lc-rr-detail">{r.explanation}</div>
-                        <span className="lc-rr-rule">{r.ucpRule}</span>
-                      </div>
+                return (
+                  <div key={severity} style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--app-regent)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                      {label}
                     </div>
-                  ))}
-                </div>
-              )}
 
-              {/* Matched results */}
-              {resultData.results.filter(r => r.severity === "GREEN").length > 0 && (
-                <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--app-regent)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
-                    🟢 Matched
-                  </div>
-                  {resultData.results.filter(r => r.severity === "GREEN").map((r, i) => (
-                    <div key={`ok-${i}`} className="lc-rr ok" data-testid={`result-item-ok-${i}`}>
-                      <div className="lc-rr-dot ok" />
-                      <div>
-                        <div className="lc-rr-field">{r.fieldName}</div>
-                        <div className="lc-rr-detail">
-                          {r.explanation || "All fields match LC terms ✓"}
+                    {lcItems.length > 0 && (
+                      <>
+                        {crossItems.length > 0 && (
+                          <div style={{ fontSize: 9.5, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", margin: "8px 0 4px", paddingLeft: 4 }}>
+                            LC Validation
+                          </div>
+                        )}
+                        {lcItems.map((r, i) => (
+                          <div key={`${cssClass}-lc-${i}`} className={`lc-rr ${cssClass}`} data-testid={`result-item-${cssClass}-${i}`}>
+                            <div className={`lc-rr-dot ${cssClass}`} />
+                            <div>
+                              <div className="lc-rr-field">{r.fieldName} — {r.documentType}</div>
+                              {severity !== "GREEN" && (
+                                <div className="lc-rr-detail">
+                                  LC: <span className="lc-rr-lc">"{r.lcValue}"</span> · Doc: <span className="lc-rr-doc">"{r.documentValue}"</span>
+                                </div>
+                              )}
+                              <div className="lc-rr-detail">{r.explanation || "All fields match LC terms \u2713"}</div>
+                              {r.ucpRule && <span className="lc-rr-rule">{r.ucpRule}</span>}
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )}
+
+                    {crossItems.length > 0 && (
+                      <>
+                        <div style={{ fontSize: 9.5, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", margin: "10px 0 4px", paddingLeft: 4 }}>
+                          Cross-Document Consistency
                         </div>
-                        {r.ucpRule && <span className="lc-rr-rule">{r.ucpRule}</span>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                        {crossItems.map((r, i) => (
+                          <div key={`${cssClass}-cross-${i}`} className={`lc-rr ${cssClass}`} data-testid={`result-item-${cssClass}-cross-${i}`}>
+                            <div className={`lc-rr-dot ${cssClass}`} />
+                            <div>
+                              <div className="lc-rr-field">{r.fieldName} — {r.documentType}</div>
+                              <div className="lc-rr-detail">
+                                <span className="lc-rr-lc">"{r.lcValue}"</span> · <span className="lc-rr-doc">"{r.documentValue}"</span>
+                              </div>
+                              <div className="lc-rr-detail">{r.explanation}</div>
+                              {r.ucpRule && <span className="lc-rr-rule">{r.ucpRule}</span>}
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Correction Email Card */}
@@ -1358,6 +1384,7 @@ export default function LcCheck() {
                       latestShipmentDate: "", lcExpiryDate: "", incoterms: "FOB",
                       partialShipmentsAllowed: false, transhipmentAllowed: false, lcReference: "",
                       issuingBank: "", advisingBank: "", issuingBankSwift: "", advisingBankSwift: "",
+                      tolerancePercent: 5,
                     });
                     setDocuments([{ documentType: "commercial_invoice", fields: {} }]);
                     setActiveDocTab(0);

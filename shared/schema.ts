@@ -370,6 +370,7 @@ export const lcFieldsSchema = z.object({
   advisingBank: z.string().optional().default(""),
   issuingBankSwift: z.string().optional().default(""),
   advisingBankSwift: z.string().optional().default(""),
+  tolerancePercent: z.number().min(0).max(100).optional().default(5),
 });
 
 export type LcFields = z.infer<typeof lcFieldsSchema>;
@@ -409,6 +410,8 @@ export const lcCheckRequestSchema = z.object({
 
 export type CheckSeverity = "GREEN" | "AMBER" | "RED";
 
+export type CheckCategory = "lc_validation" | "cross_document";
+
 export type CheckResultItem = {
   fieldName: string;
   lcValue: string;
@@ -417,6 +420,7 @@ export type CheckResultItem = {
   severity: CheckSeverity;
   ucpRule: string;
   explanation: string;
+  checkCategory: CheckCategory;
 };
 
 export type LcCheckSummary = {
