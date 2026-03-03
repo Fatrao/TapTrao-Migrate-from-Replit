@@ -70,6 +70,8 @@ import {
   leads,
   type Lead,
   type InsertLead,
+  complianceRules,
+  type ComplianceRule,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -94,6 +96,14 @@ export interface IStorage {
     stopFlagCommodities: { name: string; hsCode: string; stopFlags: unknown }[];
   }>;
   getAfcftaRooByHsHeading(hsHeading: string): Promise<AfcftaRoo | undefined>;
+  getMatchingComplianceRules(params: {
+    destinationIso2: string;
+    triggerFlags: string[];
+    hsCode: string;
+    commodityType: string;
+    transportMode?: string | null;
+    shipmentValue?: number | null;
+  }): Promise<ComplianceRule[]>;
   createLcCheck(data: InsertLcCheck): Promise<LcCheck>;
   getLcCheckById(id: string): Promise<LcCheck | undefined>;
   getRecentLcChecks(limit: number): Promise<LcCheck[]>;
@@ -338,6 +348,35 @@ export class DatabaseStorage implements IStorage {
       .from(afcftaRoo)
       .where(eq(afcftaRoo.hsHeading, hsHeading));
     return result;
+  }
+
+  async getMatchingComplianceRules(params: {
+    destinationIso2: string;
+    triggerFlags: string[];
+    hsCode: string;
+    commodityType: string;
+    transportMode?: string | null;
+    shipmentValue?: number | null;
+  }): Promise<ComplianceRule[]> {
+    const { destinationIso2, triggerFlags, hsCode, commodityType, transportMode, shipmentValue } = params;
+    // Convert JS array to Postgres array literal: ARRAY['flag1','flag2']
+    const pgArray = triggerFlags.length > 0
+      ? sql`ARRAY[${sql.join(triggerFlags.map(f => sql`${f}`), sql`, `)}]::text[]`
+      : sql`ARRAY[]::text[]`;
+
+    // Use Drizzle select() so column names are properly mapped to camelCase
+    const rows = await db.select().from(complianceRules).where(
+      sql`is_active = true
+        AND effective_date <= CURRENT_DATE
+        AND (expiry_date IS NULL OR expiry_date > CURRENT_DATE)
+        AND (destination_iso2 IS NULL OR destination_iso2 = ${destinationIso2})
+        AND (trigger_flag IS NULL OR trigger_flag = ANY(${pgArray}))
+        AND (hs_code_prefix IS NULL OR ${hsCode} LIKE hs_code_prefix || '%')
+        AND (commodity_type IS NULL OR commodity_type = ${commodityType})
+        AND (transport_mode IS NULL OR transport_mode = ${transportMode ?? null})
+        AND (min_value IS NULL OR ${shipmentValue ?? 0} >= min_value::numeric)`
+    ).orderBy(complianceRules.sortOrder, complianceRules.id);
+    return rows;
   }
 
   async createLcCheck(data: InsertLcCheck): Promise<LcCheck> {

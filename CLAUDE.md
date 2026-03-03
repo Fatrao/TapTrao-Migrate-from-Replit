@@ -97,7 +97,7 @@ TapTrao is a trade compliance SaaS platform for commodity traders. It lets users
 
 ```bash
 # Development
-npm run dev                     # Start dev server (Express + Vite HMR) on port 5000
+npm run dev                     # Start dev server (Express + Vite HMR) on port 3000
 
 # Production build
 npm run build                   # Build client (Vite) + server (esbuild) → dist/
@@ -124,7 +124,7 @@ node scripts/bot-test.mjs       # Quick smoke test (38 assertions)
 | `STRIPE_SECRET_KEY` | No | Stripe API key (payments disabled without it) |
 | `STRIPE_WEBHOOK_SECRET` | No | Stripe webhook signature verification |
 | `ADMIN_PASSWORD` | No | Password for admin alert creation endpoint |
-| `PORT` | No | Server port (default: 5000) |
+| `PORT` | No | Server port (default: 3000) |
 | `NODE_ENV` | No | `development` or `production` |
 
 ## Path Aliases

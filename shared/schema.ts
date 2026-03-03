@@ -142,6 +142,63 @@ export const afcftaRoo = pgTable(
   (table) => [index("afcfta_roo_hs_heading_idx").on(table.hsHeading)]
 );
 
+/* ── Compliance Rules (Phase 3: Structured Rules Database) ── */
+export const complianceRules = pgTable(
+  "compliance_rules",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ruleKey: varchar("rule_key", { length: 80 }).notNull().unique(),
+
+    // Match conditions (NULL = matches all)
+    destinationIso2: varchar("destination_iso2", { length: 2 }),
+    triggerFlag: text("trigger_flag"),
+    hsCodePrefix: varchar("hs_code_prefix", { length: 10 }),
+    commodityType: text("commodity_type"),
+    transportMode: text("transport_mode"),
+    minValue: numeric("min_value", { precision: 12, scale: 2 }),
+    extraConditions: jsonb("extra_conditions"),
+
+    // Document requirement template
+    titleTemplate: text("title_template").notNull(),
+    descriptionTemplate: text("description_template").notNull(),
+    issuedByTemplate: text("issued_by_template").notNull(),
+    whenNeeded: text("when_needed").notNull(),
+    tipTemplate: text("tip_template").notNull(),
+    portalGuideTemplate: text("portal_guide_template"),
+    documentCode: text("document_code"),
+    isSupplierSide: boolean("is_supplier_side").notNull().default(false),
+
+    // Lifecycle (replaces assignDocumentMeta inference)
+    owner: text("owner").notNull().default("IMPORTER"),
+    dueBy: text("due_by").notNull().default("BEFORE_LOADING"),
+
+    // Metadata
+    ruleCategory: text("rule_category").notNull().default("seed"),
+    regulationRef: text("regulation_ref"),
+    sortOrder: integer("sort_order").notNull().default(100),
+    isActive: boolean("is_active").notNull().default(true),
+    effectiveDate: date("effective_date").notNull().default(sql`CURRENT_DATE`),
+    expiryDate: date("expiry_date"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("compliance_rules_dest_idx").on(table.destinationIso2),
+    index("compliance_rules_trigger_idx").on(table.triggerFlag),
+    index("compliance_rules_active_idx").on(table.isActive, table.effectiveDate),
+    index("compliance_rules_sort_idx").on(table.sortOrder),
+  ]
+);
+
+export const insertComplianceRuleSchema = createInsertSchema(complianceRules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertComplianceRule = z.infer<typeof insertComplianceRuleSchema>;
+export type ComplianceRule = typeof complianceRules.$inferSelect;
+
 export const tradeStatusEnum = pgEnum("trade_status", [
   "active",
   "in_transit",

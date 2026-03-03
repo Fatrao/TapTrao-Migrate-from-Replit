@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
 
-const BASE = process.env.TEST_BASE_URL || "http://localhost:5000";
+const BASE = process.env.TEST_BASE_URL || "http://localhost:3000";
 
 async function api(path: string, opts: RequestInit = {}) {
   const url = `${BASE}${path}`;

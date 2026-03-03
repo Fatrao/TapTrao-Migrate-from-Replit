@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const BASE = process.env.TEST_BASE_URL || "http://localhost:5000";
+const BASE = process.env.TEST_BASE_URL || "http://localhost:3000";
 let passed = 0;
 let failed = 0;
 const errors = [];

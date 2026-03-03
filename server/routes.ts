@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { randomUUID, createHash } from "crypto";
 import { storage } from "./storage";
-import { seedPrompt2, seedPrompt3A, seedPrompt3B, seedPrompt3C, seedPrompt5, seedPrompt6, seedPrompt7 } from "./seed";
+import { seedPrompt2, seedPrompt3A, seedPrompt3B, seedPrompt3C, seedPrompt5, seedPrompt6, seedPrompt7, seedComplianceRules } from "./seed";
 import { runComplianceCheck, computeReadinessScore } from "./compliance";
 import { runLcCrossCheck, computeLcHash, generateCorrectionEmail } from "./lc-engine";
 import { generateTwinlogPdf } from "./twinlog-pdf";
@@ -108,6 +108,7 @@ export async function registerRoutes(
   await seedPrompt5();
   await seedPrompt6();
   await seedPrompt7();
+  await seedComplianceRules();
 
   // ── Protected User Guide (behind login wall) ──
   app.get("/user-guide", (req, res) => {
