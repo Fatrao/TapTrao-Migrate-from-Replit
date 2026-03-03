@@ -1008,6 +1008,7 @@ export async function seedComplianceRules() {
     dueBy: string;
     regulationRef?: string | null;
     sortOrder: number;
+    validationSpec?: Record<string, unknown> | null;
   }> = [
     // ── 1. Commercial Invoice (always required) ──
     {
@@ -1023,6 +1024,26 @@ export async function seedComplianceRules() {
       owner: "SUPPLIER",
       dueBy: "BEFORE_LOADING",
       sortOrder: 10,
+      validationSpec: {
+        docTypeGate: {
+          mustContainAny: ["invoice", "facture", "factura"],
+          rejectIfContainsAny: ["bill of lading", "packing list", "certificate of origin", "phytosanitary"],
+        },
+        expectedFields: [
+          { name: "beneficiaryName", description: "Seller/exporter name", required: true, severityIfMissing: "critical" },
+          { name: "totalAmount", description: "Total invoice amount", required: true, severityIfMissing: "critical" },
+          { name: "currency", description: "Currency code (USD, EUR, etc.)", required: true, severityIfMissing: "critical" },
+          { name: "quantity", description: "Quantity of goods", required: false, severityIfMissing: "warning" },
+          { name: "hsCode", description: "HS/tariff code", required: false, severityIfMissing: "warning" },
+          { name: "incoterms", description: "Incoterms (FOB, CIF, etc.)", required: false, severityIfMissing: "warning" },
+          { name: "goodsDescription", description: "Description of goods", required: true, severityIfMissing: "critical" },
+        ],
+        consistencyChecks: [
+          { type: "hs_prefix_matches_context", severity: "warning", message: "HS code does not match expected commodity." },
+          { type: "numeric_positive", severity: "warning", message: "Invoice amounts must be positive values." },
+        ],
+        minimumAcceptable: { mustHave: ["beneficiaryName", "totalAmount"], ifMissing: "ISSUES_FOUND" },
+      },
     },
     // ── 2. Packing List (always required) ──
     {
@@ -1038,6 +1059,22 @@ export async function seedComplianceRules() {
       owner: "SUPPLIER",
       dueBy: "BEFORE_LOADING",
       sortOrder: 11,
+      validationSpec: {
+        docTypeGate: {
+          mustContainAny: ["packing list", "colisage", "liste de colisage"],
+          rejectIfContainsAny: ["invoice", "bill of lading", "certificate of origin"],
+        },
+        expectedFields: [
+          { name: "quantity", description: "Total quantity of items", required: true, severityIfMissing: "critical" },
+          { name: "grossWeight", description: "Gross weight with unit", required: false, severityIfMissing: "warning" },
+          { name: "netWeight", description: "Net weight with unit", required: false, severityIfMissing: "warning" },
+          { name: "numberOfPackages", description: "Number of packages/cartons", required: false, severityIfMissing: "warning" },
+        ],
+        consistencyChecks: [
+          { type: "numeric_positive", severity: "warning", message: "Weights and quantities must be positive." },
+        ],
+        minimumAcceptable: { mustHave: ["quantity"], ifMissing: "ISSUES_FOUND" },
+      },
     },
     // ── 3. Bill of Lading (always required) ──
     {
@@ -1053,6 +1090,24 @@ export async function seedComplianceRules() {
       owner: "IMPORTER",
       dueBy: "BEFORE_LOADING",
       sortOrder: 12,
+      validationSpec: {
+        docTypeGate: {
+          mustContainAny: ["bill of lading", "B/L", "connaissement", "airway bill", "AWB"],
+          rejectIfContainsAny: ["invoice", "packing list", "certificate of origin"],
+        },
+        expectedFields: [
+          { name: "shipperName", description: "Shipper/exporter name", required: true, severityIfMissing: "critical" },
+          { name: "consignee", description: "Consignee name", required: true, severityIfMissing: "critical" },
+          { name: "portOfLoading", description: "Port of loading", required: false, severityIfMissing: "warning" },
+          { name: "portOfDischarge", description: "Port of discharge", required: false, severityIfMissing: "warning" },
+          { name: "shippedOnBoardDate", description: "Shipped on board date", required: false, severityIfMissing: "warning" },
+        ],
+        consistencyChecks: [
+          { type: "date_not_future", severity: "critical", message: "Shipped on board date cannot be in the future." },
+          { type: "origin_country_match", severity: "warning", message: "Port of loading does not match expected origin." },
+        ],
+        minimumAcceptable: { mustHave: ["shipperName", "consignee"], ifMissing: "ISSUES_FOUND" },
+      },
     },
     // ── 4. Certificate of Origin (always required) ──
     {
@@ -1068,6 +1123,21 @@ export async function seedComplianceRules() {
       owner: "SUPPLIER",
       dueBy: "BEFORE_LOADING",
       sortOrder: 13,
+      validationSpec: {
+        docTypeGate: {
+          mustContainAny: ["certificate of origin", "certificat d'origine", "EUR.1", "Form A"],
+          rejectIfContainsAny: ["invoice", "packing list", "bill of lading", "phytosanitary"],
+        },
+        expectedFields: [
+          { name: "exporterName", description: "Exporter/seller name", required: true, severityIfMissing: "critical" },
+          { name: "originCountry", description: "Country of origin", required: true, severityIfMissing: "critical" },
+          { name: "goodsDescription", description: "Description of goods", required: false, severityIfMissing: "warning" },
+        ],
+        consistencyChecks: [
+          { type: "origin_country_match", severity: "critical", message: "Origin country does not match trade context." },
+        ],
+        minimumAcceptable: { mustHave: ["exporterName", "originCountry"], ifMissing: "ISSUES_FOUND" },
+      },
     },
     // ── 5. Phytosanitary / SPS Certificate (trigger: sps) ──
     {
@@ -1084,6 +1154,22 @@ export async function seedComplianceRules() {
       owner: "SUPPLIER",
       dueBy: "BEFORE_LOADING",
       sortOrder: 20,
+      validationSpec: {
+        docTypeGate: {
+          mustContainAny: ["phytosanitary", "plant health", "SPS", "certificat phytosanitaire", "IPPC"],
+          rejectIfContainsAny: ["invoice", "packing list", "bill of lading"],
+        },
+        expectedFields: [
+          { name: "exporterName", description: "Exporter/applicant name", required: true, severityIfMissing: "critical" },
+          { name: "originCountry", description: "Country of origin", required: true, severityIfMissing: "critical" },
+          { name: "issuingAuthority", description: "Issuing authority (NPPO)", required: true, severityIfMissing: "critical" },
+          { name: "commodityDescription", description: "Commodity/product description", required: false, severityIfMissing: "warning" },
+        ],
+        consistencyChecks: [
+          { type: "origin_country_match", severity: "critical", message: "Origin country does not match trade context." },
+        ],
+        minimumAcceptable: { mustHave: ["exporterName", "issuingAuthority"], ifMissing: "ISSUES_FOUND" },
+      },
     },
     // ── 6. SPS compliance at destination (trigger: sps) ──
     {
@@ -1312,6 +1398,43 @@ export async function seedComplianceRules() {
       owner: "SUPPLIER",
       dueBy: "BEFORE_LOADING",
       sortOrder: 80,
+      validationSpec: {
+        docTypeGate: {
+          mustContainAny: ["TRACES", "due diligence statement", "EUDR", "Regulation (EU) 2023/1115"],
+          shouldContainAny: ["Annex II", "deforestation-free", "negligible risk", "geolocation"],
+          rejectIfContainsAny: ["fumigation", "bill of lading", "commercial invoice", "packing list"],
+        },
+        expectedFields: [
+          { name: "hs_code", description: "HS/CN code for relevant product(s)", required: true, severityIfMissing: "critical" },
+          { name: "product_description", description: "Free-text product description incl. trade name", required: true, severityIfMissing: "critical" },
+          { name: "scientific_name", description: "Scientific name where applicable", required: false, severityIfMissing: "warning" },
+          { name: "quantity_net_mass_kg", description: "Quantity in kg net mass", required: true, severityIfMissing: "critical" },
+          { name: "country_of_production", description: "Country of production for commodities/products", required: true, severityIfMissing: "critical" },
+          { name: "geolocation_plots", description: "Geolocation for all production plots (point or polygon)", required: true, severityIfMissing: "critical" },
+          { name: "supplier_identity", description: "Name + postal address + email of supplier(s)", required: true, severityIfMissing: "critical" },
+          { name: "customer_identity", description: "Name + postal address + email of customer(s)", required: true, severityIfMissing: "critical" },
+          { name: "deforestation_free_evidence", description: "Conclusive info products are deforestation-free", required: true, severityIfMissing: "critical" },
+          { name: "legality_evidence", description: "Info commodities comply with country-of-production legislation", required: true, severityIfMissing: "critical" },
+          { name: "operator_declaration", description: "Declaration due diligence exercised, no/negligible risk", required: true, severityIfMissing: "critical" },
+          { name: "traces_reference_number", description: "TRACES NT reference number", required: true, severityIfMissing: "critical" },
+        ],
+        consistencyChecks: [
+          { type: "hs_prefix_matches_context", severity: "warning", message: "HS code does not match expected commodity/HS context." },
+          { type: "quantity_is_numeric_and_kg", severity: "critical", message: "Quantity must include numeric value and unit kg (net mass)." },
+          { type: "geolocation_has_points_or_polygons", severity: "critical", message: "Geolocation must be present for all plots." },
+          { type: "emails_present_for_supplier_and_customer", severity: "critical", message: "Supplier/customer email(s) missing." },
+          { type: "traces_reference_format", severity: "warning", message: "TRACES NT reference number format unclear — verify." },
+        ],
+        acceptedForms: ["pdf", "scan", "screenshot", "email", "portal_export"],
+        minimumAcceptable: {
+          mustHave: ["traces_reference_number", "operator_declaration"],
+          ifMissing: "ISSUES_FOUND",
+        },
+        outputHints: {
+          extractGeolocationAs: "geojson_or_latlon_list",
+          maxEvidenceSnippets: 6,
+        },
+      },
     },
     // ── 19. EUDR due-diligence statement (dest: GB) ──
     {
@@ -2061,7 +2184,8 @@ export async function seedComplianceRules() {
         regulation_ref,
         sort_order,
         is_active,
-        effective_date
+        effective_date,
+        validation_spec
       ) VALUES (
         ${r.ruleKey},
         ${r.destinationIso2 ?? null},
@@ -2085,7 +2209,8 @@ export async function seedComplianceRules() {
         ${r.regulationRef ?? null},
         ${r.sortOrder},
         true,
-        CURRENT_DATE
+        CURRENT_DATE,
+        ${r.validationSpec ? sql`${JSON.stringify(r.validationSpec)}::jsonb` : sql`NULL`}
       )
       ON CONFLICT (rule_key) DO UPDATE SET
         destination_iso2 = EXCLUDED.destination_iso2,
@@ -2109,6 +2234,7 @@ export async function seedComplianceRules() {
         sort_order = EXCLUDED.sort_order,
         is_active = EXCLUDED.is_active,
         effective_date = EXCLUDED.effective_date,
+        validation_spec = EXCLUDED.validation_spec,
         updated_at = NOW()
       WHERE compliance_rules.rule_category = 'seed'
     `);

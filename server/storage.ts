@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { eq, and, sql, desc, inArray } from "drizzle-orm";
+import { eq, and, sql, desc, inArray, lt, isNull, or, asc } from "drizzle-orm";
 import { createHash, randomBytes } from "crypto";
 import {
   destinations,
@@ -72,6 +72,13 @@ import {
   type InsertLead,
   complianceRules,
   type ComplianceRule,
+  documentValidations,
+  type DocumentValidation,
+  type InsertDocumentValidation,
+  type ValidationIssue,
+  type EvidenceSnippet,
+  type FieldStatus,
+  type RequirementReadiness,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -229,6 +236,16 @@ export interface IStorage {
   createLead(data: InsertLead): Promise<Lead>;
   getLeadByEmailAndSession(email: string, sessionId: string): Promise<Lead | undefined>;
   getLeads(limit?: number): Promise<Lead[]>;
+  // Phase 4: Document Validations
+  createDocumentValidation(data: InsertDocumentValidation): Promise<DocumentValidation>;
+  getDocumentValidationsByLookup(lookupId: string): Promise<DocumentValidation[]>;
+  getDocumentValidationById(id: string): Promise<DocumentValidation | undefined>;
+  getPendingValidations(limit?: number): Promise<DocumentValidation[]>;
+  updateValidationProcessing(id: string, update: Partial<DocumentValidation>): Promise<DocumentValidation | undefined>;
+  overrideDocumentValidation(id: string, sessionId: string, verdict: string, reason: string): Promise<DocumentValidation | undefined>;
+  deleteDocumentValidation(id: string, sessionId: string): Promise<boolean>;
+  getRequirementReadiness(lookupId: string): Promise<RequirementReadiness[]>;
+  findExistingValidation(lookupId: string, requirementIndex: number, fileSha256: string): Promise<DocumentValidation | undefined>;
 }
 
 export type EnrichedTrade = {
@@ -1425,6 +1442,158 @@ export class DatabaseStorage implements IStorage {
 
   async getLeads(limit = 100): Promise<Lead[]> {
     return db.select().from(leads).orderBy(desc(leads.createdAt)).limit(limit);
+  }
+
+  // ── Phase 4: Document Validations ──
+
+  async createDocumentValidation(data: InsertDocumentValidation): Promise<DocumentValidation> {
+    const [row] = await db.insert(documentValidations).values(data).returning();
+    return row;
+  }
+
+  async getDocumentValidationsByLookup(lookupId: string): Promise<DocumentValidation[]> {
+    return db.select().from(documentValidations)
+      .where(eq(documentValidations.lookupId, lookupId))
+      .orderBy(asc(documentValidations.requirementIndex));
+  }
+
+  async getDocumentValidationById(id: string): Promise<DocumentValidation | undefined> {
+    const [row] = await db.select().from(documentValidations)
+      .where(eq(documentValidations.id, id));
+    return row;
+  }
+
+  async findExistingValidation(lookupId: string, requirementIndex: number, fileSha256: string): Promise<DocumentValidation | undefined> {
+    const [row] = await db.select().from(documentValidations)
+      .where(and(
+        eq(documentValidations.lookupId, lookupId),
+        eq(documentValidations.requirementIndex, requirementIndex),
+        eq(documentValidations.fileSha256, fileSha256),
+      ));
+    return row;
+  }
+
+  async getPendingValidations(limit = 5): Promise<DocumentValidation[]> {
+    const now = new Date();
+    return db.select().from(documentValidations)
+      .where(
+        or(
+          // Pending jobs
+          eq(documentValidations.processingStatus, "pending"),
+          // Expired leases (stuck processing jobs)
+          and(
+            eq(documentValidations.processingStatus, "processing"),
+            lt(documentValidations.processingLeaseUntil, now),
+          ),
+        ),
+      )
+      .orderBy(asc(documentValidations.createdAt))
+      .limit(limit);
+  }
+
+  async updateValidationProcessing(id: string, update: Partial<DocumentValidation>): Promise<DocumentValidation | undefined> {
+    const [row] = await db.update(documentValidations)
+      .set({ ...update, updatedAt: new Date() })
+      .where(eq(documentValidations.id, id))
+      .returning();
+    return row;
+  }
+
+  async overrideDocumentValidation(id: string, sessionId: string, verdict: string, reason: string): Promise<DocumentValidation | undefined> {
+    const [row] = await db.update(documentValidations)
+      .set({
+        manualOverride: true,
+        manualVerdict: verdict,
+        overrideReason: reason,
+        updatedAt: new Date(),
+      })
+      .where(and(
+        eq(documentValidations.id, id),
+        eq(documentValidations.sessionId, sessionId),
+      ))
+      .returning();
+    return row;
+  }
+
+  async deleteDocumentValidation(id: string, sessionId: string): Promise<boolean> {
+    const result = await db.delete(documentValidations)
+      .where(and(
+        eq(documentValidations.id, id),
+        eq(documentValidations.sessionId, sessionId),
+      ))
+      .returning({ id: documentValidations.id });
+    return result.length > 0;
+  }
+
+  async getRequirementReadiness(lookupId: string): Promise<RequirementReadiness[]> {
+    // Get all validations for this lookup
+    const validations = await this.getDocumentValidationsByLookup(lookupId);
+
+    // Get the lookup to access requirements
+    const [lookup] = await db.select().from(lookups).where(eq(lookups.id, lookupId));
+    if (!lookup) return [];
+
+    const result = lookup.resultJson as any;
+    const requirements: Array<{ title: string; documentCode?: string | null }> = result?.requirementsDetailed ?? [];
+
+    return requirements.map((req, index) => {
+      // Find the latest validation for this requirement index
+      const validation = validations
+        .filter((v) => v.requirementIndex === index)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+
+      if (!validation) {
+        return {
+          requirementIndex: index,
+          requirementTitle: req.title,
+          documentCode: req.documentCode ?? null,
+          status: "not_uploaded" as const,
+          validationId: null,
+          verdict: null,
+          confidence: null,
+          issues: [],
+          evidence: [],
+          fieldStatus: [],
+          filename: null,
+          uploadedAt: null,
+        };
+      }
+
+      // Map processing status + verdict to readiness status
+      let status: RequirementReadiness["status"];
+      if (validation.manualOverride) {
+        status = "overridden";
+      } else if (validation.processingStatus === "pending") {
+        status = "pending";
+      } else if (validation.processingStatus === "processing") {
+        status = "processing";
+      } else if (validation.processingStatus === "failed") {
+        status = "failed";
+      } else if (validation.verdict === "VALID" || validation.verdict === "VALID_WITH_NOTES") {
+        status = "valid";
+      } else if (validation.verdict === "WRONG_DOCUMENT") {
+        status = "wrong_doc";
+      } else if (validation.verdict === "ISSUES_FOUND") {
+        status = "issues";
+      } else {
+        status = "failed";
+      }
+
+      return {
+        requirementIndex: index,
+        requirementTitle: req.title,
+        documentCode: req.documentCode ?? null,
+        status,
+        validationId: validation.id,
+        verdict: validation.manualOverride ? validation.manualVerdict : validation.verdict,
+        confidence: validation.confidence,
+        issues: (validation.validationIssues as ValidationIssue[]) ?? [],
+        evidence: (validation.evidence as EvidenceSnippet[]) ?? [],
+        fieldStatus: (validation.fieldStatus as FieldStatus[]) ?? [],
+        filename: validation.originalFilename,
+        uploadedAt: validation.createdAt.toISOString(),
+      };
+    });
   }
 }
 

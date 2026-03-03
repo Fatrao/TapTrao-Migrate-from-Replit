@@ -168,6 +168,9 @@ export const complianceRules = pgTable(
     documentCode: text("document_code"),
     isSupplierSide: boolean("is_supplier_side").notNull().default(false),
 
+    // Phase 4: Structured validation spec (machine-checkable criteria for doc validation)
+    validationSpec: jsonb("validation_spec"),
+
     // Lifecycle (replaces assignDocumentMeta inference)
     owner: text("owner").notNull().default("IMPORTER"),
     dueBy: text("due_by").notNull().default("BEFORE_LOADING"),
@@ -1013,3 +1016,197 @@ export const leadCaptureSchema = z.object({
   commodityName: z.string().optional(),
   corridorDescription: z.string().optional(),
 });
+
+/* ══════════════════════════════════════════════════════════════════
+ * Phase 4: Requirement-Driven Document Validation
+ * ════════════════════════════════════════════════════════════════ */
+
+// ── Document Validations table ──
+
+export const documentValidations = pgTable(
+  "document_validations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    // Links
+    lookupId: uuid("lookup_id").notNull(),
+    sessionId: text("session_id").notNull(),
+
+    // Which requirement this validates
+    requirementIndex: integer("requirement_index").notNull(),
+    requirementTitle: text("requirement_title").notNull(),
+    requirementDocumentCode: text("requirement_document_code"),
+    requirementTemplateVersion: text("requirement_template_version"),
+
+    // Uploaded file
+    originalFilename: text("original_filename").notNull(),
+    fileKey: text("file_key").notNull(),
+    filesizeBytes: integer("filesize_bytes"),
+    mimeType: text("mime_type"),
+    fileSha256: text("file_sha256").notNull(),
+    pageCount: integer("page_count"),
+    sourceTextMethod: text("source_text_method"),
+    uploadSource: text("upload_source").notNull().default("buyer"),
+    supplierUploadId: uuid("supplier_upload_id"),
+
+    // Processing status (async queue with leases)
+    processingStatus: text("processing_status").notNull().default("pending"),
+    processingError: text("processing_error"),
+    processingLeaseUntil: timestamp("processing_lease_until"),
+    processingWorkerId: text("processing_worker_id"),
+
+    // Step A: Document intake result
+    intakeResult: jsonb("intake_result"),
+
+    // Step B: Requirement validation result
+    verdict: text("verdict"),
+    confidence: text("confidence"),
+    extractedFields: jsonb("extracted_fields"),
+    fieldStatus: jsonb("field_status"),
+    validationIssues: jsonb("validation_issues"),
+    deterministicChecks: jsonb("deterministic_checks"),
+    evidence: jsonb("evidence"),
+    validationSummary: text("validation_summary"),
+    rawText: text("raw_text"),
+
+    // AI metadata
+    llmModel: text("llm_model"),
+    intakeTimeMs: integer("intake_time_ms"),
+    validationTimeMs: integer("validation_time_ms"),
+
+    // Manual override
+    manualOverride: boolean("manual_override").notNull().default(false),
+    manualVerdict: text("manual_verdict"),
+    overrideReason: text("override_reason"),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("docval_lookup_idx").on(table.lookupId),
+    index("docval_session_idx").on(table.sessionId),
+    index("docval_status_idx").on(table.processingStatus),
+    uniqueIndex("docval_dedup_idx").on(table.lookupId, table.requirementIndex, table.fileSha256),
+  ]
+);
+
+export type DocumentValidation = typeof documentValidations.$inferSelect;
+export type InsertDocumentValidation = typeof documentValidations.$inferInsert;
+
+// ── Phase 4 Types: ValidationSpec (stored as JSONB in complianceRules.validationSpec) ──
+
+export type DocTypeGate = {
+  mustContainAny?: string[];
+  shouldContainAny?: string[];
+  rejectIfContainsAny?: string[];
+};
+
+export type ExpectedField = {
+  name: string;
+  description: string;
+  required: boolean;
+  severityIfMissing: "critical" | "warning" | "info";
+};
+
+export type IssuerRules = {
+  mustContain?: string[];
+  mustNotContain?: string[];
+};
+
+export type ConsistencyCheck = {
+  type: string;
+  severity: "critical" | "warning";
+  message: string;
+};
+
+export type MinimumAcceptable = {
+  mustHave: string[];
+  ifMissing: "ISSUES_FOUND";
+};
+
+export type OutputHints = {
+  extractGeolocationAs?: string;
+  maxEvidenceSnippets?: number;
+  [key: string]: any;
+};
+
+export type ValidationSpec = {
+  docTypeGate?: DocTypeGate;
+  expectedFields?: ExpectedField[];
+  issuerRules?: IssuerRules;
+  consistencyChecks?: ConsistencyCheck[];
+  outputHints?: OutputHints;
+  acceptedForms?: string[];
+  minimumAcceptable?: MinimumAcceptable;
+};
+
+// ── Phase 4 Types: Validation Results ──
+
+export type IntakeResult = {
+  isReadable: boolean;
+  docKindGuess: string;
+  docKindConfidence: "high" | "medium" | "low";
+  language: string;
+  keyIdentifiers: Record<string, string>;
+  suspiciousPages: string[];
+};
+
+export type ValidationVerdict =
+  | "VALID"
+  | "VALID_WITH_NOTES"
+  | "ISSUES_FOUND"
+  | "WRONG_DOCUMENT"
+  | "UNREADABLE";
+
+export type ValidationIssue = {
+  field: string;
+  expected: string;
+  found: string;
+  severity: "critical" | "warning" | "info";
+  explanation: string;
+  source: "ai" | "deterministic";
+};
+
+export type FieldStatus = {
+  field: string;
+  status: "present" | "missing" | "unclear";
+  severity: "critical" | "warning" | "info";
+  expected: string;
+  found: string;
+};
+
+export type EvidenceSnippet = {
+  quote: string;
+  page: number | null;
+  field: string;
+  reason: string;
+};
+
+export type DeterministicCheckResult = {
+  check: string;
+  passed: boolean;
+  detail: string;
+};
+
+export type RequirementReadiness = {
+  requirementIndex: number;
+  requirementTitle: string;
+  documentCode: string | null;
+  status:
+    | "not_uploaded"
+    | "pending"
+    | "processing"
+    | "valid"
+    | "issues"
+    | "wrong_doc"
+    | "failed"
+    | "overridden";
+  validationId: string | null;
+  verdict: string | null;
+  confidence: string | null;
+  issues: ValidationIssue[];
+  evidence: EvidenceSnippet[];
+  fieldStatus: FieldStatus[];
+  filename: string | null;
+  uploadedAt: string | null;
+};

@@ -2308,7 +2308,7 @@ Rules:
 
       const safeFilename = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 100);
 
-      await storage.createSupplierUpload({
+      const supplierUpload = await storage.createSupplierUpload({
         requestId: request.id,
         docType,
         originalFilename: safeFilename,
@@ -2349,6 +2349,83 @@ Rules:
           });
         } catch (auditErr) {
           console.error("Audit event failed (non-fatal):", auditErr);
+        }
+      }
+
+      // Phase 4: Auto-validate supplier upload against compliance requirements
+      if (request.lookupId) {
+        try {
+          const lookup = await storage.getLookupById(request.lookupId);
+          if (lookup) {
+            const result = lookup.resultJson as any;
+            const requirements = result?.requirementsDetailed ?? [];
+
+            // Match docType (title) to a requirement index
+            const reqIndex = requirements.findIndex(
+              (r: any) => r.title?.toLowerCase() === docType.toLowerCase()
+            );
+
+            if (reqIndex >= 0) {
+              const requirement = requirements[reqIndex];
+
+              // Compute file hash
+              const { computeFileSha256 } = await import("./file-extract");
+              const fileSha256 = await computeFileSha256(file.path);
+
+              // Check idempotency — don't create duplicate validations
+              const existing = await storage.findExistingValidation(
+                request.lookupId, reqIndex, fileSha256
+              );
+
+              if (!existing) {
+                // Get validationSpec from compliance rules
+                const { complianceRules } = await import("@shared/schema");
+                const allRules = await db.select().from(complianceRules);
+                const matchingRule = requirement.documentCode
+                  ? allRules.find((r: any) => r.documentCode === requirement.documentCode)
+                  : null;
+                const validationSpec = matchingRule?.validationSpec ?? null;
+
+                // Create document_validations row
+                const validation = await storage.createDocumentValidation({
+                  lookupId: request.lookupId,
+                  sessionId: request.userSessionId,
+                  requirementIndex: reqIndex,
+                  requirementTitle: requirement.title,
+                  requirementDocumentCode: requirement.documentCode ?? null,
+                  requirementTemplateVersion: matchingRule?.ruleKey ?? null,
+                  originalFilename: safeFilename,
+                  fileKey: file.path,
+                  filesizeBytes: file.size,
+                  mimeType: file.mimetype,
+                  fileSha256,
+                  processingStatus: "pending",
+                  uploadSource: "supplier",
+                  supplierUploadId: supplierUpload.id,
+                });
+
+                // Process asynchronously (fire and forget)
+                processValidationAsync(
+                  validation.id, file.path, file.mimetype,
+                  requirement, validationSpec,
+                  {
+                    commodityName: lookup.commodityName,
+                    hsCode: lookup.hsCode,
+                    originCountry: lookup.originName,
+                    originIso2: result?.origin?.iso2 ?? "",
+                    destinationName: lookup.destinationName,
+                    destinationIso2: result?.destination?.iso2 ?? "",
+                  },
+                  supplierUpload.id,
+                ).catch((err) => {
+                  console.error(`Supplier doc validation failed for ${validation.id}:`, err);
+                });
+              }
+            }
+          }
+        } catch (valErr) {
+          // Non-fatal: supplier upload succeeds even if validation setup fails
+          console.error("Auto-validation for supplier upload failed (non-fatal):", valErr);
         }
       }
 
@@ -3349,6 +3426,367 @@ Rules:
       res.json({ leads: allLeads });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ══════════════════════════════════════════════════════════
+  // Phase 4: Document Validation Endpoints
+  // ══════════════════════════════════════════════════════════
+
+  // Async validation processor — runs in background after upload
+  async function processValidationAsync(
+    validationId: string,
+    filePath: string,
+    mimeType: string,
+    requirement: any,
+    validationSpec: any,
+    trade: { commodityName: string; hsCode: string; originCountry: string; originIso2: string; destinationName: string; destinationIso2: string },
+    supplierUploadId?: string,
+  ) {
+    try {
+      // Set processing status with lease
+      const leaseUntil = new Date(Date.now() + 5 * 60 * 1000); // 5 min lease
+      await storage.updateValidationProcessing(validationId, {
+        processingStatus: "processing",
+        processingLeaseUntil: leaseUntil,
+        processingWorkerId: `worker-${process.pid}`,
+      });
+
+      const { extractFileContent } = await import("./file-extract");
+      const { validateDocument, validateSpecShape } = await import("./doc-validate");
+      type TradeContext = import("./doc-validate").TradeContext;
+      type RequirementValidationContext = import("./doc-validate").RequirementValidationContext;
+
+      // Extract file content
+      const fileContent = await extractFileContent(filePath, mimeType);
+
+      // Validate spec shape
+      const validatedSpec = validationSpec ? validateSpecShape(validationSpec) : null;
+
+      const ctx: RequirementValidationContext = {
+        requirement: {
+          title: requirement.title ?? "",
+          description: requirement.description ?? "",
+          issuedBy: requirement.issuedBy ?? "",
+          whenNeeded: requirement.whenNeeded ?? "",
+          tip: requirement.tip ?? "",
+          documentCode: requirement.documentCode ?? null,
+        },
+        validationSpec: validatedSpec,
+        trade,
+      };
+
+      // Run the full validation pipeline
+      const result = await validateDocument(fileContent, ctx);
+
+      // Update the validation row with results
+      await storage.updateValidationProcessing(validationId, {
+        processingStatus: "completed",
+        intakeResult: result.intake as any,
+        verdict: result.finalVerdict,
+        confidence: result.finalConfidence,
+        extractedFields: result.aiResult.extractedFields as any,
+        fieldStatus: result.fieldStatus as any,
+        validationIssues: result.allIssues as any,
+        deterministicChecks: result.deterministicChecks as any,
+        evidence: result.allEvidence as any,
+        validationSummary: result.summary,
+        rawText: fileContent.pages.map((p) => p.text).join("\n\n").slice(0, 50000),
+        llmModel: result.llmModel,
+        intakeTimeMs: result.intakeTimeMs,
+        validationTimeMs: result.validationTimeMs,
+        pageCount: fileContent.totalPageCount,
+        sourceTextMethod: fileContent.sourceTextMethod,
+      });
+
+      // Sync results back to supplier_uploads if this came from a supplier
+      if (supplierUploadId) {
+        try {
+          const verdict = result.finalVerdict;
+          const isVerified = verdict === "VALID" || verdict === "VALID_WITH_NOTES";
+          const finding = result.allIssues.length > 0
+            ? result.allIssues
+                .filter((i: any) => i.severity === "critical" || i.severity === "warning")
+                .map((i: any) => i.explanation || i.expected)
+                .slice(0, 3)
+                .join("; ") || null
+            : null;
+
+          await storage.updateSupplierUploadVerification(supplierUploadId, {
+            verified: isVerified,
+            finding: !isVerified ? (finding || result.summary || "Document validation found issues") : null,
+          });
+        } catch (syncErr) {
+          console.error(`Supplier upload sync failed for ${supplierUploadId}:`, syncErr);
+        }
+      }
+    } catch (err: any) {
+      console.error(`Validation processing failed for ${validationId}:`, err);
+      await storage.updateValidationProcessing(validationId, {
+        processingStatus: "failed",
+        processingError: err.message?.substring(0, 500) ?? "Unknown error",
+      });
+    }
+  }
+
+  const docValUploadDir = path.join("/tmp", "uploads", "doc-validate");
+  const docValUpload = multer({
+    storage: multer.diskStorage({
+      destination: (_req, _file, cb) => {
+        fs.mkdirSync(docValUploadDir, { recursive: true });
+        cb(null, docValUploadDir);
+      },
+      filename: (_req, file, cb) => {
+        const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 100);
+        cb(null, `${Date.now()}-${safeName}`);
+      },
+    }),
+    limits: { fileSize: 20 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+      const allowed = [".pdf", ".jpg", ".jpeg", ".png", ".webp", ".html", ".htm", ".txt"];
+      const ext = path.extname(file.originalname).toLowerCase();
+      if (allowed.includes(ext)) {
+        cb(null, true);
+      } else {
+        cb(new Error("Only PDF, JPG, PNG, WebP, HTML, and TXT files are allowed"));
+      }
+    },
+  });
+
+  // POST /api/lookups/:lookupId/requirements/:reqIndex/validate
+  // Upload a document to validate against a specific requirement
+  app.post("/api/lookups/:lookupId/requirements/:reqIndex/validate", docValUpload.single("file"), async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const lookupId = req.params.lookupId as string;
+      const reqIndex = req.params.reqIndex as string;
+      const requirementIndex = parseInt(reqIndex, 10);
+
+      if (isNaN(requirementIndex) || requirementIndex < 0) {
+        return res.status(400).json({ message: "Invalid requirement index" });
+      }
+
+      const file = req.file;
+      if (!file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      // Get the lookup
+      const lookup = await storage.getLookupById(lookupId);
+      if (!lookup) {
+        return res.status(404).json({ message: "Lookup not found" });
+      }
+
+      // Get the requirement
+      const result = lookup.resultJson as any;
+      const requirements = result?.requirementsDetailed ?? [];
+      if (requirementIndex >= requirements.length) {
+        return res.status(400).json({ message: "Requirement index out of range" });
+      }
+
+      const requirement = requirements[requirementIndex];
+
+      // Compute file hash for idempotency
+      const { computeFileSha256 } = await import("./file-extract");
+      const fileSha256 = await computeFileSha256(file.path);
+
+      // Check idempotency
+      const existing = await storage.findExistingValidation(lookupId, requirementIndex, fileSha256);
+      if (existing) {
+        // Return existing validation
+        if (existing.processingStatus === "failed") {
+          // Allow retry: reset to pending
+          await storage.updateValidationProcessing(existing.id, {
+            processingStatus: "pending",
+            processingError: null,
+          });
+        }
+        return res.status(200).json(existing);
+      }
+
+      // Get the compliance rule for this requirement (for validationSpec)
+      const { complianceRules } = await import("@shared/schema");
+      const allRules = await db.select().from(complianceRules);
+      const matchingRule = requirement.documentCode
+        ? allRules.find((r: any) => r.documentCode === requirement.documentCode)
+        : null;
+
+      const validationSpec = matchingRule?.validationSpec ?? null;
+
+      // Create validation row
+      const validation = await storage.createDocumentValidation({
+        lookupId,
+        sessionId,
+        requirementIndex,
+        requirementTitle: requirement.title,
+        requirementDocumentCode: requirement.documentCode ?? null,
+        requirementTemplateVersion: matchingRule?.ruleKey ?? null,
+        originalFilename: file.originalname,
+        fileKey: file.path,
+        filesizeBytes: file.size,
+        mimeType: file.mimetype,
+        fileSha256,
+        processingStatus: "pending",
+        uploadSource: "buyer",
+      });
+
+      // Process asynchronously (fire and forget)
+      processValidationAsync(validation.id, file.path, file.mimetype, requirement, validationSpec, {
+        commodityName: lookup.commodityName,
+        hsCode: lookup.hsCode,
+        originCountry: lookup.originName,
+        originIso2: result?.origin?.iso2 ?? "",
+        destinationName: lookup.destinationName,
+        destinationIso2: result?.destination?.iso2 ?? "",
+      }).catch((err) => {
+        console.error(`Validation processing failed for ${validation.id}:`, err);
+      });
+
+      return res.status(202).json(validation);
+    } catch (error: any) {
+      console.error("Document validation upload error:", error);
+      return res.status(500).json({ message: error.message });
+    }
+  });
+
+  // GET /api/lookups/:lookupId/document-readiness
+  // Get per-requirement readiness status
+  app.get("/api/lookups/:lookupId/document-readiness", async (req, res) => {
+    try {
+      const lookupId = req.params.lookupId as string;
+      const readiness = await storage.getRequirementReadiness(lookupId);
+      return res.json({ readiness });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  });
+
+  // GET /api/document-validations/:id
+  // Single validation (for polling processing status)
+  app.get("/api/document-validations/:id", async (req, res) => {
+    try {
+      const id = req.params.id as string;
+      const validation = await storage.getDocumentValidationById(id);
+      if (!validation) {
+        return res.status(404).json({ message: "Validation not found" });
+      }
+      return res.json(validation);
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  });
+
+  // POST /api/document-validations/:id/override
+  // Buyer overrides AI verdict
+  app.post("/api/document-validations/:id/override", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const id = req.params.id as string;
+      const { verdict, reason } = req.body;
+
+      if (!verdict || !reason) {
+        return res.status(400).json({ message: "verdict and reason are required" });
+      }
+
+      const updated = await storage.overrideDocumentValidation(id, sessionId, verdict, reason);
+      if (!updated) {
+        return res.status(404).json({ message: "Validation not found or access denied" });
+      }
+
+      return res.json(updated);
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  });
+
+  // POST /api/document-validations/:id/revalidate
+  // Re-run AI on existing upload
+  app.post("/api/document-validations/:id/revalidate", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const id = req.params.id as string;
+
+      const validation = await storage.getDocumentValidationById(id);
+      if (!validation || validation.sessionId !== sessionId) {
+        return res.status(404).json({ message: "Validation not found or access denied" });
+      }
+
+      if (!validation.fileKey || !fs.existsSync(validation.fileKey)) {
+        return res.status(400).json({ message: "Original file no longer available" });
+      }
+
+      // Reset processing status
+      await storage.updateValidationProcessing(id, {
+        processingStatus: "pending",
+        processingError: null,
+        manualOverride: false,
+        manualVerdict: null,
+        overrideReason: null,
+      });
+
+      // Get the lookup for trade context
+      const lookup = await storage.getLookupById(validation.lookupId);
+      if (!lookup) {
+        return res.status(404).json({ message: "Lookup not found" });
+      }
+
+      const result = lookup.resultJson as any;
+      const requirements = result?.requirementsDetailed ?? [];
+      const requirement = requirements[validation.requirementIndex];
+
+      // Get validationSpec
+      const { complianceRules } = await import("@shared/schema");
+      const allRules = await db.select().from(complianceRules);
+      const matchingRule = validation.requirementDocumentCode
+        ? allRules.find((r: any) => r.documentCode === validation.requirementDocumentCode)
+        : null;
+
+      const validationSpec = matchingRule?.validationSpec ?? null;
+
+      // Process asynchronously
+      processValidationAsync(id, validation.fileKey, validation.mimeType ?? "application/pdf", requirement, validationSpec, {
+        commodityName: lookup.commodityName,
+        hsCode: lookup.hsCode,
+        originCountry: lookup.originName,
+        originIso2: result?.origin?.iso2 ?? "",
+        destinationName: lookup.destinationName,
+        destinationIso2: result?.destination?.iso2 ?? "",
+      }).catch((err) => {
+        console.error(`Revalidation failed for ${id}:`, err);
+      });
+
+      const updated = await storage.getDocumentValidationById(id);
+      return res.status(202).json(updated);
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  });
+
+  // DELETE /api/document-validations/:id
+  // Remove validation + file
+  app.delete("/api/document-validations/:id", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const id = req.params.id as string;
+
+      // Get validation first to clean up file
+      const validation = await storage.getDocumentValidationById(id);
+      if (validation?.fileKey) {
+        try {
+          fs.unlinkSync(validation.fileKey);
+        } catch {
+          // File cleanup error — ignore
+        }
+      }
+
+      const deleted = await storage.deleteDocumentValidation(id, sessionId);
+      if (!deleted) {
+        return res.status(404).json({ message: "Validation not found or access denied" });
+      }
+
+      return res.json({ success: true });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
     }
   });
 

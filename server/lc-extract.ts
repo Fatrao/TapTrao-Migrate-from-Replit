@@ -1,5 +1,9 @@
-import { readFileSync, unlinkSync } from "fs";
+import { unlinkSync } from "fs";
 import Anthropic from "@anthropic-ai/sdk";
+import { extractTextFromPdf, pdfToImages } from "./file-extract";
+
+// Re-export low-level utilities for backward compatibility
+export { extractTextFromPdf, pdfToImages } from "./file-extract";
 
 // ── Types ──
 
@@ -42,29 +46,6 @@ export const ALL_DOC_TYPES = [
 ] as const;
 
 export type DocumentType = (typeof ALL_DOC_TYPES)[number];
-
-// ── PDF Text Extraction ──
-
-export async function extractTextFromPdf(filePath: string): Promise<string> {
-  // pdf-parse has no default export in all module systems; handle both
-  const mod = await import("pdf-parse");
-  const pdfParse = (mod as any).default ?? mod;
-  const buffer = readFileSync(filePath);
-  const data = await (pdfParse as any)(buffer);
-  return (data.text ?? "").trim();
-}
-
-// ── PDF → Images (for scanned docs) ──
-
-export async function pdfToImages(filePath: string): Promise<Buffer[]> {
-  const { pdf } = await import("pdf-to-img");
-  const images: Buffer[] = [];
-  const document = await pdf(filePath, { scale: 2 });
-  for await (const page of document) {
-    images.push(Buffer.from(page));
-  }
-  return images;
-}
 
 // ── Field Schemas for Prompts ──
 

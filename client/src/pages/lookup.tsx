@@ -1154,6 +1154,291 @@ function LeadCaptureCard({ result }: { result: ComplianceResult }) {
   );
 }
 
+// ── Phase 4: Document Readiness Section ──
+
+type RequirementReadiness = {
+  requirementIndex: number;
+  requirementTitle: string;
+  documentCode: string | null;
+  status: "not_uploaded" | "pending" | "processing" | "valid" | "issues" | "wrong_doc" | "failed" | "overridden";
+  validationId: string | null;
+  verdict: string | null;
+  confidence: string | null;
+  issues: Array<{ field: string; expected: string; found: string; severity: string; explanation: string; source: string }>;
+  evidence: Array<{ quote: string; page: number | null; field: string; reason: string }>;
+  fieldStatus: Array<{ field: string; status: string; severity: string; expected: string; found: string }>;
+  filename: string | null;
+  uploadedAt: string | null;
+};
+
+function DocumentReadinessSection({ lookupId, result }: { lookupId: string; result: ComplianceResult }) {
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
+  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+  const fileInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+
+  const { data: readinessData, isLoading, refetch } = useQuery<{ readiness: RequirementReadiness[] }>({
+    queryKey: [`/api/lookups/${lookupId}/document-readiness`],
+    queryFn: async () => {
+      const res = await fetch(`/api/lookups/${lookupId}/document-readiness`, { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch readiness");
+      return res.json();
+    },
+    refetchInterval: (query) => {
+      // Poll while any validation is pending/processing
+      const data = query.state.data;
+      if (!data?.readiness) return false;
+      const hasActive = data.readiness.some((r: RequirementReadiness) => r.status === "pending" || r.status === "processing");
+      return hasActive ? 3000 : false;
+    },
+  });
+
+  const readiness = readinessData?.readiness ?? [];
+
+  const handleUpload = async (requirementIndex: number, file: File) => {
+    setUploadingIdx(requirementIndex);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch(`/api/lookups/${lookupId}/requirements/${requirementIndex}/validate`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Upload failed");
+      }
+
+      // Refetch readiness data
+      refetch();
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      alert(err.message || "Upload failed. Please try again.");
+    } finally {
+      setUploadingIdx(null);
+    }
+  };
+
+  const statusConfig: Record<string, { label: string; color: string; bg: string; icon: string }> = {
+    not_uploaded: { label: "Not uploaded", color: "rgba(255,255,255,0.4)", bg: "transparent", icon: "○" },
+    pending: { label: "Queued", color: "#eab308", bg: "rgba(234,179,8,0.1)", icon: "⏳" },
+    processing: { label: "Validating...", color: "#3b82f6", bg: "rgba(59,130,246,0.1)", icon: "⚙" },
+    valid: { label: "Valid", color: "#22c55e", bg: "rgba(34,197,94,0.1)", icon: "✓" },
+    issues: { label: "Issues found", color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: "!" },
+    wrong_doc: { label: "Wrong document", color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: "✗" },
+    failed: { label: "Failed", color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: "✗" },
+    overridden: { label: "Overridden", color: "#eab308", bg: "rgba(234,179,8,0.1)", icon: "↻" },
+  };
+
+  if (isLoading || readiness.length === 0) return null;
+
+  const uploadedCount = readiness.filter(r => r.status !== "not_uploaded").length;
+  const validCount = readiness.filter(r => r.status === "valid" || r.status === "overridden").length;
+
+  return (
+    <div style={{
+      background: "#1e2a36",
+      borderRadius: 14,
+      border: "1px solid rgba(93,217,193,0.12)",
+      padding: "20px 24px",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <div>
+          <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 15, color: "#fff", margin: 0 }}>
+            Document Readiness
+          </h3>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", margin: "4px 0 0" }}>
+            Upload documents to validate against requirements
+          </p>
+        </div>
+        <span style={{
+          fontFamily: "'DM Mono', monospace", fontSize: 10,
+          background: validCount === readiness.length ? "rgba(34,197,94,0.15)" : "rgba(93,217,193,0.12)",
+          color: validCount === readiness.length ? "#22c55e" : "#5dd9c1",
+          padding: "3px 10px", borderRadius: 4,
+        }}>
+          {validCount}/{readiness.length} validated
+        </span>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {readiness.map((req) => {
+          const cfg = statusConfig[req.status] ?? statusConfig.not_uploaded;
+          const isExpanded = expandedIdx === req.requirementIndex;
+          const isUploading = uploadingIdx === req.requirementIndex;
+
+          return (
+            <div key={req.requirementIndex} style={{
+              background: "rgba(255,255,255,0.03)",
+              borderRadius: 10,
+              border: `1px solid ${req.status === "valid" || req.status === "overridden" ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.06)"}`,
+              padding: "12px 14px",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {/* Status indicator */}
+                <span style={{
+                  width: 22, height: 22, borderRadius: 6,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  background: cfg.bg, color: cfg.color,
+                  fontSize: 12, fontWeight: 700, flexShrink: 0,
+                  border: `1px solid ${cfg.color}33`,
+                }}>{cfg.icon}</span>
+
+                {/* Title + status */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {req.requirementTitle}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 3 }}>
+                    <span style={{ fontSize: 11, color: cfg.color }}>{cfg.label}</span>
+                    {req.filename && (
+                      <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>
+                        {req.filename}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Upload button */}
+                <div style={{ flexShrink: 0 }}>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,.webp,.html,.txt"
+                    style={{ display: "none" }}
+                    ref={(el) => { fileInputRefs.current[req.requirementIndex] = el; }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleUpload(req.requirementIndex, file);
+                      e.target.value = "";
+                    }}
+                  />
+                  <button
+                    onClick={() => fileInputRefs.current[req.requirementIndex]?.click()}
+                    disabled={isUploading}
+                    style={{
+                      background: req.status === "not_uploaded" ? "#6b9080" : "rgba(255,255,255,0.08)",
+                      color: req.status === "not_uploaded" ? "#fff" : "rgba(255,255,255,0.6)",
+                      border: "none", borderRadius: 6, padding: "6px 12px",
+                      fontSize: 11, fontWeight: 500, cursor: isUploading ? "wait" : "pointer",
+                      opacity: isUploading ? 0.5 : 1,
+                    }}
+                  >
+                    {isUploading ? "Uploading..." : req.status === "not_uploaded" ? "Upload" : "Replace"}
+                  </button>
+
+                  {/* Expand button if there are details */}
+                  {(req.fieldStatus.length > 0 || req.issues.length > 0) && (
+                    <button
+                      onClick={() => setExpandedIdx(isExpanded ? null : req.requirementIndex)}
+                      style={{
+                        background: "none", border: "none", color: "rgba(255,255,255,0.4)",
+                        cursor: "pointer", padding: "6px 4px", fontSize: 12, marginLeft: 4,
+                      }}
+                    >
+                      {isExpanded ? "▾" : "▸"}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Expanded details */}
+              {isExpanded && (
+                <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                  {/* Field status checklist */}
+                  {req.fieldStatus.length > 0 && (
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>
+                        Field Checklist
+                      </div>
+                      {req.fieldStatus.map((f, fi) => {
+                        const statusIcon = f.status === "present" ? "✅" : f.status === "missing" ? "❌" : "⚠";
+                        const sevColor = f.severity === "critical" ? "#ef4444" : f.severity === "warning" ? "#eab308" : "rgba(255,255,255,0.4)";
+                        return (
+                          <div key={fi} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 4 }}>
+                            <span style={{ fontSize: 12, width: 18, flexShrink: 0 }}>{statusIcon}</span>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <span style={{ fontSize: 12, color: f.status === "missing" ? sevColor : "#fff" }}>
+                                {f.expected || f.field}
+                              </span>
+                              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginLeft: 6 }}>
+                                ({f.severity})
+                              </span>
+                              {f.status === "present" && f.found && f.found !== "Not found" && (
+                                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", marginLeft: 6 }}>
+                                  — {f.found.length > 60 ? f.found.slice(0, 60) + "..." : f.found}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Issues */}
+                  {req.issues.length > 0 && (
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>
+                        Issues
+                      </div>
+                      {req.issues.map((issue, ii) => (
+                        <div key={ii} style={{
+                          background: issue.severity === "critical" ? "rgba(239,68,68,0.08)" : issue.severity === "warning" ? "rgba(234,179,8,0.08)" : "rgba(255,255,255,0.03)",
+                          borderRadius: 6, padding: "6px 10px", marginBottom: 4,
+                          borderLeft: `3px solid ${issue.severity === "critical" ? "#ef4444" : issue.severity === "warning" ? "#eab308" : "rgba(255,255,255,0.2)"}`,
+                        }}>
+                          <div style={{ fontSize: 12, color: "#fff" }}>{issue.explanation}</div>
+                          {issue.found && (
+                            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>
+                              Found: {issue.found}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Evidence snippets */}
+                  {req.evidence.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>
+                        Evidence
+                      </div>
+                      {req.evidence.map((ev, ei) => (
+                        <div key={ei} style={{
+                          background: "rgba(255,255,255,0.03)",
+                          borderRadius: 6, padding: "6px 10px", marginBottom: 4,
+                          borderLeft: "3px solid rgba(93,217,193,0.3)",
+                        }}>
+                          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", fontStyle: "italic" }}>
+                            "{ev.quote}"
+                          </div>
+                          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>
+                            {ev.page !== null ? `Page ${ev.page}` : ""} {ev.field ? `— ${ev.field}` : ""}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Validation summary */}
+                  {req.verdict && (
+                    <div style={{ marginTop: 8, fontSize: 11, color: "rgba(255,255,255,0.5)", fontStyle: "italic" }}>
+                      Verdict: {req.verdict} (confidence: {req.confidence})
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated = false }: { result: ComplianceResult; freeLocked?: boolean; isAuthenticated?: boolean }) {
   const hasStopFlags = result.stopFlags && Object.keys(result.stopFlags).length > 0;
   const triggerCount = Object.values(result.triggers).filter(Boolean).length;
@@ -1809,6 +2094,9 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
       </div>
 
       <SupplierBriefSection result={result} />
+
+      {/* ── Phase 4: Document Readiness ── */}
+      {(result as any).lookupId && <DocumentReadinessSection lookupId={(result as any).lookupId} result={result} />}
 
       {/* Hash now embedded in Duty Estimate card above */}
 
