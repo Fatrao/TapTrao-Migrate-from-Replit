@@ -226,7 +226,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
         {/* Brand */}
         <Link href="/">
           <div className="mi brand" data-testid="shell-logo">
-            <div className="mi-icon" style={{ fontFamily: "var(--fd)", fontWeight: 700, fontSize: 16, color: "var(--gold, #c4a265)" }}>T</div>
+            <img src="/logo.png" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover" as const }} />
             <span className="mi-label" style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 14, color: "var(--gold, #c4a265)" }}>TapTrao</span>
           </div>
         </Link>
@@ -304,12 +304,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, padding: "0 4px" }}>
           <Link href="/">
             <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: 10,
-                background: "linear-gradient(135deg, var(--sage-l), var(--sage))",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#fff", fontFamily: "var(--fd)", fontWeight: 700, fontSize: 16,
-              }}>T</div>
+              <img src="/logo.png" alt="TapTrao" style={{ width: 36, height: 36, borderRadius: 10, objectFit: "cover" as const }} />
               <span style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 16, color: "#fff" }}>TapTrao</span>
             </div>
           </Link>
