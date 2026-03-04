@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TapTrao — Timber (tropical sawn) · Douala → Geneva</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f0ebe3;
+    --white: #ffffff;
+    --sage-dark: #1b2a22;
+    --sage-mid: #2d4a38;
+    --sage-light: #4a7c59;
+    --sage-pale: #e8efe9;
+    --amber: #c8872a;
+    --amber-pale: #fdf3e3;
+    --red: #c0392b;
+    --red-pale: #fdeaea;
+    --green: #2d6a4f;
+    --green-pale: #e8f5ee;
+    --text-primary: #1a1a1a;
+    --text-secondary: #5a5a5a;
+    --text-muted: #9a9a9a;
+    --border: rgba(0,0,0,0.07);
+    --shadow-card: 0 2px 16px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+    --shadow-elevated: 0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 58px;
+    background: var(--sage-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    overflow: hidden;
+    transition: width 0.25s ease;
+    gap: 4px;
+  }
+  .sidebar:hover { width: 210px; }
+  .sidebar-logo {
+    width: 36px; height: 36px;
+    background: var(--sage-light);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 700;
+    margin-bottom: 24px; flex-shrink: 0;
+  }
+  .sidebar-section-label {
+    font-size: 9px; font-weight: 600; letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.3); text-transform: uppercase;
+    padding: 8px 0 4px 20px; width: 100%; white-space: nowrap;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .sidebar:hover .sidebar-section-label { opacity: 1; }
+  .nav-item {
+    display: flex; align-items: center;
+    width: 100%; padding: 9px 11px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none; border-radius: 8px;
+    margin: 0 6px; width: calc(100% - 12px);
+    transition: all 0.15s; gap: 10px; white-space: nowrap;
+    cursor: pointer;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
+  .nav-item.active { background: rgba(255,255,255,0.12); color: white; }
+  .nav-icon { width: 20px; height: 20px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+  .nav-label { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity 0.2s; }
+  .sidebar:hover .nav-label { opacity: 1; }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: 58px;
+    flex: 1;
+    padding: 32px 36px;
+    max-width: calc(100vw - 58px);
+  }
+
+  /* ── BREADCRUMB ── */
+  .breadcrumb {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text-muted); margin-bottom: 20px;
+  }
+  .breadcrumb a { color: var(--sage-light); text-decoration: none; }
+  .breadcrumb span { color: var(--text-muted); }
+
+  /* ── HERO HEADER ── */
+  .trade-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 28px; gap: 20px;
+  }
+  .trade-title-block {}
+  .trade-commodity {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px; font-weight: 700;
+    color: var(--text-primary); line-height: 1.15;
+    margin-bottom: 6px;
+  }
+  .trade-meta {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 13px; color: var(--text-secondary);
+  }
+  .corridor-tag {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 14px; font-weight: 500; color: var(--text-primary);
+  }
+  .hs-badge {
+    background: rgba(0,0,0,0.07); border-radius: 6px;
+    padding: 2px 8px; font-family: 'DM Mono', monospace;
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .status-badge {
+    padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .status-active { background: var(--green-pale); color: var(--green); }
+  .status-amber { background: var(--amber-pale); color: var(--amber); }
+  .status-red { background: var(--red-pale); color: var(--red); }
+
+  /* ── PROGRESS STEPPER ── */
+  .stepper {
+    background: white; border-radius: var(--radius);
+    padding: 20px 28px; margin-bottom: 28px;
+    box-shadow: var(--shadow-card);
+    display: flex; align-items: center; justify-content: space-between;
+    position: relative;
+  }
+  .stepper::before {
+    content: ''; position: absolute;
+    left: 80px; right: 80px; top: 50%;
+    height: 2px; background: #e8e3db;
+    z-index: 0;
+  }
+  .step { display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; }
+  .step-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+    background: #e8e3db; color: var(--text-muted);
+  }
+  .step-dot.done { background: var(--sage-light); color: white; }
+  .step-dot.current { background: var(--sage-dark); color: white; box-shadow: 0 0 0 4px rgba(27,42,34,0.15); }
+  .step-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+  .step-label.current { color: var(--text-primary); font-weight: 600; }
+
+  /* ── GRID LAYOUT ── */
+  .page-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+    align-items: start;
+  }
+  .main-col { display: flex; flex-direction: column; gap: 16px; }
+  .side-col { display: flex; flex-direction: column; gap: 16px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow-card); overflow: hidden;
+  }
+  .card-header {
+    padding: 18px 22px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-body { padding: 18px 22px; }
+  .card-action {
+    font-size: 12px; font-weight: 600; color: var(--sage-light);
+    cursor: pointer; letter-spacing: 0.02em;
+  }
+
+  /* ── SCORE ── */
+  .score-row {
+    display: flex; align-items: center; gap: 20px;
+    padding: 18px 22px;
+  }
+  .score-dial {
+    position: relative; width: 80px; height: 80px; flex-shrink: 0;
+  }
+  .score-dial svg { transform: rotate(-90deg); }
+  .score-num {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--text-primary);
+  }
+  .score-info {}
+  .score-label { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+  .score-label.amber { color: var(--amber); }
+  .score-label.red { color: var(--red); }
+  .score-label.green { color: var(--green); }
+  .score-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* ── REGULATION TRIGGERS ── */
+  .triggers-row {
+    display: flex; flex-wrap: wrap; gap: 8px; padding: 0 22px 18px;
+  }
+  .trigger-chip {
+    padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.04em; display: flex; align-items: center; gap: 5px;
+  }
+  .trigger-eudr { background: #fff3cd; color: #856404; }
+  .trigger-cites { background: #fce4ec; color: #880e4f; }
+  .trigger-sps { background: #e3f2fd; color: #1565c0; }
+  .trigger-lacey { background: #f3e5f5; color: #6a1b9a; }
+
+  /* ── DOCUMENTS TABLE ── */
+  .doc-table { width: 100%; border-collapse: collapse; }
+  .doc-table th {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted);
+    padding: 0 0 10px; text-align: left; border-bottom: 1px solid var(--border);
+  }
+  .doc-row { border-bottom: 1px solid var(--border); }
+  .doc-row:last-child { border-bottom: none; }
+  .doc-row td { padding: 11px 0; vertical-align: top; }
+  .doc-code {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    background: rgba(0,0,0,0.05); padding: 2px 7px; border-radius: 5px;
+    color: var(--text-secondary); white-space: nowrap;
+  }
+  .doc-title { font-size: 13px; color: var(--text-primary); line-height: 1.4; padding-right: 12px; }
+  .doc-issuer { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .doc-side {
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 5px; white-space: nowrap;
+  }
+  .supplier-doc { background: var(--sage-pale); color: var(--sage-mid); }
+  .importer-doc { background: var(--cream); color: var(--text-secondary); }
+  .doc-status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #d0cac0; display: inline-block;
+  }
+
+  /* ── SECTION ACCORDION ── */
+  .accord-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 22px; cursor: pointer;
+    border-bottom: 1px solid var(--border);
+  }
+  .accord-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .accord-status { font-size: 12px; font-weight: 600; }
+  .not-assessed { color: var(--text-muted); }
+  .accord-body { padding: 16px 22px; }
+
+  /* ── EUDR FIELDS ── */
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field-item {}
+  .field-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 5px; }
+  .field-value { font-size: 13px; color: var(--text-primary); }
+  .field-empty { font-size: 13px; color: var(--text-muted); font-style: italic; }
+  .run-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--sage-dark); color: white;
+    padding: 9px 18px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+    margin-top: 16px; transition: background 0.15s;
+  }
+  .run-btn:hover { background: var(--sage-mid); }
+  .run-btn-outline {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent; color: var(--text-secondary);
+    padding: 8px 16px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--border); margin-top: 16px; margin-left: 8px;
+  }
+
+  /* ── SIDE CARDS ── */
+  .side-info-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .side-label { font-size: 12px; color: var(--text-muted); }
+  .side-value { font-size: 13px; font-weight: 600; color: var(--text-primary); text-align: right; }
+
+  .audit-item {
+    display: flex; gap: 10px; padding: 8px 0;
+    border-bottom: 1px solid var(--border); align-items: flex-start;
+  }
+  .audit-item:last-child { border-bottom: none; }
+  .audit-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--sage-pale); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; margin-top: 1px;
+  }
+  .audit-dot.shield { background: var(--sage-dark); color: white; font-size: 11px; font-weight: 700; }
+  .audit-text { font-size: 13px; color: var(--text-primary); line-height: 1.4; }
+  .audit-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .audit-hash { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--sage-light); }
+
+  .twinlog-ref {
+    background: var(--sage-dark); border-radius: var(--radius);
+    padding: 16px 18px; color: white;
+  }
+  .twinlog-ref .card-title { color: rgba(255,255,255,0.9); }
+  .twinlog-id { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--sage-light); margin: 8px 0 4px; }
+  .twinlog-hash { font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.45); word-break: break-all; }
+
+  .actions-card .action-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0; cursor: pointer; border-bottom: 1px solid var(--border);
+  }
+  .actions-card .action-item:last-child { border-bottom: none; }
+  .action-icon { width: 30px; height: 30px; border-radius: 8px; background: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .action-label { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+  .action-label:hover { color: var(--sage-light); }
+
+  /* ── TARIFF / VAT HIGHLIGHT ── */
+  .tariff-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px; margin-bottom: 0;
+  }
+  .tariff-cell {
+    background: var(--cream); border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+  .tariff-cell .tc-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .tariff-cell .tc-value { font-size: 17px; font-weight: 700; color: var(--text-primary); }
+  .tariff-cell .tc-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── DEMURRAGE ── */
+  .demurrage-alert {
+    background: var(--amber-pale); border-left: 3px solid var(--amber);
+    border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px;
+  }
+  .dem-title { font-size: 13px; font-weight: 600; color: var(--amber); margin-bottom: 3px; }
+  .dem-body { font-size: 12px; color: var(--text-secondary); }
+
+  .shipment-value-input {
+    display: flex; gap: 8px; align-items: center;
+    border: 1.5px dashed #c8c0b4; border-radius: var(--radius-sm);
+    padding: 10px 14px; cursor: pointer; margin-bottom: 14px;
+    transition: border-color 0.15s;
+  }
+  .shipment-value-input:hover { border-color: var(--sage-light); }
+  .sv-label { font-size: 13px; color: var(--text-muted); flex: 1; }
+  .sv-action { font-size: 12px; font-weight: 600; color: var(--sage-light); }
+
+  /* ── AFCFTA ── */
+  .afcfta-no {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #fdf3e3; color: var(--amber);
+    border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #d0cac0; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">T</div>
+  <div class="sidebar-section-label">MAIN</div>
+  <a class="nav-item"><div class="nav-icon">⊞</div><span class="nav-label">Dashboard</span></a>
+  <a class="nav-item active"><div class="nav-icon">⤴</div><span class="nav-label">My Trades</span></a>
+  <a class="nav-item"><div class="nav-icon">👥</div><span class="nav-label">Suppliers</span></a>
+  <div class="sidebar-section-label">TOOLS</div>
+  <a class="nav-item"><div class="nav-icon">⚓</div><span class="nav-label">Demurrage Calc</span></a>
+  <a class="nav-item"><div class="nav-icon">📄</div><span class="nav-label">Templates</span></a>
+  <a class="nav-item"><div class="nav-icon">🔔</div><span class="nav-label">Alerts</span></a>
+  <div class="sidebar-section-label">ACCOUNT</div>
+  <a class="nav-item"><div class="nav-icon">⚙</div><span class="nav-label">Settings</span></a>
+  <a class="nav-item"><div class="nav-icon">💳</div><span class="nav-label">Billing</span></a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="#">My Trades</a>
+    <span>›</span>
+    <span>Timber (tropical sawn)</span>
+  </div>
+
+  <!-- Header -->
+  <div class="trade-header">
+    <div class="trade-title-block">
+      <div class="trade-commodity">Timber (tropical sawn)</div>
+      <div class="trade-meta">
+        <div class="corridor-tag">🇨🇲 Cameroon → 🇨🇭 Switzerland</div>
+        <span class="hs-badge">HS 4407.29</span>
+        <span class="status-badge status-active">Active</span>
+        <span class="status-badge status-amber">Score: 58/100</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-shrink:0;">
+      <button class="run-btn-outline" style="margin:0;font-size:12px;padding:7px 14px;">+ New Trade</button>
+    </div>
+  </div>
+
+  <!-- Stepper -->
+  <div class="stepper">
+    <div class="step">
+      <div class="step-dot done">✓</div>
+      <div class="step-label">Active</div>
+    </div>
+    <div class="step">
+      <div class="step-dot current">2</div>
+      <div class="step-label current">In Transit</div>
+    </div>
+    <div class="step">
+      <div class="step-dot">3</div>
+      <div class="step-label">Arrived</div>
+    </div>
+    <div class="step">
+      <div class="step-dot">4</div>
+      <div class="step-label">Cleared</div>
+    </div>
+    <div class="step">
+      <div class="step-dot">5</div>
+      <div class="step-label">Closed</div>
+    </div>
+  </div>
+
+  <!-- Page Grid -->
+  <div class="page-grid">
+
+    <!-- LEFT COLUMN -->
+    <div class="main-col">
+
+      <!-- Compliance Summary Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 Compliance Summary</div>
+          <span class="card-action">View Full Report →</span>
+        </div>
+        <div class="score-row">
+          <div class="score-dial">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#e8e3db" stroke-width="7"/>
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#c8872a" stroke-width="7"
+                stroke-dasharray="201" stroke-dashoffset="85" stroke-linecap="round"/>
+            </svg>
+            <div class="score-num">58</div>
+          </div>
+          <div class="score-info">
+            <div class="score-label amber">AMBER — Action Required</div>
+            <div class="score-desc">4 regulatory triggers active on this corridor. EUDR, CITES, SPS, and Lacey Act compliance must all be verified before shipment departure. Supplier documents pending.</div>
+          </div>
+        </div>
+        <div class="triggers-row">
+          <span class="trigger-chip trigger-eudr">🌿 EUDR</span>
+          <span class="trigger-chip trigger-cites">🦜 CITES</span>
+          <span class="trigger-chip trigger-sps">🔬 SPS</span>
+          <span class="trigger-chip trigger-lacey">🌲 Lacey Act</span>
+        </div>
+      </div>
+
+      <!-- Tariff & Duties Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏦 Tariff & Duties</div>
+          <span style="font-size:11px;color:var(--text-muted);">Source: TARES (tares.admin.ch)</span>
+        </div>
+        <div class="card-body">
+          <div class="tariff-row" style="margin-bottom:16px;">
+            <div class="tariff-cell">
+              <div class="tc-label">VAT / GST</div>
+              <div class="tc-value">8.10%</div>
+              <div class="tc-sub">Applied on CIF value</div>
+            </div>
+            <div class="tariff-cell">
+              <div class="tc-label">AfCFTA</div>
+              <div class="tc-value"><span class="afcfta-no">⚠ Not Eligible</span></div>
+              <div class="tc-sub">Switzerland non-member</div>
+            </div>
+            <div class="tariff-cell">
+              <div class="tc-label">Security Filing</div>
+              <div class="tc-value" style="font-size:13px;">e-dec / NCTS</div>
+              <div class="tc-sub">Pre-arrival required</div>
+            </div>
+          </div>
+          <div style="background:var(--cream);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:var(--text-secondary);line-height:1.6;">
+            <strong style="color:var(--text-primary);">⚠ Swiss Due Diligence Act:</strong> Switzerland has enacted its own due diligence law covering timber and minerals. Cocoa and coffee expected to follow. Monitor <span style="color:var(--sage-light);">FOEN/BAFU</span> for updates. Importer must self-declare compliance.
+          </div>
+        </div>
+      </div>
+
+      <!-- Required Documents -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📁 Required Documents</div>
+          <span class="card-action">Send Upload Link →</span>
+        </div>
+        <div class="card-body">
+          <div style="margin-bottom:12px;font-size:12px;color:var(--text-muted);">
+            <span style="display:inline-flex;align-items:center;gap:5px;margin-right:14px;"><span style="background:var(--sage-pale);color:var(--sage-mid);padding:2px 8px;border-radius:5px;font-weight:600;font-size:11px;">SUPPLIER</span> Supplier-side documents</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;"><span style="background:var(--cream);color:var(--text-secondary);padding:2px 8px;border-radius:5px;font-weight:600;font-size:11px;">IMPORTER</span> Your responsibility</span>
+          </div>
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th style="width:56px;">Code</th>
+                <th>Document</th>
+                <th style="width:80px;">Party</th>
+                <th style="width:40px;text-align:center;">✓</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="doc-row">
+                <td><span class="doc-code">N935</span></td>
+                <td><div class="doc-title">Commercial Invoice</div><div class="doc-issuer">With HS Code 4407.29 and declared FOB value — Exporter / Seller</div></td>
+                <td><span class="doc-side supplier-doc">SUPPLIER</span></td>
+                <td style="text-align:center;"><span class="doc-status-dot"></span></td>
+              </tr>
+              <tr class="doc-row">
+                <td><span class="doc-code">N271</span></td>
+                <td><div class="doc-title">Packing List</div><div class="doc-issuer">With weights, marks, and lot numbers — Exporter / Seller</div></td>
+                <td><span class="doc-side supplier-doc">SUPPLIER</span></td>
+                <td style="text-align:center;"><span class="doc-status-dot"></span></td>
+              </tr>
+              <tr class="doc-row">
+                <td><span class="doc-code">N714</span></td>
+                <td><div class="doc-title">Bill of Lading / Airway Bill</div><div class="doc-issuer">Shipping Line / Freight Forwarder</div></td>
+                <td><span class="doc-side importer-doc">IMPORTER</span></td>
+                <td style="text-align:center;"><span class="doc-status-dot"></span></td>
+              </tr>
+              <tr class="doc-row">
+                <td><span class="doc-code">C644</span></td>
+                <td><div class="doc-title">Certificate of Origin</div><div class="doc-issuer">Chambre de Commerce du Cameroun</div></td>
+                <td><span class="doc-side supplier-doc">SUPPLIER</span></td>
+                <td style="text-align:center;"><span class="doc-status-dot"></span></td>
+              </tr>
+              <tr class="doc-row">
+                <td><span class="doc-code">C085</span></td>
+                <td><div class="doc-title">Phytosanitary / SPS Certificate</div><div class="doc-issuer">MINADER/DRCQ (Cameroon)</div></td>
+                <td><span class="doc-side supplier-doc">SUPPLIER</span></td>
+                <td style="text-align:center;"><span class="doc-status-dot"></span></td>
+              </tr>
+              <tr class="doc-row">
+                <td><span class="doc-code">—</span></td>
+                <td><div class="doc-title">CITES Export Permit</div><div class="doc-issuer">Cameroon CITES Management Authority</div></td>
+                <td><span class="doc-side supplier-doc">SUPPLIER</span></td>
+                <td style="text-align:center;"><span class="doc-status-dot"></span></td>
+              </tr>
+              <tr class="doc-row">
+                <td><span class="doc-code">—</span></td>
+                <td><div class="doc-title">CITES Import Permit (if Appendix I)</div><div class="doc-issuer">Switzerland CITES Management Authority / FOEN/BAFU</div></td>
+                <td><span class="doc-side importer-doc">IMPORTER</span></td>
+                <td style="text-align:center;"><span class="doc-status-dot"></span></td>
+              </tr>
+              <tr class="doc-row">
+                <td><span class="doc-code">—</span></td>
+                <td><div class="doc-title">Swiss Due Diligence Act Statement</div><div class="doc-issuer">Importer / Operator (self-declared)</div></td>
+                <td><span class="doc-side importer-doc">IMPORTER</span></td>
+                <td style="text-align:center;"><span class="doc-status-dot"></span></td>
+              </tr>
+              <tr class="doc-row">
+                <td><span class="doc-code">—</span></td>
+                <td><div class="doc-title">CEMAC Regional Export Clearance</div><div class="doc-issuer">CEMAC Secretariat / National Customs</div></td>
+                <td><span class="doc-side supplier-doc">SUPPLIER</span></td>
+                <td style="text-align:center;"><span class="doc-status-dot"></span></td>
+              </tr>
+              <tr class="doc-row">
+                <td><span class="doc-code">—</span></td>
+                <td><div class="doc-title">Swiss Customs Declaration</div><div class="doc-issuer">Customs Broker / Importer — via e-dec or NCTS</div></td>
+                <td><span class="doc-side importer-doc">IMPORTER</span></td>
+                <td style="text-align:center;"><span class="doc-status-dot"></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- EUDR -->
+      <div class="card">
+        <div class="accord-header">
+          <div class="accord-title">🌿 EUDR Due Diligence</div>
+          <span class="accord-status not-assessed">Not assessed ▾</span>
+        </div>
+        <div class="accord-body">
+          <div class="field-grid" style="margin-bottom:14px;">
+            <div class="field-item">
+              <div class="field-label">Geolocation</div>
+              <div class="field-empty">No coordinates uploaded</div>
+            </div>
+            <div class="field-item">
+              <div class="field-label">Evidence & Timeline</div>
+              <div class="field-empty">No evidence submitted</div>
+            </div>
+            <div class="field-item">
+              <div class="field-label">Supplier</div>
+              <div class="field-empty">No supplier linked</div>
+            </div>
+            <div class="field-item">
+              <div class="field-label">Risk Level</div>
+              <div class="field-empty">Unassessed</div>
+            </div>
+          </div>
+          <div style="background:var(--amber-pale);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:#6b4c0a;line-height:1.5;margin-bottom:14px;">
+            <strong>Note:</strong> Switzerland has passed its own Due Diligence Act covering timber and minerals as an EUDR-equivalent. Cocoa and coffee expected to follow. Geolocation coordinates required for forest-risk assessment.
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="run-btn" style="margin-top:0;">↻ Run Assessment</button>
+            <button class="run-btn-outline" style="margin-top:0;">Generate PDF Statement</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CBAM -->
+      <div class="card">
+        <div class="accord-header">
+          <div class="accord-title">📊 CBAM Assessment</div>
+          <span class="accord-status not-assessed">Not assessed ▾</span>
+        </div>
+        <div class="accord-body">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Timber (HS 4407.29) is not currently within the CBAM product scope. No carbon price declaration is required for this shipment.</div>
+          <div class="field-grid">
+            <div class="field-item">
+              <div class="field-label">Emissions Data</div>
+              <div class="field-empty">Not applicable</div>
+            </div>
+            <div class="field-item">
+              <div class="field-label">Installation</div>
+              <div class="field-empty">Not applicable</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="side-col">
+
+      <!-- Shipment Value -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">💰 Shipment Value</div>
+          <span class="card-action">Add Value</span>
+        </div>
+        <div class="card-body">
+          <div class="shipment-value-input">
+            <div class="sv-label">No value set yet</div>
+            <div class="sv-action">+ Add</div>
+          </div>
+          <div class="side-info-row">
+            <div class="side-label">Estimated VAT (8.10%)</div>
+            <div class="side-value" style="color:var(--text-muted);">—</div>
+          </div>
+          <div class="side-info-row">
+            <div class="side-label">Tariff Source</div>
+            <div class="side-value" style="font-size:11px;color:var(--text-muted);">TARES</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Demurrage -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">⚓ Demurrage Estimate</div>
+        </div>
+        <div class="card-body">
+          <div class="side-info-row">
+            <div class="side-label">Port</div>
+            <div class="side-value" style="font-size:12px;">Geneva / Basel (+other)</div>
+          </div>
+          <div class="side-info-row">
+            <div class="side-label">Readiness Status</div>
+            <div class="side-value"><span style="color:var(--amber);font-size:12px;font-weight:700;">AMBER</span></div>
+          </div>
+          <div class="demurrage-alert">
+            <div class="dem-title">⚠ Estimated Delay: 7–14 days</div>
+            <div class="dem-body">CITES permit and SPS certificate not yet confirmed. Delays likely at Swiss border.</div>
+          </div>
+          <div class="side-info-row">
+            <div class="side-label">Cost Range (20ft)</div>
+            <div class="side-value" style="color:var(--amber);">$560 – $1,680</div>
+          </div>
+          <div style="margin-top:8px;">
+            <span class="card-action" style="font-size:12px;">Open full calculator →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TwinLog Audit Trail -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🔐 TwinLog Audit Trail</div>
+          <span style="font-size:11px;color:var(--text-muted);">3 events</span>
+        </div>
+        <div class="card-body" style="padding:14px 18px;">
+          <div class="audit-item">
+            <div class="audit-dot shield">CC</div>
+            <div>
+              <div class="audit-text">Compliance Check</div>
+              <div class="audit-hash">e8bb6b20</div>
+              <div class="audit-time">3 Mar 2026 at 14:30</div>
+            </div>
+          </div>
+          <div class="audit-item">
+            <div class="audit-dot" style="background:#e3f2fd;color:#1565c0;">EU</div>
+            <div>
+              <div class="audit-text">EUDR Record Created</div>
+              <div class="audit-hash">6fed717a</div>
+              <div class="audit-time">3 Mar 2026 at 21:01</div>
+            </div>
+          </div>
+          <div class="audit-item">
+            <div class="audit-dot" style="background:#f3e5f5;color:#6a1b9a;">CB</div>
+            <div>
+              <div class="audit-text">CBAM Record Created</div>
+              <div class="audit-hash">5a6d4ba1</div>
+              <div class="audit-time">3 Mar 2026 at 21:01</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TwinLog Reference -->
+      <div class="twinlog-ref">
+        <div style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:6px;">TwinLog Reference</div>
+        <div class="twinlog-id">TR-2026-4407-CM</div>
+        <div class="twinlog-hash">sha256:7b3d49d42bf7a1c9e832f04d...</div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card actions-card">
+        <div class="card-header">
+          <div class="card-title">⚡ Actions</div>
+        </div>
+        <div class="card-body" style="padding:8px 18px;">
+          <div class="action-item">
+            <div class="action-icon">📋</div>
+            <div class="action-label">View Compliance Report</div>
+          </div>
+          <div class="action-item">
+            <div class="action-icon">📄</div>
+            <div class="action-label">Run LC Check</div>
+          </div>
+          <div class="action-item">
+            <div class="action-icon">🔗</div>
+            <div class="action-label">Public Verify Link</div>
+          </div>
+          <div class="action-item">
+            <div class="action-icon">📤</div>
+            <div class="action-label">Export Audit Trail</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

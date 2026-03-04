@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TapTrao — Free Pre-Shipment Compliance Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --sage-dark:#1b2a22;
+  --sage:#4a7c5e;
+  --sage-l:#6db89a;
+  --sage-pale:#e8efe9;
+  --amber:#c4882a;
+  --amber-pale:#fdf3e3;
+  --red:#c44e3a;
+  --red-pale:#fdeaea;
+  --cream:#f0ebe3;
+  --card:#fff;
+  --t1:#2c3e2e;
+  --t2:#5e7060;
+  --t3:#8a9a8c;
+  --t4:#b8c2ba;
+  --shd:0 2px 16px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);
+  --shd-lg:0 12px 48px rgba(0,0,0,.14),0 2px 10px rgba(0,0,0,.07);
+  --r:16px;--r-sm:10px;
+  --fd:'Playfair Display',serif;
+  --fb:'DM Sans',sans-serif;
+  --fm:'DM Mono',monospace
+}
+
+body{
+  font-family:var(--fb);
+  background:var(--cream);
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;
+  padding:0 20px 80px;
+}
+
+/* ── NAV ── */
+.nav{
+  width:100%;max-width:720px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:24px 0 32px;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:10px;text-decoration:none;
+}
+.nav-mark{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,var(--sage-l),var(--sage));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-size:15px;color:#fff;font-weight:700;
+}
+.nav-name{font-family:var(--fd);font-size:17px;color:var(--t1);font-weight:600}
+.nav-login{
+  font-size:13px;font-weight:600;color:rgba(255,255,255,.6);
+  text-decoration:none;padding:8px 18px;border-radius:20px;
+  border:1px solid rgba(255,255,255,.15);
+  transition:all .15s;
+}
+.nav-login:hover{color:var(--sage-dark);border-color:var(--sage)}
+
+/* ── HERO TEXT ── */
+.hero{text-align:center;margin-bottom:36px;max-width:520px}
+.hero-eyebrow{
+  font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--sage);margin-bottom:12px;
+}
+.hero h1{
+  font-family:var(--fd);font-size:36px;font-weight:700;
+  color:var(--t1);line-height:1.2;margin-bottom:14px;
+}
+.hero p{font-size:15px;color:var(--t2);line-height:1.6}
+
+/* ── FORM CARD ── */
+.form-card{
+  width:100%;max-width:620px;
+  background:#1b2a22;
+  border:1px solid rgba(0,0,0,.07);
+  border-radius:var(--r);
+  padding:28px;
+  box-shadow:var(--shd-lg);
+  margin-bottom:16px;
+}
+.field{margin-bottom:18px}
+.field:last-of-type{margin-bottom:24px}
+.field-label{
+  font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--t3);margin-bottom:8px;
+}
+.field-select{
+  width:100%;padding:13px 16px;
+  background:#f7f4ef;
+  border:1px solid rgba(0,0,0,.1);
+  border-radius:var(--r-sm);
+  font-family:var(--fb);font-size:14px;color:var(--t3);
+  cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(0,0,0,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 16px center;
+  transition:border-color .15s;
+}
+.field-select:focus{outline:none;border-color:var(--sage-l)}
+.field-select option{background:#f7f4ef;color:var(--t1)}
+.field-select.filled{color:var(--t1);background-color:#f7f4ef}
+
+.check-btn{
+  width:100%;padding:15px;
+  background:var(--sage);color:#fff;
+  border:none;border-radius:var(--r-sm);
+  font-family:var(--fb);font-size:14px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:background .15s;letter-spacing:.02em;
+}
+.check-btn:hover{background:#3d6b50}
+.check-btn:disabled{background:#2a4a35;color:rgba(255,255,255,.3);cursor:not-allowed}
+.check-btn .btn-ic{font-size:16px}
+
+.form-foot{
+  text-align:center;margin-top:14px;
+  font-size:12px;color:var(--t4);
+}
+.form-foot a{color:var(--sage);text-decoration:none}
+
+/* ── RESULTS BOX ── */
+.results{
+  width:100%;max-width:620px;
+  background:var(--card);
+  border-radius:var(--r);
+  box-shadow:var(--shd-lg);
+  overflow:hidden;
+  display:none;
+}
+.results.show{
+  display:block;
+  animation:slideUp .4s ease both;
+}
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* Results header */
+.res-head{
+  background:var(--sage-dark);
+  padding:20px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+}
+.res-corridor{display:flex;align-items:center;gap:12px}
+.res-flags{font-size:52px;display:flex;align-items:center;gap:4px}
+.res-info{}
+.res-title{font-family:var(--fd);font-size:16px;color:var(--t1);font-weight:600}
+.res-sub{font-size:12px;color:rgba(255,255,255,.45);margin-top:2px}
+.res-hs{
+  font-family:var(--fm);font-size:11px;
+  background:rgba(255,255,255,.1);color:rgba(255,255,255,.55);
+  padding:4px 10px;border-radius:6px;white-space:nowrap;
+}
+
+/* Score row */
+.score-row{
+  display:flex;align-items:center;gap:16px;
+  padding:18px 24px;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  background:#fafaf8;
+}
+.score-dial{position:relative;width:64px;height:64px;flex-shrink:0}
+.score-dial svg{transform:rotate(-90deg)}
+.score-num{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:var(--fd);font-size:18px;font-weight:700;color:var(--t1);
+}
+.score-text{}
+.score-label{font-size:16px;font-weight:700;margin-bottom:3px}
+.score-label.amber{color:var(--amber)}
+.score-desc{font-size:12px;color:var(--t3);line-height:1.5;max-width:380px}
+
+/* Triggers */
+.triggers-row{
+  display:flex;flex-wrap:wrap;gap:6px;
+  padding:14px 24px 16px;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  background:#fafaf8;
+}
+.trigger{
+  padding:5px 11px;border-radius:20px;
+  font-size:11px;font-weight:600;letter-spacing:.03em;
+  display:flex;align-items:center;gap:5px;
+}
+.t-eudr{background:#fff8e1;color:#8a6200}
+.t-cites{background:#fce4ec;color:#880e4f}
+.t-sps{background:#e3f2fd;color:#1565c0}
+.t-lacey{background:#f3e5f5;color:#6a1b9a}
+.t-swissdda{background:#e8f5e9;color:#1b5e20}
+
+/* Section: Documents */
+.section{padding:20px 24px}
+.section+.section{border-top:1px solid rgba(0,0,0,.06)}
+.section-title{
+  font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:6px;
+}
+.section-title span{color:var(--t4);font-weight:400}
+
+/* Doc table */
+.doc-list{display:flex;flex-direction:column;gap:0}
+.doc-row{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:10px 0;border-bottom:1px solid rgba(0,0,0,.04);
+}
+.doc-row:last-child{border-bottom:none}
+.doc-check{
+  width:18px;height:18px;border-radius:5px;
+  border:1.5px solid var(--t4);flex-shrink:0;margin-top:1px;
+}
+.doc-body{flex:1}
+.doc-title{font-size:13px;color:var(--t1);line-height:1.4;font-weight:500}
+.doc-issuer{font-size:11px;color:var(--t3);margin-top:2px}
+.doc-meta{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap}
+.doc-code{
+  font-family:var(--fm);font-size:10px;
+  background:rgba(0,0,0,.05);color:var(--t3);
+  padding:1px 6px;border-radius:4px;
+}
+.doc-side{
+  font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;
+}
+.side-supplier{background:var(--sage-pale);color:var(--sage)}
+.side-importer{background:#f0ebe3;color:var(--t2)}
+
+/* Tariff strip */
+.tariff-strip{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:8px;padding:16px 24px;
+  border-top:1px solid rgba(0,0,0,.06);
+  background:#fafaf8;
+}
+.tariff-cell{
+  background:var(--cream);border-radius:var(--r-sm);
+  padding:11px 13px;
+}
+.tc-label{font-size:9px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:3px}
+.tc-value{font-size:15px;font-weight:700;color:var(--t1)}
+.tc-sub{font-size:10px;color:var(--t3);margin-top:2px}
+
+/* CTA */
+.res-cta{
+  padding:20px 24px;
+  background:var(--sage-dark);
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  flex-wrap:wrap;
+}
+.res-cta-text{color:rgba(255,255,255,.6);font-size:13px;line-height:1.5}
+.res-cta-text strong{color:#fff;display:block;font-size:14px;margin-bottom:2px}
+.res-cta-btn{
+  padding:11px 22px;background:var(--sage-l);color:#fff;
+  border:none;border-radius:var(--r-sm);
+  font-family:var(--fb);font-size:13px;font-weight:600;
+  cursor:pointer;white-space:nowrap;transition:background .15s;flex-shrink:0;
+}
+.res-cta-btn:hover{background:var(--sage)}
+
+/* Alert note */
+.alert-note{
+  margin:0 24px 16px;
+  background:var(--amber-pale);
+  border-left:3px solid var(--amber);
+  border-radius:var(--r-sm);
+  padding:11px 14px;
+  font-size:12px;color:#6b4c0a;line-height:1.55;
+}
+.alert-note strong{color:var(--amber)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-logo" href="#">
+    <div class="nav-mark">T</div>
+    <span class="nav-name">TapTrao</span>
+  </a>
+  <a class="nav-login" href="#">Sign in</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Free pre-shipment check</div>
+  <h1>De-risk your next shipment before spending.</h1>
+  <p>Enter your trade corridor and commodity to see regulatory triggers, required documents, and compliance risk — instantly.</p>
+</div>
+
+<!-- FORM -->
+<div class="form-card">
+  <div class="field">
+    <div class="field-label">What are you shipping?</div>
+    <select class="field-select filled" id="commodity">
+      <option>Timber (tropical sawn) — HS 4407.29</option>
+      <option>Cocoa Beans — HS 1801.00</option>
+      <option>Coffee (Green) — HS 0901.11</option>
+      <option>Cashew Nuts — HS 0801.31</option>
+      <option>Palm Oil (Crude) — HS 1511.10</option>
+    </select>
+  </div>
+  <div class="field">
+    <div class="field-label">Where are the goods coming from?</div>
+    <select class="field-select filled" id="origin">
+      <option>Cameroon 🇨🇲</option>
+      <option>Ghana 🇬🇭</option>
+      <option>Nigeria 🇳🇬</option>
+      <option>Ethiopia 🇪🇹</option>
+      <option>Côte d'Ivoire 🇨🇮</option>
+    </select>
+  </div>
+  <div class="field">
+    <div class="field-label">Where are the goods going?</div>
+    <select class="field-select filled" id="dest">
+      <option>Switzerland 🇨🇭</option>
+      <option>Netherlands 🇳🇱</option>
+      <option>United Kingdom 🇬🇧</option>
+      <option>Germany 🇩🇪</option>
+      <option>United States 🇺🇸</option>
+    </select>
+  </div>
+  <button class="check-btn" onclick="showResults()">
+    <span class="btn-ic">🔍</span> Check compliance risk
+  </button>
+  <div class="form-foot">No account needed · Results in seconds · </div>
+</div>
+
+<!-- RESULTS BOX -->
+<div class="results" id="results">
+
+  <!-- Header -->
+  <div class="res-head">
+    <div class="res-corridor">
+      <div class="res-flags" style="font-size:52px;gap:6px">🇨🇲 <span style="color:rgba(255,255,255,.4);font-size:24px;margin:0 4px">→</span> 🇨🇭</div>
+      <div class="res-info">
+        <div class="res-title">Timber (tropical sawn)</div>
+        <div class="res-sub">Cameroon → Switzerland</div>
+      </div>
+    </div>
+    <div class="res-hs">HS 4407.29</div>
+  </div>
+
+  <!-- Score -->
+  <div class="score-row">
+    <div class="score-dial">
+      <svg width="64" height="64" viewBox="0 0 64 64">
+        <circle cx="32" cy="32" r="26" fill="none" stroke="#e8e3db" stroke-width="6"/>
+        <circle cx="32" cy="32" r="26" fill="none" stroke="#c4882a" stroke-width="6"
+          stroke-dasharray="163" stroke-dashoffset="69" stroke-linecap="round"/>
+      </svg>
+      <div class="score-num">58</div>
+    </div>
+    <div class="score-text">
+      <div class="score-label amber">AMBER — Action Required</div>
+      <div class="score-desc">4 regulatory frameworks active on this corridor. EUDR, CITES, SPS, and Lacey Act all apply. Verify all requirements before committing to shipment.</div>
+    </div>
+  </div>
+
+  <!-- Triggers -->
+  <div class="triggers-row">
+    <span class="trigger t-eudr">🌿 EUDR</span>
+    <span class="trigger t-cites">🦜 CITES</span>
+    <span class="trigger t-sps">🔬 SPS</span>
+    <span class="trigger t-lacey">🌲 Lacey Act</span>
+    <span class="trigger t-swissdda">🇨🇭 Swiss Due Diligence Act</span>
+  </div>
+
+  <!-- Alert -->
+  <div class="alert-note">
+    <strong>⚠ Swiss Due Diligence Act:</strong> Switzerland has enacted its own timber due diligence law, separate from EUDR. Importer must self-declare compliance. Cocoa and coffee expected to follow — monitor FOEN/BAFU for updates.
+  </div>
+
+  <!-- Supplier documents -->
+  <div class="section">
+    <div class="section-title">Supplier documents <span>— your supplier must provide these</span></div>
+    <div class="doc-list">
+      <div class="doc-row">
+        <div class="doc-check"></div>
+        <div class="doc-body">
+          <div class="doc-title">Commercial Invoice</div>
+          <div class="doc-issuer">With HS Code 4407.29 and declared FOB value</div>
+          <div class="doc-meta"><span class="doc-code">N935</span><span class="doc-side side-supplier">SUPPLIER</span></div>
+        </div>
+      </div>
+      <div class="doc-row">
+        <div class="doc-check"></div>
+        <div class="doc-body">
+          <div class="doc-title">Packing List</div>
+          <div class="doc-issuer">With weights, marks, and lot numbers</div>
+          <div class="doc-meta"><span class="doc-code">N271</span><span class="doc-side side-supplier">SUPPLIER</span></div>
+        </div>
+      </div>
+      <div class="doc-row">
+        <div class="doc-check"></div>
+        <div class="doc-body">
+          <div class="doc-title">Certificate of Origin</div>
+          <div class="doc-issuer">Issued by Chambre de Commerce du Cameroun</div>
+          <div class="doc-meta"><span class="doc-code">C644</span><span class="doc-side side-supplier">SUPPLIER</span></div>
+        </div>
+      </div>
+      <div class="doc-row">
+        <div class="doc-check"></div>
+        <div class="doc-body">
+          <div class="doc-title">Phytosanitary / SPS Certificate</div>
+          <div class="doc-issuer">Issued by MINADER/DRCQ (Cameroon)</div>
+          <div class="doc-meta"><span class="doc-code">C085</span><span class="doc-side side-supplier">SUPPLIER</span></div>
+        </div>
+      </div>
+      <div class="doc-row">
+        <div class="doc-check"></div>
+        <div class="doc-body">
+          <div class="doc-title">CITES Export Permit</div>
+          <div class="doc-issuer">Cameroon CITES Management Authority</div>
+          <div class="doc-meta"><span class="doc-side side-supplier">SUPPLIER</span></div>
+        </div>
+      </div>
+      <div class="doc-row">
+        <div class="doc-check"></div>
+        <div class="doc-body">
+          <div class="doc-title">CEMAC Regional Export Clearance</div>
+          <div class="doc-issuer">CEMAC Secretariat / National Customs</div>
+          <div class="doc-meta"><span class="doc-side side-supplier">SUPPLIER</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Importer documents -->
+  <div class="section">
+    <div class="section-title">Your documents <span>— importer responsibility</span></div>
+    <div class="doc-list">
+      <div class="doc-row">
+        <div class="doc-check"></div>
+        <div class="doc-body">
+          <div class="doc-title">Bill of Lading / Airway Bill</div>
+          <div class="doc-issuer">Shipping line or freight forwarder</div>
+          <div class="doc-meta"><span class="doc-code">N714</span><span class="doc-side side-importer">IMPORTER</span></div>
+        </div>
+      </div>
+      <div class="doc-row">
+        <div class="doc-check"></div>
+        <div class="doc-body">
+          <div class="doc-title">Swiss Due Diligence Act Statement</div>
+          <div class="doc-issuer">Self-declared by importer / operator</div>
+          <div class="doc-meta"><span class="doc-side side-importer">IMPORTER</span></div>
+        </div>
+      </div>
+      <div class="doc-row">
+        <div class="doc-check"></div>
+        <div class="doc-body">
+          <div class="doc-title">CITES Import Permit (if Appendix I species)</div>
+          <div class="doc-issuer">Switzerland CITES Management Authority / FOEN/BAFU</div>
+          <div class="doc-meta"><span class="doc-side side-importer">IMPORTER</span></div>
+        </div>
+      </div>
+      <div class="doc-row">
+        <div class="doc-check"></div>
+        <div class="doc-body">
+          <div class="doc-title">Swiss Customs Declaration</div>
+          <div class="doc-issuer">Via e-dec or NCTS — customs broker / importer</div>
+          <div class="doc-meta"><span class="doc-side side-importer">IMPORTER</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tariff strip -->
+  <div class="tariff-strip">
+    <div class="tariff-cell">
+      <div class="tc-label">VAT / GST</div>
+      <div class="tc-value">8.10%</div>
+      <div class="tc-sub">Applied on CIF value</div>
+    </div>
+    <div class="tariff-cell">
+      <div class="tc-label">AfCFTA</div>
+      <div class="tc-value" style="font-size:12px;color:var(--amber);margin-top:2px">Not eligible</div>
+      <div class="tc-sub">Switzerland non-member</div>
+    </div>
+    <div class="tariff-cell">
+      <div class="tc-label">Security Filing</div>
+      <div class="tc-value" style="font-size:13px">e-dec / NCTS</div>
+      <div class="tc-sub">Pre-arrival required</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="res-cta">
+    <div class="res-cta-text">
+      <strong>Want the full compliance report?</strong>
+      EUDR geolocation assessment, CBAM check, LC review, supplier upload link, and TwinLog audit trail.
+    </div>
+    <button class="res-cta-btn">Get full report →</button>
+  </div>
+
+</div>
+
+<script>
+function showResults(){
+  const r = document.getElementById('results');
+  r.classList.add('show');
+  setTimeout(()=>r.scrollIntoView({behavior:'smooth',block:'start'}), 100);
+}
+</script>
+</body>
+</html>

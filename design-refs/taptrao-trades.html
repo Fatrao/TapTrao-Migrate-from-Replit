@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TapTrao — My Trades</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #000;
+      color: #fff;
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+    /* ──────────────────────────────────────────
+       SIDEBAR
+    ────────────────────────────────────────── */
+    .sidebar {
+      width: 240px;
+      min-height: calc(100vh - 20px);
+      background: #242428;
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      border-radius: 18px;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      padding: 0 8px;
+    }
+    .sidebar-logo .logo-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0e4e45, #3a7d6a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Clash Display', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #fff;
+    }
+    .sidebar-logo span {
+      font-family: 'Clash Display', sans-serif;
+      font-weight: 600;
+      font-size: 17px;
+      color: #fff;
+    }
+
+    /* Token badge */
+    .token-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      margin: 0 4px 16px;
+      border-radius: 10px;
+      background: rgba(74,222,128,0.08);
+      border: 1px solid rgba(74,222,128,0.15);
+    }
+    .token-badge .hex { font-size: 13px; color: #4ade80; }
+    .token-badge .count { font-size: 12px; font-weight: 600; color: #4ade80; }
+    .token-badge .buy-more { font-size: 11px; color: rgba(255,255,255,0.35); margin-left: auto; }
+
+    /* Sidebar sections */
+    .sidebar-section { margin-bottom: 20px; }
+    .sidebar-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 6px;
+      padding-left: 10px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      border-left: 3px solid transparent;
+    }
+    .sidebar-item:hover {
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.8);
+    }
+    .sidebar-item.active {
+      background: rgba(74,222,128,0.1);
+      color: #4ade80;
+      border-left-color: #4ade80;
+      padding-left: 7px;
+    }
+    .sidebar-item .icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+    .sidebar-item .item-label { flex: 1; }
+    .sidebar-item .badge {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 10px;
+    }
+    .badge-red { background: #ef4444; color: #fff; }
+    .badge-green { background: #6b9080; color: #fff; }
+
+    .sidebar-spacer { flex: 1; }
+
+    /* Sidebar history */
+    .history-card {
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .history-card:hover { background: rgba(255,255,255,0.07); }
+    .history-card .title {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 5px;
+    }
+    .history-card .tags { display: flex; gap: 5px; }
+    .history-card .tag {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ──────────────────────────────────────────
+       MAIN BOX
+    ────────────────────────────────────────── */
+    .main-box {
+      border-radius: 18px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(180deg,
+        #1a1a1c 0%, #1c2420 3%, #1e2e28 6%, #1f3830 9%,
+        #214232 12%, #264a38 16%, #2c5540 20%, #356248 25%,
+        #3f7056 30%, #4a7e64 35%, #578d74 40%, #659b82 45%,
+        #74a890 50%, #85b49e 55%, #96bfab 60%, #a8cab8 65%,
+        #bbd5c6 70%, #cddfd3 75%, #dde8e1 80%, #eaf0ec 85%,
+        #f2f4f3 90%, #f5f5f5 95%
+      );
+      min-height: calc(100vh - 20px);
+    }
+
+    /* ── Top nav ── */
+    .top-nav {
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .top-nav-links { display: flex; gap: 26px; }
+    .top-nav-links a {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      font-weight: 400;
+      transition: color 0.15s;
+    }
+    .top-nav-links a:hover { color: rgba(255,255,255,0.8); }
+    .top-nav-links a.active { color: #fff; font-weight: 600; }
+
+    .top-nav-icons { display: flex; align-items: center; gap: 12px; }
+    .icon-btn {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.5); font-size: 13px;
+      cursor: pointer; position: relative;
+    }
+    .icon-btn .dot {
+      position: absolute; top: 1px; right: 1px;
+      width: 7px; height: 7px; border-radius: 50%; background: #ef4444;
+    }
+    .user-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: #3b82f6;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+
+    /* ── Page header ── */
+    .page-header {
+      padding: 32px 40px 24px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .page-header h1 {
+      font-family: 'Clash Display', sans-serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+    .page-header .subtitle {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.45);
+    }
+    .page-header .subtitle strong {
+      color: rgba(255,255,255,0.7);
+      font-weight: 600;
+    }
+
+    .btn-sage {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      background: #6b9080;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-sage:hover { background: #5a7a6b; }
+
+    /* ── White zone ── */
+    .white-zone {
+      background: #fff;
+      border-radius: 24px 24px 0 0;
+      padding: 28px 40px 40px;
+      flex: 1;
+    }
+
+    /* ── Summary cards ── */
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      margin-bottom: 24px;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .summary-card {
+      padding: 20px 22px;
+      background: #f8f8f8;
+      position: relative;
+    }
+    .summary-card:first-child { border-radius: 14px 0 0 14px; }
+    .summary-card:last-child { border-radius: 0 14px 14px 0; }
+
+    .summary-card .sc-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .summary-card .sc-value {
+      font-family: 'Clash Display', sans-serif;
+      font-size: 26px;
+      font-weight: 600;
+      margin-bottom: 0;
+    }
+    .summary-card .sc-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+      position: relative;
+      top: -1px;
+    }
+
+    .sc-blue .sc-value { color: #3b82f6; }
+    .sc-blue .sc-dot { background: #3b82f6; }
+
+    .sc-red {
+      background: linear-gradient(135deg, #fef2f2, #fff1f2, #f8f8f8);
+    }
+    .sc-red .sc-value { color: #dc2626; }
+    .sc-red .sc-dot { background: #dc2626; }
+
+    .sc-amber .sc-value { color: #eab308; }
+    .sc-amber .sc-dot { background: #eab308; }
+
+    .sc-green .sc-value { color: #15803d; }
+    .sc-green .sc-dot { background: #15803d; }
+
+    /* ── Filter pills ── */
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .filter-pill {
+      padding: 7px 16px;
+      font-size: 12.5px;
+      font-weight: 500;
+      border-radius: 20px;
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-pill:hover {
+      border-color: #ccc;
+      background: #f9f9f9;
+    }
+    .filter-pill.active {
+      background: #6b9080;
+      color: #fff;
+      border-color: #6b9080;
+      font-weight: 600;
+    }
+    .filter-search {
+      margin-left: auto;
+      padding: 7px 14px 7px 34px;
+      font-size: 12.5px;
+      border-radius: 20px;
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      color: #333;
+      outline: none;
+      width: 200px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 12px center;
+    }
+    .filter-search:focus {
+      border-color: #6b9080;
+      box-shadow: 0 0 0 3px rgba(107,144,128,0.1);
+    }
+
+    /* ── Trades table ── */
+    .trades-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .trades-table th {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #999;
+      text-align: left;
+      padding: 0 0 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .trades-table td {
+      padding: 16px 0;
+      font-size: 13px;
+      color: #1a1a1a;
+      border-bottom: 1px solid #f5f5f5;
+      vertical-align: middle;
+    }
+    .trades-table tr:last-child td { border-bottom: none; }
+
+    /* Row number */
+    .row-num {
+      font-size: 12px;
+      font-weight: 500;
+      color: #bbb;
+      width: 28px;
+      text-align: center;
+    }
+
+    /* Origin avatar */
+    .origin-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .origin-gh { background: linear-gradient(135deg, #d4a017, #c79810); }
+    .origin-ci { background: linear-gradient(135deg, #e97a2e, #d06820); }
+    .origin-dz { background: linear-gradient(135deg, #2d8a4e, #1f7a3e); }
+
+    .commodity-corridor {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .cc-info .cc-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+    }
+    .cc-info .cc-corridor {
+      font-size: 12px;
+      color: #888;
+    }
+
+    /* Step indicator */
+    .step-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .step-dot.gray { background: #bbb; }
+    .step-dot.blue { background: #3b82f6; }
+    .step-dot.amber { background: #eab308; }
+    .step-text {
+      font-size: 12.5px;
+      color: #555;
+    }
+
+    /* Risk indicator */
+    .risk-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .risk-icon {
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .risk-icon.blocking { color: #ef4444; }
+    .risk-icon.at-risk { color: #eab308; }
+    .risk-icon.clear { color: #16a34a; }
+    .risk-label {
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .risk-label.blocking { color: #ef4444; }
+    .risk-label.at-risk { color: #eab308; }
+    .risk-label.clear { color: #16a34a; }
+
+    /* Score badge */
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .score-high-risk {
+      background: #fee2e2;
+      color: #ef4444;
+    }
+    .score-medium-risk {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    .score-low-risk {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    /* Value column */
+    .trade-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: #1a1a1a;
+    }
+    .trade-value.empty { color: #ccc; }
+
+    /* Updated column */
+    .updated-cell {
+      font-size: 12px;
+      color: #999;
+    }
+    .updated-cell .updated-date {
+      font-weight: 500;
+      color: #888;
+    }
+
+    /* ── Table footer ── */
+    .table-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 20px;
+      margin-top: 4px;
+      border-top: 1px solid #f0f0f0;
+    }
+    .table-footer .footer-count {
+      font-size: 12.5px;
+      color: #999;
+    }
+    .table-footer .footer-links {
+      display: flex;
+      gap: 16px;
+    }
+    .table-footer .footer-links a {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #6b9080;
+      text-decoration: none;
+    }
+    .table-footer .footer-links a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <!-- ════════ SIDEBAR ════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-circle">T</div>
+      <span>TapTrao</span>
+    </div>
+
+    <!-- Token badge -->
+    <div class="token-badge">
+      <span class="hex">&#x2B22;</span>
+      <span class="count">2 checks</span>
+      <span class="buy-more">Buy More</span>
+    </div>
+
+    <!-- MAIN -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">Main</div>
+      <div class="sidebar-item">
+        <span class="icon">&#x229E;</span>
+        <span class="item-label">Dashboard</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">&#x2726;</span>
+        <span class="item-label">New Check</span>
+      </div>
+      <div class="sidebar-item active">
+        <span class="icon">&#x25C9;</span>
+        <span class="item-label">My Trades</span>
+        <span class="badge badge-green">5</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">&#x1F4EC;</span>
+        <span class="item-label">Suppliers</span>
+      </div>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">Tools</div>
+      <div class="sidebar-item">
+        <span class="icon">&#x29D6;</span>
+        <span class="item-label">Demurrage Calc</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">&#x1F4CB;</span>
+        <span class="item-label">Templates</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">&#x1F514;</span>
+        <span class="item-label">Alerts</span>
+        <span class="badge badge-red">2</span>
+      </div>
+    </div>
+
+    <!-- ACCOUNT -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">Account</div>
+      <div class="sidebar-item">
+        <span class="icon">&#x25EC;</span>
+        <span class="item-label">Settings</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">&#x25EB;</span>
+        <span class="item-label">Billing</span>
+      </div>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+
+    <!-- HISTORY -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">History</div>
+      <div class="history-card">
+        <div class="title">&#x1F1E8;&#x1F1EE; Cashew CI &rarr; &#x1F1EC;&#x1F1E7; UK Q1 2026</div>
+        <div class="tags">
+          <span class="tag">LC Check</span>
+          <span class="tag">$126k</span>
+        </div>
+      </div>
+      <div class="history-card">
+        <div class="title">&#x1F1EC;&#x1F1ED; Cocoa Beans GH &rarr; &#x1F1EA;&#x1F1FA; EU</div>
+        <div class="tags">
+          <span class="tag">LC Check</span>
+          <span class="tag">$84k</span>
+        </div>
+      </div>
+      <div class="history-card">
+        <div class="title">&#x1F1EA;&#x1F1F9; Sesame Seeds ET &rarr; &#x1F1EA;&#x1F1FA; EU</div>
+        <div class="tags">
+          <span class="tag">Lookup</span>
+          <span class="tag">$43k</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ════════ MAIN BOX ════════ -->
+  <main class="main-box">
+
+    <!-- Top nav -->
+    <div class="top-nav">
+      <div class="top-nav-links">
+        <a href="#" class="active">Dashboard</a>
+        <a href="#">Commodities</a>
+        <a href="#">Suppliers</a>
+        <a href="#">Compliance</a>
+        <a href="#">Messages</a>
+      </div>
+      <div class="top-nav-icons">
+        <div class="icon-btn">
+          &#x1F514;
+          <span class="dot"></span>
+        </div>
+        <div class="icon-btn">&#x1F4AC;</div>
+        <div class="icon-btn">&#x2699;&#xFE0F;</div>
+        <div class="user-avatar">F</div>
+      </div>
+    </div>
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div>
+        <h1>My Trades</h1>
+        <div class="subtitle"><strong>5</strong> active shipments &middot; <strong>2</strong> needs attention</div>
+      </div>
+      <button class="btn-sage">+ Start a new compliance check</button>
+    </div>
+
+    <!-- White zone -->
+    <div class="white-zone">
+
+      <!-- Summary cards -->
+      <div class="summary-cards">
+        <div class="summary-card sc-blue">
+          <div class="sc-label">Active shipments</div>
+          <div class="sc-value"><span class="sc-dot"></span>5</div>
+        </div>
+        <div class="summary-card sc-red">
+          <div class="sc-label">Action required</div>
+          <div class="sc-value"><span class="sc-dot"></span>2</div>
+        </div>
+        <div class="summary-card sc-amber">
+          <div class="sc-label">LC pending</div>
+          <div class="sc-value"><span class="sc-dot"></span>1</div>
+        </div>
+        <div class="summary-card sc-green">
+          <div class="sc-label">Ready to close</div>
+          <div class="sc-value"><span class="sc-dot"></span>1</div>
+        </div>
+      </div>
+
+      <!-- Filter pills -->
+      <div class="filter-row">
+        <span class="filter-pill active">All shipments</span>
+        <span class="filter-pill">Needs action</span>
+        <span class="filter-pill">In progress</span>
+        <span class="filter-pill">Closed</span>
+        <input type="text" class="filter-search" placeholder="Search trades...">
+      </div>
+
+      <!-- Trades table -->
+      <table class="trades-table">
+        <thead>
+          <tr>
+            <th style="width: 28px;"></th>
+            <th>Commodity &middot; Corridor</th>
+            <th>Step</th>
+            <th>Risk</th>
+            <th>Score</th>
+            <th>Value</th>
+            <th>Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Row 1 -->
+          <tr>
+            <td class="row-num">1</td>
+            <td>
+              <div class="commodity-corridor">
+                <div class="origin-avatar origin-gh">GH</div>
+                <div class="cc-info">
+                  <div class="cc-name">Cocoa Beans</div>
+                  <div class="cc-corridor">&#x1F1EC;&#x1F1ED; GH &rarr; &#x1F1EC;&#x1F1E7; GB</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="step-cell">
+                <span class="step-dot gray"></span>
+                <span class="step-text">Paperwork review</span>
+              </div>
+            </td>
+            <td>
+              <div class="risk-cell">
+                <span class="risk-icon blocking">&#x2297;</span>
+                <span class="risk-label blocking">Blocking</span>
+              </div>
+            </td>
+            <td><span class="score-badge score-high-risk">32</span></td>
+            <td><span class="trade-value empty">&mdash;</span></td>
+            <td class="updated-cell"><span class="updated-date">1 Mar</span> &middot; 14:22</td>
+          </tr>
+
+          <!-- Row 2 -->
+          <tr>
+            <td class="row-num">2</td>
+            <td>
+              <div class="commodity-corridor">
+                <div class="origin-avatar origin-gh">GH</div>
+                <div class="cc-info">
+                  <div class="cc-name">Cocoa Beans</div>
+                  <div class="cc-corridor">&#x1F1EC;&#x1F1ED; GH &rarr; &#x1F1EA;&#x1F1FA; EU</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="step-cell">
+                <span class="step-dot blue"></span>
+                <span class="step-text">LC review</span>
+              </div>
+            </td>
+            <td>
+              <div class="risk-cell">
+                <span class="risk-icon at-risk">&#x25CF;</span>
+                <span class="risk-label at-risk">At risk</span>
+              </div>
+            </td>
+            <td><span class="score-badge score-medium-risk">64</span></td>
+            <td><span class="trade-value empty">&mdash;</span></td>
+            <td class="updated-cell"><span class="updated-date">1 Mar</span> &middot; 14:20</td>
+          </tr>
+
+          <!-- Row 3 -->
+          <tr>
+            <td class="row-num">3</td>
+            <td>
+              <div class="commodity-corridor">
+                <div class="origin-avatar origin-ci">CI</div>
+                <div class="cc-info">
+                  <div class="cc-name">Coffee (green/unroasted)</div>
+                  <div class="cc-corridor">&#x1F1E8;&#x1F1EE; CI &rarr; &#x1F1EA;&#x1F1FA; EU</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="step-cell">
+                <span class="step-dot amber"></span>
+                <span class="step-text">TwinLog Trail</span>
+              </div>
+            </td>
+            <td>
+              <div class="risk-cell">
+                <span class="risk-icon clear">&#x2713;</span>
+                <span class="risk-label clear">Clear</span>
+              </div>
+            </td>
+            <td><span class="score-badge score-low-risk">88</span></td>
+            <td><span class="trade-value">USD 45,000</span></td>
+            <td class="updated-cell"><span class="updated-date">28 Feb</span> &middot; 09:15</td>
+          </tr>
+
+          <!-- Row 4 -->
+          <tr>
+            <td class="row-num">4</td>
+            <td>
+              <div class="commodity-corridor">
+                <div class="origin-avatar origin-dz">DZ</div>
+                <div class="cc-info">
+                  <div class="cc-name">Argan Oil</div>
+                  <div class="cc-corridor">&#x1F1E9;&#x1F1FF; DZ &rarr; &#x1F1FA;&#x1F1F8; US</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="step-cell">
+                <span class="step-dot gray"></span>
+                <span class="step-text">Paperwork review</span>
+              </div>
+            </td>
+            <td>
+              <div class="risk-cell">
+                <span class="risk-icon clear">&#x2713;</span>
+                <span class="risk-label clear">Clear</span>
+              </div>
+            </td>
+            <td><span class="score-badge score-low-risk">91</span></td>
+            <td><span class="trade-value">USD 12,500</span></td>
+            <td class="updated-cell"><span class="updated-date">27 Feb</span> &middot; 16:40</td>
+          </tr>
+
+          <!-- Row 5 -->
+          <tr>
+            <td class="row-num">5</td>
+            <td>
+              <div class="commodity-corridor">
+                <div class="origin-avatar origin-ci">CI</div>
+                <div class="cc-info">
+                  <div class="cc-name">Cashew Nuts</div>
+                  <div class="cc-corridor">&#x1F1E8;&#x1F1EE; CI &rarr; &#x1F1EC;&#x1F1E7; GB</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="step-cell">
+                <span class="step-dot blue"></span>
+                <span class="step-text">LC review</span>
+              </div>
+            </td>
+            <td>
+              <div class="risk-cell">
+                <span class="risk-icon at-risk">&#x25CF;</span>
+                <span class="risk-label at-risk">At risk</span>
+              </div>
+            </td>
+            <td><span class="score-badge score-medium-risk">55</span></td>
+            <td><span class="trade-value empty">&mdash;</span></td>
+            <td class="updated-cell"><span class="updated-date">25 Feb</span> &middot; 11:30</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Footer -->
+      <div class="table-footer">
+        <div class="footer-count">5 shipments total</div>
+        <div class="footer-links">
+          <a href="#">New check</a>
+          <a href="#">Saved templates</a>
+          <a href="#">Alerts</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>

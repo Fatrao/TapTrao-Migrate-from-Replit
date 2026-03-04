@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TapTrao — Design Reference Mocks</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 680px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 40px;
+    }
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 12px;
+      margin-top: 32px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    a.card {
+      display: block;
+      background: #242428;
+      border-radius: 14px;
+      padding: 20px;
+      text-decoration: none;
+      color: #fff;
+      transition: background 0.15s, transform 0.15s;
+    }
+    a.card:hover {
+      background: #2e2e33;
+      transform: translateY(-2px);
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .card-desc {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+    }
+    .badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .badge-app { background: rgba(107,144,128,0.2); color: #6b9080; }
+    .badge-public { background: rgba(74,222,128,0.1); color: #4ade80; }
+    .footer {
+      margin-top: 48px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.25);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>TapTrao Design Mocks</h1>
+    <p class="subtitle">Self-contained HTML references for redesign. All data is dummy — no private information.</p>
+
+    <div class="section-label">App Pages (behind paywall)</div>
+    <div class="grid">
+      <a class="card" href="taptrao-dashboard.html">
+        <span class="badge badge-app">App</span>
+        <div class="card-title">Dashboard</div>
+        <div class="card-desc">Overview, stats, recent trades, pending docs</div>
+      </a>
+      <a class="card" href="taptrao-trades.html">
+        <span class="badge badge-app">App</span>
+        <div class="card-title">My Trades</div>
+        <div class="card-desc">Trade history, filters, summary cards</div>
+      </a>
+      <a class="card" href="taptrao-demurrage.html">
+        <span class="badge badge-app">App</span>
+        <div class="card-title">Demurrage Calculator</div>
+        <div class="card-desc">Port cost estimator with breakdown</div>
+      </a>
+      <a class="card" href="taptrao-alerts.html">
+        <span class="badge badge-app">App</span>
+        <div class="card-title">Regulatory Alerts</div>
+        <div class="card-desc">Corridor monitoring, alert cards</div>
+      </a>
+      <a class="card" href="taptrao-inbox.html">
+        <span class="badge badge-app">App</span>
+        <div class="card-title">Supplier Inbox</div>
+        <div class="card-desc">Document requests, progress tracking</div>
+      </a>
+      <a class="card" href="taptrao-templates.html">
+        <span class="badge badge-app">App</span>
+        <div class="card-title">Templates</div>
+        <div class="card-desc">Saved trade corridors, stale detection</div>
+      </a>
+      <a class="card" href="taptrao-settings.html">
+        <span class="badge badge-app">App</span>
+        <div class="card-title">Company Profile</div>
+        <div class="card-desc">Settings form, EORI, company details</div>
+      </a>
+    </div>
+
+    <div class="section-label">Public Pages (already redesigned)</div>
+    <div class="grid">
+      <a class="card" href="taptrao-homepage.html">
+        <span class="badge badge-public">Public</span>
+        <div class="card-title">Homepage</div>
+        <div class="card-desc">Landing page, pricing, features</div>
+      </a>
+      <a class="card" href="taptrao-lc-checker.html">
+        <span class="badge badge-public">Public</span>
+        <div class="card-title">LC Checker</div>
+        <div class="card-desc">Multi-step LC document validator</div>
+      </a>
+    </div>
+
+    <div class="footer">
+      TapTrao — Fatrao Limited · Design reference mocks · All data is fictional
+    </div>
+  </div>
+</body>
+</html>

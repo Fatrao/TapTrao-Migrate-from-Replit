@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TapTrao — Templates</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000;
+      padding: 10px;
+      gap: 10px;
+      display: flex;
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+    /* ══════════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════════ */
+    .sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: #242428;
+      border-radius: 18px;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      height: calc(100vh - 20px);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px 16px;
+    }
+
+    .sidebar-logo .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #0e4e45, #3a7d6a);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .sidebar-logo span {
+      font-family: 'Clash Display', sans-serif;
+      font-weight: 600;
+      font-size: 17px;
+      color: #fff;
+    }
+
+    .token-pill {
+      margin: 0 16px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(74, 222, 128, 0.08);
+      border: 1px solid rgba(74, 222, 128, 0.15);
+    }
+
+    .token-pill .hex { color: #4ade80; font-size: 14px; }
+    .token-pill .count { font-size: 12px; font-weight: 600; color: #4ade80; }
+    .token-pill .buy { font-size: 11px; color: rgba(255,255,255,0.35); margin-left: auto; }
+
+    .sidebar-section { padding: 8px 0 4px; }
+
+    .sidebar-section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.25);
+      padding: 8px 20px 6px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 20px;
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: all 0.15s;
+      border-left: 3px solid transparent;
+      text-decoration: none;
+    }
+
+    .sidebar-item:hover { color: rgba(255,255,255,0.8); }
+
+    .sidebar-item.active {
+      color: #4ade80;
+      border-left-color: #4ade80;
+      background: rgba(74, 222, 128, 0.1);
+      font-weight: 600;
+    }
+
+    .sidebar-item .icon { font-size: 15px; width: 20px; text-align: center; }
+
+    .sidebar-item .badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-item .badge.red { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .sidebar-item .badge.green { background: rgba(74,222,128,0.12); color: #4ade80; }
+
+    .sidebar-spacer { flex: 1; }
+
+    .sidebar-history { padding: 0 12px; display: flex; flex-direction: column; gap: 6px; }
+    .history-card { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 12px; }
+    .history-card .title { font-size: 12px; color: rgba(255,255,255,0.65); margin-bottom: 6px; }
+    .history-card .tags { display: flex; gap: 5px; }
+    .history-card .tag { font-size: 10px; padding: 2px 8px; border-radius: 8px; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
+
+    /* ══════════════════════════════════════════
+       MAIN BOX
+    ══════════════════════════════════════════ */
+    .main-box {
+      flex: 1;
+      border-radius: 18px;
+      background: linear-gradient(180deg,
+        #1a1a1c 0%, #1c2420 3%, #1e2e28 6%, #1f3830 9%,
+        #214232 12%, #264a38 16%, #2c5540 20%, #356248 25%,
+        #3f7056 30%, #4a7e64 35%, #578d74 40%, #659b82 45%,
+        #74a890 50%, #85b49e 55%, #96bfab 60%, #a8cab8 65%,
+        #bbd5c6 70%, #cddfd3 75%, #dde8e1 80%, #eaf0ec 85%,
+        #f2f4f3 90%, #f5f5f5 95%
+      );
+      overflow-y: auto;
+      height: calc(100vh - 20px);
+    }
+
+    /* Top Nav */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+    }
+
+    .top-nav-links { display: flex; gap: 24px; }
+
+    .top-nav-links a {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      font-weight: 400;
+      transition: color 0.15s;
+    }
+
+    .top-nav-links a:hover { color: rgba(255,255,255,0.7); }
+    .top-nav-links a.active { color: #fff; font-weight: 600; }
+
+    .top-nav-icons { display: flex; align-items: center; gap: 8px; }
+
+    .icon-btn {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 10px; font-size: 16px; cursor: pointer;
+      position: relative; transition: background 0.15s;
+    }
+
+    .icon-btn:hover { background: rgba(255,255,255,0.06); }
+    .icon-btn .dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: #ef4444; border-radius: 50%; }
+
+    .user-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #6b9080;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff; cursor: pointer;
+    }
+
+    /* Green Hero */
+    .green-hero {
+      margin: 4px 24px 16px;
+      padding: 28px 32px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #0e4e45, #14574a, #1c6352, #327462, #3a7d6a);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .green-hero::after {
+      content: '';
+      position: absolute; top: 0; right: 0; bottom: 0; width: 60%;
+      background: radial-gradient(ellipse at 80% 20%, rgba(74,222,128,0.06), transparent 60%);
+      pointer-events: none;
+    }
+
+    .green-hero h1 {
+      font-family: 'Clash Display', sans-serif;
+      font-weight: 600;
+      font-size: 32px;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .green-hero .subtitle {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ══════════════════════════════════════════
+       TEMPLATE CARDS GRID
+    ══════════════════════════════════════════ */
+    .templates-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px 40px;
+    }
+
+    .template-card {
+      background: linear-gradient(160deg, #0e3d34, #0c332c, #0a2e28, #0b2924);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .template-card:hover {
+      border-color: rgba(255,255,255,0.15);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .template-card.stale {
+      border-color: rgba(234, 179, 8, 0.25);
+    }
+
+    /* Card header */
+    .tc-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .tc-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .tc-avatar.green { background: #16a34a; }
+    .tc-avatar.orange { background: #ea580c; }
+    .tc-avatar.red { background: #ef4444; }
+
+    .tc-title-group { flex: 1; min-width: 0; }
+
+    .tc-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 3px;
+    }
+
+    .tc-route {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Card meta */
+    .tc-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tc-pill {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.5);
+    }
+
+    .tc-pill.hs {
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.3px;
+    }
+
+    /* Stale warning */
+    .tc-stale-warning {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #eab308;
+      background: rgba(234, 179, 8, 0.08);
+      padding: 6px 10px;
+      border-radius: 8px;
+    }
+
+    /* Card usage row */
+    .tc-usage {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tc-usage-text {
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+    }
+
+    .tc-usage-text strong {
+      color: rgba(255,255,255,0.55);
+      font-weight: 600;
+    }
+
+    /* Card buttons */
+    .tc-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tc-btn {
+      flex: 1;
+      padding: 9px 0;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .tc-btn.primary {
+      background: #6b9080;
+      color: #fff;
+    }
+
+    .tc-btn.primary:hover {
+      background: #5a7a6b;
+    }
+
+    .tc-btn.danger {
+      background: transparent;
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+
+    .tc-btn.danger:hover {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════
+       SIDEBAR
+  ══════════════════════════════════════════ -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">T</div>
+      <span>TapTrao</span>
+    </div>
+
+    <div class="token-pill">
+      <span class="hex">&#x2B22;</span>
+      <span class="count">2 checks</span>
+      <span class="buy">Buy More</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main</div>
+      <div class="sidebar-item"><span class="icon">&#x229E;</span> Dashboard</div>
+      <div class="sidebar-item"><span class="icon">&#x2726;</span> New Check</div>
+      <div class="sidebar-item"><span class="icon">&#x25C9;</span> My Trades</div>
+      <div class="sidebar-item"><span class="icon">&#x1F4EC;</span> Suppliers</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Tools</div>
+      <div class="sidebar-item"><span class="icon">&#x29D6;</span> Demurrage Calc</div>
+      <div class="sidebar-item active">
+        <span class="icon">&#x1F4CB;</span> Templates
+      </div>
+      <div class="sidebar-item"><span class="icon">&#x1F514;</span> Alerts</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Account</div>
+      <div class="sidebar-item"><span class="icon">&#x25EC;</span> Settings</div>
+      <div class="sidebar-item"><span class="icon">&#x25EB;</span> Billing</div>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">History</div>
+      <div class="sidebar-history">
+        <div class="history-card">
+          <div class="title">&#x1F1E8;&#x1F1EE; Cashew CI &#x2192; &#x1F1EC;&#x1F1E7; UK Q1 2026</div>
+          <div class="tags"><span class="tag">LC Check</span><span class="tag">$126k</span></div>
+        </div>
+        <div class="history-card">
+          <div class="title">&#x1F1EC;&#x1F1ED; Cocoa Beans GH &#x2192; &#x1F1EA;&#x1F1FA; EU</div>
+          <div class="tags"><span class="tag">LC Check</span><span class="tag">$84k</span></div>
+        </div>
+        <div class="history-card">
+          <div class="title">&#x1F1EA;&#x1F1F9; Sesame Seeds ET &#x2192; &#x1F1EA;&#x1F1FA; EU</div>
+          <div class="tags"><span class="tag">Lookup</span><span class="tag">$43k</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MAIN BOX
+  ══════════════════════════════════════════ -->
+  <div class="main-box">
+
+    <!-- Top Nav -->
+    <div class="top-nav">
+      <div class="top-nav-links">
+        <a href="#">Dashboard</a>
+        <a href="#">Commodities</a>
+        <a href="#">Suppliers</a>
+        <a href="#" class="active">Compliance</a>
+        <a href="#">Messages</a>
+      </div>
+      <div class="top-nav-icons">
+        <div class="icon-btn">&#x1F514;</div>
+        <div class="icon-btn">&#x1F4AC;</div>
+        <div class="icon-btn">&#x2699;&#xFE0F;</div>
+        <div class="user-avatar">S</div>
+      </div>
+    </div>
+
+    <!-- Green Hero -->
+    <div class="green-hero">
+      <h1>Templates</h1>
+      <div class="subtitle">4 saved templates</div>
+    </div>
+
+    <!-- Templates Grid -->
+    <div class="templates-grid">
+
+      <!-- Template 1 — Ghana Cocoa to EU (STALE) -->
+      <div class="template-card stale">
+        <div class="tc-header">
+          <div class="tc-avatar green">GH</div>
+          <div class="tc-title-group">
+            <div class="tc-title">Ghana Cocoa to EU</div>
+            <div class="tc-route">&#x1F1EC;&#x1F1ED; GH &#x2192; &#x1F1EA;&#x1F1FA; EU</div>
+          </div>
+        </div>
+        <div class="tc-meta">
+          <span class="tc-pill">Cocoa Beans</span>
+          <span class="tc-pill hs">HS 1801.00</span>
+        </div>
+        <div class="tc-stale-warning">
+          &#x26A0;&#xFE0F; Data may be stale &mdash; rates updated since last check
+        </div>
+        <div class="tc-usage">
+          <span class="tc-usage-text">Used <strong>12x</strong></span>
+          <span class="tc-usage-text">2h ago</span>
+        </div>
+        <div class="tc-buttons">
+          <button class="tc-btn primary">Use template &#x2192;</button>
+          <button class="tc-btn danger">Delete</button>
+        </div>
+      </div>
+
+      <!-- Template 2 — CI Cashew to UK -->
+      <div class="template-card">
+        <div class="tc-header">
+          <div class="tc-avatar orange">CI</div>
+          <div class="tc-title-group">
+            <div class="tc-title">CI Cashew to UK</div>
+            <div class="tc-route">&#x1F1E8;&#x1F1EE; CI &#x2192; &#x1F1EC;&#x1F1E7; GB</div>
+          </div>
+        </div>
+        <div class="tc-meta">
+          <span class="tc-pill">Cashew Nuts</span>
+          <span class="tc-pill hs">HS 0801.00</span>
+        </div>
+        <div class="tc-usage">
+          <span class="tc-usage-text">Used <strong>5x</strong></span>
+          <span class="tc-usage-text">3d ago</span>
+        </div>
+        <div class="tc-buttons">
+          <button class="tc-btn primary">Use template &#x2192;</button>
+          <button class="tc-btn danger">Delete</button>
+        </div>
+      </div>
+
+      <!-- Template 3 — Ethiopian Coffee to Switzerland -->
+      <div class="template-card">
+        <div class="tc-header">
+          <div class="tc-avatar green">ET</div>
+          <div class="tc-title-group">
+            <div class="tc-title">Ethiopian Coffee to Switzerland</div>
+            <div class="tc-route">&#x1F1EA;&#x1F1F9; ET &#x2192; &#x1F1E8;&#x1F1ED; CH</div>
+          </div>
+        </div>
+        <div class="tc-meta">
+          <span class="tc-pill">Coffee</span>
+          <span class="tc-pill hs">HS 0901.11</span>
+        </div>
+        <div class="tc-usage">
+          <span class="tc-usage-text">Used <strong>8x</strong></span>
+          <span class="tc-usage-text">1d ago</span>
+        </div>
+        <div class="tc-buttons">
+          <button class="tc-btn primary">Use template &#x2192;</button>
+          <button class="tc-btn danger">Delete</button>
+        </div>
+      </div>
+
+      <!-- Template 4 — Argan Oil to US -->
+      <div class="template-card">
+        <div class="tc-header">
+          <div class="tc-avatar red">DZ</div>
+          <div class="tc-title-group">
+            <div class="tc-title">Argan Oil to US</div>
+            <div class="tc-route">&#x1F1E9;&#x1F1FF; DZ &#x2192; &#x1F1FA;&#x1F1F8; US</div>
+          </div>
+        </div>
+        <div class="tc-meta">
+          <span class="tc-pill">Argan Oil</span>
+          <span class="tc-pill hs">HS 1515.90</span>
+        </div>
+        <div class="tc-usage">
+          <span class="tc-usage-text">Used <strong>2x</strong></span>
+          <span class="tc-usage-text">14d ago</span>
+        </div>
+        <div class="tc-buttons">
+          <button class="tc-btn primary">Use template &#x2192;</button>
+          <button class="tc-btn danger">Delete</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

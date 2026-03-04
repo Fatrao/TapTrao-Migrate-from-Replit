@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TapTrao — Company Profile Settings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000;
+      padding: 10px;
+      gap: 10px;
+      display: flex;
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+    /* ══════════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════════ */
+    .sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: #242428;
+      border-radius: 18px;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      height: calc(100vh - 20px);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px 16px;
+    }
+
+    .sidebar-logo .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #0e4e45, #3a7d6a);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .sidebar-logo span {
+      font-family: 'Clash Display', sans-serif;
+      font-weight: 600;
+      font-size: 17px;
+      color: #fff;
+    }
+
+    .token-pill {
+      margin: 0 16px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(74, 222, 128, 0.08);
+      border: 1px solid rgba(74, 222, 128, 0.15);
+    }
+
+    .token-pill .hex { color: #4ade80; font-size: 14px; }
+    .token-pill .count { font-size: 12px; font-weight: 600; color: #4ade80; }
+    .token-pill .buy { font-size: 11px; color: rgba(255,255,255,0.35); margin-left: auto; }
+
+    .sidebar-section { padding: 8px 0 4px; }
+
+    .sidebar-section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.25);
+      padding: 8px 20px 6px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 20px;
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: all 0.15s;
+      border-left: 3px solid transparent;
+      text-decoration: none;
+    }
+
+    .sidebar-item:hover { color: rgba(255,255,255,0.8); }
+
+    .sidebar-item.active {
+      color: #4ade80;
+      border-left-color: #4ade80;
+      background: rgba(74, 222, 128, 0.1);
+      font-weight: 600;
+    }
+
+    .sidebar-item .icon { font-size: 15px; width: 20px; text-align: center; }
+
+    .sidebar-item .badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-item .badge.red { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .sidebar-item .badge.green { background: rgba(74,222,128,0.12); color: #4ade80; }
+
+    .sidebar-spacer { flex: 1; }
+
+    .sidebar-history { padding: 0 12px; display: flex; flex-direction: column; gap: 6px; }
+    .history-card { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 12px; }
+    .history-card .title { font-size: 12px; color: rgba(255,255,255,0.65); margin-bottom: 6px; }
+    .history-card .tags { display: flex; gap: 5px; }
+    .history-card .tag { font-size: 10px; padding: 2px 8px; border-radius: 8px; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
+
+    /* ══════════════════════════════════════════
+       MAIN BOX
+    ══════════════════════════════════════════ */
+    .main-box {
+      flex: 1;
+      border-radius: 18px;
+      background: linear-gradient(180deg,
+        #1a1a1c 0%, #1c2420 3%, #1e2e28 6%, #1f3830 9%,
+        #214232 12%, #264a38 16%, #2c5540 20%, #356248 25%,
+        #3f7056 30%, #4a7e64 35%, #578d74 40%, #659b82 45%,
+        #74a890 50%, #85b49e 55%, #96bfab 60%, #a8cab8 65%,
+        #bbd5c6 70%, #cddfd3 75%, #dde8e1 80%, #eaf0ec 85%,
+        #f2f4f3 90%, #f5f5f5 95%
+      );
+      overflow-y: auto;
+      height: calc(100vh - 20px);
+    }
+
+    /* Top Nav */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+    }
+
+    .top-nav-links { display: flex; gap: 24px; }
+
+    .top-nav-links a {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      font-weight: 400;
+      transition: color 0.15s;
+    }
+
+    .top-nav-links a:hover { color: rgba(255,255,255,0.7); }
+    .top-nav-links a.active { color: #fff; font-weight: 600; }
+
+    .top-nav-icons { display: flex; align-items: center; gap: 8px; }
+
+    .icon-btn {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 10px; font-size: 16px; cursor: pointer;
+      position: relative; transition: background 0.15s;
+    }
+
+    .icon-btn:hover { background: rgba(255,255,255,0.06); }
+    .icon-btn .dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: #ef4444; border-radius: 50%; }
+
+    .user-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #6b9080;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff; cursor: pointer;
+    }
+
+    /* Green Hero */
+    .green-hero {
+      margin: 4px 24px 16px;
+      padding: 28px 32px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #0e4e45, #14574a, #1c6352, #327462, #3a7d6a);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .green-hero::after {
+      content: '';
+      position: absolute; top: 0; right: 0; bottom: 0; width: 60%;
+      background: radial-gradient(ellipse at 80% 20%, rgba(74,222,128,0.06), transparent 60%);
+      pointer-events: none;
+    }
+
+    .green-hero h1 {
+      font-family: 'Clash Display', sans-serif;
+      font-weight: 600;
+      font-size: 28px;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .green-hero .subtitle {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.5;
+    }
+
+    /* ══════════════════════════════════════════
+       SUCCESS BANNER
+    ══════════════════════════════════════════ */
+    .success-banner {
+      margin: 0 24px 16px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      background: rgba(74, 222, 128, 0.08);
+      border: 1px solid rgba(74, 222, 128, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #4ade80;
+      font-weight: 500;
+    }
+
+    .success-banner .check-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(74, 222, 128, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════════════
+       WHITE FORM CARD
+    ══════════════════════════════════════════ */
+    .form-wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 0 24px 48px;
+    }
+
+    .form-card {
+      width: 100%;
+      max-width: 640px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px 36px 36px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    /* Form groups */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .form-group label .required {
+      color: #ef4444;
+      margin-left: 2px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 11px 13px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: #1a1a1a;
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.15s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: #999;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: #6b9080;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(107, 144, 128, 0.12);
+    }
+
+    .form-group input:hover:not(:focus),
+    .form-group textarea:hover:not(:focus),
+    .form-group select:hover:not(:focus) {
+      border-color: #ccc;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.6;
+    }
+
+    .form-group select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+      cursor: pointer;
+    }
+
+    .field-hint {
+      font-size: 11px;
+      color: #999;
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+
+    /* Info box */
+    .info-box {
+      margin-bottom: 20px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: rgba(59, 130, 246, 0.05);
+      border: 1px solid rgba(59, 130, 246, 0.12);
+      display: flex;
+      gap: 10px;
+    }
+
+    .info-box .info-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #3b82f6;
+      flex-shrink: 0;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    .info-box .info-content {
+      flex: 1;
+    }
+
+    .info-box .info-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #3b82f6;
+      margin-bottom: 4px;
+    }
+
+    .info-box .info-text {
+      font-size: 12px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* Divider */
+    .form-divider {
+      height: 1px;
+      background: #eee;
+      margin: 24px 0;
+    }
+
+    /* Save button */
+    .save-btn {
+      width: 100%;
+      padding: 13px 0;
+      border-radius: 10px;
+      background: #6b9080;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .save-btn:hover {
+      background: #5a7a6b;
+    }
+
+    .save-btn:active {
+      transform: translateY(1px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════
+       SIDEBAR
+  ══════════════════════════════════════════ -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">T</div>
+      <span>TapTrao</span>
+    </div>
+
+    <div class="token-pill">
+      <span class="hex">&#x2B22;</span>
+      <span class="count">2 checks</span>
+      <span class="buy">Buy More</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main</div>
+      <div class="sidebar-item"><span class="icon">&#x229E;</span> Dashboard</div>
+      <div class="sidebar-item"><span class="icon">&#x2726;</span> New Check</div>
+      <div class="sidebar-item"><span class="icon">&#x25C9;</span> My Trades</div>
+      <div class="sidebar-item"><span class="icon">&#x1F4EC;</span> Suppliers</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Tools</div>
+      <div class="sidebar-item"><span class="icon">&#x29D6;</span> Demurrage Calc</div>
+      <div class="sidebar-item"><span class="icon">&#x1F4CB;</span> Templates</div>
+      <div class="sidebar-item"><span class="icon">&#x1F514;</span> Alerts</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Account</div>
+      <div class="sidebar-item active">
+        <span class="icon">&#x25EC;</span> Settings
+      </div>
+      <div class="sidebar-item"><span class="icon">&#x25EB;</span> Billing</div>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">History</div>
+      <div class="sidebar-history">
+        <div class="history-card">
+          <div class="title">&#x1F1E8;&#x1F1EE; Cashew CI &#x2192; &#x1F1EC;&#x1F1E7; UK Q1 2026</div>
+          <div class="tags"><span class="tag">LC Check</span><span class="tag">$126k</span></div>
+        </div>
+        <div class="history-card">
+          <div class="title">&#x1F1EC;&#x1F1ED; Cocoa Beans GH &#x2192; &#x1F1EA;&#x1F1FA; EU</div>
+          <div class="tags"><span class="tag">LC Check</span><span class="tag">$84k</span></div>
+        </div>
+        <div class="history-card">
+          <div class="title">&#x1F1EA;&#x1F1F9; Sesame Seeds ET &#x2192; &#x1F1EA;&#x1F1FA; EU</div>
+          <div class="tags"><span class="tag">Lookup</span><span class="tag">$43k</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MAIN BOX
+  ══════════════════════════════════════════ -->
+  <div class="main-box">
+
+    <!-- Top Nav -->
+    <div class="top-nav">
+      <div class="top-nav-links">
+        <a href="#">Dashboard</a>
+        <a href="#">Commodities</a>
+        <a href="#">Suppliers</a>
+        <a href="#">Compliance</a>
+        <a href="#">Messages</a>
+      </div>
+      <div class="top-nav-icons">
+        <div class="icon-btn">&#x1F514;</div>
+        <div class="icon-btn">&#x1F4AC;</div>
+        <div class="icon-btn">&#x2699;&#xFE0F;</div>
+        <div class="user-avatar">S</div>
+      </div>
+    </div>
+
+    <!-- Green Hero -->
+    <div class="green-hero">
+      <h1>Company Profile</h1>
+      <div class="subtitle">Your company details appear on every TwinLog Trail record and are used for compliance verification.</div>
+    </div>
+
+    <!-- Success Banner -->
+    <div class="success-banner">
+      <div class="check-icon">&#x2713;</div>
+      Profile complete. You can download TwinLog Trail records.
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-wrapper">
+      <div class="form-card">
+
+        <!-- Company Name -->
+        <div class="form-group">
+          <label>Company Name <span class="required">*</span></label>
+          <input type="text" value="Sahel Trading Test Co. Ltd" />
+        </div>
+
+        <!-- Registered Address -->
+        <div class="form-group">
+          <label>Registered Address <span class="required">*</span></label>
+          <textarea rows="3">42 Victoria Street
+London, SW1H 0TL
+United Kingdom</textarea>
+          <div class="field-hint">Full registered address including postcode and country</div>
+        </div>
+
+        <!-- Country -->
+        <div class="form-group">
+          <label>Country <span class="required">*</span></label>
+          <select>
+            <option value="" disabled>Select a country</option>
+            <option value="GB" selected>United Kingdom</option>
+            <option value="DE">Germany</option>
+            <option value="FR">France</option>
+            <option value="CH">Switzerland</option>
+            <option value="US">United States</option>
+            <option value="AE">United Arab Emirates</option>
+          </select>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- VAT Number -->
+        <div class="form-group">
+          <label>VAT Number</label>
+          <input type="text" value="GB205672212000" />
+          <div class="field-hint">Your VAT or tax identification number</div>
+        </div>
+
+        <!-- EORI Number -->
+        <div class="form-group">
+          <label>EORI Number</label>
+          <input type="text" value="GB205672212000" />
+        </div>
+
+        <!-- EORI info box -->
+        <div class="info-box">
+          <div class="info-icon">i</div>
+          <div class="info-content">
+            <div class="info-title">Why EORI matters</div>
+            <div class="info-text">
+              An Economic Operators Registration and Identification (EORI) number is required for any business importing or exporting goods to/from the EU or UK. It appears on customs declarations, TwinLog Trail records, and is checked by border agencies. If you trade with the EU, you likely need one.
+            </div>
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- Contact Email -->
+        <div class="form-group">
+          <label>Contact Email</label>
+          <input type="email" value="trade@sahel-trading.co.uk" />
+          <div class="field-hint">Used for TwinLog Trail correspondence and supplier notifications</div>
+        </div>
+
+        <!-- Save Button -->
+        <button class="save-btn">Save Profile</button>
+
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

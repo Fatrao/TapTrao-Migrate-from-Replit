@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TapTrao — Regulatory Alerts</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Tokens ── */
+:root {
+  --bg-body: #000000;
+  --bg-sidebar: #242428;
+  --sage: #6b9080;
+  --sage-hover: #5a7a6b;
+  --green-accent: #4ade80;
+  --green-accent-bg: rgba(74, 222, 128, 0.1);
+  --red: #ef4444;
+  --amber: #eab308;
+  --text-white: #ffffff;
+  --text-white-secondary: rgba(255,255,255,0.45);
+  --text-white-muted: rgba(255,255,255,0.25);
+  --text-dark: #1a1a1a;
+  --text-dark-secondary: #888888;
+  --text-dark-muted: #999999;
+}
+
+body {
+  background: var(--bg-body);
+  padding: 10px;
+  gap: 10px;
+  display: flex;
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: var(--bg-sidebar);
+  border-radius: 18px;
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 6px;
+  margin-bottom: 20px;
+}
+
+.sidebar-logo-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #6b9080, #4ade80);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.sidebar-logo-text {
+  font-family: 'Clash Display', sans-serif;
+  font-weight: 600;
+  font-size: 17px;
+  color: #fff;
+}
+
+.sidebar-token-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 6px 20px;
+  padding: 6px 10px;
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.15);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--green-accent);
+}
+
+.sidebar-token-pill .dot {
+  width: 6px;
+  height: 6px;
+  background: var(--green-accent);
+  border-radius: 50%;
+}
+
+.sidebar-section-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-white-muted);
+  padding: 0 6px;
+  margin: 16px 0 6px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  position: relative;
+}
+
+.sidebar-item:hover {
+  color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.03);
+}
+
+.sidebar-item.active {
+  color: var(--green-accent);
+  background: var(--green-accent-bg);
+  font-weight: 600;
+  border-left: 3px solid var(--green-accent);
+  margin-left: -3px;
+}
+
+.sidebar-item .icon {
+  width: 18px;
+  text-align: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.sidebar-item .badge {
+  margin-left: auto;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  min-width: 18px;
+  text-align: center;
+}
+
+.sidebar-item .badge-red {
+  background: var(--red);
+  color: #fff;
+}
+
+.sidebar-item .badge-green {
+  background: rgba(74, 222, 128, 0.15);
+  color: var(--green-accent);
+}
+
+/* ── Main box ── */
+.main-box {
+  flex: 1;
+  border-radius: 18px;
+  background: linear-gradient(180deg,
+    #1a1a1c 0%, #1c2420 3%, #1e2e28 6%, #1f3830 9%,
+    #214232 12%, #264a38 16%, #2c5540 20%, #356248 25%,
+    #3f7056 30%, #4a7e64 35%, #578d74 40%, #659b82 45%,
+    #74a890 50%, #85b49e 55%, #96bfab 60%, #a8cab8 65%,
+    #bbd5c6 70%, #cddfd3 75%, #dde8e1 80%, #eaf0ec 85%,
+    #f2f4f3 90%, #f5f5f5 95%
+  );
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Nav bar ── */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+}
+
+.nav-link {
+  font-size: 13.5px;
+  font-weight: 400;
+  color: var(--text-white-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.nav-link:hover {
+  color: rgba(255,255,255,0.7);
+}
+
+.nav-link.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nav-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-white-secondary);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.nav-icon:hover {
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.05);
+}
+
+.nav-icon .notification-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  background: var(--red);
+  border-radius: 50%;
+  border: 1.5px solid #1a1a1c;
+}
+
+.nav-avatar {
+  width: 32px;
+  height: 32px;
+  background: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* ── Green hero ── */
+.green-hero {
+  margin: 4px 24px 16px;
+  padding: 28px 32px;
+  background: linear-gradient(135deg, #0e4e45, #14574a, #1c6352, #327462, #3a7d6a);
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.green-hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: radial-gradient(ellipse at 80% 20%, rgba(74,222,128,0.06), transparent 60%);
+  pointer-events: none;
+}
+
+.green-hero .breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 20px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 12px;
+}
+
+.green-hero .breadcrumb .sep {
+  color: rgba(255,255,255,0.25);
+}
+
+.green-hero h1 {
+  font-family: 'Clash Display', sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  color: #fff;
+  margin-bottom: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.green-hero .subtitle {
+  font-size: 14px;
+  color: rgba(255,255,255,0.45);
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Content area ── */
+.content-area {
+  padding: 0 24px 40px;
+  flex: 1;
+}
+
+/* ── Corridor pills ── */
+.corridors-section {
+  max-width: 720px;
+  margin: 0 auto 24px;
+}
+
+.corridors-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.corridors-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.35);
+}
+
+.corridors-count {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+}
+
+.corridor-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.corridor-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  transition: all 0.15s;
+}
+
+.corridor-pill .arrow {
+  color: rgba(255,255,255,0.3);
+  font-size: 10px;
+}
+
+.corridor-pill .close-btn {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+  padding: 0;
+  line-height: 1;
+}
+
+.corridor-pill .close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--red);
+}
+
+/* ── Alert cards ── */
+.alerts-list {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alert-card {
+  background: #1e1e22;
+  border-radius: 14px;
+  padding: 14px 16px;
+  transition: all 0.15s;
+}
+
+.alert-card:hover {
+  background: #222226;
+}
+
+.alert-card.unread {
+  border-left: 3px solid #3b82f6;
+}
+
+/* ── Source badges ── */
+.source-badge {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+
+.source-badge.eudr-deadline {
+  background: #fefce8;
+  border: 1px solid #fcd34d;
+  color: #b45309;
+}
+
+.source-badge.tariff-api {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #15803d;
+}
+
+.source-badge.manual {
+  background: #eff6ff;
+  border: 1px solid #93c5fd;
+  color: #2563eb;
+}
+
+/* ── Alert content ── */
+.alert-summary {
+  font-size: 13px;
+  color: rgba(255,255,255,0.9);
+  line-height: 1.55;
+  margin: 8px 0;
+}
+
+.alert-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  margin: 3px 0;
+}
+
+.alert-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.alert-source-link {
+  font-size: 11px;
+  color: var(--sage);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.alert-source-link:hover {
+  color: var(--sage-hover);
+  text-decoration: underline;
+}
+
+.btn-lookup {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+}
+
+.btn-lookup:hover {
+  background: #2563eb;
+}
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">T</div>
+    <span class="sidebar-logo-text">TapTrao</span>
+  </div>
+
+  <div class="sidebar-token-pill">
+    <span class="dot"></span>
+    2 checks remaining
+  </div>
+
+  <div class="sidebar-section-label">Main</div>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#8862;</span> Dashboard
+  </a>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#10022;</span> New Check
+  </a>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#9673;</span> My Trades
+    <span class="badge badge-green">5</span>
+  </a>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#128236;</span> Suppliers
+  </a>
+
+  <div class="sidebar-section-label">Tools</div>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#10695;</span> Demurrage Calc
+  </a>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#128203;</span> Templates
+  </a>
+  <a class="sidebar-item active" href="#">
+    <span class="icon">&#128276;</span> Alerts
+    <span class="badge badge-red">2</span>
+  </a>
+
+  <div class="sidebar-section-label">Account</div>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#9707;</span> Settings
+  </a>
+  <a class="sidebar-item" href="#">
+    <span class="icon">&#9707;</span> Billing
+  </a>
+</aside>
+
+<!-- ── MAIN BOX ── -->
+<div class="main-box">
+
+  <!-- Nav bar -->
+  <nav class="nav-bar">
+    <div class="nav-links">
+      <a class="nav-link" href="#">Dashboard</a>
+      <a class="nav-link" href="#">Commodities</a>
+      <a class="nav-link" href="#">Suppliers</a>
+      <a class="nav-link active" href="#">Compliance</a>
+      <a class="nav-link" href="#">Messages</a>
+    </div>
+    <div class="nav-icons">
+      <div class="nav-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notification-dot"></span>
+      </div>
+      <div class="nav-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+      <div class="nav-avatar">S</div>
+    </div>
+  </nav>
+
+  <!-- Green hero -->
+  <div class="green-hero">
+    <div class="breadcrumb">
+      Tools <span class="sep">/</span> Alerts
+    </div>
+    <h1>Regulatory Alerts</h1>
+    <div class="subtitle">Monitoring 3 corridors for regulatory changes</div>
+  </div>
+
+  <!-- Content -->
+  <div class="content-area">
+
+    <!-- Watched corridors -->
+    <div class="corridors-section">
+      <div class="corridors-header">
+        <span class="corridors-title">Watched Corridors</span>
+        <span class="corridors-count">3 of 3 slots used</span>
+      </div>
+      <div class="corridor-pills">
+        <div class="corridor-pill">
+          &#127468;&#127469; Ghana Cocoa <span class="arrow">&rarr;</span> EU
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="corridor-pill">
+          &#127468;&#127469; Ghana Cocoa <span class="arrow">&rarr;</span> UK
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="corridor-pill">
+          &#127464;&#127470; CI Cashew <span class="arrow">&rarr;</span> DE
+          <button class="close-btn">&times;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert cards -->
+    <div class="alerts-list">
+
+      <!-- Alert 1: EUDR DEADLINE (unread) -->
+      <div class="alert-card">
+        <span class="source-badge eudr-deadline">EUDR Deadline</span>
+        <p class="alert-summary">
+          EUDR compliance deadline extended to December 2026. Operators importing cocoa, timber, and other forest-risk commodities into the EU must complete due diligence statements by 30 Dec 2026. Applies to all consignments with HS headings under the regulation scope.
+        </p>
+        <p class="alert-meta">HS: 1801.00, 4403.00</p>
+        <p class="alert-meta">Effective 30 Dec 2026</p>
+        <div class="alert-footer">
+          <a class="alert-source-link" href="#">&nearr; View source</a>
+          <a class="btn-lookup" href="#">Run fresh lookup &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Alert 2: TARIFF API -->
+      <div class="alert-card">
+        <span class="source-badge tariff-api">Tariff API</span>
+        <p class="alert-summary">
+          UK Global Tariff updated: Cocoa beans MFN duty rate revised from 0% to 2.5% for non-preference imports. Traders with GSP or DCTS preference certification are unaffected. Verify preference eligibility before next shipment.
+        </p>
+        <p class="alert-meta">HS: 1801.00</p>
+        <p class="alert-meta">Effective 15 Mar 2026</p>
+        <div class="alert-footer">
+          <a class="alert-source-link" href="#">&nearr; View source</a>
+          <a class="btn-lookup" href="#">Run fresh lookup &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Alert 3: MANUAL (unread) -->
+      <div class="alert-card unread">
+        <span class="source-badge manual">Manual</span>
+        <p class="alert-summary">
+          Ghana COCOBOD seasonal export levy increased from $40/mt to $55/mt for the 2026/27 crop season. The levy applies to all raw cocoa bean exports and is collected at the port of loading. Budget accordingly for upcoming shipments.
+        </p>
+        <p class="alert-meta">HS: 1801.00</p>
+        <p class="alert-meta">Effective 1 Oct 2026</p>
+        <div class="alert-footer">
+          <a class="alert-source-link" href="#">&nearr; View source</a>
+          <a class="btn-lookup" href="#">Run fresh lookup &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Alert 4: TARIFF API (read) -->
+      <div class="alert-card">
+        <span class="source-badge tariff-api">Tariff API</span>
+        <p class="alert-summary">
+          EU CBAM transitional reporting requirements extended to cover additional aluminium product categories. Importers of unwrought aluminium (HS 7601) must now include embedded emissions data in quarterly CBAM reports.
+        </p>
+        <p class="alert-meta">HS: 7601.00</p>
+        <p class="alert-meta">Effective 1 Jan 2026</p>
+        <div class="alert-footer">
+          <a class="alert-source-link" href="#">&nearr; View source</a>
+          <a class="btn-lookup" href="#">Run fresh lookup &rarr;</a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
