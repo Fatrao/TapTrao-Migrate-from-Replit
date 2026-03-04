@@ -28,7 +28,7 @@ export default function Home() {
         WebkitBackdropFilter: "blur(12px)",
       }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <img src="/logo.png" alt="TapTrao" style={{ width: 34, height: 34, borderRadius: 10, objectFit: "cover" }} />
+          <img src="/logo.png?v=2" alt="TapTrao" style={{ width: 34, height: 34, borderRadius: 10, objectFit: "cover" }} />
           <span style={{ fontFamily: "var(--fd)", fontSize: 18, fontWeight: 600, color: "var(--t1)" }}>TapTrao</span>
         </Link>
 
@@ -401,7 +401,7 @@ export default function Home() {
       }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <img src="/logo.png" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: 8, objectFit: "cover" }} />
+            <img src="/logo.png?v=2" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: 8, objectFit: "cover" }} />
             <span style={{ fontFamily: "var(--fd)", fontSize: 14, color: "#fff", fontWeight: 600 }}>TapTrao</span>
           </div>
           <div>Trade compliance for African commodity corridors.</div>

@@ -226,7 +226,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
         {/* Brand */}
         <Link href="/">
           <div className="mi brand" data-testid="shell-logo">
-            <img src="/logo.png" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover" as const }} />
+            <img src="/logo.png?v=2" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover" as const }} />
             <span className="mi-label" style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 14, color: "var(--gold, #c4a265)" }}>TapTrao</span>
           </div>
         </Link>
@@ -304,7 +304,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, padding: "0 4px" }}>
           <Link href="/">
             <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-              <img src="/logo.png" alt="TapTrao" style={{ width: 36, height: 36, borderRadius: 10, objectFit: "cover" as const }} />
+              <img src="/logo.png?v=2" alt="TapTrao" style={{ width: 36, height: 36, borderRadius: 10, objectFit: "cover" as const }} />
               <span style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 16, color: "#fff" }}>TapTrao</span>
             </div>
           </Link>
@@ -481,7 +481,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
               ☰
             </button>
             <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-              <img src="/logo.png" alt="TapTrao" style={{ width: 26, height: 26, borderRadius: 6, objectFit: "cover" as const }} />
+              <img src="/logo.png?v=2" alt="TapTrao" style={{ width: 26, height: 26, borderRadius: 6, objectFit: "cover" as const }} />
               <span style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 15, color: "var(--t1)" }}>TapTrao</span>
             </Link>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>

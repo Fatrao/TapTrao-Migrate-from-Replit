@@ -1,4 +1,4 @@
-const CACHE_NAME = 'taptrao-v1';
+const CACHE_NAME = 'taptrao-v2';
 const PRECACHE_URLS = [
   '/',
   '/manifest.json',
