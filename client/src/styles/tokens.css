@@ -1,109 +1,123 @@
 :root {
-  /* ── Design system tokens (matches HTML design refs) ── */
-  --bg:       #000000;
-  --sidebar:  #0e4e45;
-  --card:     #1c1c1e;
-  --card2:    #1c1c1e;
-  --border:   rgba(255,255,255,0.07);
-  --border2:  rgba(255,255,255,0.12);
+  /* ── New warm cream design system ── */
+  --bg:       #eee9e0;
+  --card:     #ffffff;
+  --dark:     #1b2a22;
+  --sidebar:  #1a1a1a;
+  --border:   rgba(0,0,0,0.07);
 
-  /* Legacy aliases */
-  --s0: #000000;
-  --s1: #1a2332;
-  --s2: #1a2332;
-  --s3: #2a2a2e;
-  --s4: #333338;
-  --s5: rgba(255,255,255,0.07);
+  /* Primary palette */
+  --sage:       #4a7c5e;
+  --sage-hover: #3d6b4f;
+  --sage-l:     #6db89a;
+  --sage-xs:    rgba(74,124,94,.06);
+  --sage-pale:  #e8efe9;
+  --sage-mid:   #2d4a38;
 
-  /* Text hierarchy — white at different opacities */
-  --t1: rgba(255,255,255,0.95);
-  --t2: rgba(255,255,255,0.7);
-  --t3: rgba(255,255,255,0.5);
+  /* Status colors */
+  --amber:      #c4882a;
+  --amber-xs:   rgba(196,136,42,.08);
+  --amber-pale: #fdf3e3;
+  --red:        #c44e3a;
+  --red-xs:     rgba(196,78,58,.07);
+  --red-pale:   #fdeaea;
+  --green-pale: #e8f5ee;
 
-  /* Design system colors — Readdy teal palette */
-  --sage:     #0e4e45;
-  --sage-hover: #0a3a33;
-  --green:    #5dd9c1;
-  --green-accent: #5dd9c1;
-  --teal:     #1a6b5f;
-  --amber:    #eab308;
-  --red:      #ef4444;
-  --txt:      #111111;
-  --txt2:     #555555;
-  --txt3:     #666666;
+  /* Text hierarchy — dark on light */
+  --t1:  #2c3e2e;
+  --t2:  #5e7060;
+  --t3:  #8a9a8c;
+  --t4:  #b8c2ba;
 
-  /* Accent — deep teal primary */
-  --blue:     #0e4e45;
-  --blue-dim: rgba(14,78,69,0.12);
-  --blue-bd:  rgba(14,78,69,0.25);
-  --blue-glow:rgba(14,78,69,0.06);
+  /* Legacy text aliases */
+  --txt:   #1a1a1a;
+  --txt2:  #5a5a5a;
+  --txt3:  #9a9a9a;
 
-  /* Status */
-  --gbg:      rgba(14,78,69,0.10);
-  --gbd:      rgba(14,78,69,0.20);
-  --abg:      rgba(234,179,8,0.10);
-  --abd:      rgba(234,179,8,0.20);
-  --rbg:      rgba(239,68,68,0.10);
-  --rbd:      rgba(239,68,68,0.20);
+  /* Card shadows */
+  --shd: 0 1px 3px rgba(0,0,0,.03), 0 4px 16px rgba(0,0,0,.05);
+  --r:   16px;
 
-  /* Font families */
-  --fh: 'Inter', sans-serif;
-  --fb: 'Inter', sans-serif;
+  /* Fonts */
+  --fd: 'Playfair Display', serif;
+  --fb: 'DM Sans', sans-serif;
+  --fh: 'Playfair Display', serif;
 
-  /* Sidebar — dark navy */
-  --bg-sidebar: #1a2332;
+  /* ── App-shell palette (backward compat aliases) ── */
+  --app-sidebar:          #1a1a1a;
+  --app-sidebar-mid:      #1a1a1a;
+  --app-sidebar-deep:     #1a1a1a;
+  --app-main-base:        #eee9e0;
+  --app-hero-start:       #1b2a22;
+  --app-hero-mid:         #2d4a38;
+  --app-hero-end:         #4a7c5e;
+  --app-gray-nurse:       #2c3e2e;
+  --app-acapulco:         #6db89a;
+  --app-acapulco-hover:   #5ea888;
+  --app-acapulco-dim:     rgba(109,184,154,0.08);
+  --app-acapulco-border:  rgba(109,184,154,0.20);
+  --app-acapulco-glow:    rgba(109,184,154,0.06);
+  --app-regent:           #8a9a8c;
+  --app-regent-light:     rgba(138,154,140,0.5);
+  --app-regent-faint:     rgba(138,154,140,0.25);
 
-  /* ── App-shell palette (Readdy teal) ── */
-  --app-sidebar:          #1a2332;
-  --app-sidebar-mid:      #222e3e;
-  --app-sidebar-deep:     #141c28;
-  --app-main-base:        #0e4e45;
-  --app-hero-start:       #0e4e45;
-  --app-hero-mid:         #1a6b5f;
-  --app-hero-end:         #2a7b6f;
-  --app-gray-nurse:       #E5E8E6;
-  --app-acapulco:         #5dd9c1;
-  --app-acapulco-hover:   #4cc9b1;
-  --app-acapulco-dim:     rgba(93,217,193,0.10);
-  --app-acapulco-border:  rgba(93,217,193,0.25);
-  --app-acapulco-glow:    rgba(93,217,193,0.06);
-  --app-regent:           #81949C;
-  --app-regent-light:     rgba(129,148,156,0.5);
-  --app-regent-faint:     rgba(129,148,156,0.25);
+  /* ── Homepage palette (legacy aliases) ── */
+  --gable-green:       #1b2a22;
+  --gable-deep:        #0a3a33;
+  --gable-mid:         #2d4a38;
+  --celadon:           #e8efe9;
+  --fern:              #6db89a;
+  --mantis:            #5ea888;
+  --regent-gray:       #8a9a8c;
+  --gray-nurse:        #eee9e0;
+  --surface-card:      #ffffff;
+  --surface-card-hover: #f8f6f2;
+  --border-subtle:     rgba(0,0,0,0.06);
+  --border-accent:     rgba(74,124,94,0.20);
+  --hp-text-primary:   #2c3e2e;
+  --hp-text-secondary: #5e7060;
+  --hp-text-muted:     rgba(138,154,140,0.6);
+  --glow-green:        rgba(109,184,154,0.15);
+  --neon-green:        #6db89a;
+  --off-white:         #f8f6f2;
+  --light-gray:        #eee9e0;
+  --mid-gray:          #d0cac0;
+  --dark-text:         #2c3e2e;
+  --dark-text-secondary: #5e7060;
+  --dark-text-muted:   #8a9a8c;
+  --font-display:      'Playfair Display', serif;
+  --font-body:         'DM Sans', sans-serif;
+  --bg-sidebar:        #1a1a1a;
 
-  /* ── Homepage palette (aligned to Readdy teal palette) ── */
-  --gable-green: #0e4e45;
-  --gable-deep: #0a3a33;
-  --gable-mid: #1a6b5f;
-  --celadon: #E5E8E6;
-  --fern: #5dd9c1;
-  --mantis: #4cc9b1;
-  --regent-gray: #81949C;
-  --gray-nurse: #E5E8E6;
-  --surface-card: #0e4e45;
-  --surface-card-hover: #1a6b5f;
-  --border-subtle: rgba(93,217,193,0.15);
-  --border-accent: rgba(93,217,193,0.3);
-  --hp-text-primary: #E5E8E6;
-  --hp-text-secondary: #81949C;
-  --hp-text-muted: rgba(129,148,156,0.6);
-  --glow-green: rgba(93,217,193,0.15);
-  --neon-green: #5dd9c1;
-  --off-white: #F6F8F6;
-  --light-gray: #EDF0ED;
-  --mid-gray: #D1D8D3;
-  --dark-text: #0e4e45;
-  --dark-text-secondary: #1a6b5f;
-  --dark-text-muted: #81949C;
-  --font-display: 'Clash Display', 'Inter', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  /* Legacy status aliases */
+  --green:        #4a7c5e;
+  --green-accent: #6db89a;
+  --teal:         #4a7c5e;
+  --blue:         #4a7c5e;
+  --blue-dim:     rgba(74,124,94,0.12);
+  --blue-bd:      rgba(74,124,94,0.25);
+  --blue-glow:    rgba(74,124,94,0.06);
+  --gbg:          rgba(74,124,94,0.10);
+  --gbd:          rgba(74,124,94,0.20);
+  --abg:          rgba(196,136,42,0.10);
+  --abd:          rgba(196,136,42,0.20);
+  --rbg:          rgba(196,78,58,0.10);
+  --rbd:          rgba(196,78,58,0.20);
+
+  /* Legacy surface aliases */
+  --s0: #eee9e0;
+  --s1: #1a1a1a;
+  --s2: #1a1a1a;
+  --s3: #f5f3ef;
+  --s4: #e8e3db;
+  --s5: rgba(0,0,0,0.07);
 }
 
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 3px; }
 
 /* ── Base form elements ── */
 input, textarea, select {
@@ -126,9 +140,9 @@ input::placeholder, textarea::placeholder {
 }
 
 input:focus, textarea:focus, select:focus {
-  border-color: var(--app-acapulco);
+  border-color: var(--sage);
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(14,78,69,0.12);
+  box-shadow: 0 0 0 3px rgba(74,124,94,0.12);
 }
 
 input:hover:not(:focus), textarea:hover:not(:focus), select:hover:not(:focus) {
@@ -216,7 +230,7 @@ input[type="checkbox"]:checked {
 }
 
 input[type="checkbox"]:focus {
-  box-shadow: 0 0 0 3px rgba(14,78,69,0.15);
+  box-shadow: 0 0 0 3px rgba(74,124,94,0.15);
 }
 
 .checkbox-row {
@@ -260,7 +274,7 @@ input[type="radio"]:checked {
 }
 
 input[type="radio"]:focus {
-  box-shadow: 0 0 0 3px rgba(14,78,69,0.15);
+  box-shadow: 0 0 0 3px rgba(74,124,94,0.15);
 }
 
 /* ── Radio card (styled option block) ── */
@@ -278,12 +292,12 @@ input[type="radio"]:focus {
 }
 
 .radio-card:has(input[type="radio"]:checked) {
-  background: rgba(14,78,69,0.06);
-  border-color: rgba(74,140,111,0.25);
+  background: rgba(74,124,94,0.06);
+  border-color: rgba(74,124,94,0.25);
 }
 
 .radio-card:hover:not(:has(input[type="radio"]:checked)) {
-  border-color: rgba(74,140,111,.2);
+  border-color: rgba(74,124,94,.2);
 }
 
 .radio-card-content {
@@ -341,7 +355,7 @@ input[type="search"] {
 
 /* ── Upload zone ── */
 .upload-zone {
-  border: 2px dashed #d0d0d0;
+  border: 2px dashed #d0cac0;
   border-radius: 12px;
   padding: 36px;
   text-align: center;
@@ -351,8 +365,8 @@ input[type="search"] {
 }
 
 .upload-zone:hover, .upload-zone.drag-over {
-  border-color: var(--app-acapulco);
-  background: rgba(14,78,69,0.03);
+  border-color: var(--sage);
+  background: rgba(74,124,94,0.03);
 }
 
 .upload-zone input[type="file"] {

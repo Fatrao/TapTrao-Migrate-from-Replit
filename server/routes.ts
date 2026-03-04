@@ -735,7 +735,7 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const trades = await storage.getEnrichedTrades(sessionId);
       const pendingCount = trades.filter(
-        (t) => t.status === "pending" || t.status === "in_progress"
+        (t) => t.tradeStatus === "pending" || t.tradeStatus === "in_progress"
       ).length;
       res.json({ count: pendingCount });
     } catch (error: any) {
