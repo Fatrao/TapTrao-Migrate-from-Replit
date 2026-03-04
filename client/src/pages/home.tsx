@@ -12,24 +12,24 @@ import { CookieConsentBanner } from "@/components/cookie-consent";
 
 /* ─── Colour constants ─── */
 const C = {
-  primary: "#0e4e45",
-  primaryDark: "#0a3a33",
-  primaryLight: "#1a6b5f",
-  accent: "#5dd9c1",
-  accentLight: "#7ee3cf",
-  dark: "#1a2332",
-  darkLight: "#2a3442",
-  gold: "#F5A623",
+  primary: "#1b2a22",
+  primaryDark: "#0f1c14",
+  primaryLight: "#2d4a38",
+  accent: "#6db89a",
+  accentLight: "#8ac9ac",
+  dark: "#1b2a22",
+  darkLight: "#2d4a38",
+  gold: "#c4882a",
   white: "#ffffff",
-  gray50: "#f9fafb",
-  gray100: "#f3f4f6",
-  gray200: "#e5e7eb",
-  gray300: "#d1d5db",
-  gray500: "#6b7280",
-  gray600: "#4b5563",
-  gray700: "#374151",
-  gray800: "#1f2937",
-  gray900: "#111827",
+  gray50: "#f8f6f2",
+  gray100: "#eee9e0",
+  gray200: "#d0cac0",
+  gray300: "#b8b0a4",
+  gray500: "#5e7060",
+  gray600: "#4a5e4c",
+  gray700: "#2c3e2e",
+  gray800: "#1b2a22",
+  gray900: "#1b2a22",
 };
 
 /* ═══════════════════════════════════════════
@@ -114,7 +114,7 @@ function DemoSection() {
                   activeTab === tab.id ? C.accent : "transparent",
                 background:
                   activeTab === tab.id
-                    ? "rgba(93,217,193,0.05)"
+                    ? "rgba(109,184,154,0.05)"
                     : "transparent",
               }}
             >
@@ -215,7 +215,7 @@ function DemoSection() {
                 <div className="p-4 rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.85)" }}>Your Side - Buyer</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(93,217,193,0.12)", color: C.accent }}>5 docs</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(109,184,154,0.12)", color: C.accent }}>5 docs</span>
                   </div>
                   {[
                     { name: "Customs Declaration (CDS)", auth: "HMRC", ok: true },
@@ -225,7 +225,7 @@ function DemoSection() {
                     { name: "Duty & VAT Payment", auth: "HMRC", ok: true },
                   ].map((d) => (
                     <div key={d.name} className="flex items-center gap-2 py-1.5">
-                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: d.ok ? "#5dd9c1" : C.gold }} />
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: d.ok ? "#6db89a" : C.gold }} />
                       <span className="text-xs flex-1" style={{ color: "rgba(255,255,255,0.75)" }}>{d.name}</span>
                       <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>{d.auth}</span>
                     </div>
@@ -236,7 +236,7 @@ function DemoSection() {
                 <div className="p-4 rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.85)" }}>Their Side - Supplier</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(93,217,193,0.12)", color: C.accent }}>6 docs</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(109,184,154,0.12)", color: C.accent }}>6 docs</span>
                   </div>
                   {[
                     { name: "Certificate of Origin", auth: "CCA (Conseil Anacarde)", ok: true },
@@ -246,7 +246,7 @@ function DemoSection() {
                     { name: "Aflatoxin Test Report", auth: "Accredited Lab", ok: false },
                   ].map((d) => (
                     <div key={d.name} className="flex items-center gap-2 py-1.5">
-                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: d.ok ? "#5dd9c1" : C.gold }} />
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: d.ok ? "#6db89a" : C.gold }} />
                       <span className="text-xs flex-1" style={{ color: "rgba(255,255,255,0.75)" }}>{d.name}</span>
                       <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>{d.auth}</span>
                     </div>
@@ -257,16 +257,16 @@ function DemoSection() {
                 <div className="p-4 rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.85)" }}>Readiness Score</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(34,197,94,0.10)", color: "#5dd9c1" }}>Low Risk</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(109,184,154,0.10)", color: "#6db89a" }}>Low Risk</span>
                   </div>
                   <div className="text-4xl font-bold text-center my-2" style={{ color: C.accent, fontFamily: "Inter, sans-serif" }}>87</div>
                   <div className="text-[10px] text-center uppercase tracking-wider mb-3" style={{ color: "rgba(255,255,255,0.35)" }}>Compliance Readiness</div>
                   <div className="h-2 rounded-full mb-4" style={{ background: "rgba(255,255,255,0.08)" }}>
-                    <div className="h-full rounded-full" style={{ width: "87%", background: `linear-gradient(90deg, ${C.accent}, #5dd9c1)` }} />
+                    <div className="h-full rounded-full" style={{ width: "87%", background: `linear-gradient(90deg, ${C.accent}, #6db89a)` }} />
                   </div>
                   {[
-                    ["Commodity risk", "LOW", "#5dd9c1"],
-                    ["Origin risk", "LOW", "#5dd9c1"],
+                    ["Commodity risk", "LOW", "#6db89a"],
+                    ["Origin risk", "LOW", "#6db89a"],
                     ["Regulatory complexity", "MEDIUM", C.gold],
                     ["Known hazards", "AFLATOXIN", C.gold],
                   ].map(([k, v, c]) => (
@@ -281,7 +281,7 @@ function DemoSection() {
                 <div className="p-4 rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.85)" }}>Duty Estimate</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(34,197,94,0.10)", color: "#5dd9c1" }}>GSP rate</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(109,184,154,0.10)", color: "#6db89a" }}>GSP rate</span>
                   </div>
                   {[
                     ["MFN Tariff Rate", "0%"],
@@ -315,7 +315,7 @@ function DemoSection() {
               </p>
 
               {/* Verdict banner */}
-              <div className="p-4 rounded-xl mb-4" style={{ background: "rgba(245,166,35,0.08)", border: `1px solid rgba(245,166,35,0.2)` }}>
+              <div className="p-4 rounded-xl mb-4" style={{ background: "rgba(196,136,42,0.08)", border: `1px solid rgba(196,136,42,0.2)` }}>
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{"\u26A0\uFE0F"}</span>
                   <div className="flex-1">
@@ -324,7 +324,7 @@ function DemoSection() {
                   </div>
                   <div className="flex gap-4">
                     {[
-                      { n: "8", label: "matched", color: "#5dd9c1" },
+                      { n: "8", label: "matched", color: "#6db89a" },
                       { n: "1", label: "warning", color: C.gold },
                       { n: "2", label: "critical", color: "#ef4444" },
                     ].map((s) => (
@@ -400,12 +400,12 @@ function DemoSection() {
                   </div>
 
                   <div className="h-px my-3" style={{ background: "rgba(255,255,255,0.06)" }} />
-                  <div className="text-xs font-semibold mb-2" style={{ color: "#5dd9c1" }}>
+                  <div className="text-xs font-semibold mb-2" style={{ color: "#6db89a" }}>
                     {"\u{1F7E2}"} Matched (8)
                   </div>
                   {["Currency (USD)", "Goods Description", "Shipment Date", "Port of Discharge", "Quantity", "Incoterms (CIF)"].map((f) => (
                     <div key={f} className="flex items-center gap-2 py-0.5">
-                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#5dd9c1" }} />
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#6db89a" }} />
                       <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.45)" }}>{f}</span>
                     </div>
                   ))}
@@ -500,7 +500,7 @@ function DemoSection() {
         <button
           onClick={() => goTo(activeTab === total ? 1 : activeTab + 1)}
           className="ml-3 text-xs font-medium py-1.5 px-4 rounded-full transition-colors"
-          style={{ background: "rgba(93,217,193,0.12)", color: C.accent }}
+          style={{ background: "rgba(109,184,154,0.12)", color: C.accent }}
         >
           {activeTab === total ? "Start over" : "Next step \u2192"}
         </button>
@@ -574,22 +574,22 @@ export default function Home() {
                   >
                     <div className="px-3 py-1.5">
                       <div className="text-[10px] uppercase tracking-wider font-semibold mb-1" style={{ color: C.gray500 }}>Main</div>
-                      <Link href="/dashboard" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-teal-700" style={{ color: C.gray700 }}>Dashboard</Link>
-                      <Link href="/trades" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-teal-700" style={{ color: C.gray700 }}>My Trades</Link>
-                      <Link href="/lookup" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-teal-700" style={{ color: C.gray700 }}>Pre-Shipment Check</Link>
+                      <Link href="/dashboard" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-[#2d4a38]" style={{ color: C.gray700 }}>Dashboard</Link>
+                      <Link href="/trades" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-[#2d4a38]" style={{ color: C.gray700 }}>My Trades</Link>
+                      <Link href="/lookup" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-[#2d4a38]" style={{ color: C.gray700 }}>Pre-Shipment Check</Link>
                     </div>
                     <div className="h-px mx-3 my-1" style={{ background: C.gray100 }} />
                     <div className="px-3 py-1.5">
                       <div className="text-[10px] uppercase tracking-wider font-semibold mb-1" style={{ color: C.gray500 }}>Compliance</div>
-                      <Link href="/inbox" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-teal-700" style={{ color: C.gray700 }}>Supplier Inbox</Link>
-                      <Link href="/alerts" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-teal-700" style={{ color: C.gray700 }}>Alerts</Link>
-                      <Link href="/templates" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-teal-700" style={{ color: C.gray700 }}>Templates</Link>
+                      <Link href="/inbox" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-[#2d4a38]" style={{ color: C.gray700 }}>Supplier Inbox</Link>
+                      <Link href="/alerts" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-[#2d4a38]" style={{ color: C.gray700 }}>Alerts</Link>
+                      <Link href="/templates" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-[#2d4a38]" style={{ color: C.gray700 }}>Templates</Link>
                     </div>
                     <div className="h-px mx-3 my-1" style={{ background: C.gray100 }} />
                     <div className="px-3 py-1.5">
                       <div className="text-[10px] uppercase tracking-wider font-semibold mb-1" style={{ color: C.gray500 }}>Tools</div>
-                      <Link href="/lc-check" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-teal-700" style={{ color: C.gray700 }}>LC Document Check</Link>
-                      <Link href="/demurrage" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-teal-700" style={{ color: C.gray700 }}>Demurrage Calculator</Link>
+                      <Link href="/lc-check" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-[#2d4a38]" style={{ color: C.gray700 }}>LC Document Check</Link>
+                      <Link href="/demurrage" onClick={() => setMenuDropdownOpen(false)} className="block py-1.5 text-sm hover:text-[#2d4a38]" style={{ color: C.gray700 }}>Demurrage Calculator</Link>
                     </div>
                   </div>
                 )}
@@ -608,7 +608,7 @@ export default function Home() {
 
             {/* Right: Auth buttons */}
             <div className="hidden md:flex items-center gap-3">
-              <Link href="/pricing" className="text-sm font-medium transition-colors hover:text-teal-700" style={{ color: C.gray600 }}>
+              <Link href="/pricing" className="text-sm font-medium transition-colors hover:text-[#2d4a38]" style={{ color: C.gray600 }}>
                 Pricing
               </Link>
               {isAuthenticated ? (
@@ -621,7 +621,7 @@ export default function Home() {
                 </Link>
               ) : (
                 <>
-                  <Link href="/login" className="text-sm font-medium transition-colors hover:text-teal-700" style={{ color: C.gray600 }}>
+                  <Link href="/login" className="text-sm font-medium transition-colors hover:text-[#2d4a38]" style={{ color: C.gray600 }}>
                     Log In
                   </Link>
                   <Link
@@ -727,7 +727,7 @@ export default function Home() {
           <div className="relative w-full max-w-md">
             {/* Main card */}
             <div className="rounded-3xl shadow-2xl overflow-hidden" style={{ background: C.white, border: `1px solid ${C.gray100}` }}>
-              {/* Card header — dark teal */}
+              {/* Card header — dark sage */}
               <div className="px-6 py-4 flex items-center justify-between" style={{ background: C.primary }}>
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.6)" }}>Pre-Shipment Report</p>
@@ -748,10 +748,10 @@ export default function Home() {
                   </div>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
                     {[
-                      { label: "Commodity risk", val: "LOW", color: "#059669" },
-                      { label: "Origin risk", val: "LOW", color: "#059669" },
-                      { label: "Regulatory", val: "MEDIUM", color: "#f59e0b" },
-                      { label: "Hazard", val: "AFLATOXIN", color: "#f97316" },
+                      { label: "Commodity risk", val: "LOW", color: "#4a7c5e" },
+                      { label: "Origin risk", val: "LOW", color: "#4a7c5e" },
+                      { label: "Regulatory", val: "MEDIUM", color: "#c4882a" },
+                      { label: "Hazard", val: "AFLATOXIN", color: "#c4882a" },
                     ].map((r) => (
                       <div key={r.label} className="flex justify-between">
                         <span style={{ color: C.gray500 }}>{r.label}</span>
@@ -774,7 +774,7 @@ export default function Home() {
                     "Packing List",
                   ].map((doc) => (
                     <div key={doc} className="flex items-center gap-3 text-xs">
-                      <span className="w-5 h-5 flex items-center justify-center rounded-full text-xs font-bold flex-shrink-0" style={{ background: "#dcfce7", color: "#16a34a" }}>✓</span>
+                      <span className="w-5 h-5 flex items-center justify-center rounded-full text-xs font-bold flex-shrink-0" style={{ background: "#e8efe9", color: "#4a7c5e" }}>✓</span>
                       <span className="font-medium" style={{ color: C.gray700 }}>{doc}</span>
                     </div>
                   ))}
@@ -798,9 +798,9 @@ export default function Home() {
             </div>
 
             {/* Floating trust pill — Sanctions: Clear */}
-            <div className="absolute -top-6 left-6 rounded-full shadow-md px-4 py-2 flex items-center gap-2" style={{ background: "#ecfdf5", border: "1px solid #d1fae5" }}>
-              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#10b981" }} />
-              <p className="text-xs font-bold" style={{ color: "#047857" }}>Sanctions: Clear</p>
+            <div className="absolute -top-6 left-6 rounded-full shadow-md px-4 py-2 flex items-center gap-2" style={{ background: "#e8efe9", border: "1px solid #d0cac0" }}>
+              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#4a7c5e" }} />
+              <p className="text-xs font-bold" style={{ color: "#2d4a38" }}>Sanctions: Clear</p>
             </div>
 
             {/* Flags row */}
@@ -899,8 +899,8 @@ export default function Home() {
                 key={step.num}
                 className="relative rounded-[2rem] p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                 style={{
-                  background: "linear-gradient(135deg, #f0fdfa, #ffffff, #ecfdf5)",
-                  border: "1px solid #ccfbf1",
+                  background: "linear-gradient(135deg, #f5f3ef, #ffffff, #eee9e0)",
+                  border: "1px solid #d0cac0",
                 }}
               >
                 {/* Floating step number bubble */}
@@ -951,7 +951,7 @@ export default function Home() {
       </section>
 
       {/* ═══ TRUST SECTION ═══ */}
-      <section id="trust" className="relative py-24 overflow-hidden" style={{ background: "linear-gradient(135deg, #f0fdfa, #ffffff, #ecfdf5)" }}>
+      <section id="trust" className="relative py-24 overflow-hidden" style={{ background: "linear-gradient(135deg, #f5f3ef, #ffffff, #eee9e0)" }}>
         {/* Decorative blobs */}
         <div className="absolute top-0 right-0 w-72 h-72 rounded-full blur-[80px] pointer-events-none" style={{ background: `${C.accent}33`, transform: "translate(33%, -50%)" }} />
         <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full blur-[80px] pointer-events-none" style={{ background: `${C.primary}1a`, transform: "translate(-33%, 50%)" }} />
@@ -999,7 +999,7 @@ export default function Home() {
               <div
                 key={card.title}
                 className="rounded-[2rem] p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
-                style={{ background: C.white, border: "1px solid #ccfbf1" }}
+                style={{ background: C.white, border: "1px solid #d0cac0" }}
               >
                 <div
                   className="w-14 h-14 flex items-center justify-center rounded-2xl text-3xl mb-5 group-hover:scale-110 transition-transform"
@@ -1016,7 +1016,7 @@ export default function Home() {
       </section>
 
       {/* ═══ PRICING SECTION ═══ */}
-      <section id="pricing" className="relative py-24 overflow-hidden" style={{ background: "linear-gradient(135deg, #f9fafb, #ffffff, #f0fdfa)" }}>
+      <section id="pricing" className="relative py-24 overflow-hidden" style={{ background: "linear-gradient(135deg, #f8f6f2, #ffffff, #f5f3ef)" }}>
         {/* Decorative blob */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-64 rounded-full blur-[80px] pointer-events-none" style={{ background: `${C.accent}1a` }} />
 
@@ -1120,7 +1120,7 @@ export default function Home() {
                 style={
                   plan.featured
                     ? { background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, border: `2px solid ${C.primary}`, boxShadow: `0 8px 32px ${C.primary}4d` }
-                    : { background: C.white, border: "2px solid #2dd4bf" }
+                    : { background: C.white, border: "2px solid #6db89a" }
                 }
               >
                 {plan.badge && (
@@ -1230,24 +1230,24 @@ export default function Home() {
       </section>
 
       {/* ═══ COMING SOON ═══ */}
-      <section style={{ background: "linear-gradient(135deg, #f0fdfa, #ecfdf5)", paddingTop: 48, paddingBottom: 0 }}>
+      <section style={{ background: "linear-gradient(135deg, #f5f3ef, #eee9e0)", paddingTop: 48, paddingBottom: 0 }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h3 className="text-center text-lg font-bold mb-2" style={{ color: C.gray900 }}>Coming Soon</h3>
           <p className="text-center text-sm mb-8" style={{ color: C.gray500 }}>We're building more tools for commodity traders.</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto pb-8">
-            <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid #ccfbf1" }}>
+            <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid #d0cac0" }}>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-sm font-bold" style={{ color: C.gray900 }}>Pro Monitoring</span>
-                <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded" style={{ background: "rgba(234,179,8,0.12)", color: "#b45309" }}>Coming Soon</span>
+                <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded" style={{ background: "rgba(196,136,42,0.12)", color: "#8a6420" }}>Coming Soon</span>
               </div>
               <p className="text-sm leading-relaxed" style={{ color: C.gray500 }}>
                 Regulatory change alerts and compliance calendar. For frequent shippers.
               </p>
             </div>
-            <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid #ccfbf1" }}>
+            <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid #d0cac0" }}>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-sm font-bold" style={{ color: C.gray900 }}>Public API</span>
-                <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded" style={{ background: "rgba(234,179,8,0.12)", color: "#b45309" }}>Coming Soon</span>
+                <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded" style={{ background: "rgba(196,136,42,0.12)", color: "#8a6420" }}>Coming Soon</span>
               </div>
               <p className="text-sm leading-relaxed" style={{ color: C.gray500 }}>
                 Integrate compliance checks directly into your systems via REST API.
@@ -1293,7 +1293,7 @@ export default function Home() {
                   onChange={(e) => setFooterEmail(e.target.value)}
                   required
                   className="flex-1 px-4 py-2.5 rounded-xl text-sm"
-                  style={{ background: "rgba(255,255,255,0.8)", border: "1px solid #ccfbf1", color: C.gray900 }}
+                  style={{ background: "rgba(255,255,255,0.8)", border: "1px solid #d0cac0", color: C.gray900 }}
                   data-testid="input-footer-email"
                 />
                 <button
@@ -1316,12 +1316,12 @@ export default function Home() {
       </section>
 
       {/* ═══ FOOTER ═══ */}
-      <footer style={{ background: "linear-gradient(135deg, #f0fdfa, #ecfdf5)" }}>
+      <footer style={{ background: "linear-gradient(135deg, #f5f3ef, #eee9e0)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
           {/* Disclaimer card */}
           <div
             className="rounded-3xl px-8 py-6 text-center mb-10"
-            style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid #ccfbf1" }}
+            style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid #d0cac0" }}
           >
             <p className="text-sm max-w-3xl mx-auto leading-relaxed" style={{ color: C.gray500 }}>
               TapTrao provides automated trade and document screening for informational purposes only. Results do not constitute legal, regulatory, or banking advice and do not guarantee acceptance by authorities or financial institutions.
