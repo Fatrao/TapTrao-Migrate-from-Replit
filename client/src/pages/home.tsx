@@ -430,6 +430,7 @@ export default function Home() {
       {/* Responsive overrides for mobile */}
       <style>{`
         @media (max-width: 768px) {
+          .hp-page { overflow-x: hidden !important; }
           .hp-page nav { padding: 12px 16px !important; }
           .hp-page section { padding: 32px 16px !important; }
           .hp-page h1 { font-size: 26px !important; line-height: 1.2 !important; }
@@ -452,6 +453,8 @@ export default function Home() {
           .hp-page .hp-hero-btns a {
             text-align: center !important;
             padding: 14px 24px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
           }
 
           /* Trust bar */
@@ -472,9 +475,10 @@ export default function Home() {
             margin: 0 12px !important;
             padding: 28px 16px !important;
             border-radius: 16px !important;
+            overflow: hidden !important;
           }
-          .hp-cost-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
-          .hp-cost-grid > div { padding: 16px !important; }
+          .hp-cost-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+          .hp-cost-grid > div { padding: 14px 10px !important; word-break: break-word !important; }
 
           /* Steps */
           .hp-steps-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
@@ -488,6 +492,11 @@ export default function Home() {
           }
           .hp-page .hp-validation-section .hp-check-grid {
             grid-template-columns: 1fr !important;
+            gap: 6px !important;
+          }
+          .hp-page .hp-validation-section > div {
+            max-width: 100% !important;
+            padding: 20px 16px !important;
           }
 
           /* Pricing */
