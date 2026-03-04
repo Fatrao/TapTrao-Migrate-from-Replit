@@ -146,7 +146,7 @@ export default function Pricing() {
 
       <div style={{ margin: "0 24px 32px", maxWidth: 900 }}>
         {/* ── SECTION A: Credit Balance ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
+        <div className="pricing-balance-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
           {/* Shield Credits */}
           <div style={{ ...S.card, display: "flex", alignItems: "center", gap: 16 }} data-testid="card-shield-balance">
             <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(109,184,154,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -213,10 +213,10 @@ export default function Pricing() {
           ) : (
             <div data-testid="table-transactions">
               {/* Header row */}
-              <div style={{ display: "grid", gridTemplateColumns: "110px 80px 1fr 80px", gap: 12, padding: "8px 0", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+              <div className="pricing-tx-row" style={{ display: "grid", gridTemplateColumns: "110px 80px 1fr 80px", gap: 12, padding: "8px 0", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>Date</span>
                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>Type</span>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>Description</span>
+                <span className="pricing-tx-desc-hdr" style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>Description</span>
                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)", textAlign: "right" }}>Amount</span>
               </div>
               {/* Transaction rows */}
@@ -226,6 +226,7 @@ export default function Pricing() {
                 return (
                   <div
                     key={t.id}
+                    className="pricing-tx-row"
                     style={{
                       display: "grid",
                       gridTemplateColumns: "110px 80px 1fr 80px",
@@ -289,7 +290,7 @@ export default function Pricing() {
           </p>
 
           {/* Shield Packs Grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 24 }}>
+          <div className="pricing-packs-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 24 }}>
             {tradePacks.map((pack) => (
               <div
                 key={pack.key}
@@ -342,7 +343,7 @@ export default function Pricing() {
           </div>
 
           {/* LC Standalone + Corrections + Enterprise — compact row */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
+          <div className="pricing-addons-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
             {/* LC Standalone */}
             <div style={{ ...S.card, padding: 18 }} data-testid="card-lc-standalone">
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>

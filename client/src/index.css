@@ -2920,6 +2920,12 @@
   }
   .form-row.cols-2, .form-row.cols-3 { grid-template-columns: 1fr !important; }
 
+  /* Shield & Billing (pricing) mobile */
+  .pricing-balance-grid { grid-template-columns: 1fr !important; }
+  .pricing-packs-grid { grid-template-columns: 1fr !important; }
+  .pricing-addons-grid { grid-template-columns: 1fr !important; }
+  .pricing-tx-row { grid-template-columns: 80px 60px 1fr 60px !important; gap: 6px !important; }
+
   /* Lookup + page-level mobile */
   [data-testid="lookup-page"],
   [data-testid="lc-check-page"],
