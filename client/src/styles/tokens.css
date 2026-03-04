@@ -15,6 +15,12 @@
   --sage-pale:  #e8efe9;
   --sage-mid:   #2d4a38;
 
+  /* Brand gold (from logo) */
+  --gold:       #c4a265;
+  --gold-light: #d4b87a;
+  --gold-xs:    rgba(196,162,101,.08);
+  --gold-pale:  #fdf6e8;
+
   /* Status colors */
   --amber:      #c4882a;
   --amber-xs:   rgba(196,136,42,.08);
@@ -26,14 +32,14 @@
 
   /* Text hierarchy — dark on light */
   --t1:  #2c3e2e;
-  --t2:  #5e7060;
-  --t3:  #8a9a8c;
-  --t4:  #b8c2ba;
+  --t2:  #4a5e4c;
+  --t3:  #667a68;
+  --t4:  #8a9a8c;
 
   /* Legacy text aliases */
   --txt:   #1a1a1a;
-  --txt2:  #5a5a5a;
-  --txt3:  #9a9a9a;
+  --txt2:  #4a4a4a;
+  --txt3:  #6a6a6a;
 
   /* Card shadows */
   --shd: 0 1px 3px rgba(0,0,0,.03), 0 4px 16px rgba(0,0,0,.05);
@@ -58,9 +64,9 @@
   --app-acapulco-dim:     rgba(109,184,154,0.08);
   --app-acapulco-border:  rgba(109,184,154,0.20);
   --app-acapulco-glow:    rgba(109,184,154,0.06);
-  --app-regent:           #8a9a8c;
-  --app-regent-light:     rgba(138,154,140,0.5);
-  --app-regent-faint:     rgba(138,154,140,0.25);
+  --app-regent:           #667a68;
+  --app-regent-light:     rgba(102,122,104,0.5);
+  --app-regent-faint:     rgba(102,122,104,0.25);
 
   /* ── Homepage palette (legacy aliases) ── */
   --gable-green:       #1b2a22;
@@ -69,7 +75,7 @@
   --celadon:           #e8efe9;
   --fern:              #6db89a;
   --mantis:            #5ea888;
-  --regent-gray:       #8a9a8c;
+  --regent-gray:       #667a68;
   --gray-nurse:        #eee9e0;
   --surface-card:      #ffffff;
   --surface-card-hover: #f8f6f2;
@@ -85,7 +91,7 @@
   --mid-gray:          #d0cac0;
   --dark-text:         #2c3e2e;
   --dark-text-secondary: #5e7060;
-  --dark-text-muted:   #8a9a8c;
+  --dark-text-muted:   #667a68;
   --font-display:      'Playfair Display', serif;
   --font-body:         'DM Sans', sans-serif;
   --bg-sidebar:        #1a1a1a;
@@ -175,7 +181,7 @@ label {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.5px;
-  color: #555;
+  color: #444;
   text-transform: uppercase;
   margin-bottom: 6px;
 }
