@@ -92,40 +92,40 @@ type AuditEvent = {
 
 /* ── Status badge colors ── */
 const statusConfig: Record<string, { label: string; bg: string; text: string; icon: typeof Package }> = {
-  active: { label: "Active", bg: "rgba(93,217,193,0.1)", text: "#16a34a", icon: Package },
+  active: { label: "Active", bg: "rgba(109,184,154,0.1)", text: "#16a34a", icon: Package },
   in_transit: { label: "In Transit", bg: "rgba(59,130,246,0.1)", text: "#3b82f6", icon: Anchor },
   arrived: { label: "Arrived", bg: "rgba(139,92,246,0.1)", text: "#8b5cf6", icon: Anchor },
-  cleared: { label: "Cleared", bg: "rgba(34,197,94,0.1)", text: "#5dd9c1", icon: CheckCircle2 },
+  cleared: { label: "Cleared", bg: "rgba(34,197,94,0.1)", text: "var(--sage-l)", icon: CheckCircle2 },
   closed: { label: "Closed", bg: "rgba(107,114,128,0.1)", text: "#6b7280", icon: Archive },
   archived: { label: "Archived", bg: "rgba(107,114,128,0.1)", text: "#9ca3af", icon: Archive },
 };
 
 /* ── Event type display config ── */
 const eventConfig: Record<string, { icon: typeof CheckCircle2; color: string; label: string }> = {
-  compliance_check: { icon: Shield, color: "#0e4e45", label: "Compliance Check" },
-  account_created: { icon: CheckCircle2, color: "#5dd9c1", label: "Account Created" },
+  compliance_check: { icon: Shield, color: "var(--sage)", label: "Compliance Check" },
+  account_created: { icon: CheckCircle2, color: "var(--sage-l)", label: "Account Created" },
   lc_check: { icon: FileText, color: "#3b82f6", label: "LC Check" },
   lc_recheck: { icon: FileText, color: "#8b5cf6", label: "LC Re-check" },
   correction_sent: { icon: ArrowRight, color: "#f59e0b", label: "Correction Sent" },
-  supplier_link_created: { icon: ExternalLink, color: "#0e4e45", label: "Supplier Link Created" },
-  supplier_doc_uploaded: { icon: Upload, color: "#5dd9c1", label: "Document Uploaded" },
-  buyer_doc_uploaded: { icon: Upload, color: "#0e4e45", label: "Document Uploaded (Buyer)" },
+  supplier_link_created: { icon: ExternalLink, color: "var(--sage)", label: "Supplier Link Created" },
+  supplier_doc_uploaded: { icon: Upload, color: "var(--sage-l)", label: "Document Uploaded" },
+  buyer_doc_uploaded: { icon: Upload, color: "var(--sage)", label: "Document Uploaded (Buyer)" },
   doc_verified: { icon: ShieldCheck, color: "#16a34a", label: "Document Verified" },
   doc_flagged: { icon: Flag, color: "#ef4444", label: "Document Flagged" },
   doc_ai_scanned: { icon: Sparkles, color: "#8b5cf6", label: "AI Document Scan" },
   supplier_complete: { icon: CheckCircle2, color: "#16a34a", label: "Supplier Submission Complete" },
   status_change: { icon: ArrowRight, color: "#3b82f6", label: "Status Changed" },
   eta_set: { icon: Clock, color: "#8b5cf6", label: "ETA Set" },
-  arrival: { icon: Anchor, color: "#5dd9c1", label: "Shipment Arrived" },
+  arrival: { icon: Anchor, color: "var(--sage-l)", label: "Shipment Arrived" },
   customs_cleared: { icon: CheckCircle2, color: "#16a34a", label: "Customs Cleared" },
-  twinlog_generated: { icon: Hash, color: "#0e4e45", label: "TwinLog Generated" },
+  twinlog_generated: { icon: Hash, color: "var(--sage)", label: "TwinLog Generated" },
   eudr_created: { icon: Shield, color: "#059669", label: "EUDR Record Created" },
   eudr_assessed: { icon: ShieldCheck, color: "#059669", label: "EUDR Assessment Run" },
   cbam_created: { icon: Shield, color: "#2563eb", label: "CBAM Record Created" },
   cbam_assessed: { icon: ShieldCheck, color: "#2563eb", label: "CBAM Assessment Run" },
   trade_archived: { icon: Archive, color: "#9ca3af", label: "Trade Archived" },
   trade_closed: { icon: Archive, color: "#6b7280", label: "Trade Closed" },
-  trade_value_set: { icon: Package, color: "#0e4e45", label: "Trade Value Set" },
+  trade_value_set: { icon: Package, color: "var(--sage)", label: "Trade Value Set" },
 };
 
 /* ── Status Stepper ── */
@@ -161,8 +161,8 @@ function StatusStepper({ current }: { current: string }) {
                 fontSize: 12,
                 fontWeight: 600,
                 background: isArchived ? "rgba(156,163,175,0.15)" :
-                  isComplete ? "#0e4e45" :
-                  isCurrent ? "#5dd9c1" : "rgba(255,255,255,0.1)",
+                  isComplete ? "var(--sage)" :
+                  isCurrent ? "var(--sage-l)" : "rgba(74,124,94,0.06)",
                 color: isArchived ? "#9ca3af" :
                   (isComplete || isCurrent) ? "#fff" : "var(--t3)",
                 transition: "all 0.2s",
@@ -186,7 +186,7 @@ function StatusStepper({ current }: { current: string }) {
                 marginBottom: 18,
                 marginLeft: 6,
                 marginRight: 6,
-                background: isComplete ? "#0e4e45" : "rgba(255,255,255,0.1)",
+                background: isComplete ? "var(--sage)" : "rgba(74,124,94,0.06)",
                 borderRadius: 1,
                 transition: "background 0.2s",
               }} />
@@ -210,14 +210,14 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
         marginBottom: 16,
         padding: "8px 12px",
         borderRadius: 8,
-        background: "rgba(93,217,193,0.06)",
-        border: "1px solid rgba(93,217,193,0.2)",
+        background: "rgba(109,184,154,0.06)",
+        border: "1px solid rgba(109,184,154,0.2)",
       }}>
-        <ShieldCheck size={16} style={{ color: "#0e4e45" }} />
+        <ShieldCheck size={16} style={{ color: "var(--sage)" }} />
         <span style={{
           fontSize: 12,
           fontWeight: 600,
-          color: "#0e4e45",
+          color: "var(--sage)",
         }}>
           Audit Trail
         </span>
@@ -240,7 +240,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
             top: 8,
             bottom: 8,
             width: 2,
-            background: "rgba(255,255,255,0.1)",
+            background: "rgba(74,124,94,0.06)",
             borderRadius: 1,
           }} />
 
@@ -267,7 +267,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                   width: 24,
                   height: 24,
                   borderRadius: "50%",
-                  background: "rgba(255,255,255,0.08)",
+                  background: "rgba(0,0,0,0.04)",
                   border: `2px solid ${cfg.color}`,
                   display: "flex",
                   alignItems: "center",
@@ -286,7 +286,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                       fontSize: 10,
                       fontFamily: "monospace",
                       color: "var(--t3)",
-                      background: "rgba(255,255,255,0.06)",
+                      background: "rgba(0,0,0,0.03)",
                       padding: "2px 6px",
                       borderRadius: 4,
                     }}>
@@ -344,7 +344,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                     </div>
                   )}
                   {event.eventType === "trade_value_set" && event.eventData?.value && (
-                    <div style={{ fontSize: 11, color: "#0e4e45", marginTop: 4 }}>
+                    <div style={{ fontSize: 11, color: "var(--sage)", marginTop: 4 }}>
                       {event.eventData.currency || "USD"} {Number(event.eventData.value).toLocaleString()}
                     </div>
                   )}
@@ -361,7 +361,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
 /* ── Shared regulatory helpers ── */
 
 const BAND_COLORS: Record<string, { bg: string; color: string; bar: string }> = {
-  negligible: { bg: "rgba(34,197,94,0.12)", color: "#5dd9c1", bar: "#22c55e" },
+  negligible: { bg: "rgba(34,197,94,0.12)", color: "var(--sage-l)", bar: "#22c55e" },
   low: { bg: "rgba(234,179,8,0.12)", color: "#eab308", bar: "#eab308" },
   medium: { bg: "rgba(249,115,22,0.12)", color: "#f97316", bar: "#f97316" },
   high: { bg: "rgba(239,68,68,0.12)", color: "#ef4444", bar: "#ef4444" },
@@ -372,7 +372,7 @@ function ScoreBar({ score, band }: { score: number | null; band: string | null }
   const c = BAND_COLORS[band] || BAND_COLORS.medium;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8 }}>
-      <div style={{ flex: 1, height: 8, borderRadius: 4, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+      <div style={{ flex: 1, height: 8, borderRadius: 4, background: "rgba(74,124,94,0.06)", overflow: "hidden" }}>
         <div style={{ width: `${Math.min(score, 100)}%`, height: "100%", borderRadius: 4, background: c.bar, transition: "width 0.3s ease" }} />
       </div>
       <span style={{ fontSize: 13, fontWeight: 700, color: c.color, minWidth: 60, textAlign: "right" }}>
@@ -398,7 +398,7 @@ function ChecksList({ checks }: { checks: any[] }) {
       {open && (
         <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
           {checks.map((c: any) => (
-            <div key={c.id} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 11, color: c.passed ? "#5dd9c1" : c.severity === "critical" ? "#ef4444" : "#eab308" }}>
+            <div key={c.id} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 11, color: c.passed ? "var(--sage-l)" : c.severity === "critical" ? "#ef4444" : "#eab308" }}>
               <span style={{ flexShrink: 0, marginTop: 1 }}>{c.passed ? "✅" : c.severity === "critical" ? "❌" : "⚠️"}</span>
               <div>
                 <span style={{ fontWeight: 500 }}>{c.label}</span>
@@ -447,8 +447,8 @@ function BreakdownRow({ breakdown }: { breakdown: any }) {
       {items.map(item => (
         <div key={item.label} style={{ fontSize: 11, color: "var(--t3)" }}>
           <span style={{ fontWeight: 500 }}>{item.label}</span>
-          <span style={{ marginLeft: 4, fontWeight: 700, color: item.val > 0 ? "#ef4444" : "#5dd9c1" }}>{item.val}</span>
-          <span style={{ color: "rgba(255,255,255,0.3)" }}>/{item.max}</span>
+          <span style={{ marginLeft: 4, fontWeight: 700, color: item.val > 0 ? "#ef4444" : "var(--sage-l)" }}>{item.val}</span>
+          <span style={{ color: "var(--t3)" }}>/{item.max}</span>
         </div>
       ))}
     </div>
@@ -459,7 +459,7 @@ function BreakdownRow({ breakdown }: { breakdown: any }) {
 function FormSection({ title, icon: Icon, children, defaultOpen = false }: { title: string; icon: any; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 12 }}>
+    <div style={{ borderTop: "1px solid rgba(0,0,0,0.06)", paddingTop: 12 }}>
       <button
         onClick={() => setOpen(!open)}
         style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, padding: 0, width: "100%", textAlign: "left" }}
@@ -566,7 +566,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
             {assessment && assessment.applicable && assessment.score != null && (
               <span style={{
                 fontSize: 11, fontWeight: 600, padding: "2px 10px", borderRadius: 4,
-                background: bandC?.bg || "rgba(255,255,255,0.08)",
+                background: bandC?.bg || "rgba(0,0,0,0.04)",
                 color: bandC?.color || "var(--t3)",
               }}>
                 {assessment.score} · {assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : ""}
@@ -676,7 +676,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
             </FormSection>
 
             {/* Assessment Section */}
-            <div style={{ borderTop: "2px solid rgba(255,255,255,0.12)", paddingTop: 16, marginTop: 4 }}>
+            <div style={{ borderTop: "2px solid rgba(0,0,0,0.08)", paddingTop: 16, marginTop: 4 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
                 <Button size="sm" onClick={runAssessment} disabled={assessing} style={{ fontSize: 12 }}>
                   {assessing ? (
@@ -712,7 +712,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               )}
 
               {assessment && assessment.applicable === false && (
-                <div style={{ marginTop: 12, fontSize: 12, color: "var(--t3)", padding: "8px 12px", background: "rgba(255,255,255,0.05)", borderRadius: 8 }}>
+                <div style={{ marginTop: 12, fontSize: 12, color: "var(--t3)", padding: "8px 12px", background: "rgba(0,0,0,0.03)", borderRadius: 8 }}>
                   EUDR does not apply to this trade corridor (commodity or destination not in scope).
                 </div>
               )}
@@ -797,7 +797,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
             {assessment && assessment.applicable && assessment.score != null && (
               <span style={{
                 fontSize: 11, fontWeight: 600, padding: "2px 10px", borderRadius: 4,
-                background: bandC?.bg || "rgba(255,255,255,0.08)",
+                background: bandC?.bg || "rgba(0,0,0,0.04)",
                 color: bandC?.color || "var(--t3)",
               }}>
                 {assessment.score} · {assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : ""}
@@ -880,7 +880,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
             </FormSection>
 
             {/* Assessment Section */}
-            <div style={{ borderTop: "2px solid rgba(255,255,255,0.12)", paddingTop: 16, marginTop: 4 }}>
+            <div style={{ borderTop: "2px solid rgba(0,0,0,0.08)", paddingTop: 16, marginTop: 4 }}>
               <Button size="sm" onClick={runAssessment} disabled={assessing} style={{ fontSize: 12 }}>
                 {assessing ? (
                   <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> Assessing...</>
@@ -907,7 +907,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               )}
 
               {assessment && assessment.applicable === false && (
-                <div style={{ marginTop: 12, fontSize: 12, color: "var(--t3)", padding: "8px 12px", background: "rgba(255,255,255,0.05)", borderRadius: 8 }}>
+                <div style={{ marginTop: 12, fontSize: 12, color: "var(--t3)", padding: "8px 12px", background: "rgba(0,0,0,0.03)", borderRadius: 8 }}>
                   CBAM does not apply to this trade corridor (commodity or destination not in scope).
                 </div>
               )}
@@ -1106,27 +1106,27 @@ export default function TradeDetail() {
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
-          background: "rgba(255,255,255,0.08)",
+          background: "rgba(0,0,0,0.04)",
           borderRadius: 20,
           padding: "5px 14px",
           fontSize: 11,
-          color: "rgba(255,255,255,0.55)",
+          color: "var(--t3)",
           marginBottom: 14,
           letterSpacing: "0.03em",
         }}>
-          <Link href="/trades" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>
+          <Link href="/trades" style={{ color: "var(--t3)", textDecoration: "none" }}>
             My Trades
           </Link>
           <ChevronRight size={12} />
-          <span style={{ color: "rgba(255,255,255,0.8)" }}>
+          <span style={{ color: "var(--t1)" }}>
             {isLoading ? "Loading..." : data?.lookup?.commodityName || "Trade Detail"}
           </span>
         </div>
 
         {isLoading ? (
           <div className="space-y-2">
-            <Skeleton className="h-8 w-64" style={{ background: "rgba(255,255,255,0.1)" }} />
-            <Skeleton className="h-4 w-48" style={{ background: "rgba(255,255,255,0.06)" }} />
+            <Skeleton className="h-8 w-64" style={{ background: "rgba(74,124,94,0.06)" }} />
+            <Skeleton className="h-4 w-48" style={{ background: "rgba(0,0,0,0.03)" }} />
           </div>
         ) : data ? (
           <>
@@ -1135,7 +1135,7 @@ export default function TradeDetail() {
                 fontFamily: "'Clash Display', sans-serif",
                 fontWeight: 700,
                 fontSize: 28,
-                color: "#fff",
+                color: "var(--t1)",
                 margin: 0,
               }}>
                 {data.lookup.commodityName}
@@ -1161,9 +1161,9 @@ export default function TradeDetail() {
               {/* Readiness score badge */}
               {data.lookup.readinessScore != null && (
                 <Badge style={{
-                  background: "rgba(255,255,255,0.1)",
-                  color: "#fff",
-                  border: "1px solid rgba(255,255,255,0.15)",
+                  background: "rgba(74,124,94,0.06)",
+                  color: "var(--t1)",
+                  border: "1px solid rgba(0,0,0,0.08)",
                   fontSize: 11,
                   fontWeight: 600,
                   padding: "3px 10px",
@@ -1175,14 +1175,14 @@ export default function TradeDetail() {
 
             <p style={{
               fontSize: 14,
-              color: "rgba(255,255,255,0.55)",
+              color: "var(--t3)",
               margin: "6px 0 0",
             }}>
               {nameFlag(data.lookup.originName)} {data.lookup.originName}
               {" → "}
               {nameFlag(data.lookup.destinationName)} {data.lookup.destinationName}
               {data.lookup.hsCode && (
-                <span style={{ marginLeft: 10, fontFamily: "monospace", fontSize: 12, color: "rgba(255,255,255,0.35)" }}>
+                <span style={{ marginLeft: 10, fontFamily: "monospace", fontSize: 12, color: "var(--t3)" }}>
                   HS {data.lookup.hsCode}
                 </span>
               )}
@@ -1258,7 +1258,7 @@ export default function TradeDetail() {
                         fontFamily: "'Clash Display', sans-serif",
                         fontWeight: 700,
                         fontSize: 28,
-                        color: "#5dd9c1",
+                        color: "var(--sage-l)",
                       }}>
                         {data.lookup.readinessScore}
                       </div>
@@ -1270,7 +1270,7 @@ export default function TradeDetail() {
                           fontSize: 12,
                           fontWeight: 700,
                           color: data.lookup.readinessVerdict === "RED" ? "#ef4444" :
-                            data.lookup.readinessVerdict === "AMBER" ? "#eab308" : "#5dd9c1",
+                            data.lookup.readinessVerdict === "AMBER" ? "#eab308" : "var(--sage-l)",
                         }}>
                           {data.lookup.readinessVerdict || "—"}
                         </div>
@@ -1398,9 +1398,9 @@ export default function TradeDetail() {
                                 fontSize: 11,
                                 padding: "2px 8px",
                                 borderRadius: 6,
-                                background: received ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.06)",
+                                background: received ? "rgba(34,197,94,0.1)" : "rgba(0,0,0,0.03)",
                                 color: received ? "#16a34a" : "var(--t3)",
-                                border: `1px solid ${received ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.08)"}`,
+                                border: `1px solid ${received ? "rgba(34,197,94,0.15)" : "rgba(0,0,0,0.04)"}`,
                               }}>
                                 {received && <CheckCircle2 size={9} style={{ display: "inline", marginRight: 3, verticalAlign: "middle" }} />}
                                 {doc}
@@ -1422,11 +1422,11 @@ export default function TradeDetail() {
                                 padding: "10px 12px",
                                 background: upload.verified === true ? "rgba(34,197,94,0.06)" :
                                   (upload.verified === false && upload.finding) ? "rgba(239,68,68,0.06)" :
-                                  "rgba(255,255,255,0.03)",
+                                  "rgba(0,0,0,0.02)",
                                 border: `1px solid ${
                                   upload.verified === true ? "rgba(34,197,94,0.15)" :
                                   (upload.verified === false && upload.finding) ? "rgba(239,68,68,0.15)" :
-                                  "rgba(255,255,255,0.06)"
+                                  "rgba(0,0,0,0.03)"
                                 }`,
                                 borderRadius: 8,
                               }}>
@@ -1446,7 +1446,7 @@ export default function TradeDetail() {
                                     {upload.uploadedBy === "buyer" && (
                                       <span style={{
                                         fontSize: 9, fontWeight: 600, color: "var(--t3)",
-                                        background: "rgba(255,255,255,0.08)", padding: "1px 5px",
+                                        background: "rgba(0,0,0,0.04)", padding: "1px 5px",
                                         borderRadius: 4,
                                       }}>
                                         Manual
@@ -1491,7 +1491,7 @@ export default function TradeDetail() {
                                       </button>
                                     )}
                                     {verifyingId === upload.id ? (
-                                      <Loader2 size={14} style={{ color: "#0e4e45", animation: "spin 1s linear infinite" }} />
+                                      <Loader2 size={14} style={{ color: "var(--sage)", animation: "spin 1s linear infinite" }} />
                                     ) : upload.verified !== true ? (
                                       <button
                                         onClick={() => handleVerify(upload.id)}
@@ -1576,8 +1576,8 @@ export default function TradeDetail() {
                                 {flaggingUploadId === upload.id && (
                                   <div style={{
                                     marginTop: 8, padding: 10, borderRadius: 6,
-                                    background: "rgba(255,255,255,0.04)",
-                                    border: "1px solid rgba(255,255,255,0.08)",
+                                    background: "rgba(0,0,0,0.02)",
+                                    border: "1px solid rgba(0,0,0,0.06)",
                                   }}>
                                     <div style={{ fontSize: 11, fontWeight: 600, color: "var(--t2)", marginBottom: 6 }}>
                                       Flag issue with this document
@@ -1588,8 +1588,8 @@ export default function TradeDetail() {
                                       value={flagFinding}
                                       onChange={(e) => setFlagFinding(e.target.value)}
                                       style={{
-                                        width: "100%", background: "rgba(255,255,255,0.06)",
-                                        border: "1px solid rgba(255,255,255,0.12)", color: "var(--t1)",
+                                        width: "100%", background: "rgba(0,0,0,0.03)",
+                                        border: "1px solid rgba(0,0,0,0.08)", color: "var(--t1)",
                                         borderRadius: 6, padding: "6px 8px", fontSize: 11, marginBottom: 6,
                                       }}
                                     />
@@ -1599,8 +1599,8 @@ export default function TradeDetail() {
                                       value={flagUcpRule}
                                       onChange={(e) => setFlagUcpRule(e.target.value)}
                                       style={{
-                                        width: "100%", background: "rgba(255,255,255,0.06)",
-                                        border: "1px solid rgba(255,255,255,0.12)", color: "var(--t1)",
+                                        width: "100%", background: "rgba(0,0,0,0.03)",
+                                        border: "1px solid rgba(0,0,0,0.08)", color: "var(--t1)",
                                         borderRadius: 6, padding: "6px 8px", fontSize: 11, marginBottom: 8,
                                       }}
                                     />
@@ -1620,7 +1620,7 @@ export default function TradeDetail() {
                                       <button
                                         onClick={() => { setFlaggingUploadId(null); setFlagFinding(""); setFlagUcpRule(""); }}
                                         style={{
-                                          background: "transparent", color: "var(--t3)", border: "1px solid rgba(255,255,255,0.1)",
+                                          background: "transparent", color: "var(--t3)", border: "1px solid rgba(0,0,0,0.06)",
                                           borderRadius: 6, padding: "5px 12px", fontSize: 11, cursor: "pointer",
                                         }}
                                       >
@@ -1640,8 +1640,8 @@ export default function TradeDetail() {
                         <div style={{
                           marginTop: 14,
                           padding: 14,
-                          background: "rgba(255,255,255,0.04)",
-                          border: "1px solid rgba(255,255,255,0.08)",
+                          background: "rgba(0,0,0,0.02)",
+                          border: "1px solid rgba(0,0,0,0.06)",
                           borderRadius: 10,
                         }}>
                           <div style={{ fontSize: 12, fontWeight: 600, color: "var(--t2)", marginBottom: 10 }}>
@@ -1652,8 +1652,8 @@ export default function TradeDetail() {
                             onChange={(e) => setBuyerDocType(e.target.value)}
                             style={{
                               width: "100%",
-                              background: "rgba(255,255,255,0.06)",
-                              border: "1px solid rgba(255,255,255,0.12)",
+                              background: "rgba(0,0,0,0.03)",
+                              border: "1px solid rgba(0,0,0,0.08)",
                               color: "var(--t1)",
                               borderRadius: 6,
                               padding: "8px 10px",
@@ -1684,8 +1684,8 @@ export default function TradeDetail() {
                             onChange={(e) => setBuyerNote(e.target.value)}
                             style={{
                               width: "100%",
-                              background: "rgba(255,255,255,0.06)",
-                              border: "1px solid rgba(255,255,255,0.12)",
+                              background: "rgba(0,0,0,0.03)",
+                              border: "1px solid rgba(0,0,0,0.08)",
                               color: "var(--t1)",
                               borderRadius: 6,
                               padding: "8px 10px",
@@ -1696,7 +1696,7 @@ export default function TradeDetail() {
                           <div style={{ display: "flex", gap: 8 }}>
                             <Button
                               size="sm"
-                              style={{ fontSize: 11, background: "#0e4e45", color: "#fff" }}
+                              style={{ fontSize: 11, background: "var(--sage)", color: "#fff" }}
                               disabled={!buyerDocType || buyerUploading}
                               onClick={handleBuyerUpload}
                             >
@@ -1751,7 +1751,7 @@ export default function TradeDetail() {
                           borderRadius: 6,
                           padding: "3px 10px",
                           fontSize: 11,
-                          color: "#0e4e45",
+                          color: "var(--sage)",
                           cursor: "pointer",
                         }}
                       >
@@ -1806,7 +1806,7 @@ export default function TradeDetail() {
                             fontWeight: 600,
                             borderRadius: 6,
                             border: "none",
-                            background: "#0e4e45",
+                            background: "var(--sage)",
                             color: "#fff",
                             cursor: savingValue ? "wait" : "pointer",
                             opacity: savingValue || !tradeValueInput.trim() ? 0.5 : 1,
@@ -1835,7 +1835,7 @@ export default function TradeDetail() {
                       fontFamily: "'Clash Display', sans-serif",
                       fontWeight: 700,
                       fontSize: 24,
-                      color: "#5dd9c1",
+                      color: "var(--sage-l)",
                     }}>
                       {data.lookup.tradeValueCurrency || "USD"} {Number(data.lookup.tradeValue).toLocaleString()}
                     </div>
@@ -1855,7 +1855,7 @@ export default function TradeDetail() {
                 if (!estimate) return null;
                 const tradeVal = data.lookup.tradeValue ? Number(data.lookup.tradeValue) : 0;
                 const pctOfCargo = tradeVal > 0 ? ((estimate.maxCost / tradeVal) * 100).toFixed(1) : null;
-                const verdictColor = verdict === "RED" ? "#ef4444" : verdict === "AMBER" ? "#eab308" : "#5dd9c1";
+                const verdictColor = verdict === "RED" ? "#ef4444" : verdict === "AMBER" ? "#eab308" : "var(--sage-l)";
                 return (
                   <Card>
                     <CardContent className="p-5">
@@ -1881,7 +1881,7 @@ export default function TradeDetail() {
                         </div>
                         <div style={{ marginBottom: 6 }}>
                           <span style={{ color: "var(--t3)", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Cost range (20ft)</span>
-                          <div style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 20, color: "#0e4e45" }}>
+                          <div style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 20, color: "var(--sage)" }}>
                             ${estimate.minCost.toLocaleString()} – ${estimate.maxCost.toLocaleString()}
                           </div>
                         </div>
@@ -1892,7 +1892,7 @@ export default function TradeDetail() {
                         )}
                       </div>
                       <Link href="/demurrage">
-                        <span style={{ fontSize: 11, color: "#0e4e45", cursor: "pointer", fontWeight: 600 }}>
+                        <span style={{ fontSize: 11, color: "var(--sage)", cursor: "pointer", fontWeight: 600 }}>
                           Open full calculator ({estimate.allPorts.length} port{estimate.allPorts.length !== 1 ? "s" : ""}) →
                         </span>
                       </Link>
@@ -1915,13 +1915,13 @@ export default function TradeDetail() {
                 <Card style={{ marginTop: 16 }}>
                   <CardContent className="p-4">
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                      <Hash size={14} style={{ color: "#0e4e45" }} />
+                      <Hash size={14} style={{ color: "var(--sage)" }} />
                       <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>TwinLog Reference</span>
                     </div>
                     <div style={{
                       fontFamily: "monospace",
                       fontSize: 12,
-                      color: "#0e4e45",
+                      color: "var(--sage)",
                       background: "rgba(14,78,69,0.06)",
                       padding: "8px 12px",
                       borderRadius: 8,
