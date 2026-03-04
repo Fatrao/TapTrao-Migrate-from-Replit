@@ -405,7 +405,7 @@
 /* ── Label — hidden when collapsed ── */
 .mi-label {
   font-family: var(--fb);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: rgba(255,255,255,0.4);
   white-space: nowrap;
