@@ -17,7 +17,7 @@ export default function NewCheck() {
           background: "rgba(255,255,255,0.08)",
           borderRadius: 20,
           padding: "5px 14px",
-          fontSize: 11,
+          fontSize: 13,
           color: "rgba(255,255,255,0.55)",
           marginBottom: 14,
           letterSpacing: "0.03em",

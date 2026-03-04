@@ -65,7 +65,7 @@ export default function AdminFeatureRequests() {
   return (
     <AppShell>
       <div style={{ margin: "4px 24px 16px", padding: "32px 28px", borderRadius: 14, background: "linear-gradient(135deg, #0e4e45, #14574a, #1c6352, #327462, #3a7d6a)" }}>
-        <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
           Admin
         </div>
         <h1 style={{ fontSize: 28, fontWeight: 700, color: "#fff", margin: 0, fontFamily: "'Clash Display', sans-serif" }}>
@@ -91,7 +91,7 @@ export default function AdminFeatureRequests() {
                 }}>
                   {status}
                 </span>
-                <span style={{ fontSize: 12, color: "#888" }}>{items.length}</span>
+                <span style={{ fontSize: 14, color: "#888" }}>{items.length}</span>
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -110,13 +110,13 @@ export default function AdminFeatureRequests() {
                             {req.description}
                           </div>
                         )}
-                        <div style={{ fontSize: 11, color: "#999" }}>
+                        <div style={{ fontSize: 13, color: "#999" }}>
                           {new Date(req.createdAt).toLocaleDateString()} · Session: {req.sessionId.substring(0, 8)}…
                         </div>
                         {req.adminNote && (
                           <div style={{
                             marginTop: 8, padding: "6px 10px", borderRadius: 6,
-                            background: "#f8f8f8", fontSize: 12, color: "#555",
+                            background: "#f8f8f8", fontSize: 14, color: "#555",
                             borderLeft: "3px solid #0e4e45",
                           }}>
                             <strong>Note:</strong> {req.adminNote}
@@ -155,20 +155,20 @@ export default function AdminFeatureRequests() {
                           placeholder="Add admin note..."
                           style={{
                             flex: 1, padding: "6px 10px", borderRadius: 6,
-                            border: "1px solid #ddd", fontSize: 12, outline: "none",
+                            border: "1px solid #ddd", fontSize: 14, outline: "none",
                           }}
                         />
                         <button
                           onClick={() => updateMutation.mutate({ id: req.id, status: req.status, adminNote: editNote })}
                           style={{
-                            padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600,
+                            padding: "6px 12px", borderRadius: 6, fontSize: 13, fontWeight: 600,
                             background: "#0e4e45", color: "#fff", border: "none", cursor: "pointer",
                           }}
                         >Save</button>
                         <button
                           onClick={() => { setEditingId(null); setEditNote(""); }}
                           style={{
-                            padding: "6px 10px", borderRadius: 6, fontSize: 11,
+                            padding: "6px 10px", borderRadius: 6, fontSize: 13,
                             background: "#f3f3f3", color: "#666", border: "none", cursor: "pointer",
                           }}
                         >Cancel</button>
@@ -177,7 +177,7 @@ export default function AdminFeatureRequests() {
                       <button
                         onClick={() => { setEditingId(req.id); setEditNote(req.adminNote || ""); }}
                         style={{
-                          marginTop: 8, fontSize: 11, color: "#0e4e45", background: "none",
+                          marginTop: 8, fontSize: 13, color: "#0e4e45", background: "none",
                           border: "none", cursor: "pointer", padding: 0, fontWeight: 500,
                         }}
                       >

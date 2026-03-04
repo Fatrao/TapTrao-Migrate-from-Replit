@@ -137,12 +137,12 @@ export default function Dashboard() {
         </div>
         <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
           <Link href="/new-check">
-            <button className="ai-btn" data-testid="stat-new-check" style={{ fontSize: 12, padding: "6px 16px" }}>
+            <button className="ai-btn" data-testid="stat-new-check" style={{ fontSize: 14, padding: "6px 16px" }}>
               New Check
             </button>
           </Link>
           <Link href="/inbox">
-            <button className="ai-btn" data-testid="stat-supplier-link" style={{ fontSize: 12, padding: "6px 16px", background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}>
+            <button className="ai-btn" data-testid="stat-supplier-link" style={{ fontSize: 14, padding: "6px 16px", background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}>
               Supplier Inbox
             </button>
           </Link>
@@ -244,7 +244,7 @@ export default function Dashboard() {
                   </td>
                   <td>
                     {t.corridor}<br />
-                    <span style={{ fontSize: 11, color: "var(--app-regent)" }}>{t.date}</span>
+                    <span style={{ fontSize: 13, color: "var(--app-regent)" }}>{t.date}</span>
                   </td>
                   <td>{t.value}</td>
                   <td>
@@ -351,7 +351,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-                      <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 4, background: st.bg, color: st.color }}>
+                      <span style={{ fontSize: 14, fontWeight: 600, padding: "2px 8px", borderRadius: 4, background: st.bg, color: st.color }}>
                         {st.label}
                       </span>
                       <span style={{ fontSize: 10.5, color: "var(--app-regent)" }}>

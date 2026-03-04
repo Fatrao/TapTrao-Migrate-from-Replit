@@ -5,8 +5,8 @@ import { PORTS, CONTAINER_OPTIONS, computeDemurrage, type ContainerType } from "
 const s = {
   page: { maxWidth: 960, margin: "0 auto", padding: "28px 20px" } as React.CSSProperties,
   panel: { background: "var(--card)", borderRadius: 14, padding: 24, boxShadow: "0 1px 3px rgba(0,0,0,.03), 0 4px 16px rgba(0,0,0,.05)" } as React.CSSProperties,
-  label: { fontFamily: "'Inter', sans-serif", fontSize: 9, fontWeight: 600, color: "var(--t3)", marginBottom: 4, display: "block", textTransform: "uppercase", letterSpacing: ".08em" } as React.CSSProperties,
-  helper: { fontSize: 11, color: "var(--t3)", marginTop: 3 } as React.CSSProperties,
+  label: { fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 600, color: "var(--t3)", marginBottom: 4, display: "block", textTransform: "uppercase", letterSpacing: ".08em" } as React.CSSProperties,
+  helper: { fontSize: 13, color: "var(--t3)", marginTop: 3 } as React.CSSProperties,
   input: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: ".5rem", color: "var(--t1)", fontSize: 14, outline: "none" } as React.CSSProperties,
   select: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: ".5rem", color: "var(--t1)", fontSize: 14, outline: "none", appearance: "none" as const } as React.CSSProperties,
   field: { marginBottom: 16 } as React.CSSProperties,
@@ -83,7 +83,7 @@ export default function DemurragePage() {
                       background: container === opt.value ? "var(--blue-dim)" : "var(--card2)",
                       border: container === opt.value ? "1px solid var(--blue-bd)" : "none",
                       color: container === opt.value ? "var(--blue)" : "var(--t2)",
-                      fontSize: 12, fontWeight: container === opt.value ? 700 : 500,
+                      fontSize: 14, fontWeight: container === opt.value ? 700 : 500,
                       transition: "all .15s",
                     }}
                   >
@@ -122,7 +122,7 @@ export default function DemurragePage() {
                 <button
                   data-testid="demurrage-toggle-date"
                   onClick={() => setUseDate(!useDate)}
-                  style={{ background: "none", border: "none", color: "var(--blue)", fontSize: 11, cursor: "pointer", fontWeight: 600 }}
+                  style={{ background: "none", border: "none", color: "var(--blue)", fontSize: 13, cursor: "pointer", fontWeight: 600 }}
                 >
                   {useDate ? "Enter days manually" : "Calculate from arrival date"}
                 </button>
@@ -188,27 +188,27 @@ export default function DemurragePage() {
                   <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 22, fontWeight: 700, color: "var(--t1)" }} data-testid="demurrage-chargeable-days">
                     {chargeableDays}
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--t3)" }}>Billable days</div>
+                  <div style={{ fontSize: 13, color: "var(--t3)" }}>Billable days</div>
                 </div>
                 <div style={{ textAlign: "center", padding: 12, background: "var(--card2)", borderRadius: 8 }}>
                   <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 22, fontWeight: 700, color: "var(--t1)" }} data-testid="demurrage-daily-rate">
                     ${baseRate}
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--t3)" }}>Daily rate</div>
+                  <div style={{ fontSize: 13, color: "var(--t3)" }}>Daily rate</div>
                 </div>
                 <div style={{ textAlign: "center", padding: 12, background: "var(--card2)", borderRadius: 8 }}>
                   <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 22, fontWeight: 700, color: "var(--t1)" }}>
                     {effectiveDaysHeld}
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--t3)" }}>Days at port</div>
+                  <div style={{ fontSize: 13, color: "var(--t3)" }}>Days at port</div>
                 </div>
               </div>
 
               {/* Cost breakdown */}
               {tiers.length > 0 ? (
                 <div style={{ marginBottom: 20 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--t2)", marginBottom: 8 }}>Cost breakdown</div>
-                  <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--t2)", marginBottom: 8 }}>Cost breakdown</div>
+                  <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
                     <thead>
                       <tr style={{ borderBottom: "1px solid var(--s5)" }}>
                         <th style={{ textAlign: "left", padding: "6px 0", color: "var(--t3)", fontWeight: 500 }}>Period</th>
@@ -248,15 +248,15 @@ export default function DemurragePage() {
                   ${total.toLocaleString()}
                 </span>
               </div>
-              <p style={{ fontSize: 11, color: "var(--t3)", textAlign: "right", marginTop: -8, marginBottom: 12, fontStyle: "italic" }}>Based on current inputs</p>
+              <p style={{ fontSize: 13, color: "var(--t3)", textAlign: "right", marginTop: -8, marginBottom: 12, fontStyle: "italic" }}>Based on current inputs</p>
 
               {cargoVal > 0 && (
                 <div style={{ marginBottom: 12 }}>
-                  <span style={{ fontSize: 12, color: pct > 5 ? "var(--red)" : "var(--t2)" }} data-testid="demurrage-pct">
+                  <span style={{ fontSize: 14, color: pct > 5 ? "var(--red)" : "var(--t2)" }} data-testid="demurrage-pct">
                     Demurrage as % of cargo value: {pct.toFixed(1)}%
                   </span>
                   {pct > 5 && (
-                    <p style={{ fontSize: 11, color: "var(--red)", marginTop: 4 }}>
+                    <p style={{ fontSize: 13, color: "var(--red)", marginTop: 4 }}>
                       Consider whether re-export or destruction may be cheaper.
                     </p>
                   )}
@@ -271,26 +271,26 @@ export default function DemurragePage() {
               </div>
               <div className="demurrage-nudge-grid">
                 <div style={{ background: "var(--card2)", borderRadius: 8, padding: "12px 14px" }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>Re-export</div>
-                  <div style={{ fontSize: 11, color: "var(--t2)" }}>Often 30–50% of cargo value</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>Re-export</div>
+                  <div style={{ fontSize: 13, color: "var(--t2)" }}>Often 30–50% of cargo value</div>
                 </div>
                 <div style={{ background: "var(--card2)", borderRadius: 8, padding: "12px 14px" }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>Destruction</div>
-                  <div style={{ fontSize: 11, color: "var(--t2)" }}>Often $500–5,000, depending on port and volume</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>Destruction</div>
+                  <div style={{ fontSize: 13, color: "var(--t2)" }}>Often $500–5,000, depending on port and volume</div>
                 </div>
                 <div style={{ background: "var(--card2)", borderRadius: 8, padding: "12px 14px" }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>Appeal / re-test</div>
-                  <div style={{ fontSize: 11, color: "var(--t2)" }}>Re-testing fee typically $200-500 + additional storage</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>Appeal / re-test</div>
+                  <div style={{ fontSize: 13, color: "var(--t2)" }}>Re-testing fee typically $200-500 + additional storage</div>
                 </div>
               </div>
-              <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "var(--t3)", marginTop: 12, lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)", marginTop: 12, lineHeight: 1.5 }}>
                 Rates are indicative based on published port tariffs. Actual rates vary by
                 carrier, season, and contract terms. Confirm final charges with your freight agent.
               </p>
             </div>
 
             {/* Disclaimer */}
-            <p style={{ fontSize: 11, color: "var(--t3)", marginTop: 16, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 13, color: "var(--t3)", marginTop: 16, lineHeight: 1.5 }}>
               TapTrao demurrage estimates are based on published port tariff data and are
               provided for planning purposes only. They do not constitute financial advice.
             </p>

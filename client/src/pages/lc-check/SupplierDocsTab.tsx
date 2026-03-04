@@ -128,7 +128,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
             <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 16, color: "var(--t1)", marginBottom: 6 }}>
               Send document request to supplier
             </h3>
-            <p style={{ fontSize: 12, color: "var(--t2)", lineHeight: 1.5, marginBottom: 14 }}>
+            <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.5, marginBottom: 14 }}>
               {sr?.lastSentAt
                 ? `Last sent via ${(sr.sentVia as string[])?.slice(-1)[0] || "link"} \u00B7 ${relativeTime(sr.lastSentAt as unknown as string)} \u00B7 ${sr.status}`
                 : "Generate a secure upload link and send it to your supplier. They can upload directly \u2014 no account required."}
@@ -140,7 +140,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
                 style={{
                   background: "rgba(37,211,102,.12)",
                   color: "#25D366",
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: 700,
                   padding: "9px 16px",
                   borderRadius: 7,
@@ -159,7 +159,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
                 style={{
                   background: "var(--blue-dim)",
                   color: "var(--blue)",
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: 700,
                   padding: "9px 16px",
                   borderRadius: 7,
@@ -178,7 +178,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
                 style={{
                   background: "var(--card2)",
                   color: "var(--t2)",
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: 700,
                   padding: "9px 16px",
                   borderRadius: 7,
@@ -197,7 +197,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
 
         {/* DOCUMENT CHECKLIST */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-          <span style={{ fontFamily: "var(--fb)", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", whiteSpace: "nowrap" }}>
+          <span style={{ fontFamily: "var(--fb)", fontSize: 13, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", whiteSpace: "nowrap" }}>
             Required documents ({totalCount})
           </span>
           <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
@@ -267,12 +267,12 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{docName}</div>
-                  <div style={{ fontSize: 10, color: "var(--t3)", fontFamily: "var(--fb)" }}>{getDocIssuer(docName)}</div>
+                  <div style={{ fontSize: 14, color: "var(--t3)", fontFamily: "var(--fb)" }}>{getDocIssuer(docName)}</div>
                 </div>
                 <span
                   style={{
                     fontFamily: "var(--fb)",
-                    fontSize: 9,
+                    fontSize: 13,
                     color: statusColor,
                     whiteSpace: "nowrap",
                   }}
@@ -294,12 +294,12 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
                   }}
                 >
                   <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--red)", marginTop: 4, flexShrink: 0 }} />
-                  <span style={{ fontSize: 11, color: "var(--t2)", lineHeight: 1.5, flex: 1 }}>{upload!.finding}</span>
+                  <span style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.5, flex: 1 }}>{upload!.finding}</span>
                   {upload!.ucpRule && (
                     <span
                       style={{
                         fontFamily: "var(--fb)",
-                        fontSize: 9,
+                        fontSize: 13,
                         background: "var(--blue-dim)",
 
                         color: "var(--blue)",
@@ -326,14 +326,14 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
               >
                 {upload ? (
                   <>
-                    <span style={{ fontFamily: "var(--fb)", fontSize: 11, color: "var(--t3)", flex: 1 }}>
+                    <span style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)", flex: 1 }}>
                       {upload.originalFilename}
                       {upload.filesizeBytes ? ` \u00B7 ${(upload.filesizeBytes / 1024).toFixed(0)}KB` : ""}
                       {upload.uploadedAt ? ` \u00B7 ${relativeTime(upload.uploadedAt as unknown as string)}` : ""}
                     </span>
                   </>
                 ) : (
-                  <span style={{ fontStyle: "italic", fontSize: 11, color: "var(--t3)", flex: 1 }}>Not yet uploaded</span>
+                  <span style={{ fontStyle: "italic", fontSize: 13, color: "var(--t3)", flex: 1 }}>Not yet uploaded</span>
                 )}
               </div>
             </div>
@@ -352,11 +352,11 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
         <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 15, color: "var(--t1)", marginBottom: 4 }}>
           Document progress
         </h3>
-        <p style={{ fontFamily: "var(--fb)", fontSize: 11, color: "var(--t3)", marginBottom: 16 }}>
+        <p style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)", marginBottom: 16 }}>
           {prefillData?.commodity_name || "Commodity"} \u00B7 {prefillData?.origin_name || ""} \u2192 {prefillData?.dest_name || ""}
         </p>
 
-        <div style={{ fontFamily: "var(--fb)", fontSize: 9, color: "var(--t3)", marginBottom: 6 }}>
+        <div style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)", marginBottom: 6 }}>
           {receivedCount} of {totalCount} received
         </div>
         <div style={{ height: 4, background: "var(--border)", borderRadius: 2, marginBottom: 12, overflow: "hidden" }}>
@@ -371,7 +371,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
           />
         </div>
 
-        <p style={{ fontSize: 11, color: "var(--t2)", lineHeight: 1.5, marginBottom: 16 }}>
+        <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.5, marginBottom: 16 }}>
           {receivedCount === 0
             ? "No documents received yet. Send a request to your supplier to get started."
             : receivedCount === totalCount
@@ -381,7 +381,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
 
         <div style={{ height: 1, background: "var(--border)", margin: "12px 0" }} />
 
-        <div style={{ fontFamily: "var(--fb)", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", marginBottom: 10 }}>
+        <div style={{ fontFamily: "var(--fb)", fontSize: 13, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", marginBottom: 10 }}>
           Activity
         </div>
 
@@ -389,10 +389,10 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
           <div style={{ display: "flex", gap: 10, padding: "8px 0", borderBottom: "1px solid var(--border)", alignItems: "flex-start" }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--blue)", marginTop: 3, flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 11, color: "var(--t2)" }}>
+              <div style={{ fontSize: 13, color: "var(--t2)" }}>
                 Supplier brief sent via {(sr.sentVia as string[])?.slice(-1)[0] || "link"}
               </div>
-              <div style={{ fontFamily: "var(--fb)", fontSize: 9, color: "var(--t3)" }}>
+              <div style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)" }}>
                 {relativeTime(sr.lastSentAt as unknown as string)}
               </div>
             </div>
@@ -403,10 +403,10 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
           <div key={idx} style={{ display: "flex", gap: 10, padding: "8px 0", borderBottom: "1px solid var(--border)", alignItems: "flex-start" }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: upload.verified ? "var(--green)" : "var(--amber)", marginTop: 3, flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 11, color: "var(--t2)" }}>
+              <div style={{ fontSize: 13, color: "var(--t2)" }}>
                 {upload.verified ? `${upload.docType} verified` : `${upload.docType} uploaded`}
               </div>
-              <div style={{ fontFamily: "var(--fb)", fontSize: 9, color: "var(--t3)" }}>
+              <div style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)" }}>
                 {upload.uploadedAt ? relativeTime(upload.uploadedAt as unknown as string) : ""}
               </div>
             </div>
@@ -414,17 +414,17 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
         ))}
 
         {!sr?.lastSentAt && uploads.length === 0 && (
-          <div style={{ fontSize: 11, color: "var(--t3)", fontStyle: "italic", padding: "8px 0" }}>
+          <div style={{ fontSize: 13, color: "var(--t3)", fontStyle: "italic", padding: "8px 0" }}>
             No activity yet
           </div>
         )}
 
         <div style={{ height: 1, background: "var(--border)", margin: "12px 0" }} />
 
-        <div style={{ fontFamily: "var(--fb)", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", marginBottom: 6 }}>
+        <div style={{ fontFamily: "var(--fb)", fontSize: 13, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", marginBottom: 6 }}>
           Supplier
         </div>
-        <div style={{ fontSize: 12, fontWeight: 600, color: "var(--t1)", marginBottom: 4 }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: "var(--t1)", marginBottom: 4 }}>
           {sr?.supplierName || "Not yet assigned"}
         </div>
         {sr?.uploadToken && (
@@ -439,7 +439,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
               marginTop: 10,
               background: "transparent",
               color: "var(--t2)",
-              fontSize: 11,
+              fontSize: 13,
               fontWeight: 500,
               padding: "8px 12px",
               borderRadius: 8,

@@ -436,7 +436,7 @@ export default function LcCheck() {
               {prefillData.lookup_id && (
                 <Link
                   href="/trades"
-                  style={{ fontSize: 11, color: "var(--app-acapulco)", textDecoration: "underline", marginTop: 4, display: "inline-block" }}
+                  style={{ fontSize: 13, color: "var(--app-acapulco)", textDecoration: "underline", marginTop: 4, display: "inline-block" }}
                   data-testid="link-view-lookup"
                 >
                   View lookup →
@@ -711,7 +711,7 @@ export default function LcCheck() {
 
               {/* Quantity Tolerance — SWIFT 39A/39B */}
               <div className="form-group" style={{ marginTop: 12 }}>
-                <label>Quantity Tolerance % <span style={{ fontSize: 11, color: "#888" }}>(SWIFT 39A — default 5%)</span></label>
+                <label>Quantity Tolerance % <span style={{ fontSize: 13, color: "#888" }}>(SWIFT 39A — default 5%)</span></label>
                 <input
                   type="number"
                   min={0}
@@ -744,7 +744,7 @@ export default function LcCheck() {
                 <div className="upload-note" style={{ padding: "24px 16px", textAlign: "center" }}>
                   <div style={{ fontSize: 22, marginBottom: 8, animation: "pulse 1.5s ease-in-out infinite" }}>🔍</div>
                   <div style={{ fontWeight: 600, fontSize: 14, color: "#2a3d40", marginBottom: 4 }}>Extracting fields from your LC...</div>
-                  <div style={{ fontSize: 12, color: "#888" }}>This may take 10-20 seconds</div>
+                  <div style={{ fontSize: 14, color: "#888" }}>This may take 10-20 seconds</div>
                 </div>
               )}
 
@@ -1107,7 +1107,7 @@ export default function LcCheck() {
                     {lcItems.length > 0 && (
                       <>
                         {crossItems.length > 0 && (
-                          <div style={{ fontSize: 9.5, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", margin: "8px 0 4px", paddingLeft: 4 }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", margin: "8px 0 4px", paddingLeft: 4 }}>
                             LC Validation
                           </div>
                         )}
@@ -1131,7 +1131,7 @@ export default function LcCheck() {
 
                     {crossItems.length > 0 && (
                       <>
-                        <div style={{ fontSize: 9.5, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", margin: "10px 0 4px", paddingLeft: 4 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", margin: "10px 0 4px", paddingLeft: 4 }}>
                           Cross-Document Consistency
                         </div>
                         {crossItems.map((r, i) => (
@@ -1203,7 +1203,7 @@ export default function LcCheck() {
 
                 {/* Correction text */}
                 <div style={{ background: "#f7f7f7", borderRadius: 10, padding: "16px 18px", border: "1px solid #e8e8e8" }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#555", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".05em" }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "#555", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".05em" }}>
                     {correctionTab === "email" ? "Email message" : "WhatsApp message"}
                   </div>
                   <div className="lc-email-box" data-testid={`text-correction-${correctionTab}`}>
@@ -1272,10 +1272,10 @@ export default function LcCheck() {
                   <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-lc-check-ref">
                     LC check ref: TT-LC-{new Date().getFullYear()}-{resultData.integrityHash.substring(0, 6).toUpperCase()}
                   </p>
-                  <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "var(--app-regent)", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
+                  <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--app-regent)", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
                     Integrity hash: sha256:{resultData.integrityHash}
                   </p>
-                  <p style={{ fontSize: 11, color: "var(--app-regent)" }} data-testid="text-lc-check-timestamp">
+                  <p style={{ fontSize: 13, color: "var(--app-regent)" }} data-testid="text-lc-check-timestamp">
                     Checked: {new Date(resultData.timestamp).toLocaleString()}
                   </p>
                 </div>
@@ -1344,7 +1344,7 @@ export default function LcCheck() {
                   📄 Upload Corrected Docs
                 </button>
                 <button
-                  style={{ background: "none", border: "none", color: "#999", fontSize: 12, cursor: "pointer", padding: "6px 0" }}
+                  style={{ background: "none", border: "none", color: "#999", fontSize: 14, cursor: "pointer", padding: "6px 0" }}
                   onClick={async () => {
                     if (resultData?.caseId) {
                       try {
@@ -1394,7 +1394,7 @@ export default function LcCheck() {
                   New Check
                 </button>
                 <button
-                  style={{ background: "none", border: "none", color: "#999", fontSize: 12, cursor: "pointer", padding: "6px 0" }}
+                  style={{ background: "none", border: "none", color: "#999", fontSize: 14, cursor: "pointer", padding: "6px 0" }}
                   onClick={async () => {
                     if (resultData?.caseId) {
                       try {

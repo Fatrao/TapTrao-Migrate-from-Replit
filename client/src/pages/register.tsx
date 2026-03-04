@@ -90,7 +90,7 @@ export default function Register() {
           </div>
 
           {error && (
-            <div style={{ fontSize: 12, color: "var(--red)", marginBottom: 12 }}>{error}</div>
+            <div style={{ fontSize: 14, color: "var(--red)", marginBottom: 12 }}>{error}</div>
           )}
 
           <button

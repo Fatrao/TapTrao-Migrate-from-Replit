@@ -17,7 +17,7 @@ const s = {
   card: { background: "var(--card)", borderRadius: 14, padding: "24px", marginBottom: 16 } as React.CSSProperties,
   heading: { fontFamily: "var(--fh)", fontSize: 20, fontWeight: 900, color: "var(--t1)", margin: "0 0 4px" } as React.CSSProperties,
   sub: { fontSize: 13, color: "var(--t3)", marginBottom: 20 } as React.CSSProperties,
-  label: { fontFamily: "'Inter', sans-serif", fontSize: 9, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)", marginBottom: 6, display: "block" } as React.CSSProperties,
+  label: { fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)", marginBottom: 6, display: "block" } as React.CSSProperties,
   input: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "none", borderRadius: 8, color: "var(--t1)", fontSize: 13, outline: "none" } as React.CSSProperties,
   select: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "none", borderRadius: 8, color: "var(--t1)", fontSize: 13, outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const } as React.CSSProperties,
   row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 } as React.CSSProperties,
@@ -244,7 +244,7 @@ export default function EudrPage() {
                 borderRadius: ".5rem",
                 background: step === st.num ? "var(--blue, #3B82F6)" : st.num < step ? "var(--green, #1B7340)" : "var(--s2, #232B3E)",
                 color: step >= st.num ? "#fff" : "var(--t3)",
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: step === st.num ? 700 : 500,
                 cursor: st.num < step ? "pointer" : "default",
                 transition: "background .2s",
@@ -314,7 +314,7 @@ export default function EudrPage() {
                     </div>
                   </div>
                 ))}
-                <button style={{ ...s.btnSecondary, fontSize: 12, padding: "6px 12px" }} onClick={() => setDraft(d => ({ ...d, polygonPoints: [...d.polygonPoints, { lat: "", lng: "" }] }))} data-testid="eudr-add-point">
+                <button style={{ ...s.btnSecondary, fontSize: 14, padding: "6px 12px" }} onClick={() => setDraft(d => ({ ...d, polygonPoints: [...d.polygonPoints, { lat: "", lng: "" }] }))} data-testid="eudr-add-point">
                   + Add point
                 </button>
               </div>
@@ -324,7 +324,7 @@ export default function EudrPage() {
               <label style={s.label}>Plot country (ISO 2-letter code)</label>
               <input data-testid="eudr-plot-country" style={{ ...s.input, width: 100 }} maxLength={2} placeholder="GH" value={draft.plotCountryIso2} onChange={e => setDraft(d => ({ ...d, plotCountryIso2: e.target.value.toUpperCase() }))} />
               {draft.plotCountryValid === false && (
-                <p style={{ color: "var(--red, #DC2626)", fontSize: 12, marginTop: 6 }}>
+                <p style={{ color: "var(--red, #DC2626)", fontSize: 14, marginTop: 6 }}>
                   Warning: Plot country does not match the trade origin country ({resultJson?.origin?.iso2}).
                 </p>
               )}
@@ -358,7 +358,7 @@ export default function EudrPage() {
               <label style={s.label}>Evidence date (must post-date 31 Dec 2020)</label>
               <input data-testid="eudr-evidence-date" style={{ ...s.input, width: 200 }} type="date" value={draft.evidenceDate} onChange={e => setDraft(d => ({ ...d, evidenceDate: e.target.value }))} />
               {draft.evidenceDate && new Date(draft.evidenceDate) <= new Date("2020-12-31") && (
-                <p style={{ color: "var(--red, #DC2626)", fontSize: 12, marginTop: 6 }}>
+                <p style={{ color: "var(--red, #DC2626)", fontSize: 14, marginTop: 6 }}>
                   Warning: Evidence date must be after 31 December 2020 (EUDR cutoff).
                 </p>
               )}
@@ -423,7 +423,7 @@ export default function EudrPage() {
                   <span style={{ fontSize: 24 }}>✓</span>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 14 }}>Statement Generated</div>
-                    <div style={{ fontSize: 12, opacity: 0.85 }}>
+                    <div style={{ fontSize: 14, opacity: 0.85 }}>
                       Reference: {(eudrQuery.data?.statementJson as any)?.reference || "—"}
                       {eudrQuery.data?.retentionUntil && ` | Retained until ${eudrQuery.data.retentionUntil.split("T")[0]}`}
                     </div>
@@ -475,7 +475,7 @@ export default function EudrPage() {
                 {/* Summary */}
                 <div style={{ background: "var(--s2, #232B3E)", borderRadius: ".5rem", padding: 16, marginTop: 16, marginBottom: 16 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t1)", marginBottom: 8 }}>Summary</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px", fontSize: 12, color: "var(--t2)" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px", fontSize: 14, color: "var(--t2)" }}>
                     <span>Geolocation:</span>
                     <span style={{ color: draft.plotCountryValid !== false ? "var(--green)" : "var(--red)" }}>
                       {draft.coordType === "point" ? `${draft.lat}, ${draft.lng}` : `${draft.polygonPoints.filter(p => p.lat).length} points`}

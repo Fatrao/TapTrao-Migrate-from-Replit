@@ -91,6 +91,8 @@ export default {
         'nav-dark': '#1a1a1a',
         'green-hero': '#1b2a22',
         'white-card': '#ffffff',
+        gold: '#c4a265',
+        'gold-light': '#d4b87a',
         amber: '#c4882a',
         'tt-red': '#c44e3a',
         'text-dark': '#2c3e2e',

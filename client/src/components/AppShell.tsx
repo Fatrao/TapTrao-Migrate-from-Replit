@@ -226,8 +226,8 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
         {/* Brand */}
         <Link href="/">
           <div className="mi brand" data-testid="shell-logo">
-            <div className="mi-icon" style={{ fontFamily: "var(--fd)", fontWeight: 700, fontSize: 16 }}>T</div>
-            <span className="mi-label" style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 14, color: "#fff" }}>TapTrao</span>
+            <div className="mi-icon" style={{ fontFamily: "var(--fd)", fontWeight: 700, fontSize: 16, color: "var(--gold, #c4a265)" }}>T</div>
+            <span className="mi-label" style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 14, color: "var(--gold, #c4a265)" }}>TapTrao</span>
           </div>
         </Link>
 

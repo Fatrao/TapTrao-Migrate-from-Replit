@@ -182,7 +182,7 @@ function StatusDropdown({
           className="inline-flex items-center gap-1 shrink-0 cursor-pointer"
           style={{
             fontFamily: "'Inter', sans-serif",
-            fontSize: 9,
+            fontSize: 13,
             letterSpacing: "0.08em",
             padding: "3px 8px",
             borderRadius: 4,
@@ -335,9 +335,9 @@ function NextActionsPanel({
   return (
     <div style={{ background: "rgba(109,184,154,0.06)", borderRadius: 14, border: "1px solid rgba(109,184,154,0.2)", padding: "20px 24px" }} data-testid="section-next-actions">
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Next Actions</span>
+        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Next Actions</span>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 11, color: "var(--t3)" }} data-testid="text-pending-count">
+          <span style={{ fontSize: 13, color: "var(--t3)" }} data-testid="text-pending-count">
             {pendingCount} pending
           </span>
           <span style={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -369,7 +369,7 @@ function NextActionsPanel({
               All actions complete for this trade.
             </p>
           </div>
-          <p style={{ fontSize: 11, color: "var(--t3)", margin: "8px 0 12px" }}>
+          <p style={{ fontSize: 13, color: "var(--t3)", margin: "8px 0 12px" }}>
             You can now download your compliance pack.
           </p>
           <Button variant="outline" size="sm" disabled data-testid="button-download-compliance-pack">
@@ -384,10 +384,10 @@ function NextActionsPanel({
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   <span style={{ fontSize: 13, fontWeight: 500, color: "var(--t1)" }}>{doc.title.length > 60 ? doc.title.substring(0, 60) + "..." : doc.title}</span>
-                  <span style={{ fontSize: 11, color: "var(--t3)" }}>{ownerLabels[doc.owner]}</span>
-                  <span style={{ fontSize: 11, color: "var(--t3)" }}>{dueByLabels[doc.due_by]}</span>
+                  <span style={{ fontSize: 13, color: "var(--t3)" }}>{ownerLabels[doc.owner]}</span>
+                  <span style={{ fontSize: 13, color: "var(--t3)" }}>{dueByLabels[doc.due_by]}</span>
                 </div>
-                <p style={{ fontSize: 11, color: "var(--t3)", fontStyle: "italic", margin: "2px 0 0" }}>
+                <p style={{ fontSize: 13, color: "var(--t3)", fontStyle: "italic", margin: "2px 0 0" }}>
                   {getActionHint(doc)}
                 </p>
               </div>
@@ -497,7 +497,7 @@ function SupplierBriefSection({ result }: { result: ComplianceResult }) {
 
           <div style={{ position: "relative" }}>
             <pre
-              style={{ fontSize: 11, padding: 12, borderRadius: 8, whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "monospace", maxHeight: 320, overflowY: "auto", background: "rgba(0,0,0,0.04)", color: "var(--t2)" }}
+              style={{ fontSize: 13, padding: 12, borderRadius: 8, whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "monospace", maxHeight: 320, overflowY: "auto", background: "rgba(0,0,0,0.04)", color: "var(--t2)" }}
               data-testid={`text-brief-${activeTab}`}
             >
                 {activeTab === "email" ? emailText : whatsappText}
@@ -594,13 +594,13 @@ function EvidenceHashInline({ result }: { result: ComplianceResult }) {
 
   return (
     <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid rgba(0,0,0,0.05)" }}>
-      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "rgba(109,184,154,0.8)" }} data-testid="text-compliance-ref">
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "rgba(109,184,154,0.8)" }} data-testid="text-compliance-ref">
         {shortRef}
       </p>
-      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "var(--t4)", wordBreak: "break-all", marginTop: 2 }} data-testid="text-full-hash">
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t4)", wordBreak: "break-all", marginTop: 2 }} data-testid="text-full-hash">
         sha256:{hash}
       </p>
-      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "var(--t4)", marginTop: 2 }} data-testid="text-hash-timestamp">
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t4)", marginTop: 2 }} data-testid="text-hash-timestamp">
         {new Date(timestamp).toLocaleString()}
       </p>
     </div>
@@ -638,7 +638,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
 
   return (
     <div data-testid="section-readiness-score">
-      <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 12 }}>
+      <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 12 }}>
         Readiness Score
       </div>
       <div style={{ display: "flex", gap: 0 }}>
@@ -660,7 +660,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
             style={{
               display: "inline-block",
               fontFamily: "'Inter', sans-serif",
-              fontSize: 10,
+              fontSize: 14,
               fontWeight: 600,
               padding: "3px 10px",
               borderRadius: 4,
@@ -697,7 +697,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
                 style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}
                 data-testid={`factor-${f.key}`}
               >
-                <span style={{ width: 120, fontSize: 11, color: "var(--t2)", textAlign: "right", flexShrink: 0 }}>
+                <span style={{ width: 120, fontSize: 13, color: "var(--t2)", textAlign: "right", flexShrink: 0 }}>
                   {f.label}
                 </span>
                 <div style={{ flex: 1, height: 3, background: "rgba(0,0,0,0.07)", borderRadius: 2, position: "relative" }}>
@@ -991,7 +991,7 @@ function EudrAlertBlock({ lookupId, result }: { lookupId?: string; result: Compl
           <div style={{ fontWeight: 700, color: "var(--t1)", fontSize: 14 }}>
             Swiss Due Diligence Act — Prepare EUDR-Equivalent Documentation
           </div>
-          <div style={{ color: "var(--t1)", fontSize: 12, marginTop: 4, lineHeight: 1.5 }}>
+          <div style={{ color: "var(--t1)", fontSize: 14, marginTop: 4, lineHeight: 1.5 }}>
             Switzerland has passed its own Due Diligence Act covering timber and minerals.
             Cocoa, coffee, and other EUDR commodities are expected to be added.
             Monitor FOEN/BAFU (<span style={{ fontWeight: 600 }}>bafu.admin.ch</span>) for confirmation of scope and timeline.
@@ -1020,7 +1020,7 @@ function EudrAlertBlock({ lookupId, result }: { lookupId?: string; result: Compl
         <div style={{ fontWeight: 700, color: "var(--t1)", fontSize: 14 }}>
           {eudrComplete ? "EUDR Due Diligence Complete" : "EUDR due diligence required"}
         </div>
-        <div style={{ color: "var(--t1)", fontSize: 12, marginTop: 2 }}>
+        <div style={{ color: "var(--t1)", fontSize: 14, marginTop: 2 }}>
           {eudrComplete
             ? "Your EUDR due diligence statement has been completed for this trade."
             : "Additional requirement to ship legally and avoid penalties."}
@@ -1145,7 +1145,7 @@ function LeadCaptureCard({ result }: { result: ComplianceResult }) {
         >
           {loading ? "Saving..." : "Save & Get Updates →"}
         </Button>
-        <p style={{ fontSize: 11, color: "var(--t3)", margin: "6px 0 0" }}>
+        <p style={{ fontSize: 13, color: "var(--t3)", margin: "6px 0 0" }}>
           By submitting, you agree to our{" "}
           <Link href="/privacy-policy" style={{ color: "var(--t2)", textDecoration: "underline" }}>Privacy Policy</Link>.
         </p>
@@ -1249,12 +1249,12 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
           <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 15, color: "var(--t1)", margin: 0 }}>
             Document Readiness
           </h3>
-          <p style={{ fontSize: 12, color: "var(--t3)", margin: "4px 0 0" }}>
+          <p style={{ fontSize: 14, color: "var(--t3)", margin: "4px 0 0" }}>
             Upload documents to validate against requirements
           </p>
         </div>
         <span style={{
-          fontFamily: "'Inter', sans-serif", fontSize: 10,
+          fontFamily: "'Inter', sans-serif", fontSize: 14,
           background: validCount === readiness.length ? "rgba(109,184,154,0.15)" : "rgba(109,184,154,0.2)",
           color: validCount === readiness.length ? "var(--sage)" : "var(--sage)",
           padding: "3px 10px", borderRadius: 4,
@@ -1282,7 +1282,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                   width: 22, height: 22, borderRadius: 6,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   background: cfg.bg, color: cfg.color,
-                  fontSize: 12, fontWeight: 700, flexShrink: 0,
+                  fontSize: 14, fontWeight: 700, flexShrink: 0,
                   border: `1px solid ${cfg.color}33`,
                 }}>{cfg.icon}</span>
 
@@ -1292,9 +1292,9 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                     {req.requirementTitle}
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 3 }}>
-                    <span style={{ fontSize: 11, color: cfg.color }}>{cfg.label}</span>
+                    <span style={{ fontSize: 13, color: cfg.color }}>{cfg.label}</span>
                     {req.filename && (
-                      <span style={{ fontSize: 10, color: "var(--t4)" }}>
+                      <span style={{ fontSize: 14, color: "var(--t4)" }}>
                         {req.filename}
                       </span>
                     )}
@@ -1321,7 +1321,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                       background: req.status === "not_uploaded" ? "var(--sage)" : "rgba(0,0,0,0.06)",
                       color: req.status === "not_uploaded" ? "#fff" : "var(--t2)",
                       border: "none", borderRadius: 6, padding: "6px 12px",
-                      fontSize: 11, fontWeight: 500, cursor: isUploading ? "wait" : "pointer",
+                      fontSize: 13, fontWeight: 500, cursor: isUploading ? "wait" : "pointer",
                       opacity: isUploading ? 0.5 : 1,
                     }}
                   >
@@ -1334,7 +1334,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                       onClick={() => setExpandedIdx(isExpanded ? null : req.requirementIndex)}
                       style={{
                         background: "none", border: "none", color: "var(--t3)",
-                        cursor: "pointer", padding: "6px 4px", fontSize: 12, marginLeft: 4,
+                        cursor: "pointer", padding: "6px 4px", fontSize: 14, marginLeft: 4,
                       }}
                     >
                       {isExpanded ? "▾" : "▸"}
@@ -1349,7 +1349,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                   {/* Field status checklist */}
                   {req.fieldStatus.length > 0 && (
                     <div style={{ marginBottom: 10 }}>
-                      <div style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
                         Field Checklist
                       </div>
                       {req.fieldStatus.map((f, fi) => {
@@ -1357,16 +1357,16 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                         const sevColor = f.severity === "critical" ? "#ef4444" : f.severity === "warning" ? "#eab308" : "var(--t3)";
                         return (
                           <div key={fi} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 4 }}>
-                            <span style={{ fontSize: 12, width: 18, flexShrink: 0 }}>{statusIcon}</span>
+                            <span style={{ fontSize: 14, width: 18, flexShrink: 0 }}>{statusIcon}</span>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <span style={{ fontSize: 12, color: f.status === "missing" ? sevColor : "var(--t1)" }}>
+                              <span style={{ fontSize: 14, color: f.status === "missing" ? sevColor : "var(--t1)" }}>
                                 {f.expected || f.field}
                               </span>
-                              <span style={{ fontSize: 10, color: "var(--t3)", marginLeft: 6 }}>
+                              <span style={{ fontSize: 14, color: "var(--t3)", marginLeft: 6 }}>
                                 ({f.severity})
                               </span>
                               {f.status === "present" && f.found && f.found !== "Not found" && (
-                                <span style={{ fontSize: 10, color: "var(--t3)", marginLeft: 6 }}>
+                                <span style={{ fontSize: 14, color: "var(--t3)", marginLeft: 6 }}>
                                   — {f.found.length > 60 ? f.found.slice(0, 60) + "..." : f.found}
                                 </span>
                               )}
@@ -1380,7 +1380,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                   {/* Issues */}
                   {req.issues.length > 0 && (
                     <div style={{ marginBottom: 10 }}>
-                      <div style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
                         Issues
                       </div>
                       {req.issues.map((issue, ii) => (
@@ -1389,9 +1389,9 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                           borderRadius: 6, padding: "6px 10px", marginBottom: 4,
                           borderLeft: `3px solid ${issue.severity === "critical" ? "#ef4444" : issue.severity === "warning" ? "#eab308" : "rgba(0,0,0,0.1)"}`,
                         }}>
-                          <div style={{ fontSize: 12, color: "var(--t1)" }}>{issue.explanation}</div>
+                          <div style={{ fontSize: 14, color: "var(--t1)" }}>{issue.explanation}</div>
                           {issue.found && (
-                            <div style={{ fontSize: 10, color: "var(--t3)", marginTop: 2 }}>
+                            <div style={{ fontSize: 14, color: "var(--t3)", marginTop: 2 }}>
                               Found: {issue.found}
                             </div>
                           )}
@@ -1403,7 +1403,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                   {/* Evidence snippets */}
                   {req.evidence.length > 0 && (
                     <div>
-                      <div style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
                         Evidence
                       </div>
                       {req.evidence.map((ev, ei) => (
@@ -1412,10 +1412,10 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                           borderRadius: 6, padding: "6px 10px", marginBottom: 4,
                           borderLeft: "3px solid rgba(109,184,154,0.3)",
                         }}>
-                          <div style={{ fontSize: 11, color: "var(--t2)", fontStyle: "italic" }}>
+                          <div style={{ fontSize: 13, color: "var(--t2)", fontStyle: "italic" }}>
                             "{ev.quote}"
                           </div>
-                          <div style={{ fontSize: 10, color: "var(--t3)", marginTop: 2 }}>
+                          <div style={{ fontSize: 14, color: "var(--t3)", marginTop: 2 }}>
                             {ev.page !== null ? `Page ${ev.page}` : ""} {ev.field ? `— ${ev.field}` : ""}
                           </div>
                         </div>
@@ -1425,7 +1425,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
 
                   {/* Validation summary */}
                   {req.verdict && (
-                    <div style={{ marginTop: 8, fontSize: 11, color: "var(--t2)", fontStyle: "italic" }}>
+                    <div style={{ marginTop: 8, fontSize: 13, color: "var(--t2)", fontStyle: "italic" }}>
                       Verdict: {req.verdict} (confidence: {req.confidence})
                     </div>
                   )}
@@ -1539,7 +1539,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
 
       {/* ── Risk Level Badge ── */}
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <Badge className="text-base px-6 py-2 no-default-hover-elevate no-default-active-elevate" style={{ ...riskInlineStyles[riskLevel], fontFamily: "'Inter', sans-serif", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, borderRadius: 4 }} data-testid="badge-risk-level">
+        <Badge className="text-base px-6 py-2 no-default-hover-elevate no-default-active-elevate" style={{ ...riskInlineStyles[riskLevel], fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, borderRadius: 4 }} data-testid="badge-risk-level">
           {riskLabels[riskLevel]}
         </Badge>
       </div>
@@ -1554,13 +1554,13 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                 Your Side - Buyer
               </span>
               <span style={{
-                fontFamily: "'Inter', sans-serif", fontSize: 10,
+                fontFamily: "'Inter', sans-serif", fontSize: 14,
                 background: "rgba(109,184,154,0.2)", color: "var(--sage)",
                 padding: "2px 8px", borderRadius: 4,
               }}>
                 {importerIndices.length} docs
               </span>
-              <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--t3)" }} data-testid="text-buyer-progress">
+              <span style={{ marginLeft: "auto", fontSize: 13, color: "var(--t3)" }} data-testid="text-buyer-progress">
                 {importerReadyCount}/{importerIndices.length} ready
               </span>
             </div>
@@ -1578,7 +1578,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                         </span>
                         <StatusDropdown status={st} onChange={(s) => handleStatusChange(i, s)} index={i} />
                       </div>
-                      <span style={{ fontSize: 11, color: "var(--t3)", display: "block", marginTop: 1 }}>
+                      <span style={{ fontSize: 13, color: "var(--t3)", display: "block", marginTop: 1 }}>
                         {r.issuedBy}
                       </span>
                     </div>
@@ -1597,13 +1597,13 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                 Their Side - Supplier
               </span>
               <span style={{
-                fontFamily: "'Inter', sans-serif", fontSize: 10,
+                fontFamily: "'Inter', sans-serif", fontSize: 14,
                 background: "rgba(109,184,154,0.2)", color: "var(--sage)",
                 padding: "2px 8px", borderRadius: 4,
               }}>
                 {supplierIndices.length} docs
               </span>
-              <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--t3)" }} data-testid="text-supplier-progress">
+              <span style={{ marginLeft: "auto", fontSize: 13, color: "var(--t3)" }} data-testid="text-supplier-progress">
                 {supplierReadyCount}/{supplierIndices.length} ready
               </span>
             </div>
@@ -1621,7 +1621,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                         </span>
                         <StatusDropdown status={st} onChange={(s) => handleStatusChange(i, s)} index={i} />
                       </div>
-                      <span style={{ fontSize: 11, color: "var(--t3)", display: "block", marginTop: 1 }}>
+                      <span style={{ fontSize: 13, color: "var(--t3)", display: "block", marginTop: 1 }}>
                         {r.issuedBy}
                       </span>
                     </div>
@@ -1666,12 +1666,12 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
 
         {/* Duty Estimate */}
         <div style={dkCard}>
-          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 12 }}>
+          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 12 }}>
             Duty Estimate
           </div>
           {Array.isArray(result.destination.preferenceSchemes) && (result.destination.preferenceSchemes as string[]).length > 0 && (
             <span style={{
-              fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em",
+              fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em",
               background: "rgba(109,184,154,0.2)", color: "var(--sage)",
               padding: "3px 8px", borderRadius: 4, display: "inline-block", marginBottom: 12,
             }}>
@@ -1691,7 +1691,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{result.destination.spsRegime || "Standard"}</span>
           </div>
           {result.destination.iso2 === "CH" && (
-            <p style={{ fontSize: 11, color: "#eab308", margin: "0 0 8px", lineHeight: 1.5 }}>
+            <p style={{ fontSize: 13, color: "#eab308", margin: "0 0 8px", lineHeight: 1.5 }}>
               Swiss agricultural tariffs are often specific (CHF/kg). Verify at tares.admin.ch.
             </p>
           )}
@@ -1717,7 +1717,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
               ⚠ Flagged Origin — {result.originFlagReason ?? "Sanctions / Elevated Risk"}
             </p>
             {result.originFlagDetails && (
-              <p style={{ fontSize: 12, color: "#92400e", margin: "4px 0 0", lineHeight: 1.5 }}>
+              <p style={{ fontSize: 14, color: "#92400e", margin: "4px 0 0", lineHeight: 1.5 }}>
                 {result.originFlagDetails}
               </p>
             )}
@@ -1741,7 +1741,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             <p style={{ fontSize: 13, fontWeight: 600, color: "#16a34a", margin: 0 }}>
               AGOA Eligible — Preferential Tariff Access
             </p>
-            <p style={{ fontSize: 12, color: "#166534", margin: "4px 0 0", lineHeight: 1.5 }}>
+            <p style={{ fontSize: 14, color: "#166534", margin: "4px 0 0", lineHeight: 1.5 }}>
               This origin qualifies under the African Growth and Opportunity Act for duty-free or reduced-tariff access to the US market. Ensure AGOA Certificate of Origin is prepared.
             </p>
           </div>
@@ -1757,7 +1757,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         if (!estimate) return (
           <div style={{ textAlign: "right", margin: "4px 0 8px" }}>
             <Link href="/demurrage" data-testid="link-demurrage-calculator">
-              <span style={{ fontSize: 11, color: "var(--sage)", cursor: "pointer", fontWeight: 600 }}>
+              <span style={{ fontSize: 13, color: "var(--sage)", cursor: "pointer", fontWeight: 600 }}>
                 Demurrage Calculator →
               </span>
             </Link>
@@ -1780,7 +1780,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
               <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
                 Estimated Port Demurrage
               </p>
-              <p style={{ fontSize: 12, color: "var(--t2)", margin: "4px 0 0", lineHeight: 1.6 }}>
+              <p style={{ fontSize: 14, color: "var(--t2)", margin: "4px 0 0", lineHeight: 1.6 }}>
                 At <strong style={{ color: "var(--t1)" }}>{estimate.port.label}</strong>
                 {estimate.allPorts.length > 1 && (
                   <span style={{ color: "var(--t3)", fontSize: 11 }}> (+ {estimate.allPorts.length - 1} more port{estimate.allPorts.length > 2 ? "s" : ""})</span>
@@ -1791,7 +1791,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                 <strong style={{ color: "var(--t1)" }}>${estimate.minCost.toLocaleString()} – ${estimate.maxCost.toLocaleString()}</strong>.
               </p>
               <Link href="/demurrage">
-                <span style={{ fontSize: 11, color: "var(--sage)", cursor: "pointer", fontWeight: 600, marginTop: 4, display: "inline-block" }}>
+                <span style={{ fontSize: 13, color: "var(--sage)", cursor: "pointer", fontWeight: 600, marginTop: 4, display: "inline-block" }}>
                   Open full calculator ({estimate.allPorts.length} port{estimate.allPorts.length !== 1 ? "s" : ""}) →
                 </span>
               </Link>
@@ -1813,7 +1813,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             border: "none",
             cursor: watchState === "watching" ? "default" : "pointer",
             fontFamily: "'Inter', sans-serif",
-            fontSize: 11,
+            fontSize: 13,
             color: watchState === "watching" ? "var(--green)" : "var(--t2)",
             padding: "6px 12px",
             borderRadius: 6,
@@ -1825,7 +1825,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             : "◎ Watch this corridor"}
         </button>
         {watchState !== "watching" && (
-          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "var(--t3)" }}>
+          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)" }}>
             Get notified when regulations change for {result.commodity.name} → {result.destination.iso2}
           </span>
         )}
@@ -1876,10 +1876,10 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <Leaf className="w-4 h-4" style={{ color: "var(--sage)" }} />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Commodity</span>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Commodity</span>
           </div>
           <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-commodity">{result.commodity.name}</p>
-          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", color: "var(--t3)", textTransform: "uppercase" as const, margin: 0 }}>
+          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", color: "var(--t3)", textTransform: "uppercase" as const, margin: 0 }}>
             HS {result.commodity.hsCode} · {result.commodity.commodityType}
           </p>
         </div>
@@ -1887,15 +1887,15 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <Globe className="w-4 h-4" style={{ color: "var(--sage)" }} />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Origin</span>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Origin</span>
           </div>
           <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-origin">{result.origin.countryName}</p>
-          <p style={{ fontSize: 12, color: "var(--t3)", margin: "0 0 4px" }}>
+          <p style={{ fontSize: 14, color: "var(--t3)", margin: "0 0 4px" }}>
             {result.origin.customsAdmin}
           </p>
           {result.origin.framework && (
             <span style={{
-              fontFamily: "'Inter', sans-serif", fontSize: 9,
+              fontFamily: "'Inter', sans-serif", fontSize: 13,
               background: "rgba(109,184,154,0.2)", color: "var(--sage)",
               padding: "2px 8px", borderRadius: 4, display: "inline-block",
             }}>
@@ -1907,10 +1907,10 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <FileCheck className="w-4 h-4" style={{ color: "var(--sage)" }} />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Destination</span>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Destination</span>
           </div>
           <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-destination">{result.destination.countryName}</p>
-          <p style={{ fontSize: 12, color: "var(--t3)", margin: 0 }}>
+          <p style={{ fontSize: 14, color: "var(--t3)", margin: 0 }}>
             VAT: {result.destination.vatRate}% · {result.destination.tariffSource}
           </p>
           {result.destination.iso2 === "CH" && (
@@ -1921,7 +1921,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                 padding: "10px 12px",
                 background: "rgba(234,179,8,0.08)",
                 borderRadius: 8,
-                fontSize: 12,
+                fontSize: 14,
                 color: "#eab308",
                 lineHeight: 1.5,
               }}
@@ -1938,7 +1938,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
             <Shield className="w-4 h-4" style={{ color: "var(--sage)" }} />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
               Regulatory Triggers ({triggerCount})
             </span>
           </div>
@@ -1963,7 +1963,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <div style={dkCard}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
               <AlertTriangle className="w-4 h-4" style={{ color: "#eab308" }} />
-              <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Known Hazards</span>
+              <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Known Hazards</span>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {result.hazards
@@ -1972,7 +1972,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                   <span
                     key={hazard}
                     style={{
-                      fontSize: 11,
+                      fontSize: 13,
                       fontFamily: "'Inter', sans-serif",
                       background: "rgba(234,179,8,0.1)",
                       color: "#eab308",
@@ -2011,14 +2011,14 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard} data-testid="card-afcfta-roo">
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
             <Scale className="w-4 h-4" style={{ color: "var(--sage)" }} />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
               AfCFTA Rules of Origin — HS {result.afcftaRoo.hsHeading}
             </span>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
             <span
               style={{
-                fontFamily: "'Inter', sans-serif", fontSize: 10,
+                fontFamily: "'Inter', sans-serif", fontSize: 14,
                 background: "rgba(109,184,154,0.2)", color: "var(--sage)",
                 padding: "3px 10px", borderRadius: 4,
               }}
@@ -2029,7 +2029,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             {result.afcftaRoo.minValueAddPct && (
               <span
                 style={{
-                  fontFamily: "'Inter', sans-serif", fontSize: 10,
+                  fontFamily: "'Inter', sans-serif", fontSize: 14,
                   background: "rgba(0,0,0,0.05)", color: "var(--t2)",
                   padding: "3px 10px", borderRadius: 4, border: "1px solid rgba(0,0,0,0.07)",
                 }}
@@ -2060,14 +2060,14 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
               </span>
             </div>
           )}
-          <p style={{ fontSize: 11, color: "var(--t4)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "var(--t4)", margin: 0 }}>
             Source: {String(result.afcftaRoo.sourceRef)}
           </p>
         </div>
       )}
 
       <div style={dkCard}>
-        <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 14 }}>
+        <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 14 }}>
           Actions
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
@@ -2090,7 +2090,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           </Button>
           <SupplierBriefButton result={result} />
         </div>
-        <p style={{ fontSize: 11, color: "var(--t3)", textAlign: "center", marginTop: 8, fontStyle: "italic" }}>Use directly or share with a broker if you have one</p>
+        <p style={{ fontSize: 13, color: "var(--t3)", textAlign: "center", marginTop: 8, fontStyle: "italic" }}>Use directly or share with a broker if you have one</p>
       </div>
 
       <SupplierBriefSection result={result} />
@@ -2141,7 +2141,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <p style={{ fontSize: 15, fontWeight: 700, color: "var(--t1)", margin: "0 0 6px", fontFamily: "'Clash Display', sans-serif" }}>
             Trade created — your shipment is live
           </p>
-          <p style={{ fontSize: 12, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.5 }}>
+          <p style={{ fontSize: 14, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.5 }}>
             Manage documents, run LC checks, track suppliers, and monitor compliance — all from your trade dashboard.
           </p>
           <Link href={`/trades/${(result as any).lookupId}`}>
@@ -2484,7 +2484,7 @@ export default function Lookup() {
                 {isAuthenticated ? "Back to Dashboard" : "Back to Home"}
               </button>
             </Link>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }}>TapTrao / Pre-shipment Compliance Check</p>
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }}>TapTrao / Pre-shipment Compliance Check</p>
             <h1 style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)" }} data-testid="text-lookup-title">
               Pre-shipment compliance check
             </h1>
@@ -2537,7 +2537,7 @@ export default function Lookup() {
             <CardContent className="p-6 space-y-6">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="commodity">
+                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="commodity">
                     What are you shipping?
                   </label>
                   {isLoading ? (
@@ -2563,7 +2563,7 @@ export default function Lookup() {
                 </div>
 
                 <div className="space-y-2">
-                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="origin">
+                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="origin">
                     Where are the goods coming from?
                   </label>
                   {isLoading ? (
@@ -2591,7 +2591,7 @@ export default function Lookup() {
                 </div>
 
                 <div className="space-y-2">
-                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="destination">
+                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="destination">
                     Where are the goods going?
                   </label>
                   {isLoading ? (

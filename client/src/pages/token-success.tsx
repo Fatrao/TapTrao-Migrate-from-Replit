@@ -96,7 +96,7 @@ export default function TokenSuccess() {
                 </span>
                 <span
                   style={{
-                    fontFamily: "'Inter', sans-serif", fontSize: 12,
+                    fontFamily: "'Inter', sans-serif", fontSize: 14,
                     padding: "4px 12px", borderRadius: 4, background: "var(--card2)",
                     color: "var(--t2)", display: "flex", alignItems: "center", gap: 4,
                   }}

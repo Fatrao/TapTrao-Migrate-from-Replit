@@ -120,8 +120,8 @@ export default function AdminPromoCodes() {
             </div>
           </div>
 
-          {error && <div style={{ fontSize: 12, color: "var(--red)", marginBottom: 8 }}>{error}</div>}
-          {success && <div style={{ fontSize: 12, color: "#16a34a", marginBottom: 8 }}>{success}</div>}
+          {error && <div style={{ fontSize: 14, color: "var(--red)", marginBottom: 8 }}>{error}</div>}
+          {success && <div style={{ fontSize: 14, color: "#16a34a", marginBottom: 8 }}>{success}</div>}
 
           <button
             type="submit"
@@ -155,11 +155,11 @@ export default function AdminPromoCodes() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid #eee", textAlign: "left" }}>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Code</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Tokens</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>LC</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Used / Max</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>Status</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>Code</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>Tokens</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>LC</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>Used / Max</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -174,7 +174,7 @@ export default function AdminPromoCodes() {
                         display: "inline-block",
                         padding: "2px 8px",
                         borderRadius: 12,
-                        fontSize: 11,
+                        fontSize: 13,
                         fontWeight: 600,
                         background: c.currentRedemptions >= c.maxRedemptions ? "#fee2e2" : c.isActive ? "#dcfce7" : "#fef3c7",
                         color: c.currentRedemptions >= c.maxRedemptions ? "#ef4444" : c.isActive ? "#16a34a" : "#d97706",

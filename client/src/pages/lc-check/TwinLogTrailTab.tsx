@@ -35,7 +35,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
           <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: "clamp(48px, 6vw, 64px)", letterSpacing: "-0.03em", color: "var(--t1)", lineHeight: 1 }}>
             {score}
           </div>
-          <span style={{ display: "inline-block", fontFamily: "var(--fb)", fontSize: 9, fontWeight: 600, padding: "3px 8px", borderRadius: 4, background: v.badgeBg, border: `1px solid ${v.badgeBorder}`, color: v.badgeColor, width: "fit-content", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
+          <span style={{ display: "inline-block", fontFamily: "var(--fb)", fontSize: 13, fontWeight: 600, padding: "3px 8px", borderRadius: 4, background: v.badgeBg, border: `1px solid ${v.badgeBorder}`, color: v.badgeColor, width: "fit-content", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
             {v.label}
           </span>
           <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.65, marginTop: 6, maxWidth: 260 }}>
@@ -48,7 +48,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
             const isPrimary = primaryRiskFactor === f.key && f.penalty > 10;
             return (
               <div key={f.key} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                <span style={{ width: 120, fontSize: 11, color: "var(--t2)", textAlign: "right", flexShrink: 0 }}>{f.label}</span>
+                <span style={{ width: 120, fontSize: 13, color: "var(--t2)", textAlign: "right", flexShrink: 0 }}>{f.label}</span>
                 <div style={{ flex: 1, height: 3, background: "var(--border)", borderRadius: 2, position: "relative" }}>
                   <div style={{ width: `${pct}%`, height: "100%", borderRadius: 2, background: barColors[f.key] || "var(--t3)" }} />
                 </div>
@@ -174,7 +174,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
         <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 26, color: "var(--t1)", marginBottom: 4 }}>
           TwinLog Trail
         </h2>
-        <p style={{ fontFamily: "var(--fb)", fontSize: 11, color: "var(--t3)", marginBottom: 24, lineHeight: 1.5 }}>
+        <p style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)", marginBottom: 24, lineHeight: 1.5 }}>
           {lookup.commodityName} &middot; {lookup.originName} &rarr; {lookup.destinationName}
           {lookup.twinlogLockedAt && <> &middot; locked {formatTimestamp(lookup.twinlogLockedAt)}</>}
         </p>
@@ -182,7 +182,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
         {/* Included Items */}
         <div style={{ marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-            <span style={{ fontFamily: "var(--fb)", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1 }}>
+            <span style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1 }}>
               Included Items
             </span>
             <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
@@ -223,7 +223,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
                   background: item.color === "var(--t3)" ? "var(--t3)" : item.color,
                   flexShrink: 0,
                 }} />
-                <span style={{ fontSize: 12, color: "var(--t2)" }}>{item.label}</span>
+                <span style={{ fontSize: 14, color: "var(--t2)" }}>{item.label}</span>
               </div>
               <span style={{ fontFamily: "var(--fb)", fontSize: 10, color: item.color }}>
                 {item.status}
@@ -341,7 +341,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
             </button>
           ) : (
             <div style={{ marginBottom: 16, padding: "12px 14px", background: "var(--card2)", borderRadius: 14 }}>
-              <div style={{ fontFamily: "var(--fb)", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)", marginBottom: 8 }}>Template name</div>
+              <div style={{ fontFamily: "var(--fb)", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)", marginBottom: 8 }}>Template name</div>
               <input
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
@@ -388,7 +388,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
                     background: "var(--blue)",
                     color: "#fff",
                     fontWeight: 700,
-                    fontSize: 12,
+                    fontSize: 14,
                     padding: "8px 12px",
                     borderRadius: 6,
                     border: "none",
@@ -406,7 +406,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
                     background: "transparent",
                     borderRadius: 8,
                     color: "var(--t3)",
-                    fontSize: 12,
+                    fontSize: 14,
                     cursor: "pointer",
                   }}
                   data-testid="button-cancel-save-template"
@@ -418,7 +418,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
           )
         ) : (
           <div style={{ marginBottom: 16, padding: "10px 14px", background: "var(--gbg)", borderRadius: 8 }} data-testid="text-template-saved-success">
-            <span style={{ fontSize: 12, color: "var(--app-acapulco)", fontWeight: 600 }}>
+            <span style={{ fontSize: 14, color: "var(--app-acapulco)", fontWeight: 600 }}>
               Template saved. Find it at /templates.
             </span>
           </div>
@@ -426,7 +426,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
 
         {/* Activity Timeline */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-          <span style={{ fontFamily: "var(--fb)", fontSize: 9, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1 }}>
+          <span style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1 }}>
             History
           </span>
           <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
@@ -452,8 +452,8 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
               flexShrink: 0,
             }} />
             <div>
-              <div style={{ fontSize: 11, color: "var(--t2)" }}>{entry.event}</div>
-              <div style={{ fontFamily: "var(--fb)", fontSize: 9, color: "var(--t3)" }}>
+              <div style={{ fontSize: 13, color: "var(--t2)" }}>{entry.event}</div>
+              <div style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)" }}>
                 {formatFullDate(entry.timestamp)}
               </div>
             </div>

@@ -42,18 +42,43 @@ function relativeTime(dateStr: string): string {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
-function getStatusTag(status: string) {
+function sentTime(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Sent just now";
+  if (mins < 60) return `Sent ${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `Sent ${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `Sent ${days}d ago`;
+  return `Sent ${Math.floor(days / 30)}mo ago`;
+}
+
+function overdueTime(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (days < 1) return "Overdue";
+  return `${days}d overdue`;
+}
+
+type StatusInfo = {
+  label: string;
+  color: string;
+  bg: string;
+};
+
+function getStatusInfo(status: string): StatusInfo {
   switch (status) {
     case "blocking":
-      return { symbol: "\u2297", label: "Blocking", color: "#dc2626", bg: "#fef2f2", bd: "#fca5a5" };
+      return { label: "Blocking", color: "var(--red)", bg: "var(--red-xs)" };
     case "waiting":
-      return { symbol: "\u25CF", label: "Waiting", color: "#b45309", bg: "#fefce8", bd: "#fcd34d" };
+      return { label: "Awaiting", color: "var(--amber)", bg: "var(--amber-xs)" };
     case "partial":
-      return { symbol: "\u21BB", label: "Partial", color: "#2563eb", bg: "#eff6ff", bd: "#93c5fd" };
+      return { label: "Awaiting", color: "var(--amber)", bg: "var(--amber-xs)" };
     case "complete":
-      return { symbol: "\u2713", label: "Complete", color: "#15803d", bg: "#f0fdf4", bd: "#86efac" };
+      return { label: "Complete", color: "var(--sage)", bg: "var(--sage-xs)" };
     default:
-      return { symbol: "\u25CF", label: status, color: "#666", bg: "#f5f5f5", bd: "#ddd" };
+      return { label: status, color: "var(--t3)", bg: "rgba(0,0,0,0.04)" };
   }
 }
 
@@ -67,89 +92,101 @@ export default function Inbox() {
   const requests = requestsQuery.data ?? [];
 
   const grouped = useMemo(() => {
-    const attention: SupplierRequestRow[] = [];
-    const inProgress: SupplierRequestRow[] = [];
+    const awaiting: SupplierRequestRow[] = [];
+    const blocking: SupplierRequestRow[] = [];
     const complete: SupplierRequestRow[] = [];
     for (const r of requests) {
-      if (r.status === "blocking" || r.status === "waiting") attention.push(r);
-      else if (r.status === "partial") inProgress.push(r);
-      else complete.push(r);
+      if (r.status === "blocking") blocking.push(r);
+      else if (r.status === "complete") complete.push(r);
+      else awaiting.push(r);
     }
-    return { attention, inProgress, complete };
+    return { awaiting, blocking, complete };
   }, [requests]);
 
-  const cards = [
-    { value: summary.awaiting, color: "#b45309", label: "Awaiting documents" },
-    { value: summary.blocking, color: "#dc2626", label: "Blocking issue" },
-    { value: summary.completeThisWeek, color: "#15803d", label: "Complete this week" },
+  const stats = [
+    { value: summary.awaiting, color: "var(--amber)", label: "Awaiting documents" },
+    { value: summary.blocking, color: "var(--red)", label: "Blocking issue" },
+    { value: summary.completeThisWeek, color: "var(--sage)", label: "Complete this week" },
   ];
 
   return (
     <AppShell>
-      {/* HEADER — stays on dark gradient */}
-      <div style={{ padding: "32px 40px 24px" }}>
-        <h1
-          style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "0", color: "var(--t1)", margin: 0, lineHeight: 1.1 }}
-          data-testid="text-inbox-title"
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "28px 28px 20px" }}>
+        <div>
+          <h1
+            style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 26, color: "var(--t1)", margin: 0, lineHeight: 1.1 }}
+            data-testid="text-inbox-title"
+          >
+            Supplier Inbox
+          </h1>
+          <p style={{ fontSize: 14, color: "var(--t3)", marginTop: 4 }} data-testid="text-inbox-subtitle">
+            {summary.awaiting + summary.blocking} suppliers waiting &middot; {summary.blocking} blocking issue{summary.blocking !== 1 ? "s" : ""}
+          </p>
+        </div>
+        <button
+          style={{
+            padding: "9px 20px",
+            borderRadius: 20,
+            border: "none",
+            fontFamily: "var(--fb)",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: "pointer",
+            background: "var(--sage)",
+            color: "#fff",
+          }}
         >
-          Supplier Inbox
-        </h1>
-        <p style={{ fontSize: 13, color: "var(--t2)", marginTop: 6 }} data-testid="text-inbox-subtitle">
-          {summary.awaiting + summary.blocking} suppliers waiting &middot; {summary.blocking} blocking issues
-        </p>
+          + New Upload Link
+        </button>
       </div>
 
-      {/* WHITE ZONE */}
-      <div style={{ background: "#ffffff", borderRadius: "24px 24px 0 0", padding: "28px 40px 60px", marginTop: 4, minHeight: "calc(100vh - 160px)" }}>
-        {/* SUMMARY CARDS */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 2, marginBottom: 32 }} data-testid="inbox-summary-cards">
-          {cards.map((c, i) => (
-            <div
-              key={c.label}
-              style={{
-                background: c.label === "Blocking issue"
-                  ? "linear-gradient(135deg, rgba(218,60,61,.06), transparent 60%), #f7f8f9"
-                  : "#f7f8f9",
-                padding: "20px 22px",
-                borderRadius:
-                  i === 0 ? "14px 0 0 14px" :
-                  i === cards.length - 1 ? "0 14px 14px 0" : "0",
-                border: "1px solid #e8e8e8",
-              }}
-              data-testid={`inbox-summary-card-${i}`}
-            >
-              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 36, letterSpacing: 0, lineHeight: 1, color: c.color }}>
-                {c.value}
-              </div>
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "#333", letterSpacing: ".04em", marginTop: 4 }}>
-                {c.label}
-              </div>
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, padding: "0 28px 20px" }} data-testid="inbox-summary-cards">
+        {stats.map((s, i) => (
+          <div
+            key={s.label}
+            style={{
+              background: "var(--card)",
+              borderRadius: "var(--r)",
+              boxShadow: "var(--shd)",
+              padding: "18px 22px",
+            }}
+            data-testid={`inbox-summary-card-${i}`}
+          >
+            <div style={{ fontFamily: "var(--fd)", fontSize: 28, fontWeight: 700, color: s.color, lineHeight: 1 }}>
+              {s.value}
             </div>
-          ))}
-        </div>
+            <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 4 }}>
+              {s.label}
+            </div>
+          </div>
+        ))}
+      </div>
 
-        {/* INBOX CARDS */}
+      {/* Content */}
+      <div style={{ padding: "0 28px 60px" }}>
         {requestsQuery.isLoading ? (
-          <div style={{ padding: "80px 0", textAlign: "center", color: "#333", fontSize: 14 }}>Loading inbox...</div>
+          <div style={{ padding: "80px 0", textAlign: "center", color: "var(--t3)", fontSize: 14 }}>Loading inbox...</div>
         ) : requests.length === 0 ? (
           <div style={{ padding: "80px 0", textAlign: "center" }} data-testid="inbox-empty-state">
-            <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "#1a1a1a" }}>
+            <div style={{ fontFamily: "var(--fd)", fontWeight: 700, fontSize: 20, color: "var(--t1)" }}>
               No supplier requests yet.
             </div>
-            <div style={{ fontSize: 13, color: "#333", marginTop: 8 }}>
+            <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 8 }}>
               Send your first supplier brief from the LC Checker or Compliance Lookup.
             </div>
           </div>
         ) : (
           <>
-            {grouped.attention.length > 0 && (
-              <InboxGroup label="Needs attention" items={grouped.attention} />
+            {grouped.awaiting.length > 0 && (
+              <InboxSection label="Awaiting Documents" items={grouped.awaiting} />
             )}
-            {grouped.inProgress.length > 0 && (
-              <InboxGroup label="In progress" items={grouped.inProgress} />
+            {grouped.blocking.length > 0 && (
+              <InboxSection label="Blocking Issue" items={grouped.blocking} />
             )}
             {grouped.complete.length > 0 && (
-              <InboxGroup label="Complete" items={grouped.complete} opacity={0.7} />
+              <InboxSection label="Complete" items={grouped.complete} dimmed />
             )}
           </>
         )}
@@ -158,145 +195,173 @@ export default function Inbox() {
   );
 }
 
-function InboxGroup({ label, items, opacity }: { label: string; items: SupplierRequestRow[]; opacity?: number }) {
+function InboxSection({ label, items, dimmed }: { label: string; items: SupplierRequestRow[]; dimmed?: boolean }) {
   return (
-    <div style={{ marginBottom: 28, opacity: opacity ?? 1 }} data-testid={`inbox-group-${label.toLowerCase().replace(/\s+/g, "-")}`}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, textTransform: "uppercase", letterSpacing: ".12em", color: "#555", whiteSpace: "nowrap" }}>
-          {label}
-        </span>
-        <div style={{ flex: 1 }} />
+    <div style={{ marginBottom: 24 }} data-testid={`inbox-group-${label.toLowerCase().replace(/\s+/g, "-")}`}>
+      <div style={{
+        fontSize: 9,
+        fontWeight: 600,
+        letterSpacing: "1.2px",
+        color: "var(--t3)",
+        textTransform: "uppercase",
+        padding: "8px 0",
+      }}>
+        {label}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {items.map((req) => (
-          <InboxCard key={req.id} request={req} />
+          <SupplierCard key={req.id} request={req} dimmed={dimmed} />
         ))}
       </div>
     </div>
   );
 }
 
-function InboxCard({ request }: { request: SupplierRequestRow }) {
-  const avatar = getAvatarColour(request.origin_iso2);
-  const statusTag = getStatusTag(request.status);
-  const docsRequired = Array.isArray(request.docs_required) ? request.docs_required as string[] : [];
-  const docsReceived = Array.isArray(request.docs_received) ? request.docs_received as string[] : [];
+function SupplierCard({ request, dimmed }: { request: SupplierRequestRow; dimmed?: boolean }) {
+  const statusInfo = getStatusInfo(request.status);
+  const docsRequired = Array.isArray(request.docs_required) ? request.docs_required : [];
+  const docsReceived = Array.isArray(request.docs_received) ? request.docs_received : [];
   const receivedSet = new Set(docsReceived);
-  const outstanding = docsRequired.filter(d => !receivedSet.has(d));
-  const blockingCount = request.status === "blocking" ? outstanding.length : 0;
-  const pendingCount = outstanding.length - blockingCount;
+  const outstanding = docsRequired.filter((d) => !receivedSet.has(d));
+  const isBlocking = request.status === "blocking";
+
+  // Avatar color based on status
+  const avatarStyle = isBlocking
+    ? { background: "var(--red-xs)", color: "var(--red)" }
+    : request.status === "complete"
+    ? { background: "var(--sage-xs)", color: "var(--sage)" }
+    : { background: "var(--amber-xs)", color: "var(--amber)" };
+
+  // Status description
+  const statusText = request.status === "complete"
+    ? "All documents received"
+    : isBlocking && outstanding.length > 0
+    ? outstanding.join(" and ")
+    : `Waiting for ${outstanding.join(" and ")}`;
+
+  // Time label
+  const timeLabel = isBlocking
+    ? overdueTime(request.updated_at)
+    : request.status === "complete"
+    ? relativeTime(request.updated_at)
+    : sentTime(request.created_at);
 
   return (
     <div
       style={{
-        background: "#f9f9f9",
-        borderLeft: request.status === "blocking" ? "3px solid #dc2626" : undefined,
-        borderRadius: 14,
-        padding: "16px 18px",
-        cursor: "pointer",
-        transition: "background .15s",
+        background: "var(--card)",
+        borderRadius: "var(--r)",
+        boxShadow: isBlocking
+          ? "var(--shd), inset 3px 0 0 var(--red)"
+          : "var(--shd)",
+        padding: "16px 20px",
         display: "flex",
-        flexDirection: "row",
-        gap: 14,
         alignItems: "center",
-        border: "1px solid #eee",
+        gap: 14,
+        opacity: dimmed ? 0.7 : 1,
       }}
       data-testid={`inbox-card-${request.id}`}
-      onMouseEnter={e => { e.currentTarget.style.background = "#f0f0f0"; }}
-      onMouseLeave={e => { e.currentTarget.style.background = "#f9f9f9"; }}
     >
       {/* Avatar */}
       <div
         style={{
           width: 40,
           height: 40,
-          borderRadius: 9,
-          background: avatar.bg,
-          border: `1px solid ${avatar.border}`,
+          borderRadius: 10,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: "'Inter', sans-serif",
-          fontSize: 11,
-          fontWeight: 800,
-          color: avatar.text,
+          fontSize: 14,
+          fontWeight: 700,
           flexShrink: 0,
+          ...avatarStyle,
         }}
       >
         {request.origin_iso2}
       </div>
 
-      {/* Body */}
+      {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>{request.supplier_name}</span>
-          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "#555" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>{request.supplier_name}</span>
+          <span style={{ fontSize: 13, fontWeight: 400, color: "var(--t3)" }}>
             {request.origin_iso2} → {request.dest_iso2} · {request.commodity_name}
           </span>
         </div>
-        <div style={{ fontSize: 12, color: "#333", marginTop: 3 }}>
-          {outstanding.length > 0
-            ? `Outstanding: ${outstanding.join(", ")}`
-            : "All documents received"}
+        <div style={{
+          fontSize: 13,
+          color: isBlocking ? "var(--red)" : "var(--t3)",
+          fontWeight: isBlocking ? 600 : 400,
+          marginTop: 2,
+        }}>
+          {statusText}
         </div>
-        {/* Document progress pips */}
-        <div style={{ display: "flex", gap: 3, marginTop: 8 }}>
+        {/* Document pips */}
+        <div style={{ display: "flex", gap: 3, marginTop: 4, alignItems: "center" }}>
           {docsRequired.map((doc, i) => {
             const received = receivedSet.has(doc);
-            const isBlocking = request.status === "blocking" && !received;
+            const isMissing = !received && isBlocking;
             return (
               <div
                 key={i}
                 style={{
-                  width: 22,
-                  height: 4,
+                  width: 18,
+                  height: 5,
                   borderRadius: 2,
-                  background: received ? "#15803d" : isBlocking ? "#dc2626" : "#ddd",
+                  background: received
+                    ? "var(--sage)"
+                    : isMissing
+                    ? "var(--red)"
+                    : "var(--amber)",
                 }}
               />
             );
           })}
-        </div>
-        <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "#555", marginTop: 6 }}>
-          {docsReceived.length}/{docsRequired.length} docs
-          {blockingCount > 0 && ` · ${blockingCount} blocking`}
-          {pendingCount > 0 && ` · ${pendingCount} pending`}
+          <span style={{ fontSize: 14, color: "var(--t3)", marginLeft: 4 }}>
+            {docsReceived.length}/{docsRequired.length} docs
+          </span>
         </div>
       </div>
 
-      {/* Meta */}
+      {/* Right side: badge, time, actions */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flexShrink: 0 }}>
-        <span
+        <div
           style={{
-            fontFamily: "'Inter', sans-serif",
-            fontSize: 9,
+            padding: "4px 10px",
+            borderRadius: 10,
+            fontSize: 14,
             fontWeight: 600,
-            padding: "2px 8px",
-            borderRadius: 4,
-            background: statusTag.bg,
-            border: `1px solid ${statusTag.bd}`,
-            color: statusTag.color,
-            whiteSpace: "nowrap",
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            background: statusInfo.bg,
+            color: statusInfo.color,
           }}
         >
-          {statusTag.symbol} {statusTag.label}
-        </span>
-        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "#555" }}>
-          {relativeTime(request.updated_at)}
-        </span>
-        {/* Send buttons */}
-        <div style={{ display: "flex", gap: 6 }}>
+          <span style={{
+            width: 5,
+            height: 5,
+            borderRadius: "50%",
+            background: "currentColor",
+            display: "inline-block",
+          }} />
+          {statusInfo.label}
+        </div>
+        <div style={{ fontSize: 14, color: "var(--t4)" }}>
+          {timeLabel}
+        </div>
+        <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
           <button
             style={{
-              background: "rgba(37,211,102,.12)",
-              border: "1px solid rgba(37,211,102,.3)",
-              color: "#128C7E",
-              fontSize: 11,
+              padding: "4px 10px",
+              borderRadius: 8,
+              border: "1px solid rgba(37,211,102,0.2)",
+              fontSize: 14,
               fontWeight: 600,
-              padding: "5px 10px",
-              borderRadius: 6,
               cursor: "pointer",
-              whiteSpace: "nowrap",
+              background: "transparent",
+              color: "#25D366",
+              fontFamily: "var(--fb)",
             }}
             data-testid={`inbox-whatsapp-${request.id}`}
           >
@@ -304,15 +369,15 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
           </button>
           <button
             style={{
-              background: "#eff6ff",
-              border: "1px solid #93c5fd",
-              color: "#2563eb",
-              fontSize: 11,
+              padding: "4px 10px",
+              borderRadius: 8,
+              border: "1px solid rgba(74,124,94,0.2)",
+              fontSize: 14,
               fontWeight: 600,
-              padding: "5px 10px",
-              borderRadius: 6,
               cursor: "pointer",
-              whiteSpace: "nowrap",
+              background: "transparent",
+              color: "var(--sage)",
+              fontFamily: "var(--fb)",
             }}
             data-testid={`inbox-email-${request.id}`}
           >
@@ -320,15 +385,15 @@ function InboxCard({ request }: { request: SupplierRequestRow }) {
           </button>
           <button
             style={{
-              background: "#f5f5f5",
-              border: "1px solid #ddd",
-              color: "#333",
-              fontSize: 11,
+              padding: "4px 10px",
+              borderRadius: 8,
+              border: "1px solid rgba(0,0,0,0.08)",
+              fontSize: 14,
               fontWeight: 600,
-              padding: "5px 10px",
-              borderRadius: 6,
               cursor: "pointer",
-              whiteSpace: "nowrap",
+              background: "transparent",
+              color: "var(--t2)",
+              fontFamily: "var(--fb)",
             }}
             data-testid={`inbox-link-${request.id}`}
           >

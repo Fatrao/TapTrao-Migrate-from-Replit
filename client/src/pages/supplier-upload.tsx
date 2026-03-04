@@ -218,18 +218,18 @@ export default function SupplierUpload() {
               <span style={{
                 display: "inline-flex", alignItems: "center", gap: 5,
                 background: "rgba(234,179,8,0.2)", border: "1px solid rgba(234,179,8,0.3)",
-                color: "#fcd34d", fontSize: 12, fontWeight: 600,
+                color: "#fcd34d", fontSize: 14, fontWeight: 600,
                 padding: "5px 12px", borderRadius: 6,
               }}>
                 {"\u23F1"} Due by {formatDate(request.uploadExpiresAt)}
               </span>
             ) : (
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+              <span style={{ fontSize: 14, color: "rgba(255,255,255,0.5)" }}>
                 Deadline: {formatDate(request.uploadExpiresAt)}
               </span>
             )}
             <span style={{
-              fontSize: 12, color: "rgba(255,255,255,0.5)", marginLeft: "auto",
+              fontSize: 14, color: "rgba(255,255,255,0.5)", marginLeft: "auto",
             }}>
               {docsReceived.length}/{docsRequired.length} uploaded
             </span>
@@ -282,7 +282,7 @@ export default function SupplierUpload() {
                   {docName}
                 </div>
                 <span style={{
-                  fontSize: 11, fontWeight: 600,
+                  fontSize: 13, fontWeight: 600,
                   color: isVerified ? accentGreen :
                     hasFinding ? amberText :
                     isReceived ? accentGreen : textMuted,
@@ -317,7 +317,7 @@ export default function SupplierUpload() {
                   borderTop: `1px solid ${accentGreenBorder}`,
                   display: "flex", alignItems: "center", gap: 8,
                 }}>
-                  <span style={{ fontSize: 12, color: textSecondary, flex: 1 }}>
+                  <span style={{ fontSize: 14, color: textSecondary, flex: 1 }}>
                     {upload.originalFilename}
                     {upload.filesizeBytes ? ` \u00B7 ${(upload.filesizeBytes / 1024).toFixed(0)}KB` : ""}
                   </span>
@@ -347,7 +347,7 @@ export default function SupplierUpload() {
           marginTop: 24,
           boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
         }}>
-          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: textMuted, marginBottom: 10 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: textMuted, marginBottom: 10 }}>
             Upload progress
           </div>
           {docsRequired.map((docName, idx) => {
@@ -433,7 +433,7 @@ function TopBar() {
           TapTrao
         </span>
       </div>
-      <span style={{ fontSize: 12, color: textMuted, display: "flex", alignItems: "center", gap: 5 }}>
+      <span style={{ fontSize: 14, color: textMuted, display: "flex", alignItems: "center", gap: 5 }}>
         {"\uD83D\uDD12"} Secure upload
       </span>
     </div>
@@ -451,10 +451,10 @@ function Footer({ expiryDate }: { expiryDate: string }) {
           TapTrao
         </span>
       </div>
-      <p style={{ fontSize: 12, color: textMuted, lineHeight: 1.55 }}>
+      <p style={{ fontSize: 14, color: textMuted, lineHeight: 1.55 }}>
         Your files go directly and securely to the buyer. No TapTrao account required.
       </p>
-      <p style={{ fontSize: 12, color: textMuted, lineHeight: 1.55, marginTop: 2 }}>
+      <p style={{ fontSize: 14, color: textMuted, lineHeight: 1.55, marginTop: 2 }}>
         This link expires {formatDate(expiryDate)}.
       </p>
     </div>
@@ -562,14 +562,14 @@ function UploadZone({
             <div style={{ fontSize: 14, color: textSecondary, fontWeight: 500 }}>
               {"\uD83D\uDCCE"} Drop file here or tap to choose
             </div>
-            <div style={{ fontSize: 12, color: textMuted, marginTop: 4 }}>
+            <div style={{ fontSize: 14, color: textMuted, marginTop: 4 }}>
               PDF, JPG, PNG {"\u00B7"} max 20MB
             </div>
           </>
         )}
       </div>
       {error && (
-        <div style={{ fontSize: 12, color: "#ef4444", marginTop: 6 }}>{error}</div>
+        <div style={{ fontSize: 14, color: "#ef4444", marginTop: 6 }}>{error}</div>
       )}
       <input
         ref={inputRef}

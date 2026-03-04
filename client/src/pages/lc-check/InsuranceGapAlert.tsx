@@ -40,7 +40,7 @@ export function InsuranceGapAlert() {
         </span>
       </div>
 
-      <p style={{ fontSize: 12, color: "var(--app-regent)", lineHeight: 1.65, marginBottom: 12 }}>
+      <p style={{ fontSize: 14, color: "var(--app-regent)", lineHeight: 1.65, marginBottom: 12 }}>
         Standard cargo insurance (Institute Cargo Clauses A/B/C) covers physical
         loss and damage. It does NOT cover goods rejected at port due to regulatory
         non-compliance — which is a separate and common risk for agricultural and
@@ -50,7 +50,7 @@ export function InsuranceGapAlert() {
       <div style={{
         display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12,
         background: "#f5f5f5", borderRadius: 6, padding: "10px 14px",
-        fontFamily: "var(--fb)", fontSize: 11, marginBottom: 12,
+        fontFamily: "var(--fb)", fontSize: 13, marginBottom: 12,
       }}>
         <div>
           <div style={{ fontWeight: 600, color: "var(--app-main-base)", marginBottom: 6 }}>NOT covered by standard policy:</div>
@@ -72,7 +72,7 @@ export function InsuranceGapAlert() {
         </div>
       </div>
 
-      <p style={{ fontSize: 11, color: "var(--app-regent)", lineHeight: 1.5 }}>
+      <p style={{ fontSize: 13, color: "var(--app-regent)", lineHeight: 1.5 }}>
         This applies regardless of Incoterms. Even under CIF or CIP, the seller&apos;s
         insurance does not cover destination regulatory rejection.
       </p>

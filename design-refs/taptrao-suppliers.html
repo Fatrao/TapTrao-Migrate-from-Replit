@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TapTrao — Supplier Inbox</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#eee9e0;--card:#fff;--dark:#1b2a22;
+  --sage:#4a7c5e;--sage-l:#6db89a;--sage-xs:rgba(74,124,94,.06);
+  --amber:#c4882a;--amber-xs:rgba(196,136,42,.08);
+  --red:#c44e3a;--red-xs:rgba(196,78,58,.07);
+  --t1:#2c3e2e;--t2:#5e7060;--t3:#8a9a8c;--t4:#b8c2ba;
+  --shd:0 1px 3px rgba(0,0,0,.03),0 4px 16px rgba(0,0,0,.05);
+  --r:16px;--fd:'Playfair Display',serif;--fb:'DM Sans',sans-serif
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--fb);background:var(--bg);color:var(--t1);display:flex;padding:6px}
+
+/* SIDEBAR */
+.sb{width:220px;min-width:220px;background:#182228;display:flex;flex-direction:column;padding:20px 14px;overflow-y:auto;flex-shrink:0;border-radius:20px;margin:6px;box-shadow:0 4px 20px rgba(0,0,0,.12)}
+.sb::-webkit-scrollbar{width:3px}.sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:2px}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:16px}
+.sb-name{font-family:var(--fd);font-size:17px;color:#fff;font-weight:600}
+.sb-cred{display:flex;align-items:center;gap:8px;background:rgba(109,184,154,.1);border-radius:10px;padding:8px 14px;margin:0 4px 8px}
+.sb-cred-v{font-size:12px;font-weight:600;color:var(--sage-l)}.sb-cred-b{font-size:11px;color:rgba(255,255,255,.3);margin-left:auto;cursor:pointer}
+.sb-sec{font-size:9px;font-weight:600;letter-spacing:1.2px;color:rgba(255,255,255,.2);padding:14px 12px 6px}
+.sb-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;font-size:13px;color:rgba(255,255,255,.4);cursor:pointer;text-decoration:none;font-weight:500}
+.sb-item:hover{color:rgba(255,255,255,.7);background:rgba(255,255,255,.04)}
+.sb-item.on{background:var(--sage);color:#fff;font-weight:600}
+.sb-ic{width:20px;text-align:center;font-size:14px;flex-shrink:0}
+.sb-sp{flex:1;min-height:12px}
+.sb-feat{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;font-size:12px;color:rgba(255,255,255,.35);cursor:pointer;background:rgba(255,255,255,.03);margin:4px}
+
+/* MAIN */
+.mn{flex:1;display:flex;flex-direction:column;padding:18px 22px;gap:14px;overflow-y:auto}
+
+/* Header */
+.hdr{display:flex;align-items:center;justify-content:space-between}
+.hdr h1{font-family:var(--fd);font-size:26px;font-weight:600}
+.hdr .sub{font-size:12px;color:var(--t3);margin-top:2px}
+.hdr-btn{padding:9px 20px;border-radius:20px;border:none;font-family:var(--fb);font-size:12px;font-weight:600;cursor:pointer;background:var(--sage);color:#fff}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat{background:var(--card);border-radius:var(--r);box-shadow:var(--shd);padding:18px 22px}
+.stat-num{font-family:var(--fd);font-size:28px;font-weight:700}
+.stat-num.red{color:var(--red)}.stat-num.amber{color:var(--amber)}.stat-num.green{color:var(--sage)}
+.stat-label{font-size:11px;color:var(--t3);margin-top:2px}
+
+/* Section label */
+.sec-label{font-size:9px;font-weight:600;letter-spacing:1.2px;color:var(--t3);text-transform:uppercase;padding:6px 0}
+
+/* Supplier rows */
+.sup-card{background:var(--card);border-radius:var(--r);box-shadow:var(--shd);padding:16px 20px;display:flex;align-items:center;gap:14px}
+.sup-avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.sup-avatar.await{background:var(--amber-xs);color:var(--amber)}
+.sup-avatar.block{background:var(--red-xs);color:var(--red)}
+.sup-avatar.done{background:var(--sage-xs);color:var(--sage)}
+.sup-info{flex:1}
+.sup-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.sup-name .route{font-size:11px;font-weight:400;color:var(--t3)}
+.sup-status{font-size:11px;color:var(--t3);margin-top:2px}
+.sup-docs{display:flex;gap:3px;margin-top:4px}
+.sup-doc{width:18px;height:5px;border-radius:2px}
+.sup-doc.ok{background:var(--sage)}.sup-doc.miss{background:var(--red)}.sup-doc.pend{background:var(--amber)}
+.sup-doc-count{font-size:10px;color:var(--t3);margin-left:4px}
+.sup-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.sup-badge{padding:4px 10px;border-radius:10px;font-size:10px;font-weight:600;display:flex;align-items:center;gap:4px}
+.sup-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+.sup-badge.await{background:var(--amber-xs);color:var(--amber)}
+.sup-badge.block{background:var(--red-xs);color:var(--red)}
+.sup-badge.done{background:var(--sage-xs);color:var(--sage)}
+.sup-time{font-size:10px;color:var(--t4)}
+.sup-actions{display:flex;gap:6px;margin-top:4px}
+.sup-act{padding:4px 10px;border-radius:8px;border:1px solid rgba(0,0,0,.08);font-size:10px;font-weight:600;cursor:pointer;background:transparent;color:var(--t2);font-family:var(--fb)}
+.sup-act:hover{background:rgba(0,0,0,.02)}
+.sup-act.wa{color:#25D366;border-color:rgba(37,211,102,.2)}
+.sup-act.em{color:var(--sage);border-color:rgba(74,124,94,.2)}
+
+.cards-list{display:flex;flex-direction:column;gap:10px}
+</style>
+</head>
+<body>
+
+<nav class="sb">
+  <div class="sb-logo"><img src="data:image/png;base64,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" style="width:36px;height:36px;border-radius:10px" alt="TapTrao"/><span class="sb-name">TapTrao</span></div>
+  <div class="sb-cred"><span style="font-size:14px">🛡</span><span class="sb-cred-v">2 checks</span><span class="sb-cred-b">Buy More</span></div>
+  <div class="sb-sec">MAIN</div>
+  <a class="sb-item"><span class="sb-ic">⊞</span>Dashboard</a>
+  <a class="sb-item"><span class="sb-ic">✦</span>New Check</a>
+  <a class="sb-item"><span class="sb-ic">◉</span>My Trades</a>
+  <a class="sb-item on"><span class="sb-ic">📮</span>Suppliers</a>
+  <div class="sb-sec">TOOLS</div>
+  <a class="sb-item"><span class="sb-ic">⌧</span>Demurrage Calc</a>
+  <a class="sb-item"><span class="sb-ic">📋</span>Templates</a>
+  <a class="sb-item"><span class="sb-ic">🔔</span>Alerts</a>
+  <div class="sb-sec">ACCOUNT</div>
+  <a class="sb-item"><span class="sb-ic">⚙</span>Settings</a>
+  <a class="sb-item"><span class="sb-ic">🧾</span>Billing</a>
+  <div class="sb-sp"></div>
+  <a class="sb-feat"><span class="sb-ic">📦</span>Request a Feature</a>
+</nav>
+
+<div class="mn">
+  <div class="hdr">
+    <div><h1>Supplier Inbox</h1><div class="sub">3 suppliers waiting · 1 blocking issue</div></div>
+    <button class="hdr-btn">+ New Upload Link</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num amber">3</div><div class="stat-label">Awaiting documents</div></div>
+    <div class="stat"><div class="stat-num red">1</div><div class="stat-label">Blocking issue</div></div>
+    <div class="stat"><div class="stat-num green">2</div><div class="stat-label">Complete this week</div></div>
+  </div>
+
+  <!-- AWAITING -->
+  <div class="sec-label">AWAITING DOCUMENTS</div>
+  <div class="cards-list">
+    <div class="sup-card">
+      <div class="sup-avatar await">GH</div>
+      <div class="sup-info">
+        <div class="sup-name">Tema Cocoa Cooperative <span class="route">GH → EU · Cocoa Beans</span></div>
+        <div class="sup-status">Waiting for Certificate of Origin and Phytosanitary Certificate</div>
+        <div class="sup-docs"><div class="sup-doc ok"></div><div class="sup-doc ok"></div><div class="sup-doc ok"></div><div class="sup-doc pend"></div><div class="sup-doc pend"></div><div class="sup-doc miss"></div><span class="sup-doc-count">3/6 docs</span></div>
+      </div>
+      <div class="sup-right">
+        <div class="sup-badge await">Awaiting</div>
+        <div class="sup-time">Sent 2d ago</div>
+        <div class="sup-actions"><button class="sup-act wa">WhatsApp</button><button class="sup-act em">Email</button><button class="sup-act">Link</button></div>
+      </div>
+    </div>
+
+    <div class="sup-card">
+      <div class="sup-avatar await">ET</div>
+      <div class="sup-info">
+        <div class="sup-name">Addis Coffee Exports <span class="route">ET → US · Coffee (Green)</span></div>
+        <div class="sup-status">Waiting for Bill of Lading and Insurance Certificate</div>
+        <div class="sup-docs"><div class="sup-doc ok"></div><div class="sup-doc pend"></div><div class="sup-doc pend"></div><div class="sup-doc miss"></div><div class="sup-doc miss"></div><div class="sup-doc miss"></div><div class="sup-doc miss"></div><div class="sup-doc miss"></div><span class="sup-doc-count">1/8 docs</span></div>
+      </div>
+      <div class="sup-right">
+        <div class="sup-badge await">Awaiting</div>
+        <div class="sup-time">Sent 5h ago</div>
+        <div class="sup-actions"><button class="sup-act wa">WhatsApp</button><button class="sup-act em">Email</button><button class="sup-act">Link</button></div>
+      </div>
+    </div>
+
+    <div class="sup-card">
+      <div class="sup-avatar await">CM</div>
+      <div class="sup-info">
+        <div class="sup-name">Douala Timber Ltd <span class="route">CM → CH · Timber (tropical sawn)</span></div>
+        <div class="sup-status">Waiting for CITES export permit and CEMAC clearance</div>
+        <div class="sup-docs"><div class="sup-doc ok"></div><div class="sup-doc ok"></div><div class="sup-doc pend"></div><div class="sup-doc pend"></div><div class="sup-doc miss"></div><span class="sup-doc-count">2/5 docs</span></div>
+      </div>
+      <div class="sup-right">
+        <div class="sup-badge await">Awaiting</div>
+        <div class="sup-time">Sent 1d ago</div>
+        <div class="sup-actions"><button class="sup-act wa">WhatsApp</button><button class="sup-act em">Email</button><button class="sup-act">Link</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCKING -->
+  <div class="sec-label">BLOCKING ISSUE</div>
+  <div class="cards-list">
+    <div class="sup-card" style="box-shadow:var(--shd),inset 3px 0 0 var(--red)">
+      <div class="sup-avatar block">CI</div>
+      <div class="sup-info">
+        <div class="sup-name">Abidjan Coop Ltd <span class="route">CI → NL · Cashew Nuts</span></div>
+        <div class="sup-status" style="color:var(--red);font-weight:600">HS code mismatch between invoice and Certificate of Origin</div>
+        <div class="sup-docs"><div class="sup-doc ok"></div><div class="sup-doc ok"></div><div class="sup-doc ok"></div><div class="sup-doc miss"></div><div class="sup-doc miss"></div><span class="sup-doc-count">3/5 docs</span></div>
+      </div>
+      <div class="sup-right">
+        <div class="sup-badge block">Blocking</div>
+        <div class="sup-time">3d overdue</div>
+        <div class="sup-actions"><button class="sup-act wa">WhatsApp</button><button class="sup-act em">Email</button><button class="sup-act">Link</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPLETE -->
+  <div class="sec-label">COMPLETE</div>
+  <div class="cards-list">
+    <div class="sup-card" style="opacity:.7">
+      <div class="sup-avatar done">CI</div>
+      <div class="sup-info">
+        <div class="sup-name">Abidjan Coop Ltd <span class="route">CI → EU · Cocoa Beans</span></div>
+        <div class="sup-status">All documents received</div>
+        <div class="sup-docs"><div class="sup-doc ok"></div><div class="sup-doc ok"></div><div class="sup-doc ok"></div><span class="sup-doc-count">3/3 docs</span></div>
+      </div>
+      <div class="sup-right">
+        <div class="sup-badge done">Complete</div>
+        <div class="sup-time">3d ago</div>
+        <div class="sup-actions"><button class="sup-act wa">WhatsApp</button><button class="sup-act em">Email</button><button class="sup-act">Link</button></div>
+      </div>
+    </div>
+
+    <div class="sup-card" style="opacity:.7">
+      <div class="sup-avatar done">BF</div>
+      <div class="sup-info">
+        <div class="sup-name">Ouaga Shea Women's Coop <span class="route">BF → DE · Shea Butter</span></div>
+        <div class="sup-status">All documents received</div>
+        <div class="sup-docs"><div class="sup-doc ok"></div><div class="sup-doc ok"></div><div class="sup-doc ok"></div><div class="sup-doc ok"></div><div class="sup-doc ok"></div><span class="sup-doc-count">5/5 docs</span></div>
+      </div>
+      <div class="sup-right">
+        <div class="sup-badge done">Complete</div>
+        <div class="sup-time">5d ago</div>
+        <div class="sup-actions"><button class="sup-act wa">WhatsApp</button><button class="sup-act em">Email</button><button class="sup-act">Link</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

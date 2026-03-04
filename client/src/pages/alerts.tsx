@@ -65,7 +65,7 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
       <span
         style={{
           fontFamily: "'Inter', sans-serif",
-          fontSize: 9,
+          fontSize: 13,
           fontWeight: 600,
           textTransform: "uppercase",
           padding: "2px 6px",
@@ -92,14 +92,14 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
       </p>
 
       {alert.hsCodesAffected && alert.hsCodesAffected.length > 0 && (
-        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "var(--t3)", margin: "2px 0" }}>
+        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)", margin: "2px 0" }}>
           HS: {alert.hsCodesAffected.slice(0, 6).join(", ")}
           {alert.hsCodesAffected.length > 6 && ` +${alert.hsCodesAffected.length - 6} more`}
         </p>
       )}
 
       {effectiveDateStr && (
-        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "var(--t3)", margin: "2px 0" }}>
+        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)", margin: "2px 0" }}>
           Effective {effectiveDateStr}
         </p>
       )}
@@ -111,7 +111,7 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
               href={alert.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ fontSize: 11, color: "var(--blue)", textDecoration: "none" }}
+              style={{ fontSize: 13, color: "var(--blue)", textDecoration: "none" }}
               data-testid={`link-alert-source-${alert.id}`}
             >
               ↗ View source
@@ -121,7 +121,7 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
         <Link href={lookupHref}>
           <button
             style={{
-              fontSize: 11,
+              fontSize: 13,
               fontWeight: 600,
               padding: "5px 12px",
               borderRadius: 5,

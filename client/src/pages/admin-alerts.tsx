@@ -62,7 +62,7 @@ export default function AdminAlertsPage() {
   const labelStyle = {
     display: "block",
     fontFamily: "'Inter', sans-serif",
-    fontSize: 9,
+    fontSize: 13,
     color: "var(--t3)",
     marginBottom: 4,
     textTransform: "uppercase" as const,
@@ -190,7 +190,7 @@ export default function AdminAlertsPage() {
                   border: "1px solid var(--gbd)",
                   borderRadius: 6,
                   padding: "10px 14px",
-                  fontSize: 12,
+                  fontSize: 14,
                   color: "var(--green)",
                   fontWeight: 600,
                 }}
@@ -207,7 +207,7 @@ export default function AdminAlertsPage() {
                   border: "1px solid var(--rbd)",
                   borderRadius: 6,
                   padding: "10px 14px",
-                  fontSize: 12,
+                  fontSize: 14,
                   color: "var(--red)",
                   fontWeight: 600,
                 }}

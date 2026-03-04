@@ -96,7 +96,7 @@ export default function ForgotPassword() {
             </button>
 
             {error && (
-              <div style={{ fontSize: 12, color: "var(--red)", marginBottom: 12 }}>{error}</div>
+              <div style={{ fontSize: 14, color: "var(--red)", marginBottom: 12 }}>{error}</div>
             )}
 
             <p style={{ fontSize: 13, color: "#888", textAlign: "center" }}>
@@ -120,7 +120,7 @@ export default function ForgotPassword() {
             </div>
 
             {error && (
-              <div style={{ fontSize: 12, color: "var(--red)", marginBottom: 12 }}>{error}</div>
+              <div style={{ fontSize: 14, color: "var(--red)", marginBottom: 12 }}>{error}</div>
             )}
 
             <button

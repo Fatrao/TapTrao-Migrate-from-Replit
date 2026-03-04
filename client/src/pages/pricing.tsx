@@ -47,7 +47,7 @@ const S = {
   } as React.CSSProperties,
   badge: {
     fontFamily: "'Inter', sans-serif",
-    fontSize: 9,
+    fontSize: 13,
     letterSpacing: "0.08em",
     textTransform: "uppercase" as const,
     padding: "4px 10px",
@@ -156,7 +156,7 @@ export default function Pricing() {
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, color: "var(--t1)", lineHeight: 1 }}>
                 {balance}
               </div>
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginTop: 4 }}>
+              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginTop: 4 }}>
                 {balance === 1 ? "Shield" : "Shields"}
               </div>
             </div>
@@ -179,7 +179,7 @@ export default function Pricing() {
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, color: "var(--t1)", lineHeight: 1 }}>
                 {lcBalance}
               </div>
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginTop: 4 }}>
+              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginTop: 4 }}>
                 LC {lcBalance === 1 ? "credit" : "credits"}
               </div>
             </div>
@@ -214,10 +214,10 @@ export default function Pricing() {
             <div data-testid="table-transactions">
               {/* Header row */}
               <div style={{ display: "grid", gridTemplateColumns: "110px 80px 1fr 80px", gap: 12, padding: "8px 0", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>Date</span>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>Type</span>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>Description</span>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)", textAlign: "right" }}>Amount</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>Date</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>Type</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>Description</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)", textAlign: "right" }}>Amount</span>
               </div>
               {/* Transaction rows */}
               {transactions.map((t, idx) => {
@@ -236,7 +236,7 @@ export default function Pricing() {
                     }}
                     data-testid={`transaction-row-${idx}`}
                   >
-                    <span style={{ fontSize: 12, color: "var(--t3)" }}>
+                    <span style={{ fontSize: 14, color: "var(--t3)" }}>
                       {date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                     </span>
                     <span style={{
@@ -315,7 +315,7 @@ export default function Pricing() {
                 <div style={{ fontSize: 13, color: pack.popular ? "rgba(255,255,255,0.8)" : "var(--t2)", marginBottom: 4 }}>
                   {pack.lookups} {pack.lookups === 1 ? "shipment" : "shipments"}
                 </div>
-                <div style={{ fontSize: 11, color: pack.popular ? "rgba(255,255,255,0.6)" : "var(--t3)", marginBottom: 14 }}>
+                <div style={{ fontSize: 13, color: pack.popular ? "rgba(255,255,255,0.6)" : "var(--t3)", marginBottom: 14 }}>
                   {pack.perLookup} / shipment
                 </div>
                 <button
@@ -325,7 +325,7 @@ export default function Pricing() {
                       : S.btnOutline),
                     width: "100%",
                     padding: "8px 14px",
-                    fontSize: 12,
+                    fontSize: 14,
                     opacity: checkoutMutation.isPending ? 0.6 : 1,
                   }}
                   disabled={checkoutMutation.isPending}
@@ -352,10 +352,10 @@ export default function Pricing() {
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "var(--t1)", marginBottom: 4 }}>
                 $49.99
               </div>
-              <p style={{ fontSize: 11, color: "var(--t3)", margin: "0 0 4px", lineHeight: 1.5 }}>
+              <p style={{ fontSize: 13, color: "var(--t3)", margin: "0 0 4px", lineHeight: 1.5 }}>
                 One-time LC document validation against UCP 600.
               </p>
-              <p style={{ fontSize: 10, color: "var(--sage-l)", margin: "0 0 12px", fontStyle: "italic" }}>
+              <p style={{ fontSize: 14, color: "var(--sage-l)", margin: "0 0 12px", fontStyle: "italic" }}>
                 Included free with Shield
               </p>
               <button
@@ -380,7 +380,7 @@ export default function Pricing() {
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "var(--t1)", marginBottom: 4 }}>
                 $9.99
               </div>
-              <p style={{ fontSize: 11, color: "var(--t3)", margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 13, color: "var(--t3)", margin: 0, lineHeight: 1.5 }}>
                 Re-check after supplier corrects documents. Per re-check.
               </p>
             </div>
@@ -391,7 +391,7 @@ export default function Pricing() {
                 <Building2 style={{ width: 16, height: 16, color: "var(--t3)" }} />
                 <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>High Volume</span>
               </div>
-              <p style={{ fontSize: 11, color: "var(--t3)", margin: "0 0 12px", lineHeight: 1.5 }}>
+              <p style={{ fontSize: 13, color: "var(--t3)", margin: "0 0 12px", lineHeight: 1.5 }}>
                 Custom pricing, shared credits, API access, and dedicated support.
               </p>
               <button
@@ -407,7 +407,7 @@ export default function Pricing() {
         </div>
 
         {/* Disclaimer */}
-        <p style={{ fontSize: 11, color: "var(--t4)", textAlign: "center", margin: "0 0 24px", lineHeight: 1.5 }}>
+        <p style={{ fontSize: 13, color: "var(--t4)", textAlign: "center", margin: "0 0 24px", lineHeight: 1.5 }}>
           TapTrao does not provide legal or banking advice. Reports are informational and designed to support internal decision-making.
         </p>
       </div>

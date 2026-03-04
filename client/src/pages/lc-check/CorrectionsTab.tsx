@@ -18,7 +18,7 @@ function statusBadge(status: LcCaseStatus) {
       display: "inline-block",
       padding: "3px 10px",
       borderRadius: 6,
-      fontSize: 11,
+      fontSize: 13,
       fontWeight: 700,
       background: s.bg,
       border: `1px solid ${s.border}`,
@@ -129,17 +129,17 @@ export function CorrectionsTab({ prefillData }: { prefillData: LcPrefillData | n
                 : "#fef2f2";
               return (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 7, background: verdictBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: verdictColor, flexShrink: 0 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 7, background: verdictBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: verdictColor, flexShrink: 0 }}>
                     {entry.recheckNumber === 0 ? "1" : `R${entry.recheckNumber}`}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>
                       {entry.recheckNumber === 0 ? "Initial check" : `Re-check #${entry.recheckNumber}`}
-                      <span style={{ fontSize: 11, fontWeight: 400, color: "rgba(255,255,255,0.45)", marginLeft: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 400, color: "rgba(255,255,255,0.45)", marginLeft: 8 }}>
                         {relativeTime(entry.createdAt)}
                       </span>
                     </div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>
+                    <div style={{ fontSize: 14, color: "rgba(255,255,255,0.55)" }}>
                       {entry.summary}
                     </div>
                   </div>
@@ -166,7 +166,7 @@ export function CorrectionsTab({ prefillData }: { prefillData: LcPrefillData | n
                 <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>
                   Sent via {cr.channel} · {cr.discrepancyCount} discrepanc{cr.discrepancyCount > 1 ? "ies" : "y"}
                 </span>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginLeft: "auto" }}>
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", marginLeft: "auto" }}>
                   {relativeTime(cr.sentAt)}
                 </span>
               </div>
@@ -194,7 +194,7 @@ export function CorrectionsTab({ prefillData }: { prefillData: LcPrefillData | n
           <p style={{ fontSize: 14, fontWeight: 600, color: "#0e4e45", marginBottom: 8 }}>
             Supplier sent corrected documents?
           </p>
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginBottom: 14 }}>
+          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", marginBottom: 14 }}>
             Upload the corrected supplier documents and run a free re-check to verify corrections.
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 10 }}>
@@ -245,14 +245,14 @@ function ComparisonTable({ initialResults, latestResults }: { initialResults: an
         const fixed = latestSeverity === "GREEN";
         return (
           <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 80px 80px 80px", gap: 8, alignItems: "center", padding: "6px 0" }}>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>{r.fieldName}</span>
-            <span style={{ fontSize: 11, textAlign: "center" }}>
+            <span style={{ fontSize: 14, color: "rgba(255,255,255,0.7)" }}>{r.fieldName}</span>
+            <span style={{ fontSize: 13, textAlign: "center" }}>
               <SeverityDot severity={r.severity} />
             </span>
-            <span style={{ fontSize: 11, textAlign: "center" }}>
+            <span style={{ fontSize: 13, textAlign: "center" }}>
               <SeverityDot severity={latestSeverity} />
             </span>
-            <span style={{ fontSize: 11, fontWeight: 600, textAlign: "center", color: fixed ? "#15803d" : "#dc2626" }}>
+            <span style={{ fontSize: 13, fontWeight: 600, textAlign: "center", color: fixed ? "#15803d" : "#dc2626" }}>
               {fixed ? "✓ Fixed" : "✗ Open"}
             </span>
           </div>

@@ -98,7 +98,7 @@ const css = `
 /* Stats */
 .mt-stats { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;flex-shrink:0 }
 .mt-st { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;animation:mt-fu .3s ease both }
-.mt-st .sl { font-size:11px;color:var(--t3);margin-bottom:1px }
+.mt-st .sl { font-size:13px;color:var(--t3);margin-bottom:1px }
 .mt-st .sv { font-family:var(--fd);font-size:18px;font-weight:600;color:var(--t1) }
 .mt-st-bars { display:flex;align-items:flex-end;gap:2px;height:24px }
 .mt-st-bars span { width:3px;border-radius:1px;background:var(--sage) }
@@ -113,12 +113,12 @@ const css = `
 .mt-tc { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:16px 20px;display:flex;flex-direction:column;min-height:0;animation:mt-fu .3s ease both }
 .mt-tc .th { display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-shrink:0 }
 .mt-tc h3 { font-family:var(--fd);font-size:16px;font-weight:600;color:var(--t1);margin:0 }
-.mt-tc .tsub { font-size:11px;color:var(--t3);margin-bottom:10px;flex-shrink:0 }
+.mt-tc .tsub { font-size:13px;color:var(--t3);margin-bottom:10px;flex-shrink:0 }
 .mt-tc .tsub b { color:var(--sage);font-weight:600 }
 
 /* Filter pills */
 .mt-pls { display:flex;gap:3px }
-.mt-pl { padding:5px 12px;border-radius:12px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:var(--fb);background:rgba(0,0,0,.03);color:var(--t3) }
+.mt-pl { padding:5px 12px;border-radius:12px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--fb);background:rgba(0,0,0,.03);color:var(--t3) }
 .mt-pl.on { background:var(--sage);color:#fff }
 
 /* Trades list */
@@ -133,14 +133,14 @@ const css = `
 .mt-rw .fl { font-size:17px;display:flex;gap:1px;min-width:42px }
 .mt-rw .inf { flex:1;min-width:0 }
 .mt-rw .nm { font-size:13px;font-weight:600;color:var(--t1) }
-.mt-rw .rt { font-size:11px;color:var(--t3) }
+.mt-rw .rt { font-size:13px;color:var(--t3) }
 .mt-rw .vl { font-size:12px;color:var(--t2);min-width:62px;text-align:right }
-.mt-rw .dc { font-size:11px;color:var(--t3);min-width:26px;text-align:center }
+.mt-rw .dc { font-size:13px;color:var(--t3);min-width:26px;text-align:center }
 .mt-rw .pc { font-size:12px;font-weight:700;min-width:32px;text-align:right }
 .mt-rw .pc.g { color:var(--sage) }
 .mt-rw .pc.a { color:var(--amber) }
 .mt-rw .pc.r { color:var(--red) }
-.mt-rw .bg { padding:3px 8px;border-radius:5px;font-size:10px;font-weight:600;min-width:48px;text-align:center }
+.mt-rw .bg { padding:3px 8px;border-radius:5px;font-size:12px;font-weight:600;min-width:48px;text-align:center }
 .mt-rw .bg.ok { background:var(--sage-xs);color:var(--sage) }
 .mt-rw .bg.w { background:var(--amber-xs);color:var(--amber) }
 .mt-rw .bg.e { background:var(--red-xs);color:var(--red) }
@@ -161,9 +161,9 @@ const css = `
 .mt-acr { display:flex;align-items:center;gap:8px;margin-bottom:3px }
 .mt-acr .cfl { font-size:13px }
 .mt-acr .ci { flex:1 }
-.mt-acr .cn { font-size:12px;font-weight:600;color:var(--t1) }
-.mt-acr .cs { font-size:10px;color:var(--t3) }
-.mt-acr .cv { font-size:12px;font-weight:700;color:var(--t1) }
+.mt-acr .cn { font-size:14px;font-weight:600;color:var(--t1) }
+.mt-acr .cs { font-size:12px;color:var(--t3) }
+.mt-acr .cv { font-size:14px;font-weight:700;color:var(--t1) }
 .mt-bar { height:5px;background:rgba(0,0,0,.03);border-radius:3px;overflow:hidden;margin-bottom:10px }
 .mt-bar div { height:100%;border-radius:3px }
 
@@ -171,7 +171,7 @@ const css = `
 .mt-pie-area { flex:1;display:flex;align-items:center;gap:12px;min-height:0;padding-top:4px;border-top:1px solid rgba(0,0,0,.04) }
 .mt-pie { width:100px;height:100px;flex-shrink:0 }
 .mt-pie-leg { display:flex;flex-direction:column;gap:4px }
-.mt-apl { display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t2);font-weight:500 }
+.mt-apl { display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2);font-weight:500 }
 .mt-apl span { width:6px;height:6px;border-radius:2px;flex-shrink:0 }
 
 /* Demurrage */
@@ -182,23 +182,23 @@ const css = `
 .mt-dem-ring { width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative }
 .mt-dem-ring::after { content:'';position:absolute;inset:14px;border-radius:50%;background:#fff }
 .mt-dem-ring span { position:relative;z-index:1;font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1) }
-.mt-dem-label { font-size:11px;color:var(--t3);margin-top:6px;text-align:center }
+.mt-dem-label { font-size:13px;color:var(--t3);margin-top:6px;text-align:center }
 .mt-dem-list { flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px }
 .mt-dem-row { display:flex;align-items:center;gap:6px }
 .mt-dem-dot { width:8px;height:8px;border-radius:2px;flex-shrink:0 }
 .mt-dem-row .di { flex:1 }
-.mt-dem-row .dn { font-size:11px;font-weight:600;color:var(--t1) }
-.mt-dem-row .dd { font-size:10px;color:var(--t3) }
+.mt-dem-row .dn { font-size:13px;font-weight:600;color:var(--t1) }
+.mt-dem-row .dd { font-size:12px;color:var(--t3) }
 .mt-dem-row .dv { font-size:12px;font-weight:700 }
 .mt-dem-total { display:flex;align-items:center;justify-content:space-between;padding-top:6px;margin-top:auto;border-top:1px solid rgba(0,0,0,.04) }
-.mt-dem-total .dtl { font-size:11px;color:var(--t3) }
+.mt-dem-total .dtl { font-size:13px;color:var(--t3) }
 .mt-dem-total .dtv { font-family:var(--fd);font-size:16px;font-weight:700;color:var(--red) }
 
 /* Bottom row */
 .mt-bot { display:grid;grid-template-columns:3fr 3fr 5fr;gap:10px;flex-shrink:0;height:260px }
 .mt-eudr { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:12px 14px;display:flex;flex-direction:column;overflow:hidden;animation:mt-fu .3s ease both }
 .mt-eudr h4 { font-family:var(--fd);font-size:14px;font-weight:600;color:var(--sage);margin:0 0 4px }
-.mt-eudr .es { font-size:11px;color:var(--t3);margin-bottom:6px }
+.mt-eudr .es { font-size:13px;color:var(--t3);margin-bottom:6px }
 .mt-eb { flex:1;overflow-y:auto }
 .mt-eb::-webkit-scrollbar { width:2px }
 .mt-eb::-webkit-scrollbar-thumb { background:rgba(0,0,0,.04) }
@@ -207,24 +207,24 @@ const css = `
 .mt-er .dot { width:5px;height:5px;border-radius:50%;flex-shrink:0 }
 .mt-er .ei { flex:1 }
 .mt-er .en { font-size:11px;font-weight:600;color:var(--t1) }
-.mt-er .et { font-size:10px;color:var(--t3) }
-.mt-er .eg { padding:3px 7px;border-radius:3px;font-size:10px;font-weight:600 }
+.mt-er .et { font-size:12px;color:var(--t3) }
+.mt-er .eg { padding:3px 7px;border-radius:3px;font-size:12px;font-weight:600 }
 
 .mt-cbam { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:12px 14px;display:flex;flex-direction:column;overflow:hidden;animation:mt-fu .3s ease both }
 .mt-cbam h4 { font-family:var(--fd);font-size:14px;font-weight:600;color:var(--amber);margin:0 0 6px }
 .mt-cbr { display:flex;align-items:center;justify-content:space-between;padding:5px 0 }
 .mt-cbr+.mt-cbr { border-top:1px solid rgba(0,0,0,.03) }
 .mt-cbr .cc { display:flex;align-items:center;gap:5px }
-.mt-cbr .cc em { font-style:normal;font-size:11px }
-.mt-cbr .cc span { font-size:11px;font-weight:600;color:var(--t1) }
-.mt-cbr .cx { font-size:11px;font-weight:600;color:var(--sage) }
+.mt-cbr .cc em { font-style:normal;font-size:13px }
+.mt-cbr .cc span { font-size:13px;font-weight:600;color:var(--t1) }
+.mt-cbr .cx { font-size:13px;font-weight:600;color:var(--sage) }
 
 .mt-mp { background:#1b2a22;border-radius:var(--r);box-shadow:var(--shd);position:relative;overflow:hidden;display:flex;flex-direction:column;animation:mt-fu .3s ease both }
 .mt-mp h4 { font-family:var(--fd);font-size:14px;color:#fff;font-weight:600;padding:10px 14px 0;position:relative;z-index:2;flex-shrink:0;margin:0 }
-.mt-mp .ms { font-size:10px;color:rgba(255,255,255,.4);padding:2px 14px;position:relative;z-index:2;flex-shrink:0 }
+.mt-mp .ms { font-size:12px;color:rgba(255,255,255,.4);padding:2px 14px;position:relative;z-index:2;flex-shrink:0 }
 .mt-mp-inner { flex:1;position:relative;min-height:0 }
 .mt-ml { display:flex;gap:8px;padding:4px 14px 6px;position:relative;z-index:2;flex-shrink:0 }
-.mt-mll { display:flex;align-items:center;gap:4px;font-size:10px;color:rgba(255,255,255,.4);font-weight:500 }
+.mt-mll { display:flex;align-items:center;gap:4px;font-size:12px;color:rgba(255,255,255,.4);font-weight:500 }
 .mt-mll span { width:6px;height:6px;border-radius:50% }
 
 /* Empty state */
@@ -464,7 +464,7 @@ export default function Trades() {
               <div className="mt-an-split">
                 <div>
                   {corridorAnalytics.length === 0 ? (
-                    <div style={{ fontSize: 11, color: "var(--t3)", padding: "16px 0" }}>No corridor data yet</div>
+                    <div style={{ fontSize: 13, color: "var(--t3)", padding: "16px 0" }}>No corridor data yet</div>
                   ) : (
                     corridorAnalytics.map((c, i) => (
                       <div key={i}>
@@ -534,7 +534,7 @@ export default function Trades() {
                   <div className="mt-dem-label">Total exposure</div>
                 </div>
                 <div className="mt-dem-list">
-                  <div style={{ fontSize: 11, color: "var(--t3)", padding: "16px 0" }}>
+                  <div style={{ fontSize: 13, color: "var(--t3)", padding: "16px 0" }}>
                     Add shipment values to see demurrage estimates
                   </div>
                 </div>
@@ -551,7 +551,7 @@ export default function Trades() {
             <div className="es">Deforestation regulation</div>
             <div className="mt-eb">
               {eudrTrades.length === 0 ? (
-                <div style={{ fontSize: 9, color: "var(--t3)", padding: "10px 0" }}>No EUDR-applicable trades</div>
+                <div style={{ fontSize: 13, color: "var(--t3)", padding: "10px 0" }}>No EUDR-applicable trades</div>
               ) : (
                 eudrTrades.slice(0, 5).map(t => {
                   const badge = getEudrBadge(t.eudrBand);
@@ -578,7 +578,7 @@ export default function Trades() {
             <h4>⚠️ CBAM Tariff</h4>
             <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
               {cbamTrades.length === 0 ? (
-                <div style={{ fontSize: 9, color: "var(--t3)", padding: "10px 0" }}>No CBAM-applicable trades</div>
+                <div style={{ fontSize: 13, color: "var(--t3)", padding: "10px 0" }}>No CBAM-applicable trades</div>
               ) : (
                 cbamTrades.slice(0, 5).map(t => (
                   <div key={t.id} className="mt-cbr" onClick={() => navigate(`/trades/${t.id}#cbam`)} style={{ cursor: "pointer" }}>
@@ -602,7 +602,7 @@ export default function Trades() {
                 <TradeCorridorsMap corridors={corridors} />
               ) : (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", opacity: 0.3 }}>
-                  <span style={{ fontSize: 11, color: "#fff" }}>Map appears with trade data</span>
+                  <span style={{ fontSize: 13, color: "#fff" }}>Map appears with trade data</span>
                 </div>
               )}
             </div>
