@@ -102,7 +102,7 @@ function timeAgo(dateStr: string): string {
 /* ─── CSS ─── */
 const css = `
 /* Page layout */
-.cm-page{display:flex;flex-direction:column;padding:18px 22px 18px 10px;gap:14px;height:100%;overflow-y:auto}
+.cm-page{display:flex;flex-direction:column;padding:24px 30px 24px 20px;gap:14px;height:100%;overflow-y:auto}
 .cm-page::-webkit-scrollbar{width:4px}
 .cm-page::-webkit-scrollbar-thumb{background:rgba(0,0,0,.08);border-radius:2px}
 

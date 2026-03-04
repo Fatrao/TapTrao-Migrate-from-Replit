@@ -86,7 +86,7 @@ function getEudrBadge(band: string | null): { label: string; cls: string } {
 
 /* ─── Inline CSS (matches design mock) ─── */
 const css = `
-.mt-page { display:flex;flex-direction:column;padding:18px 22px 18px 10px;gap:10px;height:100%;overflow:hidden }
+.mt-page { display:flex;flex-direction:column;padding:24px 30px 24px 20px;gap:12px;height:100%;overflow:hidden }
 .mt-hdr { display:flex;align-items:center;justify-content:space-between;flex-shrink:0 }
 .mt-hdr h1 { font-family:var(--fd);font-size:24px;font-weight:600;color:var(--t1);margin:0 }
 .mt-hdr .sub { font-size:13px;color:var(--t3);margin-top:1px }
