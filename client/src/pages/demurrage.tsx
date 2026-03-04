@@ -4,11 +4,11 @@ import { PORTS, CONTAINER_OPTIONS, computeDemurrage, type ContainerType } from "
 
 const s = {
   page: { maxWidth: 960, margin: "0 auto", padding: "28px 20px" } as React.CSSProperties,
-  panel: { background: "var(--card)", borderRadius: 14, padding: 24 } as React.CSSProperties,
+  panel: { background: "var(--card)", borderRadius: 14, padding: 24, boxShadow: "0 1px 3px rgba(0,0,0,.03), 0 4px 16px rgba(0,0,0,.05)" } as React.CSSProperties,
   label: { fontFamily: "'Inter', sans-serif", fontSize: 9, fontWeight: 600, color: "var(--t3)", marginBottom: 4, display: "block", textTransform: "uppercase", letterSpacing: ".08em" } as React.CSSProperties,
   helper: { fontSize: 11, color: "var(--t3)", marginTop: 3 } as React.CSSProperties,
-  input: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "none", borderRadius: ".5rem", color: "var(--t1)", fontSize: 14, outline: "none" } as React.CSSProperties,
-  select: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "none", borderRadius: ".5rem", color: "var(--t1)", fontSize: 14, outline: "none", appearance: "none" as const } as React.CSSProperties,
+  input: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: ".5rem", color: "var(--t1)", fontSize: 14, outline: "none" } as React.CSSProperties,
+  select: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: ".5rem", color: "var(--t1)", fontSize: 14, outline: "none", appearance: "none" as const } as React.CSSProperties,
   field: { marginBottom: 16 } as React.CSSProperties,
 };
 
@@ -165,7 +165,7 @@ export default function DemurragePage() {
               data-testid="demurrage-calculate"
               style={{
                 width: "100%",
-                background: "var(--blue, #3B82F6)",
+                background: "var(--sage)",
                 color: "#fff",
                 border: "none",
                 borderRadius: ".5rem",

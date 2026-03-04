@@ -40,9 +40,9 @@ const tradePacks = [
 
 const S = {
   card: {
-    background: "#2a3442",
-    borderRadius: 14,
-    border: "1px solid rgba(93,217,193,0.12)",
+    background: "#ffffff",
+    borderRadius: 16,
+    boxShadow: "0 1px 3px rgba(0,0,0,.03), 0 4px 16px rgba(0,0,0,.05)",
     padding: 24,
   } as React.CSSProperties,
   badge: {
@@ -57,8 +57,8 @@ const S = {
     gap: 4,
   } as React.CSSProperties,
   btnPrimary: {
-    background: "#5dd9c1",
-    color: "#0e4e45",
+    background: "var(--sage)",
+    color: "#fff",
     borderRadius: 8,
     border: "none",
     padding: "10px 20px",
@@ -75,9 +75,9 @@ const S = {
   } as React.CSSProperties,
   btnOutline: {
     background: "transparent",
-    color: "rgba(255,255,255,0.7)",
+    color: "var(--t2)",
     borderRadius: 8,
-    border: "1px solid rgba(93,217,193,0.25)",
+    border: "1px solid rgba(0,0,0,0.12)",
     padding: "10px 20px",
     fontFamily: "var(--fb)",
     fontSize: 13,
@@ -149,20 +149,20 @@ export default function Pricing() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
           {/* Shield Credits */}
           <div style={{ ...S.card, display: "flex", alignItems: "center", gap: 16 }} data-testid="card-shield-balance">
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(93,217,193,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <Shield style={{ width: 24, height: 24, color: "#5dd9c1" }} />
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(109,184,154,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Shield style={{ width: 24, height: 24, color: "var(--sage-l)" }} />
             </div>
             <div>
-              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, color: "#fff", lineHeight: 1 }}>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, color: "var(--t1)", lineHeight: 1 }}>
                 {balance}
               </div>
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
+              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginTop: 4 }}>
                 {balance === 1 ? "Shield" : "Shields"}
               </div>
             </div>
             {tokenQuery.data && !tokenQuery.data.freeLookupUsed && (
               <span
-                style={{ ...S.badge, background: "rgba(93,217,193,0.1)", color: "#5dd9c1", border: "1px solid rgba(93,217,193,0.2)", marginLeft: "auto" }}
+                style={{ ...S.badge, background: "rgba(109,184,154,0.1)", color: "var(--sage-l)", border: "1px solid rgba(109,184,154,0.2)", marginLeft: "auto" }}
                 data-testid="badge-free-demo"
               >
                 <Gift style={{ width: 10, height: 10 }} /> First check free
@@ -172,14 +172,14 @@ export default function Pricing() {
 
           {/* LC Credits */}
           <div style={{ ...S.card, display: "flex", alignItems: "center", gap: 16 }} data-testid="card-lc-balance">
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(59,130,246,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(59,130,246,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <FileCheck style={{ width: 24, height: 24, color: "#60a5fa" }} />
             </div>
             <div>
-              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, color: "#fff", lineHeight: 1 }}>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, color: "var(--t1)", lineHeight: 1 }}>
                 {lcBalance}
               </div>
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
+              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginTop: 4 }}>
                 LC {lcBalance === 1 ? "credit" : "credits"}
               </div>
             </div>
@@ -190,34 +190,34 @@ export default function Pricing() {
         <div style={{ ...S.card, marginBottom: 24 }} data-testid="section-transaction-history">
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Clock style={{ width: 16, height: 16, color: "rgba(255,255,255,0.4)" }} />
-              <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 16, color: "#fff" }}>
+              <Clock style={{ width: 16, height: 16, color: "var(--t3)" }} />
+              <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 16, color: "var(--t1)" }}>
                 Transaction History
               </span>
             </div>
-            <span style={{ ...S.badge, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>
+            <span style={{ ...S.badge, background: "rgba(0,0,0,0.04)", color: "var(--t3)" }}>
               {transactions.length} {transactions.length === 1 ? "entry" : "entries"}
             </span>
           </div>
 
           {transactionsQuery.isLoading ? (
-            <div style={{ textAlign: "center", padding: "24px 0", color: "rgba(255,255,255,0.35)", fontSize: 13 }}>
+            <div style={{ textAlign: "center", padding: "24px 0", color: "var(--t3)", fontSize: 13 }}>
               Loading transactions...
             </div>
           ) : transactions.length === 0 ? (
             <div style={{ textAlign: "center", padding: "32px 0" }}>
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", margin: 0 }}>
+              <p style={{ fontSize: 13, color: "var(--t3)", margin: 0 }}>
                 No transactions yet. Your purchase and usage history will appear here.
               </p>
             </div>
           ) : (
             <div data-testid="table-transactions">
               {/* Header row */}
-              <div style={{ display: "grid", gridTemplateColumns: "110px 80px 1fr 80px", gap: 12, padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>Date</span>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>Type</span>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>Description</span>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", textAlign: "right" }}>Amount</span>
+              <div style={{ display: "grid", gridTemplateColumns: "110px 80px 1fr 80px", gap: 12, padding: "8px 0", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>Date</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>Type</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>Description</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)", textAlign: "right" }}>Amount</span>
               </div>
               {/* Transaction rows */}
               {transactions.map((t, idx) => {
@@ -231,26 +231,26 @@ export default function Pricing() {
                       gridTemplateColumns: "110px 80px 1fr 80px",
                       gap: 12,
                       padding: "10px 0",
-                      borderBottom: idx < transactions.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                      borderBottom: idx < transactions.length - 1 ? "1px solid rgba(0,0,0,0.04)" : "none",
                       alignItems: "center",
                     }}
                     data-testid={`transaction-row-${idx}`}
                   >
-                    <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>
+                    <span style={{ fontSize: 12, color: "var(--t3)" }}>
                       {date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                     </span>
                     <span style={{
                       ...S.badge,
                       fontSize: 8,
                       padding: "2px 6px",
-                      background: isPurchase ? "rgba(93,217,193,0.1)" : "rgba(255,255,255,0.06)",
-                      color: isPurchase ? "#5dd9c1" : "rgba(255,255,255,0.5)",
-                      border: isPurchase ? "1px solid rgba(93,217,193,0.2)" : "1px solid rgba(255,255,255,0.08)",
+                      background: isPurchase ? "rgba(109,184,154,0.1)" : "rgba(0,0,0,0.04)",
+                      color: isPurchase ? "var(--sage-l)" : "var(--t3)",
+                      border: isPurchase ? "1px solid rgba(109,184,154,0.2)" : "1px solid rgba(0,0,0,0.06)",
                       width: "fit-content",
                     }}>
                       {t.type}
                     </span>
-                    <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <span style={{ fontSize: 13, color: "var(--t2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {t.description}
                     </span>
                     <span style={{
@@ -258,7 +258,7 @@ export default function Pricing() {
                       fontWeight: 600,
                       fontFamily: "'Inter', sans-serif",
                       textAlign: "right",
-                      color: isPurchase ? "#5dd9c1" : "rgba(255,255,255,0.5)",
+                      color: isPurchase ? "var(--sage-l)" : "var(--t3)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "flex-end",
@@ -281,10 +281,10 @@ export default function Pricing() {
 
         {/* ── SECTION C: Buy More Credits ── */}
         <div style={{ marginBottom: 32 }}>
-          <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "#fff", margin: "0 0 6px" }}>
+          <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "var(--t1)", margin: "0 0 6px" }}>
             Buy More Credits
           </h2>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", margin: "0 0 20px" }}>
+          <p style={{ fontSize: 13, color: "var(--t3)", margin: "0 0 20px" }}>
             Activate TapTrao Shield for full shipment protection. Credits never expire.
           </p>
 
@@ -294,9 +294,10 @@ export default function Pricing() {
               <div
                 key={pack.key}
                 style={{
-                  background: pack.popular ? "linear-gradient(160deg, #0e4e45, #0a3a33)" : "#2a3442",
-                  borderRadius: 14,
-                  border: pack.popular ? "1px solid rgba(93,217,193,0.4)" : "1px solid rgba(93,217,193,0.15)",
+                  background: pack.popular ? "var(--sage)" : "#ffffff",
+                  borderRadius: 16,
+                  border: pack.popular ? "none" : "1px solid rgba(0,0,0,0.08)",
+                  boxShadow: pack.popular ? "0 4px 24px rgba(74,124,94,0.18)" : "0 1px 3px rgba(0,0,0,.03), 0 4px 16px rgba(0,0,0,.05)",
                   padding: "20px 16px",
                   textAlign: "center",
                   position: "relative",
@@ -304,22 +305,24 @@ export default function Pricing() {
                 data-testid={`card-pack-${pack.key}`}
               >
                 {pack.popular && (
-                  <span style={{ ...S.badge, background: "#5dd9c1", color: "#0e4e45", fontWeight: 700, position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)" }}>
+                  <span style={{ ...S.badge, background: "#fff", color: "var(--sage)", fontWeight: 700, position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)" }}>
                     Most Popular
                   </span>
                 )}
-                <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "#fff", marginBottom: 4, marginTop: pack.popular ? 6 : 0 }}>
+                <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: pack.popular ? "#fff" : "var(--t1)", marginBottom: 4, marginTop: pack.popular ? 6 : 0 }}>
                   {pack.price}
                 </div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 4 }}>
+                <div style={{ fontSize: 13, color: pack.popular ? "rgba(255,255,255,0.8)" : "var(--t2)", marginBottom: 4 }}>
                   {pack.lookups} {pack.lookups === 1 ? "shipment" : "shipments"}
                 </div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginBottom: 14 }}>
+                <div style={{ fontSize: 11, color: pack.popular ? "rgba(255,255,255,0.6)" : "var(--t3)", marginBottom: 14 }}>
                   {pack.perLookup} / shipment
                 </div>
                 <button
                   style={{
-                    ...(pack.popular ? S.btnPrimary : S.btnOutline),
+                    ...(pack.popular
+                      ? { ...S.btnPrimary, background: "#fff", color: "var(--sage)" }
+                      : S.btnOutline),
                     width: "100%",
                     padding: "8px 14px",
                     fontSize: 12,
@@ -344,15 +347,15 @@ export default function Pricing() {
             <div style={{ ...S.card, padding: 18 }} data-testid="card-lc-standalone">
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                 <FileCheck style={{ width: 16, height: 16, color: "#60a5fa" }} />
-                <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>LC Check Only</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>LC Check Only</span>
               </div>
-              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "#fff", marginBottom: 4 }}>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "var(--t1)", marginBottom: 4 }}>
                 $49.99
               </div>
-              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", margin: "0 0 4px", lineHeight: 1.5 }}>
+              <p style={{ fontSize: 11, color: "var(--t3)", margin: "0 0 4px", lineHeight: 1.5 }}>
                 One-time LC document validation against UCP 600.
               </p>
-              <p style={{ fontSize: 10, color: "#5dd9c1", margin: "0 0 12px", fontStyle: "italic" }}>
+              <p style={{ fontSize: 10, color: "var(--sage-l)", margin: "0 0 12px", fontStyle: "italic" }}>
                 Included free with Shield
               </p>
               <button
@@ -372,23 +375,23 @@ export default function Pricing() {
             <div style={{ ...S.card, padding: 18 }} data-testid="card-lc-recheck-addon">
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                 <RefreshCw style={{ width: 16, height: 16, color: "#60a5fa" }} />
-                <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>LC Re-check</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>LC Re-check</span>
               </div>
-              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "#fff", marginBottom: 4 }}>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "var(--t1)", marginBottom: 4 }}>
                 $9.99
               </div>
-              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 11, color: "var(--t3)", margin: 0, lineHeight: 1.5 }}>
                 Re-check after supplier corrects documents. Per re-check.
               </p>
             </div>
 
             {/* Enterprise */}
-            <div style={{ ...S.card, padding: 18, background: "transparent", border: "1px dashed rgba(93,217,193,0.2)" }} data-testid="card-enterprise">
+            <div style={{ ...S.card, padding: 18, background: "transparent", border: "1px dashed rgba(0,0,0,0.12)" }} data-testid="card-enterprise">
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                <Building2 style={{ width: 16, height: 16, color: "rgba(255,255,255,0.4)" }} />
-                <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>High Volume</span>
+                <Building2 style={{ width: 16, height: 16, color: "var(--t3)" }} />
+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>High Volume</span>
               </div>
-              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", margin: "0 0 12px", lineHeight: 1.5 }}>
+              <p style={{ fontSize: 11, color: "var(--t3)", margin: "0 0 12px", lineHeight: 1.5 }}>
                 Custom pricing, shared credits, API access, and dedicated support.
               </p>
               <button
@@ -404,7 +407,7 @@ export default function Pricing() {
         </div>
 
         {/* Disclaimer */}
-        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", textAlign: "center", margin: "0 0 24px", lineHeight: 1.5 }}>
+        <p style={{ fontSize: 11, color: "var(--t4)", textAlign: "center", margin: "0 0 24px", lineHeight: 1.5 }}>
           TapTrao does not provide legal or banking advice. Reports are informational and designed to support internal decision-making.
         </p>
       </div>
