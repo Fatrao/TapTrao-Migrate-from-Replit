@@ -31,15 +31,15 @@
   --green-pale: #e8f5ee;
 
   /* Text hierarchy — dark on light */
-  --t1:  #2c3e2e;
-  --t2:  #4a5e4c;
-  --t3:  #667a68;
-  --t4:  #8a9a8c;
+  --t1:  #1a2b1c;
+  --t2:  #3a4d3c;
+  --t3:  #4d5e4f;
+  --t4:  #6b7c6d;
 
   /* Legacy text aliases */
-  --txt:   #1a1a1a;
-  --txt2:  #4a4a4a;
-  --txt3:  #6a6a6a;
+  --txt:   #111;
+  --txt2:  #333;
+  --txt3:  #555;
 
   /* Card shadows */
   --shd: 0 1px 3px rgba(0,0,0,.03), 0 4px 16px rgba(0,0,0,.05);
@@ -64,9 +64,9 @@
   --app-acapulco-dim:     rgba(109,184,154,0.08);
   --app-acapulco-border:  rgba(109,184,154,0.20);
   --app-acapulco-glow:    rgba(109,184,154,0.06);
-  --app-regent:           #667a68;
-  --app-regent-light:     rgba(102,122,104,0.5);
-  --app-regent-faint:     rgba(102,122,104,0.25);
+  --app-regent:           #4d5e4f;
+  --app-regent-light:     rgba(77,94,79,0.6);
+  --app-regent-faint:     rgba(77,94,79,0.35);
 
   /* ── Homepage palette (legacy aliases) ── */
   --gable-green:       #1b2a22;
@@ -75,23 +75,23 @@
   --celadon:           #e8efe9;
   --fern:              #6db89a;
   --mantis:            #5ea888;
-  --regent-gray:       #667a68;
+  --regent-gray:       #4d5e4f;
   --gray-nurse:        #eee9e0;
   --surface-card:      #ffffff;
   --surface-card-hover: #f8f6f2;
   --border-subtle:     rgba(0,0,0,0.06);
   --border-accent:     rgba(74,124,94,0.20);
   --hp-text-primary:   #2c3e2e;
-  --hp-text-secondary: #5e7060;
-  --hp-text-muted:     rgba(138,154,140,0.6);
+  --hp-text-secondary: #3a4d3c;
+  --hp-text-muted:     rgba(77,94,79,0.7);
   --glow-green:        rgba(109,184,154,0.15);
   --neon-green:        #6db89a;
   --off-white:         #f8f6f2;
   --light-gray:        #eee9e0;
   --mid-gray:          #d0cac0;
   --dark-text:         #2c3e2e;
-  --dark-text-secondary: #5e7060;
-  --dark-text-muted:   #667a68;
+  --dark-text-secondary: #3a4d3c;
+  --dark-text-muted:   #4d5e4f;
   --font-display:      'Playfair Display', serif;
   --font-body:         'DM Sans', sans-serif;
   --bg-sidebar:        #1a1a1a;
@@ -133,8 +133,8 @@ input, textarea, select {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   font-family: var(--fb);
-  font-size: 14px;
-  padding: 12px 14px;
+  font-size: 15px;
+  padding: 13px 16px;
   width: 100%;
   outline: none;
   transition: all .15s;
@@ -143,7 +143,7 @@ input, textarea, select {
 }
 
 input::placeholder, textarea::placeholder {
-  color: #999;
+  color: #777;
 }
 
 input:focus, textarea:focus, select:focus {
@@ -178,10 +178,10 @@ select option {
 label {
   display: block;
   font-family: var(--fb);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.5px;
-  color: #444;
+  color: #333;
   text-transform: uppercase;
   margin-bottom: 6px;
 }

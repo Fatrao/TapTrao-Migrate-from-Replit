@@ -50,7 +50,7 @@ export default function Home() {
             <Link href="/trades" style={{
               padding: "9px 22px", borderRadius: 20, border: "none",
               background: "var(--sage)", color: "#fff",
-              fontFamily: "var(--fb)", fontSize: 12, fontWeight: 600,
+              fontFamily: "var(--fb)", fontSize: 14, fontWeight: 600,
               textDecoration: "none", cursor: "pointer",
             }}>
               My Trades
@@ -59,7 +59,7 @@ export default function Home() {
             <Link href="/lookup" style={{
               padding: "9px 22px", borderRadius: 20, border: "none",
               background: "var(--sage)", color: "#fff",
-              fontFamily: "var(--fb)", fontSize: 12, fontWeight: 600,
+              fontFamily: "var(--fb)", fontSize: 14, fontWeight: 600,
               textDecoration: "none", cursor: "pointer",
             }}>
               Free Compliance Check
@@ -179,9 +179,9 @@ export default function Home() {
           }}>
             AFRICA &rarr; EU &middot; UK &middot; USA &middot; CANADA &middot; T&Uuml;RKIYE &middot; SWITZERLAND
           </div>
-          <div style={{ fontSize: 26, letterSpacing: 6 }}>
+          <div style={{ fontSize: 32, letterSpacing: 8 }}>
             🇨🇮 🇬🇭 🇳🇬 🇰🇪 🇹🇿 🇪🇹{" "}
-            <span style={{ color: "#fff", fontSize: 20 }}>&rarr;</span>{" "}
+            <span style={{ color: "#fff", fontSize: 24 }}>&rarr;</span>{" "}
             🇪🇺 🇬🇧 🇩🇪 🇫🇷 🇮🇹 🇨🇭 🇺🇸 🇨🇦 🇹🇷
           </div>
         </div>
@@ -195,7 +195,7 @@ export default function Home() {
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
           The cost of getting it wrong
         </h2>
-        <p style={{ fontSize: 14, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
+        <p style={{ fontSize: 16, color: "var(--t2)", marginBottom: 40, maxWidth: 500 }}>
           A single document issue can cascade into thousands in losses.
         </p>
 
@@ -208,7 +208,7 @@ export default function Home() {
           ].map((c) => (
             <div key={c.val} style={{ background: "var(--bg)", borderRadius: "var(--r)", padding: 24, textAlign: "center" }}>
               <div style={{ fontFamily: "var(--fd)", fontSize: 22, fontWeight: 700, color: "var(--red)", marginBottom: 6 }}>{c.val}</div>
-              <div style={{ fontSize: 11, color: "var(--t3)", lineHeight: 1.5 }}>{c.desc}</div>
+              <div style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.5 }}>{c.desc}</div>
             </div>
           ))}
         </div>
@@ -244,7 +244,7 @@ export default function Home() {
             },
           ].map((s) => (
             <div key={s.num} style={{ background: "#fff", borderRadius: "var(--r)", padding: 32, boxShadow: "var(--shd)" }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--sage-l)", letterSpacing: 1, marginBottom: 8 }}>{s.num}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--sage-l)", letterSpacing: 1, marginBottom: 8 }}>{s.num}</div>
               <h3 style={{ fontFamily: "var(--fd)", fontSize: 20, fontWeight: 600, marginBottom: 8 }}>{s.title}</h3>
               <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.7 }}>{s.desc}</p>
             </div>
@@ -260,7 +260,7 @@ export default function Home() {
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8, color: "#fff" }}>
           Cross-Validation Report
         </h2>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,.4)", marginBottom: 40, maxWidth: 500 }}>
+        <p style={{ fontSize: 14, color: "rgba(255,255,255,.8)", marginBottom: 40, maxWidth: 500 }}>
           Every document checked against every other. Every regulation mapped.
         </p>
 
@@ -274,16 +274,16 @@ export default function Home() {
               <div style={{ fontFamily: "var(--fd)", fontSize: 16, fontWeight: 600 }}>
                 🥜 Raw Cashew &middot; CI &rarr; UK
               </div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginTop: 2 }}>TT-2026-a3f9c1</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,.55)", marginTop: 2 }}>TT-2026-a3f9c1</div>
             </div>
             <div style={{ fontFamily: "var(--fd)", fontSize: 32, fontWeight: 700, color: "var(--sage-l)" }}>87</div>
           </div>
 
           {/* Risk tags */}
           <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-            <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>LOW</span> Origin</span>
-            <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>LOW</span> Commodity</span>
-            <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}><span style={{ color: "var(--amber)", fontWeight: 600 }}>MED</span> Regulatory</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>LOW</span> Origin</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>LOW</span> Commodity</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--amber)", fontWeight: 600 }}>MED</span> Regulatory</span>
           </div>
 
           {/* Check items */}
@@ -306,7 +306,7 @@ export default function Home() {
                 <div key={c.label} style={{
                   display: "flex", alignItems: "center", gap: 8,
                   padding: "8px 12px", borderRadius: 8,
-                  fontSize: 11, fontWeight: 500, background: bg, color,
+                  fontSize: 13, fontWeight: 500, background: bg, color,
                 }}>
                   {c.icon} {c.label}
                 </div>
@@ -348,17 +348,17 @@ export default function Home() {
               textAlign: "center",
             }}>
               <div style={{
-                fontSize: 11, fontWeight: 600, letterSpacing: 1,
+                fontSize: 13, fontWeight: 600, letterSpacing: 1,
                 color: plan.featured ? "var(--sage-l)" : "var(--t3)",
                 marginBottom: 8, textTransform: "uppercase",
               }}>{plan.name}</div>
               <div style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 700, marginBottom: 4 }}>{plan.price}</div>
               <div style={{
-                fontSize: 11, color: plan.featured ? "rgba(255,255,255,.35)" : "var(--t3)",
+                fontSize: 13, color: plan.featured ? "rgba(255,255,255,.8)" : "var(--t3)",
                 marginBottom: 20,
               }}>{plan.per}</div>
               <div style={{
-                fontSize: 12, color: plan.featured ? "rgba(255,255,255,.5)" : "var(--t2)",
+                fontSize: 14, color: plan.featured ? "rgba(255,255,255,.85)" : "var(--t2)",
                 lineHeight: 2, textAlign: "left", marginBottom: 20,
               }}>
                 {plan.feats.split("\n").map((f) => <div key={f}>{f}</div>)}
@@ -401,7 +401,7 @@ export default function Home() {
       <footer style={{
         background: "var(--dark)", padding: "48px 60px",
         display: "flex", justifyContent: "space-between", alignItems: "flex-start",
-        color: "rgba(255,255,255,.35)", fontSize: 12,
+        color: "rgba(255,255,255,.8)", fontSize: 14,
         flexWrap: "wrap", gap: 40,
       }}>
         <div>
@@ -410,7 +410,7 @@ export default function Home() {
               width: 28, height: 28, borderRadius: 8,
               background: "linear-gradient(135deg, var(--sage-l), var(--sage))",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontFamily: "var(--fd)", fontSize: 12, fontWeight: 700, color: "#fff",
+              fontFamily: "var(--fd)", fontSize: 14, fontWeight: 700, color: "#fff",
             }}>T</div>
             <span style={{ fontFamily: "var(--fd)", fontSize: 14, color: "#fff", fontWeight: 600 }}>TapTrao</span>
           </div>
@@ -420,19 +420,19 @@ export default function Home() {
 
         <div style={{ display: "flex", gap: 40, flexWrap: "wrap" }}>
           <div>
-            <h4 style={{ fontSize: 10, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>Product</h4>
-            <Link href="/lookup" style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.4)", textDecoration: "none", marginBottom: 6 }}>Free Check</Link>
-            <Link href="/pricing" style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.4)", textDecoration: "none", marginBottom: 6 }}>Pricing</Link>
-            <Link href="/lc-check" style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.4)", textDecoration: "none", marginBottom: 6 }}>LC Check</Link>
+            <h4 style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>Product</h4>
+            <Link href="/lookup" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>Free Check</Link>
+            <Link href="/pricing" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>Pricing</Link>
+            <Link href="/lc-check" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>LC Check</Link>
           </div>
           <div>
-            <h4 style={{ fontSize: 10, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>Company</h4>
-            <a href="mailto:hello@taptrao.com" style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.4)", textDecoration: "none", marginBottom: 6 }}>Contact</a>
+            <h4 style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>Company</h4>
+            <a href="mailto:hello@taptrao.com" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>Contact</a>
           </div>
           <div>
-            <h4 style={{ fontSize: 10, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>Legal</h4>
-            <Link href="/privacy-policy" style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.4)", textDecoration: "none", marginBottom: 6 }}>Privacy Policy</Link>
-            <Link href="/terms-of-service" style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.4)", textDecoration: "none", marginBottom: 6 }}>Terms &amp; Conditions</Link>
+            <h4 style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>Legal</h4>
+            <Link href="/privacy-policy" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>Privacy Policy</Link>
+            <Link href="/terms-of-service" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>Terms &amp; Conditions</Link>
           </div>
         </div>
       </footer>
