@@ -1545,7 +1545,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
       </div>
 
       {/* ── Two-Column Document Checklist ── */}
-      <div style={{ display: "grid", gridTemplateColumns: importerIndices.length > 0 && supplierIndices.length > 0 ? "1fr 1fr" : "1fr", gap: 16 }}>
+      <div className="lookup-docs-grid" style={{ display: "grid", gridTemplateColumns: importerIndices.length > 0 && supplierIndices.length > 0 ? "1fr 1fr" : "1fr", gap: 16 }}>
         {/* Your Side - Buyer */}
         {importerIndices.length > 0 && (
           <div style={dkCard} ref={buyerDocsRef}>
@@ -1648,7 +1648,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
       </div>
 
       {/* ── Readiness Score + Duty Estimate (two-column) ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div className="lookup-score-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         {/* Readiness Score */}
         <div style={dkCard}>
           {result.readinessScore ? (
@@ -1872,7 +1872,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+      <div className="lookup-info-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <Leaf className="w-4 h-4" style={{ color: "var(--sage)" }} />

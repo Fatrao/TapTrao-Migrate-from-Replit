@@ -2929,6 +2929,15 @@
     padding-right: 8px !important;
   }
 
+  /* Lookup results: stack two-column grids */
+  .lookup-docs-grid { grid-template-columns: 1fr !important; }
+  .lookup-score-grid { grid-template-columns: 1fr !important; }
+  .lookup-info-grid { grid-template-columns: 1fr !important; }
+
+  /* Lookup page: tighter padding on mobile */
+  .flex-1.py-10.px-4 { padding: 16px 10px !important; }
+  .max-w-2xl { max-width: 100% !important; }
+
   /* TwinLog Trail tab */
   [data-testid="twinlog-trail-tab"] {
     flex-direction: column !important;

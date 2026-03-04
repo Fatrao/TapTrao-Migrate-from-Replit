@@ -233,6 +233,22 @@ const css = `
 .mt-empty p { font-size:14px;color:var(--t3);margin:0 0 20px;line-height:1.6 }
 
 @keyframes mt-fu { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+@media (max-width: 768px) {
+  .mt-page { padding:16px 12px 16px 12px;overflow:auto;height:auto }
+  .mt-hdr { flex-direction:column;align-items:flex-start;gap:8px }
+  .mt-hdr-r { width:100%;flex-wrap:wrap }
+  .mt-srch { flex:1;width:auto;min-width:120px }
+  .mt-stats { grid-template-columns:1fr 1fr;gap:8px }
+  .mt-mid { grid-template-columns:1fr;height:auto }
+  .mt-tc { max-height:none }
+  .mt-right { gap:10px }
+  .mt-bot { grid-template-columns:1fr;height:auto }
+  .mt-bot > * { min-height:180px }
+  .mt-pie-area { flex-direction:column;align-items:center }
+  .mt-dem-body { flex-direction:column }
+  .mt-rw .vl,.mt-rw .dc,.mt-rw .pc,.mt-rw .bg,.mt-rw .arr { display:none }
+}
 `;
 
 /* ─── Main Component ─── */

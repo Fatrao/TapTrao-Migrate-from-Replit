@@ -28,12 +28,7 @@ export default function Home() {
         WebkitBackdropFilter: "blur(12px)",
       }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <div style={{
-            width: 34, height: 34, borderRadius: 10,
-            background: "linear-gradient(135deg, var(--sage-l), var(--sage))",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontFamily: "var(--fd)", fontSize: 15, fontWeight: 700, color: "#fff",
-          }}>T</div>
+          <img src="/logo.png" alt="TapTrao" style={{ width: 34, height: 34, borderRadius: 10, objectFit: "cover" }} />
           <span style={{ fontFamily: "var(--fd)", fontSize: 18, fontWeight: 600, color: "var(--t1)" }}>TapTrao</span>
         </Link>
 
@@ -124,7 +119,7 @@ export default function Home() {
           background: "linear-gradient(135deg, rgba(27,42,34,0.82) 0%, rgba(45,74,56,0.7) 50%, rgba(61,107,79,0.6) 100%)",
         }} />
 
-        <div style={{
+        <div className="hp-hero-inner" style={{
           position: "relative", zIndex: 2, padding: "30px 60px 60px", width: "100%",
           display: "flex", flexDirection: "column", minHeight: 280,
         }}>
@@ -143,7 +138,7 @@ export default function Home() {
 
           <div style={{ flex: 1, minHeight: 40 }} />
 
-          <div style={{ display: "flex", gap: 12, alignSelf: "flex-end", marginRight: 60, flexWrap: "wrap" }}>
+          <div className="hp-hero-btns" style={{ display: "flex", gap: 12, alignSelf: "flex-end", marginRight: 60, flexWrap: "wrap" }}>
             <Link href="/lookup" style={{
               padding: "16px 36px", borderRadius: 24, border: "none",
               background: "var(--sage)", color: "#fff",
@@ -168,7 +163,7 @@ export default function Home() {
       </div>
 
       {/* ═══ TRUST BAR ═══ */}
-      <div style={{
+      <div className="hp-trust-bar" style={{
         display: "flex", justifyContent: "center", padding: "28px 40px",
         background: "var(--dark)",
       }}>
@@ -188,7 +183,7 @@ export default function Home() {
       </div>
 
       {/* ═══ COST OF GETTING IT WRONG ═══ */}
-      <div style={{
+      <div className="hp-cost-section" style={{
         background: "#fff", borderRadius: 24, margin: "0 40px",
         padding: 60, boxShadow: "var(--shd)",
       }}>
@@ -253,7 +248,7 @@ export default function Home() {
       </section>
 
       {/* ═══ VALIDATION PREVIEW ═══ */}
-      <div id="validation" style={{
+      <div id="validation" className="hp-validation-section" style={{
         background: "var(--dark)", borderRadius: 24, margin: "0 40px",
         padding: 60, color: "#fff",
       }}>
@@ -287,7 +282,7 @@ export default function Home() {
           </div>
 
           {/* Check items */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 16 }}>
+          <div className="hp-check-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 16 }}>
             {[
               { icon: "\u2713", label: "Certificate of Origin", status: "pass" },
               { icon: "\u2713", label: "Phytosanitary Certificate", status: "pass" },
@@ -379,7 +374,7 @@ export default function Home() {
       </section>
 
       {/* ═══ FINAL CTA ═══ */}
-      <div style={{ textAlign: "center", padding: "80px 60px" }}>
+      <div className="hp-cta" style={{ textAlign: "center", padding: "80px 60px" }}>
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 12 }}>
           Ready to de-risk your next shipment?
         </h2>
@@ -406,12 +401,7 @@ export default function Home() {
       }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <div style={{
-              width: 28, height: 28, borderRadius: 8,
-              background: "linear-gradient(135deg, var(--sage-l), var(--sage))",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontFamily: "var(--fd)", fontSize: 14, fontWeight: 700, color: "#fff",
-            }}>T</div>
+            <img src="/logo.png" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: 8, objectFit: "cover" }} />
             <span style={{ fontFamily: "var(--fd)", fontSize: 14, color: "#fff", fontWeight: 600 }}>TapTrao</span>
           </div>
           <div>Trade compliance for African commodity corridors.</div>
@@ -440,16 +430,78 @@ export default function Home() {
       {/* Responsive overrides for mobile */}
       <style>{`
         @media (max-width: 768px) {
-          .hp-page nav { padding: 12px 20px !important; }
-          .hp-page section { padding: 40px 20px !important; }
-          .hp-page h1 { font-size: 28px !important; }
-          .hp-page h2 { font-size: 24px !important; }
-          .hp-page footer { padding: 32px 20px !important; flex-direction: column !important; }
-          .hp-cost-grid { grid-template-columns: repeat(2, 1fr) !important; }
-          .hp-steps-grid { grid-template-columns: 1fr !important; }
-          .hp-pricing-grid { grid-template-columns: 1fr !important; }
-          .hp-page [style*="margin: 0 40px"],
-          .hp-page [style*="margin:0 40px"] { margin-left: 16px !important; margin-right: 16px !important; }
+          .hp-page nav { padding: 12px 16px !important; }
+          .hp-page section { padding: 32px 16px !important; }
+          .hp-page h1 { font-size: 26px !important; line-height: 1.2 !important; }
+          .hp-page h2 { font-size: 22px !important; }
+          .hp-page footer { padding: 32px 16px !important; flex-direction: column !important; }
+
+          /* Hero */
+          .hp-page .hp-hero-inner {
+            padding: 20px 20px 28px !important;
+            min-height: 240px !important;
+          }
+          .hp-page .hp-hero-inner h1 { max-width: 100% !important; }
+          .hp-page .hp-hero-inner p { font-size: 15px !important; margin-bottom: 20px !important; }
+          .hp-page .hp-hero-btns {
+            align-self: stretch !important;
+            margin-right: 0 !important;
+            flex-direction: column !important;
+            gap: 10px !important;
+          }
+          .hp-page .hp-hero-btns a {
+            text-align: center !important;
+            padding: 14px 24px !important;
+          }
+
+          /* Trust bar */
+          .hp-page .hp-trust-bar {
+            padding: 20px 16px !important;
+          }
+          .hp-page .hp-trust-bar > div > div:first-child {
+            font-size: 11px !important;
+            letter-spacing: 1.5px !important;
+          }
+          .hp-page .hp-trust-bar > div > div:last-child {
+            font-size: 24px !important;
+            letter-spacing: 4px !important;
+          }
+
+          /* Cost section */
+          .hp-page .hp-cost-section {
+            margin: 0 12px !important;
+            padding: 28px 16px !important;
+            border-radius: 16px !important;
+          }
+          .hp-cost-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+          .hp-cost-grid > div { padding: 16px !important; }
+
+          /* Steps */
+          .hp-steps-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
+          .hp-steps-grid > div { padding: 20px !important; }
+
+          /* Validation section */
+          .hp-page .hp-validation-section {
+            margin: 0 12px !important;
+            padding: 28px 16px !important;
+            border-radius: 16px !important;
+          }
+          .hp-page .hp-validation-section .hp-check-grid {
+            grid-template-columns: 1fr !important;
+          }
+
+          /* Pricing */
+          .hp-pricing-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
+          .hp-pricing-grid > div { padding: 24px !important; }
+
+          /* Final CTA */
+          .hp-page .hp-cta { padding: 40px 16px !important; }
+
+          /* Footer columns */
+          .hp-page footer > div:last-child {
+            flex-direction: column !important;
+            gap: 24px !important;
+          }
         }
       `}</style>
     </div>

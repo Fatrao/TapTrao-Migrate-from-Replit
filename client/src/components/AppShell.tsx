@@ -480,7 +480,8 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
             >
               ☰
             </button>
-            <Link href="/">
+            <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
+              <img src="/logo.png" alt="TapTrao" style={{ width: 26, height: 26, borderRadius: 6, objectFit: "cover" as const }} />
               <span style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 15, color: "var(--t1)" }}>TapTrao</span>
             </Link>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
