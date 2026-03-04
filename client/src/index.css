@@ -315,11 +315,12 @@
 
 /* ── Rail container — centers the sidebar pill vertically ── */
 .rail {
-  width: 72px;
-  min-width: 72px;
+  width: 200px;
+  min-width: 200px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  padding-top: 20px;
   position: relative;
   z-index: 100;
   overflow: visible;
@@ -345,7 +346,8 @@
   border-radius: 18px;
   align-items: stretch;
   position: absolute;
-  left: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   box-shadow: 0 12px 40px rgba(0,0,0,0.3);
 }
 
@@ -428,13 +430,25 @@
 
 /* ── Brand item ── */
 .mi.brand {
-  background: linear-gradient(135deg, var(--sage-l), var(--sage));
-  color: #fff;
+  background: var(--dark);
+  border: 1.5px solid var(--gold, #c4a265);
+  border-radius: 50%;
+  color: var(--gold, #c4a265);
   margin-bottom: 8px;
-  box-shadow: 0 3px 10px rgba(74,124,94,0.3);
+  box-shadow: 0 3px 12px rgba(196,162,101,0.2);
+  width: 40px;
+  height: 40px;
+}
+.mi.brand .mi-icon {
+  color: var(--gold, #c4a265);
 }
 .mi.brand .mi-label {
   color: #fff;
+}
+.sidebar-v2:hover .mi.brand {
+  width: auto;
+  height: 38px;
+  border-radius: 12px;
 }
 
 /* ── Tooltip — only when collapsed ── */
