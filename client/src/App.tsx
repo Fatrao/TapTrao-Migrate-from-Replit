@@ -37,6 +37,7 @@ import ForgotPassword from "@/pages/forgot-password";
 import ResetPassword from "@/pages/reset-password";
 import NewCheck from "@/pages/new-check";
 import TradeDetail from "@/pages/trade-detail";
+import Commodities from "@/pages/commodities";
 
 function Router() {
   return (
@@ -59,6 +60,7 @@ function Router() {
       <Route path="/lc-check">{() => <AuthGuard><LcCheck /></AuthGuard>}</Route>
       <Route path="/trades/:id">{() => <AuthGuard><TradeDetail /></AuthGuard>}</Route>
       <Route path="/trades">{() => <AuthGuard><Trades /></AuthGuard>}</Route>
+      <Route path="/commodities">{() => <AuthGuard><Commodities /></AuthGuard>}</Route>
       <Route path="/templates">{() => <AuthGuard><Templates /></AuthGuard>}</Route>
       <Route path="/pricing">{() => <AuthGuard><Pricing /></AuthGuard>}</Route>
       <Route path="/tokens/success">{() => <AuthGuard><TokenSuccess /></AuthGuard>}</Route>
