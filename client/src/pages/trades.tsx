@@ -7,7 +7,7 @@ import { useTokenBalance } from "@/hooks/use-tokens";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
 import { TradeCorridorsMap } from "@/components/TradeCorridorsMap";
 import type { Corridor } from "@/components/TradeCorridorsMap";
-import { Search, ChevronRight, Plus, Leaf, Factory, FileText } from "lucide-react";
+import { Plus } from "lucide-react";
 
 /* ─── Types ─── */
 
@@ -49,54 +49,191 @@ type FilterTab = "all" | "active" | "issues" | "closed";
 
 /* ─── Helpers ─── */
 
-function getStatusBadge(trade: EnrichedTrade): { label: string; bg: string; color: string } {
+function getStatusBadge(trade: EnrichedTrade): { label: string; cls: string } {
   const status = trade.tradeStatus || "active";
   if (status === "closed" || status === "archived")
-    return { label: "Closed", bg: "#f5f5f5", color: "#999" };
+    return { label: "Closed", cls: "off" };
   if (trade.readinessScore !== null && trade.readinessScore >= 80 && trade.docsReceivedCount >= trade.docsRequiredCount && trade.docsRequiredCount > 0)
-    return { label: "Complete", bg: "#f0fdf4", color: "#15803d" };
+    return { label: "Complete", cls: "ok" };
   if (trade.readinessVerdict === "RED")
-    return { label: "Issues", bg: "#fef2f2", color: "#dc2626" };
+    return { label: "Issues", cls: "e" };
   if (!trade.lcVerdict && trade.docsReceivedCount === 0)
-    return { label: "New", bg: "#fefce8", color: "#d97706" };
-  return { label: "Active", bg: "#eff6ff", color: "#2563eb" };
+    return { label: "Waiting", cls: "w" };
+  return { label: "Active", cls: "ok" };
 }
 
-function getComplianceColor(score: number | null): string {
-  if (score == null) return "#999";
-  if (score >= 80) return "#15803d";
-  if (score >= 50) return "#d97706";
-  return "#dc2626";
+function getComplianceClass(score: number | null): string {
+  if (score == null) return "";
+  if (score >= 80) return "g";
+  if (score >= 50) return "a";
+  return "r";
 }
 
-function formatDate(d: string | Date) {
-  const date = new Date(d);
-  const day = date.getDate();
-  const month = date.toLocaleString("en-GB", { month: "short" });
-  return `${day} ${month}`;
+function formatValue(v: string | null, currency: string | null): string {
+  if (!v) return "—";
+  const n = Number(v);
+  if (n >= 1000) return `$${(n / 1000).toFixed(0)}k`;
+  return `$${n.toLocaleString()}`;
 }
 
-function getRegulatoryBadge(applicable: boolean | null, score: number | null, band: string | null): { label: string; bg: string; color: string } {
-  if (applicable === false) return { label: "N/A", bg: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.3)" };
-  if (applicable == null) return { label: "—", bg: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.3)" };
-  if (score == null || !band) return { label: "Not assessed", bg: "rgba(37,99,235,0.1)", color: "#60a5fa" };
-  if (band === "negligible") return { label: "Negligible", bg: "rgba(74,222,128,0.1)", color: "#4ade80" };
-  if (band === "low") return { label: "Low", bg: "rgba(234,179,8,0.1)", color: "#eab308" };
-  if (band === "medium") return { label: "Medium", bg: "rgba(249,115,22,0.15)", color: "#f97316" };
-  if (band === "high") return { label: "High", bg: "rgba(239,68,68,0.12)", color: "#ef4444" };
-  return { label: `${score}`, bg: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.3)" };
+function getEudrBadge(band: string | null): { label: string; cls: string } {
+  if (!band) return { label: "—", cls: "" };
+  if (band === "negligible" || band === "low") return { label: "Low", cls: "ok" };
+  if (band === "medium") return { label: "Med", cls: "w" };
+  if (band === "high") return { label: "High", cls: "e" };
+  return { label: band, cls: "" };
 }
 
-/* ─── Styles ─── */
+/* ─── Inline CSS (matches design mock) ─── */
+const css = `
+.mt-page { display:flex;flex-direction:column;padding:18px 22px 18px 10px;gap:10px;height:100%;overflow:hidden }
+.mt-hdr { display:flex;align-items:center;justify-content:space-between;flex-shrink:0 }
+.mt-hdr h1 { font-family:var(--fd);font-size:24px;font-weight:600;color:var(--t1);margin:0 }
+.mt-hdr .sub { font-size:12px;color:var(--t3);margin-top:1px }
+.mt-hdr-r { display:flex;align-items:center;gap:8px }
+.mt-srch { background:#fff;border:none;border-radius:12px;padding:8px 16px;font-family:var(--fb);font-size:12px;color:var(--t2);box-shadow:var(--shd);width:170px;outline:none }
+.mt-hbtn { width:36px;height:36px;border-radius:50%;border:none;background:#fff;box-shadow:var(--shd);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--t2) }
+.mt-ntb { padding:8px 18px;border-radius:20px;border:none;background:var(--sage);color:#fff;font-family:var(--fb);font-size:11px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(74,124,94,.25);display:flex;align-items:center;gap:5px }
 
-const S = {
-  card: {
-    background: "linear-gradient(160deg, #0e3d34, #0c332c, #0a2e28)",
-    border: "1px solid rgba(74,222,128,0.08)",
-    borderRadius: 14,
-    padding: "18px 20px",
-  } as React.CSSProperties,
-};
+/* Stats */
+.mt-stats { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;flex-shrink:0 }
+.mt-st { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;animation:mt-fu .3s ease both }
+.mt-st .sl { font-size:9px;color:var(--t3);margin-bottom:1px }
+.mt-st .sv { font-family:var(--fd);font-size:18px;font-weight:600;color:var(--t1) }
+.mt-st-bars { display:flex;align-items:flex-end;gap:2px;height:24px }
+.mt-st-bars span { width:3px;border-radius:1px;background:var(--sage) }
+.mt-st.ac { background:var(--sage) }
+.mt-st.ac .sl { color:rgba(255,255,255,.5) }
+.mt-st.ac .sv { color:#fff }
+
+/* Mid grid */
+.mt-mid { flex:1;display:grid;grid-template-columns:60fr 40fr;gap:10px;min-height:0 }
+
+/* Trades card (left) */
+.mt-tc { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:16px 20px;display:flex;flex-direction:column;min-height:0;animation:mt-fu .3s ease both }
+.mt-tc .th { display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-shrink:0 }
+.mt-tc h3 { font-family:var(--fd);font-size:16px;font-weight:600;color:var(--t1);margin:0 }
+.mt-tc .tsub { font-size:11px;color:var(--t3);margin-bottom:10px;flex-shrink:0 }
+.mt-tc .tsub b { color:var(--sage);font-weight:600 }
+
+/* Filter pills */
+.mt-pls { display:flex;gap:3px }
+.mt-pl { padding:4px 11px;border-radius:12px;font-size:9px;font-weight:600;border:none;cursor:pointer;font-family:var(--fb);background:rgba(0,0,0,.03);color:var(--t3) }
+.mt-pl.on { background:var(--sage);color:#fff }
+
+/* Trades list */
+.mt-tb { flex:1;overflow-y:auto;min-height:0 }
+.mt-tb::-webkit-scrollbar { width:2px }
+.mt-tb::-webkit-scrollbar-thumb { background:rgba(0,0,0,.06);border-radius:2px }
+
+/* Trade row */
+.mt-rw { display:flex;align-items:center;gap:10px;padding:9px 4px;cursor:pointer;border-radius:8px;transition:background .1s;text-decoration:none }
+.mt-rw:hover { background:rgba(0,0,0,.015) }
+.mt-rw+.mt-rw { border-top:1px solid rgba(0,0,0,.03) }
+.mt-rw .fl { font-size:17px;display:flex;gap:1px;min-width:42px }
+.mt-rw .inf { flex:1;min-width:0 }
+.mt-rw .nm { font-size:12px;font-weight:600;color:var(--t1) }
+.mt-rw .rt { font-size:9px;color:var(--t3) }
+.mt-rw .vl { font-size:11px;color:var(--t2);min-width:62px;text-align:right }
+.mt-rw .dc { font-size:10px;color:var(--t3);min-width:26px;text-align:center }
+.mt-rw .pc { font-size:11px;font-weight:700;min-width:32px;text-align:right }
+.mt-rw .pc.g { color:var(--sage) }
+.mt-rw .pc.a { color:var(--amber) }
+.mt-rw .pc.r { color:var(--red) }
+.mt-rw .bg { padding:2px 8px;border-radius:5px;font-size:8px;font-weight:600;min-width:44px;text-align:center }
+.mt-rw .bg.ok { background:var(--sage-xs);color:var(--sage) }
+.mt-rw .bg.w { background:var(--amber-xs);color:var(--amber) }
+.mt-rw .bg.e { background:var(--red-xs);color:var(--red) }
+.mt-rw .bg.off { background:rgba(0,0,0,.03);color:var(--t4) }
+.mt-rw .arr { color:var(--t4);font-size:13px }
+.mt-rw:hover .arr { color:var(--sage) }
+.mt-rw.closed { opacity:.4 }
+
+/* Right column */
+.mt-right { display:flex;flex-direction:column;gap:10px;min-height:0 }
+
+/* Analytics */
+.mt-an { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:14px 16px;display:flex;flex-direction:column;min-height:0;flex:1.5;overflow-y:auto;animation:mt-fu .3s ease both }
+.mt-an::-webkit-scrollbar { width:2px }
+.mt-an::-webkit-scrollbar-thumb { background:rgba(0,0,0,.05) }
+.mt-an h3 { font-family:var(--fd);font-size:14px;font-weight:600;margin:0 0 10px;flex-shrink:0;color:var(--t1) }
+.mt-an-split { flex:1;display:flex;flex-direction:column;gap:8px;min-height:0 }
+.mt-acr { display:flex;align-items:center;gap:8px;margin-bottom:3px }
+.mt-acr .cfl { font-size:13px }
+.mt-acr .ci { flex:1 }
+.mt-acr .cn { font-size:10px;font-weight:600;color:var(--t1) }
+.mt-acr .cs { font-size:8px;color:var(--t3) }
+.mt-acr .cv { font-size:11px;font-weight:700;color:var(--t1) }
+.mt-bar { height:5px;background:rgba(0,0,0,.03);border-radius:3px;overflow:hidden;margin-bottom:10px }
+.mt-bar div { height:100%;border-radius:3px }
+
+/* Pie area */
+.mt-pie-area { flex:1;display:flex;align-items:center;gap:12px;min-height:0;padding-top:4px;border-top:1px solid rgba(0,0,0,.04) }
+.mt-pie { width:100px;height:100px;flex-shrink:0 }
+.mt-pie-leg { display:flex;flex-direction:column;gap:4px }
+.mt-apl { display:flex;align-items:center;gap:5px;font-size:8px;color:var(--t2);font-weight:500 }
+.mt-apl span { width:6px;height:6px;border-radius:2px;flex-shrink:0 }
+
+/* Demurrage */
+.mt-dem { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:14px 16px;display:flex;flex-direction:column;flex:1;min-height:0;animation:mt-fu .3s ease both }
+.mt-dem h3 { font-family:var(--fd);font-size:14px;font-weight:600;margin:0 0 10px;flex-shrink:0;color:var(--t1) }
+.mt-dem-body { flex:1;display:flex;gap:10px;min-height:0 }
+.mt-dem-chart { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center }
+.mt-dem-ring { width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative }
+.mt-dem-ring::after { content:'';position:absolute;inset:14px;border-radius:50%;background:#fff }
+.mt-dem-ring span { position:relative;z-index:1;font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1) }
+.mt-dem-label { font-size:9px;color:var(--t3);margin-top:6px;text-align:center }
+.mt-dem-list { flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px }
+.mt-dem-row { display:flex;align-items:center;gap:6px }
+.mt-dem-dot { width:8px;height:8px;border-radius:2px;flex-shrink:0 }
+.mt-dem-row .di { flex:1 }
+.mt-dem-row .dn { font-size:9px;font-weight:600;color:var(--t1) }
+.mt-dem-row .dd { font-size:8px;color:var(--t3) }
+.mt-dem-row .dv { font-size:10px;font-weight:700 }
+.mt-dem-total { display:flex;align-items:center;justify-content:space-between;padding-top:6px;margin-top:auto;border-top:1px solid rgba(0,0,0,.04) }
+.mt-dem-total .dtl { font-size:9px;color:var(--t3) }
+.mt-dem-total .dtv { font-family:var(--fd);font-size:16px;font-weight:700;color:var(--red) }
+
+/* Bottom row */
+.mt-bot { display:grid;grid-template-columns:3fr 3fr 5fr;gap:10px;flex-shrink:0;height:165px }
+.mt-eudr { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:12px 14px;display:flex;flex-direction:column;overflow:hidden;animation:mt-fu .3s ease both }
+.mt-eudr h4 { font-family:var(--fd);font-size:12px;font-weight:600;color:var(--sage);margin:0 0 2px }
+.mt-eudr .es { font-size:8px;color:var(--t3);margin-bottom:6px }
+.mt-eb { flex:1;overflow-y:auto }
+.mt-eb::-webkit-scrollbar { width:2px }
+.mt-eb::-webkit-scrollbar-thumb { background:rgba(0,0,0,.04) }
+.mt-er { display:flex;align-items:center;gap:6px;padding:5px 0 }
+.mt-er+.mt-er { border-top:1px solid rgba(0,0,0,.03) }
+.mt-er .dot { width:5px;height:5px;border-radius:50%;flex-shrink:0 }
+.mt-er .ei { flex:1 }
+.mt-er .en { font-size:9px;font-weight:600;color:var(--t1) }
+.mt-er .et { font-size:7px;color:var(--t3) }
+.mt-er .eg { padding:2px 6px;border-radius:3px;font-size:7px;font-weight:600 }
+
+.mt-cbam { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:12px 14px;display:flex;flex-direction:column;overflow:hidden;animation:mt-fu .3s ease both }
+.mt-cbam h4 { font-family:var(--fd);font-size:12px;font-weight:600;color:var(--amber);margin:0 0 6px }
+.mt-cbr { display:flex;align-items:center;justify-content:space-between;padding:5px 0 }
+.mt-cbr+.mt-cbr { border-top:1px solid rgba(0,0,0,.03) }
+.mt-cbr .cc { display:flex;align-items:center;gap:5px }
+.mt-cbr .cc em { font-style:normal;font-size:11px }
+.mt-cbr .cc span { font-size:9px;font-weight:600;color:var(--t1) }
+.mt-cbr .cx { font-size:9px;font-weight:600;color:var(--sage) }
+
+.mt-mp { background:#1b2a22;border-radius:var(--r);box-shadow:var(--shd);position:relative;overflow:hidden;display:flex;flex-direction:column;animation:mt-fu .3s ease both }
+.mt-mp h4 { font-family:var(--fd);font-size:12px;color:#fff;font-weight:600;padding:10px 14px 0;position:relative;z-index:2;flex-shrink:0;margin:0 }
+.mt-mp .ms { font-size:7px;color:rgba(255,255,255,.25);padding:1px 14px;position:relative;z-index:2;flex-shrink:0 }
+.mt-mp-inner { flex:1;position:relative;min-height:0 }
+.mt-ml { display:flex;gap:8px;padding:4px 14px 6px;position:relative;z-index:2;flex-shrink:0 }
+.mt-mll { display:flex;align-items:center;gap:3px;font-size:7px;color:rgba(255,255,255,.3);font-weight:500 }
+.mt-mll span { width:4px;height:4px;border-radius:50% }
+
+/* Empty state */
+.mt-empty { text-align:center;padding:60px 20px }
+.mt-empty h3 { font-family:var(--fd);font-size:18px;font-weight:600;color:var(--t1);margin:0 0 8px }
+.mt-empty p { font-size:13px;color:var(--t3);margin:0 0 20px;line-height:1.6 }
+
+@keyframes mt-fu { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+`;
 
 /* ─── Main Component ─── */
 
@@ -138,9 +275,7 @@ export default function Trades() {
       list = list.filter(t =>
         t.commodityName.toLowerCase().includes(q) ||
         t.originName.toLowerCase().includes(q) ||
-        t.destName.toLowerCase().includes(q) ||
-        t.originIso2.toLowerCase().includes(q) ||
-        t.destIso2.toLowerCase().includes(q)
+        t.destName.toLowerCase().includes(q)
       );
     }
     return list;
@@ -154,366 +289,331 @@ export default function Trades() {
     allTrades.filter(t => t.cbamApplicable === true && t.tradeStatus !== "closed" && t.tradeStatus !== "archived"),
   [allTrades]);
 
-  const filters: { key: FilterTab; label: string; count?: number }[] = [
+  const filters: { key: FilterTab; label: string; count: number }[] = [
     { key: "all", label: "All", count: allTrades.length },
     { key: "active", label: "Active", count: allTrades.filter(t => (t.tradeStatus || "active") !== "closed" && (t.tradeStatus || "active") !== "archived").length },
     { key: "issues", label: "Issues", count: allTrades.filter(t => t.readinessVerdict === "RED").length },
     { key: "closed", label: "Closed", count: allTrades.filter(t => t.tradeStatus === "closed" || t.tradeStatus === "archived").length },
   ];
 
+  /* Compute analytics data from real trades */
+  const corridorAnalytics = useMemo(() => {
+    const map = new Map<string, { flags: string; label: string; count: number; value: number }>();
+    allTrades.forEach(t => {
+      if (t.tradeStatus === "closed" || t.tradeStatus === "archived") return;
+      const key = `${t.originIso2}-${t.destIso2}`;
+      const existing = map.get(key);
+      const val = t.tradeValue ? Number(t.tradeValue) : 0;
+      if (existing) {
+        existing.count++;
+        existing.value += val;
+      } else {
+        map.set(key, {
+          flags: `${iso2ToFlag(t.originIso2)}${iso2ToFlag(t.destIso2)}`,
+          label: `${t.originName} → ${t.destName}`,
+          count: 1,
+          value: val,
+        });
+      }
+    });
+    return Array.from(map.values()).sort((a, b) => b.value - a.value).slice(0, 4);
+  }, [allTrades]);
+
+  const totalValue = stats.activeShipmentValue || corridorAnalytics.reduce((s, c) => s + c.value, 0);
+  const maxCorridorValue = Math.max(...corridorAnalytics.map(c => c.value), 1);
+  const pieColors = ["var(--sage-l)", "var(--amber)", "#5aa07a", "#8ecaad"];
+
   return (
     <AppShell>
-      {/* ── Header ── */}
-      <div style={{ padding: "28px 32px 0" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+      <style>{css}</style>
+      <div className="mt-page">
+        {/* ── Header ── */}
+        <div className="mt-hdr">
           <div>
-            <h1 style={{ fontFamily: "var(--fh)", fontWeight: 800, fontSize: 26, color: "#fff", margin: 0 }} data-testid="text-trades-title">
-              My Trades
-            </h1>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginTop: 4 }} data-testid="text-trades-subtitle">
-              {stats.activeShipments} active shipment{stats.activeShipments !== 1 ? "s" : ""}
-              {corridors.length > 0 && <> across {corridors.length} corridor{corridors.length !== 1 ? "s" : ""}</>}
-            </p>
-          </div>
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-            <div style={{ position: "relative" }}>
-              <Search size={14} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.3)" }} />
-              <input
-                type="text"
-                placeholder="Search trades..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                data-testid="input-search-trades"
-                style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: 8,
-                  padding: "7px 12px 7px 32px",
-                  fontSize: 12,
-                  width: 200,
-                  color: "#fff",
-                  outline: "none",
-                }}
-              />
+            <h1 data-testid="text-trades-title">My Trades</h1>
+            <div className="sub" data-testid="text-trades-subtitle">
+              Active shipment value: ${totalValue.toLocaleString()} across {corridors.length || corridorAnalytics.length} corridor{(corridors.length || corridorAnalytics.length) !== 1 ? "s" : ""}
             </div>
-            <button
-              onClick={() => navigate("/lookup")}
-              style={{
-                background: "#6b9080",
-                color: "#fff",
-                border: "none",
-                borderRadius: 8,
-                padding: "8px 16px",
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-              data-testid="button-new-trade"
-            >
-              <Plus size={14} /> New Trade
+          </div>
+          <div className="mt-hdr-r">
+            <input
+              className="mt-srch"
+              placeholder="Search trades..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              data-testid="input-search-trades"
+            />
+            <button className="mt-hbtn">🔔</button>
+            <button className="mt-ntb" onClick={() => navigate("/lookup")} data-testid="button-new-trade">
+              <Plus size={12} /> New Trade
             </button>
           </div>
         </div>
 
         {/* ── Stat Cards ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 24 }} data-testid="stat-cards">
-          {[
-            { label: "Active Shipments", value: stats.activeShipments, color: "#4ade80" },
-            { label: "Pending Documents", value: stats.pendingDocuments, color: stats.pendingDocuments > 0 ? "#eab308" : "#4ade80" },
-            { label: "Avg Compliance", value: `${stats.avgCompliance}%`, color: getComplianceColor(stats.avgCompliance) },
-            { label: "Shields", value: balance, color: "#5dd9c1" },
-          ].map((card) => (
-            <div key={card.label} style={S.card} data-testid={`stat-${card.label.toLowerCase().replace(/ /g, "-")}`}>
-              <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(255,255,255,0.35)", fontWeight: 600, marginBottom: 8 }}>
-                {card.label}
-              </div>
-              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 800, color: card.color, lineHeight: 1 }}>
-                {card.value}
-              </div>
+        <div className="mt-stats" data-testid="stat-cards">
+          <div className="mt-st">
+            <div>
+              <div className="sl">Active Shipments</div>
+              <div className="sv">{stats.activeShipments}</div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Main Content: 2-column grid ── */}
-      <div style={{ padding: "0 32px 32px", display: "grid", gridTemplateColumns: "1fr 320px", gap: 16 }}>
-        {/* LEFT: Trades Table */}
-        <div>
-          {/* Filter tabs */}
-          <div style={{ display: "flex", gap: 4, marginBottom: 16 }} data-testid="filter-bar">
-            {filters.map(f => (
-              <button
-                key={f.key}
-                onClick={() => setFilter(f.key)}
-                data-testid={`filter-${f.key}`}
-                style={{
-                  background: filter === f.key ? "rgba(74,222,128,0.1)" : "transparent",
-                  border: `1px solid ${filter === f.key ? "rgba(74,222,128,0.3)" : "rgba(255,255,255,0.08)"}`,
-                  color: filter === f.key ? "#4ade80" : "rgba(255,255,255,0.5)",
-                  borderRadius: 20,
-                  padding: "5px 14px",
-                  fontSize: 11,
-                  fontWeight: 500,
-                  cursor: "pointer",
-                }}
-              >
-                {f.label}{f.count != null && f.count > 0 ? ` (${f.count})` : ""}
-              </button>
-            ))}
-          </div>
-
-          {/* Trade rows */}
-          {tradesQuery.isLoading ? (
-            <div style={{ padding: "60px 0", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: 13 }}>Loading trades...</div>
-          ) : filtered.length === 0 && allTrades.length === 0 ? (
-            <div style={{ ...S.card, padding: "60px 32px", textAlign: "center" }}>
-              <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "#fff", marginBottom: 8 }}>No trades yet</div>
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 20px", lineHeight: 1.6 }}>
-                Run your first compliance check to create a trade.
-              </p>
-              <Link href="/lookup">
-                <button style={{ background: "#6b9080", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer" }} data-testid="button-empty-new-lookup">
-                  <Plus size={14} style={{ marginRight: 6, verticalAlign: "middle" }} />
-                  Start a new compliance check
-                </button>
-              </Link>
-            </div>
-          ) : filtered.length === 0 ? (
-            <div style={{ padding: "60px 0", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: 13 }}>No trades match your filter.</div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {filtered.map((trade, idx) => {
-                const status = getStatusBadge(trade);
-                return (
-                  <div
-                    key={trade.id}
-                    data-testid={`trade-row-${trade.id}`}
-                    onClick={() => navigate(`/trades/${trade.id}`)}
-                    style={{
-                      ...S.card,
-                      padding: "14px 18px",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 14,
-                      transition: "border-color .15s",
-                      animation: "fadeUp .3s ease both",
-                      animationDelay: `${idx * 30}ms`,
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(74,222,128,0.25)"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(74,222,128,0.08)"; }}
-                  >
-                    {/* Flags + Commodity */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {trade.commodityName}
-                      </div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>
-                        {iso2ToFlag(trade.originIso2)} {trade.originName} → {iso2ToFlag(trade.destIso2)} {trade.destName}
-                      </div>
-                    </div>
-
-                    {/* Trade value */}
-                    <div style={{ textAlign: "right", minWidth: 80 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: trade.tradeValue ? "#fff" : "rgba(255,255,255,0.25)" }}>
-                        {trade.tradeValue
-                          ? `${trade.tradeValueCurrency || "USD"} ${Number(trade.tradeValue).toLocaleString()}`
-                          : "—"}
-                      </div>
-                    </div>
-
-                    {/* Docs progress */}
-                    <div style={{ textAlign: "center", minWidth: 50 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: trade.docsReceivedCount >= trade.docsRequiredCount && trade.docsRequiredCount > 0 ? "#4ade80" : "rgba(255,255,255,0.6)" }}>
-                        {trade.docsRequiredCount > 0 ? `${trade.docsReceivedCount}/${trade.docsRequiredCount}` : "—"}
-                      </div>
-                      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginTop: 1 }}>docs</div>
-                    </div>
-
-                    {/* Compliance % */}
-                    <div style={{ textAlign: "center", minWidth: 44 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: getComplianceColor(trade.readinessScore) }}>
-                        {trade.readinessScore != null ? `${trade.readinessScore}%` : "—"}
-                      </div>
-                    </div>
-
-                    {/* Status badge */}
-                    <span style={{
-                      fontSize: 10, fontWeight: 600, padding: "3px 10px", borderRadius: 12,
-                      background: status.bg, color: status.color, whiteSpace: "nowrap",
-                    }}>
-                      {status.label}
-                    </span>
-
-                    <ChevronRight size={14} style={{ color: "rgba(255,255,255,0.2)", flexShrink: 0 }} />
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT: Intelligence Panels */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* EUDR Intelligence */}
-          <div style={S.card}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-              <Leaf size={14} style={{ color: "#4ade80" }} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>EUDR Intelligence</span>
-            </div>
-            {eudrTrades.length === 0 ? (
-              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", margin: 0 }}>No EUDR-applicable trades</p>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {eudrTrades.slice(0, 5).map(t => {
-                  const badge = getRegulatoryBadge(t.eudrApplicable, t.eudrScore, t.eudrBand);
-                  return (
-                    <div
-                      key={t.id}
-                      onClick={() => navigate(`/trades/${t.id}#eudr`)}
-                      style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", padding: "6px 8px", borderRadius: 8, transition: "background .15s" }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)"; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ""; }}
-                    >
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.8)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {iso2ToFlag(t.originIso2)} {t.commodityName}
-                        </div>
-                      </div>
-                      <span style={{ fontSize: 9, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: badge.bg, color: badge.color }}>
-                        {badge.label}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* CBAM Intelligence */}
-          <div style={S.card}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-              <Factory size={14} style={{ color: "#60a5fa" }} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>CBAM Intelligence</span>
-            </div>
-            {cbamTrades.length === 0 ? (
-              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", margin: 0 }}>No CBAM-applicable trades</p>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {cbamTrades.slice(0, 5).map(t => {
-                  const badge = getRegulatoryBadge(t.cbamApplicable, t.cbamScore, t.cbamBand);
-                  return (
-                    <div
-                      key={t.id}
-                      onClick={() => navigate(`/trades/${t.id}#cbam`)}
-                      style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", padding: "6px 8px", borderRadius: 8, transition: "background .15s" }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)"; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ""; }}
-                    >
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.8)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {iso2ToFlag(t.originIso2)} {t.commodityName}
-                        </div>
-                      </div>
-                      <span style={{ fontSize: 9, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: badge.bg, color: badge.color }}>
-                        {badge.label}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Shield Balance mini card */}
-          <Link href="/pricing">
-            <div style={{ ...S.card, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, padding: "14px 18px" }}>
-              <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(255,255,255,0.35)", fontWeight: 600 }}>
-                Shield Balance
-              </div>
-              <div style={{ fontFamily: "var(--fh)", fontSize: 18, fontWeight: 800, color: "#5dd9c1", marginLeft: "auto" }}>
-                {balance}
-              </div>
-              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Buy more →</span>
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      {/* ── Bottom Row: Shipments list + Corridors Map ── */}
-      <div style={{ padding: "0 32px 40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-        {/* All Shipments compact list */}
-        <div style={S.card}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-            <FileText size={14} style={{ color: "rgba(255,255,255,0.5)" }} />
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>All Shipments</span>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginLeft: "auto" }}>{allTrades.length} total</span>
-          </div>
-          {allTrades.length === 0 ? (
-            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", margin: 0 }}>No shipments yet</p>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 4, maxHeight: 240, overflowY: "auto" }}>
-              {allTrades.slice(0, 15).map(t => (
-                <div
-                  key={t.id}
-                  onClick={() => navigate(`/trades/${t.id}`)}
-                  style={{
-                    display: "flex", alignItems: "center", gap: 10, cursor: "pointer",
-                    padding: "6px 8px", borderRadius: 6, transition: "background .15s",
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ""; }}
-                >
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {iso2ToFlag(t.originIso2)} {t.commodityName} → {iso2ToFlag(t.destIso2)} {t.destIso2}
-                  </span>
-                  <span style={{
-                    fontSize: 11, fontWeight: 700,
-                    color: getComplianceColor(t.readinessScore),
-                    minWidth: 30, textAlign: "right",
-                  }}>
-                    {t.readinessScore != null ? `${t.readinessScore}%` : "—"}
-                  </span>
-                  <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}>{formatDate(t.createdAt)}</span>
-                </div>
+            <div className="mt-st-bars">
+              {[35, 60, 50, 75, 100, 65, 85].map((h, i) => (
+                <span key={i} style={{ height: `${h}%` }} />
               ))}
             </div>
-          )}
-        </div>
-
-        {/* Trade Corridors Map */}
-        <div style={{ ...S.card, padding: 0, overflow: "hidden", minHeight: 280 }}>
-          {corridors.length === 0 ? (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", padding: 32 }}>
-              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", textAlign: "center" }}>
-                Trade corridors will appear here once you have trades
-              </p>
+          </div>
+          <div className="mt-st ac">
+            <div>
+              <div className="sl">Pending Docs</div>
+              <div className="sv">{stats.pendingDocuments}</div>
             </div>
-          ) : (
-            <TradeCorridorsMap corridors={corridors} />
-          )}
+            <div style={{ fontSize: 16 }}>📄</div>
+          </div>
+          <div className="mt-st">
+            <div>
+              <div className="sl">Total Value</div>
+              <div className="sv">${totalValue >= 1000 ? `${(totalValue / 1000).toFixed(0)}k` : totalValue.toLocaleString()}</div>
+            </div>
+            <svg width="48" height="20" viewBox="0 0 48 20">
+              <path d="M0,16 Q7,11 14,13 Q22,15 32,6 Q40,1 48,4" fill="none" stroke="var(--sage-l)" strokeWidth="1.5" opacity=".5" />
+            </svg>
+          </div>
+          <div className="mt-st ac">
+            <div>
+              <div className="sl">Shield Balance</div>
+              <div className="sv">{balance} check{balance !== 1 ? "s" : ""}</div>
+            </div>
+            <div style={{ fontSize: 16 }}>🛡</div>
+          </div>
+        </div>
+
+        {/* ── Mid Section ── */}
+        <div className="mt-mid">
+          {/* LEFT: Trades Card */}
+          <div className="mt-tc">
+            <div className="th">
+              <h3>Trades</h3>
+              <div className="mt-pls" data-testid="filter-bar">
+                {filters.map(f => (
+                  <button
+                    key={f.key}
+                    className={`mt-pl${filter === f.key ? " on" : ""}`}
+                    onClick={() => setFilter(f.key)}
+                    data-testid={`filter-${f.key}`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="tsub">
+              Total: <b>${totalValue.toLocaleString()}</b> · {allTrades.filter(t => (t.tradeStatus || "active") !== "closed").length} shipments
+            </div>
+
+            <div className="mt-tb">
+              {tradesQuery.isLoading ? (
+                <div style={{ padding: "60px 0", textAlign: "center", color: "var(--t3)", fontSize: 13 }}>Loading trades...</div>
+              ) : filtered.length === 0 && allTrades.length === 0 ? (
+                <div className="mt-empty">
+                  <h3>No trades yet</h3>
+                  <p>Run your first compliance check to create a trade.</p>
+                  <Link href="/lookup">
+                    <button className="mt-ntb" data-testid="button-empty-new-lookup">
+                      <Plus size={12} /> Start a new compliance check
+                    </button>
+                  </Link>
+                </div>
+              ) : filtered.length === 0 ? (
+                <div style={{ padding: "60px 0", textAlign: "center", color: "var(--t3)", fontSize: 13 }}>No trades match your filter.</div>
+              ) : (
+                filtered.map(trade => {
+                  const status = getStatusBadge(trade);
+                  const isClosed = trade.tradeStatus === "closed" || trade.tradeStatus === "archived";
+                  return (
+                    <div
+                      key={trade.id}
+                      className={`mt-rw${isClosed ? " closed" : ""}`}
+                      onClick={() => navigate(`/trades/${trade.id}`)}
+                      data-testid={`trade-row-${trade.id}`}
+                    >
+                      <div className="fl">{iso2ToFlag(trade.originIso2)}{iso2ToFlag(trade.destIso2)}</div>
+                      <div className="inf">
+                        <div className="nm">{trade.commodityName}</div>
+                        <div className="rt">{trade.originName} → {trade.destName}</div>
+                      </div>
+                      <div className="vl">{formatValue(trade.tradeValue, trade.tradeValueCurrency)}</div>
+                      <div className="dc">{trade.docsRequiredCount > 0 ? `${trade.docsReceivedCount}/${trade.docsRequiredCount}` : "—"}</div>
+                      <div className={`pc ${getComplianceClass(trade.readinessScore)}`}>
+                        {trade.readinessScore != null ? `${trade.readinessScore}%` : "—"}
+                      </div>
+                      <div className={`bg ${status.cls}`}>{status.label}</div>
+                      <span className="arr">›</span>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* RIGHT: Analytics + Demurrage */}
+          <div className="mt-right">
+            {/* Trade Analytics */}
+            <div className="mt-an">
+              <h3>Trade Analytics</h3>
+              <div className="mt-an-split">
+                <div>
+                  {corridorAnalytics.length === 0 ? (
+                    <div style={{ fontSize: 11, color: "var(--t3)", padding: "16px 0" }}>No corridor data yet</div>
+                  ) : (
+                    corridorAnalytics.map((c, i) => (
+                      <div key={i}>
+                        <div className="mt-acr">
+                          <div className="cfl">{c.flags}</div>
+                          <div className="ci">
+                            <div className="cn">{c.label}</div>
+                            <div className="cs">{c.count} shipment{c.count !== 1 ? "s" : ""}</div>
+                          </div>
+                          <div className="cv">${c.value >= 1000 ? `${(c.value / 1000).toFixed(0)}k` : c.value}</div>
+                        </div>
+                        <div className="mt-bar">
+                          <div style={{ width: `${(c.value / maxCorridorValue) * 100}%`, background: pieColors[i % pieColors.length] }} />
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {corridorAnalytics.length > 0 && (
+                  <div className="mt-pie-area">
+                    <svg viewBox="0 0 120 120" className="mt-pie">
+                      {(() => {
+                        const total = corridorAnalytics.reduce((s, c) => s + c.value, 0) || 1;
+                        let startAngle = -90;
+                        return corridorAnalytics.map((c, i) => {
+                          const angle = (c.value / total) * 360;
+                          const endAngle = startAngle + angle;
+                          const startRad = (startAngle * Math.PI) / 180;
+                          const endRad = (endAngle * Math.PI) / 180;
+                          const x1 = 60 + 50 * Math.cos(startRad);
+                          const y1 = 60 + 50 * Math.sin(startRad);
+                          const x2 = 60 + 50 * Math.cos(endRad);
+                          const y2 = 60 + 50 * Math.sin(endRad);
+                          const largeArc = angle > 180 ? 1 : 0;
+                          const d = `M60,60 L${x1.toFixed(1)},${y1.toFixed(1)} A50,50 0 ${largeArc},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z`;
+                          startAngle = endAngle;
+                          return <path key={i} d={d} fill={pieColors[i % pieColors.length]} />;
+                        });
+                      })()}
+                    </svg>
+                    <div className="mt-pie-leg">
+                      {corridorAnalytics.map((c, i) => {
+                        const total = corridorAnalytics.reduce((s, cc) => s + cc.value, 0) || 1;
+                        const pct = Math.round((c.value / total) * 100);
+                        return (
+                          <div key={i} className="mt-apl">
+                            <span style={{ background: pieColors[i % pieColors.length] }} />
+                            {c.label.split(" → ")[0]} {pct}%
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Demurrage Estimate (placeholder — uses mock data structure) */}
+            <div className="mt-dem">
+              <h3>Demurrage Estimate</h3>
+              <div className="mt-dem-body">
+                <div className="mt-dem-chart">
+                  <div className="mt-dem-ring" style={{ background: "conic-gradient(var(--sage-l) 0deg 108deg, var(--amber) 108deg 198deg, var(--red) 198deg 234deg, rgba(0,0,0,.04) 234deg)" }}>
+                    <span>—</span>
+                  </div>
+                  <div className="mt-dem-label">Total exposure</div>
+                </div>
+                <div className="mt-dem-list">
+                  <div style={{ fontSize: 11, color: "var(--t3)", padding: "16px 0" }}>
+                    Add shipment values to see demurrage estimates
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Bottom Row ── */}
+        <div className="mt-bot">
+          {/* EUDR Intelligence */}
+          <div className="mt-eudr">
+            <h4>🌿 EUDR Intelligence</h4>
+            <div className="es">Deforestation regulation</div>
+            <div className="mt-eb">
+              {eudrTrades.length === 0 ? (
+                <div style={{ fontSize: 9, color: "var(--t3)", padding: "10px 0" }}>No EUDR-applicable trades</div>
+              ) : (
+                eudrTrades.slice(0, 5).map(t => {
+                  const badge = getEudrBadge(t.eudrBand);
+                  const dotColor = badge.cls === "e" ? "var(--red)" : badge.cls === "w" ? "var(--amber)" : "var(--sage-l)";
+                  const egBg = badge.cls === "e" ? "var(--red-xs)" : badge.cls === "w" ? "var(--amber-xs)" : "var(--sage-xs)";
+                  const egColor = badge.cls === "e" ? "var(--red)" : badge.cls === "w" ? "var(--amber)" : "var(--sage)";
+                  return (
+                    <div key={t.id} className="mt-er" onClick={() => navigate(`/trades/${t.id}#eudr`)} style={{ cursor: "pointer" }}>
+                      <div className="dot" style={{ background: dotColor }} />
+                      <div className="ei">
+                        <div className="en">{iso2ToFlag(t.originIso2)} {t.commodityName.split(" ")[0]}</div>
+                        <div className="et">{t.eudrBand ? `Risk: ${t.eudrBand}` : "Not assessed"}</div>
+                      </div>
+                      <div className="eg" style={{ background: egBg, color: egColor }}>{badge.label}</div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* CBAM Tariff */}
+          <div className="mt-cbam">
+            <h4>⚠️ CBAM Tariff</h4>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              {cbamTrades.length === 0 ? (
+                <div style={{ fontSize: 9, color: "var(--t3)", padding: "10px 0" }}>No CBAM-applicable trades</div>
+              ) : (
+                cbamTrades.slice(0, 5).map(t => (
+                  <div key={t.id} className="mt-cbr" onClick={() => navigate(`/trades/${t.id}#cbam`)} style={{ cursor: "pointer" }}>
+                    <div className="cc">
+                      <em>{iso2ToFlag(t.originIso2)}</em>
+                      <span>{t.commodityName.split(" ")[0]} {t.originIso2}→{t.destIso2}</span>
+                    </div>
+                    <div className="cx">{t.cbamScore != null ? `${t.cbamScore}%` : "0%"}</div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Trade Corridors Map */}
+          <div className="mt-mp">
+            <h4>Trade Corridors</h4>
+            <div className="ms">{corridors.length || corridorAnalytics.length} active route{(corridors.length || corridorAnalytics.length) !== 1 ? "s" : ""}</div>
+            <div className="mt-mp-inner">
+              {corridors.length > 0 ? (
+                <TradeCorridorsMap corridors={corridors} />
+              ) : (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", opacity: 0.3 }}>
+                  <span style={{ fontSize: 11, color: "#fff" }}>Map appears with trade data</span>
+                </div>
+              )}
+            </div>
+            <div className="mt-ml">
+              <div className="mt-mll"><span style={{ background: "var(--sage-l)" }} />Primary</div>
+              <div className="mt-mll"><span style={{ background: "var(--amber)" }} />Secondary</div>
+              <div className="mt-mll"><span style={{ background: "var(--red)" }} />At Risk</div>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <div style={{ padding: "0 32px 40px", textAlign: "center" }}>
-        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", margin: 0 }}>
-          TapTrao does not provide legal or banking advice. Reports are informational.
-        </p>
-        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.15)", marginTop: 8 }}>
-          Fatrao Limited — Registered in England and Wales
-        </p>
-      </div>
-
-      <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(6px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </AppShell>
   );
 }
