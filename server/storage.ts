@@ -153,6 +153,8 @@ export interface IStorage {
   createTwinlogDownload(data: { lookupId?: string; sessionId: string; companyName: string; eoriNumber?: string; documentStatuses: unknown; pdfHash: string }): Promise<TwinlogDownload>;
   getTradesSummary(sessionId?: string): Promise<{ total: number; needAttention: number; lcPending: number; archiveReady: number }>;
   getEnrichedTrades(sessionId?: string): Promise<EnrichedTrade[]>;
+  getMyTradesStats(sessionId: string): Promise<MyTradesStats>;
+  getTradeCorridors(sessionId: string): Promise<TradeCorridor[]>;
   getSupplierRequestsBySession(sessionId: string): Promise<EnrichedSupplierRequest[]>;
   getSupplierInboxSummary(sessionId: string): Promise<{ awaiting: number; blocking: number; completeThisWeek: number }>;
   getSupplierInboxBadgeCount(sessionId: string): Promise<number>;
@@ -291,6 +293,27 @@ export type EnrichedTrade = {
   cbamApplicable: boolean | null;
   cbamScore: number | null;
   cbamBand: string | null;
+  // Doc progress
+  docsRequiredCount: number;
+  docsReceivedCount: number;
+};
+
+export type MyTradesStats = {
+  activeShipments: number;
+  activeShipmentValue: number;
+  pendingDocuments: number;
+  avgCompliance: number;
+};
+
+export type TradeCorridor = {
+  originIso2: string;
+  originName: string;
+  destIso2: string;
+  destName: string;
+  tradeCount: number;
+  activeCount: number;
+  issueCount: number;
+  waitingCount: number;
 };
 
 export type TradeDetail = {
@@ -787,13 +810,16 @@ export class DatabaseStorage implements IStorage {
         ea.band AS "eudrBand",
         ca.applicable AS "cbamApplicable",
         ca.score AS "cbamScore",
-        ca.band AS "cbamBand"
+        ca.band AS "cbamBand",
+        COALESCE(jsonb_array_length(sr.docs_required), 0)::int AS "docsRequiredCount",
+        COALESCE(jsonb_array_length(sr.docs_received), 0)::int AS "docsReceivedCount"
       FROM lookups l
       INNER JOIN origin_countries o ON l.origin_id = o.id
       INNER JOIN destinations d ON l.destination_id = d.id
       LEFT JOIN lc_checks lc ON lc.source_lookup_id = l.id
       LEFT JOIN eudr_assessments ea ON ea.lookup_id = l.id
       LEFT JOIN cbam_assessments ca ON ca.lookup_id = l.id
+      LEFT JOIN supplier_requests sr ON sr.lookup_id = l.id
       WHERE 1=1 ${sessionFilter}
       ORDER BY l.id, lc.created_at DESC
     `);
@@ -801,6 +827,50 @@ export class DatabaseStorage implements IStorage {
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
     return sorted;
+  }
+
+  async getMyTradesStats(sessionId: string): Promise<MyTradesStats> {
+    const rows = await db.execute(sql`
+      SELECT
+        COUNT(*)::int AS "activeShipments",
+        COALESCE(SUM(CASE WHEN l.trade_value IS NOT NULL THEN l.trade_value::numeric ELSE 0 END), 0)::float AS "activeShipmentValue",
+        COALESCE(SUM(
+          GREATEST(COALESCE(jsonb_array_length(sr.docs_required), 0) - COALESCE(jsonb_array_length(sr.docs_received), 0), 0)
+        ), 0)::int AS "pendingDocuments",
+        COALESCE(AVG(l.readiness_score), 0)::float AS "avgCompliance"
+      FROM lookups l
+      LEFT JOIN supplier_requests sr ON sr.lookup_id = l.id
+      WHERE l.session_id = ${sessionId}
+        AND (l.trade_status IS NULL OR l.trade_status NOT IN ('closed', 'archived'))
+    `);
+    const row = rows.rows[0] as any;
+    return {
+      activeShipments: row.activeShipments || 0,
+      activeShipmentValue: row.activeShipmentValue || 0,
+      pendingDocuments: row.pendingDocuments || 0,
+      avgCompliance: Math.round(row.avgCompliance || 0),
+    };
+  }
+
+  async getTradeCorridors(sessionId: string): Promise<TradeCorridor[]> {
+    const rows = await db.execute(sql`
+      SELECT
+        o.iso2 AS "originIso2",
+        o.country_name AS "originName",
+        d.iso2 AS "destIso2",
+        d.country_name AS "destName",
+        COUNT(*)::int AS "tradeCount",
+        COUNT(*) FILTER (WHERE l.trade_status IS NULL OR l.trade_status = 'active' OR l.trade_status = 'in_transit')::int AS "activeCount",
+        COUNT(*) FILTER (WHERE l.readiness_verdict = 'RED')::int AS "issueCount",
+        COUNT(*) FILTER (WHERE l.trade_status = 'arrived' OR l.trade_status = 'cleared')::int AS "waitingCount"
+      FROM lookups l
+      INNER JOIN origin_countries o ON l.origin_id = o.id
+      INNER JOIN destinations d ON l.destination_id = d.id
+      WHERE l.session_id = ${sessionId}
+      GROUP BY o.iso2, o.country_name, d.iso2, d.country_name
+      ORDER BY "tradeCount" DESC
+    `);
+    return rows.rows as TradeCorridor[];
   }
 
   async getSupplierRequestsBySession(sessionId: string): Promise<EnrichedSupplierRequest[]> {

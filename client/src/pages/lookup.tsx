@@ -2109,42 +2109,50 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           ...dkCard,
           background: "linear-gradient(135deg, #0e4e45, #14574a, #1c6352)",
           border: "1px solid rgba(93,217,193,0.15)",
+          textAlign: "center",
         }} data-testid="banner-signup-conversion">
           <h3 style={{ fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: "'Clash Display', sans-serif", margin: "0 0 8px" }}>
-            Create a free account to save this check
+            Activate Shield to manage this shipment
           </h3>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, margin: "0 0 12px" }}>
-            Keep your compliance results, run LC document checks, track supplier documents, and monitor your shipments — all from one dashboard.
+            Create a free account to save your results, run LC document checks, track supplier documents, and manage your shipment from a single dashboard.
           </p>
           <Link href="/register">
             <Button
               size="sm"
-              style={{ background: "rgba(255,255,255,0.12)", color: "#fff", borderRadius: 10, border: "1px solid rgba(255,255,255,0.2)" }}
+              style={{ background: "#6b9080", color: "#fff", borderRadius: 10, border: "none", padding: "10px 24px", fontSize: 13, fontWeight: 700 }}
               data-testid="button-conversion-register"
             >
-              Create Account →
+              Create Account & Activate Shield →
             </Button>
           </Link>
         </div>
       )}
 
-      {isAuthenticated && (
+      {isAuthenticated && (result as any).lookupId && (
         <div style={{
           ...dkCard,
-          background: "rgba(93,217,193,0.06)",
-          border: "1px solid rgba(93,217,193,0.2)",
-          padding: "14px 20px",
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-        }} data-testid="banner-saved-confirmation">
-          <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: "#5dd9c1" }} />
-          <div>
-            <p style={{ fontSize: 13, fontWeight: 600, color: "#5dd9c1", margin: 0 }}>Saved to My Trades</p>
-            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", margin: "2px 0 0" }}>
-              View in your <Link href="/trades" style={{ textDecoration: "underline", color: "#5dd9c1" }}>trades dashboard</Link> or continue to LC check.
-            </p>
-          </div>
+          background: "linear-gradient(135deg, #0e4e45, #14574a, #1c6352)",
+          border: "1px solid rgba(74,222,128,0.2)",
+          padding: "20px 24px",
+          textAlign: "center",
+        }} data-testid="banner-open-trade-dashboard">
+          <CheckCircle2 className="w-6 h-6 shrink-0" style={{ color: "#4ade80", margin: "0 auto 10px" }} />
+          <p style={{ fontSize: 15, fontWeight: 700, color: "#fff", margin: "0 0 6px", fontFamily: "'Clash Display', sans-serif" }}>
+            Trade created — your shipment is live
+          </p>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", margin: "0 0 16px", lineHeight: 1.5 }}>
+            Manage documents, run LC checks, track suppliers, and monitor compliance — all from your trade dashboard.
+          </p>
+          <Link href={`/trades/${(result as any).lookupId}`}>
+            <Button
+              size="sm"
+              style={{ background: "#6b9080", color: "#fff", borderRadius: 10, padding: "10px 28px", fontSize: 14, fontWeight: 700 }}
+              data-testid="button-open-trade-dashboard"
+            >
+              Open Trade Dashboard →
+            </Button>
+          </Link>
         </div>
       )}
 

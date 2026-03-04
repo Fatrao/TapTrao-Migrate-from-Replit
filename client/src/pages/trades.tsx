@@ -2,9 +2,14 @@ import { useState, useMemo, useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation, useSearch } from "wouter";
-import { getAvatarColour } from "@/lib/avatarColours";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { useTokenBalance } from "@/hooks/use-tokens";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
+import { TradeCorridorsMap } from "@/components/TradeCorridorsMap";
+import type { Corridor } from "@/components/TradeCorridorsMap";
+import { Search, ChevronRight, Plus, Leaf, Factory, FileText } from "lucide-react";
+
+/* ─── Types ─── */
 
 type EnrichedTrade = {
   id: string;
@@ -18,477 +23,494 @@ type EnrichedTrade = {
   readinessScore: number | null;
   readinessVerdict: string | null;
   createdAt: string;
+  tradeStatus: string | null;
   tradeValue: string | null;
   tradeValueCurrency: string | null;
   lcVerdict: string | null;
   lcCheckId: string | null;
-  // Regulatory assessment badges
   eudrApplicable: boolean | null;
   eudrScore: number | null;
   eudrBand: string | null;
   cbamApplicable: boolean | null;
   cbamScore: number | null;
   cbamBand: string | null;
+  docsRequiredCount: number;
+  docsReceivedCount: number;
 };
 
-function getRegulatoryBadge(applicable: boolean | null, score: number | null, band: string | null): { label: string; bg: string; color: string; bd: string } {
-  if (applicable === false) return { label: "N/A", bg: "#f5f5f5", color: "#999", bd: "#e5e5e5" };
-  if (applicable == null) return { label: "—", bg: "#f5f5f5", color: "#999", bd: "#e5e5e5" };
-  if (score == null || !band) return { label: "Not assessed", bg: "#eff6ff", color: "#2563eb", bd: "#93c5fd" };
-  if (band === "negligible") return { label: `${score} Negligible`, bg: "#f0fdf4", color: "#15803d", bd: "#86efac" };
-  if (band === "low") return { label: `${score} Low`, bg: "#fefce8", color: "#a16207", bd: "#fcd34d" };
-  if (band === "medium") return { label: `${score} Medium`, bg: "#fff7ed", color: "#c2410c", bd: "#fdba74" };
-  if (band === "high") return { label: `${score} High`, bg: "#fef2f2", color: "#dc2626", bd: "#fca5a5" };
-  return { label: `${score}`, bg: "#f5f5f5", color: "#999", bd: "#e5e5e5" };
-}
-
-type TradesSummary = {
-  total: number;
-  needAttention: number;
-  lcPending: number;
-  archiveReady: number;
+type MyTradesStats = {
+  activeShipments: number;
+  activeShipmentValue: number;
+  pendingDocuments: number;
+  avgCompliance: number;
 };
 
-type FilterTab = "all" | "attention" | "progress" | "archived";
+type FilterTab = "all" | "active" | "issues" | "closed";
 
-function getStep(trade: EnrichedTrade): { label: string; color: string } {
-  if (!trade.lcVerdict) return { label: "Paperwork review", color: "#666" };
-  if (trade.lcVerdict === "DISCREPANCIES_FOUND") return { label: "LC review", color: "#2563eb" };
-  if (trade.lcVerdict === "COMPLIANT" || trade.lcVerdict === "COMPLIANT_WITH_NOTES") return { label: "TwinLog Trail", color: "#b45309" };
-  return { label: "Paperwork review", color: "#666" };
+/* ─── Helpers ─── */
+
+function getStatusBadge(trade: EnrichedTrade): { label: string; bg: string; color: string } {
+  const status = trade.tradeStatus || "active";
+  if (status === "closed" || status === "archived")
+    return { label: "Closed", bg: "#f5f5f5", color: "#999" };
+  if (trade.readinessScore !== null && trade.readinessScore >= 80 && trade.docsReceivedCount >= trade.docsRequiredCount && trade.docsRequiredCount > 0)
+    return { label: "Complete", bg: "#f0fdf4", color: "#15803d" };
+  if (trade.readinessVerdict === "RED")
+    return { label: "Issues", bg: "#fef2f2", color: "#dc2626" };
+  if (!trade.lcVerdict && trade.docsReceivedCount === 0)
+    return { label: "New", bg: "#fefce8", color: "#d97706" };
+  return { label: "Active", bg: "#eff6ff", color: "#2563eb" };
 }
 
-function getRiskTag(verdict: string | null) {
-  if (verdict === "RED") return { symbol: "\u2297", label: "Blocking", color: "#dc2626", bg: "#fef2f2", bd: "#fca5a5" };
-  if (verdict === "AMBER") return { symbol: "\u25CF", label: "At risk \u2014 review documents", color: "#b45309", bg: "#fefce8", bd: "#fcd34d" };
-  if (verdict === "GREEN") return { symbol: "\u2713", label: "Clear", color: "#15803d", bg: "#f0fdf4", bd: "#86efac" };
-  return { symbol: "\u25CF", label: "Review", color: "#b45309", bg: "#fefce8", bd: "#fcd34d" };
+function getComplianceColor(score: number | null): string {
+  if (score == null) return "#999";
+  if (score >= 80) return "#15803d";
+  if (score >= 50) return "#d97706";
+  return "#dc2626";
 }
 
 function formatDate(d: string | Date) {
   const date = new Date(d);
   const day = date.getDate();
   const month = date.toLocaleString("en-GB", { month: "short" });
-  const hours = String(date.getHours()).padStart(2, "0");
-  const mins = String(date.getMinutes()).padStart(2, "0");
-  return `${day} ${month} \u00B7 ${hours}:${mins}`;
+  return `${day} ${month}`;
 }
 
+function getRegulatoryBadge(applicable: boolean | null, score: number | null, band: string | null): { label: string; bg: string; color: string } {
+  if (applicable === false) return { label: "N/A", bg: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.3)" };
+  if (applicable == null) return { label: "—", bg: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.3)" };
+  if (score == null || !band) return { label: "Not assessed", bg: "rgba(37,99,235,0.1)", color: "#60a5fa" };
+  if (band === "negligible") return { label: "Negligible", bg: "rgba(74,222,128,0.1)", color: "#4ade80" };
+  if (band === "low") return { label: "Low", bg: "rgba(234,179,8,0.1)", color: "#eab308" };
+  if (band === "medium") return { label: "Medium", bg: "rgba(249,115,22,0.15)", color: "#f97316" };
+  if (band === "high") return { label: "High", bg: "rgba(239,68,68,0.12)", color: "#ef4444" };
+  return { label: `${score}`, bg: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.3)" };
+}
+
+/* ─── Styles ─── */
+
+const S = {
+  card: {
+    background: "linear-gradient(160deg, #0e3d34, #0c332c, #0a2e28)",
+    border: "1px solid rgba(74,222,128,0.08)",
+    borderRadius: 14,
+    padding: "18px 20px",
+  } as React.CSSProperties,
+};
+
+/* ─── Main Component ─── */
+
 export default function Trades() {
-  usePageTitle("My Trades", "All your compliance checks and LC reviews in one place");
+  usePageTitle("My Trades");
   const [, navigate] = useLocation();
   const searchString = useSearch();
   const [filter, setFilter] = useState<FilterTab>("all");
   const [search, setSearch] = useState("");
 
-  // Parse URL filter param on mount (e.g., /trades?filter=attention)
   useEffect(() => {
     const params = new URLSearchParams(searchString);
     const urlFilter = params.get("filter");
-    if (urlFilter && ["all", "attention", "progress", "archived"].includes(urlFilter)) {
+    if (urlFilter && ["all", "active", "issues", "closed"].includes(urlFilter)) {
       setFilter(urlFilter as FilterTab);
     }
   }, []);
 
-  const summaryQuery = useQuery<TradesSummary>({ queryKey: ["/api/trades/summary"] });
+  const statsQuery = useQuery<MyTradesStats>({ queryKey: ["/api/trades/dashboard-stats"] });
   const tradesQuery = useQuery<EnrichedTrade[]>({ queryKey: ["/api/trades"] });
+  const corridorsQuery = useQuery<Corridor[]>({ queryKey: ["/api/trades/corridors"] });
+  const tokenQuery = useTokenBalance();
 
-  const summary = summaryQuery.data ?? { total: 0, needAttention: 0, lcPending: 0, archiveReady: 0 };
+  const stats = statsQuery.data ?? { activeShipments: 0, activeShipmentValue: 0, pendingDocuments: 0, avgCompliance: 0 };
   const allTrades = tradesQuery.data ?? [];
+  const corridors = corridorsQuery.data ?? [];
+  const balance = tokenQuery.data?.balance ?? 0;
 
   const filtered = useMemo(() => {
     let list = allTrades;
-    if (filter === "attention") list = list.filter(t => t.readinessVerdict === "RED" || t.readinessVerdict === "AMBER");
-    if (filter === "progress") list = list.filter(t => t.readinessVerdict !== "RED" && t.readinessVerdict !== "AMBER");
-    if (filter === "archived") {
-      const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
-      list = list.filter(t => new Date(t.createdAt).getTime() < thirtyDaysAgo);
-    }
+    if (filter === "active") list = list.filter(t => {
+      const s = t.tradeStatus || "active";
+      return s !== "closed" && s !== "archived" && t.readinessVerdict !== "RED";
+    });
+    if (filter === "issues") list = list.filter(t => t.readinessVerdict === "RED");
+    if (filter === "closed") list = list.filter(t => t.tradeStatus === "closed" || t.tradeStatus === "archived");
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(t =>
         t.commodityName.toLowerCase().includes(q) ||
-        t.originIso2.toLowerCase().includes(q) ||
-        t.destIso2.toLowerCase().includes(q) ||
         t.originName.toLowerCase().includes(q) ||
-        t.destName.toLowerCase().includes(q)
+        t.destName.toLowerCase().includes(q) ||
+        t.originIso2.toLowerCase().includes(q) ||
+        t.destIso2.toLowerCase().includes(q)
       );
     }
     return list;
   }, [allTrades, filter, search]);
 
-  const filters: { key: FilterTab; label: string }[] = [
-    { key: "all", label: "All shipments" },
-    { key: "attention", label: "Needs action" },
-    { key: "progress", label: "In progress" },
-    { key: "archived", label: "Closed" },
-  ];
+  const eudrTrades = useMemo(() =>
+    allTrades.filter(t => t.eudrApplicable === true && t.tradeStatus !== "closed" && t.tradeStatus !== "archived"),
+  [allTrades]);
 
-  const cards = [
-    { value: summary.total, color: "var(--blue)", label: "Active shipments", gradient: false },
-    { value: summary.needAttention, color: "var(--red)", label: "Action required", gradient: true },
-    { value: summary.lcPending, color: "var(--amber)", label: "LC checks pending", gradient: false },
-    { value: summary.archiveReady, color: "var(--green)", label: "Ready to close", gradient: false },
+  const cbamTrades = useMemo(() =>
+    allTrades.filter(t => t.cbamApplicable === true && t.tradeStatus !== "closed" && t.tradeStatus !== "archived"),
+  [allTrades]);
+
+  const filters: { key: FilterTab; label: string; count?: number }[] = [
+    { key: "all", label: "All", count: allTrades.length },
+    { key: "active", label: "Active", count: allTrades.filter(t => (t.tradeStatus || "active") !== "closed" && (t.tradeStatus || "active") !== "archived").length },
+    { key: "issues", label: "Issues", count: allTrades.filter(t => t.readinessVerdict === "RED").length },
+    { key: "closed", label: "Closed", count: allTrades.filter(t => t.tradeStatus === "closed" || t.tradeStatus === "archived").length },
   ];
 
   return (
     <AppShell>
-      {/* HEADER — stays on dark gradient */}
-      <div style={{ padding: "32px 40px 24px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      {/* ── Header ── */}
+      <div style={{ padding: "28px 32px 0" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
           <div>
-            <h1
-              style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, letterSpacing: "0", color: "var(--t1)", margin: 0, lineHeight: 1.1 }}
-              data-testid="text-trades-title"
-            >
+            <h1 style={{ fontFamily: "var(--fh)", fontWeight: 800, fontSize: 26, color: "#fff", margin: 0 }} data-testid="text-trades-title">
               My Trades
             </h1>
-            <p style={{ fontSize: 13, color: "var(--t2)", marginTop: 6 }} data-testid="text-trades-subtitle">
-              {summary.total} active shipments &middot; {summary.needAttention} needs attention
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginTop: 4 }} data-testid="text-trades-subtitle">
+              {stats.activeShipments} active shipment{stats.activeShipments !== 1 ? "s" : ""}
+              {corridors.length > 0 && <> across {corridors.length} corridor{corridors.length !== 1 ? "s" : ""}</>}
             </p>
           </div>
-          <Link href="/lookup">
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <div style={{ position: "relative" }}>
+              <Search size={14} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.3)" }} />
+              <input
+                type="text"
+                placeholder="Search trades..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                data-testid="input-search-trades"
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 8,
+                  padding: "7px 12px 7px 32px",
+                  fontSize: 12,
+                  width: 200,
+                  color: "#fff",
+                  outline: "none",
+                }}
+              />
+            </div>
             <button
+              onClick={() => navigate("/lookup")}
               style={{
-                background: "var(--blue)",
+                background: "#6b9080",
                 color: "#fff",
                 border: "none",
                 borderRadius: 8,
-                padding: "8px 18px",
-                fontSize: 13,
+                padding: "8px 16px",
+                fontSize: 12,
                 fontWeight: 700,
                 cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
               }}
-              data-testid="button-new-lookup"
+              data-testid="button-new-trade"
             >
-              + Start a new compliance check
+              <Plus size={14} /> New Trade
             </button>
+          </div>
+        </div>
+
+        {/* ── Stat Cards ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 24 }} data-testid="stat-cards">
+          {[
+            { label: "Active Shipments", value: stats.activeShipments, color: "#4ade80" },
+            { label: "Pending Documents", value: stats.pendingDocuments, color: stats.pendingDocuments > 0 ? "#eab308" : "#4ade80" },
+            { label: "Avg Compliance", value: `${stats.avgCompliance}%`, color: getComplianceColor(stats.avgCompliance) },
+            { label: "Shields", value: balance, color: "#5dd9c1" },
+          ].map((card) => (
+            <div key={card.label} style={S.card} data-testid={`stat-${card.label.toLowerCase().replace(/ /g, "-")}`}>
+              <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(255,255,255,0.35)", fontWeight: 600, marginBottom: 8 }}>
+                {card.label}
+              </div>
+              <div style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 800, color: card.color, lineHeight: 1 }}>
+                {card.value}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Main Content: 2-column grid ── */}
+      <div style={{ padding: "0 32px 32px", display: "grid", gridTemplateColumns: "1fr 320px", gap: 16 }}>
+        {/* LEFT: Trades Table */}
+        <div>
+          {/* Filter tabs */}
+          <div style={{ display: "flex", gap: 4, marginBottom: 16 }} data-testid="filter-bar">
+            {filters.map(f => (
+              <button
+                key={f.key}
+                onClick={() => setFilter(f.key)}
+                data-testid={`filter-${f.key}`}
+                style={{
+                  background: filter === f.key ? "rgba(74,222,128,0.1)" : "transparent",
+                  border: `1px solid ${filter === f.key ? "rgba(74,222,128,0.3)" : "rgba(255,255,255,0.08)"}`,
+                  color: filter === f.key ? "#4ade80" : "rgba(255,255,255,0.5)",
+                  borderRadius: 20,
+                  padding: "5px 14px",
+                  fontSize: 11,
+                  fontWeight: 500,
+                  cursor: "pointer",
+                }}
+              >
+                {f.label}{f.count != null && f.count > 0 ? ` (${f.count})` : ""}
+              </button>
+            ))}
+          </div>
+
+          {/* Trade rows */}
+          {tradesQuery.isLoading ? (
+            <div style={{ padding: "60px 0", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: 13 }}>Loading trades...</div>
+          ) : filtered.length === 0 && allTrades.length === 0 ? (
+            <div style={{ ...S.card, padding: "60px 32px", textAlign: "center" }}>
+              <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "#fff", marginBottom: 8 }}>No trades yet</div>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 20px", lineHeight: 1.6 }}>
+                Run your first compliance check to create a trade.
+              </p>
+              <Link href="/lookup">
+                <button style={{ background: "#6b9080", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer" }} data-testid="button-empty-new-lookup">
+                  <Plus size={14} style={{ marginRight: 6, verticalAlign: "middle" }} />
+                  Start a new compliance check
+                </button>
+              </Link>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div style={{ padding: "60px 0", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: 13 }}>No trades match your filter.</div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {filtered.map((trade, idx) => {
+                const status = getStatusBadge(trade);
+                return (
+                  <div
+                    key={trade.id}
+                    data-testid={`trade-row-${trade.id}`}
+                    onClick={() => navigate(`/trades/${trade.id}`)}
+                    style={{
+                      ...S.card,
+                      padding: "14px 18px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 14,
+                      transition: "border-color .15s",
+                      animation: "fadeUp .3s ease both",
+                      animationDelay: `${idx * 30}ms`,
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(74,222,128,0.25)"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(74,222,128,0.08)"; }}
+                  >
+                    {/* Flags + Commodity */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {trade.commodityName}
+                      </div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>
+                        {iso2ToFlag(trade.originIso2)} {trade.originName} → {iso2ToFlag(trade.destIso2)} {trade.destName}
+                      </div>
+                    </div>
+
+                    {/* Trade value */}
+                    <div style={{ textAlign: "right", minWidth: 80 }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: trade.tradeValue ? "#fff" : "rgba(255,255,255,0.25)" }}>
+                        {trade.tradeValue
+                          ? `${trade.tradeValueCurrency || "USD"} ${Number(trade.tradeValue).toLocaleString()}`
+                          : "—"}
+                      </div>
+                    </div>
+
+                    {/* Docs progress */}
+                    <div style={{ textAlign: "center", minWidth: 50 }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: trade.docsReceivedCount >= trade.docsRequiredCount && trade.docsRequiredCount > 0 ? "#4ade80" : "rgba(255,255,255,0.6)" }}>
+                        {trade.docsRequiredCount > 0 ? `${trade.docsReceivedCount}/${trade.docsRequiredCount}` : "—"}
+                      </div>
+                      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginTop: 1 }}>docs</div>
+                    </div>
+
+                    {/* Compliance % */}
+                    <div style={{ textAlign: "center", minWidth: 44 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: getComplianceColor(trade.readinessScore) }}>
+                        {trade.readinessScore != null ? `${trade.readinessScore}%` : "—"}
+                      </div>
+                    </div>
+
+                    {/* Status badge */}
+                    <span style={{
+                      fontSize: 10, fontWeight: 600, padding: "3px 10px", borderRadius: 12,
+                      background: status.bg, color: status.color, whiteSpace: "nowrap",
+                    }}>
+                      {status.label}
+                    </span>
+
+                    <ChevronRight size={14} style={{ color: "rgba(255,255,255,0.2)", flexShrink: 0 }} />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT: Intelligence Panels */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* EUDR Intelligence */}
+          <div style={S.card}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+              <Leaf size={14} style={{ color: "#4ade80" }} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>EUDR Intelligence</span>
+            </div>
+            {eudrTrades.length === 0 ? (
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", margin: 0 }}>No EUDR-applicable trades</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {eudrTrades.slice(0, 5).map(t => {
+                  const badge = getRegulatoryBadge(t.eudrApplicable, t.eudrScore, t.eudrBand);
+                  return (
+                    <div
+                      key={t.id}
+                      onClick={() => navigate(`/trades/${t.id}#eudr`)}
+                      style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", padding: "6px 8px", borderRadius: 8, transition: "background .15s" }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ""; }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.8)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {iso2ToFlag(t.originIso2)} {t.commodityName}
+                        </div>
+                      </div>
+                      <span style={{ fontSize: 9, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: badge.bg, color: badge.color }}>
+                        {badge.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* CBAM Intelligence */}
+          <div style={S.card}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+              <Factory size={14} style={{ color: "#60a5fa" }} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>CBAM Intelligence</span>
+            </div>
+            {cbamTrades.length === 0 ? (
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", margin: 0 }}>No CBAM-applicable trades</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {cbamTrades.slice(0, 5).map(t => {
+                  const badge = getRegulatoryBadge(t.cbamApplicable, t.cbamScore, t.cbamBand);
+                  return (
+                    <div
+                      key={t.id}
+                      onClick={() => navigate(`/trades/${t.id}#cbam`)}
+                      style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", padding: "6px 8px", borderRadius: 8, transition: "background .15s" }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ""; }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.8)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {iso2ToFlag(t.originIso2)} {t.commodityName}
+                        </div>
+                      </div>
+                      <span style={{ fontSize: 9, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: badge.bg, color: badge.color }}>
+                        {badge.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Shield Balance mini card */}
+          <Link href="/pricing">
+            <div style={{ ...S.card, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, padding: "14px 18px" }}>
+              <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(255,255,255,0.35)", fontWeight: 600 }}>
+                Shield Balance
+              </div>
+              <div style={{ fontFamily: "var(--fh)", fontSize: 18, fontWeight: 800, color: "#5dd9c1", marginLeft: "auto" }}>
+                {balance}
+              </div>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Buy more →</span>
+            </div>
           </Link>
         </div>
       </div>
 
-      {/* WHITE ZONE — fades from gradient to white starting after header */}
-      <div style={{
-        background: "#ffffff",
-        borderRadius: "24px 24px 0 0",
-        padding: "28px 40px 0",
-        marginTop: 4,
-        minHeight: "calc(100vh - 160px)",
-      }}>
-        {/* SUMMARY CARDS */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 2, marginBottom: 28 }} data-testid="summary-cards">
-          {cards.map((c, i) => (
-            <div
-              key={c.label}
-              style={{
-                background: c.gradient
-                  ? "linear-gradient(135deg, rgba(218,60,61,.06), transparent 60%), #f7f8f9"
-                  : "#f7f8f9",
-                padding: "20px 22px",
-                borderRadius:
-                  i === 0 ? "14px 0 0 14px" :
-                  i === cards.length - 1 ? "0 14px 14px 0" : "0",
-                border: "1px solid #e8e8e8",
-              }}
-              data-testid={`summary-card-${i}`}
-            >
-              <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 36, letterSpacing: 0, lineHeight: 1, color: c.color }}>
-                {c.value}
-              </div>
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "#333", letterSpacing: ".04em", marginTop: 4 }}>
-                {c.label}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* FILTER BAR */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }} data-testid="filter-bar">
-          {filters.map(f => (
-            <button
-              key={f.key}
-              onClick={() => setFilter(f.key)}
-              data-testid={`filter-${f.key}`}
-              style={{
-                background: filter === f.key ? "rgba(14,78,69,0.12)" : "#fff",
-                border: `1px solid ${filter === f.key ? "#0e4e45" : "#ccc"}`,
-                color: filter === f.key ? "#0e4e45" : "#1a1a1a",
-                borderRadius: 20,
-                padding: "5px 14px",
-                fontSize: 12,
-                fontWeight: 500,
-                cursor: "pointer",
-              }}
-            >
-              {f.label}
-            </button>
-          ))}
-          <input
-            type="text"
-            placeholder="Search commodity, corridor\u2026"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            data-testid="input-search-trades"
-            style={{
-              marginLeft: "auto",
-              background: "#f5f5f5",
-              border: "1px solid #e5e5e5",
-              borderRadius: 6,
-              padding: "6px 12px",
-              fontSize: 12,
-              width: 220,
-              color: "#333",
-              outline: "none",
-            }}
-          />
-        </div>
-
-        {/* TABLE OR EMPTY STATE */}
-        {tradesQuery.isLoading ? (
-          <div style={{ padding: "80px 0", textAlign: "center", color: "#333", fontSize: 14 }}>Loading trades...</div>
-        ) : filtered.length === 0 && allTrades.length === 0 ? (
-          <div style={{ padding: "80px 0", textAlign: "center" }}>
-            <div style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "#1a1a1a" }}>No trades yet.</div>
-            <div style={{ fontSize: 13, color: "#333", marginTop: 8 }}>Run your first compliance lookup to get started.</div>
-            <Link href="/lookup">
-              <button
-                style={{
-                  background: "#0e4e45",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "8px 18px",
-                  fontSize: 13,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  marginTop: 20,
-                }}
-                data-testid="button-empty-new-lookup"
-              >
-                + Start a new compliance check
-              </button>
-            </Link>
+      {/* ── Bottom Row: Shipments list + Corridors Map ── */}
+      <div style={{ padding: "0 32px 40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        {/* All Shipments compact list */}
+        <div style={S.card}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+            <FileText size={14} style={{ color: "rgba(255,255,255,0.5)" }} />
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>All Shipments</span>
+            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginLeft: "auto" }}>{allTrades.length} total</span>
           </div>
-        ) : filtered.length === 0 ? (
-          <div style={{ padding: "80px 0", textAlign: "center", color: "#333", fontSize: 14 }}>No trades match your filter.</div>
-        ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="trades-table">
-            <thead>
-              <tr>
-                {["Commodity \u00B7 Corridor", "Step", "Risk", "Score", "EUDR", "CBAM", "Value", "Updated", ""].map(h => (
-                  <th
-                    key={h}
-                    style={{
-                      fontFamily: "'Inter', sans-serif",
-                      fontSize: 9,
-                      textTransform: "uppercase",
-                      letterSpacing: ".12em",
-                      color: "#555",
-                      fontWeight: 400,
-                      textAlign: h === "Score" || h === "Value" || h === "Updated" ? "right" : h === "EUDR" || h === "CBAM" ? "center" : "left",
-                      padding: "0 12px 10px",
-                      borderBottom: "1px solid #e5e5e5",
-                    }}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((trade, idx) => {
-                const step = getStep(trade);
-                const risk = getRiskTag(trade.readinessVerdict);
-                const avatar = getAvatarColour(trade.originIso2);
-                return (
-                  <tr
-                    key={trade.id}
-                    data-testid={`trade-row-${trade.id}`}
-                    style={{
-                      cursor: "pointer",
-                      animation: `fadeUp .35s ease both`,
-                      animationDelay: `${idx * 40}ms`,
-                    }}
-                    onClick={() => {
-                      navigate(`/trades/${trade.id}`);
-                    }}
-                    onMouseEnter={e => {
-                      Array.from(e.currentTarget.querySelectorAll("td")).forEach(td => {
-                        (td as HTMLElement).style.background = "#f5f5f5";
-                      });
-                      const openEl = e.currentTarget.querySelector("[data-open]") as HTMLElement;
-                      if (openEl) openEl.style.opacity = "1";
-                    }}
-                    onMouseLeave={e => {
-                      Array.from(e.currentTarget.querySelectorAll("td")).forEach(td => {
-                        (td as HTMLElement).style.background = "";
-                      });
-                      const openEl = e.currentTarget.querySelector("[data-open]") as HTMLElement;
-                      if (openEl) openEl.style.opacity = "0";
-                    }}
-                  >
-                    {/* Commodity · Corridor */}
-                    <td style={{ padding: "12px 12px", verticalAlign: "middle" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div
-                          style={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: 8,
-                            background: avatar.bg,
-                            border: `1px solid ${avatar.border}`,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontFamily: "'Inter', sans-serif",
-                            fontSize: 10,
-                            fontWeight: 800,
-                            color: avatar.text,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {trade.originIso2}
-                        </div>
-                        <div>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a" }}>{trade.commodityName}</div>
-                          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "#555" }}>
-                            {iso2ToFlag(trade.originIso2)} {trade.originIso2} → {iso2ToFlag(trade.destIso2)} {trade.destIso2}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    {/* Step */}
-                    <td style={{ padding: "12px 12px", verticalAlign: "middle" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: step.color, flexShrink: 0 }} />
-                        <span style={{ fontSize: 11, fontWeight: 500, color: step.color }}>{step.label}</span>
-                      </div>
-                    </td>
-                    {/* Risk */}
-                    <td style={{ padding: "12px 12px", verticalAlign: "middle" }}>
-                      <span
-                        style={{
-                          fontFamily: "'Inter', sans-serif",
-                          fontSize: 9,
-                          padding: "2px 8px",
-                          borderRadius: 4,
-                          background: risk.bg,
-                          border: `1px solid ${risk.bd}`,
-                          color: risk.color,
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {risk.symbol} {risk.label}
-                      </span>
-                    </td>
-                    {/* Score */}
-                    <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>
-                      <span
-                        style={{
-                          fontFamily: "'Inter', sans-serif",
-                          fontSize: 14,
-                          fontWeight: 700,
-                          color: trade.readinessScore == null
-                            ? "#999"
-                            : trade.readinessScore < 50
-                              ? "var(--red)"
-                              : trade.readinessScore < 80
-                                ? "var(--amber)"
-                                : "var(--green)",
-                        }}
-                      >
-                        {trade.readinessScore == null
-                          ? "\u2014"
-                          : trade.readinessScore < 50
-                            ? `High risk (${trade.readinessScore})`
-                            : trade.readinessScore < 80
-                              ? `Medium risk (${trade.readinessScore})`
-                              : `Low risk (${trade.readinessScore})`}
-                      </span>
-                    </td>
-                    {/* EUDR */}
-                    <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "center" }}>
-                      {(() => {
-                        const b = getRegulatoryBadge(trade.eudrApplicable, trade.eudrScore, trade.eudrBand);
-                        return (
-                          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, padding: "2px 8px", borderRadius: 4, background: b.bg, border: `1px solid ${b.bd}`, color: b.color, whiteSpace: "nowrap" }}>
-                            {b.label}
-                          </span>
-                        );
-                      })()}
-                    </td>
-                    {/* CBAM */}
-                    <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "center" }}>
-                      {(() => {
-                        const b = getRegulatoryBadge(trade.cbamApplicable, trade.cbamScore, trade.cbamBand);
-                        return (
-                          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, padding: "2px 8px", borderRadius: 4, background: b.bg, border: `1px solid ${b.bd}`, color: b.color, whiteSpace: "nowrap" }}>
-                            {b.label}
-                          </span>
-                        );
-                      })()}
-                    </td>
-                    {/* Value */}
-                    <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>
-                      <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, fontWeight: trade.tradeValue ? 600 : 400, color: trade.tradeValue ? "#1a1a1a" : "#999" }}>
-                        {trade.tradeValue
-                          ? `${trade.tradeValueCurrency || "USD"} ${Number(trade.tradeValue).toLocaleString()}`
-                          : "\u2014"}
-                      </span>
-                    </td>
-                    {/* Updated */}
-                    <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>
-                      <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "#555" }}>
-                        {formatDate(trade.createdAt)}
-                      </span>
-                    </td>
-                    {/* Action link */}
-                    <td style={{ padding: "12px 12px", verticalAlign: "middle", textAlign: "right" }}>
-                      <span
-                        data-open
-                        style={{ fontSize: 11, fontWeight: 600, color: "#0e4e45", opacity: 0, transition: "opacity .15s", whiteSpace: "nowrap" }}
-                      >
-                        {!trade.lcVerdict ? "View results →" : trade.lcVerdict === "DISCREPANCIES_FOUND" ? "Review LC →" : "View checklist →"}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-
-        {/* FOOTER */}
-        {/* FOOTER */}
-        <div style={{ marginTop: 48, paddingTop: 24, borderTop: "1px solid #e5e5e5", paddingBottom: 60 }}>
-          <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
-            <p style={{ fontSize: 14, color: "#1a1a1a", margin: 0, fontWeight: 600 }}>
-              {allTrades.length} shipment{allTrades.length !== 1 ? "s" : ""} total &middot; Data refreshed on each visit
-            </p>
-            <p style={{ fontSize: 13, color: "#999", marginTop: 10, lineHeight: 1.6 }}>
-              TapTrao does not provide legal or banking advice. Reports are informational and designed to support internal decision-making.
-            </p>
-            <div style={{ marginTop: 32, display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
-              <Link href="/lookup">
-                <span style={{ fontSize: 13, color: "#0e4e45", fontWeight: 600, cursor: "pointer" }}>+ New compliance check</span>
-              </Link>
-              <Link href="/templates">
-                <span style={{ fontSize: 13, color: "#0e4e45", fontWeight: 600, cursor: "pointer" }}>Saved templates</span>
-              </Link>
-              <Link href="/alerts">
-                <span style={{ fontSize: 13, color: "#0e4e45", fontWeight: 600, cursor: "pointer" }}>Alerts</span>
-              </Link>
+          {allTrades.length === 0 ? (
+            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", margin: 0 }}>No shipments yet</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 4, maxHeight: 240, overflowY: "auto" }}>
+              {allTrades.slice(0, 15).map(t => (
+                <div
+                  key={t.id}
+                  onClick={() => navigate(`/trades/${t.id}`)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 10, cursor: "pointer",
+                    padding: "6px 8px", borderRadius: 6, transition: "background .15s",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ""; }}
+                >
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {iso2ToFlag(t.originIso2)} {t.commodityName} → {iso2ToFlag(t.destIso2)} {t.destIso2}
+                  </span>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700,
+                    color: getComplianceColor(t.readinessScore),
+                    minWidth: 30, textAlign: "right",
+                  }}>
+                    {t.readinessScore != null ? `${t.readinessScore}%` : "—"}
+                  </span>
+                  <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}>{formatDate(t.createdAt)}</span>
+                </div>
+              ))}
             </div>
-            <p style={{ fontSize: 11, color: "#555", marginTop: 48 }}>
-              Fatrao Limited — Registered in England and Wales
-            </p>
-          </div>
+          )}
         </div>
+
+        {/* Trade Corridors Map */}
+        <div style={{ ...S.card, padding: 0, overflow: "hidden", minHeight: 280 }}>
+          {corridors.length === 0 ? (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", padding: 32 }}>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", textAlign: "center" }}>
+                Trade corridors will appear here once you have trades
+              </p>
+            </div>
+          ) : (
+            <TradeCorridorsMap corridors={corridors} />
+          )}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div style={{ padding: "0 32px 40px", textAlign: "center" }}>
+        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", margin: 0 }}>
+          TapTrao does not provide legal or banking advice. Reports are informational.
+        </p>
+        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.15)", marginTop: 8 }}>
+          Fatrao Limited — Registered in England and Wales
+        </p>
       </div>
 
       <style>{`
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(8px); }
+          from { opacity: 0; transform: translateY(6px); }
           to { opacity: 1; transform: translateY(0); }
         }
       `}</style>

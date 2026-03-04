@@ -92,7 +92,7 @@ const S = {
 };
 
 export default function Pricing() {
-  usePageTitle("Credits & Billing");
+  usePageTitle("Shield & Billing");
   useEffect(() => { trackEvent("pricing_page_viewed"); }, []);
   const tokenQuery = useTokenBalance();
   const { toast } = useToast();
@@ -137,10 +137,10 @@ export default function Pricing() {
       {/* Hero */}
       <div className="green-hero-box" style={{ margin: "4px 24px 16px" }}>
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }} data-testid="text-pricing-title">
-          Credits & Billing
+          Shield & Billing
         </h1>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
-          Manage your credits, view transactions, and buy more when you need them.
+          Manage your Shields, view transactions, and buy more when you need them.
         </p>
       </div>
 
@@ -157,7 +157,7 @@ export default function Pricing() {
                 {balance}
               </div>
               <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
-                Shield {balance === 1 ? "check" : "checks"}
+                {balance === 1 ? "Shield" : "Shields"}
               </div>
             </div>
             {tokenQuery.data && !tokenQuery.data.freeLookupUsed && (

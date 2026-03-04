@@ -15,16 +15,15 @@ interface NavItem {
   badge?: { type: "red" | "green"; value: number };
 }
 
-/* ── Section: Main ── */
+/* ── Section: Main (trade-centric) ── */
 const mainItems: NavItem[] = [
-  { icon: "⊞", label: "Dashboard", href: "/dashboard" },
-  { icon: "✦", label: "New Check", href: "/new-check" },
   { icon: "◉", label: "My Trades", href: "/trades", matchPaths: ["/trades"] },
-  { icon: "📬", label: "Suppliers", href: "/inbox" },
+  { icon: "✦", label: "New Check", href: "/lookup" },
 ];
 
 /* ── Section: Tools ── */
 const toolsItems: NavItem[] = [
+  { icon: "📬", label: "Suppliers", href: "/inbox" },
   { icon: "⧖", label: "Demurrage Calc", href: "/demurrage" },
   { icon: "📋", label: "Templates", href: "/templates" },
   { icon: "🔔", label: "Alerts", href: "/alerts" },
@@ -33,7 +32,7 @@ const toolsItems: NavItem[] = [
 /* ── Section: Account ── */
 const accountItems: NavItem[] = [
   { icon: "◬", label: "Settings", href: "/settings/profile" },
-  { icon: "◫", label: "Billing", href: "/pricing" },
+  { icon: "◫", label: "Shield & Billing", href: "/pricing" },
 ];
 
 /* ── Section: Admin (only visible when isAdmin) ── */
@@ -226,19 +225,16 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
 /* ── Default nav links (shown when topCenter is not provided) ── */
 function DefaultNavLinks({ activePage }: { activePage: string }) {
   const links = [
-    { label: "Dashboard", href: "/dashboard", match: ["/dashboard", "/trades"] },
-    { label: "My Trades", href: "/trades", match: ["/trades", "/demurrage"] },
+    { label: "My Trades", href: "/trades", match: ["/trades", "/dashboard"] },
+    { label: "New Check", href: "/lookup", match: ["/lookup"] },
     { label: "Suppliers", href: "/inbox", match: ["/inbox"] },
-    { label: "Compliance", href: "/alerts", match: ["/alerts", "/lc-check", "/templates", "/eudr"] },
-    { label: "Messages", href: "/inbox", match: [] },
+    { label: "Alerts", href: "/alerts", match: ["/alerts"] },
   ];
   return (
     <>
       {links.map((link) => (
-        <Link key={link.label} href={link.href}>
-          <a className={link.match.some((m) => activePage.startsWith(m)) ? "active" : ""}>
-            {link.label}
-          </a>
+        <Link key={link.label} href={link.href} className={link.match.some((m) => activePage.startsWith(m)) ? "active" : ""}>
+          {link.label}
         </Link>
       ))}
     </>
@@ -337,7 +333,7 @@ export function AppShell({ children, topCenter, sidebarBottom, contentClassName 
           }}>
             <Hexagon size={14} style={{ color: "#5dd9c1" }} />
             <span style={{ fontSize: 12, fontWeight: 600, color: "#5dd9c1" }}>
-              {balance} {balance === 1 ? "check" : "checks"}
+              {balance} {balance === 1 ? "Shield" : "Shields"}
             </span>
             <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginLeft: "auto" }}>
               Buy More

@@ -700,11 +700,44 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/trades/dashboard-stats", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const stats = await storage.getMyTradesStats(sessionId);
+      res.json(stats);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/trades/corridors", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const corridors = await storage.getTradeCorridors(sessionId);
+      res.json(corridors);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   app.get("/api/trades/summary", async (req, res) => {
     try {
       const sessionId = getSessionId(req, res);
       const summary = await storage.getTradesSummary(sessionId);
       res.json(summary);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/trades/pending-count", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const trades = await storage.getEnrichedTrades(sessionId);
+      const pendingCount = trades.filter(
+        (t) => t.status === "pending" || t.status === "in_progress"
+      ).length;
+      res.json({ count: pendingCount });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
