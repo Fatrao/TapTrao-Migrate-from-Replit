@@ -309,156 +309,305 @@
   background: linear-gradient(135deg, #1b2a22, #2d4a38);
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   Section A: Shared App Shell CSS (sidebar, nav, hero)
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════════
+   Section A: App Shell — Icon-Rail Sidebar + Main Area
+   ═══════════════════════════════════════════════════════ */
 
-.sidebar {
-  width: 240px;
-  min-height: calc(100vh - 20px);
+/* ── Rail container — centers the sidebar pill vertically ── */
+.rail {
+  width: 68px;
+  min-width: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 100;
+  overflow: visible;
+}
+
+/* ── Sidebar pill — collapsed 48px, expands to 200px on hover ── */
+.sidebar-v2 {
   background: #1a1a1a;
+  border-radius: 26px;
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 48px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+  transition: width 0.25s ease, border-radius 0.25s ease;
+  overflow: hidden;
+  position: relative;
+}
+.sidebar-v2:hover {
+  width: 200px;
+  border-radius: 18px;
+  align-items: stretch;
+  position: absolute;
+  left: 10px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+
+/* ── Menu item ── */
+.mi {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  padding: 0;
+  cursor: pointer;
+  color: rgba(255,255,255,0.3);
+  transition: all 0.25s ease;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin: 0 auto;
+  text-decoration: none;
+}
+.sidebar-v2:hover .mi {
+  width: 170px;
+  height: 38px;
+  padding: 0 14px;
+  justify-content: flex-start;
+  gap: 12px;
+  margin: 0 auto;
+  overflow: visible;
+}
+.mi:hover {
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.06);
+}
+.mi.active {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+
+/* ── Icon container ── */
+.mi-icon {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.sidebar-v2:hover .mi-icon {
+  width: 20px;
+  min-width: 20px;
+  height: auto;
+}
+
+/* ── Label — hidden when collapsed ── */
+.mi-label {
+  font-family: var(--fb);
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  transition: opacity 0.2s ease, max-width 0.25s ease;
+}
+.sidebar-v2:hover .mi-label {
+  opacity: 1;
+  max-width: 120px;
+}
+.mi.active .mi-label {
+  color: #fff;
+  font-weight: 600;
+}
+.mi:hover .mi-label {
+  color: rgba(255,255,255,0.7);
+}
+
+/* ── Brand item ── */
+.mi.brand {
+  background: linear-gradient(135deg, var(--sage-l), var(--sage));
+  color: #fff;
+  margin-bottom: 8px;
+  box-shadow: 0 3px 10px rgba(74,124,94,0.3);
+}
+.mi.brand .mi-label {
+  color: #fff;
+}
+
+/* ── Tooltip — only when collapsed ── */
+.mi-tip {
+  display: none;
+  position: absolute;
+  left: 58px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 500;
+  font-family: var(--fb);
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  pointer-events: none;
+  z-index: 60;
+}
+.mi:hover .mi-tip { display: block; }
+.sidebar-v2:hover .mi-tip { display: none !important; }
+
+/* ── Notification dot ── */
+.mi-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+.sidebar-v2:hover .mi-dot {
+  position: static;
+  margin-left: auto;
+}
+
+/* ── Divider ── */
+.sb-div {
+  width: 20px;
+  height: 1px;
+  background: rgba(255,255,255,0.07);
+  margin: 4px auto;
+  transition: width 0.25s;
+  flex-shrink: 0;
+}
+.sidebar-v2:hover .sb-div {
+  width: 100%;
+}
+
+/* ── Avatar ── */
+.mi-av {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sage), #3a6048);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.sidebar-v2:hover .mi-av {
+  width: 100%;
+  height: 38px;
+  border-radius: 10px;
+  justify-content: flex-start;
+  padding: 0 14px;
+  gap: 10px;
+}
+.mi-av .av-label {
+  font-family: var(--fb);
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.2s ease, max-width 0.25s ease;
+}
+.sidebar-v2:hover .mi-av .av-label {
+  opacity: 1;
+  max-width: 100px;
+}
+
+/* ── Main content area ── */
+.mn-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+.main-content {
+  flex: 1;
+  overflow: auto;
+  padding: 0;
+  background: #eee9e0;
+}
+
+/* ── Mobile header ── */
+.mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #eee9e0;
+  flex-shrink: 0;
+}
+.hamburger-btn-v2 {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--t1);
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* ── Mobile sidebar overlay ── */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 998;
+}
+.sidebar-mobile-v2 {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: 260px;
+  max-width: 80vw;
+  background: #1a1a1a;
+  border-radius: 0 18px 18px 0;
+  z-index: 999;
   padding: 20px 14px;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
-  border-radius: 18px;
-  border: none;
+  overflow-y: auto;
+  box-shadow: 4px 0 24px rgba(0,0,0,0.4);
 }
-.sidebar-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 30px;
-  padding: 0 8px;
-}
-.sidebar-logo img {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  object-fit: cover;
-}
-.sidebar-logo span {
-  font-family: 'Clash Display', sans-serif;
-  font-weight: 600;
-  font-size: 17px;
-  color: #fff;
-}
-.sidebar-section { margin-bottom: 20px; }
-.sidebar-section-label {
-  font-size: 10px; font-weight: 600;
-  letter-spacing: 1.2px; text-transform: uppercase;
-  color: var(--app-regent-light);
-  margin-bottom: 6px; padding-left: 10px;
-}
-.sidebar-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 10px; border-radius: 8px;
-  font-size: 13.5px; color: var(--app-regent);
-  cursor: pointer; transition: all 0.15s; text-decoration: none;
-}
-.sidebar-item:hover { background: rgba(255,255,255,0.05); color: var(--app-gray-nurse); }
-.sidebar-item.active {
-  background: var(--app-acapulco-dim); color: var(--app-acapulco);
-  border-left: 3px solid var(--app-acapulco); padding-left: 7px;
-}
-.sidebar-item .icon { font-size: 15px; width: 20px; text-align: center; }
-.sidebar-item .badge { margin-left: auto; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 10px; }
-.badge-red { background: #ef4444; color: #fff; }
-.badge-green { background: var(--app-acapulco); color: #fff; }
-.sidebar-history { margin-top: 4px; }
-.history-card {
-  background: rgba(255,255,255,0.04); border-radius: 8px;
-  padding: 10px 12px; margin-bottom: 6px; cursor: pointer; transition: background 0.15s;
-}
-.history-card:hover { background: rgba(255,255,255,0.07); }
-.history-card .title { font-size: 12.5px; font-weight: 500; color: var(--app-gray-nurse); margin-bottom: 5px; }
-.history-card .tags { display: flex; gap: 5px; }
-.history-card .tag { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(255,255,255,0.07); color: var(--app-regent); }
-.main-wrapper { flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: calc(100vh - 20px); }
+
+/* ── Legacy classes kept for backward compat ── */
 .main-box { border-radius: 18px; flex: 1; overflow: hidden; display: flex; flex-direction: column; background: #eee9e0; }
-.top-nav { padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-.top-nav-links { display: flex; gap: 26px; }
-.top-nav-links a { font-size: 13.5px; color: var(--app-regent); text-decoration: none; transition: color 0.15s; font-weight: 400; }
-.top-nav-links a:hover { color: var(--app-gray-nurse); }
-.top-nav-links a.active { color: var(--app-gray-nurse); font-weight: 600; }
-.top-nav-icons { display: flex; align-items: center; gap: 12px; }
-.icon-btn {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: rgba(129,148,156,0.15); display: flex;
-  align-items: center; justify-content: center;
-  color: var(--app-regent); font-size: 13px; cursor: pointer; position: relative;
-}
-.icon-btn .dot { position: absolute; top: 1px; right: 1px; width: 7px; height: 7px; border-radius: 50%; background: #ef4444; }
-.user-avatar {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: #0e4e45; display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 12px; font-weight: 600; cursor: pointer;
-}
 .green-hero-box {
   margin: 0 24px; padding: 24px 28px 20px;
   background: linear-gradient(135deg, var(--app-hero-start) 0%, var(--app-hero-mid) 40%, var(--app-hero-end) 100%);
   border-radius: 14px; position: relative;
 }
 .green-hero-box h1 {
-  font-family: 'Clash Display', sans-serif; font-size: 34px; font-weight: 600;
+  font-family: var(--fd); font-size: 34px; font-weight: 600;
   color: #fff; line-height: 1.12; margin-bottom: 8px; letter-spacing: -0.02em;
 }
 .green-hero-box .subtitle { font-size: 14px; color: var(--app-regent); line-height: 1.5; }
 .hero-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-.breadcrumb { display: inline-block; font-size: 12px; color: var(--app-regent); background: rgba(129,148,156,0.12); padding: 5px 14px; border-radius: 20px; }
-.price-pill { display: inline-block; font-size: 13px; font-weight: 600; background: var(--app-acapulco-dim); color: var(--app-acapulco); padding: 6px 16px; border-radius: 20px; border: 1px solid var(--app-acapulco-border); }
+.breadcrumb { display: inline-block; font-size: 12px; color: var(--t2); background: rgba(0,0,0,0.04); padding: 5px 14px; border-radius: 20px; }
+.price-pill { display: inline-block; font-size: 13px; font-weight: 600; background: var(--sage-xs); color: var(--sage); padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(74,124,94,0.2); }
+
+/* ── Responsive: mobile ── */
 @media (max-width: 768px) {
   #root {
     display: block;
-    padding: 6px;
+    padding: 0;
   }
-  .sidebar { display: none; }
-  .main-wrapper {
-    min-height: calc(100vh - 12px);
-  }
+  .rail { display: none; }
+  .mn-area { min-height: 100vh; }
 }
-
-/* AppShell utility classes */
-.sidebar-spacer { flex: 1; }
-.sidebar-close-btn {
-  background: none; border: none;
-  color: rgba(255,255,255,0.6); padding: 4px;
-  cursor: pointer; display: flex;
-  align-items: center; justify-content: center;
-}
-.sidebar-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.6); z-index: 998;
-}
-.sidebar-mobile {
-  position: fixed; top: 0; left: 0; bottom: 0;
-  width: 260px; max-width: 80vw;
-  background: linear-gradient(180deg, var(--app-sidebar) 0%, var(--app-sidebar-mid) 50%, var(--app-sidebar-deep) 100%);
-  border: 1px solid rgba(93,217,193,0.08);
-  border-radius: 0 18px 18px 0;
-  z-index: 999; padding: 20px 14px;
-  display: flex; flex-direction: column;
-  overflow-y: auto;
-  box-shadow: 4px 0 24px rgba(0,0,0,0.4);
-}
-.sidebar-logo .logo-link {
-  display: flex; align-items: center; gap: 10px; cursor: pointer;
-}
-.sidebar-logo .logo-img {
-  width: 32px; height: 32px; border-radius: 8px; object-fit: cover;
-}
-.hamburger-btn {
-  background: none; border: none;
-  color: rgba(255,255,255,0.7); padding: 6px;
-  cursor: pointer; display: flex;
-  align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.main-content {
-  flex: 1; overflow: auto; padding: 0;
-  background: #eee9e0;
-}
-.sidebar-item .label { flex: 1; }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    Section B: Dashboard-Specific CSS

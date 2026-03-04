@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Menu, X, LogOut, User, Hexagon } from "lucide-react";
+import { X, LogOut, User, Hexagon } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, type ReactNode } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -12,30 +12,27 @@ interface NavItem {
   label: string;
   href: string;
   matchPaths?: string[];
-  badge?: { type: "red" | "green"; value: number };
+  hasDot?: boolean;
 }
 
-/* ── Section: Main (trade-centric) ── */
+/* ── Nav items ── */
 const mainItems: NavItem[] = [
   { icon: "◉", label: "My Trades", href: "/trades", matchPaths: ["/trades"] },
   { icon: "✦", label: "New Check", href: "/lookup" },
+  { icon: "📮", label: "Suppliers", href: "/inbox" },
 ];
 
-/* ── Section: Tools ── */
 const toolsItems: NavItem[] = [
-  { icon: "📬", label: "Suppliers", href: "/inbox" },
-  { icon: "⧖", label: "Demurrage Calc", href: "/demurrage" },
+  { icon: "⌧", label: "Demurrage", href: "/demurrage" },
   { icon: "📋", label: "Templates", href: "/templates" },
   { icon: "🔔", label: "Alerts", href: "/alerts" },
 ];
 
-/* ── Section: Account ── */
 const accountItems: NavItem[] = [
-  { icon: "◬", label: "Settings", href: "/settings/profile" },
+  { icon: "⚙", label: "Settings", href: "/settings/profile" },
   { icon: "◫", label: "Shield & Billing", href: "/pricing" },
 ];
 
-/* ── Section: Admin (only visible when isAdmin) ── */
 const adminItems: NavItem[] = [
   { icon: "🎟️", label: "Promo Codes", href: "/admin/promo-codes" },
   { icon: "🔑", label: "API Keys", href: "/admin/api-keys" },
@@ -56,54 +53,6 @@ interface AppShellProps {
   topCenter?: ReactNode;
   sidebarBottom?: ReactNode;
   contentClassName?: string;
-}
-
-/* ── Sidebar nav item — uses CSS classes from index.css ── */
-function SidebarNavItem({ item, isActive, onClick }: { item: NavItem; isActive: boolean; onClick?: () => void }) {
-  return (
-    <Link href={item.href}>
-      <div
-        onClick={onClick}
-        className={`sidebar-item${isActive ? " active" : ""}`}
-        data-testid={`shell-nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
-      >
-        <span className="icon">{item.icon}</span>
-        <span className="label">{item.label}</span>
-        {item.badge && item.badge.value > 0 && (
-          <span className={`badge badge-${item.badge.type}`}>
-            {item.badge.value}
-          </span>
-        )}
-      </div>
-    </Link>
-  );
-}
-
-/* ── Section label ── */
-function SidebarLabel({ children }: { children: ReactNode }) {
-  return (
-    <div className="sidebar-section-label">
-      {children}
-    </div>
-  );
-}
-
-/* ── History card ── */
-function HistoryCard({ title, tags, href }: { title: string; tags: string[]; href?: string }) {
-  const content = (
-    <div className="history-card" style={href ? { cursor: "pointer" } : undefined}>
-      <div className="title">{title}</div>
-      <div className="tags">
-        {tags.map((tag, i) => (
-          <span key={i} className="tag">{tag}</span>
-        ))}
-      </div>
-    </div>
-  );
-  if (href) {
-    return <Link href={href}>{content}</Link>;
-  }
-  return content;
 }
 
 /* ── Feature Request Modal ── */
@@ -134,32 +83,32 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
 
   return (
     <>
-      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 100 }} onClick={onClose} />
+      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100 }} onClick={onClose} />
       <div style={{
         position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
-        background: "#1a2332", borderRadius: 14, padding: 28, width: "min(440px, 90vw)",
-        border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 16px 48px rgba(0,0,0,0.5)",
+        background: "#fff", borderRadius: 16, padding: 28, width: "min(440px, 90vw)",
+        border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 16px 48px rgba(0,0,0,0.15)",
         zIndex: 101,
       }}>
         {submitted ? (
           <div style={{ textAlign: "center", padding: "20px 0" }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>✅</div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: "#fff" }}>Thank you!</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>Thank you!</div>
+            <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 6 }}>
               Your request has been submitted. We review every suggestion.
             </div>
           </div>
         ) : (
           <>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 600, color: "#fff", margin: 0 }}>🗳️ Request a Feature</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--t1)", margin: 0, fontFamily: "var(--fd)" }}>🗳️ Request a Feature</h3>
               <button onClick={onClose} style={{
-                background: "transparent", border: "none", color: "rgba(255,255,255,0.4)",
+                background: "transparent", border: "none", color: "var(--t3)",
                 cursor: "pointer", fontSize: 18, padding: 4,
               }}>✕</button>
             </div>
             <div style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
                 What would you like to see?
               </label>
               <input
@@ -168,15 +117,10 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Multi-currency support, Bulk LC checks..."
                 maxLength={120}
-                style={{
-                  width: "100%", padding: "10px 12px", borderRadius: 8,
-                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
-                  color: "#fff", fontSize: 14, outline: "none",
-                }}
               />
             </div>
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
                 Details (optional)
               </label>
               <textarea
@@ -185,25 +129,20 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
                 placeholder="Tell us more about your use case..."
                 maxLength={1000}
                 rows={3}
-                style={{
-                  width: "100%", padding: "10px 12px", borderRadius: 8, resize: "vertical",
-                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
-                  color: "#fff", fontSize: 14, outline: "none", fontFamily: "inherit",
-                }}
               />
             </div>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
               <button onClick={onClose} style={{
                 padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 500,
-                background: "transparent", border: "1px solid rgba(255,255,255,0.15)",
-                color: "rgba(255,255,255,0.6)", cursor: "pointer",
+                background: "transparent", border: "1px solid rgba(0,0,0,0.12)",
+                color: "var(--t2)", cursor: "pointer",
               }}>Cancel</button>
               <button
                 onClick={() => mutation.mutate()}
                 disabled={title.trim().length < 3 || mutation.isPending}
                 style={{
                   padding: "8px 20px", borderRadius: 8, fontSize: 13, fontWeight: 600,
-                  background: title.trim().length < 3 ? "rgba(14,78,69,0.4)" : "#0e4e45",
+                  background: title.trim().length < 3 ? "rgba(74,124,94,0.4)" : "var(--sage)",
                   border: "none", color: "#fff", cursor: title.trim().length < 3 ? "not-allowed" : "pointer",
                   opacity: mutation.isPending ? 0.7 : 1,
                 }}>
@@ -211,7 +150,7 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
               </button>
             </div>
             {mutation.isError && (
-              <div style={{ marginTop: 12, fontSize: 12, color: "#ef4444" }}>
+              <div style={{ marginTop: 12, fontSize: 12, color: "var(--red)" }}>
                 {(mutation.error as any)?.message || "Failed to submit. Please try again."}
               </div>
             )}
@@ -222,362 +161,350 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
   );
 }
 
-/* ── Default nav links (shown when topCenter is not provided) ── */
-function DefaultNavLinks({ activePage }: { activePage: string }) {
-  const links = [
-    { label: "My Trades", href: "/trades", match: ["/trades", "/dashboard"] },
-    { label: "New Check", href: "/lookup", match: ["/lookup"] },
-    { label: "Suppliers", href: "/inbox", match: ["/inbox"] },
-    { label: "Alerts", href: "/alerts", match: ["/alerts"] },
-  ];
-  return (
-    <>
-      {links.map((link) => (
-        <Link key={link.label} href={link.href} className={link.match.some((m) => activePage.startsWith(m)) ? "active" : ""}>
-          {link.label}
-        </Link>
-      ))}
-    </>
-  );
-}
-
-export function AppShell({ children, topCenter, sidebarBottom, contentClassName }: AppShellProps) {
+export function AppShell({ children, contentClassName }: AppShellProps) {
   const [location, navigate] = useLocation();
   const isMobile = useIsMobile();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [featureModalOpen, setFeatureModalOpen] = useState(false);
   const tokenQuery = useTokenBalance();
   const tokenData = tokenQuery.data;
-  const balance = tokenData?.balance ?? 0;
   const { user, isAuthenticated, logout } = useAuth();
-  const inboxBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/supplier-inbox/badge-count"] });
-  const inboxBadge = inboxBadgeQuery.data?.count ?? 0;
   const alertsBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/alerts/unread-count"] });
   const alertsBadge = alertsBadgeQuery.data?.count ?? 0;
-  const tradesBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/trades/pending-count"] });
-  const tradesBadge = tradesBadgeQuery.data?.count ?? 0;
-
-  const recentLookupsQuery = useQuery<any[]>({ queryKey: ["/api/lookups/recent"] });
-  const recentLookups = recentLookupsQuery.data?.slice(0, 3) ?? [];
-  const lcCasesQuery = useQuery<any[]>({ queryKey: ["/api/lc-cases"] });
-  const activeLcCases = (lcCasesQuery.data ?? []).filter((c: any) => c.status === "discrepancy" || c.status === "pending_correction").length;
 
   useEffect(() => {
-    setSidebarOpen(false);
+    setMobileOpen(false);
   }, [location]);
 
   useEffect(() => {
-    if (isMobile && sidebarOpen) {
+    if (isMobile && mobileOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
     return () => { document.body.style.overflow = ""; };
-  }, [isMobile, sidebarOpen]);
+  }, [isMobile, mobileOpen]);
 
-  /* Build nav items with live badge counts */
-  const mItems: NavItem[] = mainItems.map((item) => {
-    if (item.label === "My Trades" && tradesBadge > 0)
-      return { ...item, badge: { type: "green" as const, value: tradesBadge } };
-    if (item.label === "Suppliers" && inboxBadge > 0)
-      return { ...item, badge: { type: "red" as const, value: inboxBadge } };
-    return item;
-  });
-  const tItems: NavItem[] = toolsItems.map((item) => {
-    if (item.label === "Alerts" && alertsBadge > 0)
-      return { ...item, badge: { type: "red" as const, value: alertsBadge } };
-    return item;
-  });
-
-  const closeSidebar = () => setSidebarOpen(false);
-
-  const userInitial = user?.displayName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "?";
+  const userInitial = user?.displayName
+    ? user.displayName.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()
+    : user?.email?.[0]?.toUpperCase() || "?";
+  const userName = user?.displayName?.split(" ")[0] || user?.email?.split("@")[0] || "";
 
   const handleLogout = async () => {
-    setUserDropdownOpen(false);
     await logout();
     navigate("/");
   };
 
-  /* ── Sidebar content ── */
-  const sidebarContent = (
-    <>
-      {/* Logo */}
-      <div className="sidebar-logo">
+  /* Build nav items with live alert dot */
+  const tItems: NavItem[] = toolsItems.map((item) => {
+    if (item.label === "Alerts" && alertsBadge > 0)
+      return { ...item, hasDot: true };
+    return item;
+  });
+
+  /* ── Sidebar menu item ── */
+  const MenuItem = ({ item, active, onClick }: { item: NavItem; active: boolean; onClick?: () => void }) => (
+    <Link href={item.href}>
+      <div
+        className={`mi${active ? " active" : ""}`}
+        onClick={onClick}
+        style={{ position: "relative" }}
+        data-testid={`shell-nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+      >
+        <div className="mi-icon">{item.icon}</div>
+        <span className="mi-label">{item.label}</span>
+        {item.hasDot && <div className="mi-dot" />}
+        <div className="mi-tip">{item.label}</div>
+      </div>
+    </Link>
+  );
+
+  /* ── Desktop sidebar (icon rail) ── */
+  const desktopSidebar = (
+    <nav className="rail">
+      <div className="sidebar-v2">
+        {/* Brand */}
         <Link href="/">
-          <div className="logo-link" data-testid="shell-logo">
-            <img className="logo-img" src="/logo.png" alt="TapTrao" />
-            <span>TapTrao</span>
+          <div className="mi brand" data-testid="shell-logo">
+            <div className="mi-icon" style={{ fontFamily: "var(--fd)", fontWeight: 700, fontSize: 16 }}>T</div>
+            <span className="mi-label" style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 14, color: "#fff" }}>TapTrao</span>
           </div>
         </Link>
-        {isMobile && (
-          <button onClick={closeSidebar} className="sidebar-close-btn" aria-label="Close menu">
-            <X size={20} />
-          </button>
+
+        {/* Main */}
+        {mainItems.map((item) => (
+          <MenuItem key={item.href} item={item} active={isNavActive(item, location)} />
+        ))}
+
+        <div className="sb-div" />
+
+        {/* Tools */}
+        {tItems.map((item) => (
+          <MenuItem key={item.href} item={item} active={isNavActive(item, location)} />
+        ))}
+
+        <div className="sb-div" />
+
+        {/* Account */}
+        {accountItems.map((item) => (
+          <MenuItem key={item.href} item={item} active={isNavActive(item, location)} />
+        ))}
+
+        {/* Feature Request (paying customers) */}
+        {tokenData?.hasPurchased && (
+          <div
+            className="mi"
+            onClick={() => setFeatureModalOpen(true)}
+            style={{ position: "relative" }}
+            data-testid="sidebar-feature-request-btn"
+          >
+            <div className="mi-icon">🗳️</div>
+            <span className="mi-label">Request Feature</span>
+            <div className="mi-tip">Request Feature</div>
+          </div>
+        )}
+
+        {/* Admin section */}
+        {tokenData?.isAdmin && (
+          <>
+            <div className="sb-div" />
+            {adminItems.map((item) => (
+              <MenuItem key={item.href} item={item} active={isNavActive(item, location)} />
+            ))}
+          </>
+        )}
+
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
+        {/* Avatar */}
+        {isAuthenticated ? (
+          <div className="mi-av" onClick={handleLogout} title="Log out">
+            <span>{userInitial}</span>
+            <span className="av-label">{userName}</span>
+          </div>
+        ) : (
+          <Link href="/login">
+            <div className="mi-av">
+              <span>?</span>
+              <span className="av-label">Log in</span>
+            </div>
+          </Link>
         )}
       </div>
+    </nav>
+  );
 
-      {/* Token balance pill */}
-      <div style={{ padding: "0 16px 8px" }}>
+  /* ── Mobile sidebar (full overlay, expanded view) ── */
+  const mobileSidebar = (
+    <>
+      <div className="sidebar-overlay" onClick={() => setMobileOpen(false)} />
+      <div className="sidebar-mobile-v2">
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, padding: "0 4px" }}>
+          <Link href="/">
+            <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 10,
+                background: "linear-gradient(135deg, var(--sage-l), var(--sage))",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: "#fff", fontFamily: "var(--fd)", fontWeight: 700, fontSize: 16,
+              }}>T</div>
+              <span style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 16, color: "#fff" }}>TapTrao</span>
+            </div>
+          </Link>
+          <button onClick={() => setMobileOpen(false)} style={{
+            background: "none", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer", padding: 4,
+          }}>
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Token balance */}
         <Link href="/pricing">
           <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "8px 12px",
-            borderRadius: 10,
-            background: "rgba(93,217,193,0.08)",
-            border: "1px solid rgba(93,217,193,0.15)",
+            display: "flex", alignItems: "center", gap: 8,
+            padding: "8px 12px", borderRadius: 10, marginBottom: 16,
+            background: "rgba(74,124,94,0.08)", border: "1px solid rgba(74,124,94,0.15)",
             cursor: "pointer",
           }}>
-            <Hexagon size={14} style={{ color: "#5dd9c1" }} />
-            <span style={{ fontSize: 12, fontWeight: 600, color: "#5dd9c1" }}>
-              {balance} {balance === 1 ? "Shield" : "Shields"}
+            <Hexagon size={14} style={{ color: "var(--sage-l)" }} />
+            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--sage-l)" }}>
+              {tokenData?.balance ?? 0} {(tokenData?.balance ?? 0) === 1 ? "Shield" : "Shields"}
             </span>
             <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginLeft: "auto" }}>
               Buy More
             </span>
           </div>
         </Link>
-      </div>
 
-      {/* Main section */}
-      <div className="sidebar-section">
-        <SidebarLabel>Main</SidebarLabel>
-        {mItems.map((item) => (
-          <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+        {/* Nav items */}
+        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>Main</div>
+        {mainItems.map((item) => (
+          <Link key={item.href} href={item.href}>
+            <div
+              onClick={() => setMobileOpen(false)}
+              style={{
+                display: "flex", alignItems: "center", gap: 12, padding: "10px 12px",
+                borderRadius: 8, cursor: "pointer", fontSize: 13.5,
+                color: isNavActive(item, location) ? "#fff" : "rgba(255,255,255,0.5)",
+                background: isNavActive(item, location) ? "rgba(255,255,255,0.1)" : "transparent",
+              }}
+            >
+              <span style={{ fontSize: 15 }}>{item.icon}</span>
+              <span>{item.label}</span>
+            </div>
+          </Link>
         ))}
-      </div>
 
-      {/* Tools section */}
-      <div className="sidebar-section">
-        <SidebarLabel>Tools</SidebarLabel>
+        <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "8px 0" }} />
+
+        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>Tools</div>
         {tItems.map((item) => (
-          <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+          <Link key={item.href} href={item.href}>
+            <div
+              onClick={() => setMobileOpen(false)}
+              style={{
+                display: "flex", alignItems: "center", gap: 12, padding: "10px 12px",
+                borderRadius: 8, cursor: "pointer", fontSize: 13.5,
+                color: isNavActive(item, location) ? "#fff" : "rgba(255,255,255,0.5)",
+                background: isNavActive(item, location) ? "rgba(255,255,255,0.1)" : "transparent",
+                position: "relative",
+              }}
+            >
+              <span style={{ fontSize: 15 }}>{item.icon}</span>
+              <span>{item.label}</span>
+              {item.hasDot && (
+                <span style={{
+                  width: 6, height: 6, borderRadius: "50%", background: "var(--red)", marginLeft: "auto",
+                }} />
+              )}
+            </div>
+          </Link>
         ))}
-      </div>
 
-      {/* Account section */}
-      <div className="sidebar-section">
-        <SidebarLabel>Account</SidebarLabel>
+        <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "8px 0" }} />
+
+        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>Account</div>
         {accountItems.map((item) => (
-          <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
+          <Link key={item.href} href={item.href}>
+            <div
+              onClick={() => setMobileOpen(false)}
+              style={{
+                display: "flex", alignItems: "center", gap: 12, padding: "10px 12px",
+                borderRadius: 8, cursor: "pointer", fontSize: 13.5,
+                color: isNavActive(item, location) ? "#fff" : "rgba(255,255,255,0.5)",
+                background: isNavActive(item, location) ? "rgba(255,255,255,0.1)" : "transparent",
+              }}
+            >
+              <span style={{ fontSize: 15 }}>{item.icon}</span>
+              <span>{item.label}</span>
+            </div>
+          </Link>
         ))}
-      </div>
 
-      {/* Feature Request button (paying customers only) */}
-      {tokenData?.hasPurchased && (
-        <div style={{ padding: "4px 16px 0" }}>
-          <div
-            onClick={() => setFeatureModalOpen(true)}
-            style={{
-              display: "flex", alignItems: "center", gap: 8,
-              padding: "9px 12px", borderRadius: 10, cursor: "pointer",
-              background: "rgba(14,78,69,0.1)",
-              border: "1px solid rgba(14,78,69,0.2)",
-              transition: "background 0.15s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(14,78,69,0.18)")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(14,78,69,0.1)")}
-            data-testid="sidebar-feature-request-btn"
-          >
-            <span style={{ fontSize: 14 }}>🗳️</span>
-            <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.7)" }}>
-              Request a Feature
-            </span>
+        {/* Admin */}
+        {tokenData?.isAdmin && (
+          <>
+            <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "8px 0" }} />
+            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>Admin</div>
+            {adminItems.map((item) => (
+              <Link key={item.href} href={item.href}>
+                <div
+                  onClick={() => setMobileOpen(false)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 12, padding: "10px 12px",
+                    borderRadius: 8, cursor: "pointer", fontSize: 13.5,
+                    color: isNavActive(item, location) ? "#fff" : "rgba(255,255,255,0.5)",
+                    background: isNavActive(item, location) ? "rgba(255,255,255,0.1)" : "transparent",
+                  }}
+                >
+                  <span style={{ fontSize: 15 }}>{item.icon}</span>
+                  <span>{item.label}</span>
+                </div>
+              </Link>
+            ))}
+          </>
+        )}
+
+        <div style={{ flex: 1 }} />
+
+        {/* Avatar / Auth */}
+        {isAuthenticated ? (
+          <div style={{
+            display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
+            borderRadius: 10, marginTop: 8,
+          }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: "50%",
+              background: "linear-gradient(135deg, var(--sage), #3a6048)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 10, fontWeight: 700, color: "#fff",
+            }}>{userInitial}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#fff" }}>{user?.displayName || user?.email}</div>
+            </div>
+            <button onClick={handleLogout} style={{
+              background: "none", border: "none", color: "rgba(255,255,255,0.4)",
+              cursor: "pointer", padding: 4,
+            }}>
+              <LogOut size={16} />
+            </button>
           </div>
-        </div>
-      )}
-
-      {/* Admin section (only if admin) */}
-      {tokenData?.isAdmin && (
-        <div className="sidebar-section">
-          <SidebarLabel>Admin</SidebarLabel>
-          {adminItems.map((item) => (
-            <SidebarNavItem key={item.href} item={item} isActive={isNavActive(item, location)} onClick={closeSidebar} />
-          ))}
-        </div>
-      )}
-
-      {/* Spacer */}
-      <div className="sidebar-spacer" />
-
-      {/* History section */}
-      <div className="sidebar-section">
-        <SidebarLabel>History</SidebarLabel>
-        <div className="sidebar-history">
-          {recentLookups.length > 0 ? (
-            recentLookups.map((lookup: any) => {
-              const originFlag = lookup.originFlag || "";
-              const destFlag = lookup.destinationFlag || "";
-              const originCode = lookup.originCode || "";
-              const destCode = lookup.destinationCode || "";
-              const commodity = lookup.commodityName || "Trade";
-              const title = `${originFlag} ${commodity} ${originCode} → ${destFlag} ${destCode}`;
-              const tags = ["Lookup"];
-              return <HistoryCard key={lookup.id} title={title} tags={tags} href={`/trades/${lookup.id}`} />;
-            })
-          ) : (
-            <>
-              <HistoryCard title="🇨🇮 Cashew CI → 🇬🇧 UK Q1 2026" tags={["LC Check", "$126k"]} />
-              <HistoryCard title="🇬🇭 Cocoa Beans GH → 🇪🇺 EU" tags={["LC Check", "$84k"]} />
-              <HistoryCard title="🇪🇹 Sesame Seeds ET → 🇪🇺 EU" tags={["Lookup", "$43k"]} />
-            </>
-          )}
-        </div>
+        ) : (
+          <Link href="/login">
+            <div style={{
+              padding: "10px 14px", textAlign: "center", borderRadius: 8,
+              border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)",
+              fontSize: 13, fontWeight: 500, cursor: "pointer", marginTop: 8,
+            }}>Log in</div>
+          </Link>
+        )}
       </div>
-
-      {sidebarBottom}
     </>
   );
 
   return (
     <>
-      {/* SIDEBAR — desktop: always visible */}
-      {!isMobile && (
-        <div className="sidebar">
-          {sidebarContent}
-        </div>
-      )}
+      {/* Desktop icon-rail sidebar */}
+      {!isMobile && desktopSidebar}
 
-      {/* Mobile sidebar overlay */}
-      {isMobile && sidebarOpen && (
-        <>
-          <div className="sidebar-overlay" onClick={closeSidebar} />
-          <div className="sidebar-mobile">
-            {sidebarContent}
-          </div>
-        </>
-      )}
+      {/* Mobile overlay sidebar */}
+      {isMobile && mobileOpen && mobileSidebar}
 
-      {/* MAIN AREA */}
-      <div className="main-box">
-        {/* Content area wraps BOTH nav and children — gradient flows behind nav */}
-        <div className={contentClassName || "main-content"}>
-          {/* TOP NAV — inside the content area per design ref */}
-          <div className="top-nav">
-            {/* Left: hamburger on mobile, nav links on desktop */}
-            {isMobile ? (
-              <button onClick={() => setSidebarOpen(true)} className="hamburger-btn" aria-label="Open menu" data-testid="shell-hamburger">
-                <Menu size={22} />
-              </button>
-            ) : (
-              <div className="top-nav-links">
-                {topCenter || <DefaultNavLinks activePage={location} />}
-              </div>
-            )}
-
-            {/* Right: icon buttons + avatar */}
-            <div className="top-nav-icons">
+      {/* Main content area */}
+      <div className="mn-area">
+        {/* Mobile header bar */}
+        {isMobile && (
+          <div className="mobile-header">
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="hamburger-btn-v2"
+              aria-label="Open menu"
+              data-testid="shell-hamburger"
+            >
+              ☰
+            </button>
+            <Link href="/">
+              <span style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 15, color: "var(--t1)" }}>TapTrao</span>
+            </Link>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <Link href="/alerts">
-                <div className="icon-btn" data-testid="shell-bell-icon">
+                <div style={{ position: "relative", fontSize: 14, cursor: "pointer" }}>
                   🔔
-                  {alertsBadge > 0 && <span className="dot" />}
-                </div>
-              </Link>
-
-              {!isMobile && (
-                <Link href="/inbox">
-                  <div className="icon-btn">💬</div>
-                </Link>
-              )}
-
-              {!isMobile && (
-                <Link href="/settings/profile">
-                  <div className="icon-btn">⚙️</div>
-                </Link>
-              )}
-
-              {isAuthenticated ? (
-                <div style={{ position: "relative" }}>
-                  <div
-                    className="user-avatar"
-                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    style={{ cursor: "pointer" }}
-                    data-testid="shell-user-avatar"
-                  >
-                    {userInitial}
-                  </div>
-                  {userDropdownOpen && (
-                    <>
-                      <div
-                        style={{ position: "fixed", inset: 0, zIndex: 40 }}
-                        onClick={() => setUserDropdownOpen(false)}
-                      />
-                      <div style={{
-                        position: "absolute",
-                        top: "calc(100% + 8px)",
-                        right: 0,
-                        background: "#1a2332",
-                        borderRadius: 10,
-                        padding: "6px 0",
-                        minWidth: 180,
-                        boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-                        border: "1px solid rgba(255,255,255,0.08)",
-                        zIndex: 50,
-                      }}>
-                        <div style={{ padding: "8px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>
-                            {user?.displayName || user?.email}
-                          </div>
-                          {user?.displayName && (
-                            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>
-                              {user.email}
-                            </div>
-                          )}
-                        </div>
-                        <Link href="/settings/profile">
-                          <div
-                            onClick={() => setUserDropdownOpen(false)}
-                            style={{
-                              display: "flex", alignItems: "center", gap: 8,
-                              padding: "8px 14px", cursor: "pointer", fontSize: 13,
-                              color: "rgba(255,255,255,0.7)",
-                            }}
-                            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                          >
-                            <User size={14} /> Settings
-                          </div>
-                        </Link>
-                        <div
-                          onClick={handleLogout}
-                          style={{
-                            display: "flex", alignItems: "center", gap: 8,
-                            padding: "8px 14px", cursor: "pointer", fontSize: 13,
-                            color: "rgba(255,255,255,0.7)",
-                          }}
-                          onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
-                          onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                        >
-                          <LogOut size={14} /> Log out
-                        </div>
-                      </div>
-                    </>
+                  {alertsBadge > 0 && (
+                    <span style={{
+                      position: "absolute", top: -2, right: -4, width: 6, height: 6,
+                      borderRadius: "50%", background: "var(--red)",
+                    }} />
                   )}
                 </div>
-              ) : (
-                <Link href="/login">
-                  <div
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 500,
-                      color: "rgba(255,255,255,0.7)",
-                      cursor: "pointer",
-                      padding: "6px 14px",
-                      borderRadius: 8,
-                      border: "1px solid rgba(255,255,255,0.15)",
-                    }}
-                    data-testid="shell-login-btn"
-                  >
-                    Log in
-                  </div>
-                </Link>
-              )}
+              </Link>
             </div>
           </div>
+        )}
 
+        <div className={contentClassName || "main-content"}>
           {children}
         </div>
       </div>
