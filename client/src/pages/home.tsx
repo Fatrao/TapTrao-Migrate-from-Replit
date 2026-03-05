@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -23,6 +23,25 @@ export default function Home() {
   usePageTitle(t("pageTitle"));
 
   const { toast } = useToast();
+
+  /* Demo section state */
+  const [activeDemo, setActiveDemo] = useState(0);
+  const [autoCycle, setAutoCycle] = useState(true);
+  const resumeRef = useRef<ReturnType<typeof setTimeout>>();
+  const DEMO_COUNT = 4;
+
+  useEffect(() => {
+    if (!autoCycle) return;
+    const id = setInterval(() => setActiveDemo((p) => (p + 1) % DEMO_COUNT), 6000);
+    return () => clearInterval(id);
+  }, [autoCycle]);
+
+  const handleTabClick = (idx: number) => {
+    setActiveDemo(idx);
+    setAutoCycle(false);
+    clearTimeout(resumeRef.current);
+    resumeRef.current = setTimeout(() => setAutoCycle(true), 15000);
+  };
 
   // Map landing page plan keys → Stripe pack keys
   const PACK_KEYS: Record<string, string> = {
@@ -290,67 +309,68 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══ VALIDATION PREVIEW ═══ */}
+      {/* ═══ PLATFORM DEMO — Real screenshots ═══ */}
       <div id="validation" className="hp-validation-section" style={{
         background: "var(--dark)", borderRadius: 24, margin: "0 40px",
         padding: 60, color: "#fff",
       }}>
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8, color: "#fff" }}>
-          {t("validationPreview.heading")}
+          {t("demo.heading")}
         </h2>
-        <p style={{ fontSize: 15, color: "rgba(255,255,255,.8)", marginBottom: 40, maxWidth: 500 }}>
-          {t("validationPreview.subheading")}
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,.8)", marginBottom: 32, maxWidth: 600 }}>
+          {t("demo.subheading")}
         </p>
 
-        <div style={{
-          background: "rgba(255,255,255,.06)", borderRadius: "var(--r)",
-          padding: 28, maxWidth: 500,
+        {/* Tab bar */}
+        <div className="hp-demo-tabs" style={{
+          display: "flex", gap: 4, marginBottom: 24, overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
         }}>
-          {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-            <div>
-              <div style={{ fontFamily: "var(--fd)", fontSize: 16, fontWeight: 600 }}>
-                {t("validationPreview.mockTrade")}
-              </div>
-              <div style={{ fontSize: 15, color: "rgba(255,255,255,.55)", marginTop: 2 }}>TT-2026-a3f9c1</div>
-            </div>
-            <div style={{ fontFamily: "var(--fd)", fontSize: 32, fontWeight: 700, color: "var(--sage-l)" }}>87</div>
-          </div>
+          {([
+            { tab: "check", label: t("demo.tabs.check") },
+            { tab: "dashboard", label: t("demo.tabs.dashboard") },
+            { tab: "lcVerify", label: t("demo.tabs.lcVerify") },
+            { tab: "inbox", label: t("demo.tabs.inbox") },
+          ] as const).map(({ tab, label }, i) => (
+            <button key={tab} onClick={() => handleTabClick(i)} style={{
+              padding: "10px 20px", borderRadius: 10, border: "none",
+              background: activeDemo === i ? "rgba(109,184,154,.15)" : "transparent",
+              color: activeDemo === i ? "var(--sage-l)" : "rgba(255,255,255,.5)",
+              fontFamily: "var(--fb)", fontSize: 15, fontWeight: activeDemo === i ? 600 : 400,
+              cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+              borderBottom: activeDemo === i ? "2px solid var(--sage-l)" : "2px solid transparent",
+              transition: "all .2s",
+            }}>
+              {label}
+            </button>
+          ))}
+        </div>
 
-          {/* Risk tags */}
-          <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-            <span style={{ fontSize: 15, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>{t("validationPreview.riskLow")}</span> {t("validationPreview.riskOrigin")}</span>
-            <span style={{ fontSize: 15, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>{t("validationPreview.riskLow")}</span> {t("validationPreview.riskCommodity")}</span>
-            <span style={{ fontSize: 15, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--amber)", fontWeight: 600 }}>{t("validationPreview.riskMed")}</span> {t("validationPreview.riskRegulatory")}</span>
-          </div>
+        {/* Screenshot panel */}
+        <div key={activeDemo} className="hp-demo-panel" style={{
+          borderRadius: 14, overflow: "hidden",
+          border: "1px solid rgba(255,255,255,.1)",
+          animation: "demoFadeIn .4s ease both",
+          background: "#1a1a1c",
+        }}>
+          <img
+            src={["/demo/compliance.png", "/demo/trades.png", "/demo/lc-check.png", "/demo/inbox.png"][activeDemo]}
+            alt={[t("demo.tabs.check"), t("demo.tabs.dashboard"), t("demo.tabs.lcVerify"), t("demo.tabs.inbox")][activeDemo]}
+            style={{
+              width: "100%", height: "auto", display: "block",
+            }}
+          />
+        </div>
 
-          {/* Check items */}
-          <div className="hp-check-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 16 }}>
-            {[
-              { icon: "\u2713", labelKey: "certificateOfOrigin" as const, status: "pass" },
-              { icon: "\u2713", labelKey: "phytosanitaryCertificate" as const, status: "pass" },
-              { icon: "\u2713", labelKey: "billOfLading" as const, status: "pass" },
-              { icon: "!", labelKey: "insurance" as const, status: "warn" },
-              { icon: "\u2717", labelKey: "weightCertificate" as const, status: "fail" },
-              { icon: "\u2713", labelKey: "fumigationCertificate" as const, status: "pass" },
-            ].map((c) => {
-              const bg = c.status === "pass" ? "rgba(109,184,154,.1)"
-                : c.status === "warn" ? "rgba(196,136,42,.1)"
-                : "rgba(196,78,58,.1)";
-              const color = c.status === "pass" ? "var(--sage-l)"
-                : c.status === "warn" ? "var(--amber)"
-                : "var(--red)";
-              return (
-                <div key={c.labelKey} style={{
-                  display: "flex", alignItems: "center", gap: 8,
-                  padding: "8px 12px", borderRadius: 8,
-                  fontSize: 15, fontWeight: 500, background: bg, color,
-                }}>
-                  {c.icon} {t(`validationPreview.checkItems.${c.labelKey}`)}
-                </div>
-              );
-            })}
-          </div>
+        {/* Progress dots */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 20 }}>
+          {Array.from({ length: DEMO_COUNT }).map((_, i) => (
+            <button key={i} onClick={() => handleTabClick(i)} style={{
+              width: activeDemo === i ? 24 : 8, height: 8, borderRadius: 4, border: "none",
+              background: activeDemo === i ? "var(--sage-l)" : "rgba(255,255,255,.2)",
+              cursor: "pointer", transition: "all .3s", padding: 0,
+            }} />
+          ))}
         </div>
       </div>
 
@@ -469,8 +489,15 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Responsive overrides for mobile */}
+      {/* Animations + Responsive overrides */}
       <style>{`
+        @keyframes demoFadeIn {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .hp-demo-tabs::-webkit-scrollbar { display: none; }
+        .hp-demo-tabs { scrollbar-width: none; }
+
         @media (max-width: 768px) {
           .hp-page { overflow-x: hidden !important; }
           .hp-page nav { padding: 12px 16px !important; }
@@ -526,20 +553,13 @@ export default function Home() {
           .hp-steps-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
           .hp-steps-grid > div { padding: 20px !important; }
 
-          /* Validation section */
+          /* Demo / Validation section */
           .hp-page .hp-validation-section {
             margin: 0 12px !important;
             padding: 28px 16px !important;
             border-radius: 16px !important;
           }
-          .hp-page .hp-validation-section .hp-check-grid {
-            grid-template-columns: 1fr !important;
-            gap: 6px !important;
-          }
-          .hp-page .hp-validation-section > div {
-            max-width: 100% !important;
-            padding: 20px 16px !important;
-          }
+          .hp-demo-panel { padding: 0 !important; }
 
           /* Pricing */
           .hp-pricing-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
