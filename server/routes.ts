@@ -256,8 +256,8 @@ export async function registerRoutes(
   // ── Password Reset ──
 
   app.post("/api/auth/forgot-password", async (req, res) => {
+    const locale = getLocale(req);
     try {
-      const locale = getLocale(req);
       const parsed = forgotPasswordSchema.safeParse(req.body);
       if (!parsed.success) {
         res.status(400).json({ message: t("routes.valid_email_required", locale) });
@@ -304,8 +304,8 @@ export async function registerRoutes(
   });
 
   app.post("/api/auth/reset-password", async (req, res) => {
+    const locale = getLocale(req);
     try {
-      const locale = getLocale(req);
       const parsed = resetPasswordSchema.safeParse(req.body);
       if (!parsed.success) {
         res.status(400).json({ message: t("routes.invalid_input", locale), errors: parsed.error.flatten().fieldErrors });
