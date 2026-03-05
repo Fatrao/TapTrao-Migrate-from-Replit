@@ -179,7 +179,7 @@ select option {
 label {
   display: block;
   font-family: var(--fb);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.5px;
   color: #333;
@@ -196,14 +196,14 @@ label {
 }
 
 .field-hint {
-  font-size: 11px;
+  font-size: 15px;
   color: var(--txt2);
   margin-top: 5px;
   line-height: 1.5;
 }
 
 .field-error {
-  font-size: 11px;
+  font-size: 15px;
   color: var(--red);
   margin-top: 5px;
 }
@@ -251,7 +251,7 @@ input[type="checkbox"]:focus {
 .checkbox-row label {
   text-transform: none;
   letter-spacing: 0;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--txt2);
   cursor: pointer;
@@ -313,7 +313,7 @@ input[type="radio"]:focus {
 }
 
 .radio-card-label {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--txt);
   margin-bottom: 2px;
@@ -322,7 +322,7 @@ input[type="radio"]:focus {
 }
 
 .radio-card-sub {
-  font-size: 11px;
+  font-size: 15px;
   color: var(--txt2);
   line-height: 1.5;
 }

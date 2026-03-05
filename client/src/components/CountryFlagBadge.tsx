@@ -65,11 +65,11 @@ export default function CountryFlagBadge({
                   {flagReason ?? t("country.flagged")}
                 </p>
                 {flagDetails && (
-                  <p className="text-[11px] text-gray-300 leading-relaxed">
+                  <p className="text-[15px] text-gray-300 leading-relaxed">
                     {flagDetails}
                   </p>
                 )}
-                <p className="text-[10px] text-gray-500 italic">
+                <p className="text-[15px] text-gray-500 italic">
                   {t("country.enhancedDueDiligence")}
                 </p>
               </div>
