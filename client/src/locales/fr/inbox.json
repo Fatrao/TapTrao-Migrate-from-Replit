@@ -1,44 +1,35 @@
 {
-  "title": "Bo\u00eete Fournisseur",
-  "subtitle": "{{waiting}} fournisseurs en attente \u00b7 {{blocking}} probl\u00e8me{{plural}} bloquant{{plural}}",
-  "newUploadLink": "+ Nouveau lien d'envoi",
-
+  "title": "Boîte fournisseurs",
+  "subtitle": "{{waiting}} fournisseur(s) en attente · {{blocking}} problème(s) bloquant(s){{plural}}",
+  "newUploadLink": "+ Nouveau lien d'import",
   "stat.awaitingDocuments": "Documents en attente",
-  "stat.blockingIssue": "Probl\u00e8me bloquant",
-  "stat.completeThisWeek": "Compl\u00e9t\u00e9s cette semaine",
-
-  "loading": "Chargement de la bo\u00eete...",
-  "empty.title": "Aucune demande fournisseur.",
-  "empty.subtitle": "Envoyez votre premier brief fournisseur depuis le v\u00e9rificateur LC ou la recherche de conformit\u00e9.",
-
+  "stat.blockingIssue": "Problème bloquant",
+  "stat.completeThisWeek": "Finalisés cette semaine",
+  "loading": "Chargement de la boîte...",
+  "empty.title": "Aucune demande fournisseur pour l'instant.",
+  "empty.subtitle": "Envoyez votre premier dossier fournisseur depuis le vérificateur LC ou la recherche de conformité.",
   "section.awaitingDocuments": "Documents en attente",
-  "section.blockingIssue": "Probl\u00e8me bloquant",
-  "section.complete": "Termin\u00e9",
-
+  "section.blockingIssue": "Problème bloquant",
+  "section.complete": "Finalisé",
   "status.blocking": "Bloquant",
   "status.awaiting": "En attente",
-  "status.complete": "Termin\u00e9",
-
-  "card.allDocsReceived": "Tous les documents re\u00e7us",
+  "status.complete": "Finalisé",
+  "card.allDocsReceived": "Tous les documents reçus",
   "card.waitingFor": "En attente de {{docs}}",
   "card.docs": "{{received}}/{{total}} docs",
-
-  "time.justNow": "\u00e0 l'instant",
-  "time.minsAgo": "il y a {{mins}}min",
-  "time.hoursAgo": "il y a {{hours}}h",
-  "time.daysAgo": "il y a {{days}}j",
-  "time.monthsAgo": "il y a {{months}}mois",
-
-  "time.sentJustNow": "Envoy\u00e9 \u00e0 l'instant",
-  "time.sentMinsAgo": "Envoy\u00e9 il y a {{mins}}min",
-  "time.sentHoursAgo": "Envoy\u00e9 il y a {{hours}}h",
-  "time.sentDaysAgo": "Envoy\u00e9 il y a {{days}}j",
-  "time.sentMonthsAgo": "Envoy\u00e9 il y a {{months}}mois",
-
+  "time.justNow": "à l'instant",
+  "time.minsAgo": "il y a {{mins}} min",
+  "time.hoursAgo": "il y a {{hours}} h",
+  "time.daysAgo": "il y a {{days}} j",
+  "time.monthsAgo": "il y a {{months}} mois",
+  "time.sentJustNow": "Envoyé à l'instant",
+  "time.sentMinsAgo": "Envoyé il y a {{mins}} min",
+  "time.sentHoursAgo": "Envoyé il y a {{hours}} h",
+  "time.sentDaysAgo": "Envoyé il y a {{days}} j",
+  "time.sentMonthsAgo": "Envoyé il y a {{months}} mois",
   "time.overdue": "En retard",
-  "time.daysOverdue": "{{days}}j de retard",
-
+  "time.daysOverdue": "{{days}} j de retard",
   "btn.whatsapp": "WhatsApp",
-  "btn.email": "Email",
+  "btn.email": "E-mail",
   "btn.link": "Lien"
 }

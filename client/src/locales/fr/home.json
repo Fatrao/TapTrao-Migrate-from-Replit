@@ -1,137 +1,128 @@
 {
-  "pageTitle": "TapTrao \u2014 Conformit\u00e9 commerciale pour les n\u00e9gociants de mati\u00e8res premi\u00e8res",
-
+  "pageTitle": "TapTrao — Conformité commerciale pour les négociants en matières premières",
   "nav": {
-    "howItWorks": "Comment \u00e7a marche",
+    "howItWorks": "Comment ça marche",
     "validation": "Validation",
     "pricing": "Tarifs",
     "myTrades": "Mes transactions",
-    "freeComplianceCheck": "V\u00e9rification gratuite"
+    "freeComplianceCheck": "Vérification de conformité gratuite"
   },
-
   "hero": {
-    "heading": "S\u00e9curisez votre prochaine exp\u00e9dition avant de vous engager.",
-    "subheading": "Chaque document. Chaque r\u00e9glementation. Chaque corridor. V\u00e9rifiez avant de vous engager.",
-    "ctaPrimary": "V\u00e9rification gratuite \u2192",
-    "ctaSecondary": "Voir la validation compl\u00e8te"
+    "heading": "Réduisez les risques avant d'engager vos dépenses.",
+    "subheading": "Chaque document. Chaque réglementation. Chaque corridor. Vérifiés avant que vous ne vous engagiez.",
+    "ctaPrimary": "Vérification gratuite →",
+    "ctaSecondary": "Voir la validation complète"
   },
-
   "trustBar": {
-    "corridors": "AFRIQUE \u2192 UE \u00b7 RU \u00b7 USA \u00b7 CANADA \u00b7 T\u00dcRKIYE \u00b7 SUISSE"
+    "corridors": "AFRIQUE → UE · UK · USA · CANADA · TÜRKIYE · SUISSE"
   },
-
   "costSection": {
-    "heading": "Les co\u00fbts d\u2019erreurs",
-    "subheading": "Un seul probl\u00e8me peut entra\u00eener des milliers d\u2019euros en pertes.",
+    "heading": "Le coût d'une erreur",
+    "subheading": "Un seul problème documentaire peut entraîner des milliers de pertes.",
     "stats": {
       "demurrage": {
-        "value": "75\u2013300 $/jour",
-        "description": "Surestaries pendant que les documents sont bloqu\u00e9s au port"
+        "value": "75–300 $/jour",
+        "description": "Surestaries pendant le blocage des documents au port"
       },
       "bankFee": {
-        "value": "95\u2013160 $",
-        "description": "Frais bancaires pour une divergence LC"
+        "value": "95–160 $",
+        "description": "Frais bancaires pour une divergence de crédit documentaire"
       },
       "isfPenalty": {
         "value": "5 000 $",
-        "description": "Amende ISF am\u00e9ricaine pour d\u00e9claration tardive par infraction"
+        "description": "Pénalité ISF américaine par infraction pour dépôt tardif"
       },
       "cascadeCost": {
         "value": "1 500 $+",
-        "description": "Co\u00fbt en cascade d\u2019un document manquant"
+        "description": "Coût en cascade pour un document manquant"
       }
     },
-    "summary": "Un seul rejet bancaire co\u00fbte <b>{{amount}} ou plus</b>. La validation compl\u00e8te co\u00fbte",
+    "summary": "Un seul refus bancaire coûte <b>{{amount}} $ ou plus</b>. La validation complète coûte",
     "summaryAmount": "1 500 $",
     "summaryValidationCost": "189 $"
   },
-
   "howItWorks": {
-    "heading": "Comment \u00e7a marche",
+    "heading": "Comment ça marche",
     "subheading": "Connaissance. Action. Confiance.",
     "steps": {
       "step1": {
-        "label": "\u00c9TAPE 1",
+        "label": "ÉTAPE 1",
         "title": "Connaissance",
-        "description": "Saisissez votre origine, votre destination et votre marchandise. TapTrao identifie toutes les r\u00e9glementations, les documents requis et les obligations de conformit\u00e9 pour votre corridor commercial."
+        "description": "Saisissez votre origine, destination et marchandise. TapTrao cartographie chaque réglementation, document requis et obligation de conformité pour votre corridor."
       },
       "step2": {
-        "label": "\u00c9TAPE 2",
+        "label": "ÉTAPE 2",
         "title": "Action",
-        "description": "T\u00e9l\u00e9chargez vos documents commerciaux. Notre moteur effectue une validation crois\u00e9e de chaque document avec les autres, v\u00e9rifie les termes de la lettre de cr\u00e9dit (LC) et signale les incoh\u00e9rences avant la soumission."
+        "description": "Importez vos documents commerciaux. Notre moteur valide croisément chaque document, vérifie les conditions LC et signale les incohérences avant la soumission."
       },
       "step3": {
-        "label": "\u00c9TAPE 3",
+        "label": "ÉTAPE 3",
         "title": "Confiance",
-        "description": "Recevez votre rapport Shield avec un score de conformit\u00e9, le d\u00e9tail des probl\u00e8mes et des recommandations de correction. Soumettez \u00e0 la banque en toute confiance."
+        "description": "Recevez votre rapport Shield avec un score de conformité, le détail des problèmes et des recommandations correctives. Soumettez à la banque en toute confiance."
       }
     }
   },
-
   "validationPreview": {
-    "heading": "Rapport de validation crois\u00e9e",
-    "subheading": "Chaque document est v\u00e9rifi\u00e9 par rapport aux autres. Chaque r\u00e9glementation est prise en compte.",
+    "heading": "Rapport de validation croisée",
+    "subheading": "Chaque document vérifié par rapport à tous les autres. Chaque réglementation cartographiée.",
     "riskOrigin": "Origine",
-    "riskCommodity": "Produit",
-    "riskRegulatory": "R\u00e9glementaire",
-    "mockTrade": "Noix de cajou brutes \u00b7 CI \u2192 UK",
+    "riskCommodity": "Marchandise",
+    "riskRegulatory": "Réglementaire",
+    "mockTrade": "🥜 Noix de cajou brutes · CI → UK",
     "riskLow": "FAIBLE",
-    "riskMed": "MOYEN",
-    "riskHigh": "\u00c9LEV\u00c9",
+    "riskMed": "MOY",
+    "riskHigh": "ÉLEVÉ",
     "checkItems": {
-      "certificateOfOrigin": "Certificat d\u2019origine",
+      "certificateOfOrigin": "Certificat d'origine",
       "phytosanitaryCertificate": "Certificat phytosanitaire",
       "billOfLading": "Connaissement",
-      "insurance": "Assurance \u2014 inf\u00e9rieure \u00e0 110 % CIF",
-      "weightCertificate": "Certificat de poids \u2014 manquant",
+      "insurance": "Assurance — inférieure à 110 % CAF",
+      "weightCertificate": "Certificat de poids — manquant",
       "fumigationCertificate": "Certificat de fumigation"
     }
   },
-
   "pricingSection": {
     "heading": "Tarifs",
-    "subheading": "Simple, transparent. Aucun abonnement requis.",
+    "subheading": "Simple et transparent. Sans abonnement.",
     "plans": {
       "single": {
-        "name": "V\u00e9rification unique",
+        "name": "Vérification unique",
         "price": "189 $",
         "per": "par transaction",
-        "features": "Validation crois\u00e9e compl\u00e8te\nV\u00e9rification des termes LC\nContr\u00f4le EUDR + CBAM\nScore de conformit\u00e9 + rapport\nRecommandations de correction"
+        "features": "Validation croisée complète\nVérification des conditions LC\nContrôle EUDR + CBAM\nScore de conformité + rapport\nRecommandations correctives"
       },
       "threePack": {
         "name": "Pack 3",
         "price": "499 $",
         "per": "166,33 $ par transaction",
-        "features": "Tout dans un seul contr\u00f4le\n\u00c9conomisez 68 $ au total\nValable pendant 12 mois\nSupport prioritaire"
+        "features": "Tout ce qui est inclus dans la vérification unique\nÉconomisez 68 $ au total\nValable 12 mois\nSupport prioritaire"
       },
       "fivePack": {
         "name": "Pack 5",
         "price": "799 $",
         "per": "159,80 $ par transaction",
-        "features": "Tout dans un seul contr\u00f4le\n\u00c9conomisez 146 $ au total\nValable pendant 12 mois\nSupport prioritaire\nOnboarding d\u00e9di\u00e9"
+        "features": "Tout ce qui est inclus dans la vérification unique\nÉconomisez 146 $ au total\nValable 12 mois\nSupport prioritaire\nIntégration dédiée"
       }
     },
-    "ctaFeatured": "Meilleur rapport qualit\u00e9-prix \u2192",
+    "ctaFeatured": "Meilleur rapport qualité/prix →",
     "ctaDefault": "Commencer"
   },
-
   "finalCta": {
-    "heading": "Pr\u00eat \u00e0 r\u00e9duire les risques de votre prochain envoi ?",
-    "subheading": "Commencez par un contr\u00f4le de conformit\u00e9 gratuit. Aucun compte requis.",
-    "button": "Contr\u00f4le de conformit\u00e9 gratuit \u2192"
+    "heading": "Prêt à réduire les risques de votre prochain envoi ?",
+    "subheading": "Commencez avec une vérification de conformité gratuite. Aucun compte requis.",
+    "button": "Vérification gratuite →"
   },
-
   "footer": {
-    "tagline": "Conformit\u00e9 commerciale pour les corridors de mati\u00e8res premi\u00e8res africains.",
-    "copyright": "\u00a9 2026 Fatrao Limited. Tous droits r\u00e9serv\u00e9s.",
+    "tagline": "Conformité commerciale pour les corridors de matières premières africaines.",
+    "copyright": "© 2026 Fatrao Limited. Tous droits réservés.",
     "product": "Produit",
-    "freeCheck": "V\u00e9rification gratuite",
+    "freeCheck": "Vérification gratuite",
     "pricing": "Tarifs",
-    "lcCheck": "V\u00e9rification LC",
-    "company": "Entreprise",
+    "lcCheck": "Vérification LC",
+    "company": "Société",
     "contact": "Contact",
-    "legal": "Mentions l\u00e9gales",
-    "privacyPolicy": "Politique de confidentialit\u00e9",
-    "termsConditions": "Conditions g\u00e9n\u00e9rales"
+    "legal": "Mentions légales",
+    "privacyPolicy": "Politique de confidentialité",
+    "termsConditions": "Conditions générales"
   }
 }

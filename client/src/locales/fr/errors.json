@@ -1,18 +1,18 @@
 {
   "notFound": {
-    "title": "404 Page non trouv\u00e9e",
+    "title": "404 Page introuvable",
     "description": "La page que vous recherchez n'existe pas."
   },
   "tokenSuccess": {
-    "noSession": "Aucune session d'achat trouv\u00e9e.",
-    "goToPricing": "Voir les tarifs",
-    "verifying": "V\u00e9rification de votre achat...",
-    "purchaseComplete": "Achat termin\u00e9",
-    "packAdded": "Votre pack {{packName}} a \u00e9t\u00e9 ajout\u00e9 \u00e0 votre compte.",
+    "noSession": "Aucune session d'achat trouvée.",
+    "goToPricing": "Aller aux tarifs",
+    "verifying": "Vérification de votre achat...",
+    "purchaseComplete": "Achat finalisé",
+    "packAdded": "Votre pack {{packName}} a été ajouté à votre compte.",
     "tokensAdded": "+{{count}} jetons",
     "balance": "Solde : {{count}}",
-    "processing": "Traitement en cours",
-    "processingDefault": "Votre paiement est en cours de traitement. Les jetons appara\u00eetront sous peu.",
+    "processing": "Traitement",
+    "processingDefault": "Votre paiement est en cours de traitement. Les jetons apparaîtront sous peu.",
     "runLookup": "Lancer une recherche",
     "dashboard": "Tableau de bord"
   }
