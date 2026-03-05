@@ -6,6 +6,7 @@ import { usePageTitle } from "@/hooks/use-page-title";
 import { AppShell } from "@/components/AppShell";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Template } from "@shared/schema";
+import { translateCommodity } from "@/lib/commodity-i18n";
 import type { TFunction } from "i18next";
 
 type StaleInfo = { stale: boolean };
@@ -50,6 +51,7 @@ function TemplateCard({
   onDelete,
   onUse,
   t,
+  lang,
   tc,
 }: {
   template: Template;
@@ -57,6 +59,7 @@ function TemplateCard({
   onDelete: (id: string) => void;
   onUse: (template: Template) => void;
   t: TFunction;
+  lang: string;
   tc: TFunction;
 }) {
   const isStale = staleInfo?.stale ?? false;
@@ -88,7 +91,7 @@ function TemplateCard({
             </span>
           </div>
           <div style={{ fontSize: 14, color: "var(--t2)", marginTop: 4 }}>
-            {commodityName} {hsCode ? `· HS ${hsCode}` : ""}
+            {translateCommodity(commodityName, lang)} {hsCode ? `· HS ${hsCode}` : ""}
           </div>
         </div>
       </div>
@@ -154,7 +157,8 @@ function TemplateCard({
 }
 
 export default function Templates() {
-  const { t } = useTranslation("templates");
+  const { t, i18n } = useTranslation("templates");
+  const lang = i18n.language;
   const { t: tc } = useTranslation("common");
   usePageTitle("Templates", "Your saved trade corridors for quick reuse");
   const [, navigate] = useLocation();
@@ -270,6 +274,7 @@ export default function Templates() {
                   onDelete={(id) => setDeleteId(id)}
                   onUse={handleUse}
                   t={t}
+                  lang={lang}
                   tc={tc}
                 />
               ))}

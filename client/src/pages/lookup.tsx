@@ -86,6 +86,7 @@ import type {
   DocumentStatus,
   Template,
 } from "@shared/schema";
+import { translateCommodity } from "@/lib/commodity-i18n";
 
 function TriggerBadge({
   label,
@@ -433,14 +434,14 @@ function NextActionsPanel({
   );
 }
 
-function generateSupplierBriefEmail(result: ComplianceResult, t: (key: string, opts?: Record<string, string>) => string): string {
+function generateSupplierBriefEmail(result: ComplianceResult, t: (key: string, opts?: Record<string, string>) => string, lang: string): string {
   const supplierDocs = result.requirementsDetailed.filter(r => r.isSupplierSide);
   const lines: string[] = [];
-  lines.push(t("supplierEmail.subject", { commodity: result.commodity.name, hsCode: result.commodity.hsCode, origin: result.origin.countryName, destination: result.destination.countryName }));
+  lines.push(t("supplierEmail.subject", { commodity: translateCommodity(result.commodity.name, lang), hsCode: result.commodity.hsCode, origin: result.origin.countryName, destination: result.destination.countryName }));
   lines.push("");
   lines.push(t("supplierEmail.greeting"));
   lines.push("");
-  lines.push(t("supplierEmail.intro", { commodity: result.commodity.name, hsCode: result.commodity.hsCode, origin: result.origin.countryName, destination: result.destination.countryName }));
+  lines.push(t("supplierEmail.intro", { commodity: translateCommodity(result.commodity.name, lang), hsCode: result.commodity.hsCode, origin: result.origin.countryName, destination: result.destination.countryName }));
   lines.push("");
   supplierDocs.forEach((doc, i) => {
     lines.push(`${i + 1}. ${doc.title}`);
@@ -457,10 +458,10 @@ function generateSupplierBriefEmail(result: ComplianceResult, t: (key: string, o
   return lines.join("\n");
 }
 
-function generateSupplierBriefWhatsApp(result: ComplianceResult, t: (key: string, opts?: Record<string, string>) => string): string {
+function generateSupplierBriefWhatsApp(result: ComplianceResult, t: (key: string, opts?: Record<string, string>) => string, lang: string): string {
   const supplierDocs = result.requirementsDetailed.filter(r => r.isSupplierSide);
   const lines: string[] = [];
-  lines.push(t("supplierWhatsapp.title", { commodity: result.commodity.name, hsCode: result.commodity.hsCode }));
+  lines.push(t("supplierWhatsapp.title", { commodity: translateCommodity(result.commodity.name, lang), hsCode: result.commodity.hsCode }));
   lines.push(`${result.origin.countryName} -> ${result.destination.countryName}`);
   lines.push("");
   supplierDocs.forEach((doc, i) => {
@@ -478,13 +479,13 @@ function generateSupplierBriefWhatsApp(result: ComplianceResult, t: (key: string
 function SupplierBriefSection({ result }: { result: ComplianceResult }) {
   const [showBrief, setShowBrief] = useState(false);
   const [activeTab, setActiveTab] = useState<"email" | "whatsapp">("email");
-  const { t } = useTranslation("lookup");
+  const { t, i18n } = useTranslation("lookup"); const lang = i18n.language;
 
   const supplierDocs = result.requirementsDetailed.filter(r => r.isSupplierSide);
   if (supplierDocs.length === 0) return null;
 
-  const emailText = generateSupplierBriefEmail(result, t);
-  const whatsappText = generateSupplierBriefWhatsApp(result, t);
+  const emailText = generateSupplierBriefEmail(result, t, lang);
+  const whatsappText = generateSupplierBriefWhatsApp(result, t, lang);
 
   return (
     <div style={{ background: "rgba(109,184,154,0.06)", borderRadius: 14, border: "1px solid rgba(109,184,154,0.2)", padding: "20px 24px" }}>
@@ -541,10 +542,10 @@ function SupplierBriefSection({ result }: { result: ComplianceResult }) {
   );
 }
 
-function generateCustomsCSV(result: ComplianceResult, t: (key: string, opts?: Record<string, string>) => string): string {
+function generateCustomsCSV(result: ComplianceResult, t: (key: string, opts?: Record<string, string>) => string, lang: string): string {
   const rows: string[][] = [];
   rows.push([t("csv.field"), t("csv.value")]);
-  rows.push([t("csv.commodity"), result.commodity.name]);
+  rows.push([t("csv.commodity"), translateCommodity(result.commodity.name, lang)]);
   rows.push([t("csv.hsCode"), result.commodity.hsCode]);
   rows.push([t("csv.commodityType"), result.commodity.commodityType]);
   rows.push([t("csv.originCountry"), result.origin.countryName]);
@@ -1470,7 +1471,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
 }
 
 function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated = false }: { result: ComplianceResult; freeLocked?: boolean; isAuthenticated?: boolean }) {
-  const { t } = useTranslation("lookup");
+  const { t, i18n } = useTranslation("lookup"); const lang = i18n.language;
   const { t: tc } = useTranslation("common");
   const ruleLabels = useRuleLabels();
   const hasStopFlags = result.stopFlags && Object.keys(result.stopFlags).length > 0;
@@ -1566,7 +1567,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
       <div style={{ textAlign: "center" }}>
         <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 22, color: "var(--t1)", margin: "0 0 6px" }}>{t("result.preShipmentReport")}</h2>
         <p style={{ fontSize: 13, color: "var(--t2)", margin: 0 }}>
-          {"📦"} {result.commodity.name} › {result.origin.countryName} › {result.destination.countryName}
+          {"📦"} {translateCommodity(result.commodity.name, lang)} › {result.origin.countryName} › {result.destination.countryName}
         </p>
       </div>
 
@@ -1859,7 +1860,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         </button>
         {watchState !== "watching" && (
           <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)" }}>
-            {t("watch.getNotified", { commodity: result.commodity.name, destination: result.destination.iso2 })}
+            {t("watch.getNotified", { commodity: translateCommodity(result.commodity.name, lang), destination: result.destination.iso2 })}
           </span>
         )}
       </div>
@@ -1911,7 +1912,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             <Leaf className="w-4 h-4" style={{ color: "var(--sage)" }} />
             <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("info.commodity")}</span>
           </div>
-          <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-commodity">{result.commodity.name}</p>
+          <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-commodity">{translateCommodity(result.commodity.name, lang)}</p>
           <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", color: "var(--t3)", textTransform: "uppercase" as const, margin: 0 }}>
             HS {result.commodity.hsCode} · {result.commodity.commodityType}
           </p>
@@ -2110,7 +2111,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             variant="outline"
             className="w-full"
             onClick={() => {
-              const csv = generateCustomsCSV(result, t);
+              const csv = generateCustomsCSV(result, t, lang);
               const filename = `TapTrao_CustomsDataPack_${result.commodity.hsCode}_${result.origin.iso2}_${result.destination.iso2}.csv`;
               downloadCSV(csv, filename);
             }}
@@ -2227,11 +2228,11 @@ function SaveTemplatePrompt({
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState("");
   const [saved, setSaved] = useState(false);
-  const { t } = useTranslation("lookup");
+  const { t, i18n } = useTranslation("lookup"); const lang = i18n.language;
   const { t: tc } = useTranslation("common");
 
   useEffect(() => {
-    setName(`${result.commodity.name} ${originIso2} to ${destIso2}`);
+    setName(`${translateCommodity(result.commodity.name, lang)} ${originIso2} to ${destIso2}`);
   }, [result, originIso2, destIso2]);
 
   const saveMutation = useMutation({
@@ -2323,7 +2324,7 @@ function SaveTemplatePrompt({
 }
 
 export default function Lookup() {
-  const { t } = useTranslation("lookup");
+  const { t, i18n } = useTranslation("lookup"); const lang = i18n.language;
   const { t: tc } = useTranslation("common");
   const searchString = useSearch();
   const searchParams = new URLSearchParams(searchString);
@@ -2589,7 +2590,7 @@ export default function Lookup() {
                       <SelectContent>
                         {commoditiesData?.map((c) => (
                           <SelectItem key={c.id} value={c.id}>
-                            {c.name} (HS {c.hsCode})
+                            {translateCommodity(c.name, lang)} (HS {c.hsCode})
                           </SelectItem>
                         ))}
                       </SelectContent>

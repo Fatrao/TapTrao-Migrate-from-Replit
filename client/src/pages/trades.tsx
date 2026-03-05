@@ -11,6 +11,7 @@ import { iso2ToFlag } from "@/components/CountryFlagBadge";
 import { TradeCorridorsMap } from "@/components/TradeCorridorsMap";
 import type { Corridor } from "@/components/TradeCorridorsMap";
 import { Plus, Loader2 } from "lucide-react";
+import { translateCommodity } from "@/lib/commodity-i18n";
 
 /* ─── Types ─── */
 
@@ -261,7 +262,8 @@ const css = `
 /* ─── Main Component ─── */
 
 export default function Trades() {
-  const { t } = useTranslation("trades");
+  const { t, i18n } = useTranslation("trades");
+  const lang = i18n.language;
   usePageTitle(t("pageTitle"));
   const [, navigate] = useLocation();
   const searchString = useSearch();
@@ -524,7 +526,7 @@ export default function Trades() {
                     >
                       <div className="fl">{iso2ToFlag(trade.originIso2)}{iso2ToFlag(trade.destIso2)}</div>
                       <div className="inf">
-                        <div className="nm">{trade.commodityName}</div>
+                        <div className="nm">{translateCommodity(trade.commodityName, lang)}</div>
                         <div className="rt">{trade.originName} → {trade.destName}</div>
                       </div>
                       <div className="vl">{formatValue(trade.tradeValue, trade.tradeValueCurrency)}</div>
@@ -710,7 +712,7 @@ export default function Trades() {
                   const demColors = ["var(--sage-l)", "var(--amber)", "var(--red)", "#8ecaad"];
                   const demData = tradesWithValue.slice(0, 4).map(tr => {
                     const tv = Number(tr.tradeValue);
-                    return { name: tr.commodityName.split(" ")[0], origin: tr.originIso2, est: Math.round(tv * 0.03), tv };
+                    return { name: translateCommodity(tr.commodityName, lang).split(" ")[0], origin: tr.originIso2, est: Math.round(tv * 0.03), tv };
                   });
                   const totalDem = demData.reduce((s, d) => s + d.est, 0);
                   let ang = 0;
@@ -799,7 +801,7 @@ export default function Trades() {
                     <div key={tr.id} className="mt-er" onClick={() => navigate(`/trades/${tr.id}#eudr`)} style={{ cursor: "pointer" }}>
                       <div className="dot" style={{ background: dotColor }} />
                       <div className="ei">
-                        <div className="en">{iso2ToFlag(tr.originIso2)} {tr.commodityName.split(" ")[0]}</div>
+                        <div className="en">{iso2ToFlag(tr.originIso2)} {translateCommodity(tr.commodityName, lang).split(" ")[0]}</div>
                         <div className="et">{tr.eudrBand ? t("eudr.risk", { band: tr.eudrBand }) : t("eudr.notAssessed")}</div>
                       </div>
                       <div className="eg" style={{ background: egBg, color: egColor }}>{badge.label}</div>
@@ -844,7 +846,7 @@ export default function Trades() {
                   <div key={tr.id} className="mt-cbr" onClick={() => navigate(`/trades/${tr.id}#cbam`)} style={{ cursor: "pointer" }}>
                     <div className="cc">
                       <em>{iso2ToFlag(tr.originIso2)}</em>
-                      <span>{tr.commodityName.split(" ")[0]} {tr.originIso2}→{tr.destIso2}</span>
+                      <span>{translateCommodity(tr.commodityName, lang).split(" ")[0]} {tr.originIso2}→{tr.destIso2}</span>
                     </div>
                     <div className="cx">{tr.cbamScore != null ? `${tr.cbamScore}%` : "0%"}</div>
                   </div>

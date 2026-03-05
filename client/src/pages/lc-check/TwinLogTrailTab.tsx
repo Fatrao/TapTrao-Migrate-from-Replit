@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { LcPrefillData, TwinlogData } from "./constants";
+import { translateCommodity } from "@/lib/commodity-i18n";
 
 function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }: {
   score: number;
@@ -67,7 +68,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
 }
 
 export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null }) {
-  const { t } = useTranslation("lcCheck");
+  const { t, i18n } = useTranslation("lcCheck"); const lang = i18n.language;
   const [copiedHash, setCopiedHash] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -178,7 +179,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
           {t("twinlog.title")}
         </h2>
         <p style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)", marginBottom: 24, lineHeight: 1.5 }}>
-          {lookup.commodityName} &middot; {lookup.originName} &rarr; {lookup.destinationName}
+          {translateCommodity(lookup.commodityName, lang)} &middot; {lookup.originName} &rarr; {lookup.destinationName}
           {lookup.twinlogLockedAt && <> &middot; {t("twinlog.locked", { date: formatTimestamp(lookup.twinlogLockedAt) })}</>}
         </p>
 
@@ -321,7 +322,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
           !showSaveModal ? (
             <button
               onClick={() => {
-                setTemplateName(`${lookup.commodityName} ${prefillData?.origin_iso2 || ""}→${prefillData?.dest_iso2 || ""}`);
+                setTemplateName(`${translateCommodity(lookup.commodityName, lang)} ${prefillData?.origin_iso2 || ""}→${prefillData?.dest_iso2 || ""}`);
                 setShowSaveModal(true);
               }}
               disabled={!lookup.commodityId || !lookup.resultJson}

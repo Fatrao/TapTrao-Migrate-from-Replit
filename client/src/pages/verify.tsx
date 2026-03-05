@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
+import { translateCommodity } from "@/lib/commodity-i18n";
 
 type VerifyData = {
   commodityName: string;
@@ -22,7 +23,7 @@ function formatDate(dateStr: string): string {
 }
 
 export default function VerifyPage() {
-  const { t } = useTranslation("supplierUpload");
+  const { t, i18n } = useTranslation("supplierUpload"); const lang = i18n.language;
   const params = useParams<{ ref: string }>();
   const ref = params.ref;
 
@@ -123,7 +124,7 @@ export default function VerifyPage() {
                   {t("verify.trade")}
                 </div>
                 <div style={{ fontSize: 14, color: "var(--t1)", fontWeight: 600 }}>
-                  {query.data.commodityName}
+                  {translateCommodity(query.data.commodityName, lang)}
                 </div>
                 <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t3)", marginTop: 2 }}>
                   {query.data.originName} {"\u2192"} {query.data.destinationName}

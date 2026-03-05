@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import type { SupplierUpload } from "@shared/schema";
+import { translateCommodity } from "@/lib/commodity-i18n";
 
 type UploadPageData = {
   request: {
@@ -75,7 +76,7 @@ const sageHover = "#5a7a6b";
 /* ── page ── */
 
 export default function SupplierUpload() {
-  const { t } = useTranslation("supplierUpload");
+  const { t, i18n } = useTranslation("supplierUpload"); const lang = i18n.language;
   const params = useParams<{ token: string }>();
   const token = params.token;
   const [submitted, setSubmitted] = useState(false);
@@ -202,7 +203,7 @@ export default function SupplierUpload() {
             </div>
             <div>
               <div style={{ fontFamily: "'Clash Display', sans-serif", fontSize: 18, fontWeight: 700 }}>
-                {trade.commodityName}
+                {translateCommodity(trade.commodityName, lang)}
               </div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>
                 {iso2ToFlag(trade.originIso2)} {trade.originName} {"\u2192"} {iso2ToFlag(trade.destIso2)} {trade.destName}

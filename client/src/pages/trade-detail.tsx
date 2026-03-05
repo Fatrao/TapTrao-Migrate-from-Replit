@@ -50,6 +50,7 @@ import {
 } from "lucide-react";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
 import { estimateDemurrageRange } from "@/lib/demurrage-utils";
+import { translateCommodity } from "@/lib/commodity-i18n";
 
 /* ── Map common country/region names to ISO2 for flag display ── */
 const nameToIso2: Record<string, string> = {
@@ -987,7 +988,8 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
 
 /* ── Main Page Component ── */
 export default function TradeDetail() {
-  const { t } = useTranslation("trades");
+  const { t, i18n } = useTranslation("trades");
+  const lang = i18n.language;
   const [match, params] = useRoute("/trades/:id");
   const tradeId = params?.id;
 
@@ -1158,7 +1160,7 @@ export default function TradeDetail() {
 
   usePageTitle(
     data?.lookup?.commodityName
-      ? `${data.lookup.commodityName} — ${t("detail.pageTitle")}`
+      ? `${translateCommodity(data.lookup.commodityName, lang)} — ${t("detail.pageTitle")}`
       : t("detail.pageTitle"),
     "View full trade information, compliance results, and audit trail"
   );
@@ -1186,7 +1188,7 @@ export default function TradeDetail() {
           </Link>
           <ChevronRight size={12} />
           <span style={{ color: "var(--t1)" }}>
-            {isLoading ? t("detail.loading") : data?.lookup?.commodityName || t("detail.pageTitle")}
+            {isLoading ? t("detail.loading") : (data?.lookup?.commodityName ? translateCommodity(data.lookup.commodityName, lang) : t("detail.pageTitle"))}
           </span>
         </div>
 
@@ -1205,7 +1207,7 @@ export default function TradeDetail() {
                 color: "var(--t1)",
                 margin: 0,
               }}>
-                {data.lookup.commodityName}
+                {translateCommodity(data.lookup.commodityName, lang)}
               </h1>
 
               {/* Status badge */}

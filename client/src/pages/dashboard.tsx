@@ -9,9 +9,11 @@ import { useTokenBalance } from "@/hooks/use-tokens";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
+import { translateCommodity } from "@/lib/commodity-i18n";
 
 export default function Dashboard() {
-  const { t } = useTranslation("dashboard");
+  const { t, i18n } = useTranslation("dashboard");
+  const lang = i18n.language;
   const { t: tc } = useTranslation("common");
   const { user } = useAuth();
   const statsQuery = useQuery<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null; totalTradeValue: number }>({
@@ -101,7 +103,7 @@ export default function Dashboard() {
       const dIso2 = destNameToIso2[l.destinationName] ?? "";
       recentTrades.push({
         id: l.id,
-        name: l.commodityName,
+        name: translateCommodity(l.commodityName, lang),
         hs: `HS ${l.hsCode}`,
         hsCode: l.hsCode,
         corridor: `${iso2ToFlag(oIso2)} ${oIso2 || "?"} → ${iso2ToFlag(dIso2)} ${dIso2 || "?"}`,
@@ -410,7 +412,7 @@ export default function Dashboard() {
                 <div key={l.id} className="activity-item">
                   <div className="act-avatar" style={{ background: i === 0 ? "rgba(93,217,193,0.12)" : "rgba(234,179,8,0.12)", color: i === 0 ? "var(--app-acapulco)" : "#d97706" }}>F</div>
                   <div className="act-content">
-                    <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.complianceLookup", { commodity: l.commodityName }) }} />
+                    <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.complianceLookup", { commodity: translateCommodity(l.commodityName, lang) }) }} />
                     <div className="act-time">{new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</div>
                   </div>
                 </div>
@@ -474,7 +476,7 @@ export default function Dashboard() {
               <div key={l.id} className="activity-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/trades/${l.id}`)}>
                 <div className="act-avatar" style={{ background: "rgba(93,217,193,0.12)", color: "var(--app-acapulco)" }}>F</div>
                 <div className="act-content">
-                  <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.complianceLookup", { commodity: l.commodityName }) }} />
+                  <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.complianceLookup", { commodity: translateCommodity(l.commodityName, lang) }) }} />
                   <div className="act-time">{new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</div>
                 </div>
               </div>

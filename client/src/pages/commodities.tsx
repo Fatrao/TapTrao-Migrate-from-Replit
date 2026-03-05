@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
+import { translateCommodity } from "@/lib/commodity-i18n";
 
 /* ─── Types (shared with trades.tsx) ─── */
 
@@ -232,7 +233,8 @@ const css = `
 /* ─── Component ─── */
 
 export default function Commodities() {
-  const { t } = useTranslation("lookup");
+  const { t, i18n } = useTranslation("lookup");
+  const lang = i18n.language;
   usePageTitle("Commodities");
   const [, navigate] = useLocation();
   const [filter, setFilter] = useState<FilterTab>("all");
@@ -467,7 +469,7 @@ export default function Commodities() {
                   )}
 
                   {/* Commodity name + route */}
-                  <div className="cm-tc-name">{trade.commodityName}</div>
+                  <div className="cm-tc-name">{translateCommodity(trade.commodityName, lang)}</div>
                   <div className="cm-tc-route">
                     {trade.originName} → {trade.destName}
                   </div>
