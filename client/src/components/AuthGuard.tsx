@@ -25,12 +25,12 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         alignItems: "center",
         justifyContent: "center",
         height: "100vh",
-        background: "#000",
+        background: "#eee9e0",
       }}>
         <div style={{
           fontFamily: "'Clash Display', sans-serif",
           fontSize: 18,
-          color: "rgba(255,255,255,0.3)",
+          color: "rgba(0,0,0,0.25)",
         }}>
           Loading...
         </div>

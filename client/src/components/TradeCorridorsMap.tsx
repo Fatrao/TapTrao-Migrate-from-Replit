@@ -112,12 +112,12 @@ export const TradeCorridorsMap = memo(function TradeCorridorsMap({
               <Geography
                 key={geo.rsmKey}
                 geography={geo}
-                fill="#1a2e28"
-                stroke="rgba(74,222,128,0.08)"
+                fill="#2a4435"
+                stroke="rgba(109,184,154,0.25)"
                 strokeWidth={0.5}
                 style={{
                   default: { outline: "none" },
-                  hover: { outline: "none", fill: "#264a38" },
+                  hover: { outline: "none", fill: "#3a5c48" },
                   pressed: { outline: "none" },
                 }}
               />

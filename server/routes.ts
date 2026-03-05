@@ -370,10 +370,10 @@ export async function registerRoutes(
   app.get("/api/tokens/balance", async (req, res) => {
     try {
       const sessionId = getSessionId(req, res);
-      const { balance, lcBalance, freeLookupUsed } = await storage.getTokenBalance(sessionId);
+      const { balance, lcBalance, freeLookupUsed, freeLcCheckUsed } = await storage.getTokenBalance(sessionId);
       const isAdmin = await storage.isAdminSession(sessionId);
       const hasPurchased = await storage.hasPurchased(sessionId);
-      res.json({ balance, lcBalance, freeLookupUsed, isAdmin, hasPurchased });
+      res.json({ balance, lcBalance, freeLookupUsed, freeLcCheckUsed, isAdmin, hasPurchased });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -935,7 +935,7 @@ export async function registerRoutes(
       let freeRechecksRemaining = 3;
 
       if (!isAdmin) {
-        const { balance } = await storage.getTokenBalance(sessionId);
+        const { balance, freeLcCheckUsed } = await storage.getTokenBalance(sessionId);
 
         if (existingCase) {
           // Re-check: free if under limit, otherwise 1 trade credit
@@ -958,8 +958,10 @@ export async function registerRoutes(
             await storage.spendTokens(sessionId, 1, `LC re-check #${recheckNumber} for case ${existingCase.id}`);
           }
         } else {
-          // New check: costs 1 trade credit
-          if (balance < 1) {
+          // New check: first LC check is free, then costs 1 trade credit
+          if (!freeLcCheckUsed) {
+            await storage.markFreeLcCheckUsed(sessionId);
+          } else if (balance < 1) {
             res.status(402).json({
               message: t("routes.lc_credit_required", locale),
               required: 1,
@@ -967,6 +969,8 @@ export async function registerRoutes(
               type: "trade_pack",
             });
             return;
+          } else {
+            await storage.spendTokens(sessionId, 1, `LC check`);
           }
         }
       } // end if (!isAdmin)

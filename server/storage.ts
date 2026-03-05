@@ -132,12 +132,13 @@ export interface IStorage {
   getAllLcChecks(): Promise<LcCheck[]>;
   getDashboardStats(sessionId?: string): Promise<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null; totalTradeValue: number }>;
   getOrCreateUserTokens(sessionId: string): Promise<UserTokens>;
-  getTokenBalance(sessionId: string): Promise<{ balance: number; lcBalance: number; freeLookupUsed: boolean }>;
+  getTokenBalance(sessionId: string): Promise<{ balance: number; lcBalance: number; freeLookupUsed: boolean; freeLcCheckUsed: boolean }>;
   spendTokens(sessionId: string, amount: number, description: string): Promise<{ success: boolean; balance: number }>;
   creditTokens(sessionId: string, amount: number, description: string, stripeSessionId: string): Promise<{ success: boolean; balance: number }>;
   spendLcCredit(sessionId: string, description: string): Promise<{ success: boolean; lcBalance: number }>;
   creditLcCredits(sessionId: string, amount: number, description: string, stripeSessionId: string): Promise<{ success: boolean; lcBalance: number }>;
   markDemoUsed(sessionId: string): Promise<void>;
+  markFreeLcCheckUsed(sessionId: string): Promise<void>;
   getTokenTransactions(sessionId: string, limit: number): Promise<TokenTransaction[]>;
   hasStripeSessionBeenProcessed(stripeSessionId: string): Promise<boolean>;
   createTemplate(data: InsertTemplate): Promise<Template>;
@@ -572,9 +573,9 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async getTokenBalance(sessionId: string): Promise<{ balance: number; lcBalance: number; freeLookupUsed: boolean }> {
+  async getTokenBalance(sessionId: string): Promise<{ balance: number; lcBalance: number; freeLookupUsed: boolean; freeLcCheckUsed: boolean }> {
     const user = await this.getOrCreateUserTokens(sessionId);
-    return { balance: user.balance, lcBalance: user.lcBalance, freeLookupUsed: user.freeLookupUsed };
+    return { balance: user.balance, lcBalance: user.lcBalance, freeLookupUsed: user.freeLookupUsed, freeLcCheckUsed: user.freeLcCheckUsed };
   }
 
   async spendTokens(sessionId: string, amount: number, description: string): Promise<{ success: boolean; balance: number }> {
@@ -650,6 +651,11 @@ export class DatabaseStorage implements IStorage {
   async markDemoUsed(sessionId: string): Promise<void> {
     await this.getOrCreateUserTokens(sessionId);
     await db.update(userTokens).set({ freeLookupUsed: true, updatedAt: new Date() }).where(eq(userTokens.sessionId, sessionId));
+  }
+
+  async markFreeLcCheckUsed(sessionId: string): Promise<void> {
+    await this.getOrCreateUserTokens(sessionId);
+    await db.update(userTokens).set({ freeLcCheckUsed: true, updatedAt: new Date() }).where(eq(userTokens.sessionId, sessionId));
   }
 
   async getTokenTransactions(sessionId: string, limit: number): Promise<TokenTransaction[]> {

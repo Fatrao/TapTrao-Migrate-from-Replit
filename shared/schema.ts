@@ -263,6 +263,7 @@ export const userTokens = pgTable("user_tokens", {
   balance: integer("balance").notNull().default(0),
   lcBalance: integer("lc_balance").notNull().default(0),
   freeLookupUsed: boolean("free_lookup_used").notNull().default(false),
+  freeLcCheckUsed: boolean("free_lc_check_used").notNull().default(false),
   isAdmin: boolean("is_admin").notNull().default(false),
   utmSource: text("utm_source"),
   utmMedium: text("utm_medium"),

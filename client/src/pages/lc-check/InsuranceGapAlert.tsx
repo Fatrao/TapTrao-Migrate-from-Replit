@@ -37,7 +37,7 @@ export function InsuranceGapAlert() {
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
         <Shield size={16} style={{ color: "var(--app-acapulco)", flexShrink: 0 }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--app-main-base)" }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--app-text-heading)" }}>
           {t("insurance.title")}
         </span>
       </div>
@@ -52,7 +52,7 @@ export function InsuranceGapAlert() {
         fontFamily: "var(--fb)", fontSize: 13, marginBottom: 12,
       }}>
         <div>
-          <div style={{ fontWeight: 600, color: "var(--app-main-base)", marginBottom: 6 }}>{t("insurance.notCoveredTitle")}</div>
+          <div style={{ fontWeight: 600, color: "var(--app-text-heading)", marginBottom: 6 }}>{t("insurance.notCoveredTitle")}</div>
           <ul style={{ margin: 0, paddingLeft: 16, color: "var(--app-regent)", lineHeight: 1.8 }}>
             <li>{t("insurance.notCovered1")}</li>
             <li>{t("insurance.notCovered2")}</li>
@@ -61,7 +61,7 @@ export function InsuranceGapAlert() {
           </ul>
         </div>
         <div>
-          <div style={{ fontWeight: 600, color: "var(--app-main-base)", marginBottom: 6 }}>{t("insurance.askInsurerTitle")}</div>
+          <div style={{ fontWeight: 600, color: "var(--app-text-heading)", marginBottom: 6 }}>{t("insurance.askInsurerTitle")}</div>
           <ul style={{ margin: 0, paddingLeft: 16, color: "var(--app-regent)", lineHeight: 1.8 }}>
             <li>{t("insurance.askInsurer1")}</li>
             <li>{t("insurance.askInsurer2")}</li>

@@ -301,8 +301,8 @@ export default function LcCheck() {
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [, navigate] = useLocation();
   const balance = tokenQuery.data?.balance ?? 0;
-  const freeLookupUsed = tokenQuery.data?.freeLookupUsed ?? false;
-  const isFreeCheck = !freeLookupUsed;
+  const freeLcCheckUsed = tokenQuery.data?.freeLcCheckUsed ?? false;
+  const isFreeCheck = !freeLcCheckUsed;
 
   const checkMutation = useMutation<LcCheckResponse, Error, void>({
     mutationFn: async () => {
