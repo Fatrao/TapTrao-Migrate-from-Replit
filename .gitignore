@@ -5,3 +5,6 @@ server/public
 vite.config.ts.*
 *.tar.gz
 pglite-data
+.env
+.claude/
+design-refs/
