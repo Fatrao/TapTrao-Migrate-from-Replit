@@ -4,6 +4,8 @@ import { AppShell } from "@/components/AppShell";
 import { useQuery } from "@tanstack/react-query";
 import { getAvatarColour } from "@/lib/avatarColours";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 import type { TFunction } from "i18next";
 
 type InboxSummary = {
@@ -86,6 +88,7 @@ function getStatusInfo(status: string, t: TFunction): StatusInfo {
 
 export default function Inbox() {
   const { t } = useTranslation("inbox");
+  const [, navigate] = useLocation();
   usePageTitle("Supplier Inbox", "Track supplier documents and uploads");
 
   const summaryQuery = useQuery<InboxSummary>({ queryKey: ["/api/supplier-inbox/summary"] });
@@ -132,6 +135,7 @@ export default function Inbox() {
           </p>
         </div>
         <button
+          onClick={() => navigate("/lookup")}
           style={{
             padding: "9px 20px",
             borderRadius: 20,
@@ -225,7 +229,45 @@ function InboxSection({ label, items, dimmed, t }: { label: string; items: Suppl
 }
 
 function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dimmed?: boolean; t: TFunction }) {
+  const { toast } = useToast();
   const statusInfo = getStatusInfo(request.status, t);
+  const uploadUrl = `${window.location.origin}/upload/${request.upload_token}`;
+
+  const handleWhatsApp = () => {
+    const msg = encodeURIComponent(
+      t("share.whatsappMessage", {
+        supplier: request.supplier_name,
+        commodity: request.commodity_name,
+        url: uploadUrl,
+      })
+    );
+    const phone = request.supplier_whatsapp?.replace(/[^0-9]/g, "") || "";
+    window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
+  };
+
+  const handleEmail = () => {
+    const subject = encodeURIComponent(
+      t("share.emailSubject", { commodity: request.commodity_name })
+    );
+    const body = encodeURIComponent(
+      t("share.emailBody", {
+        supplier: request.supplier_name,
+        commodity: request.commodity_name,
+        url: uploadUrl,
+      })
+    );
+    const email = request.supplier_email || "";
+    window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_self");
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(uploadUrl);
+      toast({ title: t("share.linkCopied") });
+    } catch {
+      toast({ title: t("share.linkCopyFailed"), variant: "destructive" });
+    }
+  };
   const docsRequired = Array.isArray(request.docs_required) ? request.docs_required : [];
   const docsReceived = Array.isArray(request.docs_received) ? request.docs_received : [];
   const receivedSet = new Set(docsReceived);
@@ -359,6 +401,7 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
         </div>
         <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
           <button
+            onClick={handleWhatsApp}
             style={{
               padding: "4px 10px",
               borderRadius: 8,
@@ -375,6 +418,7 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
             {t("btn.whatsapp")}
           </button>
           <button
+            onClick={handleEmail}
             style={{
               padding: "4px 10px",
               borderRadius: 8,
@@ -391,6 +435,7 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
             {t("btn.email")}
           </button>
           <button
+            onClick={handleCopyLink}
             style={{
               padding: "4px 10px",
               borderRadius: 8,

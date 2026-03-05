@@ -31,5 +31,11 @@
   "time.daysOverdue": "{{days}} j de retard",
   "btn.whatsapp": "WhatsApp",
   "btn.email": "E-mail",
-  "btn.link": "Lien"
+  "btn.link": "Lien",
+
+  "share.whatsappMessage": "Bonjour {{supplier}}, veuillez importer vos documents pour l'expédition de {{commodity}} via ce lien : {{url}}",
+  "share.emailSubject": "Demande d'importation de documents – {{commodity}}",
+  "share.emailBody": "Cher(e) {{supplier}},\n\nVeuillez importer les documents requis pour l'expédition de {{commodity}} via le lien sécurisé ci-dessous :\n\n{{url}}\n\nMerci.",
+  "share.linkCopied": "Lien d'importation copié dans le presse-papiers",
+  "share.linkCopyFailed": "Échec de la copie du lien"
 }

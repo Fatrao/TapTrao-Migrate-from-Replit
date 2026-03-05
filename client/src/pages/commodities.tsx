@@ -325,6 +325,33 @@ export default function Commodities() {
     return Math.round(((trades.length - counts.closed) / trades.length) * 100);
   }, [trades.length, counts.closed]);
 
+  const handleExport = () => {
+    const rows = [
+      ["Commodity", "HS Code", "Origin", "Destination", "Status", "Compliance %", "Value", "Date"],
+    ];
+    for (const tr of filtered) {
+      const si = statusMap.get(tr.id);
+      rows.push([
+        tr.commodityName,
+        tr.hsCode,
+        `${tr.originIso2} (${tr.originName})`,
+        `${tr.destIso2} (${tr.destName})`,
+        si?.label ?? "—",
+        tr.readinessScore != null ? String(tr.readinessScore) : "—",
+        tr.tradeValue ? `$${Number(tr.tradeValue).toLocaleString()}` : "—",
+        new Date(tr.createdAt).toLocaleDateString("en-GB"),
+      ]);
+    }
+    const csv = rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `taptrao-commodities-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <AppShell>
       <style>{css}</style>
@@ -339,7 +366,7 @@ export default function Commodities() {
             </div>
           </div>
           <div className="cm-hdr-r">
-            <button className="cm-btn out">{t("commodities.export")}</button>
+            <button className="cm-btn out" onClick={handleExport}>{t("commodities.export")}</button>
             <button
               className="cm-btn pri"
               onClick={() => navigate("/lookup")}

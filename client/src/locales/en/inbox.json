@@ -40,5 +40,11 @@
 
   "btn.whatsapp": "WhatsApp",
   "btn.email": "Email",
-  "btn.link": "Link"
+  "btn.link": "Link",
+
+  "share.whatsappMessage": "Hi {{supplier}}, please upload your documents for the {{commodity}} shipment using this link: {{url}}",
+  "share.emailSubject": "Document Upload Request – {{commodity}}",
+  "share.emailBody": "Dear {{supplier}},\n\nPlease upload the required documents for the {{commodity}} shipment using the secure link below:\n\n{{url}}\n\nThank you.",
+  "share.linkCopied": "Upload link copied to clipboard",
+  "share.linkCopyFailed": "Failed to copy link"
 }

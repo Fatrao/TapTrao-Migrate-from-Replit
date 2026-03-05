@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useRef, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/AppShell";
 import { PORTS, CONTAINER_OPTIONS, computeDemurrage, type ContainerType } from "@/lib/demurrage-utils";
@@ -22,6 +22,7 @@ export default function DemurragePage() {
   const [useDate, setUseDate] = useState(false);
   const [arrivalDate, setArrivalDate] = useState("");
   const [cargoValue, setCargoValue] = useState("");
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const effectiveDaysHeld = useMemo(() => {
     if (useDate && arrivalDate) {
@@ -165,6 +166,7 @@ export default function DemurragePage() {
 
             <button
               data-testid="demurrage-calculate"
+              onClick={() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
               style={{
                 width: "100%",
                 background: "var(--sage)",
@@ -183,7 +185,7 @@ export default function DemurragePage() {
           </div>
 
           {/* RESULTS PANEL */}
-          <div>
+          <div ref={resultsRef}>
             <div style={s.panel}>
               <div className="demurrage-stats-grid">
                 <div style={{ textAlign: "center", padding: 12, background: "var(--card2)", borderRadius: 8 }}>

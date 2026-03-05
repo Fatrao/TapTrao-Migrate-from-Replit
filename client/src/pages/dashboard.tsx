@@ -237,7 +237,7 @@ export default function Dashboard() {
                   </td>
                 </tr>
               ) : recentTrades.map((tr) => (
-                <tr key={tr.id}>
+                <tr key={tr.id} style={{ cursor: "pointer" }} onClick={() => navigate(`/trades/${tr.id}`)}>
                   <td>
                     <div className="trade-cell">
                       <div className="trade-icon" style={{ background: tr.iconBg }}>{tr.icon}</div>
@@ -288,7 +288,7 @@ export default function Dashboard() {
               { ic: "🌿", name: t("doc.eudrDueDiligence"), detail: t("doc.eudrDueDiligenceDetail"), st: "warn", stLabel: "⚠ 3" },
               { ic: "📋", name: t("doc.customsDeclaration"), detail: t("doc.customsDeclarationDetail"), st: "ok", stLabel: "✓ Ready" },
             ].map((d) => (
-              <div key={d.name} className="pending-item">
+              <div key={d.name} className="pending-item" style={{ cursor: "pointer" }} onClick={() => navigate("/inbox")}>
                 <div className="pending-icon">{d.ic}</div>
                 <div className="pending-info">
                   <div className="pending-name">{d.name}</div>
@@ -382,17 +382,17 @@ export default function Dashboard() {
               </div>
               <div className="comp-progress"><div className="comp-fill" style={{ width: "78%" }} /></div>
               <div className="comp-tiles">
-                <div className="comp-tile">
+                <div className="comp-tile" style={{ cursor: "pointer" }} onClick={() => navigate("/inbox")}>
                   <div className="comp-tile-ic">📁</div>
                   <div className="comp-tile-lbl">{t("compliance.documents")}</div>
                   <div className="comp-tile-cnt comp-red">{t("compliance.documentsCount", { count: 7, total: 10 })}</div>
                 </div>
-                <div className="comp-tile">
+                <div className="comp-tile" style={{ cursor: "pointer" }} onClick={() => navigate("/trades")}>
                   <div className="comp-tile-ic">🛡️</div>
                   <div className="comp-tile-lbl">{t("compliance.risks")}</div>
                   <div className="comp-tile-cnt comp-amber">{t("compliance.flagged", { count: 3 })}</div>
                 </div>
-                <div className="comp-tile">
+                <div className="comp-tile" style={{ cursor: "pointer" }} onClick={() => navigate("/alerts")}>
                   <div className="comp-tile-ic">🚩</div>
                   <div className="comp-tile-lbl">{t("compliance.sanctions")}</div>
                   <div className="comp-tile-cnt comp-amber">{tc("status.pending")}</div>
@@ -409,7 +409,7 @@ export default function Dashboard() {
             </div>
             <div className="activity-list">
               {(lookupsQuery.data ?? []).slice(0, 2).map((l, i) => (
-                <div key={l.id} className="activity-item">
+                <div key={l.id} className="activity-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/trades/${l.id}`)}>
                   <div className="act-avatar" style={{ background: i === 0 ? "rgba(93,217,193,0.12)" : "rgba(234,179,8,0.12)", color: i === 0 ? "var(--app-acapulco)" : "#d97706" }}>F</div>
                   <div className="act-content">
                     <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.complianceLookup", { commodity: translateCommodity(l.commodityName, lang) }) }} />
@@ -418,7 +418,7 @@ export default function Dashboard() {
                 </div>
               ))}
               {(lcQuery.data ?? []).slice(0, 1).map((lc) => (
-                <div key={lc.id} className="activity-item">
+                <div key={lc.id} className="activity-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/trades/${lc.id}`)}>
                   <div className="act-avatar" style={{ background: "rgba(20,184,166,0.12)", color: "#0d9488" }}>F</div>
                   <div className="act-content">
                     <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.lcCheck") }} />
