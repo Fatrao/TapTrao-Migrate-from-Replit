@@ -34,9 +34,9 @@ function requireAuth(req: Request, res: Response, next: NextFunction): void {
 
 const TOKEN_PACKS: Record<string, { price: number; tokens: number; name: string }> = {
   lc_standalone: { price: 4999, tokens: 0, name: "LC Document Check" },
-  shield_single: { price: 11000, tokens: 1, name: "TapTrao Shield: Single" },
-  shield_3: { price: 29900, tokens: 3, name: "TapTrao Shield: 3-Pack" },
-  shield_5: { price: 47500, tokens: 5, name: "TapTrao Shield: 5-Pack" },
+  shield_single: { price: 18900, tokens: 1, name: "TapTrao Shield: Single" },
+  shield_3: { price: 49900, tokens: 3, name: "TapTrao Shield: 3-Pack" },
+  shield_5: { price: 79900, tokens: 5, name: "TapTrao Shield: 5-Pack" },
 };
 
 const LOOKUP_COST = 1;

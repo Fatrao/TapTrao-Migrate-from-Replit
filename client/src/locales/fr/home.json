@@ -43,7 +43,7 @@
     },
     "summary": "Un seul rejet bancaire co\u00fbte <b>{{amount}} ou plus</b>. La validation compl\u00e8te co\u00fbte",
     "summaryAmount": "1 500 $",
-    "summaryValidationCost": "110 $"
+    "summaryValidationCost": "189 $"
   },
 
   "howItWorks": {
@@ -94,21 +94,21 @@
     "plans": {
       "single": {
         "name": "V\u00e9rification unique",
-        "price": "110 $",
+        "price": "189 $",
         "per": "par transaction",
         "features": "Validation crois\u00e9e compl\u00e8te\nV\u00e9rification des termes LC\nContr\u00f4le EUDR + CBAM\nScore de conformit\u00e9 + rapport\nRecommandations de correction"
       },
       "threePack": {
         "name": "Pack 3",
-        "price": "299 $",
-        "per": "99,67 $ par transaction",
-        "features": "Tout dans un seul contr\u00f4le\n\u00c9conomisez 31 $ par transaction\nValable pendant 12 mois\nSupport prioritaire"
+        "price": "499 $",
+        "per": "166,33 $ par transaction",
+        "features": "Tout dans un seul contr\u00f4le\n\u00c9conomisez 68 $ au total\nValable pendant 12 mois\nSupport prioritaire"
       },
       "fivePack": {
         "name": "Pack 5",
-        "price": "475 $",
-        "per": "95 $ par transaction",
-        "features": "Tout dans un seul contr\u00f4le\n\u00c9conomisez 75 $ au total\nValable pendant 12 mois\nSupport prioritaire\nOnboarding d\u00e9di\u00e9"
+        "price": "799 $",
+        "per": "159,80 $ par transaction",
+        "features": "Tout dans un seul contr\u00f4le\n\u00c9conomisez 146 $ au total\nValable pendant 12 mois\nSupport prioritaire\nOnboarding d\u00e9di\u00e9"
       }
     },
     "ctaFeatured": "Meilleur rapport qualit\u00e9-prix \u2192",

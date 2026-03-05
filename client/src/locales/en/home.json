@@ -43,7 +43,7 @@
     },
     "summary": "A single bank rejection costs <b>${{amount}} or more</b>. Full validation costs",
     "summaryAmount": "$1,500",
-    "summaryValidationCost": "$110"
+    "summaryValidationCost": "$189"
   },
 
   "howItWorks": {
@@ -94,21 +94,21 @@
     "plans": {
       "single": {
         "name": "Single Check",
-        "price": "$110",
+        "price": "$189",
         "per": "per trade",
         "features": "Full cross-validation\nLC terms check\nEUDR + CBAM screening\nCompliance score + report\nFix recommendations"
       },
       "threePack": {
         "name": "3-Pack",
-        "price": "$299",
-        "per": "$99.67 per trade",
-        "features": "Everything in Single Check\nSave $31 per trade\nValid for 12 months\nPriority support"
+        "price": "$499",
+        "per": "$166.33 per trade",
+        "features": "Everything in Single Check\nSave $68 total\nValid for 12 months\nPriority support"
       },
       "fivePack": {
         "name": "5-Pack",
-        "price": "$475",
-        "per": "$95 per trade",
-        "features": "Everything in Single Check\nSave $75 total\nValid for 12 months\nPriority support\nDedicated onboarding"
+        "price": "$799",
+        "per": "$159.80 per trade",
+        "features": "Everything in Single Check\nSave $146 total\nValid for 12 months\nPriority support\nDedicated onboarding"
       }
     },
     "ctaFeatured": "Best Value \u2192",
