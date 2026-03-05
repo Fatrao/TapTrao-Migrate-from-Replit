@@ -361,7 +361,7 @@ export default function Home() {
               }}>
                 {(t(`pricingSection.plans.${plan.key}.features`) as string).split("\n").map((f: string) => <div key={f}>{f}</div>)}
               </div>
-              <Link href="/lookup" style={{
+              <Link href="/pricing" style={{
                 display: "block", width: "100%", padding: 12, borderRadius: 20,
                 border: "none", fontFamily: "var(--fb)", fontSize: 13, fontWeight: 600,
                 cursor: "pointer", textDecoration: "none",
