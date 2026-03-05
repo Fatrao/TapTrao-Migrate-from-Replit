@@ -1,8 +1,12 @@
 import { Link } from "wouter";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { trackEvent } from "@/lib/analytics";
 import { usePageTitle } from "@/hooks/use-page-title";
-import { Menu, X, Globe } from "lucide-react";
+import { Menu, X, Globe, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 /* ═══════════════════════════════════════════
@@ -17,6 +21,33 @@ export default function Home() {
   const isEn = i18n.language === "en";
 
   usePageTitle(t("pageTitle"));
+
+  const { toast } = useToast();
+
+  // Map landing page plan keys → Stripe pack keys
+  const PACK_KEYS: Record<string, string> = {
+    single: "shield_single",
+    threePack: "shield_3",
+    fivePack: "shield_5",
+  };
+
+  const checkoutMutation = useMutation({
+    mutationFn: async (pack: string) => {
+      trackEvent("checkout_started", { pack });
+      const res = await apiRequest("POST", "/api/tokens/checkout", { pack });
+      return res.json();
+    },
+    onSuccess: (data: { url?: string }) => {
+      if (data.url) window.location.href = data.url;
+    },
+    onError: (err: Error) => {
+      toast({
+        title: "Checkout failed",
+        description: err.message || "Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   return (
     <div className="hp-page" style={{ fontFamily: "var(--fb)", background: "var(--bg)", color: "var(--t1)", minHeight: "100vh" }}>
@@ -361,16 +392,24 @@ export default function Home() {
               }}>
                 {(t(`pricingSection.plans.${plan.key}.features`) as string).split("\n").map((f: string) => <div key={f}>{f}</div>)}
               </div>
-              <Link href="/pricing" style={{
-                display: "block", width: "100%", padding: 12, borderRadius: 20,
-                border: "none", fontFamily: "var(--fb)", fontSize: 13, fontWeight: 600,
-                cursor: "pointer", textDecoration: "none",
-                background: plan.featured ? "var(--sage-l)" : "var(--bg)",
-                color: plan.featured ? "var(--dark)" : "var(--t1)",
-                textAlign: "center",
-              }}>
+              <button
+                onClick={() => checkoutMutation.mutate(PACK_KEYS[plan.key])}
+                disabled={checkoutMutation.isPending}
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  width: "100%", padding: 12, borderRadius: 20,
+                  border: "none", fontFamily: "var(--fb)", fontSize: 13, fontWeight: 600,
+                  cursor: checkoutMutation.isPending ? "wait" : "pointer",
+                  background: plan.featured ? "var(--sage-l)" : "var(--bg)",
+                  color: plan.featured ? "var(--dark)" : "var(--t1)",
+                  opacity: checkoutMutation.isPending ? 0.7 : 1,
+                }}
+              >
+                {checkoutMutation.isPending && checkoutMutation.variables === PACK_KEYS[plan.key] && (
+                  <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
+                )}
                 {plan.featured ? t("pricingSection.ctaFeatured") : t("pricingSection.ctaDefault")}
-              </Link>
+              </button>
             </div>
           ))}
         </div>
