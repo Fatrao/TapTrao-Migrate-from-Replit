@@ -1,14 +1,16 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/AppShell";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Link, useLocation, useSearch } from "wouter";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { useTokenBalance } from "@/hooks/use-tokens";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
 import { TradeCorridorsMap } from "@/components/TradeCorridorsMap";
 import type { Corridor } from "@/components/TradeCorridorsMap";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 
 /* ─── Types ─── */
 
@@ -99,6 +101,10 @@ const css = `
 /* Stats */
 .mt-stats { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;flex-shrink:0 }
 .mt-st { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;animation:mt-fu .3s ease both }
+.mt-st-click { cursor:pointer;transition:transform .15s,box-shadow .15s }
+.mt-st-click:hover { transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08) }
+.mt-st-click:active { transform:translateY(0) }
+.mt-acr-click:hover { background:rgba(0,0,0,.02) }
 .mt-st .sl { font-size:14px;color:var(--t3);margin-bottom:1px }
 .mt-st .sv { font-family:var(--fd);font-size:22px;font-weight:600;color:var(--t1) }
 .mt-st-bars { display:flex;align-items:flex-end;gap:2px;height:24px }
@@ -259,8 +265,16 @@ export default function Trades() {
   usePageTitle(t("pageTitle"));
   const [, navigate] = useLocation();
   const searchString = useSearch();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [filter, setFilter] = useState<FilterTab>("all");
   const [search, setSearch] = useState("");
+  const [statCardFilter, setStatCardFilter] = useState<string | null>(null);
+  const [hoveredPie, setHoveredPie] = useState<number | null>(null);
+  const [selectedCorridor, setSelectedCorridor] = useState<string | null>(null);
+  const [pieTooltip, setPieTooltip] = useState<{ x: number; y: number; text: string } | null>(null);
+  const [batchEudrAssessing, setBatchEudrAssessing] = useState(false);
+  const [batchCbamAssessing, setBatchCbamAssessing] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(searchString);
@@ -288,6 +302,14 @@ export default function Trades() {
     });
     if (filter === "issues") list = list.filter(tr => tr.readinessVerdict === "RED");
     if (filter === "closed") list = list.filter(tr => tr.tradeStatus === "closed" || tr.tradeStatus === "archived");
+    // Stat card sub-filter
+    if (statCardFilter === "pendingDocs") {
+      list = list.filter(tr => tr.docsRequiredCount > 0 && tr.docsReceivedCount < tr.docsRequiredCount);
+    }
+    // Corridor filter from pie chart / bar click
+    if (selectedCorridor) {
+      list = list.filter(tr => `${tr.originName} → ${tr.destName}` === selectedCorridor);
+    }
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(tr =>
@@ -297,7 +319,7 @@ export default function Trades() {
       );
     }
     return list;
-  }, [allTrades, filter, search]);
+  }, [allTrades, filter, search, statCardFilter, selectedCorridor]);
 
   const eudrTrades = useMemo(() =>
     allTrades.filter(tr => tr.eudrApplicable === true && tr.tradeStatus !== "closed" && tr.tradeStatus !== "archived"),
@@ -341,6 +363,41 @@ export default function Trades() {
   const maxCorridorValue = Math.max(...corridorAnalytics.map(c => c.value), 1);
   const pieColors = ["var(--sage-l)", "var(--amber)", "#5aa07a", "#8ecaad"];
 
+  const eudrAssessedCount = useMemo(() => eudrTrades.filter(tr => tr.eudrBand !== null).length, [eudrTrades]);
+  const cbamAssessedCount = useMemo(() => cbamTrades.filter(tr => tr.cbamBand !== null).length, [cbamTrades]);
+
+  const batchAssessEudr = async () => {
+    setBatchEudrAssessing(true);
+    const unassessed = eudrTrades.filter(tr => tr.eudrBand === null);
+    let done = 0;
+    for (const trade of unassessed) {
+      try {
+        await apiRequest("POST", "/api/eudr", { lookupId: trade.id });
+        await apiRequest("POST", `/api/eudr/${trade.id}/assess`);
+        done++;
+      } catch { /* continue with remaining */ }
+    }
+    queryClient.invalidateQueries({ queryKey: ["/api/trades"] });
+    toast({ title: t("eudr.batchDone", { count: done }) });
+    setBatchEudrAssessing(false);
+  };
+
+  const batchAssessCbam = async () => {
+    setBatchCbamAssessing(true);
+    const unassessed = cbamTrades.filter(tr => tr.cbamBand === null);
+    let done = 0;
+    for (const trade of unassessed) {
+      try {
+        await apiRequest("POST", "/api/cbam", { lookupId: trade.id });
+        await apiRequest("POST", `/api/cbam/${trade.id}/assess`);
+        done++;
+      } catch { /* continue with remaining */ }
+    }
+    queryClient.invalidateQueries({ queryKey: ["/api/trades"] });
+    toast({ title: t("cbam.batchDone", { count: done }) });
+    setBatchCbamAssessing(false);
+  };
+
   return (
     <AppShell>
       <style>{css}</style>
@@ -370,7 +427,7 @@ export default function Trades() {
 
         {/* ── Stat Cards ── */}
         <div className="mt-stats" data-testid="stat-cards">
-          <div className="mt-st">
+          <div className="mt-st mt-st-click" onClick={() => { setFilter("active"); setStatCardFilter(null); setSelectedCorridor(null); }}>
             <div>
               <div className="sl">{t("stat.activeShipments")}</div>
               <div className="sv">{stats.activeShipments}</div>
@@ -381,14 +438,14 @@ export default function Trades() {
               ))}
             </div>
           </div>
-          <div className="mt-st ac">
+          <div className="mt-st ac mt-st-click" onClick={() => { setFilter("all"); setStatCardFilter("pendingDocs"); setSelectedCorridor(null); }}>
             <div>
               <div className="sl">{t("stat.pendingDocs")}</div>
               <div className="sv">{stats.pendingDocuments}</div>
             </div>
             <div style={{ fontSize: 16 }}>📄</div>
           </div>
-          <div className="mt-st">
+          <div className="mt-st mt-st-click" onClick={() => { setFilter("all"); setStatCardFilter(null); setSelectedCorridor(null); document.querySelector(".mt-tc")?.scrollIntoView({ behavior: "smooth" }); }}>
             <div>
               <div className="sl">{t("stat.totalValue")}</div>
               <div className="sv">${totalValue >= 1000 ? `${(totalValue / 1000).toFixed(0)}k` : totalValue.toLocaleString()}</div>
@@ -397,7 +454,7 @@ export default function Trades() {
               <path d="M0,16 Q7,11 14,13 Q22,15 32,6 Q40,1 48,4" fill="none" stroke="var(--sage-l)" strokeWidth="1.5" opacity=".5" />
             </svg>
           </div>
-          <div className="mt-st ac">
+          <div className="mt-st ac mt-st-click" onClick={() => navigate("/pricing")}>
             <div>
               <div className="sl">{t("stat.shieldBalance")}</div>
               <div className="sv">{t("stat.check", { count: balance })}</div>
@@ -417,12 +474,22 @@ export default function Trades() {
                   <button
                     key={f.key}
                     className={`mt-pl${filter === f.key ? " on" : ""}`}
-                    onClick={() => setFilter(f.key)}
+                    onClick={() => { setFilter(f.key); setStatCardFilter(null); setSelectedCorridor(null); }}
                     data-testid={`filter-${f.key}`}
                   >
                     {f.label}
                   </button>
                 ))}
+                {selectedCorridor && (
+                  <button className="mt-pl on" onClick={() => setSelectedCorridor(null)} style={{ fontSize: 11, gap: 4 }}>
+                    {selectedCorridor} ✕
+                  </button>
+                )}
+                {statCardFilter === "pendingDocs" && (
+                  <button className="mt-pl on" onClick={() => setStatCardFilter(null)} style={{ fontSize: 11, gap: 4 }}>
+                    {t("stat.pendingDocs")} ✕
+                  </button>
+                )}
               </div>
             </div>
             <div className="tsub">
@@ -485,7 +552,20 @@ export default function Trades() {
                     <div style={{ fontSize: 13, color: "var(--t3)", padding: "16px 0" }}>{t("analytics.noData")}</div>
                   ) : (
                     corridorAnalytics.map((c, i) => (
-                      <div key={i}>
+                      <div
+                        key={i}
+                        className="mt-acr-click"
+                        style={{
+                          cursor: "pointer", borderRadius: 6, padding: "2px 4px", margin: "-2px -4px",
+                          transition: "background 0.15s",
+                          background: selectedCorridor === c.label ? "rgba(107,144,128,0.08)" : undefined,
+                        }}
+                        onClick={() => {
+                          setSelectedCorridor(selectedCorridor === c.label ? null : c.label);
+                          setFilter("all");
+                          setStatCardFilter(null);
+                        }}
+                      >
                         <div className="mt-acr">
                           <div className="cfl">{c.flags}</div>
                           <div className="ci">
@@ -503,7 +583,7 @@ export default function Trades() {
                 </div>
 
                 {corridorAnalytics.length > 0 && (
-                  <div className="mt-pie-area">
+                  <div className="mt-pie-area" style={{ position: "relative" }}>
                     <svg viewBox="0 0 120 120" className="mt-pie">
                       {(() => {
                         const useCount = corridorAnalytics.every(c => c.value === 0);
@@ -522,10 +602,53 @@ export default function Trades() {
                           const largeArc = angle > 180 ? 1 : 0;
                           const d = `M60,60 L${x1.toFixed(1)},${y1.toFixed(1)} A50,50 0 ${largeArc},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z`;
                           startAngle = endAngle;
-                          return <path key={i} d={d} fill={pieColors[i % pieColors.length]} />;
+                          return (
+                            <path
+                              key={i}
+                              d={d}
+                              fill={pieColors[i % pieColors.length]}
+                              style={{
+                                opacity: hoveredPie !== null && hoveredPie !== i ? 0.4 : 1,
+                                transform: hoveredPie === i ? "scale(1.04)" : "scale(1)",
+                                transformOrigin: "60px 60px",
+                                transition: "opacity 0.2s, transform 0.2s",
+                                cursor: "pointer",
+                              }}
+                              onMouseEnter={(e) => {
+                                setHoveredPie(i);
+                                const rect = (e.target as SVGPathElement).closest("svg")!.getBoundingClientRect();
+                                setPieTooltip({
+                                  x: e.clientX - rect.left,
+                                  y: e.clientY - rect.top - 40,
+                                  text: `${c.label}: $${c.value >= 1000 ? `${(c.value / 1000).toFixed(0)}k` : c.value} (${t("analytics.shipment", { count: c.count })})`,
+                                });
+                              }}
+                              onMouseMove={(e) => {
+                                const rect = (e.target as SVGPathElement).closest("svg")!.getBoundingClientRect();
+                                setPieTooltip(prev => prev ? { ...prev, x: e.clientX - rect.left, y: e.clientY - rect.top - 40 } : null);
+                              }}
+                              onMouseLeave={() => { setHoveredPie(null); setPieTooltip(null); }}
+                              onClick={() => {
+                                setSelectedCorridor(selectedCorridor === c.label ? null : c.label);
+                                setFilter("all");
+                                setStatCardFilter(null);
+                              }}
+                            />
+                          );
                         });
                       })()}
                     </svg>
+                    {pieTooltip && (
+                      <div style={{
+                        position: "absolute", left: pieTooltip.x, top: pieTooltip.y,
+                        background: "rgba(0,0,0,0.85)", color: "#fff",
+                        padding: "4px 10px", borderRadius: 6, fontSize: 12, fontWeight: 500,
+                        whiteSpace: "nowrap", pointerEvents: "none", zIndex: 10,
+                        transform: "translateX(-50%)",
+                      }}>
+                        {pieTooltip.text}
+                      </div>
+                    )}
                     <div className="mt-pie-leg">
                       {corridorAnalytics.map((c, i) => {
                         const useCount = corridorAnalytics.every(cc => cc.value === 0);
@@ -533,7 +656,20 @@ export default function Trades() {
                         const total = corridorAnalytics.reduce((s, cc) => s + metric(cc), 0) || 1;
                         const pct = Math.round((metric(c) / total) * 100);
                         return (
-                          <div key={i} className="mt-apl">
+                          <div
+                            key={i}
+                            className="mt-apl"
+                            style={{
+                              cursor: "pointer",
+                              fontWeight: selectedCorridor === c.label ? 700 : 500,
+                              color: selectedCorridor === c.label ? "var(--t1)" : undefined,
+                            }}
+                            onClick={() => {
+                              setSelectedCorridor(selectedCorridor === c.label ? null : c.label);
+                              setFilter("all");
+                              setStatCardFilter(null);
+                            }}
+                          >
                             <span style={{ background: pieColors[i % pieColors.length] }} />
                             {c.label.split(" → ")[0]} {pct}%
                           </div>
@@ -546,7 +682,7 @@ export default function Trades() {
             </div>
 
             {/* Demurrage Estimate (placeholder — uses mock data structure) */}
-            <div className="mt-dem">
+            <div className="mt-dem" style={{ cursor: "pointer" }} onClick={() => navigate("/demurrage")}>
               <h3>{t("demurrage.title")}</h3>
               <div className="mt-dem-body">
                 {(() => {
@@ -609,6 +745,9 @@ export default function Trades() {
                           <div className="dtl">{t("demurrage.totalEst")}</div>
                           <div className="dtv">${totalDem.toLocaleString()}</div>
                         </div>
+                        <div style={{ fontSize: 12, color: "var(--sage)", textAlign: "center", paddingTop: 6, fontWeight: 500 }}>
+                          {t("demurrage.openCalculator")} →
+                        </div>
                       </div>
                     </>
                   );
@@ -622,7 +761,30 @@ export default function Trades() {
         <div className="mt-bot">
           {/* EUDR Intelligence */}
           <div className="mt-eudr">
-            <h4>🌿 {t("eudr.title")}</h4>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+              <h4 style={{ margin: 0 }}>🌿 {t("eudr.title")}</h4>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                {eudrTrades.length > 0 && (
+                  <span style={{ fontSize: 11, fontWeight: 600, color: "var(--t3)" }}>
+                    {eudrAssessedCount}/{eudrTrades.length} {t("eudr.assessed")}
+                  </span>
+                )}
+                {eudrTrades.length > eudrAssessedCount && (
+                  <button
+                    onClick={batchAssessEudr}
+                    disabled={batchEudrAssessing}
+                    style={{
+                      fontSize: 10, fontWeight: 600, padding: "3px 8px", borderRadius: 5,
+                      border: "1px solid var(--sage)", background: "transparent",
+                      color: "var(--sage)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
+                    }}
+                  >
+                    {batchEudrAssessing && <Loader2 size={10} className="animate-spin" />}
+                    {batchEudrAssessing ? t("eudr.assessing") : t("eudr.batchAssess")}
+                  </button>
+                )}
+              </div>
+            </div>
             <div className="es">{t("eudr.subtitle")}</div>
             <div className="mt-eb">
               {eudrTrades.length === 0 ? (
@@ -650,7 +812,30 @@ export default function Trades() {
 
           {/* CBAM Tariff */}
           <div className="mt-cbam">
-            <h4>⚠️ {t("cbam.title")}</h4>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+              <h4 style={{ margin: 0 }}>⚠️ {t("cbam.title")}</h4>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                {cbamTrades.length > 0 && (
+                  <span style={{ fontSize: 11, fontWeight: 600, color: "var(--t3)" }}>
+                    {cbamAssessedCount}/{cbamTrades.length} {t("cbam.assessed")}
+                  </span>
+                )}
+                {cbamTrades.length > cbamAssessedCount && (
+                  <button
+                    onClick={batchAssessCbam}
+                    disabled={batchCbamAssessing}
+                    style={{
+                      fontSize: 10, fontWeight: 600, padding: "3px 8px", borderRadius: 5,
+                      border: "1px solid var(--amber)", background: "transparent",
+                      color: "var(--amber)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
+                    }}
+                  >
+                    {batchCbamAssessing && <Loader2 size={10} className="animate-spin" />}
+                    {batchCbamAssessing ? t("cbam.assessing") : t("cbam.batchAssess")}
+                  </button>
+                )}
+              </div>
+            </div>
             <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
               {cbamTrades.length === 0 ? (
                 <div style={{ fontSize: 13, color: "var(--t3)", padding: "10px 0" }}>{t("cbam.noTrades")}</div>

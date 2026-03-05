@@ -266,5 +266,24 @@
   "detail.edit": "Edit",
   "detail.scan": "Scan",
   "detail.verify": "Verify",
-  "detail.flag": "Flag"
+  "detail.flag": "Flag",
+
+  "detail.advanceStatusTitle": "Advance Trade Status",
+  "detail.advanceStatusDescription": "Move this trade from \"{{from}}\" to \"{{to}}\"? This action will be recorded in the audit trail.",
+  "detail.statusAdvanced": "Status advanced to {{status}}",
+  "detail.statusAdvanceFailed": "Failed to advance status",
+  "detail.advancing": "Advancing...",
+  "detail.confirmAdvance": "Confirm",
+
+  "eudr.assessed": "assessed",
+  "eudr.batchAssess": "Assess All",
+  "eudr.assessing": "Assessing...",
+  "eudr.batchDone": "EUDR assessment complete for {{count}} trades",
+
+  "cbam.assessed": "assessed",
+  "cbam.batchAssess": "Assess All",
+  "cbam.assessing": "Assessing...",
+  "cbam.batchDone": "CBAM assessment complete for {{count}} trades",
+
+  "demurrage.openCalculator": "Open Demurrage Calculator"
 }

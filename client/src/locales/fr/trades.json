@@ -266,5 +266,24 @@
   "detail.edit": "Modifier",
   "detail.scan": "Scan",
   "detail.verify": "Vérifier",
-  "detail.flag": "Signaler"
+  "detail.flag": "Signaler",
+
+  "detail.advanceStatusTitle": "Avancer le statut du trade",
+  "detail.advanceStatusDescription": "Passer ce trade de « {{from}} » à « {{to}} » ? Cette action sera enregistrée dans le journal d'audit.",
+  "detail.statusAdvanced": "Statut avancé à {{status}}",
+  "detail.statusAdvanceFailed": "Impossible d'avancer le statut",
+  "detail.advancing": "Avancement...",
+  "detail.confirmAdvance": "Confirmer",
+
+  "eudr.assessed": "évalués",
+  "eudr.batchAssess": "Tout évaluer",
+  "eudr.assessing": "Évaluation...",
+  "eudr.batchDone": "Évaluation EUDR terminée pour {{count}} trades",
+
+  "cbam.assessed": "évalués",
+  "cbam.batchAssess": "Tout évaluer",
+  "cbam.assessing": "Évaluation...",
+  "cbam.batchDone": "Évaluation CBAM terminée pour {{count}} trades",
+
+  "demurrage.openCalculator": "Ouvrir le calculateur de surestaries"
 }

@@ -9,6 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   CheckCircle2,
   XCircle,
@@ -139,64 +144,116 @@ const STATUS_LABEL_KEYS: Record<string, string> = {
   closed: "detail.status.closed",
 };
 
-function StatusStepper({ current }: { current: string }) {
+function StatusStepper({ current, tradeId, onStatusAdvanced }: { current: string; tradeId: string; onStatusAdvanced: () => void }) {
   const { t } = useTranslation("trades");
+  const { toast } = useToast();
   const currentIndex = STATUSES.indexOf(current);
+  const nextIndex = currentIndex + 1;
+  const nextStatus = nextIndex < STATUSES.length ? STATUSES[nextIndex] : null;
+  const canAdvance = nextStatus !== null && current !== "archived" && current !== "closed";
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [advancing, setAdvancing] = useState(false);
+
+  const advanceStatus = async () => {
+    if (!nextStatus) return;
+    setAdvancing(true);
+    try {
+      await apiRequest("PATCH", `/api/trades/${tradeId}/status`, { status: nextStatus });
+      toast({ title: t("detail.statusAdvanced", { status: t(STATUS_LABEL_KEYS[nextStatus]) }) });
+      onStatusAdvanced();
+    } catch {
+      toast({ variant: "destructive", title: t("detail.statusAdvanceFailed") });
+    } finally {
+      setAdvancing(false);
+      setConfirmOpen(false);
+    }
+  };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 0, padding: "0 24px 20px" }}>
-      {STATUSES.map((status, i) => {
-        const isComplete = i < currentIndex;
-        const isCurrent = i === currentIndex;
-        const isArchived = current === "archived";
+    <>
+      <div style={{ display: "flex", alignItems: "center", gap: 0, padding: "0 24px 20px" }}>
+        {STATUSES.map((status, i) => {
+          const isComplete = i < currentIndex;
+          const isCurrent = i === currentIndex;
+          const isArchived = current === "archived";
+          const isNext = i === nextIndex && canAdvance;
 
-        return (
-          <div key={status} style={{ display: "flex", alignItems: "center", flex: i < STATUSES.length - 1 ? 1 : "none" }}>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-              <div style={{
-                width: 28,
-                height: 28,
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 14,
-                fontWeight: 600,
-                background: isArchived ? "rgba(156,163,175,0.15)" :
-                  isComplete ? "var(--sage)" :
-                  isCurrent ? "var(--sage-l)" : "rgba(74,124,94,0.06)",
-                color: isArchived ? "#9ca3af" :
-                  (isComplete || isCurrent) ? "#fff" : "var(--t3)",
-                transition: "all 0.2s",
-              }}>
-                {isComplete ? <CheckCircle2 size={14} /> : (i + 1)}
+          return (
+            <div key={status} style={{ display: "flex", alignItems: "center", flex: i < STATUSES.length - 1 ? 1 : "none" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                <div
+                  onClick={isNext ? (e) => { e.stopPropagation(); setConfirmOpen(true); } : undefined}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    background: isArchived ? "rgba(156,163,175,0.15)" :
+                      isComplete ? "var(--sage)" :
+                      isCurrent ? "var(--sage-l)" :
+                      isNext ? "rgba(107,144,128,0.12)" : "rgba(74,124,94,0.06)",
+                    color: isArchived ? "#9ca3af" :
+                      (isComplete || isCurrent) ? "#fff" :
+                      isNext ? "var(--sage)" : "var(--t3)",
+                    border: isNext ? "2px dashed var(--sage)" : "2px solid transparent",
+                    cursor: isNext ? "pointer" : "default",
+                    transition: "all 0.2s",
+                  }}>
+                  {isComplete ? <CheckCircle2 size={14} /> : (i + 1)}
+                </div>
+                <span style={{
+                  fontSize: 14,
+                  fontWeight: isCurrent ? 600 : isNext ? 500 : 400,
+                  color: isCurrent ? "var(--t1)" : isNext ? "var(--sage)" : "var(--t3)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.03em",
+                }}>
+                  {t(STATUS_LABEL_KEYS[status])}
+                </span>
               </div>
-              <span style={{
-                fontSize: 14,
-                fontWeight: isCurrent ? 600 : 400,
-                color: isCurrent ? "var(--t1)" : "var(--t3)",
-                textTransform: "uppercase",
-                letterSpacing: "0.03em",
-              }}>
-                {t(STATUS_LABEL_KEYS[status])}
-              </span>
+              {i < STATUSES.length - 1 && (
+                <div style={{
+                  flex: 1,
+                  height: 2,
+                  marginBottom: 18,
+                  marginLeft: 6,
+                  marginRight: 6,
+                  background: isComplete ? "var(--sage)" : "rgba(74,124,94,0.06)",
+                  borderRadius: 1,
+                  transition: "background 0.2s",
+                }} />
+              )}
             </div>
-            {i < STATUSES.length - 1 && (
-              <div style={{
-                flex: 1,
-                height: 2,
-                marginBottom: 18,
-                marginLeft: 6,
-                marginRight: 6,
-                background: isComplete ? "var(--sage)" : "rgba(74,124,94,0.06)",
-                borderRadius: 1,
-                transition: "background 0.2s",
-              }} />
-            )}
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("detail.advanceStatusTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("detail.advanceStatusDescription", {
+                from: t(STATUS_LABEL_KEYS[current]),
+                to: nextStatus ? t(STATUS_LABEL_KEYS[nextStatus]) : "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={advancing}>{t("detail.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={advanceStatus} disabled={advancing}>
+              {advancing ? <Loader2 size={14} className="animate-spin" /> : null}
+              {advancing ? t("detail.advancing") : t("detail.confirmAdvance")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
@@ -1228,7 +1285,7 @@ export default function TradeDetail() {
       ) : data ? (
         <>
           {/* Status Stepper */}
-          <StatusStepper current={data.tradeStatus} />
+          <StatusStepper current={data.tradeStatus} tradeId={tradeId!} onStatusAdvanced={() => queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] })} />
 
           {/* Content grid */}
           <div style={{
