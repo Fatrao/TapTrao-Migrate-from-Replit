@@ -77,7 +77,7 @@ export default function AdminPromoCodes() {
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }}>
           {t("promoCodes.title")}
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
           {t("promoCodes.subtitle")}
         </p>
       </div>
@@ -122,8 +122,8 @@ export default function AdminPromoCodes() {
             </div>
           </div>
 
-          {error && <div style={{ fontSize: 14, color: "var(--red)", marginBottom: 8 }}>{error}</div>}
-          {success && <div style={{ fontSize: 14, color: "#16a34a", marginBottom: 8 }}>{success}</div>}
+          {error && <div style={{ fontSize: 15, color: "var(--red)", marginBottom: 8 }}>{error}</div>}
+          {success && <div style={{ fontSize: 15, color: "#16a34a", marginBottom: 8 }}>{success}</div>}
 
           <button
             type="submit"
@@ -134,7 +134,7 @@ export default function AdminPromoCodes() {
               border: "none",
               borderRadius: 10,
               padding: "10px 20px",
-              fontSize: 13,
+              fontSize: 15,
               fontWeight: 600,
               cursor: "pointer",
               opacity: createMutation.isPending || !code ? 0.5 : 1,
@@ -151,17 +151,17 @@ export default function AdminPromoCodes() {
           {t("promoCodes.existingTitle", { count: codes.length })}
         </h2>
         {codes.length === 0 ? (
-          <p style={{ fontSize: 13, color: "#555" }}>{t("promoCodes.noCodesYet")}</p>
+          <p style={{ fontSize: 15, color: "#555" }}>{t("promoCodes.noCodesYet")}</p>
         ) : (
           <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 15 }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid #eee", textAlign: "left" }}>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("promoCodes.tableCode")}</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("promoCodes.tableTokens")}</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("promoCodes.tableLc")}</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("promoCodes.tableUsedMax")}</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("promoCodes.tableStatus")}</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 15, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("promoCodes.tableCode")}</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 15, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("promoCodes.tableTokens")}</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 15, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("promoCodes.tableLc")}</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 15, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("promoCodes.tableUsedMax")}</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 15, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("promoCodes.tableStatus")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -176,7 +176,7 @@ export default function AdminPromoCodes() {
                         display: "inline-block",
                         padding: "2px 8px",
                         borderRadius: 12,
-                        fontSize: 13,
+                        fontSize: 15,
                         fontWeight: 600,
                         background: c.currentRedemptions >= c.maxRedemptions ? "#fee2e2" : c.isActive ? "#dcfce7" : "#fef3c7",
                         color: c.currentRedemptions >= c.maxRedemptions ? "#ef4444" : c.isActive ? "#16a34a" : "#d97706",

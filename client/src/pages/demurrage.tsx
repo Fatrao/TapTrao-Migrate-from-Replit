@@ -6,10 +6,10 @@ import { PORTS, CONTAINER_OPTIONS, computeDemurrage, type ContainerType } from "
 const s = {
   page: { maxWidth: 960, margin: "0 auto", padding: "28px 20px" } as React.CSSProperties,
   panel: { background: "var(--card)", borderRadius: 14, padding: 24, boxShadow: "0 1px 3px rgba(0,0,0,.03), 0 4px 16px rgba(0,0,0,.05)" } as React.CSSProperties,
-  label: { fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 600, color: "var(--t3)", marginBottom: 4, display: "block", textTransform: "uppercase", letterSpacing: ".08em" } as React.CSSProperties,
-  helper: { fontSize: 13, color: "var(--t3)", marginTop: 3 } as React.CSSProperties,
-  input: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: ".5rem", color: "var(--t1)", fontSize: 14, outline: "none" } as React.CSSProperties,
-  select: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: ".5rem", color: "var(--t1)", fontSize: 14, outline: "none", appearance: "none" as const } as React.CSSProperties,
+  label: { fontFamily: "'Inter', sans-serif", fontSize: 15, fontWeight: 600, color: "var(--t3)", marginBottom: 4, display: "block", textTransform: "uppercase", letterSpacing: ".08em" } as React.CSSProperties,
+  helper: { fontSize: 15, color: "var(--t3)", marginTop: 3 } as React.CSSProperties,
+  input: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: ".5rem", color: "var(--t1)", fontSize: 15, outline: "none" } as React.CSSProperties,
+  select: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: ".5rem", color: "var(--t1)", fontSize: 15, outline: "none", appearance: "none" as const } as React.CSSProperties,
   field: { marginBottom: 16 } as React.CSSProperties,
 };
 
@@ -52,7 +52,7 @@ export default function DemurragePage() {
         >
           {t("title")}
         </h1>
-        <p style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t2)", marginBottom: 24 }}>
+        <p style={{ fontFamily: "var(--fb)", fontSize: 15, color: "var(--t2)", marginBottom: 24 }}>
           {t("subtitle")}
         </p>
 
@@ -86,7 +86,7 @@ export default function DemurragePage() {
                       background: container === opt.value ? "var(--blue-dim)" : "var(--card2)",
                       border: container === opt.value ? "1px solid var(--blue-bd)" : "none",
                       color: container === opt.value ? "var(--blue)" : "var(--t2)",
-                      fontSize: 14, fontWeight: container === opt.value ? 700 : 500,
+                      fontSize: 15, fontWeight: container === opt.value ? 700 : 500,
                       transition: "all .15s",
                     }}
                   >
@@ -125,7 +125,7 @@ export default function DemurragePage() {
                 <button
                   data-testid="demurrage-toggle-date"
                   onClick={() => setUseDate(!useDate)}
-                  style={{ background: "none", border: "none", color: "var(--blue)", fontSize: 13, cursor: "pointer", fontWeight: 600 }}
+                  style={{ background: "none", border: "none", color: "var(--blue)", fontSize: 15, cursor: "pointer", fontWeight: 600 }}
                 >
                   {useDate ? t("enterManually") : t("calcFromDate")}
                 </button>
@@ -175,7 +175,7 @@ export default function DemurragePage() {
                 borderRadius: ".5rem",
                 padding: "12px 24px",
                 fontWeight: 700,
-                fontSize: 14,
+                fontSize: 15,
                 cursor: "pointer",
                 marginTop: 4,
               }}
@@ -192,27 +192,27 @@ export default function DemurragePage() {
                   <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 22, fontWeight: 700, color: "var(--t1)" }} data-testid="demurrage-chargeable-days">
                     {chargeableDays}
                   </div>
-                  <div style={{ fontSize: 13, color: "var(--t3)" }}>{t("billableDays")}</div>
+                  <div style={{ fontSize: 15, color: "var(--t3)" }}>{t("billableDays")}</div>
                 </div>
                 <div style={{ textAlign: "center", padding: 12, background: "var(--card2)", borderRadius: 8 }}>
                   <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 22, fontWeight: 700, color: "var(--t1)" }} data-testid="demurrage-daily-rate">
                     ${baseRate}
                   </div>
-                  <div style={{ fontSize: 13, color: "var(--t3)" }}>{t("dailyRate")}</div>
+                  <div style={{ fontSize: 15, color: "var(--t3)" }}>{t("dailyRate")}</div>
                 </div>
                 <div style={{ textAlign: "center", padding: 12, background: "var(--card2)", borderRadius: 8 }}>
                   <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 22, fontWeight: 700, color: "var(--t1)" }}>
                     {effectiveDaysHeld}
                   </div>
-                  <div style={{ fontSize: 13, color: "var(--t3)" }}>{t("daysAtPort")}</div>
+                  <div style={{ fontSize: 15, color: "var(--t3)" }}>{t("daysAtPort")}</div>
                 </div>
               </div>
 
               {/* Cost breakdown */}
               {tiers.length > 0 ? (
                 <div style={{ marginBottom: 20 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--t2)", marginBottom: 8 }}>{t("costBreakdown")}</div>
-                  <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t2)", marginBottom: 8 }}>{t("costBreakdown")}</div>
+                  <table style={{ width: "100%", fontSize: 15, borderCollapse: "collapse" }}>
                     <thead>
                       <tr style={{ borderBottom: "1px solid var(--s5)" }}>
                         <th style={{ textAlign: "left", padding: "6px 0", color: "var(--t3)", fontWeight: 500 }}>{t("period")}</th>
@@ -234,7 +234,7 @@ export default function DemurragePage() {
                   </table>
                 </div>
               ) : (
-                <div style={{ textAlign: "center", padding: "20px 0", color: "var(--t3)", fontSize: 13 }}>
+                <div style={{ textAlign: "center", padding: "20px 0", color: "var(--t3)", fontSize: 15 }}>
                   {t("noChargeableDays")}
                 </div>
               )}
@@ -244,7 +244,7 @@ export default function DemurragePage() {
                 display: "flex", justifyContent: "space-between", alignItems: "center",
                 padding: "14px 16px", background: "var(--card2)", borderRadius: 8, marginBottom: 12,
               }}>
-                <span style={{ fontSize: 14, fontWeight: 700, color: "var(--t1)" }}>{t("totalDemurrage")}</span>
+                <span style={{ fontSize: 15, fontWeight: 700, color: "var(--t1)" }}>{t("totalDemurrage")}</span>
                 <span
                   data-testid="demurrage-total"
                   style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: totalColor }}
@@ -252,15 +252,15 @@ export default function DemurragePage() {
                   ${total.toLocaleString()}
                 </span>
               </div>
-              <p style={{ fontSize: 13, color: "var(--t3)", textAlign: "right", marginTop: -8, marginBottom: 12, fontStyle: "italic" }}>{t("basedOnInputs")}</p>
+              <p style={{ fontSize: 15, color: "var(--t3)", textAlign: "right", marginTop: -8, marginBottom: 12, fontStyle: "italic" }}>{t("basedOnInputs")}</p>
 
               {cargoVal > 0 && (
                 <div style={{ marginBottom: 12 }}>
-                  <span style={{ fontSize: 14, color: pct > 5 ? "var(--red)" : "var(--t2)" }} data-testid="demurrage-pct">
+                  <span style={{ fontSize: 15, color: pct > 5 ? "var(--red)" : "var(--t2)" }} data-testid="demurrage-pct">
                     {t("pctOfCargo", { pct: pct.toFixed(1) })}
                   </span>
                   {pct > 5 && (
-                    <p style={{ fontSize: 13, color: "var(--red)", marginTop: 4 }}>
+                    <p style={{ fontSize: 15, color: "var(--red)", marginTop: 4 }}>
                       {t("pctWarning")}
                     </p>
                   )}
@@ -270,30 +270,30 @@ export default function DemurragePage() {
 
             {/* Decision nudge */}
             <div style={{ ...s.panel, marginTop: 16 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t1)", marginBottom: 12 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--t1)", marginBottom: 12 }}>
                 {t("nextStep")}
               </div>
               <div className="demurrage-nudge-grid">
                 <div style={{ background: "var(--card2)", borderRadius: 8, padding: "12px 14px" }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>{t("reExport")}</div>
-                  <div style={{ fontSize: 13, color: "var(--t2)" }}>{t("reExportDesc")}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>{t("reExport")}</div>
+                  <div style={{ fontSize: 15, color: "var(--t2)" }}>{t("reExportDesc")}</div>
                 </div>
                 <div style={{ background: "var(--card2)", borderRadius: 8, padding: "12px 14px" }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>{t("destruction")}</div>
-                  <div style={{ fontSize: 13, color: "var(--t2)" }}>{t("destructionDesc")}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>{t("destruction")}</div>
+                  <div style={{ fontSize: 15, color: "var(--t2)" }}>{t("destructionDesc")}</div>
                 </div>
                 <div style={{ background: "var(--card2)", borderRadius: 8, padding: "12px 14px" }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>{t("appealRetest")}</div>
-                  <div style={{ fontSize: 13, color: "var(--t2)" }}>{t("appealRetestDesc")}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>{t("appealRetest")}</div>
+                  <div style={{ fontSize: 15, color: "var(--t2)" }}>{t("appealRetestDesc")}</div>
                 </div>
               </div>
-              <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)", marginTop: 12, lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t3)", marginTop: 12, lineHeight: 1.5 }}>
                 {t("ratesNote")}
               </p>
             </div>
 
             {/* Disclaimer */}
-            <p style={{ fontSize: 13, color: "var(--t3)", marginTop: 16, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 15, color: "var(--t3)", marginTop: 16, lineHeight: 1.5 }}>
               {t("disclaimer")}
             </p>
           </div>

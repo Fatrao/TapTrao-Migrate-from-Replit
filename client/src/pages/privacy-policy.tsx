@@ -18,10 +18,10 @@ export default function PrivacyPolicy() {
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <Link href="/dashboard">
-            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }}>{t("nav.dashboard")}</span>
+            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 15, cursor: "pointer" }}>{t("nav.dashboard")}</span>
           </Link>
           <Link href="/">
-            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }}>{t("nav.home")}</span>
+            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 15, cursor: "pointer" }}>{t("nav.home")}</span>
           </Link>
         </div>
       </nav>
@@ -30,7 +30,7 @@ export default function PrivacyPolicy() {
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 32, fontWeight: 700, color: "#fff", marginBottom: 8 }} data-testid="text-privacy-title">
           {t("privacy.title")}
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 40 }}>{t("privacy.lastUpdated")}</p>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)", marginBottom: 40 }}>{t("privacy.lastUpdated")}</p>
 
         <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 15, lineHeight: 1.7 }}>
 
@@ -211,10 +211,10 @@ export default function PrivacyPolicy() {
           </Section>
 
           <div style={{ marginTop: 40, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>
+            <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)" }}>
               {t("privacy.footer.company")}
             </p>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
+            <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
               {t("privacy.footer.address")}
             </p>
           </div>

@@ -43,10 +43,10 @@ export default function TokenSuccess() {
     return (
       <AppShell>
         <div style={{ maxWidth: 480, margin: "0 auto", padding: "64px 16px", textAlign: "center" }}>
-          <p style={{ fontSize: 13, color: "var(--t2)" }}>{t("tokenSuccess.noSession")}</p>
+          <p style={{ fontSize: 15, color: "var(--t2)" }}>{t("tokenSuccess.noSession")}</p>
           <Link href="/pricing">
             <button
-              style={{ background: "var(--blue)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", marginTop: 16 }}
+              style={{ background: "var(--blue)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 15, fontWeight: 600, cursor: "pointer", marginTop: 16 }}
             >
               {t("tokenSuccess.goToPricing")}
             </button>
@@ -61,7 +61,7 @@ export default function TokenSuccess() {
       <AppShell>
         <div style={{ maxWidth: 480, margin: "0 auto", padding: "64px 16px", textAlign: "center" }}>
           <Loader2 size={32} style={{ color: "var(--blue)", animation: "spin 1s linear infinite", margin: "0 auto 16px" }} />
-          <p style={{ fontSize: 13, color: "var(--t2)" }}>{t("tokenSuccess.verifying")}</p>
+          <p style={{ fontSize: 15, color: "var(--t2)" }}>{t("tokenSuccess.verifying")}</p>
         </div>
       </AppShell>
     );
@@ -82,13 +82,13 @@ export default function TokenSuccess() {
               >
                 {t("tokenSuccess.purchaseComplete")}
               </h1>
-              <p style={{ fontSize: 13, color: "var(--t2)", marginBottom: 24 }}>
+              <p style={{ fontSize: 15, color: "var(--t2)", marginBottom: 24 }}>
                 {t("tokenSuccess.packAdded", { packName: result.packName })}
               </p>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
                 <span
                   style={{
-                    fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 700,
+                    fontFamily: "'Inter', sans-serif", fontSize: 15, fontWeight: 700,
                     padding: "4px 12px", borderRadius: 4, background: "var(--gbg)",
                     border: "1px solid var(--gbd)", color: "var(--green)",
                   }}
@@ -98,7 +98,7 @@ export default function TokenSuccess() {
                 </span>
                 <span
                   style={{
-                    fontFamily: "'Inter', sans-serif", fontSize: 14,
+                    fontFamily: "'Inter', sans-serif", fontSize: 15,
                     padding: "4px 12px", borderRadius: 4, background: "var(--card2)",
                     color: "var(--t2)", display: "flex", alignItems: "center", gap: 4,
                   }}
@@ -115,7 +115,7 @@ export default function TokenSuccess() {
               >
                 {t("tokenSuccess.processing")}
               </h1>
-              <p style={{ fontSize: 13, color: "var(--t2)", marginBottom: 24 }}>
+              <p style={{ fontSize: 15, color: "var(--t2)", marginBottom: 24 }}>
                 {result?.message || t("tokenSuccess.processingDefault")}
               </p>
             </>
@@ -123,7 +123,7 @@ export default function TokenSuccess() {
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
             <Link href="/lookup">
               <button
-                style={{ background: "var(--blue)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+                style={{ background: "var(--blue)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 15, fontWeight: 600, cursor: "pointer" }}
                 data-testid="button-go-lookup"
               >
                 {t("tokenSuccess.runLookup")}
@@ -131,7 +131,7 @@ export default function TokenSuccess() {
             </Link>
             <Link href="/dashboard">
               <button
-                style={{ background: "var(--card2)", color: "var(--t2)", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+                style={{ background: "var(--card2)", color: "var(--t2)", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 15, fontWeight: 600, cursor: "pointer" }}
                 data-testid="button-go-dashboard"
               >
                 {t("tokenSuccess.dashboard")}

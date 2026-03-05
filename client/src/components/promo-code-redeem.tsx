@@ -28,7 +28,7 @@ export default function PromoCodeRedeem() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <div style={{ fontSize: 11, fontWeight: 600, color: "#555", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+      <div style={{ fontSize: 15, fontWeight: 600, color: "#555", textTransform: "uppercase", letterSpacing: "0.5px" }}>
         Have a promo code?
       </div>
       <div style={{ display: "flex", gap: 8 }}>
@@ -41,7 +41,7 @@ export default function PromoCodeRedeem() {
             flex: 1,
             textTransform: "uppercase",
             fontFamily: "monospace",
-            fontSize: 13,
+            fontSize: 15,
             padding: "9px 12px",
             background: "#f5f5f5",
             border: "1px solid #e0e0e0",
@@ -58,7 +58,7 @@ export default function PromoCodeRedeem() {
             border: "none",
             borderRadius: 8,
             padding: "9px 16px",
-            fontSize: 13,
+            fontSize: 15,
             fontWeight: 600,
             cursor: "pointer",
             opacity: redeemMutation.isPending || !code.trim() ? 0.5 : 1,
@@ -69,7 +69,7 @@ export default function PromoCodeRedeem() {
         </button>
       </div>
       {message && (
-        <div style={{ fontSize: 12, color: isError ? "var(--red)" : "#16a34a" }}>
+        <div style={{ fontSize: 15, color: isError ? "var(--red)" : "#16a34a" }}>
           {message}
         </div>
       )}

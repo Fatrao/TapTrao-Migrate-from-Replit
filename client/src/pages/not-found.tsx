@@ -11,7 +11,7 @@ export default function NotFound() {
           <AlertCircle size={28} style={{ color: "var(--red)", flexShrink: 0 }} />
           <h1 style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "var(--t1)" }}>{t("notFound.title")}</h1>
         </div>
-        <p style={{ fontSize: 13, color: "var(--t2)" }}>
+        <p style={{ fontSize: 15, color: "var(--t2)" }}>
           {t("notFound.description")}
         </p>
       </div>

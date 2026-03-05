@@ -73,7 +73,7 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
           <div style={{ textAlign: "center", padding: "20px 0" }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>✅</div>
             <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{t("featureModal.thankYou")}</div>
-            <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 6 }}>
+            <div style={{ fontSize: 15, color: "var(--t3)", marginTop: 6 }}>
               {t("featureModal.thankYouMessage")}
             </div>
           </div>
@@ -87,7 +87,7 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
               }}>✕</button>
             </div>
             <div style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
+              <label style={{ display: "block", fontSize: 15, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
                 {t("featureModal.whatLabel")}
               </label>
               <input
@@ -99,7 +99,7 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
               />
             </div>
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
+              <label style={{ display: "block", fontSize: 15, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
                 {t("featureModal.detailsLabel")}
               </label>
               <textarea
@@ -112,7 +112,7 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
             </div>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
               <button onClick={onClose} style={{
-                padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 500,
+                padding: "8px 16px", borderRadius: 8, fontSize: 15, fontWeight: 500,
                 background: "transparent", border: "1px solid rgba(0,0,0,0.12)",
                 color: "var(--t2)", cursor: "pointer",
               }}>{t("button.cancel")}</button>
@@ -120,7 +120,7 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
                 onClick={() => mutation.mutate()}
                 disabled={title.trim().length < 3 || mutation.isPending}
                 style={{
-                  padding: "8px 20px", borderRadius: 8, fontSize: 13, fontWeight: 600,
+                  padding: "8px 20px", borderRadius: 8, fontSize: 15, fontWeight: 600,
                   background: title.trim().length < 3 ? "rgba(74,124,94,0.4)" : "var(--sage)",
                   border: "none", color: "#fff", cursor: title.trim().length < 3 ? "not-allowed" : "pointer",
                   opacity: mutation.isPending ? 0.7 : 1,
@@ -129,7 +129,7 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
               </button>
             </div>
             {mutation.isError && (
-              <div style={{ marginTop: 12, fontSize: 12, color: "var(--red)" }}>
+              <div style={{ marginTop: 12, fontSize: 15, color: "var(--red)" }}>
                 {(mutation.error as any)?.message || t("featureModal.failedSubmit")}
               </div>
             )}
@@ -232,7 +232,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
         <Link href="/">
           <div className="mi brand" data-testid="shell-logo">
             <img src="/logo.png?v=2" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover" as const }} />
-            <span className="mi-label" style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 14, color: "var(--gold, #c4a265)" }}>TapTrao</span>
+            <span className="mi-label" style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 15, color: "var(--gold, #c4a265)" }}>TapTrao</span>
           </div>
         </Link>
 
@@ -332,17 +332,17 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
             cursor: "pointer",
           }}>
             <Hexagon size={14} style={{ color: "var(--sage-l)" }} />
-            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--sage-l)" }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: "var(--sage-l)" }}>
               {t("token.shield", { count: tokenData?.balance ?? 0 })}
             </span>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginLeft: "auto" }}>
+            <span style={{ fontSize: 15, color: "rgba(255,255,255,0.35)", marginLeft: "auto" }}>
               {t("token.buyMore")}
             </span>
           </div>
         </Link>
 
         {/* Nav items */}
-        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>{t("section.main")}</div>
+        <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>{t("section.main")}</div>
         {mainItems.map((item) => (
           <Link key={item.href} href={item.href}>
             <div
@@ -362,7 +362,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
 
         <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "8px 0" }} />
 
-        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>{t("section.tools")}</div>
+        <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>{t("section.tools")}</div>
         {tItems.map((item) => (
           <Link key={item.href} href={item.href}>
             <div
@@ -388,7 +388,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
 
         <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "8px 0" }} />
 
-        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>{t("section.account")}</div>
+        <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>{t("section.account")}</div>
         {accountItems.map((item) => (
           <Link key={item.href} href={item.href}>
             <div
@@ -410,7 +410,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
         {tokenData?.isAdmin && (
           <>
             <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "8px 0" }} />
-            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>{t("section.admin")}</div>
+            <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>{t("section.admin")}</div>
             {adminItems.map((item) => (
               <Link key={item.href} href={item.href}>
                 <div
@@ -458,10 +458,10 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
               width: 32, height: 32, borderRadius: "50%",
               background: "linear-gradient(135deg, var(--sage), #3a6048)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 10, fontWeight: 700, color: "#fff",
+              fontSize: 15, fontWeight: 700, color: "#fff",
             }}>{userInitial}</div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#fff" }}>{user?.displayName || user?.email}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: "#fff" }}>{user?.displayName || user?.email}</div>
             </div>
             <button onClick={handleLogout} style={{
               background: "none", border: "none", color: "rgba(255,255,255,0.4)",
@@ -475,7 +475,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
             <div style={{
               padding: "10px 14px", textAlign: "center", borderRadius: 8,
               border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)",
-              fontSize: 13, fontWeight: 500, cursor: "pointer", marginTop: 8,
+              fontSize: 15, fontWeight: 500, cursor: "pointer", marginTop: 8,
             }}>{t("auth.logIn")}</div>
           </Link>
         )}
@@ -510,7 +510,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
             </Link>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <Link href="/alerts">
-                <div style={{ position: "relative", fontSize: 14, cursor: "pointer" }}>
+                <div style={{ position: "relative", fontSize: 15, cursor: "pointer" }}>
                   🔔
                   {alertsBadge > 0 && (
                     <span style={{

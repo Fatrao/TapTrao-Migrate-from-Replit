@@ -81,7 +81,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <p
               style={{
                 fontFamily: "Inter, sans-serif",
-                fontSize: 14,
+                fontSize: 15,
                 color: "rgba(255,255,255,0.55)",
                 margin: "0 0 28px",
                 lineHeight: 1.5,
@@ -93,7 +93,7 @@ export class ErrorBoundary extends Component<Props, State> {
               onClick={() => window.location.reload()}
               style={{
                 fontFamily: "Inter, sans-serif",
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: 500,
                 background: "#6b9080",
                 color: "#fff",

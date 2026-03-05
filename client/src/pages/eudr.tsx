@@ -12,15 +12,15 @@ const s = {
   page: { maxWidth: 780, margin: "0 auto", padding: "24px 16px" } as React.CSSProperties,
   card: { background: "var(--card)", borderRadius: 14, padding: "24px", marginBottom: 16 } as React.CSSProperties,
   heading: { fontFamily: "var(--fh)", fontSize: 20, fontWeight: 900, color: "var(--t1)", margin: "0 0 4px" } as React.CSSProperties,
-  sub: { fontSize: 13, color: "var(--t3)", marginBottom: 20 } as React.CSSProperties,
-  label: { fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)", marginBottom: 6, display: "block" } as React.CSSProperties,
-  input: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "none", borderRadius: 8, color: "var(--t1)", fontSize: 13, outline: "none" } as React.CSSProperties,
-  select: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "none", borderRadius: 8, color: "var(--t1)", fontSize: 13, outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const } as React.CSSProperties,
+  sub: { fontSize: 15, color: "var(--t3)", marginBottom: 20 } as React.CSSProperties,
+  label: { fontFamily: "'Inter', sans-serif", fontSize: 15, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)", marginBottom: 6, display: "block" } as React.CSSProperties,
+  input: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "none", borderRadius: 8, color: "var(--t1)", fontSize: 15, outline: "none" } as React.CSSProperties,
+  select: { width: "100%", padding: "10px 12px", background: "var(--card2)", border: "none", borderRadius: 8, color: "var(--t1)", fontSize: 15, outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const } as React.CSSProperties,
   row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 } as React.CSSProperties,
   field: { marginBottom: 12 } as React.CSSProperties,
-  btnPrimary: { background: "var(--blue)", color: "#fff", border: "none", borderRadius: 8, padding: "10px 24px", fontFamily: "var(--fb)", fontWeight: 600, fontSize: 13, cursor: "pointer" } as React.CSSProperties,
-  btnSecondary: { background: "transparent", color: "var(--t2)", border: "none", borderRadius: 8, padding: "10px 24px", fontFamily: "var(--fb)", fontWeight: 600, fontSize: 13, cursor: "pointer" } as React.CSSProperties,
-  btnDanger: { background: "var(--red)", color: "#fff", border: "none", borderRadius: 8, padding: "10px 24px", fontFamily: "var(--fb)", fontWeight: 600, fontSize: 13, cursor: "pointer" } as React.CSSProperties,
+  btnPrimary: { background: "var(--blue)", color: "#fff", border: "none", borderRadius: 8, padding: "10px 24px", fontFamily: "var(--fb)", fontWeight: 600, fontSize: 15, cursor: "pointer" } as React.CSSProperties,
+  btnSecondary: { background: "transparent", color: "var(--t2)", border: "none", borderRadius: 8, padding: "10px 24px", fontFamily: "var(--fb)", fontWeight: 600, fontSize: 15, cursor: "pointer" } as React.CSSProperties,
+  btnDanger: { background: "var(--red)", color: "#fff", border: "none", borderRadius: 8, padding: "10px 24px", fontFamily: "var(--fb)", fontWeight: 600, fontSize: 15, cursor: "pointer" } as React.CSSProperties,
   check: { width: 18, height: 18, marginRight: 8, verticalAlign: "middle", accentColor: "var(--blue)" } as React.CSSProperties,
 };
 
@@ -218,7 +218,7 @@ export default function EudrPage() {
   return (
     <AppShell>
       <div style={s.page}>
-        <button data-testid="eudr-back" onClick={() => navigate(`/lookup?loadLookup=${lookupId}`)} style={{ background: "none", border: "none", color: "var(--t3)", cursor: "pointer", fontSize: 13, marginBottom: 12 }}>
+        <button data-testid="eudr-back" onClick={() => navigate(`/lookup?loadLookup=${lookupId}`)} style={{ background: "none", border: "none", color: "var(--t3)", cursor: "pointer", fontSize: 15, marginBottom: 12 }}>
           ← {t("backToLookup")}
         </button>
 
@@ -243,7 +243,7 @@ export default function EudrPage() {
                   borderRadius: ".5rem",
                   background: step === num ? "var(--blue, #3B82F6)" : num < step ? "var(--green, #1B7340)" : "var(--s2, #232B3E)",
                   color: step >= num ? "#fff" : "var(--t3)",
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: step === num ? 700 : 500,
                   cursor: num < step ? "pointer" : "default",
                   transition: "background .2s",
@@ -266,7 +266,7 @@ export default function EudrPage() {
               <label style={s.label}>{t("geo.coordType")}</label>
               <div style={{ display: "flex", gap: 12 }}>
                 {(["point", "polygon"] as const).map((ct) => (
-                  <label key={ct} style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--t1)", fontSize: 13, cursor: "pointer" }}>
+                  <label key={ct} style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--t1)", fontSize: 15, cursor: "pointer" }}>
                     <input
                       type="radio"
                       name="coordType"
@@ -314,7 +314,7 @@ export default function EudrPage() {
                     </div>
                   </div>
                 ))}
-                <button style={{ ...s.btnSecondary, fontSize: 14, padding: "6px 12px" }} onClick={() => setDraft(d => ({ ...d, polygonPoints: [...d.polygonPoints, { lat: "", lng: "" }] }))} data-testid="eudr-add-point">
+                <button style={{ ...s.btnSecondary, fontSize: 15, padding: "6px 12px" }} onClick={() => setDraft(d => ({ ...d, polygonPoints: [...d.polygonPoints, { lat: "", lng: "" }] }))} data-testid="eudr-add-point">
                   {t("geo.addPoint")}
                 </button>
               </div>
@@ -324,7 +324,7 @@ export default function EudrPage() {
               <label style={s.label}>{t("geo.plotCountry")}</label>
               <input data-testid="eudr-plot-country" style={{ ...s.input, width: 100 }} maxLength={2} placeholder="GH" value={draft.plotCountryIso2} onChange={e => setDraft(d => ({ ...d, plotCountryIso2: e.target.value.toUpperCase() }))} />
               {draft.plotCountryValid === false && (
-                <p style={{ color: "var(--red, #DC2626)", fontSize: 14, marginTop: 6 }}>
+                <p style={{ color: "var(--red, #DC2626)", fontSize: 15, marginTop: 6 }}>
                   {t("geo.mismatchWarning", { originIso2: resultJson?.origin?.iso2 })}
                 </p>
               )}
@@ -358,7 +358,7 @@ export default function EudrPage() {
               <label style={s.label}>{t("evidence.date")}</label>
               <input data-testid="eudr-evidence-date" style={{ ...s.input, width: 200 }} type="date" value={draft.evidenceDate} onChange={e => setDraft(d => ({ ...d, evidenceDate: e.target.value }))} />
               {draft.evidenceDate && new Date(draft.evidenceDate) <= new Date("2020-12-31") && (
-                <p style={{ color: "var(--red, #DC2626)", fontSize: 14, marginTop: 6 }}>
+                <p style={{ color: "var(--red, #DC2626)", fontSize: 15, marginTop: 6 }}>
                   {t("evidence.dateWarning")}
                 </p>
               )}
@@ -388,7 +388,7 @@ export default function EudrPage() {
             </div>
 
             <div style={{ ...s.field, marginTop: 16, padding: "14px 16px", background: "var(--s2, #232B3E)", borderRadius: ".5rem" }}>
-              <label style={{ display: "flex", alignItems: "flex-start", gap: 10, color: "var(--t1)", fontSize: 13, cursor: "pointer" }}>
+              <label style={{ display: "flex", alignItems: "flex-start", gap: 10, color: "var(--t1)", fontSize: 15, cursor: "pointer" }}>
                 <input
                   type="checkbox"
                   checked={draft.sanctionsChecked}
@@ -417,8 +417,8 @@ export default function EudrPage() {
                 <div style={{ background: "var(--green, #1B7340)", borderRadius: ".75rem", padding: "16px 20px", color: "#fff", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
                   <span style={{ fontSize: 24 }}>✓</span>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: 14 }}>{t("risk.statementGenerated")}</div>
-                    <div style={{ fontSize: 14, opacity: 0.85 }}>
+                    <div style={{ fontWeight: 700, fontSize: 15 }}>{t("risk.statementGenerated")}</div>
+                    <div style={{ fontSize: 15, opacity: 0.85 }}>
                       {t("risk.reference", { ref: (eudrQuery.data?.statementJson as any)?.reference || "\u2014" })}
                       {eudrQuery.data?.retentionUntil && ` | ${t("risk.retainedUntil", { date: eudrQuery.data.retentionUntil.split("T")[0] })}`}
                     </div>
@@ -434,7 +434,7 @@ export default function EudrPage() {
                   <label style={s.label}>{t("risk.levelLabel")}</label>
                   <div style={{ display: "flex", gap: 10 }}>
                     {(["low", "standard", "high"] as const).map((lvl) => (
-                      <label key={lvl} style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--t1)", fontSize: 13, cursor: "pointer" }}>
+                      <label key={lvl} style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--t1)", fontSize: 15, cursor: "pointer" }}>
                         <input
                           type="radio"
                           name="riskLevel"
@@ -469,8 +469,8 @@ export default function EudrPage() {
 
                 {/* Summary */}
                 <div style={{ background: "var(--s2, #232B3E)", borderRadius: ".5rem", padding: 16, marginTop: 16, marginBottom: 16 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t1)", marginBottom: 8 }}>{t("summary.title")}</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px", fontSize: 14, color: "var(--t2)" }}>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "var(--t1)", marginBottom: 8 }}>{t("summary.title")}</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px", fontSize: 15, color: "var(--t2)" }}>
                     <span>{t("summary.geolocation")}</span>
                     <span style={{ color: draft.plotCountryValid !== false ? "var(--green)" : "var(--red)" }}>
                       {draft.coordType === "point" ? `${draft.lat}, ${draft.lng}` : t("summary.points", { count: draft.polygonPoints.filter(p => p.lat).length })}

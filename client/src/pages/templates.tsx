@@ -37,7 +37,7 @@ function originAvatar(iso2: string) {
         background: `color-mix(in srgb, ${color} 15%, transparent)`,
         border: `1px solid color-mix(in srgb, ${color} 30%, transparent)`,
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color,
+        fontFamily: "'Inter', sans-serif", fontSize: 15, fontWeight: 700, color,
       }}
     >
       {iso2}
@@ -83,20 +83,20 @@ function TemplateCard({
         {originAvatar(template.originIso2)}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 14, fontWeight: 700, color: "var(--t1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} data-testid={`text-template-name-${template.id}`}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "var(--t1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} data-testid={`text-template-name-${template.id}`}>
               {template.name}
             </span>
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t3)", whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t3)", whiteSpace: "nowrap" }}>
               {template.originIso2} → {template.destIso2}
             </span>
           </div>
-          <div style={{ fontSize: 14, color: "var(--t2)", marginTop: 4 }}>
+          <div style={{ fontSize: 15, color: "var(--t2)", marginTop: 4 }}>
             {translateCommodity(commodityName, lang)} {hsCode ? `· HS ${hsCode}` : ""}
           </div>
         </div>
       </div>
 
-      <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)", marginTop: 8 }}>
+      <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t3)", marginTop: 8 }}>
         {t("card.usedCount", { count: template.timesUsed })}
         {template.lastUsedAt ? t("card.lastUsed", { time: relativeTime(template.lastUsedAt, t) }) : ""}
       </div>
@@ -111,7 +111,7 @@ function TemplateCard({
           }}
           data-testid={`stale-warning-${template.id}`}
         >
-          <span style={{ fontSize: 13, color: "var(--amber)", fontWeight: 600 }}>
+          <span style={{ fontSize: 15, color: "var(--amber)", fontWeight: 600 }}>
             {t("card.staleWarning")}
           </span>
         </div>
@@ -125,7 +125,7 @@ function TemplateCard({
             background: "var(--blue)",
             color: "#fff",
             fontWeight: 700,
-            fontSize: 13,
+            fontSize: 15,
             padding: "7px 14px",
             borderRadius: 6,
             border: "none",
@@ -142,7 +142,7 @@ function TemplateCard({
             background: "transparent",
             color: "var(--red)",
             fontWeight: 600,
-            fontSize: 13,
+            fontSize: 15,
             borderRadius: 6,
             border: "1px solid rgba(218,60,61,.3)",
             cursor: "pointer",
@@ -228,7 +228,7 @@ export default function Templates() {
           >
             {t("title")}
           </h1>
-          <p style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t2)", marginTop: 6 }}>
+          <p style={{ fontFamily: "var(--fb)", fontSize: 15, color: "var(--t2)", marginTop: 6 }}>
             {t("subtitle", { count })}
           </p>
 
@@ -258,7 +258,7 @@ export default function Templates() {
               }}
               data-testid="empty-state"
             >
-              <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.6 }}>
+              <p style={{ fontSize: 15, color: "var(--t2)", lineHeight: 1.6 }}>
                 {t("empty")}
               </p>
             </div>
@@ -301,7 +301,7 @@ export default function Templates() {
             <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "var(--t1)", marginBottom: 8 }}>
               {t("deleteModal.title")}
             </h3>
-            <p style={{ fontSize: 13, color: "var(--t2)", marginBottom: 20, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 15, color: "var(--t2)", marginBottom: 20, lineHeight: 1.5 }}>
               {t("deleteModal.body")}
             </p>
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
@@ -309,7 +309,7 @@ export default function Templates() {
                 onClick={() => setDeleteId(null)}
                 style={{
                   padding: "8px 16px", background: "transparent", border: "none",
-                  borderRadius: 6, color: "var(--t2)", fontSize: 13, cursor: "pointer",
+                  borderRadius: 6, color: "var(--t2)", fontSize: 15, cursor: "pointer",
                 }}
                 data-testid="button-cancel-delete"
               >
@@ -320,7 +320,7 @@ export default function Templates() {
                 disabled={deleteMutation.isPending}
                 style={{
                   padding: "8px 16px", background: "var(--red)", border: "none",
-                  borderRadius: 6, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer",
+                  borderRadius: 6, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer",
                 }}
                 data-testid="button-confirm-delete"
               >

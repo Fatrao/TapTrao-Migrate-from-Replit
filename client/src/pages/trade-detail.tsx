@@ -192,7 +192,7 @@ function StatusStepper({ current, tradeId, onStatusAdvanced }: { current: string
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: 600,
                     background: isArchived ? "rgba(156,163,175,0.15)" :
                       isComplete ? "var(--sage)" :
@@ -208,7 +208,7 @@ function StatusStepper({ current, tradeId, onStatusAdvanced }: { current: string
                   {isComplete ? <CheckCircle2 size={14} /> : (i + 1)}
                 </div>
                 <span style={{
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: isCurrent ? 600 : isNext ? 500 : 400,
                   color: isCurrent ? "var(--t1)" : isNext ? "var(--sage)" : "var(--t3)",
                   textTransform: "uppercase",
@@ -276,20 +276,20 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
       }}>
         <ShieldCheck size={16} style={{ color: "var(--sage)" }} />
         <span style={{
-          fontSize: 14,
+          fontSize: 15,
           fontWeight: 600,
           color: "var(--sage)",
         }}>
           {t("detail.auditTrail")}
         </span>
-        <span style={{ fontSize: 13, color: "#166534", marginLeft: "auto" }}>
+        <span style={{ fontSize: 15, color: "#166534", marginLeft: "auto" }}>
           {t("detail.event", { count: events.length })}
         </span>
       </div>
 
       {/* Timeline */}
       {events.length === 0 ? (
-        <p style={{ fontSize: 13, color: "var(--t3)", textAlign: "center", padding: 20 }}>
+        <p style={{ fontSize: 15, color: "var(--t3)", textAlign: "center", padding: 20 }}>
           {t("detail.noAuditEvents")}
         </p>
       ) : (
@@ -341,11 +341,11 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                 {/* Content */}
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>
                       {eventLabel}
                     </span>
                     <span style={{
-                      fontSize: 14,
+                      fontSize: 15,
                       fontFamily: "monospace",
                       color: "var(--t3)",
                       background: "rgba(0,0,0,0.03)",
@@ -355,29 +355,29 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                       {event.eventHash.slice(0, 8)}
                     </span>
                   </div>
-                  <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 2 }}>
+                  <div style={{ fontSize: 15, color: "var(--t3)", marginTop: 2 }}>
                     {date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                     {` ${t("detail.at")} `}
                     {date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
                   </div>
                   {/* Event-specific details */}
                   {event.eventType === "status_change" && event.eventData?.from && (
-                    <div style={{ fontSize: 13, color: "var(--t2)", marginTop: 4 }}>
+                    <div style={{ fontSize: 15, color: "var(--t2)", marginTop: 4 }}>
                       {event.eventData.from} → {event.eventData.to}
                     </div>
                   )}
                   {event.eventType === "lc_check" && event.eventData?.verdict && (
-                    <div style={{ fontSize: 13, color: "var(--t2)", marginTop: 4 }}>
+                    <div style={{ fontSize: 15, color: "var(--t2)", marginTop: 4 }}>
                       {t("detail.verdict", { verdict: event.eventData.verdict })}
                     </div>
                   )}
                   {event.eventType === "supplier_doc_uploaded" && event.eventData?.docType && (
-                    <div style={{ fontSize: 13, color: "var(--t2)", marginTop: 4 }}>
+                    <div style={{ fontSize: 15, color: "var(--t2)", marginTop: 4 }}>
                       {event.eventData.docType} — {event.eventData.filename}
                     </div>
                   )}
                   {event.eventType === "buyer_doc_uploaded" && event.eventData?.docType && (
-                    <div style={{ fontSize: 13, color: "var(--t2)", marginTop: 4 }}>
+                    <div style={{ fontSize: 15, color: "var(--t2)", marginTop: 4 }}>
                       {event.eventData.docType} — {event.eventData.filename}
                       {event.eventData.note && (
                         <span style={{ color: "var(--t3)", marginLeft: 6 }}>({event.eventData.note})</span>
@@ -385,12 +385,12 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                     </div>
                   )}
                   {event.eventType === "doc_verified" && event.eventData?.docType && (
-                    <div style={{ fontSize: 13, color: "#16a34a", marginTop: 4 }}>
+                    <div style={{ fontSize: 15, color: "#16a34a", marginTop: 4 }}>
                       {event.eventData.docType} — {t("detail.verified")}
                     </div>
                   )}
                   {event.eventType === "doc_flagged" && event.eventData?.docType && (
-                    <div style={{ fontSize: 13, color: "#ef4444", marginTop: 4 }}>
+                    <div style={{ fontSize: 15, color: "#ef4444", marginTop: 4 }}>
                       {event.eventData.docType} — {event.eventData.finding || t("detail.issuesFlagged")}
                       {event.eventData.ucpRule && (
                         <span style={{ color: "var(--t3)", marginLeft: 6 }}>({event.eventData.ucpRule})</span>
@@ -398,7 +398,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                     </div>
                   )}
                   {event.eventType === "doc_ai_scanned" && event.eventData?.docType && (
-                    <div style={{ fontSize: 13, color: "#8b5cf6", marginTop: 4 }}>
+                    <div style={{ fontSize: 15, color: "#8b5cf6", marginTop: 4 }}>
                       {event.eventData.docType} — {event.eventData.verified ? t("detail.passed") : t("detail.issuesFlagged")}
                       {event.eventData.confidence && (
                         <span style={{ color: "var(--t3)", marginLeft: 6 }}>({event.eventData.confidence} confidence)</span>
@@ -406,7 +406,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                     </div>
                   )}
                   {event.eventType === "trade_value_set" && event.eventData?.value && (
-                    <div style={{ fontSize: 13, color: "var(--sage)", marginTop: 4 }}>
+                    <div style={{ fontSize: 15, color: "var(--sage)", marginTop: 4 }}>
                       {event.eventData.currency || "USD"} {Number(event.eventData.value).toLocaleString()}
                     </div>
                   )}
@@ -437,7 +437,7 @@ function ScoreBar({ score, band }: { score: number | null; band: string | null }
       <div style={{ flex: 1, height: 8, borderRadius: 4, background: "rgba(74,124,94,0.06)", overflow: "hidden" }}>
         <div style={{ width: `${Math.min(score, 100)}%`, height: "100%", borderRadius: 4, background: c.bar, transition: "width 0.3s ease" }} />
       </div>
-      <span style={{ fontSize: 13, fontWeight: 700, color: c.color, minWidth: 60, textAlign: "right" }}>
+      <span style={{ fontSize: 15, fontWeight: 700, color: c.color, minWidth: 60, textAlign: "right" }}>
         {score}/100
       </span>
     </div>
@@ -453,7 +453,7 @@ function ChecksList({ checks }: { checks: any[] }) {
     <div style={{ marginTop: 12 }}>
       <button
         onClick={() => setOpen(!open)}
-        style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, padding: 0, fontSize: 14, fontWeight: 500, color: "var(--t3)" }}
+        style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, padding: 0, fontSize: 15, fontWeight: 500, color: "var(--t3)" }}
       >
         {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
         {t("detail.allChecks", { total: checks.length, passed, failed: checks.length - passed })}
@@ -461,13 +461,13 @@ function ChecksList({ checks }: { checks: any[] }) {
       {open && (
         <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
           {checks.map((c: any) => (
-            <div key={c.id} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 13, color: c.passed ? "var(--sage-l)" : c.severity === "critical" ? "#ef4444" : "#eab308" }}>
+            <div key={c.id} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 15, color: c.passed ? "var(--sage-l)" : c.severity === "critical" ? "#ef4444" : "#eab308" }}>
               <span style={{ flexShrink: 0, marginTop: 1 }}>{c.passed ? "✅" : c.severity === "critical" ? "❌" : "⚠️"}</span>
               <div>
                 <span style={{ fontWeight: 500 }}>{c.label}</span>
                 <span style={{ color: "var(--t3)", marginLeft: 6 }}>{c.detail}</span>
                 {!c.passed && c.fixSuggestion && (
-                  <div style={{ fontSize: 14, color: "var(--app-acapulco)", marginTop: 2 }}>💡 {c.fixSuggestion}</div>
+                  <div style={{ fontSize: 15, color: "var(--app-acapulco)", marginTop: 2 }}>💡 {c.fixSuggestion}</div>
                 )}
               </div>
             </div>
@@ -483,14 +483,14 @@ function TopDrivers({ drivers }: { drivers: any[] }) {
   if (!drivers || drivers.length === 0) return null;
   return (
     <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
-      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: ".08em" }}>{t("detail.topIssues")}</span>
+      <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: ".08em" }}>{t("detail.topIssues")}</span>
       {drivers.map((d: any, i: number) => (
-        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 12 }}>
+        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 15 }}>
           <span style={{ flexShrink: 0 }}>{d.severity === "critical" ? "🔴" : "🟠"}</span>
           <div>
             <span style={{ fontWeight: 500, color: "var(--t1)" }}>{d.reason}</span>
             <span style={{ color: "var(--t3)", marginLeft: 4 }}>({d.points} pts)</span>
-            <div style={{ fontSize: 13, color: "var(--app-acapulco)" }}>→ {d.fix}</div>
+            <div style={{ fontSize: 15, color: "var(--app-acapulco)" }}>→ {d.fix}</div>
           </div>
         </div>
       ))}
@@ -510,7 +510,7 @@ function BreakdownRow({ breakdown }: { breakdown: any }) {
   return (
     <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
       {items.map(item => (
-        <div key={item.label} style={{ fontSize: 13, color: "var(--t3)" }}>
+        <div key={item.label} style={{ fontSize: 15, color: "var(--t3)" }}>
           <span style={{ fontWeight: 500 }}>{item.label}</span>
           <span style={{ marginLeft: 4, fontWeight: 700, color: item.val > 0 ? "#ef4444" : "var(--sage-l)" }}>{item.val}</span>
           <span style={{ color: "var(--t3)" }}>/{item.max}</span>
@@ -530,7 +530,7 @@ function FormSection({ title, icon: Icon, children, defaultOpen = false }: { tit
         style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, padding: 0, width: "100%", textAlign: "left" }}
       >
         <Icon className="w-4 h-4" style={{ color: "var(--t3)", flexShrink: 0 }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)", flex: 1 }}>{title}</span>
+        <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", flex: 1 }}>{title}</span>
         {open ? <ChevronUp className="w-3.5 h-3.5" style={{ color: "var(--t3)" }} /> : <ChevronDown className="w-3.5 h-3.5" style={{ color: "var(--t3)" }} />}
       </button>
       {open && <div style={{ marginTop: 12, paddingLeft: 28 }}>{children}</div>}
@@ -631,7 +631,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {assessment && assessment.applicable && assessment.score != null && (
               <span style={{
-                fontSize: 13, fontWeight: 600, padding: "2px 10px", borderRadius: 4,
+                fontSize: 15, fontWeight: 600, padding: "2px 10px", borderRadius: 4,
                 background: bandC?.bg || "rgba(0,0,0,0.04)",
                 color: bandC?.color || "var(--t3)",
               }}>
@@ -639,10 +639,10 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               </span>
             )}
             {assessment && assessment.applicable === false && (
-              <span style={{ fontSize: 13, color: "var(--t3)", fontWeight: 500 }}>N/A</span>
+              <span style={{ fontSize: 15, color: "var(--t3)", fontWeight: 500 }}>N/A</span>
             )}
             {!assessment && (
-              <span style={{ fontSize: 13, color: "var(--app-acapulco)", fontWeight: 500 }}>{t("detail.notAssessed")}</span>
+              <span style={{ fontSize: 15, color: "var(--app-acapulco)", fontWeight: 500 }}>{t("detail.notAssessed")}</span>
             )}
             {expanded ? <ChevronUp className="w-4 h-4" style={{ color: "var(--t3)" }} /> : <ChevronDown className="w-4 h-4" style={{ color: "var(--t3)" }} />}
           </div>
@@ -650,7 +650,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
 
         {/* Collapsed subtitle */}
         {!expanded && assessment && assessment.applicable && (
-          <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 4, marginLeft: 28 }}>
+          <div style={{ fontSize: 15, color: "var(--t3)", marginTop: 4, marginLeft: 28 }}>
             {assessment.canConcludeNegligibleRisk
               ? `✅ ${t("detail.canConcludeNegligible")}`
               : `❌ ${t("detail.cannotConcludeNegligible")}`}
@@ -673,7 +673,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               <Button size="sm" disabled={saving} onClick={() => saveEudrField({
                 plotCoordinates: plotCoords ? JSON.parse(plotCoords) : null,
                 plotCountryIso2: plotCountry || null,
-              })} style={{ fontSize: 13, marginTop: 4 }}>
+              })} style={{ fontSize: 15, marginTop: 4 }}>
                 {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
@@ -702,7 +702,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
                 evidenceReference: evidenceRef || null,
                 evidenceDate: evidenceDate || null,
                 cutoffDate: cutoffDate || null,
-              })} style={{ fontSize: 13, marginTop: 4 }}>
+              })} style={{ fontSize: 15, marginTop: 4 }}>
                 {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
@@ -716,7 +716,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
                 supplierName: supplierName || null,
                 supplierAddress: supplierAddr || null,
                 supplierRegNumber: supplierReg || null,
-              })} style={{ fontSize: 13, marginTop: 4 }}>
+              })} style={{ fontSize: 15, marginTop: 4 }}>
                 {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
@@ -736,7 +736,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               </div>
               <Button size="sm" disabled={saving} onClick={() => saveEudrField({
                 riskLevel,
-              })} style={{ fontSize: 13, marginTop: 4 }}>
+              })} style={{ fontSize: 15, marginTop: 4 }}>
                 {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
@@ -744,7 +744,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
             {/* Assessment Section */}
             <div style={{ borderTop: "2px solid rgba(0,0,0,0.08)", paddingTop: 16, marginTop: 4 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-                <Button size="sm" onClick={runAssessment} disabled={assessing} style={{ fontSize: 12 }}>
+                <Button size="sm" onClick={runAssessment} disabled={assessing} style={{ fontSize: 15 }}>
                   {assessing ? (
                     <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> {t("detail.assessing")}</>
                   ) : (
@@ -753,7 +753,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
                 </Button>
                 {eudr && (
                   <Link href={`/eudr/${tradeId}`}>
-                    <Button variant="outline" size="sm" style={{ fontSize: 11 }}>
+                    <Button variant="outline" size="sm" style={{ fontSize: 15 }}>
                       {t("detail.generatePdfStatement")}
                     </Button>
                   </Link>
@@ -763,10 +763,10 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               {assessment && assessment.applicable && (
                 <div style={{ marginTop: 16 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: bandC?.color || "var(--t3)" }}>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: bandC?.color || "var(--t3)" }}>
                       {t("detail.score", { score: assessment.score, band: assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : "" })}
                     </span>
-                    <span style={{ fontSize: 14, color: "var(--t2)" }}>
+                    <span style={{ fontSize: 15, color: "var(--t2)" }}>
                       {assessment.canConcludeNegligibleRisk ? `✅ ${t("detail.canConcludeNegligible")}` : `❌ ${t("detail.cannotConcludeNegligible")}`}
                     </span>
                   </div>
@@ -778,7 +778,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               )}
 
               {assessment && assessment.applicable === false && (
-                <div style={{ marginTop: 12, fontSize: 14, color: "var(--t3)", padding: "8px 12px", background: "rgba(0,0,0,0.03)", borderRadius: 8 }}>
+                <div style={{ marginTop: 12, fontSize: 15, color: "var(--t3)", padding: "8px 12px", background: "rgba(0,0,0,0.03)", borderRadius: 8 }}>
                   {t("detail.eudrNotApplicable")}
                 </div>
               )}
@@ -863,7 +863,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {assessment && assessment.applicable && assessment.score != null && (
               <span style={{
-                fontSize: 13, fontWeight: 600, padding: "2px 10px", borderRadius: 4,
+                fontSize: 15, fontWeight: 600, padding: "2px 10px", borderRadius: 4,
                 background: bandC?.bg || "rgba(0,0,0,0.04)",
                 color: bandC?.color || "var(--t3)",
               }}>
@@ -871,10 +871,10 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               </span>
             )}
             {assessment && assessment.applicable === false && (
-              <span style={{ fontSize: 13, color: "var(--t3)", fontWeight: 500 }}>N/A</span>
+              <span style={{ fontSize: 15, color: "var(--t3)", fontWeight: 500 }}>N/A</span>
             )}
             {!assessment && (
-              <span style={{ fontSize: 13, color: "var(--app-acapulco)", fontWeight: 500 }}>{t("detail.notAssessed")}</span>
+              <span style={{ fontSize: 15, color: "var(--app-acapulco)", fontWeight: 500 }}>{t("detail.notAssessed")}</span>
             )}
             {expanded ? <ChevronUp className="w-4 h-4" style={{ color: "var(--t3)" }} /> : <ChevronDown className="w-4 h-4" style={{ color: "var(--t3)" }} />}
           </div>
@@ -882,7 +882,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
 
         {/* Collapsed subtitle */}
         {!expanded && assessment && assessment.applicable && (
-          <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 4, marginLeft: 28 }}>
+          <div style={{ fontSize: 15, color: "var(--t3)", marginTop: 4, marginLeft: 28 }}>
             {assessment.canConcludeCbamCompliant
               ? `✅ ${t("detail.cbamCompliant")}`
               : `❌ ${t("detail.cbamComplianceIssues")}`}
@@ -905,7 +905,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               <Button size="sm" disabled={saving} onClick={() => saveCbamField({
                 embeddedEmissions: emissions || null,
                 quantity: quantity || null,
-              })} style={{ fontSize: 13, marginTop: 4 }}>
+              })} style={{ fontSize: 15, marginTop: 4 }}>
                 {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
@@ -919,7 +919,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
                 installationName: installName || null,
                 installationCountry: installCountry || null,
                 reportingPeriod: reportingPeriod || null,
-              })} style={{ fontSize: 13, marginTop: 4 }}>
+              })} style={{ fontSize: 15, marginTop: 4 }}>
                 {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
@@ -941,14 +941,14 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               <Button size="sm" disabled={saving} onClick={() => saveCbamField({
                 carbonPricePaid: carbonPrice || null,
                 carbonPriceCurrency: carbonCurrency,
-              })} style={{ fontSize: 13, marginTop: 4 }}>
+              })} style={{ fontSize: 15, marginTop: 4 }}>
                 {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
 
             {/* Assessment Section */}
             <div style={{ borderTop: "2px solid rgba(0,0,0,0.08)", paddingTop: 16, marginTop: 4 }}>
-              <Button size="sm" onClick={runAssessment} disabled={assessing} style={{ fontSize: 12 }}>
+              <Button size="sm" onClick={runAssessment} disabled={assessing} style={{ fontSize: 15 }}>
                 {assessing ? (
                   <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> {t("detail.assessing")}</>
                 ) : (
@@ -959,10 +959,10 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               {assessment && assessment.applicable && (
                 <div style={{ marginTop: 16 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: bandC?.color || "var(--t3)" }}>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: bandC?.color || "var(--t3)" }}>
                       {t("detail.score", { score: assessment.score, band: assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : "" })}
                     </span>
-                    <span style={{ fontSize: 14, color: "var(--t2)" }}>
+                    <span style={{ fontSize: 15, color: "var(--t2)" }}>
                       {assessment.canConcludeCbamCompliant ? `✅ ${t("detail.canConcludeCbamCompliant")}` : `❌ ${t("detail.cannotConcludeCbamCompliant")}`}
                     </span>
                   </div>
@@ -974,7 +974,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               )}
 
               {assessment && assessment.applicable === false && (
-                <div style={{ marginTop: 12, fontSize: 14, color: "var(--t3)", padding: "8px 12px", background: "rgba(0,0,0,0.03)", borderRadius: 8 }}>
+                <div style={{ marginTop: 12, fontSize: 15, color: "var(--t3)", padding: "8px 12px", background: "rgba(0,0,0,0.03)", borderRadius: 8 }}>
                   {t("detail.cbamNotApplicable")}
                 </div>
               )}
@@ -1178,7 +1178,7 @@ export default function TradeDetail() {
           background: "rgba(0,0,0,0.04)",
           borderRadius: 20,
           padding: "5px 14px",
-          fontSize: 13,
+          fontSize: 15,
           color: "var(--t3)",
           marginBottom: 14,
           letterSpacing: "0.03em",
@@ -1218,7 +1218,7 @@ export default function TradeDetail() {
                     background: cfg.bg,
                     color: cfg.text,
                     border: "none",
-                    fontSize: 13,
+                    fontSize: 15,
                     fontWeight: 600,
                     padding: "3px 10px",
                   }}>
@@ -1233,7 +1233,7 @@ export default function TradeDetail() {
                   background: "rgba(74,124,94,0.06)",
                   color: "var(--t1)",
                   border: "1px solid rgba(0,0,0,0.08)",
-                  fontSize: 13,
+                  fontSize: 15,
                   fontWeight: 600,
                   padding: "3px 10px",
                 }}>
@@ -1243,7 +1243,7 @@ export default function TradeDetail() {
             </div>
 
             <p style={{
-              fontSize: 14,
+              fontSize: 15,
               color: "var(--t3)",
               margin: "6px 0 0",
             }}>
@@ -1251,7 +1251,7 @@ export default function TradeDetail() {
               {" → "}
               {nameFlag(data.lookup.destinationName)} {data.lookup.destinationName}
               {data.lookup.hsCode && (
-                <span style={{ marginLeft: 10, fontFamily: "monospace", fontSize: 14, color: "var(--t3)" }}>
+                <span style={{ marginLeft: 10, fontFamily: "monospace", fontSize: 15, color: "var(--t3)" }}>
                   HS {data.lookup.hsCode}
                 </span>
               )}
@@ -1273,7 +1273,7 @@ export default function TradeDetail() {
           <Card>
             <CardContent className="p-6 text-center">
               <XCircle className="w-8 h-8 mx-auto mb-3" style={{ color: "#ef4444" }} />
-              <p style={{ fontSize: 14, color: "#ef4444" }}>
+              <p style={{ fontSize: 15, color: "#ef4444" }}>
                 {t("detail.notFoundDescription")}
               </p>
               <Link href="/trades">
@@ -1307,7 +1307,7 @@ export default function TradeDetail() {
                       {t("detail.complianceSummary")}
                     </h3>
                     <Link href={`/lookup?lookupId=${data.lookup.id}`}>
-                      <Button variant="outline" size="sm" style={{ fontSize: 12 }}>
+                      <Button variant="outline" size="sm" style={{ fontSize: 15 }}>
                         {t("detail.viewFullReport")}
                       </Button>
                     </Link>
@@ -1332,11 +1332,11 @@ export default function TradeDetail() {
                         {data.lookup.readinessScore}
                       </div>
                       <div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>
+                        <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>
                           {t("detail.readinessScore")}
                         </div>
                         <div style={{
-                          fontSize: 14,
+                          fontSize: 15,
                           fontWeight: 700,
                           color: data.lookup.readinessVerdict === "RED" ? "#ef4444" :
                             data.lookup.readinessVerdict === "AMBER" ? "#eab308" : "var(--sage-l)",
@@ -1348,7 +1348,7 @@ export default function TradeDetail() {
                   )}
 
                   {data.lookup.readinessSummary && (
-                    <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6, margin: 0 }}>
+                    <p style={{ fontSize: 15, color: "var(--t2)", lineHeight: 1.6, margin: 0 }}>
                       {data.lookup.readinessSummary}
                     </p>
                   )}
@@ -1364,7 +1364,7 @@ export default function TradeDetail() {
                         {t("detail.lcDocCheck")}
                       </h3>
                       <Link href={`/lc-check?lookupId=${data.lookup.id}`}>
-                        <Button variant="outline" size="sm" style={{ fontSize: 12 }}>
+                        <Button variant="outline" size="sm" style={{ fontSize: 15 }}>
                           {data.latestLcCheck ? t("detail.viewRecheck") : t("detail.runLcCheck")}
                         </Button>
                       </Link>
@@ -1380,7 +1380,7 @@ export default function TradeDetail() {
                             data.latestLcCheck.verdict === "COMPLIANT_WITH_NOTES" ? "#d97706" :
                             "#ef4444",
                           border: "none",
-                          fontSize: 14,
+                          fontSize: 15,
                           fontWeight: 600,
                           marginBottom: 10,
                         }}>
@@ -1388,19 +1388,19 @@ export default function TradeDetail() {
                         </Badge>
 
                         {data.lcCase.recheckCount > 0 && (
-                          <p style={{ fontSize: 14, color: "var(--t3)", marginTop: 6 }}>
+                          <p style={{ fontSize: 15, color: "var(--t3)", marginTop: 6 }}>
                             {t("detail.recheck", { count: data.lcCase.recheckCount })}
                           </p>
                         )}
 
                         {data.lcCase.correctionRequests && (data.lcCase.correctionRequests as any[]).length > 0 && (
-                          <p style={{ fontSize: 14, color: "var(--t3)", marginTop: 4 }}>
+                          <p style={{ fontSize: 15, color: "var(--t3)", marginTop: 4 }}>
                             {t("detail.correction", { count: (data.lcCase.correctionRequests as any[]).length })}
                           </p>
                         )}
                       </div>
                     ) : (
-                      <p style={{ fontSize: 13, color: "var(--t3)" }}>
+                      <p style={{ fontSize: 15, color: "var(--t3)" }}>
                         {t("detail.noLcCheck")}
                       </p>
                     )}
@@ -1420,7 +1420,7 @@ export default function TradeDetail() {
                         <Button
                           variant="outline"
                           size="sm"
-                          style={{ fontSize: 11 }}
+                          style={{ fontSize: 15 }}
                           onClick={() => setShowBuyerUpload(!showBuyerUpload)}
                         >
                           <Upload size={12} style={{ marginRight: 4 }} />
@@ -1429,7 +1429,7 @@ export default function TradeDetail() {
                       )}
                       {!data.supplierRequest && (
                         <Link href={`/lookup?lookupId=${data.lookup.id}`}>
-                          <Button variant="outline" size="sm" style={{ fontSize: 12 }}>
+                          <Button variant="outline" size="sm" style={{ fontSize: 15 }}>
                             {t("detail.sendUploadLink")}
                           </Button>
                         </Link>
@@ -1448,7 +1448,7 @@ export default function TradeDetail() {
                             data.supplierRequest.status === "partial" ? "#d97706" :
                             "#6b7280",
                           border: "none",
-                          fontSize: 13,
+                          fontSize: 15,
                         }}>
                           {data.supplierRequest.status}
                         </Badge>
@@ -1456,7 +1456,7 @@ export default function TradeDetail() {
 
                       {/* Required docs list */}
                       <div style={{ marginBottom: 12 }}>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 6 }}>
+                        <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 6 }}>
                           {t("detail.required", { count: (data.supplierRequest.docsRequired as string[] || []).length })}
                         </div>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
@@ -1464,7 +1464,7 @@ export default function TradeDetail() {
                             const received = data.supplierUploads.some((u: any) => u.docType === doc);
                             return (
                               <span key={doc} style={{
-                                fontSize: 13,
+                                fontSize: 15,
                                 padding: "2px 8px",
                                 borderRadius: 6,
                                 background: received ? "rgba(34,197,94,0.1)" : "rgba(0,0,0,0.03)",
@@ -1482,7 +1482,7 @@ export default function TradeDetail() {
                       {/* Received documents with verification */}
                       {data.supplierUploads.length > 0 && (
                         <div>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 8 }}>
+                          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 8 }}>
                             {t("detail.receivedDocs")}
                           </div>
                           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1509,12 +1509,12 @@ export default function TradeDetail() {
                                     ) : (
                                       <FileText size={13} style={{ color: "var(--t3)" }} />
                                     )}
-                                    <span style={{ fontSize: 14, fontWeight: 500, color: "var(--t1)" }}>
+                                    <span style={{ fontSize: 15, fontWeight: 500, color: "var(--t1)" }}>
                                       {upload.docType}
                                     </span>
                                     {upload.uploadedBy === "buyer" && (
                                       <span style={{
-                                        fontSize: 13, fontWeight: 600, color: "var(--t3)",
+                                        fontSize: 15, fontWeight: 600, color: "var(--t3)",
                                         background: "rgba(0,0,0,0.04)", padding: "1px 5px",
                                         borderRadius: 4,
                                       }}>
@@ -1523,7 +1523,7 @@ export default function TradeDetail() {
                                     )}
                                     {upload.verified === true && (
                                       <span style={{
-                                        fontSize: 13, fontWeight: 600, color: "#16a34a",
+                                        fontSize: 15, fontWeight: 600, color: "#16a34a",
                                         background: "rgba(34,197,94,0.1)", padding: "1px 6px",
                                         borderRadius: 4,
                                       }}>
@@ -1532,7 +1532,7 @@ export default function TradeDetail() {
                                     )}
                                     {upload.verified === false && upload.finding && (
                                       <span style={{
-                                        fontSize: 13, fontWeight: 600, color: "#ef4444",
+                                        fontSize: 15, fontWeight: 600, color: "#ef4444",
                                         background: "rgba(239,68,68,0.1)", padding: "1px 6px",
                                         borderRadius: 4,
                                       }}>
@@ -1553,7 +1553,7 @@ export default function TradeDetail() {
                                           background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)",
                                           borderRadius: 5, padding: "3px 6px", cursor: "pointer",
                                           display: "flex", alignItems: "center", gap: 3,
-                                          fontSize: 14, color: "#8b5cf6", fontWeight: 500,
+                                          fontSize: 15, color: "#8b5cf6", fontWeight: 500,
                                         }}
                                       >
                                         <Sparkles size={10} /> {t("detail.scan")}
@@ -1569,7 +1569,7 @@ export default function TradeDetail() {
                                           background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)",
                                           borderRadius: 5, padding: "3px 6px", cursor: "pointer",
                                           display: "flex", alignItems: "center", gap: 3,
-                                          fontSize: 14, color: "#16a34a", fontWeight: 500,
+                                          fontSize: 15, color: "#16a34a", fontWeight: 500,
                                         }}
                                       >
                                         <CheckCircle2 size={10} /> {t("detail.verify")}
@@ -1590,7 +1590,7 @@ export default function TradeDetail() {
                                         background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)",
                                         borderRadius: 5, padding: "3px 6px", cursor: "pointer",
                                         display: "flex", alignItems: "center", gap: 3,
-                                        fontSize: 14, color: "#ef4444", fontWeight: 500,
+                                        fontSize: 15, color: "#ef4444", fontWeight: 500,
                                       }}
                                     >
                                       <Flag size={10} /> {t("detail.flag")}
@@ -1599,7 +1599,7 @@ export default function TradeDetail() {
                                 </div>
 
                                 {/* File info */}
-                                <div style={{ fontSize: 14, color: "var(--t3)", marginTop: 4 }}>
+                                <div style={{ fontSize: 15, color: "var(--t3)", marginTop: 4 }}>
                                   {upload.originalFilename}
                                   {upload.filesizeBytes && (
                                     <span style={{ marginLeft: 8 }}>
@@ -1613,11 +1613,11 @@ export default function TradeDetail() {
                                   <div style={{
                                     marginTop: 6, padding: "6px 8px", borderRadius: 6,
                                     background: upload.verified === false ? "rgba(239,68,68,0.06)" : "rgba(34,197,94,0.06)",
-                                    fontSize: 13, color: upload.verified === false ? "#ef4444" : "#16a34a",
+                                    fontSize: 15, color: upload.verified === false ? "#ef4444" : "#16a34a",
                                   }}>
                                     {upload.finding}
                                     {upload.ucpRule && (
-                                      <span style={{ display: "block", marginTop: 2, fontSize: 14, color: "var(--t3)" }}>
+                                      <span style={{ display: "block", marginTop: 2, fontSize: 15, color: "var(--t3)" }}>
                                         {upload.ucpRule}
                                       </span>
                                     )}
@@ -1630,12 +1630,12 @@ export default function TradeDetail() {
                                     marginTop: 6, padding: "6px 8px", borderRadius: 6,
                                     background: "rgba(139,92,246,0.06)",
                                     border: "1px solid rgba(139,92,246,0.12)",
-                                    fontSize: 13, color: "#8b5cf6",
+                                    fontSize: 15, color: "#8b5cf6",
                                   }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 2 }}>
                                       <Sparkles size={10} />
                                       <span style={{ fontWeight: 600 }}>{t("detail.aiAnalysis")}</span>
-                                      <span style={{ fontSize: 13, color: "var(--t3)" }}>({scanResult?.confidence})</span>
+                                      <span style={{ fontSize: 15, color: "var(--t3)" }}>({scanResult?.confidence})</span>
                                     </div>
                                     {scanResult?.details}
                                   </div>
@@ -1648,7 +1648,7 @@ export default function TradeDetail() {
                                     background: "rgba(0,0,0,0.02)",
                                     border: "1px solid rgba(0,0,0,0.06)",
                                   }}>
-                                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t2)", marginBottom: 6 }}>
+                                    <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t2)", marginBottom: 6 }}>
                                       {t("detail.flagIssueTitle")}
                                     </div>
                                     <input
@@ -1659,7 +1659,7 @@ export default function TradeDetail() {
                                       style={{
                                         width: "100%", background: "rgba(0,0,0,0.03)",
                                         border: "1px solid rgba(0,0,0,0.08)", color: "var(--t1)",
-                                        borderRadius: 6, padding: "6px 8px", fontSize: 13, marginBottom: 6,
+                                        borderRadius: 6, padding: "6px 8px", fontSize: 15, marginBottom: 6,
                                       }}
                                     />
                                     <input
@@ -1670,7 +1670,7 @@ export default function TradeDetail() {
                                       style={{
                                         width: "100%", background: "rgba(0,0,0,0.03)",
                                         border: "1px solid rgba(0,0,0,0.08)", color: "var(--t1)",
-                                        borderRadius: 6, padding: "6px 8px", fontSize: 13, marginBottom: 8,
+                                        borderRadius: 6, padding: "6px 8px", fontSize: 15, marginBottom: 8,
                                       }}
                                     />
                                     <div style={{ display: "flex", gap: 6 }}>
@@ -1679,7 +1679,7 @@ export default function TradeDetail() {
                                         disabled={!flagFinding.trim()}
                                         style={{
                                           background: "#ef4444", color: "#fff", border: "none",
-                                          borderRadius: 6, padding: "5px 12px", fontSize: 13,
+                                          borderRadius: 6, padding: "5px 12px", fontSize: 15,
                                           fontWeight: 500, cursor: flagFinding.trim() ? "pointer" : "not-allowed",
                                           opacity: flagFinding.trim() ? 1 : 0.5,
                                         }}
@@ -1690,7 +1690,7 @@ export default function TradeDetail() {
                                         onClick={() => { setFlaggingUploadId(null); setFlagFinding(""); setFlagUcpRule(""); }}
                                         style={{
                                           background: "transparent", color: "var(--t3)", border: "1px solid rgba(0,0,0,0.06)",
-                                          borderRadius: 6, padding: "5px 12px", fontSize: 13, cursor: "pointer",
+                                          borderRadius: 6, padding: "5px 12px", fontSize: 15, cursor: "pointer",
                                         }}
                                       >
                                         {t("detail.docActions.cancelFlag")}
@@ -1713,7 +1713,7 @@ export default function TradeDetail() {
                           border: "1px solid rgba(0,0,0,0.06)",
                           borderRadius: 10,
                         }}>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: "var(--t2)", marginBottom: 10 }}>
+                          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t2)", marginBottom: 10 }}>
                             {t("detail.uploadOutside")}
                           </div>
                           <select
@@ -1726,7 +1726,7 @@ export default function TradeDetail() {
                               color: "var(--t1)",
                               borderRadius: 6,
                               padding: "8px 10px",
-                              fontSize: 14,
+                              fontSize: 15,
                               marginBottom: 8,
                             }}
                           >
@@ -1741,7 +1741,7 @@ export default function TradeDetail() {
                             accept=".pdf,.jpg,.jpeg,.png"
                             style={{
                               width: "100%",
-                              fontSize: 14,
+                              fontSize: 15,
                               color: "var(--t2)",
                               marginBottom: 8,
                             }}
@@ -1758,14 +1758,14 @@ export default function TradeDetail() {
                               color: "var(--t1)",
                               borderRadius: 6,
                               padding: "8px 10px",
-                              fontSize: 14,
+                              fontSize: 15,
                               marginBottom: 10,
                             }}
                           />
                           <div style={{ display: "flex", gap: 8 }}>
                             <Button
                               size="sm"
-                              style={{ fontSize: 13, background: "var(--sage)", color: "#fff" }}
+                              style={{ fontSize: 15, background: "var(--sage)", color: "#fff" }}
                               disabled={!buyerDocType || buyerUploading}
                               onClick={handleBuyerUpload}
                             >
@@ -1774,7 +1774,7 @@ export default function TradeDetail() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              style={{ fontSize: 13, color: "var(--t3)" }}
+                              style={{ fontSize: 15, color: "var(--t3)" }}
                               onClick={() => setShowBuyerUpload(false)}
                             >
                               {t("detail.buyerUpload.cancel")}
@@ -1784,7 +1784,7 @@ export default function TradeDetail() {
                       )}
                     </div>
                   ) : (
-                    <p style={{ fontSize: 13, color: "var(--t3)" }}>
+                    <p style={{ fontSize: 15, color: "var(--t3)" }}>
                       {t("detail.noSupplierLink")}
                     </p>
                   )}
@@ -1819,7 +1819,7 @@ export default function TradeDetail() {
                           border: "1px solid rgba(14,78,69,0.3)",
                           borderRadius: 6,
                           padding: "3px 10px",
-                          fontSize: 13,
+                          fontSize: 15,
                           color: "var(--sage)",
                           cursor: "pointer",
                         }}
@@ -1838,7 +1838,7 @@ export default function TradeDetail() {
                           style={{
                             width: 72,
                             padding: "6px 8px",
-                            fontSize: 13,
+                            fontSize: 15,
                             borderRadius: 6,
                             border: "1px solid rgba(0,0,0,0.15)",
                             background: "#fff",
@@ -1857,7 +1857,7 @@ export default function TradeDetail() {
                           style={{
                             flex: 1,
                             padding: "6px 10px",
-                            fontSize: 13,
+                            fontSize: 15,
                             borderRadius: 6,
                             border: "1px solid rgba(0,0,0,0.15)",
                           }}
@@ -1871,7 +1871,7 @@ export default function TradeDetail() {
                           style={{
                             flex: 1,
                             padding: "6px 0",
-                            fontSize: 14,
+                            fontSize: 15,
                             fontWeight: 600,
                             borderRadius: 6,
                             border: "none",
@@ -1887,7 +1887,7 @@ export default function TradeDetail() {
                           onClick={() => setEditingValue(false)}
                           style={{
                             padding: "6px 14px",
-                            fontSize: 14,
+                            fontSize: 15,
                             borderRadius: 6,
                             border: "1px solid rgba(0,0,0,0.15)",
                             background: "#fff",
@@ -1909,7 +1909,7 @@ export default function TradeDetail() {
                       {data.lookup.tradeValueCurrency || "USD"} {Number(data.lookup.tradeValue).toLocaleString()}
                     </div>
                   ) : (
-                    <p style={{ fontSize: 13, color: "var(--t3)", margin: 0 }}>
+                    <p style={{ fontSize: 15, color: "var(--t3)", margin: 0 }}>
                       {t("detail.noValueSet")}
                     </p>
                   )}
@@ -1931,37 +1931,37 @@ export default function TradeDetail() {
                       <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: "0 0 12px", display: "flex", alignItems: "center", gap: 8 }}>
                         <span>⚓</span> {t("detail.demurrage")}
                       </h3>
-                      <div style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6, marginBottom: 10 }}>
+                      <div style={{ fontSize: 15, color: "var(--t2)", lineHeight: 1.6, marginBottom: 10 }}>
                         <div style={{ marginBottom: 6 }}>
-                          <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("detail.port")}</span>
+                          <span style={{ color: "var(--t3)", fontSize: 15, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("detail.port")}</span>
                           <div style={{ fontWeight: 500, color: "var(--t1)" }}>
                             {estimate.port.label}
                             {estimate.allPorts.length > 1 && (
-                              <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 400 }}> ({t("detail.more", { count: estimate.allPorts.length - 1 })})</span>
+                              <span style={{ color: "var(--t3)", fontSize: 15, fontWeight: 400 }}> ({t("detail.more", { count: estimate.allPorts.length - 1 })})</span>
                             )}
                           </div>
                         </div>
                         <div style={{ marginBottom: 6 }}>
-                          <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("detail.estimatedDelay")}</span>
+                          <span style={{ color: "var(--t3)", fontSize: 15, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("detail.estimatedDelay")}</span>
                           <div>
                             <span style={{ color: verdictColor, fontWeight: 600 }}>{estimate.delayLabel}</span>
-                            <span style={{ color: "var(--t3)", fontSize: 11 }}> {t("detail.basedOn", { verdict: verdict || "AMBER" })}</span>
+                            <span style={{ color: "var(--t3)", fontSize: 15 }}> {t("detail.basedOn", { verdict: verdict || "AMBER" })}</span>
                           </div>
                         </div>
                         <div style={{ marginBottom: 6 }}>
-                          <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("detail.costRange20ft")}</span>
+                          <span style={{ color: "var(--t3)", fontSize: 15, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("detail.costRange20ft")}</span>
                           <div style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 20, color: "var(--sage)" }}>
                             ${estimate.minCost.toLocaleString()} – ${estimate.maxCost.toLocaleString()}
                           </div>
                         </div>
                         {pctOfCargo && (
-                          <div style={{ fontSize: 14, color: Number(pctOfCargo) > 5 ? "#ef4444" : "var(--t3)", marginTop: 2 }}>
+                          <div style={{ fontSize: 15, color: Number(pctOfCargo) > 5 ? "#ef4444" : "var(--t3)", marginTop: 2 }}>
                             {t("detail.percentOfCargo", { pct: pctOfCargo })}
                           </div>
                         )}
                       </div>
                       <Link href="/demurrage">
-                        <span style={{ fontSize: 13, color: "var(--sage)", cursor: "pointer", fontWeight: 600 }}>
+                        <span style={{ fontSize: 15, color: "var(--sage)", cursor: "pointer", fontWeight: 600 }}>
                           {t("detail.openFullCalculator", { count: estimate.allPorts.length, plural: estimate.allPorts.length !== 1 ? "s" : "" })}
                         </span>
                       </Link>
@@ -1985,11 +1985,11 @@ export default function TradeDetail() {
                   <CardContent className="p-4">
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                       <Hash size={14} style={{ color: "var(--sage)" }} />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{t("detail.twinlogReference")}</span>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{t("detail.twinlogReference")}</span>
                     </div>
                     <div style={{
                       fontFamily: "monospace",
-                      fontSize: 14,
+                      fontSize: 15,
                       color: "var(--sage)",
                       background: "rgba(14,78,69,0.06)",
                       padding: "8px 12px",
@@ -2001,7 +2001,7 @@ export default function TradeDetail() {
                     {data.twinlog.hash && (
                       <div style={{
                         fontFamily: "monospace",
-                        fontSize: 14,
+                        fontSize: 15,
                         color: "var(--t3)",
                         marginTop: 6,
                       }}>
@@ -2015,24 +2015,24 @@ export default function TradeDetail() {
               {/* Quick Actions */}
               <Card style={{ marginTop: 16 }}>
                 <CardContent className="p-4 space-y-2">
-                  <h3 style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)", marginBottom: 8 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", marginBottom: 8 }}>
                     {t("detail.actions")}
                   </h3>
                   <Link href={`/lookup?lookupId=${data.lookup.id}`}>
-                    <Button variant="outline" size="sm" style={{ width: "100%", justifyContent: "flex-start", fontSize: 12 }}>
+                    <Button variant="outline" size="sm" style={{ width: "100%", justifyContent: "flex-start", fontSize: 15 }}>
                       <Shield size={14} className="mr-2" /> {t("detail.viewComplianceReport")}
                     </Button>
                   </Link>
                   {!data.lcCase && (
                     <Link href={`/lc-check?lookupId=${data.lookup.id}`}>
-                      <Button variant="outline" size="sm" style={{ width: "100%", justifyContent: "flex-start", fontSize: 14, marginTop: 6 }}>
+                      <Button variant="outline" size="sm" style={{ width: "100%", justifyContent: "flex-start", fontSize: 15, marginTop: 6 }}>
                         <FileText size={14} className="mr-2" /> {t("detail.runLcCheck")}
                       </Button>
                     </Link>
                   )}
                   {data.twinlog.ref && (
                     <Link href={`/verify/${data.twinlog.ref}`}>
-                      <Button variant="outline" size="sm" style={{ width: "100%", justifyContent: "flex-start", fontSize: 14, marginTop: 6 }}>
+                      <Button variant="outline" size="sm" style={{ width: "100%", justifyContent: "flex-start", fontSize: 15, marginTop: 6 }}>
                         <ExternalLink size={14} className="mr-2" /> {t("detail.publicVerifyLink")}
                       </Button>
                     </Link>

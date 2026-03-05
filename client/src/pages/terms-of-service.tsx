@@ -18,10 +18,10 @@ export default function TermsOfService() {
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <Link href="/dashboard">
-            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }}>{t("nav.dashboard")}</span>
+            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 15, cursor: "pointer" }}>{t("nav.dashboard")}</span>
           </Link>
           <Link href="/">
-            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, cursor: "pointer" }}>{t("nav.home")}</span>
+            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 15, cursor: "pointer" }}>{t("nav.home")}</span>
           </Link>
         </div>
       </nav>
@@ -30,7 +30,7 @@ export default function TermsOfService() {
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 32, fontWeight: 700, color: "#fff", marginBottom: 8 }} data-testid="text-terms-title">
           {t("terms.title")}
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 40 }}>{t("terms.lastUpdated")}</p>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)", marginBottom: 40 }}>{t("terms.lastUpdated")}</p>
 
         <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 15, lineHeight: 1.7 }}>
 
@@ -130,7 +130,7 @@ export default function TermsOfService() {
             <p>
               <Trans i18nKey="terms.s16.p1" ns="legal" components={[<a href="mailto:hello@taptrao.com" style={linkStyle} key="0" />]} />
             </p>
-            <p style={{ marginTop: 8, fontSize: 13, color: "rgba(255,255,255,0.6)" }}>{t("terms.s16.footer")}</p>
+            <p style={{ marginTop: 8, fontSize: 15, color: "rgba(255,255,255,0.6)" }}>{t("terms.s16.footer")}</p>
           </Section>
         </div>
       </div>

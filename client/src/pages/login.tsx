@@ -48,14 +48,14 @@ export default function Login() {
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }}>
           {t("login.title")}
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
           {t("login.subtitle")}
         </p>
       </div>
 
       <div className="form-card" style={{ margin: "0 24px 20px", maxWidth: 420 }}>
         {new URLSearchParams(window.location.search).get("registered") === "1" && (
-          <div style={{ background: "rgba(14,78,69,0.12)", border: "1px solid var(--sage)", borderRadius: 8, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "var(--sage)" }}>
+          <div style={{ background: "rgba(14,78,69,0.12)", border: "1px solid var(--sage)", borderRadius: 8, padding: "10px 14px", marginBottom: 16, fontSize: 15, color: "var(--sage)" }}>
             ✓ {t("login.registeredSuccess")}
           </div>
         )}
@@ -85,13 +85,13 @@ export default function Login() {
           </div>
 
           <div style={{ textAlign: "right", marginBottom: 4 }}>
-            <a href="/forgot-password" style={{ fontSize: 14, color: "var(--sage)", textDecoration: "none" }}>
+            <a href="/forgot-password" style={{ fontSize: 15, color: "var(--sage)", textDecoration: "none" }}>
               {t("login.forgotPassword")}
             </a>
           </div>
 
           {error && (
-            <div style={{ fontSize: 14, color: "var(--red)", marginBottom: 12 }}>{error}</div>
+            <div style={{ fontSize: 15, color: "var(--red)", marginBottom: 12 }}>{error}</div>
           )}
 
           <button
@@ -103,7 +103,7 @@ export default function Login() {
               border: "none",
               borderRadius: 10,
               padding: "11px 24px",
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               cursor: "pointer",
               opacity: loginPending || !email || !password ? 0.5 : 1,
@@ -114,7 +114,7 @@ export default function Login() {
           </button>
         </form>
 
-        <p style={{ fontSize: 13, color: "#888", marginTop: 16, textAlign: "center" }}>
+        <p style={{ fontSize: 15, color: "#888", marginTop: 16, textAlign: "center" }}>
           {t("login.noAccount")}{" "}
           <a href="/register" style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none" }}>
             {t("login.createOne")}

@@ -19,7 +19,7 @@ function statusBadge(status: LcCaseStatus, t: (key: string) => string) {
       display: "inline-block",
       padding: "3px 10px",
       borderRadius: 6,
-      fontSize: 13,
+      fontSize: 15,
       fontWeight: 700,
       background: s.bg,
       border: `1px solid ${s.border}`,
@@ -71,7 +71,7 @@ export function CorrectionsTab({ prefillData }: { prefillData: LcPrefillData | n
 
   if (!lookupId) {
     return (
-      <div style={{ padding: "80px 24px", textAlign: "center", color: "rgba(255,255,255,0.65)", fontSize: 14 }}>
+      <div style={{ padding: "80px 24px", textAlign: "center", color: "rgba(255,255,255,0.65)", fontSize: 15 }}>
         {t("corrections.noLookup")}
       </div>
     );
@@ -79,7 +79,7 @@ export function CorrectionsTab({ prefillData }: { prefillData: LcPrefillData | n
 
   if (casesQuery.isLoading) {
     return (
-      <div style={{ padding: "80px 24px", textAlign: "center", color: "rgba(255,255,255,0.65)", fontSize: 14 }}>
+      <div style={{ padding: "80px 24px", textAlign: "center", color: "rgba(255,255,255,0.65)", fontSize: 15 }}>
         {t("corrections.loading")}
       </div>
     );
@@ -87,7 +87,7 @@ export function CorrectionsTab({ prefillData }: { prefillData: LcPrefillData | n
 
   if (!lcCase) {
     return (
-      <div style={{ padding: "80px 24px", textAlign: "center", color: "rgba(255,255,255,0.65)", fontSize: 14 }}>
+      <div style={{ padding: "80px 24px", textAlign: "center", color: "rgba(255,255,255,0.65)", fontSize: 15 }}>
         {t("corrections.noCase")}
       </div>
     );
@@ -108,7 +108,7 @@ export function CorrectionsTab({ prefillData }: { prefillData: LcPrefillData | n
           </h2>
           {statusBadge(lcCase.status as LcCaseStatus, t)}
         </div>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", margin: 0 }}>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", margin: 0 }}>
           {lcCase.beneficiaryName || t("corrections.unknownBeneficiary")} · {t("corrections.recheckCount", { count: lcCase.recheckCount })} · {t("corrections.freeRemaining", { count: Math.max(0, lcCase.maxFreeRechecks - lcCase.recheckCount) })}
         </p>
       </div>
@@ -119,7 +119,7 @@ export function CorrectionsTab({ prefillData }: { prefillData: LcPrefillData | n
           {t("corrections.checkHistory")}
         </div>
         {checkHistory.length === 0 ? (
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>{t("corrections.noChecks")}</p>
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,0.45)" }}>{t("corrections.noChecks")}</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {checkHistory.map((entry, i) => {
@@ -131,21 +131,21 @@ export function CorrectionsTab({ prefillData }: { prefillData: LcPrefillData | n
                 : "#fef2f2";
               return (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 7, background: verdictBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: verdictColor, flexShrink: 0 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 7, background: verdictBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 800, color: verdictColor, flexShrink: 0 }}>
                     {entry.recheckNumber === 0 ? "1" : `R${entry.recheckNumber}`}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: "#fff" }}>
                       {entry.recheckNumber === 0 ? t("corrections.initialCheck") : t("corrections.recheckNumber", { number: entry.recheckNumber })}
-                      <span style={{ fontSize: 13, fontWeight: 400, color: "rgba(255,255,255,0.45)", marginLeft: 8 }}>
+                      <span style={{ fontSize: 15, fontWeight: 400, color: "rgba(255,255,255,0.45)", marginLeft: 8 }}>
                         {relativeTime(entry.createdAt)}
                       </span>
                     </div>
-                    <div style={{ fontSize: 14, color: "rgba(255,255,255,0.55)" }}>
+                    <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)" }}>
                       {entry.summary}
                     </div>
                   </div>
-                  <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4, background: verdictBg, color: verdictColor, flexShrink: 0 }}>
+                  <span style={{ fontSize: 15, fontWeight: 700, padding: "2px 8px", borderRadius: 4, background: verdictBg, color: verdictColor, flexShrink: 0 }}>
                     {entry.verdict === "COMPLIANT" ? `✓ ${t("corrections.verdictClear")}` : entry.verdict === "COMPLIANT_WITH_NOTES" ? `⚠ ${t("corrections.verdictNotes")}` : `✗ ${t("corrections.verdictDiscrepancy")}`}
                   </span>
                 </div>
@@ -164,11 +164,11 @@ export function CorrectionsTab({ prefillData }: { prefillData: LcPrefillData | n
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {correctionRequests.map((cr, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 14 }}>{cr.channel === "email" ? "📧" : cr.channel === "whatsapp" ? "💬" : "🔗"}</span>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>
+                <span style={{ fontSize: 15 }}>{cr.channel === "email" ? "📧" : cr.channel === "whatsapp" ? "💬" : "🔗"}</span>
+                <span style={{ fontSize: 15, color: "rgba(255,255,255,0.7)" }}>
                   {t("corrections.sentVia", { channel: cr.channel, count: cr.discrepancyCount, plural: cr.discrepancyCount > 1 ? "ies" : "y" })}
                 </span>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", marginLeft: "auto" }}>
+                <span style={{ fontSize: 15, color: "rgba(255,255,255,0.35)", marginLeft: "auto" }}>
                   {relativeTime(cr.sentAt)}
                 </span>
               </div>
@@ -193,15 +193,15 @@ export function CorrectionsTab({ prefillData }: { prefillData: LcPrefillData | n
       {/* Re-check prompt */}
       {(lcCase.status === "discrepancy" || lcCase.status === "pending_correction") && (
         <div style={{ background: "rgba(14,78,69,0.08)", borderRadius: 14, border: "1px solid rgba(14,78,69,0.2)", padding: "20px 22px", textAlign: "center" }}>
-          <p style={{ fontSize: 14, fontWeight: 600, color: "#0e4e45", marginBottom: 8 }}>
+          <p style={{ fontSize: 15, fontWeight: 600, color: "#0e4e45", marginBottom: 8 }}>
             {t("corrections.supplierCorrected")}
           </p>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", marginBottom: 14 }}>
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", marginBottom: 14 }}>
             {t("corrections.uploadAndRecheck")}
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 10 }}>
             <button
-              style={{ padding: "10px 20px", background: "#0e4e45", color: "#fff", borderRadius: 8, fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer" }}
+              style={{ padding: "10px 20px", background: "#0e4e45", color: "#fff", borderRadius: 8, fontSize: 15, fontWeight: 600, border: "none", cursor: "pointer" }}
               onClick={() => {
                 // Navigate to the Check tab and go to step 2 (upload docs)
                 window.dispatchEvent(new CustomEvent("lc-go-to-recheck"));
@@ -231,16 +231,16 @@ function ComparisonTable({ initialResults, latestResults }: { initialResults: an
   const issues = initialResults.filter(r => r.severity === "RED" || r.severity === "AMBER");
 
   if (issues.length === 0) {
-    return <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{t("corrections.noDiscrepancies")}</p>;
+    return <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)" }}>{t("corrections.noDiscrepancies")}</p>;
   }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 80px 80px", gap: 8, padding: "0 0 8px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase" }}>{t("corrections.fieldColumn")}</span>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", textAlign: "center" }}>{t("corrections.initialColumn")}</span>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", textAlign: "center" }}>{t("corrections.latestColumn")}</span>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", textAlign: "center" }}>{t("corrections.statusColumn")}</span>
+        <span style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase" }}>{t("corrections.fieldColumn")}</span>
+        <span style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", textAlign: "center" }}>{t("corrections.initialColumn")}</span>
+        <span style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", textAlign: "center" }}>{t("corrections.latestColumn")}</span>
+        <span style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", textAlign: "center" }}>{t("corrections.statusColumn")}</span>
       </div>
       {issues.map((r, i) => {
         const key = `${r.fieldName}|${r.documentType}`;
@@ -248,14 +248,14 @@ function ComparisonTable({ initialResults, latestResults }: { initialResults: an
         const fixed = latestSeverity === "GREEN";
         return (
           <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 80px 80px 80px", gap: 8, alignItems: "center", padding: "6px 0" }}>
-            <span style={{ fontSize: 14, color: "rgba(255,255,255,0.7)" }}>{r.fieldName}</span>
-            <span style={{ fontSize: 13, textAlign: "center" }}>
+            <span style={{ fontSize: 15, color: "rgba(255,255,255,0.7)" }}>{r.fieldName}</span>
+            <span style={{ fontSize: 15, textAlign: "center" }}>
               <SeverityDot severity={r.severity} />
             </span>
-            <span style={{ fontSize: 13, textAlign: "center" }}>
+            <span style={{ fontSize: 15, textAlign: "center" }}>
               <SeverityDot severity={latestSeverity} />
             </span>
-            <span style={{ fontSize: 13, fontWeight: 600, textAlign: "center", color: fixed ? "#15803d" : "#dc2626" }}>
+            <span style={{ fontSize: 15, fontWeight: 600, textAlign: "center", color: fixed ? "#15803d" : "#dc2626" }}>
               {fixed ? `✓ ${t("corrections.fixed")}` : `✗ ${t("corrections.open")}`}
             </span>
           </div>
@@ -271,7 +271,7 @@ function SeverityDot({ severity }: { severity: string }) {
   const bg = severity === "GREEN" ? "#f0fdf4" : severity === "AMBER" ? "#fefce8" : severity === "RED" ? "#fef2f2" : "#f5f5f5";
   const label = severity === "GREEN" ? t("corrections.statusOk") : severity === "AMBER" ? t("corrections.statusWarn") : severity === "RED" ? t("corrections.statusFail") : "?";
   return (
-    <span style={{ display: "inline-block", padding: "1px 6px", borderRadius: 4, fontSize: 10, fontWeight: 700, background: bg, color }}>
+    <span style={{ display: "inline-block", padding: "1px 6px", borderRadius: 4, fontSize: 15, fontWeight: 700, background: bg, color }}>
       {label}
     </span>
   );

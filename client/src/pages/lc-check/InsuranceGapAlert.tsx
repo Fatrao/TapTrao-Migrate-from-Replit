@@ -37,19 +37,19 @@ export function InsuranceGapAlert() {
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
         <Shield size={16} style={{ color: "var(--app-acapulco)", flexShrink: 0 }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--app-text-heading)" }}>
+        <span style={{ fontSize: 15, fontWeight: 600, color: "var(--app-text-heading)" }}>
           {t("insurance.title")}
         </span>
       </div>
 
-      <p style={{ fontSize: 14, color: "var(--app-regent)", lineHeight: 1.65, marginBottom: 12 }}>
+      <p style={{ fontSize: 15, color: "var(--app-regent)", lineHeight: 1.65, marginBottom: 12 }}>
         {t("insurance.body")}
       </p>
 
       <div style={{
         display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12,
         background: "#f5f5f5", borderRadius: 6, padding: "10px 14px",
-        fontFamily: "var(--fb)", fontSize: 13, marginBottom: 12,
+        fontFamily: "var(--fb)", fontSize: 15, marginBottom: 12,
       }}>
         <div>
           <div style={{ fontWeight: 600, color: "var(--app-text-heading)", marginBottom: 6 }}>{t("insurance.notCoveredTitle")}</div>
@@ -71,7 +71,7 @@ export function InsuranceGapAlert() {
         </div>
       </div>
 
-      <p style={{ fontSize: 13, color: "var(--app-regent)", lineHeight: 1.5 }}>
+      <p style={{ fontSize: 15, color: "var(--app-regent)", lineHeight: 1.5 }}>
         {t("insurance.incotermsNote")}
       </p>
     </div>

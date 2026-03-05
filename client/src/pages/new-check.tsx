@@ -19,7 +19,7 @@ export default function NewCheck() {
           background: "rgba(255,255,255,0.08)",
           borderRadius: 20,
           padding: "5px 14px",
-          fontSize: 13,
+          fontSize: 15,
           color: "rgba(255,255,255,0.55)",
           marginBottom: 14,
           letterSpacing: "0.03em",
@@ -37,7 +37,7 @@ export default function NewCheck() {
           {t("newCheck.title")}
         </h1>
         <p style={{
-          fontSize: 14,
+          fontSize: 15,
           color: "rgba(255,255,255,0.55)",
           margin: 0,
           maxWidth: 500,
@@ -91,7 +91,7 @@ export default function NewCheck() {
               {t("newCheck.complianceCheck")}
             </h3>
             <p style={{
-              fontSize: 13,
+              fontSize: 15,
               color: "#888",
               lineHeight: 1.6,
               margin: "0 0 16px",
@@ -99,7 +99,7 @@ export default function NewCheck() {
               {t("newCheck.complianceDesc")}
             </p>
             <div style={{
-              fontSize: 13,
+              fontSize: 15,
               fontWeight: 600,
               color: "#0e4e45",
             }}>
@@ -146,7 +146,7 @@ export default function NewCheck() {
               {t("newCheck.lcDocCheck")}
             </h3>
             <p style={{
-              fontSize: 13,
+              fontSize: 15,
               color: "#888",
               lineHeight: 1.6,
               margin: "0 0 16px",
@@ -154,7 +154,7 @@ export default function NewCheck() {
               {t("newCheck.lcDocDesc")}
             </p>
             <div style={{
-              fontSize: 13,
+              fontSize: 15,
               fontWeight: 600,
               color: "#0e4e45",
             }}>

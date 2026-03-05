@@ -38,7 +38,7 @@ export function StepNav({ steps, currentIndex, completedUpTo }: StepNavProps) {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 11,
+                  fontSize: 15,
                   fontWeight: 800,
                   flexShrink: 0,
                   fontFamily: "var(--fh)",
@@ -54,7 +54,7 @@ export function StepNav({ steps, currentIndex, completedUpTo }: StepNavProps) {
               </div>
               <span
                 style={{
-                  fontSize: 12,
+                  fontSize: 15,
                   fontWeight: 600,
                   whiteSpace: "nowrap",
                   ...(isDone

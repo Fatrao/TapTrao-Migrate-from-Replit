@@ -48,7 +48,7 @@ const S = {
   } as React.CSSProperties,
   badge: {
     fontFamily: "'Inter', sans-serif",
-    fontSize: 13,
+    fontSize: 15,
     letterSpacing: "0.08em",
     textTransform: "uppercase" as const,
     padding: "4px 10px",
@@ -64,7 +64,7 @@ const S = {
     border: "none",
     padding: "10px 20px",
     fontFamily: "var(--fb)",
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: 700,
     cursor: "pointer",
     width: "100%",
@@ -81,7 +81,7 @@ const S = {
     border: "1px solid rgba(0,0,0,0.12)",
     padding: "10px 20px",
     fontFamily: "var(--fb)",
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: 600,
     cursor: "pointer",
     display: "inline-flex",
@@ -141,7 +141,7 @@ export default function Pricing() {
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }} data-testid="text-pricing-title">
           {t("title")}
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
           {t("subtitle")}
         </p>
       </div>
@@ -158,7 +158,7 @@ export default function Pricing() {
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, color: "var(--t1)", lineHeight: 1 }}>
                 {balance}
               </div>
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginTop: 4 }}>
+              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginTop: 4 }}>
                 {balance === 1 ? t("shieldOne") : t("shieldMany")}
               </div>
             </div>
@@ -181,7 +181,7 @@ export default function Pricing() {
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 32, color: "var(--t1)", lineHeight: 1 }}>
                 {lcBalance}
               </div>
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginTop: 4 }}>
+              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginTop: 4 }}>
                 LC {lcBalance === 1 ? t("lcCreditOne") : t("lcCreditMany")}
               </div>
             </div>
@@ -203,12 +203,12 @@ export default function Pricing() {
           </div>
 
           {transactionsQuery.isLoading ? (
-            <div style={{ textAlign: "center", padding: "24px 0", color: "var(--t3)", fontSize: 13 }}>
+            <div style={{ textAlign: "center", padding: "24px 0", color: "var(--t3)", fontSize: 15 }}>
               {t("loadingTransactions")}
             </div>
           ) : transactions.length === 0 ? (
             <div style={{ textAlign: "center", padding: "32px 0" }}>
-              <p style={{ fontSize: 13, color: "var(--t3)", margin: 0 }}>
+              <p style={{ fontSize: 15, color: "var(--t3)", margin: 0 }}>
                 {t("noTransactions")}
               </p>
             </div>
@@ -216,10 +216,10 @@ export default function Pricing() {
             <div data-testid="table-transactions">
               {/* Header row */}
               <div className="pricing-tx-row" style={{ display: "grid", gridTemplateColumns: "110px 80px 1fr 80px", gap: 12, padding: "8px 0", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>{t("headerDate")}</span>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>{t("headerType")}</span>
-                <span className="pricing-tx-desc-hdr" style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>{t("headerDescription")}</span>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)", textAlign: "right" }}>{t("headerAmount")}</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>{t("headerDate")}</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>{t("headerType")}</span>
+                <span className="pricing-tx-desc-hdr" style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)" }}>{t("headerDescription")}</span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t4)", textAlign: "right" }}>{t("headerAmount")}</span>
               </div>
               {/* Transaction rows */}
               {transactions.map((tx, idx) => {
@@ -239,7 +239,7 @@ export default function Pricing() {
                     }}
                     data-testid={`transaction-row-${idx}`}
                   >
-                    <span style={{ fontSize: 14, color: "var(--t3)" }}>
+                    <span style={{ fontSize: 15, color: "var(--t3)" }}>
                       {date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                     </span>
                     <span style={{
@@ -253,11 +253,11 @@ export default function Pricing() {
                     }}>
                       {tx.type}
                     </span>
-                    <span style={{ fontSize: 13, color: "var(--t2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <span style={{ fontSize: 15, color: "var(--t2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {tx.description}
                     </span>
                     <span style={{
-                      fontSize: 13,
+                      fontSize: 15,
                       fontWeight: 600,
                       fontFamily: "'Inter', sans-serif",
                       textAlign: "right",
@@ -287,7 +287,7 @@ export default function Pricing() {
           <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "var(--t1)", margin: "0 0 6px" }}>
             {t("buyMoreCredits")}
           </h2>
-          <p style={{ fontSize: 13, color: "var(--t3)", margin: "0 0 20px" }}>
+          <p style={{ fontSize: 15, color: "var(--t3)", margin: "0 0 20px" }}>
             {t("buyMoreSubtitle")}
           </p>
 
@@ -315,10 +315,10 @@ export default function Pricing() {
                 <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: pack.popular ? "#fff" : "var(--t1)", marginBottom: 4, marginTop: pack.popular ? 6 : 0 }}>
                   {pack.price}
                 </div>
-                <div style={{ fontSize: 13, color: pack.popular ? "rgba(255,255,255,0.8)" : "var(--t2)", marginBottom: 4 }}>
+                <div style={{ fontSize: 15, color: pack.popular ? "rgba(255,255,255,0.8)" : "var(--t2)", marginBottom: 4 }}>
                   {pack.lookups} {pack.lookups === 1 ? t("shipmentOne") : t("shipmentMany")}
                 </div>
-                <div style={{ fontSize: 13, color: pack.popular ? "rgba(255,255,255,0.6)" : "var(--t3)", marginBottom: 14 }}>
+                <div style={{ fontSize: 15, color: pack.popular ? "rgba(255,255,255,0.6)" : "var(--t3)", marginBottom: 14 }}>
                   {pack.perLookup} {t("perShipment")}
                 </div>
                 <button
@@ -328,7 +328,7 @@ export default function Pricing() {
                       : S.btnOutline),
                     width: "100%",
                     padding: "8px 14px",
-                    fontSize: 14,
+                    fontSize: 15,
                     opacity: checkoutMutation.isPending ? 0.6 : 1,
                   }}
                   disabled={checkoutMutation.isPending}
@@ -350,19 +350,19 @@ export default function Pricing() {
             <div style={{ ...S.card, padding: 18 }} data-testid="card-lc-standalone">
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                 <FileCheck style={{ width: 16, height: 16, color: "#60a5fa" }} />
-                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{t("lcCheckOnly")}</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{t("lcCheckOnly")}</span>
               </div>
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "var(--t1)", marginBottom: 4 }}>
                 {t("lcCheckOnlyPrice")}
               </div>
-              <p style={{ fontSize: 13, color: "var(--t3)", margin: "0 0 4px", lineHeight: 1.5 }}>
+              <p style={{ fontSize: 15, color: "var(--t3)", margin: "0 0 4px", lineHeight: 1.5 }}>
                 {t("lcCheckOnlyDescription")}
               </p>
-              <p style={{ fontSize: 14, color: "var(--sage-l)", margin: "0 0 12px", fontStyle: "italic" }}>
+              <p style={{ fontSize: 15, color: "var(--sage-l)", margin: "0 0 12px", fontStyle: "italic" }}>
                 {t("includedFreeWithShield")}
               </p>
               <button
-                style={{ ...S.btnOutline, width: "100%", padding: "8px 14px", fontSize: 12 }}
+                style={{ ...S.btnOutline, width: "100%", padding: "8px 14px", fontSize: 15 }}
                 disabled={lcStandaloneMutation.isPending}
                 onClick={() => lcStandaloneMutation.mutate()}
                 data-testid="button-lc-standalone"
@@ -378,12 +378,12 @@ export default function Pricing() {
             <div style={{ ...S.card, padding: 18 }} data-testid="card-lc-recheck-addon">
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                 <RefreshCw style={{ width: 16, height: 16, color: "#60a5fa" }} />
-                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{t("lcRecheck")}</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{t("lcRecheck")}</span>
               </div>
               <div style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 22, color: "var(--t1)", marginBottom: 4 }}>
                 {t("lcRecheckPrice")}
               </div>
-              <p style={{ fontSize: 13, color: "var(--t3)", margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 15, color: "var(--t3)", margin: 0, lineHeight: 1.5 }}>
                 {t("lcRecheckDescription")}
               </p>
             </div>
@@ -392,13 +392,13 @@ export default function Pricing() {
             <div style={{ ...S.card, padding: 18, background: "transparent", border: "1px dashed rgba(0,0,0,0.12)" }} data-testid="card-enterprise">
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                 <Building2 style={{ width: 16, height: 16, color: "var(--t3)" }} />
-                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{t("highVolume")}</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{t("highVolume")}</span>
               </div>
-              <p style={{ fontSize: 13, color: "var(--t3)", margin: "0 0 12px", lineHeight: 1.5 }}>
+              <p style={{ fontSize: 15, color: "var(--t3)", margin: "0 0 12px", lineHeight: 1.5 }}>
                 {t("highVolumeDescription")}
               </p>
               <button
-                style={{ ...S.btnOutline, width: "100%", padding: "8px 14px", fontSize: 12 }}
+                style={{ ...S.btnOutline, width: "100%", padding: "8px 14px", fontSize: 15 }}
                 onClick={() => window.location.href = "mailto:hello@taptrao.com?subject=Enterprise%20Pricing%20Enquiry"}
                 data-testid="button-enterprise-contact"
               >
@@ -410,7 +410,7 @@ export default function Pricing() {
         </div>
 
         {/* Disclaimer */}
-        <p style={{ fontSize: 13, color: "var(--t4)", textAlign: "center", margin: "0 0 24px", lineHeight: 1.5 }}>
+        <p style={{ fontSize: 15, color: "var(--t4)", textAlign: "center", margin: "0 0 24px", lineHeight: 1.5 }}>
           {t("disclaimer")}
         </p>
       </div>

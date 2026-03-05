@@ -67,7 +67,7 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
       <span
         style={{
           fontFamily: "'Inter', sans-serif",
-          fontSize: 13,
+          fontSize: 15,
           fontWeight: 600,
           textTransform: "uppercase",
           padding: "2px 6px",
@@ -83,7 +83,7 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
 
       <p
         style={{
-          fontSize: 13,
+          fontSize: 15,
           color: "var(--t1)",
           lineHeight: 1.55,
           margin: "6px 0",
@@ -94,14 +94,14 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
       </p>
 
       {alert.hsCodesAffected && alert.hsCodesAffected.length > 0 && (
-        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)", margin: "2px 0" }}>
+        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t3)", margin: "2px 0" }}>
           HS: {alert.hsCodesAffected.slice(0, 6).join(", ")}
           {alert.hsCodesAffected.length > 6 && ` ${t("hsMore", { count: alert.hsCodesAffected.length - 6 })}`}
         </p>
       )}
 
       {effectiveDateStr && (
-        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)", margin: "2px 0" }}>
+        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t3)", margin: "2px 0" }}>
           {t("effective", { date: effectiveDateStr })}
         </p>
       )}
@@ -113,7 +113,7 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
               href={alert.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ fontSize: 13, color: "var(--blue)", textDecoration: "none" }}
+              style={{ fontSize: 15, color: "var(--blue)", textDecoration: "none" }}
               data-testid={`link-alert-source-${alert.id}`}
             >
               ↗ {t("viewSource")}
@@ -123,7 +123,7 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
         <Link href={lookupHref}>
           <button
             style={{
-              fontSize: 13,
+              fontSize: 15,
               fontWeight: 600,
               padding: "5px 12px",
               borderRadius: 5,
@@ -177,7 +177,7 @@ export default function AlertsPage() {
           <p
             style={{
               fontFamily: "var(--fb)",
-              fontSize: 13,
+              fontSize: 15,
               color: "var(--t2)",
               marginBottom: 24,
             }}
@@ -187,7 +187,7 @@ export default function AlertsPage() {
           </p>
 
           {alertsQuery.isLoading ? (
-            <div style={{ color: "var(--t3)", fontSize: 13 }}>{t("loading")}</div>
+            <div style={{ color: "var(--t3)", fontSize: 15 }}>{t("loading")}</div>
           ) : alerts.length === 0 ? (
             <div
               style={{
@@ -198,7 +198,7 @@ export default function AlertsPage() {
               }}
               data-testid="empty-state"
             >
-              <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6 }}>
+              <p style={{ fontSize: 15, color: "var(--t2)", lineHeight: 1.6 }}>
                 {t("emptyTitle")}
                 <br />
                 {t("emptyHint")}

@@ -56,7 +56,7 @@ export default function AdminAlertsPage() {
     border: "none",
     borderRadius: 6,
     color: "var(--t1)",
-    fontSize: 13,
+    fontSize: 15,
     outline: "none",
     boxSizing: "border-box" as const,
   };
@@ -64,7 +64,7 @@ export default function AdminAlertsPage() {
   const labelStyle = {
     display: "block",
     fontFamily: "'Inter', sans-serif",
-    fontSize: 13,
+    fontSize: 15,
     color: "var(--t3)",
     marginBottom: 4,
     textTransform: "uppercase" as const,
@@ -174,7 +174,7 @@ export default function AdminAlertsPage() {
                 background: "var(--blue)",
                 color: "#fff",
                 fontWeight: 700,
-                fontSize: 13,
+                fontSize: 15,
                 padding: "10px 16px",
                 borderRadius: 6,
                 border: "none",
@@ -192,7 +192,7 @@ export default function AdminAlertsPage() {
                   border: "1px solid var(--gbd)",
                   borderRadius: 6,
                   padding: "10px 14px",
-                  fontSize: 14,
+                  fontSize: 15,
                   color: "var(--green)",
                   fontWeight: 600,
                 }}
@@ -209,7 +209,7 @@ export default function AdminAlertsPage() {
                   border: "1px solid var(--rbd)",
                   borderRadius: 6,
                   padding: "10px 14px",
-                  fontSize: 14,
+                  fontSize: 15,
                   color: "var(--red)",
                   fontWeight: 600,
                 }}

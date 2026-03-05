@@ -198,7 +198,7 @@ function StatusDropdown({
           className="inline-flex items-center gap-1 shrink-0 cursor-pointer"
           style={{
             fontFamily: "'Inter', sans-serif",
-            fontSize: 13,
+            fontSize: 15,
             letterSpacing: "0.08em",
             padding: "3px 8px",
             borderRadius: 4,
@@ -361,9 +361,9 @@ function NextActionsPanel({
   return (
     <div style={{ background: "rgba(109,184,154,0.06)", borderRadius: 14, border: "1px solid rgba(109,184,154,0.2)", padding: "20px 24px" }} data-testid="section-next-actions">
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("nextActions.title")}</span>
+        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("nextActions.title")}</span>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 13, color: "var(--t3)" }} data-testid="text-pending-count">
+          <span style={{ fontSize: 15, color: "var(--t3)" }} data-testid="text-pending-count">
             {t("nextActions.pending", { count: pendingCount })}
           </span>
           <span style={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -381,7 +381,7 @@ function NextActionsPanel({
       {hasStop && (
         <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 12, padding: 8, borderRadius: 8, background: "rgba(239,68,68,0.1)" }}>
           <AlertOctagon className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "#ef4444" }} />
-          <p style={{ fontSize: 13, fontWeight: 500, color: "#ef4444", margin: 0 }}>
+          <p style={{ fontSize: 15, fontWeight: 500, color: "#ef4444", margin: 0 }}>
             {t("nextActions.stopFlagWarning")}
           </p>
         </div>
@@ -391,11 +391,11 @@ function NextActionsPanel({
         <div style={{ textAlign: "center", padding: "16px 0" }} data-testid="section-all-complete">
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
             <CheckCircle2 className="w-5 h-5" style={{ color: "var(--sage)" }} />
-            <p style={{ fontSize: 13, fontWeight: 500, color: "var(--sage)", margin: 0 }}>
+            <p style={{ fontSize: 15, fontWeight: 500, color: "var(--sage)", margin: 0 }}>
               {t("nextActions.allComplete")}
             </p>
           </div>
-          <p style={{ fontSize: 13, color: "var(--t3)", margin: "8px 0 12px" }}>
+          <p style={{ fontSize: 15, color: "var(--t3)", margin: "8px 0 12px" }}>
             {t("nextActions.canDownload")}
           </p>
           <Button variant="outline" size="sm" disabled data-testid="button-download-compliance-pack">
@@ -409,11 +409,11 @@ function NextActionsPanel({
               <Circle className="w-2.5 h-2.5 mt-1.5 shrink-0" style={{ fill: "#eab308", color: "#eab308" }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 13, fontWeight: 500, color: "var(--t1)" }}>{doc.title.length > 60 ? doc.title.substring(0, 60) + "..." : doc.title}</span>
-                  <span style={{ fontSize: 13, color: "var(--t3)" }}>{ownerLabels[doc.owner]}</span>
-                  <span style={{ fontSize: 13, color: "var(--t3)" }}>{dueByLabels[doc.due_by]}</span>
+                  <span style={{ fontSize: 15, fontWeight: 500, color: "var(--t1)" }}>{doc.title.length > 60 ? doc.title.substring(0, 60) + "..." : doc.title}</span>
+                  <span style={{ fontSize: 15, color: "var(--t3)" }}>{ownerLabels[doc.owner]}</span>
+                  <span style={{ fontSize: 15, color: "var(--t3)" }}>{dueByLabels[doc.due_by]}</span>
                 </div>
-                <p style={{ fontSize: 13, color: "var(--t3)", fontStyle: "italic", margin: "2px 0 0" }}>
+                <p style={{ fontSize: 15, color: "var(--t3)", fontStyle: "italic", margin: "2px 0 0" }}>
                   {getActionHint(doc)}
                 </p>
               </div>
@@ -422,7 +422,7 @@ function NextActionsPanel({
           {pendingCount > 5 && (
             <button
               onClick={() => buyerDocsRef.current?.scrollIntoView({ behavior: "smooth" })}
-              style={{ fontSize: 13, color: "var(--sage)", background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, padding: 0 }}
+              style={{ fontSize: 15, color: "var(--sage)", background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, padding: 0 }}
               data-testid="button-see-all-pending"
             >
               {t("nextActions.seeAllPending", { count: pendingCount })} <ArrowDown className="w-3 h-3" />
@@ -524,7 +524,7 @@ function SupplierBriefSection({ result }: { result: ComplianceResult }) {
 
           <div style={{ position: "relative" }}>
             <pre
-              style={{ fontSize: 13, padding: 12, borderRadius: 8, whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "monospace", maxHeight: 320, overflowY: "auto", background: "rgba(0,0,0,0.04)", color: "var(--t2)" }}
+              style={{ fontSize: 15, padding: 12, borderRadius: 8, whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "monospace", maxHeight: 320, overflowY: "auto", background: "rgba(0,0,0,0.04)", color: "var(--t2)" }}
               data-testid={`text-brief-${activeTab}`}
             >
                 {activeTab === "email" ? emailText : whatsappText}
@@ -621,13 +621,13 @@ function EvidenceHashInline({ result }: { result: ComplianceResult }) {
 
   return (
     <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid rgba(0,0,0,0.05)" }}>
-      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "rgba(109,184,154,0.8)" }} data-testid="text-compliance-ref">
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "rgba(109,184,154,0.8)" }} data-testid="text-compliance-ref">
         {shortRef}
       </p>
-      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t4)", wordBreak: "break-all", marginTop: 2 }} data-testid="text-full-hash">
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t4)", wordBreak: "break-all", marginTop: 2 }} data-testid="text-full-hash">
         sha256:{hash}
       </p>
-      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t4)", marginTop: 2 }} data-testid="text-hash-timestamp">
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t4)", marginTop: 2 }} data-testid="text-hash-timestamp">
         {new Date(timestamp).toLocaleString()}
       </p>
     </div>
@@ -666,7 +666,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
 
   return (
     <div data-testid="section-readiness-score">
-      <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 12 }}>
+      <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 12 }}>
         {t("readiness.title")}
       </div>
       <div style={{ display: "flex", gap: 0 }}>
@@ -688,7 +688,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
             style={{
               display: "inline-block",
               fontFamily: "'Inter', sans-serif",
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               padding: "3px 10px",
               borderRadius: 4,
@@ -703,7 +703,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
           </span>
           <p
             style={{
-              fontSize: 13,
+              fontSize: 15,
               color: "var(--t2)",
               lineHeight: 1.65,
               marginTop: 6,
@@ -725,7 +725,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
                 style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}
                 data-testid={`factor-${f.key}`}
               >
-                <span style={{ width: 120, fontSize: 13, color: "var(--t2)", textAlign: "right", flexShrink: 0 }}>
+                <span style={{ width: 120, fontSize: 15, color: "var(--t2)", textAlign: "right", flexShrink: 0 }}>
                   {f.label}
                 </span>
                 <div style={{ flex: 1, height: 3, background: "rgba(0,0,0,0.07)", borderRadius: 2, position: "relative" }}>
@@ -1020,10 +1020,10 @@ function EudrAlertBlock({ lookupId, result }: { lookupId?: string; result: Compl
       >
         <div style={{ fontSize: 22, flexShrink: 0 }}>⚠</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, color: "var(--t1)", fontSize: 14 }}>
+          <div style={{ fontWeight: 700, color: "var(--t1)", fontSize: 15 }}>
             {t("eudr.swissTitle")}
           </div>
-          <div style={{ color: "var(--t1)", fontSize: 14, marginTop: 4, lineHeight: 1.5 }}>
+          <div style={{ color: "var(--t1)", fontSize: 15, marginTop: 4, lineHeight: 1.5 }}>
             {t("eudr.swissDescription")}
           </div>
         </div>
@@ -1046,10 +1046,10 @@ function EudrAlertBlock({ lookupId, result }: { lookupId?: string; result: Compl
     >
       <div style={{ fontSize: 22 }}>{eudrComplete ? "✓" : "⚠"}</div>
       <div style={{ flex: 1 }}>
-        <div style={{ fontWeight: 700, color: "var(--t1)", fontSize: 14 }}>
+        <div style={{ fontWeight: 700, color: "var(--t1)", fontSize: 15 }}>
           {eudrComplete ? t("eudr.dueDiligenceComplete") : t("eudr.dueDiligenceRequired")}
         </div>
-        <div style={{ color: "var(--t1)", fontSize: 14, marginTop: 2 }}>
+        <div style={{ color: "var(--t1)", fontSize: 15, marginTop: 2 }}>
           {eudrComplete
             ? t("eudr.completeMessage")
             : t("eudr.requiredMessage")}
@@ -1066,7 +1066,7 @@ function EudrAlertBlock({ lookupId, result }: { lookupId?: string; result: Compl
             borderRadius: ".5rem",
             padding: "8px 18px",
             fontWeight: 700,
-            fontSize: 13,
+            fontSize: 15,
             cursor: "pointer",
             whiteSpace: "nowrap",
           }}
@@ -1125,7 +1125,7 @@ function LeadCaptureCard({ result }: { result: ComplianceResult }) {
         data-testid="lead-capture-success"
       >
         <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: "var(--sage)" }} />
-        <p style={{ fontSize: 13, color: "var(--sage)", margin: 0 }}>
+        <p style={{ fontSize: 15, color: "var(--sage)", margin: 0 }}>
           {t("leadCapture.successMessage")}
         </p>
       </div>
@@ -1145,7 +1145,7 @@ function LeadCaptureCard({ result }: { result: ComplianceResult }) {
       <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", fontFamily: "'Clash Display', sans-serif", margin: "0 0 6px" }}>
         {t("leadCapture.title")}
       </h3>
-      <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6, margin: "0 0 14px" }}>
+      <p style={{ fontSize: 15, color: "var(--t2)", lineHeight: 1.6, margin: "0 0 14px" }}>
         {t("leadCapture.description")}
       </p>
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1175,7 +1175,7 @@ function LeadCaptureCard({ result }: { result: ComplianceResult }) {
         >
           {loading ? t("leadCapture.saving") : t("leadCapture.saveButton")}
         </Button>
-        <p style={{ fontSize: 13, color: "var(--t3)", margin: "6px 0 0" }}>
+        <p style={{ fontSize: 15, color: "var(--t3)", margin: "6px 0 0" }}>
           {t("leadCapture.privacyNotice")}{" "}
           <Link href="/privacy-policy" style={{ color: "var(--t2)", textDecoration: "underline" }}>{t("leadCapture.privacyPolicy")}</Link>.
         </p>
@@ -1280,12 +1280,12 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
           <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 15, color: "var(--t1)", margin: 0 }}>
             {t("docReadiness.title")}
           </h3>
-          <p style={{ fontSize: 14, color: "var(--t3)", margin: "4px 0 0" }}>
+          <p style={{ fontSize: 15, color: "var(--t3)", margin: "4px 0 0" }}>
             {t("docReadiness.subtitle")}
           </p>
         </div>
         <span style={{
-          fontFamily: "'Inter', sans-serif", fontSize: 14,
+          fontFamily: "'Inter', sans-serif", fontSize: 15,
           background: validCount === readiness.length ? "rgba(109,184,154,0.15)" : "rgba(109,184,154,0.2)",
           color: validCount === readiness.length ? "var(--sage)" : "var(--sage)",
           padding: "3px 10px", borderRadius: 4,
@@ -1313,19 +1313,19 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                   width: 22, height: 22, borderRadius: 6,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   background: cfg.bg, color: cfg.color,
-                  fontSize: 14, fontWeight: 700, flexShrink: 0,
+                  fontSize: 15, fontWeight: 700, flexShrink: 0,
                   border: `1px solid ${cfg.color}33`,
                 }}>{cfg.icon}</span>
 
                 {/* Title + status */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 500, color: "var(--t1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <div style={{ fontSize: 15, fontWeight: 500, color: "var(--t1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {req.requirementTitle}
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 3 }}>
-                    <span style={{ fontSize: 13, color: cfg.color }}>{cfg.label}</span>
+                    <span style={{ fontSize: 15, color: cfg.color }}>{cfg.label}</span>
                     {req.filename && (
-                      <span style={{ fontSize: 14, color: "var(--t4)" }}>
+                      <span style={{ fontSize: 15, color: "var(--t4)" }}>
                         {req.filename}
                       </span>
                     )}
@@ -1352,7 +1352,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                       background: req.status === "not_uploaded" ? "var(--sage)" : "rgba(0,0,0,0.06)",
                       color: req.status === "not_uploaded" ? "#fff" : "var(--t2)",
                       border: "none", borderRadius: 6, padding: "6px 12px",
-                      fontSize: 13, fontWeight: 500, cursor: isUploading ? "wait" : "pointer",
+                      fontSize: 15, fontWeight: 500, cursor: isUploading ? "wait" : "pointer",
                       opacity: isUploading ? 0.5 : 1,
                     }}
                   >
@@ -1365,7 +1365,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                       onClick={() => setExpandedIdx(isExpanded ? null : req.requirementIndex)}
                       style={{
                         background: "none", border: "none", color: "var(--t3)",
-                        cursor: "pointer", padding: "6px 4px", fontSize: 14, marginLeft: 4,
+                        cursor: "pointer", padding: "6px 4px", fontSize: 15, marginLeft: 4,
                       }}
                     >
                       {isExpanded ? "▾" : "▸"}
@@ -1380,7 +1380,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                   {/* Field status checklist */}
                   {req.fieldStatus.length > 0 && (
                     <div style={{ marginBottom: 10 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
+                      <div style={{ fontSize: 15, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
                         {t("docReadiness.fieldChecklist")}
                       </div>
                       {req.fieldStatus.map((f, fi) => {
@@ -1388,16 +1388,16 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                         const sevColor = f.severity === "critical" ? "#ef4444" : f.severity === "warning" ? "#eab308" : "var(--t3)";
                         return (
                           <div key={fi} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 4 }}>
-                            <span style={{ fontSize: 14, width: 18, flexShrink: 0 }}>{statusIcon}</span>
+                            <span style={{ fontSize: 15, width: 18, flexShrink: 0 }}>{statusIcon}</span>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <span style={{ fontSize: 14, color: f.status === "missing" ? sevColor : "var(--t1)" }}>
+                              <span style={{ fontSize: 15, color: f.status === "missing" ? sevColor : "var(--t1)" }}>
                                 {f.expected || f.field}
                               </span>
-                              <span style={{ fontSize: 14, color: "var(--t3)", marginLeft: 6 }}>
+                              <span style={{ fontSize: 15, color: "var(--t3)", marginLeft: 6 }}>
                                 ({f.severity})
                               </span>
                               {f.status === "present" && f.found && f.found !== "Not found" && (
-                                <span style={{ fontSize: 14, color: "var(--t3)", marginLeft: 6 }}>
+                                <span style={{ fontSize: 15, color: "var(--t3)", marginLeft: 6 }}>
                                   — {f.found.length > 60 ? f.found.slice(0, 60) + "..." : f.found}
                                 </span>
                               )}
@@ -1411,7 +1411,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                   {/* Issues */}
                   {req.issues.length > 0 && (
                     <div style={{ marginBottom: 10 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
+                      <div style={{ fontSize: 15, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
                         {t("docReadiness.issues")}
                       </div>
                       {req.issues.map((issue, ii) => (
@@ -1420,9 +1420,9 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                           borderRadius: 6, padding: "6px 10px", marginBottom: 4,
                           borderLeft: `3px solid ${issue.severity === "critical" ? "#ef4444" : issue.severity === "warning" ? "#eab308" : "rgba(0,0,0,0.1)"}`,
                         }}>
-                          <div style={{ fontSize: 14, color: "var(--t1)" }}>{issue.explanation}</div>
+                          <div style={{ fontSize: 15, color: "var(--t1)" }}>{issue.explanation}</div>
                           {issue.found && (
-                            <div style={{ fontSize: 14, color: "var(--t3)", marginTop: 2 }}>
+                            <div style={{ fontSize: 15, color: "var(--t3)", marginTop: 2 }}>
                               {t("docReadiness.found", { value: issue.found })}
                             </div>
                           )}
@@ -1434,7 +1434,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                   {/* Evidence snippets */}
                   {req.evidence.length > 0 && (
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
+                      <div style={{ fontSize: 15, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
                         {t("docReadiness.evidence")}
                       </div>
                       {req.evidence.map((ev, ei) => (
@@ -1443,10 +1443,10 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                           borderRadius: 6, padding: "6px 10px", marginBottom: 4,
                           borderLeft: "3px solid rgba(109,184,154,0.3)",
                         }}>
-                          <div style={{ fontSize: 13, color: "var(--t2)", fontStyle: "italic" }}>
+                          <div style={{ fontSize: 15, color: "var(--t2)", fontStyle: "italic" }}>
                             "{ev.quote}"
                           </div>
-                          <div style={{ fontSize: 14, color: "var(--t3)", marginTop: 2 }}>
+                          <div style={{ fontSize: 15, color: "var(--t3)", marginTop: 2 }}>
                             {ev.page !== null ? t("docReadiness.page", { number: ev.page }) : ""} {ev.field ? `— ${ev.field}` : ""}
                           </div>
                         </div>
@@ -1456,7 +1456,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
 
                   {/* Validation summary */}
                   {req.verdict && (
-                    <div style={{ marginTop: 8, fontSize: 13, color: "var(--t2)", fontStyle: "italic" }}>
+                    <div style={{ marginTop: 8, fontSize: 15, color: "var(--t2)", fontStyle: "italic" }}>
                       {t("docReadiness.verdict", { verdict: req.verdict, confidence: req.confidence })}
                     </div>
                   )}
@@ -1566,14 +1566,14 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
       {/* ── Title: Pre-Shipment Report ── */}
       <div style={{ textAlign: "center" }}>
         <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 22, color: "var(--t1)", margin: "0 0 6px" }}>{t("result.preShipmentReport")}</h2>
-        <p style={{ fontSize: 13, color: "var(--t2)", margin: 0 }}>
+        <p style={{ fontSize: 15, color: "var(--t2)", margin: 0 }}>
           {"📦"} {translateCommodity(result.commodity.name, lang)} › {result.origin.countryName} › {result.destination.countryName}
         </p>
       </div>
 
       {/* ── Risk Level Badge ── */}
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <Badge className="text-base px-6 py-2 no-default-hover-elevate no-default-active-elevate" style={{ ...riskInlineStyles[riskLevel], fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, borderRadius: 4 }} data-testid="badge-risk-level">
+        <Badge className="text-base px-6 py-2 no-default-hover-elevate no-default-active-elevate" style={{ ...riskInlineStyles[riskLevel], fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase" as const, borderRadius: 4 }} data-testid="badge-risk-level">
           {riskLabels[riskLevel]}
         </Badge>
       </div>
@@ -1584,17 +1584,17 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         {importerIndices.length > 0 && (
           <div style={dkCard} ref={buyerDocsRef}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-              <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "var(--t1)" }}>
+              <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 15, color: "var(--t1)" }}>
                 {t("docs.yourSideBuyer")}
               </span>
               <span style={{
-                fontFamily: "'Inter', sans-serif", fontSize: 14,
+                fontFamily: "'Inter', sans-serif", fontSize: 15,
                 background: "rgba(109,184,154,0.2)", color: "var(--sage)",
                 padding: "2px 8px", borderRadius: 4,
               }}>
                 {t("docs.docsCount", { count: importerIndices.length })}
               </span>
-              <span style={{ marginLeft: "auto", fontSize: 13, color: "var(--t3)" }} data-testid="text-buyer-progress">
+              <span style={{ marginLeft: "auto", fontSize: 15, color: "var(--t3)" }} data-testid="text-buyer-progress">
                 {t("docs.readyCount", { ready: importerReadyCount, total: importerIndices.length })}
               </span>
             </div>
@@ -1607,12 +1607,12 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                     <div style={{ width: 8, height: 8, borderRadius: "50%", background: dotColor, marginTop: 5, flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--t1)" }}>
+                        <span style={{ fontSize: 15, fontWeight: 500, color: "var(--t1)" }}>
                           {r.title}
                         </span>
                         <StatusDropdown status={st} onChange={(s) => handleStatusChange(i, s)} index={i} />
                       </div>
-                      <span style={{ fontSize: 13, color: "var(--t3)", display: "block", marginTop: 1 }}>
+                      <span style={{ fontSize: 15, color: "var(--t3)", display: "block", marginTop: 1 }}>
                         {r.issuedBy}
                       </span>
                     </div>
@@ -1627,17 +1627,17 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         {supplierIndices.length > 0 && (
           <div style={dkCard}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-              <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "var(--t1)" }}>
+              <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 15, color: "var(--t1)" }}>
                 {t("docs.theirSideSupplier")}
               </span>
               <span style={{
-                fontFamily: "'Inter', sans-serif", fontSize: 14,
+                fontFamily: "'Inter', sans-serif", fontSize: 15,
                 background: "rgba(109,184,154,0.2)", color: "var(--sage)",
                 padding: "2px 8px", borderRadius: 4,
               }}>
                 {t("docs.docsCount", { count: supplierIndices.length })}
               </span>
-              <span style={{ marginLeft: "auto", fontSize: 13, color: "var(--t3)" }} data-testid="text-supplier-progress">
+              <span style={{ marginLeft: "auto", fontSize: 15, color: "var(--t3)" }} data-testid="text-supplier-progress">
                 {t("docs.readyCount", { ready: supplierReadyCount, total: supplierIndices.length })}
               </span>
             </div>
@@ -1650,12 +1650,12 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                     <div style={{ width: 8, height: 8, borderRadius: "50%", background: dotColor, marginTop: 5, flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--t1)" }}>
+                        <span style={{ fontSize: 15, fontWeight: 500, color: "var(--t1)" }}>
                           {r.title}
                         </span>
                         <StatusDropdown status={st} onChange={(s) => handleStatusChange(i, s)} index={i} />
                       </div>
-                      <span style={{ fontSize: 13, color: "var(--t3)", display: "block", marginTop: 1 }}>
+                      <span style={{ fontSize: 15, color: "var(--t3)", display: "block", marginTop: 1 }}>
                         {r.issuedBy}
                       </span>
                     </div>
@@ -1675,7 +1675,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         textAlign: "center",
         padding: "20px 32px",
       }}>
-        <p style={{ fontSize: 13, color: "var(--t2)", marginBottom: 10, margin: "0 0 10px" }}>
+        <p style={{ fontSize: 15, color: "var(--t2)", marginBottom: 10, margin: "0 0 10px" }}>
           {t("lcCta.documentsLookGood")}
         </p>
         <CheckLcButton result={result} locked={freeLocked} />
@@ -1694,18 +1694,18 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
               primaryRiskFactor={result.readinessScore.factors.primary_risk_factor}
             />
           ) : (
-            <p style={{ fontSize: 13, color: "var(--t3)" }}>{t("readiness.unavailable")}</p>
+            <p style={{ fontSize: 15, color: "var(--t3)" }}>{t("readiness.unavailable")}</p>
           )}
         </div>
 
         {/* Duty Estimate */}
         <div style={dkCard}>
-          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 12 }}>
+          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 12 }}>
             {t("duty.title")}
           </div>
           {Array.isArray(result.destination.preferenceSchemes) && (result.destination.preferenceSchemes as string[]).length > 0 && (
             <span style={{
-              fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em",
+              fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em",
               background: "rgba(109,184,154,0.2)", color: "var(--sage)",
               padding: "3px 8px", borderRadius: 4, display: "inline-block", marginBottom: 12,
             }}>
@@ -1713,19 +1713,19 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             </span>
           )}
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-            <span style={{ fontSize: 13, color: "var(--t2)" }}>{t("duty.vatImport")}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{result.destination.vatRate}%</span>
+            <span style={{ fontSize: 15, color: "var(--t2)" }}>{t("duty.vatImport")}</span>
+            <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{result.destination.vatRate}%</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-            <span style={{ fontSize: 13, color: "var(--t2)" }}>{t("duty.tariffSource")}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{result.destination.tariffSource}</span>
+            <span style={{ fontSize: 15, color: "var(--t2)" }}>{t("duty.tariffSource")}</span>
+            <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{result.destination.tariffSource}</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-            <span style={{ fontSize: 13, color: "var(--t2)" }}>{t("duty.spsRegime")}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{result.destination.spsRegime || t("duty.standard")}</span>
+            <span style={{ fontSize: 15, color: "var(--t2)" }}>{t("duty.spsRegime")}</span>
+            <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{result.destination.spsRegime || t("duty.standard")}</span>
           </div>
           {result.destination.iso2 === "CH" && (
-            <p style={{ fontSize: 13, color: "#eab308", margin: "0 0 8px", lineHeight: 1.5 }}>
+            <p style={{ fontSize: 15, color: "#eab308", margin: "0 0 8px", lineHeight: 1.5 }}>
               {t("duty.swissTariffShort")}
             </p>
           )}
@@ -1747,11 +1747,11 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         }}>
           <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
           <div>
-            <p style={{ fontSize: 13, fontWeight: 600, color: "#d97706", margin: 0 }}>
+            <p style={{ fontSize: 15, fontWeight: 600, color: "#d97706", margin: 0 }}>
               ⚠ {t("origin.flaggedOrigin")} — {result.originFlagReason ?? t("origin.defaultFlagReason")}
             </p>
             {result.originFlagDetails && (
-              <p style={{ fontSize: 14, color: "#92400e", margin: "4px 0 0", lineHeight: 1.5 }}>
+              <p style={{ fontSize: 15, color: "#92400e", margin: "4px 0 0", lineHeight: 1.5 }}>
                 {result.originFlagDetails}
               </p>
             )}
@@ -1772,10 +1772,10 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         }}>
           <Shield className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
           <div>
-            <p style={{ fontSize: 13, fontWeight: 600, color: "#16a34a", margin: 0 }}>
+            <p style={{ fontSize: 15, fontWeight: 600, color: "#16a34a", margin: 0 }}>
               {t("agoa.eligible")}
             </p>
-            <p style={{ fontSize: 14, color: "#166534", margin: "4px 0 0", lineHeight: 1.5 }}>
+            <p style={{ fontSize: 15, color: "#166534", margin: "4px 0 0", lineHeight: 1.5 }}>
               {t("agoa.description")}
             </p>
           </div>
@@ -1791,7 +1791,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         if (!estimate) return (
           <div style={{ textAlign: "right", margin: "4px 0 8px" }}>
             <Link href="/demurrage" data-testid="link-demurrage-calculator">
-              <span style={{ fontSize: 13, color: "var(--sage)", cursor: "pointer", fontWeight: 600 }}>
+              <span style={{ fontSize: 15, color: "var(--sage)", cursor: "pointer", fontWeight: 600 }}>
                 {t("demurrage.calculatorLink")}
               </span>
             </Link>
@@ -1811,13 +1811,13 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           >
             <span style={{ fontSize: 18, marginTop: 1 }}>⚓</span>
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
+              <p style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
                 {t("demurrage.estimatedPortDemurrage")}
               </p>
-              <p style={{ fontSize: 14, color: "var(--t2)", margin: "4px 0 0", lineHeight: 1.6 }}>
+              <p style={{ fontSize: 15, color: "var(--t2)", margin: "4px 0 0", lineHeight: 1.6 }}>
                 At <strong style={{ color: "var(--t1)" }}>{estimate.port.label}</strong>
                 {estimate.allPorts.length > 1 && (
-                  <span style={{ color: "var(--t3)", fontSize: 11 }}> ({t("demurrage.morePorts", { count: estimate.allPorts.length - 1 })})</span>
+                  <span style={{ color: "var(--t3)", fontSize: 15 }}> ({t("demurrage.morePorts", { count: estimate.allPorts.length - 1 })})</span>
                 )}
                 {t("demurrage.costExplanation")}
                 <span style={{ color: verdictColor, fontWeight: 600 }}>{estimate.delayLabel}</span>
@@ -1825,7 +1825,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                 <strong style={{ color: "var(--t1)" }}>${estimate.minCost.toLocaleString()} – ${estimate.maxCost.toLocaleString()}</strong>.
               </p>
               <Link href="/demurrage">
-                <span style={{ fontSize: 13, color: "var(--sage)", cursor: "pointer", fontWeight: 600, marginTop: 4, display: "inline-block" }}>
+                <span style={{ fontSize: 15, color: "var(--sage)", cursor: "pointer", fontWeight: 600, marginTop: 4, display: "inline-block" }}>
                   {t("demurrage.openFullCalculator", { count: estimate.allPorts.length, plural: estimate.allPorts.length !== 1 ? "s" : "" })}
                 </span>
               </Link>
@@ -1847,7 +1847,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             border: "none",
             cursor: watchState === "watching" ? "default" : "pointer",
             fontFamily: "'Inter', sans-serif",
-            fontSize: 13,
+            fontSize: 15,
             color: watchState === "watching" ? "var(--green)" : "var(--t2)",
             padding: "6px 12px",
             borderRadius: 6,
@@ -1859,7 +1859,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             : `◎ ${t("watch.watchCorridor")}`}
         </button>
         {watchState !== "watching" && (
-          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)" }}>
+          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t3)" }}>
             {t("watch.getNotified", { commodity: translateCommodity(result.commodity.name, lang), destination: result.destination.iso2 })}
           </span>
         )}
@@ -1893,11 +1893,11 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
             <AlertOctagon className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "#ef4444" }} />
             <div>
-              <p style={{ fontWeight: 600, color: "#ef4444", fontSize: 13, margin: "0 0 8px" }}>
+              <p style={{ fontWeight: 600, color: "#ef4444", fontSize: 15, margin: "0 0 8px" }}>
                 {t("stopFlags.title")}
               </p>
               {Object.entries(result.stopFlags!).map(([key, value]) => (
-                <p key={key} style={{ fontSize: 13, color: "#ef4444", opacity: 0.8, margin: "0 0 4px" }}>
+                <p key={key} style={{ fontSize: 15, color: "#ef4444", opacity: 0.8, margin: "0 0 4px" }}>
                   <span style={{ fontWeight: 600 }}>{key}:</span> {value as string}
                 </p>
               ))}
@@ -1910,10 +1910,10 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <Leaf className="w-4 h-4" style={{ color: "var(--sage)" }} />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("info.commodity")}</span>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("info.commodity")}</span>
           </div>
-          <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-commodity">{translateCommodity(result.commodity.name, lang)}</p>
-          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", color: "var(--t3)", textTransform: "uppercase" as const, margin: 0 }}>
+          <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 15, margin: "0 0 4px" }} data-testid="text-result-commodity">{translateCommodity(result.commodity.name, lang)}</p>
+          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", color: "var(--t3)", textTransform: "uppercase" as const, margin: 0 }}>
             HS {result.commodity.hsCode} · {result.commodity.commodityType}
           </p>
         </div>
@@ -1921,15 +1921,15 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <Globe className="w-4 h-4" style={{ color: "var(--sage)" }} />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("info.origin")}</span>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("info.origin")}</span>
           </div>
-          <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-origin">{result.origin.countryName}</p>
-          <p style={{ fontSize: 14, color: "var(--t3)", margin: "0 0 4px" }}>
+          <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 15, margin: "0 0 4px" }} data-testid="text-result-origin">{result.origin.countryName}</p>
+          <p style={{ fontSize: 15, color: "var(--t3)", margin: "0 0 4px" }}>
             {result.origin.customsAdmin}
           </p>
           {result.origin.framework && (
             <span style={{
-              fontFamily: "'Inter', sans-serif", fontSize: 13,
+              fontFamily: "'Inter', sans-serif", fontSize: 15,
               background: "rgba(109,184,154,0.2)", color: "var(--sage)",
               padding: "2px 8px", borderRadius: 4, display: "inline-block",
             }}>
@@ -1941,10 +1941,10 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <FileCheck className="w-4 h-4" style={{ color: "var(--sage)" }} />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("info.destination")}</span>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("info.destination")}</span>
           </div>
-          <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-destination">{result.destination.countryName}</p>
-          <p style={{ fontSize: 14, color: "var(--t3)", margin: 0 }}>
+          <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 15, margin: "0 0 4px" }} data-testid="text-result-destination">{result.destination.countryName}</p>
+          <p style={{ fontSize: 15, color: "var(--t3)", margin: 0 }}>
             VAT: {result.destination.vatRate}% · {result.destination.tariffSource}
           </p>
           {result.destination.iso2 === "CH" && (
@@ -1955,7 +1955,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                 padding: "10px 12px",
                 background: "rgba(234,179,8,0.08)",
                 borderRadius: 8,
-                fontSize: 14,
+                fontSize: 15,
                 color: "#eab308",
                 lineHeight: 1.5,
               }}
@@ -1970,7 +1970,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
             <Shield className="w-4 h-4" style={{ color: "var(--sage)" }} />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
               {t("triggers.titleWithCount", { count: triggerCount })}
             </span>
           </div>
@@ -1995,7 +1995,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <div style={dkCard}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
               <AlertTriangle className="w-4 h-4" style={{ color: "#eab308" }} />
-              <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("hazards.title")}</span>
+              <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("hazards.title")}</span>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {result.hazards
@@ -2004,7 +2004,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                   <span
                     key={hazard}
                     style={{
-                      fontSize: 13,
+                      fontSize: 15,
                       fontFamily: "'Inter', sans-serif",
                       background: "rgba(234,179,8,0.1)",
                       color: "#eab308",
@@ -2025,7 +2025,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
 
       <div style={{ ...dkCard, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
         <Info className="w-5 h-5 shrink-0" style={{ color: "var(--sage)" }} />
-        <p style={{ fontSize: 13, fontWeight: 500, color: "var(--t1)", margin: 0 }}>
+        <p style={{ fontSize: 15, fontWeight: 500, color: "var(--t1)", margin: 0 }}>
           {t("afcfta.eligibility")}{" "}
           {result.afcftaEligible ? (
             <span style={{ color: "var(--sage)" }}>
@@ -2043,14 +2043,14 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard} data-testid="card-afcfta-roo">
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
             <Scale className="w-4 h-4" style={{ color: "var(--sage)" }} />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
               {t("afcfta.rooTitle", { hsHeading: result.afcftaRoo.hsHeading })}
             </span>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
             <span
               style={{
-                fontFamily: "'Inter', sans-serif", fontSize: 14,
+                fontFamily: "'Inter', sans-serif", fontSize: 15,
                 background: "rgba(109,184,154,0.2)", color: "var(--sage)",
                 padding: "3px 10px", borderRadius: 4,
               }}
@@ -2061,7 +2061,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             {result.afcftaRoo.minValueAddPct && (
               <span
                 style={{
-                  fontFamily: "'Inter', sans-serif", fontSize: 14,
+                  fontFamily: "'Inter', sans-serif", fontSize: 15,
                   background: "rgba(0,0,0,0.05)", color: "var(--t2)",
                   padding: "3px 10px", borderRadius: 4, border: "1px solid rgba(0,0,0,0.07)",
                 }}
@@ -2072,17 +2072,17 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             )}
           </div>
           {result.afcftaRoo.specificProcess && (
-            <p style={{ fontSize: 13, color: "var(--t2)", margin: "0 0 8px", lineHeight: 1.5 }} data-testid="text-roo-specific-process">
+            <p style={{ fontSize: 15, color: "var(--t2)", margin: "0 0 8px", lineHeight: 1.5 }} data-testid="text-roo-specific-process">
               {result.afcftaRoo.specificProcess}
             </p>
           )}
           {result.afcftaRoo.notes && (
-            <p style={{ fontSize: 13, color: "var(--t2)", margin: "0 0 8px", lineHeight: 1.5 }} data-testid="text-roo-notes">
+            <p style={{ fontSize: 15, color: "var(--t2)", margin: "0 0 8px", lineHeight: 1.5 }} data-testid="text-roo-notes">
               {String(result.afcftaRoo.notes)}
             </p>
           )}
           {result.afcftaRoo.alternativeCriteria != null && (
-            <div style={{ fontSize: 13, marginBottom: 8 }} data-testid="text-roo-alt-criteria">
+            <div style={{ fontSize: 15, marginBottom: 8 }} data-testid="text-roo-alt-criteria">
               <span style={{ fontWeight: 500, color: "var(--t1)" }}>{t("afcfta.alternative")} </span>
               <span style={{ color: "var(--t2)" }}>
                 {(() => {
@@ -2092,14 +2092,14 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
               </span>
             </div>
           )}
-          <p style={{ fontSize: 13, color: "var(--t4)", margin: 0 }}>
+          <p style={{ fontSize: 15, color: "var(--t4)", margin: 0 }}>
             {t("afcfta.source")} {String(result.afcftaRoo.sourceRef)}
           </p>
         </div>
       )}
 
       <div style={dkCard}>
-        <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 14 }}>
+        <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 14 }}>
           {t("actions.title")}
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
@@ -2122,7 +2122,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           </Button>
           <SupplierBriefButton result={result} />
         </div>
-        <p style={{ fontSize: 13, color: "var(--t3)", textAlign: "center", marginTop: 8, fontStyle: "italic" }}>{t("actions.brokerNote")}</p>
+        <p style={{ fontSize: 15, color: "var(--t3)", textAlign: "center", marginTop: 8, fontStyle: "italic" }}>{t("actions.brokerNote")}</p>
       </div>
 
       <SupplierBriefSection result={result} />
@@ -2146,13 +2146,13 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", fontFamily: "'Clash Display', sans-serif", margin: "0 0 8px" }}>
             {t("conversion.activateShield")}
           </h3>
-          <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6, margin: "0 0 12px" }}>
+          <p style={{ fontSize: 15, color: "var(--t2)", lineHeight: 1.6, margin: "0 0 12px" }}>
             {t("conversion.activateDescription")}
           </p>
           <Link href="/register">
             <Button
               size="sm"
-              style={{ background: "var(--sage)", color: "#fff", borderRadius: 10, border: "none", padding: "10px 24px", fontSize: 13, fontWeight: 700 }}
+              style={{ background: "var(--sage)", color: "#fff", borderRadius: 10, border: "none", padding: "10px 24px", fontSize: 15, fontWeight: 700 }}
               data-testid="button-conversion-register"
             >
               {t("conversion.createAccount")}
@@ -2173,13 +2173,13 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <p style={{ fontSize: 15, fontWeight: 700, color: "var(--t1)", margin: "0 0 6px", fontFamily: "'Clash Display', sans-serif" }}>
             {t("conversion.tradeCreated")}
           </p>
-          <p style={{ fontSize: 14, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.5 }}>
+          <p style={{ fontSize: 15, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.5 }}>
             {t("conversion.tradeDescription")}
           </p>
           <Link href={`/trades/${(result as any).lookupId}`}>
             <Button
               size="sm"
-              style={{ background: "var(--sage)", color: "#fff", borderRadius: 10, padding: "10px 28px", fontSize: 14, fontWeight: 700 }}
+              style={{ background: "var(--sage)", color: "#fff", borderRadius: 10, padding: "10px 28px", fontSize: 15, fontWeight: 700 }}
               data-testid="button-open-trade-dashboard"
             >
               {t("conversion.openTradeDashboard")}
@@ -2195,10 +2195,10 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           border: "1px solid rgba(234,179,8,0.15)",
         }} data-testid="banner-conversion">
           <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", fontFamily: "'Clash Display', sans-serif", margin: "0 0 8px" }}>{t("conversion.wantAnotherCorridor")}</h3>
-          <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6, margin: "0 0 6px" }}>
+          <p style={{ fontSize: 15, color: "var(--t2)", lineHeight: 1.6, margin: "0 0 6px" }}>
             {t("conversion.shieldDescription")}
           </p>
-          <p style={{ fontSize: 13, fontStyle: "italic", color: "var(--t3)", margin: "0 0 12px" }}>
+          <p style={{ fontSize: 15, fontStyle: "italic", color: "var(--t3)", margin: "0 0 12px" }}>
             {t("conversion.lcRejectionStat")}
           </p>
           <Link href="/pricing">
@@ -2266,7 +2266,7 @@ function SaveTemplatePrompt({
       return (
         <div style={{ ...dkCardLocal, display: "flex", alignItems: "center", gap: 12 }}>
           <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: "var(--sage)" }} />
-          <p style={{ fontSize: 13, color: "var(--t1)", margin: 0 }}>{t("template.saved")}</p>
+          <p style={{ fontSize: 15, color: "var(--t1)", margin: 0 }}>{t("template.saved")}</p>
         </div>
       );
     }
@@ -2276,7 +2276,7 @@ function SaveTemplatePrompt({
   return (
     <>
       <div style={{ ...dkCardLocal, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-        <p style={{ fontSize: 13, color: "var(--t2)", margin: 0 }}>
+        <p style={{ fontSize: 15, color: "var(--t2)", margin: 0 }}>
           {t("template.savePrompt")}
         </p>
         <Button
@@ -2509,7 +2509,7 @@ export default function Lookup() {
                   background: "transparent",
                   border: "none",
                   cursor: "pointer",
-                  fontSize: 13,
+                  fontSize: 15,
                   color: "var(--t2)",
                   padding: 0,
                   marginBottom: 4,
@@ -2520,11 +2520,11 @@ export default function Lookup() {
                 {isAuthenticated ? t("backToDashboard") : t("backToHome")}
               </button>
             </Link>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }}>{t("breadcrumb")}</p>
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }}>{t("breadcrumb")}</p>
             <h1 style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)" }} data-testid="text-lookup-title">
               {t("title")}
             </h1>
-            <p style={{ fontFamily: "var(--fb)", color: "var(--t2)", fontSize: 14 }}>
+            <p style={{ fontFamily: "var(--fb)", color: "var(--t2)", fontSize: 15 }}>
               {t("subtitle")}
             </p>
           </div>
@@ -2538,7 +2538,7 @@ export default function Lookup() {
               }}
               data-testid="text-template-current-banner"
             >
-              <p style={{ fontSize: 13, color: "var(--blue)", fontWeight: 600, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 15, color: "var(--blue)", fontWeight: 600, lineHeight: 1.5 }}>
                 {t("template.loadingFrom", { name: templateData?.name })}
               </p>
             </div>
@@ -2553,7 +2553,7 @@ export default function Lookup() {
               }}
               data-testid="text-template-stale-banner"
             >
-              <p style={{ fontSize: 13, color: "var(--amber)", fontWeight: 600, lineHeight: 1.5, marginBottom: 10 }}>
+              <p style={{ fontSize: 15, color: "var(--amber)", fontWeight: 600, lineHeight: 1.5, marginBottom: 10 }}>
                 {t("template.staleBanner", { date: new Date(templateData!.createdAt).toLocaleDateString() })}
               </p>
               <Button
@@ -2573,7 +2573,7 @@ export default function Lookup() {
             <CardContent className="p-6 space-y-6">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="commodity">
+                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="commodity">
                     {t("form.commodityLabel")}
                   </label>
                   {isLoading ? (
@@ -2599,7 +2599,7 @@ export default function Lookup() {
                 </div>
 
                 <div className="space-y-2">
-                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="origin">
+                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="origin">
                     {t("form.originLabel")}
                   </label>
                   {isLoading ? (
@@ -2627,7 +2627,7 @@ export default function Lookup() {
                 </div>
 
                 <div className="space-y-2">
-                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="destination">
+                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="destination">
                     {t("form.destinationLabel")}
                   </label>
                   {isLoading ? (
@@ -2686,7 +2686,7 @@ export default function Lookup() {
           {complianceMutation.isError && complianceMutation.error.message !== "Insufficient tokens" && (
             <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 14, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
               <XCircle className="w-5 h-5 shrink-0" style={{ color: "#ef4444" }} />
-              <p style={{ fontSize: 13, color: "#ef4444", margin: 0 }}>
+              <p style={{ fontSize: 15, color: "#ef4444", margin: 0 }}>
                 {complianceMutation.error.message}
               </p>
             </div>

@@ -39,7 +39,7 @@ export default function AdminLogin() {
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }}>
           {t("login.title")}
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
           {t("login.subtitle")}
         </p>
       </div>
@@ -64,7 +64,7 @@ export default function AdminLogin() {
           </div>
 
           {error && (
-            <div style={{ fontSize: 14, color: "var(--red)", marginBottom: 12 }}>{error}</div>
+            <div style={{ fontSize: 15, color: "var(--red)", marginBottom: 12 }}>{error}</div>
           )}
 
           <button
@@ -76,7 +76,7 @@ export default function AdminLogin() {
               border: "none",
               borderRadius: 10,
               padding: "11px 24px",
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               cursor: "pointer",
               opacity: loginMutation.isPending || !password ? 0.5 : 1,

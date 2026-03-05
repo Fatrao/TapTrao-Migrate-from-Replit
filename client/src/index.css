@@ -46,7 +46,7 @@
   --chart-4: 7 57% 49%;
   --chart-5: 138 10% 60%;
   --font-sans: 'DM Sans', sans-serif;
-  --font-heading: 'Playfair Display', serif;
+  --font-heading: 'Clash Display', sans-serif;
   --font-mono: 'DM Sans', sans-serif;
   --radius: .75rem;
   --shadow-2xs: 0px 1px 2px 0px rgba(0,0,0,0.06);
@@ -2497,8 +2497,8 @@
 .pack-card { background:#1c1c1e; border-radius:16px; padding:24px 20px; position:relative; transition:.2s; overflow:hidden; }
 .pack-card:hover { transform:translateY(-3px); }
 .pack-card.popular { box-shadow:0 0 0 2px var(--green),0 4px 24px rgba(74,140,111,.15); }
-.pack-card.popular::before { content:'MOST POPULAR'; position:absolute; top:12px; right:12px; font-size:9px; font-weight:700; letter-spacing:.06em; padding:3px 9px; border-radius:6px; background:var(--green); color:#000; }
-.trust-bar { margin:0 10px; padding:20px 28px; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; font-size:12.5px; color:rgba(255,255,255,.35); background:#1c1c1e; border-radius:14px; }
+.pack-card.popular::before { content:'MOST POPULAR'; position:absolute; top:12px; right:12px; font-size:15px; font-weight:700; letter-spacing:.06em; padding:3px 9px; border-radius:6px; background:var(--green); color:#000; }
+.trust-bar { margin:0 10px; padding:20px 28px; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; font-size:15px; color:rgba(255,255,255,.35); background:#1c1c1e; border-radius:14px; }
 .trust-bar .sep { width:1px; height:16px; background:rgba(255,255,255,.08); }
 
 /* ── Dashboard-specific ── */

@@ -429,16 +429,16 @@ export default function LcCheck() {
           <div className="upload-note" style={{ margin: "14px 32px 0" }} data-testid="banner-lc-prefill">
             <ExternalLink size={18} style={{ color: "var(--app-acapulco)", flexShrink: 0, marginTop: 1 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: "var(--app-acapulco)" }} data-testid="text-prefill-info">
+              <p style={{ fontSize: 15, fontWeight: 600, color: "var(--app-acapulco)" }} data-testid="text-prefill-info">
                 {t("prefill.title")}
               </p>
-              <p style={{ fontSize: 13, color: "var(--app-regent)" }}>
+              <p style={{ fontSize: 15, color: "var(--app-regent)" }}>
                 {prefillData.commodity_name} — {prefillData.origin_name} → {prefillData.dest_name}
               </p>
               {prefillData.lookup_id && (
                 <Link
                   href="/trades"
-                  style={{ fontSize: 13, color: "var(--app-acapulco)", textDecoration: "underline", marginTop: 4, display: "inline-block" }}
+                  style={{ fontSize: 15, color: "var(--app-acapulco)", textDecoration: "underline", marginTop: 4, display: "inline-block" }}
                   data-testid="link-view-lookup"
                 >
                   {t("prefill.viewLookup")}
@@ -713,7 +713,7 @@ export default function LcCheck() {
 
               {/* Quantity Tolerance — SWIFT 39A/39B */}
               <div className="form-group" style={{ marginTop: 12 }}>
-                <label>{t("step1.quantityTolerance")} <span style={{ fontSize: 13, color: "#888" }}>{t("step1.quantityToleranceHint")}</span></label>
+                <label>{t("step1.quantityTolerance")} <span style={{ fontSize: 15, color: "#888" }}>{t("step1.quantityToleranceHint")}</span></label>
                 <input
                   type="number"
                   min={0}
@@ -745,8 +745,8 @@ export default function LcCheck() {
               {extractionStatus === "extracting" && (
                 <div className="upload-note" style={{ padding: "24px 16px", textAlign: "center" }}>
                   <div style={{ fontSize: 22, marginBottom: 8, animation: "pulse 1.5s ease-in-out infinite" }}>🔍</div>
-                  <div style={{ fontWeight: 600, fontSize: 14, color: "#2a3d40", marginBottom: 4 }}>{t("step1.upload.extracting")}</div>
-                  <div style={{ fontSize: 14, color: "#888" }}>{t("step1.upload.extractingTime")}</div>
+                  <div style={{ fontWeight: 600, fontSize: 15, color: "#2a3d40", marginBottom: 4 }}>{t("step1.upload.extracting")}</div>
+                  <div style={{ fontSize: 15, color: "#888" }}>{t("step1.upload.extractingTime")}</div>
                 </div>
               )}
 
@@ -1109,7 +1109,7 @@ export default function LcCheck() {
                     {lcItems.length > 0 && (
                       <>
                         {crossItems.length > 0 && (
-                          <div style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", margin: "8px 0 4px", paddingLeft: 4 }}>
+                          <div style={{ fontSize: 15, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", margin: "8px 0 4px", paddingLeft: 4 }}>
                             {t("step4.lcValidation")}
                           </div>
                         )}
@@ -1133,7 +1133,7 @@ export default function LcCheck() {
 
                     {crossItems.length > 0 && (
                       <>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", margin: "10px 0 4px", paddingLeft: 4 }}>
+                        <div style={{ fontSize: 15, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", margin: "10px 0 4px", paddingLeft: 4 }}>
                           {t("step4.crossDocConsistency")}
                         </div>
                         {crossItems.map((r, i) => (
@@ -1172,7 +1172,7 @@ export default function LcCheck() {
                     style={{
                       flex: 1,
                       padding: "10px 16px",
-                      fontSize: 13,
+                      fontSize: 15,
                       fontWeight: 600,
                       border: correctionTab === "email" ? "1px solid var(--sage)" : "1px solid #ddd",
                       background: correctionTab === "email" ? "var(--sage-xs)" : "#fff",
@@ -1189,7 +1189,7 @@ export default function LcCheck() {
                     style={{
                       flex: 1,
                       padding: "10px 16px",
-                      fontSize: 13,
+                      fontSize: 15,
                       fontWeight: 600,
                       border: correctionTab === "whatsapp" ? "1px solid #25D366" : "1px solid #ddd",
                       background: correctionTab === "whatsapp" ? "rgba(37,211,102,0.08)" : "#fff",
@@ -1205,7 +1205,7 @@ export default function LcCheck() {
 
                 {/* Correction text */}
                 <div style={{ background: "#f7f7f7", borderRadius: 10, padding: "16px 18px", border: "1px solid #e8e8e8" }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "#555", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".05em" }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: "#555", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".05em" }}>
                     {correctionTab === "email" ? t("step4.correction.emailMessage") : t("step4.correction.whatsAppMessage")}
                   </div>
                   <div className="lc-email-box" data-testid={`text-correction-${correctionTab}`}>
@@ -1230,7 +1230,7 @@ export default function LcCheck() {
                         background: "var(--sage)",
                         color: "#fff",
                         borderRadius: 8,
-                        fontSize: 13,
+                        fontSize: 15,
                         fontWeight: 600,
                         textDecoration: "none",
                         cursor: "pointer",
@@ -1252,7 +1252,7 @@ export default function LcCheck() {
                         background: "#25D366",
                         color: "#fff",
                         borderRadius: 8,
-                        fontSize: 13,
+                        fontSize: 15,
                         fontWeight: 600,
                         textDecoration: "none",
                         cursor: "pointer",
@@ -1271,13 +1271,13 @@ export default function LcCheck() {
               <div style={{ display: "flex", alignItems: "start", gap: 10 }}>
                 <Hash size={18} style={{ color: "var(--app-regent)", flexShrink: 0, marginTop: 1 }} />
                 <div style={{ minWidth: 0 }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-lc-check-ref">
+                  <p style={{ fontSize: 15, fontWeight: 600, color: "var(--green)" }} data-testid="text-lc-check-ref">
                     {t("step4.integrityRef")} TT-LC-{new Date().getFullYear()}-{resultData.integrityHash.substring(0, 6).toUpperCase()}
                   </p>
-                  <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--app-regent)", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
+                  <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--app-regent)", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
                     {t("step4.integrityHash")} sha256:{resultData.integrityHash}
                   </p>
-                  <p style={{ fontSize: 13, color: "var(--app-regent)" }} data-testid="text-lc-check-timestamp">
+                  <p style={{ fontSize: 15, color: "var(--app-regent)" }} data-testid="text-lc-check-timestamp">
                     {t("step4.checked")} {new Date(resultData.timestamp).toLocaleString()}
                   </p>
                 </div>
@@ -1288,7 +1288,7 @@ export default function LcCheck() {
             {resultData.recheckNumber > 0 && (
               <div style={{ margin: "0 32px 16px", padding: "12px 16px", background: "var(--sage-xs)", border: "1px solid rgba(74,124,94,0.2)", borderRadius: 10, display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontSize: 16 }}>🔄</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--sage)" }}>
+                <span style={{ fontSize: 15, fontWeight: 600, color: "var(--sage)" }}>
                   {t("step4.recheckBanner", { number: resultData.recheckNumber, remaining: resultData.freeRechecksRemaining, plural: resultData.freeRechecksRemaining !== 1 ? "s" : "" })}
                 </span>
               </div>
@@ -1346,7 +1346,7 @@ export default function LcCheck() {
                   📄 {t("step4.action.uploadCorrected")}
                 </button>
                 <button
-                  style={{ background: "none", border: "none", color: "#999", fontSize: 14, cursor: "pointer", padding: "6px 0" }}
+                  style={{ background: "none", border: "none", color: "#999", fontSize: 15, cursor: "pointer", padding: "6px 0" }}
                   onClick={async () => {
                     if (resultData?.caseId) {
                       try {
@@ -1396,7 +1396,7 @@ export default function LcCheck() {
                   {t("step4.action.newCheck")}
                 </button>
                 <button
-                  style={{ background: "none", border: "none", color: "#999", fontSize: 14, cursor: "pointer", padding: "6px 0" }}
+                  style={{ background: "none", border: "none", color: "#999", fontSize: 15, cursor: "pointer", padding: "6px 0" }}
                   onClick={async () => {
                     if (resultData?.caseId) {
                       try {
@@ -1424,7 +1424,7 @@ export default function LcCheck() {
         {checkMutation.isError && checkMutation.error.message !== "Insufficient tokens" && step !== 4 && (
           <div className="lc-verdict fail" style={{ margin: "14px 32px 0" }}>
             <XCircle size={18} style={{ color: "#ef4444", flexShrink: 0 }} />
-            <p style={{ fontSize: 13, color: "#ef4444" }}>{checkMutation.error.message}</p>
+            <p style={{ fontSize: 15, color: "#ef4444" }}>{checkMutation.error.message}</p>
           </div>
         )}
 

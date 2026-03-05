@@ -68,9 +68,9 @@ export default function Home() {
 
         {/* Desktop nav links */}
         <div className="hidden md:flex" style={{ gap: 28 }}>
-          <a href="#how" style={{ fontSize: 13, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.howItWorks")}</a>
-          <a href="#validation" style={{ fontSize: 13, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.validation")}</a>
-          <a href="#pricing" style={{ fontSize: 13, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.pricing")}</a>
+          <a href="#how" style={{ fontSize: 15, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.howItWorks")}</a>
+          <a href="#validation" style={{ fontSize: 15, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.validation")}</a>
+          <a href="#pricing" style={{ fontSize: 15, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.pricing")}</a>
         </div>
 
         {/* Desktop CTA */}
@@ -81,7 +81,7 @@ export default function Home() {
               display: "flex", alignItems: "center", gap: 6,
               background: "none", border: "1px solid rgba(0,0,0,0.12)",
               borderRadius: 20, padding: "6px 14px", cursor: "pointer",
-              fontSize: 13, fontWeight: 500, color: "var(--t2)",
+              fontSize: 15, fontWeight: 500, color: "var(--t2)",
               fontFamily: "var(--fb)",
             }}
             title={isEn ? "Passer en français" : "Switch to English"}
@@ -93,7 +93,7 @@ export default function Home() {
             <Link href="/trades" style={{
               padding: "9px 22px", borderRadius: 20, border: "none",
               background: "var(--sage)", color: "#fff",
-              fontFamily: "var(--fb)", fontSize: 14, fontWeight: 600,
+              fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600,
               textDecoration: "none", cursor: "pointer",
             }}>
               {t("nav.myTrades")}
@@ -102,7 +102,7 @@ export default function Home() {
             <Link href="/lookup" style={{
               padding: "9px 22px", borderRadius: 20, border: "none",
               background: "var(--sage)", color: "#fff",
-              fontFamily: "var(--fb)", fontSize: 14, fontWeight: 600,
+              fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600,
               textDecoration: "none", cursor: "pointer",
             }}>
               {t("nav.freeComplianceCheck")}
@@ -147,12 +147,12 @@ export default function Home() {
             {isAuthenticated ? (
               <Link href="/trades" onClick={() => setMobileMenuOpen(false)} style={{
                 padding: "12px 24px", borderRadius: 20, background: "var(--sage)", color: "#fff",
-                textAlign: "center", fontWeight: 600, textDecoration: "none", fontSize: 14,
+                textAlign: "center", fontWeight: 600, textDecoration: "none", fontSize: 15,
               }}>{t("nav.myTrades")}</Link>
             ) : (
               <Link href="/lookup" onClick={() => setMobileMenuOpen(false)} style={{
                 padding: "12px 24px", borderRadius: 20, background: "var(--sage)", color: "#fff",
-                textAlign: "center", fontWeight: 600, textDecoration: "none", fontSize: 14,
+                textAlign: "center", fontWeight: 600, textDecoration: "none", fontSize: 15,
               }}>{t("nav.freeComplianceCheck")}</Link>
             )}
           </div>
@@ -203,7 +203,7 @@ export default function Home() {
             <Link href="/lookup" style={{
               padding: "16px 36px", borderRadius: 24, border: "none",
               background: "var(--sage)", color: "#fff",
-              fontFamily: "var(--fb)", fontSize: 14, fontWeight: 700,
+              fontFamily: "var(--fb)", fontSize: 15, fontWeight: 700,
               cursor: "pointer", boxShadow: "0 6px 24px rgba(27,42,34,.4)",
               textDecoration: "none", display: "inline-block",
             }}>
@@ -212,7 +212,7 @@ export default function Home() {
             <a href="#validation" style={{
               padding: "16px 36px", borderRadius: 24, border: "none",
               background: "rgba(255,255,255,.85)", color: "var(--dark)",
-              fontFamily: "var(--fb)", fontSize: 14, fontWeight: 600,
+              fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600,
               cursor: "pointer", backdropFilter: "blur(8px)",
               boxShadow: "0 4px 16px rgba(0,0,0,.12)",
               textDecoration: "none", display: "inline-block",
@@ -230,7 +230,7 @@ export default function Home() {
       }}>
         <div style={{ textAlign: "center" }}>
           <div style={{
-            fontSize: 14, fontWeight: 700, letterSpacing: 2.5,
+            fontSize: 15, fontWeight: 700, letterSpacing: 2.5,
             color: "#fff", marginBottom: 10,
           }}>
             {t("trustBar.corridors")}
@@ -259,7 +259,7 @@ export default function Home() {
           {(["demurrage", "bankFee", "isfPenalty", "cascadeCost"] as const).map((key) => (
             <div key={key} style={{ background: "var(--bg)", borderRadius: "var(--r)", padding: 24, textAlign: "center" }}>
               <div style={{ fontFamily: "var(--fd)", fontSize: 22, fontWeight: 700, color: "var(--red)", marginBottom: 6 }}>{t(`costSection.stats.${key}.value`)}</div>
-              <div style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.5 }}>{t(`costSection.stats.${key}.description`)}</div>
+              <div style={{ fontSize: 15, color: "var(--t3)", lineHeight: 1.5 }}>{t(`costSection.stats.${key}.description`)}</div>
             </div>
           ))}
         </div>
@@ -275,16 +275,16 @@ export default function Home() {
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
           {t("howItWorks.heading")}
         </h2>
-        <p style={{ fontSize: 14, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
+        <p style={{ fontSize: 15, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
           {t("howItWorks.subheading")}
         </p>
 
         <div className="hp-steps-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
           {(["step1", "step2", "step3"] as const).map((stepKey) => (
             <div key={stepKey} style={{ background: "#fff", borderRadius: "var(--r)", padding: 32, boxShadow: "var(--shd)" }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--sage-l)", letterSpacing: 1, marginBottom: 8 }}>{t(`howItWorks.steps.${stepKey}.label`)}</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--sage-l)", letterSpacing: 1, marginBottom: 8 }}>{t(`howItWorks.steps.${stepKey}.label`)}</div>
               <h3 style={{ fontFamily: "var(--fd)", fontSize: 20, fontWeight: 600, marginBottom: 8 }}>{t(`howItWorks.steps.${stepKey}.title`)}</h3>
-              <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.7 }}>{t(`howItWorks.steps.${stepKey}.description`)}</p>
+              <p style={{ fontSize: 15, color: "var(--t3)", lineHeight: 1.7 }}>{t(`howItWorks.steps.${stepKey}.description`)}</p>
             </div>
           ))}
         </div>
@@ -298,7 +298,7 @@ export default function Home() {
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8, color: "#fff" }}>
           {t("validationPreview.heading")}
         </h2>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,.8)", marginBottom: 40, maxWidth: 500 }}>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,.8)", marginBottom: 40, maxWidth: 500 }}>
           {t("validationPreview.subheading")}
         </p>
 
@@ -312,16 +312,16 @@ export default function Home() {
               <div style={{ fontFamily: "var(--fd)", fontSize: 16, fontWeight: 600 }}>
                 {t("validationPreview.mockTrade")}
               </div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.55)", marginTop: 2 }}>TT-2026-a3f9c1</div>
+              <div style={{ fontSize: 15, color: "rgba(255,255,255,.55)", marginTop: 2 }}>TT-2026-a3f9c1</div>
             </div>
             <div style={{ fontFamily: "var(--fd)", fontSize: 32, fontWeight: 700, color: "var(--sage-l)" }}>87</div>
           </div>
 
           {/* Risk tags */}
           <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>{t("validationPreview.riskLow")}</span> {t("validationPreview.riskOrigin")}</span>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>{t("validationPreview.riskLow")}</span> {t("validationPreview.riskCommodity")}</span>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--amber)", fontWeight: 600 }}>{t("validationPreview.riskMed")}</span> {t("validationPreview.riskRegulatory")}</span>
+            <span style={{ fontSize: 15, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>{t("validationPreview.riskLow")}</span> {t("validationPreview.riskOrigin")}</span>
+            <span style={{ fontSize: 15, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>{t("validationPreview.riskLow")}</span> {t("validationPreview.riskCommodity")}</span>
+            <span style={{ fontSize: 15, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--amber)", fontWeight: 600 }}>{t("validationPreview.riskMed")}</span> {t("validationPreview.riskRegulatory")}</span>
           </div>
 
           {/* Check items */}
@@ -344,7 +344,7 @@ export default function Home() {
                 <div key={c.labelKey} style={{
                   display: "flex", alignItems: "center", gap: 8,
                   padding: "8px 12px", borderRadius: 8,
-                  fontSize: 13, fontWeight: 500, background: bg, color,
+                  fontSize: 15, fontWeight: 500, background: bg, color,
                 }}>
                   {c.icon} {t(`validationPreview.checkItems.${c.labelKey}`)}
                 </div>
@@ -359,7 +359,7 @@ export default function Home() {
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
           {t("pricingSection.heading")}
         </h2>
-        <p style={{ fontSize: 14, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
+        <p style={{ fontSize: 15, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
           {t("pricingSection.subheading")}
         </p>
 
@@ -377,17 +377,17 @@ export default function Home() {
               textAlign: "center",
             }}>
               <div style={{
-                fontSize: 13, fontWeight: 600, letterSpacing: 1,
+                fontSize: 15, fontWeight: 600, letterSpacing: 1,
                 color: plan.featured ? "var(--sage-l)" : "var(--t3)",
                 marginBottom: 8, textTransform: "uppercase",
               }}>{t(`pricingSection.plans.${plan.key}.name`)}</div>
               <div style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 700, marginBottom: 4 }}>{t(`pricingSection.plans.${plan.key}.price`)}</div>
               <div style={{
-                fontSize: 13, color: plan.featured ? "rgba(255,255,255,.8)" : "var(--t3)",
+                fontSize: 15, color: plan.featured ? "rgba(255,255,255,.8)" : "var(--t3)",
                 marginBottom: 20,
               }}>{t(`pricingSection.plans.${plan.key}.per`)}</div>
               <div style={{
-                fontSize: 14, color: plan.featured ? "rgba(255,255,255,.85)" : "var(--t2)",
+                fontSize: 15, color: plan.featured ? "rgba(255,255,255,.85)" : "var(--t2)",
                 lineHeight: 2, textAlign: "left", marginBottom: 20,
               }}>
                 {(t(`pricingSection.plans.${plan.key}.features`) as string).split("\n").map((f: string) => <div key={f}>{f}</div>)}
@@ -398,7 +398,7 @@ export default function Home() {
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                   width: "100%", padding: 12, borderRadius: 20,
-                  border: "none", fontFamily: "var(--fb)", fontSize: 13, fontWeight: 600,
+                  border: "none", fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600,
                   cursor: checkoutMutation.isPending ? "wait" : "pointer",
                   background: plan.featured ? "var(--sage-l)" : "var(--bg)",
                   color: plan.featured ? "var(--dark)" : "var(--t1)",
@@ -420,13 +420,13 @@ export default function Home() {
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 12 }}>
           {t("finalCta.heading")}
         </h2>
-        <p style={{ fontSize: 14, color: "var(--t3)", marginBottom: 28 }}>
+        <p style={{ fontSize: 15, color: "var(--t3)", marginBottom: 28 }}>
           {t("finalCta.subheading")}
         </p>
         <Link href="/lookup" style={{
           padding: "16px 36px", borderRadius: 24, border: "none",
           background: "var(--sage)", color: "#fff",
-          fontFamily: "var(--fb)", fontSize: 14, fontWeight: 700,
+          fontFamily: "var(--fb)", fontSize: 15, fontWeight: 700,
           cursor: "pointer", boxShadow: "0 6px 24px rgba(27,42,34,.4)",
           textDecoration: "none", display: "inline-block",
         }}>
@@ -438,13 +438,13 @@ export default function Home() {
       <footer style={{
         background: "var(--dark)", padding: "48px 60px",
         display: "flex", justifyContent: "space-between", alignItems: "flex-start",
-        color: "rgba(255,255,255,.8)", fontSize: 14,
+        color: "rgba(255,255,255,.8)", fontSize: 15,
         flexWrap: "wrap", gap: 40,
       }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <img src="/logo.png?v=2" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: 8, objectFit: "cover" }} />
-            <span style={{ fontFamily: "var(--fd)", fontSize: 14, color: "#fff", fontWeight: 600 }}>TapTrao</span>
+            <span style={{ fontFamily: "var(--fd)", fontSize: 15, color: "#fff", fontWeight: 600 }}>TapTrao</span>
           </div>
           <div>{t("footer.tagline")}</div>
           <div style={{ marginTop: 12 }}>{t("footer.copyright")}</div>
@@ -452,19 +452,19 @@ export default function Home() {
 
         <div style={{ display: "flex", gap: 40, flexWrap: "wrap" }}>
           <div>
-            <h4 style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>{t("footer.product")}</h4>
-            <Link href="/lookup" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.freeCheck")}</Link>
-            <Link href="/pricing" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.pricing")}</Link>
-            <Link href="/lc-check" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.lcCheck")}</Link>
+            <h4 style={{ fontSize: 15, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>{t("footer.product")}</h4>
+            <Link href="/lookup" style={{ display: "block", fontSize: 15, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.freeCheck")}</Link>
+            <Link href="/pricing" style={{ display: "block", fontSize: 15, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.pricing")}</Link>
+            <Link href="/lc-check" style={{ display: "block", fontSize: 15, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.lcCheck")}</Link>
           </div>
           <div>
-            <h4 style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>{t("footer.company")}</h4>
-            <a href="mailto:hello@taptrao.com" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.contact")}</a>
+            <h4 style={{ fontSize: 15, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>{t("footer.company")}</h4>
+            <a href="mailto:hello@taptrao.com" style={{ display: "block", fontSize: 15, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.contact")}</a>
           </div>
           <div>
-            <h4 style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>{t("footer.legal")}</h4>
-            <Link href="/privacy-policy" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.privacyPolicy")}</Link>
-            <Link href="/terms-of-service" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.termsConditions")}</Link>
+            <h4 style={{ fontSize: 15, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>{t("footer.legal")}</h4>
+            <Link href="/privacy-policy" style={{ display: "block", fontSize: 15, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.privacyPolicy")}</Link>
+            <Link href="/terms-of-service" style={{ display: "block", fontSize: 15, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.termsConditions")}</Link>
           </div>
         </div>
       </footer>
@@ -504,7 +504,7 @@ export default function Home() {
             padding: 20px 16px !important;
           }
           .hp-page .hp-trust-bar > div > div:first-child {
-            font-size: 11px !important;
+            font-size: 15px !important;
             letter-spacing: 1.5px !important;
           }
           .hp-page .hp-trust-bar > div > div:last-child {

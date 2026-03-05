@@ -68,7 +68,7 @@ export default function VerifyPage() {
 
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "40px 20px" }}>
         {query.isLoading && (
-          <div style={{ textAlign: "center", color: "var(--t3)", fontSize: 13 }}>{t("verify.loading")}</div>
+          <div style={{ textAlign: "center", color: "var(--t3)", fontSize: 15 }}>{t("verify.loading")}</div>
         )}
 
         {query.isError && (
@@ -79,7 +79,7 @@ export default function VerifyPage() {
             >
               {t("verify.notFoundTitle")}
             </h2>
-            <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.6 }}>
+            <p style={{ fontSize: 15, color: "var(--t2)", lineHeight: 1.6 }}>
               {t("verify.notFoundDescription")}
             </p>
           </div>
@@ -107,7 +107,7 @@ export default function VerifyPage() {
               data-testid="verify-success-banner"
             >
               <span style={{ fontSize: 16, color: "var(--green)" }}>{"\u2713"}</span>
-              <span style={{ fontSize: 13, color: "var(--green)", lineHeight: 1.5 }}>
+              <span style={{ fontSize: 15, color: "var(--green)", lineHeight: 1.5 }}>
                 {t("verify.lockedBanner", { date: formatDate(query.data.twinlogLockedAt) })}
               </span>
             </div>
@@ -120,13 +120,13 @@ export default function VerifyPage() {
               }}
             >
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>
+                <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>
                   {t("verify.trade")}
                 </div>
-                <div style={{ fontSize: 14, color: "var(--t1)", fontWeight: 600 }}>
+                <div style={{ fontSize: 15, color: "var(--t1)", fontWeight: 600 }}>
                   {translateCommodity(query.data.commodityName, lang)}
                 </div>
-                <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t3)", marginTop: 2 }}>
+                <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t3)", marginTop: 2 }}>
                   {query.data.originName} {"\u2192"} {query.data.destinationName}
                 </div>
               </div>
@@ -135,35 +135,35 @@ export default function VerifyPage() {
 
               <div style={{ display: "grid", gap: 12 }}>
                 <div>
-                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
                     {t("verify.reference")}
                   </div>
-                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--blue)", fontWeight: 700 }} data-testid="text-verify-ref">
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--blue)", fontWeight: 700 }} data-testid="text-verify-ref">
                     {query.data.twinlogRef}
                   </div>
                 </div>
 
                 <div>
-                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
                     {t("verify.hash")}
                   </div>
-                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)", wordBreak: "break-all" }} data-testid="text-verify-hash">
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t3)", wordBreak: "break-all" }} data-testid="text-verify-hash">
                     sha256:{query.data.twinlogHash}
                   </div>
                 </div>
 
                 <div>
-                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
                     {t("verify.locked")}
                   </div>
-                  <div style={{ fontSize: 14, color: "var(--t2)" }}>
+                  <div style={{ fontSize: 15, color: "var(--t2)" }}>
                     {formatDate(query.data.twinlogLockedAt)}
                   </div>
                 </div>
 
                 {query.data.readinessScore != null && (
                   <div>
-                    <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
+                    <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
                       {t("verify.score")}
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -172,7 +172,7 @@ export default function VerifyPage() {
                       </span>
                       <span style={{
                         fontFamily: "'Inter', sans-serif",
-                        fontSize: 14,
+                        fontSize: 15,
                         fontWeight: 700,
                         color: query.data.readinessVerdict === "GREEN" ? "var(--green)" :
                           query.data.readinessVerdict === "AMBER" ? "var(--amber)" : "var(--red)",
@@ -191,9 +191,9 @@ export default function VerifyPage() {
       <div style={{ textAlign: "center", marginTop: 40, padding: "0 20px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 6 }}>
           <img src="/logo.png?v=2" alt="" style={{ width: 20, height: 20, objectFit: "contain", borderRadius: 4 }} />
-          <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "var(--t2)" }}>TapTrao</span>
+          <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 15, color: "var(--t2)" }}>TapTrao</span>
         </div>
-        <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.55 }}>
+        <p style={{ fontSize: 15, color: "var(--t3)", lineHeight: 1.55 }}>
           {t("verify.footerMessage")}
         </p>
       </div>

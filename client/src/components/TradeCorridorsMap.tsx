@@ -176,7 +176,7 @@ export const TradeCorridorsMap = memo(function TradeCorridorsMap({
             left: 16,
             display: "flex",
             gap: 16,
-            fontSize: 11,
+            fontSize: 15,
             color: "rgba(255,255,255,0.6)",
           }}
         >

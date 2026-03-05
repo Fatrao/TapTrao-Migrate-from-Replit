@@ -107,7 +107,7 @@ export default function SupplierUpload() {
   if (dataQuery.isLoading) {
     return (
       <div className="supplier-upload-page" style={{ background: lightBg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ color: textSecondary, fontSize: 14 }}>{t("loading")}</div>
+        <div style={{ color: textSecondary, fontSize: 15 }}>{t("loading")}</div>
       </div>
     );
   }
@@ -205,13 +205,13 @@ export default function SupplierUpload() {
               <div style={{ fontFamily: "'Clash Display', sans-serif", fontSize: 18, fontWeight: 700 }}>
                 {translateCommodity(trade.commodityName, lang)}
               </div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>
+              <div style={{ fontSize: 15, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>
                 {iso2ToFlag(trade.originIso2)} {trade.originName} {"\u2192"} {iso2ToFlag(trade.destIso2)} {trade.destName}
               </div>
             </div>
           </div>
 
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", lineHeight: 1.6, margin: 0 }}>
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,0.8)", lineHeight: 1.6, margin: 0 }}>
             {t("uploadDocs")}
             {" "}{t("noAccountNeeded")}
           </p>
@@ -221,18 +221,18 @@ export default function SupplierUpload() {
               <span style={{
                 display: "inline-flex", alignItems: "center", gap: 5,
                 background: "rgba(234,179,8,0.2)", border: "1px solid rgba(234,179,8,0.3)",
-                color: "#fcd34d", fontSize: 14, fontWeight: 600,
+                color: "#fcd34d", fontSize: 15, fontWeight: 600,
                 padding: "5px 12px", borderRadius: 6,
               }}>
                 {"\u23F1"} {t("dueBy", { date: formatDate(request.uploadExpiresAt) })}
               </span>
             ) : (
-              <span style={{ fontSize: 14, color: "rgba(255,255,255,0.5)" }}>
+              <span style={{ fontSize: 15, color: "rgba(255,255,255,0.5)" }}>
                 {t("deadline", { date: formatDate(request.uploadExpiresAt) })}
               </span>
             )}
             <span style={{
-              fontSize: 14, color: "rgba(255,255,255,0.5)", marginLeft: "auto",
+              fontSize: 15, color: "rgba(255,255,255,0.5)", marginLeft: "auto",
             }}>
               {t("uploadCount", { received: docsReceived.length, total: docsRequired.length })}
             </span>
@@ -281,11 +281,11 @@ export default function SupplierUpload() {
                 }}>
                   {getDocIcon(docName)}
                 </div>
-                <div style={{ flex: 1, fontSize: 14, fontWeight: 600, color: textPrimary }}>
+                <div style={{ flex: 1, fontSize: 15, fontWeight: 600, color: textPrimary }}>
                   {docName}
                 </div>
                 <span style={{
-                  fontSize: 13, fontWeight: 600,
+                  fontSize: 15, fontWeight: 600,
                   color: isVerified ? accentGreen :
                     hasFinding ? amberText :
                     isReceived ? accentGreen : textMuted,
@@ -307,7 +307,7 @@ export default function SupplierUpload() {
                   background: amberBg, borderTop: `1px solid ${amberBorder}`,
                   padding: "10px 18px",
                 }}>
-                  <p style={{ fontSize: 13, color: amberText, lineHeight: 1.5, margin: 0 }}>
+                  <p style={{ fontSize: 15, color: amberText, lineHeight: 1.5, margin: 0 }}>
                     {upload!.finding}
                   </p>
                 </div>
@@ -320,11 +320,11 @@ export default function SupplierUpload() {
                   borderTop: `1px solid ${accentGreenBorder}`,
                   display: "flex", alignItems: "center", gap: 8,
                 }}>
-                  <span style={{ fontSize: 14, color: textSecondary, flex: 1 }}>
+                  <span style={{ fontSize: 15, color: textSecondary, flex: 1 }}>
                     {upload.originalFilename}
                     {upload.filesizeBytes ? ` \u00B7 ${(upload.filesizeBytes / 1024).toFixed(0)}KB` : ""}
                   </span>
-                  <span style={{ color: accentGreen, fontSize: 14, fontWeight: 700 }}>{"\u2713"}</span>
+                  <span style={{ color: accentGreen, fontSize: 15, fontWeight: 700 }}>{"\u2713"}</span>
                 </div>
               )}
 
@@ -350,7 +350,7 @@ export default function SupplierUpload() {
           marginTop: 24,
           boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
         }}>
-          <div style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: textMuted, marginBottom: 10 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: textMuted, marginBottom: 10 }}>
             {t("progress.title")}
           </div>
           {docsRequired.map((docName, idx) => {
@@ -374,7 +374,7 @@ export default function SupplierUpload() {
             return (
               <div key={idx} style={{ display: "flex", alignItems: "center", gap: 10, padding: "5px 0" }}>
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: dotColor, flexShrink: 0 }} />
-                <span style={{ fontSize: 13, color: textSecondary }}>{label}</span>
+                <span style={{ fontSize: 15, color: textSecondary }}>{label}</span>
               </div>
             );
           })}
@@ -437,7 +437,7 @@ function TopBar() {
           TapTrao
         </span>
       </div>
-      <span style={{ fontSize: 14, color: textMuted, display: "flex", alignItems: "center", gap: 5 }}>
+      <span style={{ fontSize: 15, color: textMuted, display: "flex", alignItems: "center", gap: 5 }}>
         {"\uD83D\uDD12"} {t("secureUpload")}
       </span>
     </div>
@@ -452,14 +452,14 @@ function Footer({ expiryDate }: { expiryDate: string }) {
     <div style={{ textAlign: "center", marginTop: 40, padding: "0 20px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 6 }}>
         <img src="/logo.png?v=2" alt="" style={{ width: 20, height: 20, objectFit: "contain", borderRadius: 4 }} />
-        <span style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 14, color: textSecondary }}>
+        <span style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 15, color: textSecondary }}>
           TapTrao
         </span>
       </div>
-      <p style={{ fontSize: 14, color: textMuted, lineHeight: 1.55 }}>
+      <p style={{ fontSize: 15, color: textMuted, lineHeight: 1.55 }}>
         {t("footer.secureMessage")}
       </p>
-      <p style={{ fontSize: 14, color: textMuted, lineHeight: 1.55, marginTop: 2 }}>
+      <p style={{ fontSize: 15, color: textMuted, lineHeight: 1.55, marginTop: 2 }}>
         {t("footer.linkExpires", { date: formatDate(expiryDate) })}
       </p>
     </div>
@@ -532,7 +532,7 @@ function UploadZone({
         padding: "10px 18px",
         background: accentGreenLight,
         borderTop: `1px solid ${accentGreenBorder}`,
-        fontSize: 13, color: accentGreen, fontWeight: 500,
+        fontSize: 15, color: accentGreen, fontWeight: 500,
         display: "flex", alignItems: "center", gap: 6,
       }}>
         {"\u2713"} {t("uploadedPending")}
@@ -563,20 +563,20 @@ function UploadZone({
         }}
       >
         {isUploading ? (
-          <div style={{ fontSize: 13, color: textSecondary }}>{t("uploading")}</div>
+          <div style={{ fontSize: 15, color: textSecondary }}>{t("uploading")}</div>
         ) : (
           <>
-            <div style={{ fontSize: 14, color: textSecondary, fontWeight: 500 }}>
+            <div style={{ fontSize: 15, color: textSecondary, fontWeight: 500 }}>
               {"\uD83D\uDCCE"} {t("dropOrTap")}
             </div>
-            <div style={{ fontSize: 14, color: textMuted, marginTop: 4 }}>
+            <div style={{ fontSize: 15, color: textMuted, marginTop: 4 }}>
               {t("fileTypes")}
             </div>
           </>
         )}
       </div>
       {error && (
-        <div style={{ fontSize: 14, color: "#ef4444", marginTop: 6 }}>{error}</div>
+        <div style={{ fontSize: 15, color: "#ef4444", marginTop: 6 }}>{error}</div>
       )}
       <input
         ref={inputRef}

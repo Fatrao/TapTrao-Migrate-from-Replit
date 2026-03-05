@@ -46,9 +46,9 @@
   --r:   16px;
 
   /* Fonts */
-  --fd: 'Playfair Display', serif;
+  --fd: 'Clash Display', sans-serif;
   --fb: 'DM Sans', sans-serif;
-  --fh: 'Playfair Display', serif;
+  --fh: 'Clash Display', sans-serif;
 
   /* ── App-shell palette (backward compat aliases) ── */
   --app-sidebar:          #1a1a1a;
@@ -93,7 +93,7 @@
   --dark-text:         #2c3e2e;
   --dark-text-secondary: #3a4d3c;
   --dark-text-muted:   #4d5e4f;
-  --font-display:      'Playfair Display', serif;
+  --font-display:      'Clash Display', sans-serif;
   --font-body:         'DM Sans', sans-serif;
   --bg-sidebar:        #1a1a1a;
 

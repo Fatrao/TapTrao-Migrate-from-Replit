@@ -50,10 +50,10 @@ export default function ResetPassword() {
           </h1>
         </div>
         <div className="form-card" style={{ margin: "0 24px 20px", maxWidth: 420 }}>
-          <p style={{ fontSize: 13, color: "#888", marginBottom: 16 }}>
+          <p style={{ fontSize: 15, color: "#888", marginBottom: 16 }}>
             {t("resetPassword.invalidLinkMessage")}
           </p>
-          <a href="/forgot-password" style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none", fontSize: 13 }}>
+          <a href="/forgot-password" style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none", fontSize: 15 }}>
             {t("resetPassword.requestNewLink")}
           </a>
         </div>
@@ -67,7 +67,7 @@ export default function ResetPassword() {
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }}>
           {t("resetPassword.title")}
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
           {t("resetPassword.subtitle")}
         </p>
       </div>
@@ -75,7 +75,7 @@ export default function ResetPassword() {
       <div className="form-card" style={{ margin: "0 24px 20px", maxWidth: 420 }}>
         {success ? (
           <div>
-            <div style={{ background: "rgba(14,78,69,0.12)", border: "1px solid var(--sage)", borderRadius: 8, padding: "14px 16px", marginBottom: 16, fontSize: 13, color: "var(--sage)" }}>
+            <div style={{ background: "rgba(14,78,69,0.12)", border: "1px solid var(--sage)", borderRadius: 8, padding: "14px 16px", marginBottom: 16, fontSize: 15, color: "var(--sage)" }}>
               {t("resetPassword.successMessage")}
             </div>
             <a
@@ -87,7 +87,7 @@ export default function ResetPassword() {
                 border: "none",
                 borderRadius: 10,
                 padding: "11px 24px",
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: 600,
                 textAlign: "center",
                 textDecoration: "none",
@@ -126,7 +126,7 @@ export default function ResetPassword() {
             </div>
 
             {error && (
-              <div style={{ fontSize: 14, color: "var(--red)", marginBottom: 12 }}>{error}</div>
+              <div style={{ fontSize: 15, color: "var(--red)", marginBottom: 12 }}>{error}</div>
             )}
 
             <button
@@ -138,7 +138,7 @@ export default function ResetPassword() {
                 border: "none",
                 borderRadius: 10,
                 padding: "11px 24px",
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: 600,
                 cursor: "pointer",
                 opacity: loading || !newPassword || !confirmPassword ? 0.5 : 1,

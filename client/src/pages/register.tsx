@@ -50,7 +50,7 @@ export default function Register() {
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }}>
           {t("register.title")}
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
           {t("register.subtitle")}
         </p>
       </div>
@@ -92,7 +92,7 @@ export default function Register() {
           </div>
 
           {error && (
-            <div style={{ fontSize: 14, color: "var(--red)", marginBottom: 12 }}>{error}</div>
+            <div style={{ fontSize: 15, color: "var(--red)", marginBottom: 12 }}>{error}</div>
           )}
 
           <button
@@ -104,7 +104,7 @@ export default function Register() {
               border: "none",
               borderRadius: 10,
               padding: "11px 24px",
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               cursor: "pointer",
               opacity: registerPending || !email || !password || password.length < 8 ? 0.5 : 1,
@@ -115,7 +115,7 @@ export default function Register() {
           </button>
         </form>
 
-        <p style={{ fontSize: 13, color: "#888", marginTop: 16, textAlign: "center" }}>
+        <p style={{ fontSize: 15, color: "#888", marginTop: 16, textAlign: "center" }}>
           {t("register.hasAccount")}{" "}
           <a href="/login" style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none" }}>
             {t("register.logIn")}

@@ -178,7 +178,7 @@ export default function SettingsProfile() {
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--t1)", margin: 0 }}>
           {t("pageTitle")}
         </h1>
-        <p style={{ fontSize: 13, color: "var(--t3)", marginTop: 6 }}>
+        <p style={{ fontSize: 15, color: "var(--t3)", marginTop: 6 }}>
           {t("pageSubtitle")}
         </p>
       </div>
@@ -190,7 +190,7 @@ export default function SettingsProfile() {
             data-testid="banner-profile-complete"
           >
             <CheckCircle2 style={{ width: 18, height: 18, color: "var(--sage)", flexShrink: 0 }} />
-            <p style={{ fontSize: 13, color: "var(--sage)", margin: 0 }}>{t("profileComplete")}</p>
+            <p style={{ fontSize: 15, color: "var(--sage)", margin: 0 }}>{t("profileComplete")}</p>
           </div>
         )}
 
@@ -289,8 +289,8 @@ export default function SettingsProfile() {
               <div style={{ display: "flex", gap: 12 }}>
                 <Info style={{ width: 18, height: 18, color: "var(--sage)", flexShrink: 0, marginTop: 2 }} />
                 <div>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--sage)", marginBottom: 4 }}>{t("eori.whyTitle")}</p>
-                  <p style={{ fontSize: 13, color: "#555", margin: 0, lineHeight: 1.6 }}>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: "var(--sage)", marginBottom: 4 }}>{t("eori.whyTitle")}</p>
+                  <p style={{ fontSize: 15, color: "#555", margin: 0, lineHeight: 1.6 }}>
                     {t("eori.whyBody")}
                   </p>
                 </div>
@@ -320,8 +320,8 @@ export default function SettingsProfile() {
               <div style={{ display: "flex", gap: 12 }}>
                 <Info style={{ width: 18, height: 18, color: "var(--sage)", flexShrink: 0, marginTop: 2 }} />
                 <div>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--sage)", marginBottom: 4 }}>{t("ein.whyTitle")}</p>
-                  <p style={{ fontSize: 13, color: "#555", margin: 0, lineHeight: 1.6 }}>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: "var(--sage)", marginBottom: 4 }}>{t("ein.whyTitle")}</p>
+                  <p style={{ fontSize: 15, color: "#555", margin: 0, lineHeight: 1.6 }}>
                     {t("ein.whyBody")}
                   </p>
                 </div>
@@ -359,7 +359,7 @@ export default function SettingsProfile() {
                 data-testid="banner-customs-id-warning"
               >
                 <AlertTriangle style={{ width: 18, height: 18, color: "#b45309", flexShrink: 0 }} />
-                <p style={{ fontSize: 13, color: "#b45309", margin: 0 }}>
+                <p style={{ fontSize: 15, color: "#b45309", margin: 0 }}>
                   {t("warning.noCustomsId")}
                 </p>
               </div>

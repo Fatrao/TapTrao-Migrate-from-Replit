@@ -126,7 +126,7 @@ export default function Inbox() {
           >
             {t("title")}
           </h1>
-          <p style={{ fontSize: 14, color: "var(--t3)", marginTop: 4 }} data-testid="text-inbox-subtitle">
+          <p style={{ fontSize: 15, color: "var(--t3)", marginTop: 4 }} data-testid="text-inbox-subtitle">
             {t("subtitle", {
               waiting: summary.awaiting + summary.blocking,
               blocking: summary.blocking,
@@ -141,7 +141,7 @@ export default function Inbox() {
             borderRadius: 20,
             border: "none",
             fontFamily: "var(--fb)",
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: 600,
             cursor: "pointer",
             background: "var(--sage)",
@@ -168,7 +168,7 @@ export default function Inbox() {
             <div style={{ fontFamily: "var(--fd)", fontSize: 28, fontWeight: 700, color: s.color, lineHeight: 1 }}>
               {s.value}
             </div>
-            <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 4 }}>
+            <div style={{ fontSize: 15, color: "var(--t3)", marginTop: 4 }}>
               {s.label}
             </div>
           </div>
@@ -178,13 +178,13 @@ export default function Inbox() {
       {/* Content */}
       <div style={{ padding: "0 28px 60px" }}>
         {requestsQuery.isLoading ? (
-          <div style={{ padding: "80px 0", textAlign: "center", color: "var(--t3)", fontSize: 14 }}>{t("loading")}</div>
+          <div style={{ padding: "80px 0", textAlign: "center", color: "var(--t3)", fontSize: 15 }}>{t("loading")}</div>
         ) : requests.length === 0 ? (
           <div style={{ padding: "80px 0", textAlign: "center" }} data-testid="inbox-empty-state">
             <div style={{ fontFamily: "var(--fd)", fontWeight: 700, fontSize: 20, color: "var(--t1)" }}>
               {t("empty.title")}
             </div>
-            <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 8 }}>
+            <div style={{ fontSize: 15, color: "var(--t3)", marginTop: 8 }}>
               {t("empty.subtitle")}
             </div>
           </div>
@@ -210,7 +210,7 @@ function InboxSection({ label, items, dimmed, t }: { label: string; items: Suppl
   return (
     <div style={{ marginBottom: 24 }} data-testid={`inbox-group-${label.toLowerCase().replace(/\s+/g, "-")}`}>
       <div style={{
-        fontSize: 9,
+        fontSize: 15,
         fontWeight: 600,
         letterSpacing: "1.2px",
         color: "var(--t3)",
@@ -320,7 +320,7 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: 14,
+          fontSize: 15,
           fontWeight: 700,
           flexShrink: 0,
           ...avatarStyle,
@@ -332,13 +332,13 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 13, fontWeight: 600 }}>{request.supplier_name}</span>
-          <span style={{ fontSize: 13, fontWeight: 400, color: "var(--t3)" }}>
+          <span style={{ fontSize: 15, fontWeight: 600 }}>{request.supplier_name}</span>
+          <span style={{ fontSize: 15, fontWeight: 400, color: "var(--t3)" }}>
             {request.origin_iso2} → {request.dest_iso2} · {request.commodity_name}
           </span>
         </div>
         <div style={{
-          fontSize: 13,
+          fontSize: 15,
           color: isBlocking ? "var(--red)" : "var(--t3)",
           fontWeight: isBlocking ? 600 : 400,
           marginTop: 2,
@@ -366,7 +366,7 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
               />
             );
           })}
-          <span style={{ fontSize: 14, color: "var(--t3)", marginLeft: 4 }}>
+          <span style={{ fontSize: 15, color: "var(--t3)", marginLeft: 4 }}>
             {t("card.docs", { received: docsReceived.length, total: docsRequired.length })}
           </span>
         </div>
@@ -378,7 +378,7 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
           style={{
             padding: "4px 10px",
             borderRadius: 10,
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: 600,
             display: "flex",
             alignItems: "center",
@@ -396,7 +396,7 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
           }} />
           {statusInfo.label}
         </div>
-        <div style={{ fontSize: 14, color: "var(--t4)" }}>
+        <div style={{ fontSize: 15, color: "var(--t4)" }}>
           {timeLabel}
         </div>
         <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
@@ -406,7 +406,7 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
               padding: "4px 10px",
               borderRadius: 8,
               border: "1px solid rgba(37,211,102,0.2)",
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               cursor: "pointer",
               background: "transparent",
@@ -423,7 +423,7 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
               padding: "4px 10px",
               borderRadius: 8,
               border: "1px solid rgba(74,124,94,0.2)",
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               cursor: "pointer",
               background: "transparent",
@@ -440,7 +440,7 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
               padding: "4px 10px",
               borderRadius: 8,
               border: "1px solid rgba(0,0,0,0.08)",
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               cursor: "pointer",
               background: "transparent",

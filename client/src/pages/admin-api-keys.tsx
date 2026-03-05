@@ -76,7 +76,7 @@ export default function AdminApiKeys() {
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }}>
           {t("apiKeys.title")}
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
           {t("apiKeys.subtitle")}
         </p>
       </div>
@@ -104,14 +104,14 @@ export default function AdminApiKeys() {
             />
           </div>
 
-          {error && <div style={{ fontSize: 14, color: "var(--red)", marginBottom: 8 }}>{error}</div>}
+          {error && <div style={{ fontSize: 15, color: "var(--red)", marginBottom: 8 }}>{error}</div>}
 
           {newKey && (
             <div style={{ marginBottom: 16, padding: 16, background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "#16a34a", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8 }}>
+              <div style={{ fontSize: 15, fontWeight: 600, color: "#16a34a", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8 }}>
                 {t("apiKeys.keyCreatedWarning")}
               </div>
-              <div style={{ fontFamily: "monospace", fontSize: 13, background: "#fff", padding: "10px 12px", borderRadius: 6, border: "1px solid #e5e7eb", wordBreak: "break-all", userSelect: "all" }}>
+              <div style={{ fontFamily: "monospace", fontSize: 15, background: "#fff", padding: "10px 12px", borderRadius: 6, border: "1px solid #e5e7eb", wordBreak: "break-all", userSelect: "all" }}>
                 {newKey}
               </div>
             </div>
@@ -126,7 +126,7 @@ export default function AdminApiKeys() {
               border: "none",
               borderRadius: 10,
               padding: "10px 20px",
-              fontSize: 13,
+              fontSize: 15,
               fontWeight: 600,
               cursor: "pointer",
               opacity: createMutation.isPending || !name ? 0.5 : 1,
@@ -143,24 +143,24 @@ export default function AdminApiKeys() {
           {t("apiKeys.yourKeysTitle", { count: keys.length })}
         </h2>
         {keys.length === 0 ? (
-          <p style={{ fontSize: 13, color: "#555" }}>{t("apiKeys.noKeysYet")}</p>
+          <p style={{ fontSize: 15, color: "#555" }}>{t("apiKeys.noKeysYet")}</p>
         ) : (
           <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 15 }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid #eee", textAlign: "left" }}>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("apiKeys.tableName")}</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("apiKeys.tableKey")}</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("apiKeys.tableLastUsed")}</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("apiKeys.tableStatus")}</th>
-                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.5px" }}></th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 15, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("apiKeys.tableName")}</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 15, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("apiKeys.tableKey")}</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 15, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("apiKeys.tableLastUsed")}</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 15, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("apiKeys.tableStatus")}</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, color: "#666", fontSize: 15, textTransform: "uppercase", letterSpacing: "0.5px" }}></th>
                 </tr>
               </thead>
               <tbody>
                 {keys.map((k) => (
                   <tr key={k.id} style={{ borderBottom: "1px solid #f5f5f5" }}>
                     <td style={{ padding: "10px 12px", fontWeight: 600 }}>{k.name}</td>
-                    <td style={{ padding: "10px 12px", fontFamily: "monospace", fontSize: 14, color: "#666" }}>{k.keyPreview}</td>
+                    <td style={{ padding: "10px 12px", fontFamily: "monospace", fontSize: 15, color: "#666" }}>{k.keyPreview}</td>
                     <td style={{ padding: "10px 12px", color: "#555" }}>
                       {k.lastUsedAt ? new Date(k.lastUsedAt).toLocaleDateString() : t("apiKeys.neverUsed")}
                     </td>
@@ -169,7 +169,7 @@ export default function AdminApiKeys() {
                         display: "inline-block",
                         padding: "2px 8px",
                         borderRadius: 12,
-                        fontSize: 13,
+                        fontSize: 15,
                         fontWeight: 600,
                         background: k.isActive ? "#dcfce7" : "#fee2e2",
                         color: k.isActive ? "#16a34a" : "#ef4444",
@@ -187,7 +187,7 @@ export default function AdminApiKeys() {
                             border: "1px solid #e5e7eb",
                             borderRadius: 6,
                             padding: "4px 10px",
-                            fontSize: 13,
+                            fontSize: 15,
                             color: "#555",
                             cursor: "pointer",
                           }}
@@ -209,14 +209,14 @@ export default function AdminApiKeys() {
         <h2 style={{ fontFamily: "var(--fh)", fontSize: 16, fontWeight: 600, color: "#1a1a1a", margin: "0 0 12px" }}>
           {t("apiKeys.quickStartTitle")}
         </h2>
-        <div style={{ fontSize: 13, color: "#555", lineHeight: 1.7 }}>
-          <p style={{ margin: "0 0 12px" }}>{t("apiKeys.quickStartIntro").replace("<code>", "").replace("</code>", "")} <code style={{ background: "#f5f5f5", padding: "2px 6px", borderRadius: 4, fontSize: 12 }}>Authorization</code></p>
-          <div style={{ fontFamily: "monospace", fontSize: 14, background: "#1a1a1a", color: "#5dd9c1", padding: 16, borderRadius: 8, overflowX: "auto", marginBottom: 16 }}>
+        <div style={{ fontSize: 15, color: "#555", lineHeight: 1.7 }}>
+          <p style={{ margin: "0 0 12px" }}>{t("apiKeys.quickStartIntro").replace("<code>", "").replace("</code>", "")} <code style={{ background: "#f5f5f5", padding: "2px 6px", borderRadius: 4, fontSize: 15 }}>Authorization</code></p>
+          <div style={{ fontFamily: "monospace", fontSize: 15, background: "#1a1a1a", color: "#5dd9c1", padding: 16, borderRadius: 8, overflowX: "auto", marginBottom: 16 }}>
             <div>curl -H "Authorization: Bearer tt_live_..." \</div>
             <div>&nbsp;&nbsp;https://taptrao.com/api/v1/commodities</div>
           </div>
           <p style={{ margin: "0 0 8px", fontWeight: 600 }}>{t("apiKeys.availableEndpoints")}</p>
-          <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
+          <table style={{ width: "100%", fontSize: 15, borderCollapse: "collapse" }}>
             <tbody>
               {[
                 ["GET", "/api/v1/commodities", t("apiKeys.endpointListCommodities"), "No"],

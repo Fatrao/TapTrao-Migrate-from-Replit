@@ -24,7 +24,7 @@ export function TabBar({ tabs, activeTab, onChange }: TabBarProps) {
             onClick={() => onChange(tab)}
             style={{
               padding: "10px 16px",
-              fontSize: 12,
+              fontSize: 15,
               fontWeight: 600,
               cursor: "pointer",
               background: "none",

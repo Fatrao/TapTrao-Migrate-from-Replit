@@ -142,12 +142,12 @@ export default function Dashboard() {
         </div>
         <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
           <Link href="/new-check">
-            <button className="ai-btn" data-testid="stat-new-check" style={{ fontSize: 14, padding: "6px 16px" }}>
+            <button className="ai-btn" data-testid="stat-new-check" style={{ fontSize: 15, padding: "6px 16px" }}>
               {t("newCheck")}
             </button>
           </Link>
           <Link href="/inbox">
-            <button className="ai-btn" data-testid="stat-supplier-link" style={{ fontSize: 14, padding: "6px 16px", background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}>
+            <button className="ai-btn" data-testid="stat-supplier-link" style={{ fontSize: 15, padding: "6px 16px", background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}>
               {t("supplierInbox")}
             </button>
           </Link>
@@ -167,7 +167,7 @@ export default function Dashboard() {
           <div className="stat-icon">🔍</div>
           <div className="stat-label">{t("stat.complianceLookups")}</div>
           <div className="stat-value" data-testid="stat-compliance-lookups">
-            {totalLookups} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{t("stat.checks")}</span>
+            {totalLookups} <span style={{ fontSize: 15, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{t("stat.checks")}</span>
           </div>
           <div className="stat-sub">{t("stat.allTime")}</div>
         </div>
@@ -176,7 +176,7 @@ export default function Dashboard() {
           <div className="stat-icon">📄</div>
           <div className="stat-label">{t("stat.lcChecks")}</div>
           <div className="stat-value">
-            {stats?.totalLcChecks ?? 0} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{t("stat.checks")}</span>
+            {stats?.totalLcChecks ?? 0} <span style={{ fontSize: 15, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{t("stat.checks")}</span>
           </div>
           <div className="stat-sub">{t("stat.docValidations")}</div>
         </div>
@@ -185,7 +185,7 @@ export default function Dashboard() {
           <div className="stat-icon">🛡️</div>
           <div className="stat-label">{t("stat.shieldBalance")}</div>
           <div className="stat-value">
-            {balance} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{balance === 1 ? t("check") : t("checks")}</span>
+            {balance} <span style={{ fontSize: 15, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{balance === 1 ? t("check") : t("checks")}</span>
           </div>
           <div className="stat-sub">{balance === 0 ? t("stat.buyChecks") : t("stat.availableForUse")}</div>
         </div>
@@ -196,10 +196,10 @@ export default function Dashboard() {
           <div className="stat-value" data-testid="stat-total-trade-value">
             {(stats?.totalTradeValue ?? 0) > 0
               ? <>
-                  ${(stats!.totalTradeValue).toLocaleString()} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{t("stat.usd")}</span>
+                  ${(stats!.totalTradeValue).toLocaleString()} <span style={{ fontSize: 15, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{t("stat.usd")}</span>
                 </>
               : <>
-                  — <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{t("stat.notSet")}</span>
+                  — <span style={{ fontSize: 15, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{t("stat.notSet")}</span>
                 </>
             }
           </div>
@@ -249,7 +249,7 @@ export default function Dashboard() {
                   </td>
                   <td>
                     {tr.corridor}<br />
-                    <span style={{ fontSize: 13, color: "var(--app-regent)" }}>{tr.date}</span>
+                    <span style={{ fontSize: 15, color: "var(--app-regent)" }}>{tr.date}</span>
                   </td>
                   <td>{tr.value}</td>
                   <td>
@@ -351,12 +351,12 @@ export default function Dashboard() {
                       <div className="pending-name" style={{ fontSize: 12.5 }}>
                         {c.lcReference || t("lcCase.defaultName")}
                       </div>
-                      <div className="pending-detail" style={{ fontSize: 11 }}>
+                      <div className="pending-detail" style={{ fontSize: 15 }}>
                         {c.beneficiaryName || t("lcCase.unknown")} · {t("lcCase.recheckCount", { count: c.recheckCount })}
                       </div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-                      <span style={{ fontSize: 14, fontWeight: 600, padding: "2px 8px", borderRadius: 4, background: st.bg, color: st.color }}>
+                      <span style={{ fontSize: 15, fontWeight: 600, padding: "2px 8px", borderRadius: 4, background: st.bg, color: st.color }}>
                         {st.label}
                       </span>
                       <span style={{ fontSize: 10.5, color: "var(--app-regent)" }}>
@@ -427,7 +427,7 @@ export default function Dashboard() {
                 </div>
               ))}
               {(lookupsQuery.data ?? []).length === 0 && (lcQuery.data ?? []).length === 0 && (
-                <div style={{ textAlign: "center", padding: 16, color: "var(--app-regent)", fontSize: 13 }}>{t("noRecentActivity")}</div>
+                <div style={{ textAlign: "center", padding: 16, color: "var(--app-regent)", fontSize: 15 }}>{t("noRecentActivity")}</div>
               )}
             </div>
           </div>
@@ -445,7 +445,7 @@ export default function Dashboard() {
             <Link href="/inbox"><span className="link">{t("documentsTab.supplierInbox")}</span></Link>
           </div>
           {recentTrades.length === 0 ? (
-            <div style={{ textAlign: "center", padding: 32, color: "var(--app-regent)", fontSize: 13 }}>
+            <div style={{ textAlign: "center", padding: 32, color: "var(--app-regent)", fontSize: 15 }}>
               {t("documentsTab.empty")}
             </div>
           ) : recentTrades.map((tr) => (
@@ -491,7 +491,7 @@ export default function Dashboard() {
               </div>
             ))}
             {(lookupsQuery.data ?? []).length === 0 && (lcQuery.data ?? []).length === 0 && (
-              <div style={{ textAlign: "center", padding: 32, color: "var(--app-regent)", fontSize: 13 }}>{t("activityTab.empty")}</div>
+              <div style={{ textAlign: "center", padding: 32, color: "var(--app-regent)", fontSize: 15 }}>{t("activityTab.empty")}</div>
             )}
           </div>
         </div>
