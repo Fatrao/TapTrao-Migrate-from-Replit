@@ -279,7 +279,7 @@ export default function Home() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <div>
               <div style={{ fontFamily: "var(--fd)", fontSize: 16, fontWeight: 600 }}>
-                🥜 Raw Cashew &middot; CI &rarr; UK
+                {t("validationPreview.mockTrade")}
               </div>
               <div style={{ fontSize: 12, color: "rgba(255,255,255,.55)", marginTop: 2 }}>TT-2026-a3f9c1</div>
             </div>
@@ -288,9 +288,9 @@ export default function Home() {
 
           {/* Risk tags */}
           <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>LOW</span> {t("validationPreview.riskOrigin")}</span>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>LOW</span> {t("validationPreview.riskCommodity")}</span>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--amber)", fontWeight: 600 }}>MED</span> {t("validationPreview.riskRegulatory")}</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>{t("validationPreview.riskLow")}</span> {t("validationPreview.riskOrigin")}</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>{t("validationPreview.riskLow")}</span> {t("validationPreview.riskCommodity")}</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--amber)", fontWeight: 600 }}>{t("validationPreview.riskMed")}</span> {t("validationPreview.riskRegulatory")}</span>
           </div>
 
           {/* Check items */}

@@ -74,6 +74,10 @@
     "riskOrigin": "Origin",
     "riskCommodity": "Commodity",
     "riskRegulatory": "Regulatory",
+    "mockTrade": "\ud83e\udd5c Raw Cashew \u00b7 CI \u2192 UK",
+    "riskLow": "LOW",
+    "riskMed": "MED",
+    "riskHigh": "HIGH",
     "checkItems": {
       "certificateOfOrigin": "Certificate of Origin",
       "phytosanitaryCertificate": "Phytosanitary Certificate",
