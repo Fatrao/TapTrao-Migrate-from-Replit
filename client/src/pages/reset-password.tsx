@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { AppShell } from "@/components/AppShell";
 import { apiRequest } from "@/lib/queryClient";
@@ -9,8 +10,9 @@ export default function ResetPassword() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation("auth");
 
-  usePageTitle("Reset Password");
+  usePageTitle(t("resetPassword.title"));
 
   const token = new URLSearchParams(window.location.search).get("token");
 
@@ -19,7 +21,7 @@ export default function ResetPassword() {
     setError("");
 
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("resetPassword.passwordsMismatch"));
       return;
     }
 
@@ -28,7 +30,7 @@ export default function ResetPassword() {
       await apiRequest("POST", "/api/auth/reset-password", { token, newPassword });
       setSuccess(true);
     } catch (err: any) {
-      let msg = err?.message || "Something went wrong";
+      let msg = err?.message || t("resetPassword.errorDefault");
       try {
         const parsed = JSON.parse(msg);
         msg = parsed.message || msg;
@@ -44,15 +46,15 @@ export default function ResetPassword() {
       <AppShell contentClassName="content-area">
         <div className="green-hero-box" style={{ margin: "4px 24px 16px" }}>
           <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }}>
-            Invalid Link
+            {t("resetPassword.invalidLinkTitle")}
           </h1>
         </div>
         <div className="form-card" style={{ margin: "0 24px 20px", maxWidth: 420 }}>
           <p style={{ fontSize: 13, color: "#888", marginBottom: 16 }}>
-            This password reset link is invalid. Please request a new one.
+            {t("resetPassword.invalidLinkMessage")}
           </p>
           <a href="/forgot-password" style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none", fontSize: 13 }}>
-            Request a new link
+            {t("resetPassword.requestNewLink")}
           </a>
         </div>
       </AppShell>
@@ -63,10 +65,10 @@ export default function ResetPassword() {
     <AppShell contentClassName="content-area">
       <div className="green-hero-box" style={{ margin: "4px 24px 16px" }}>
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }}>
-          Reset Password
+          {t("resetPassword.title")}
         </h1>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
-          Choose a new password for your account
+          {t("resetPassword.subtitle")}
         </p>
       </div>
 
@@ -74,7 +76,7 @@ export default function ResetPassword() {
         {success ? (
           <div>
             <div style={{ background: "rgba(14,78,69,0.12)", border: "1px solid var(--sage)", borderRadius: 8, padding: "14px 16px", marginBottom: 16, fontSize: 13, color: "var(--sage)" }}>
-              Your password has been reset successfully.
+              {t("resetPassword.successMessage")}
             </div>
             <a
               href="/login"
@@ -93,18 +95,18 @@ export default function ResetPassword() {
                 boxSizing: "border-box",
               }}
             >
-              Go to Log In
+              {t("resetPassword.goToLogin")}
             </a>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>New Password</label>
+              <label>{t("resetPassword.newPasswordLabel")}</label>
               <input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="At least 8 characters"
+                placeholder={t("resetPassword.newPasswordPlaceholder")}
                 required
                 minLength={8}
                 autoFocus
@@ -112,12 +114,12 @@ export default function ResetPassword() {
             </div>
 
             <div className="form-group">
-              <label>Confirm Password</label>
+              <label>{t("resetPassword.confirmPasswordLabel")}</label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Re-enter your new password"
+                placeholder={t("resetPassword.confirmPasswordPlaceholder")}
                 required
                 minLength={8}
               />
@@ -143,7 +145,7 @@ export default function ResetPassword() {
                 width: "100%",
               }}
             >
-              {loading ? "Resetting..." : "Reset Password"}
+              {loading ? t("resetPassword.submitting") : t("resetPassword.submit")}
             </button>
           </form>
         )}

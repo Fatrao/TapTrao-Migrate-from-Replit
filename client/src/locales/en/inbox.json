@@ -1,0 +1,44 @@
+{
+  "title": "Supplier Inbox",
+  "subtitle": "{{waiting}} suppliers waiting \u00b7 {{blocking}} blocking issue{{plural}}",
+  "newUploadLink": "+ New Upload Link",
+
+  "stat.awaitingDocuments": "Awaiting documents",
+  "stat.blockingIssue": "Blocking issue",
+  "stat.completeThisWeek": "Complete this week",
+
+  "loading": "Loading inbox...",
+  "empty.title": "No supplier requests yet.",
+  "empty.subtitle": "Send your first supplier brief from the LC Checker or Compliance Lookup.",
+
+  "section.awaitingDocuments": "Awaiting Documents",
+  "section.blockingIssue": "Blocking Issue",
+  "section.complete": "Complete",
+
+  "status.blocking": "Blocking",
+  "status.awaiting": "Awaiting",
+  "status.complete": "Complete",
+
+  "card.allDocsReceived": "All documents received",
+  "card.waitingFor": "Waiting for {{docs}}",
+  "card.docs": "{{received}}/{{total}} docs",
+
+  "time.justNow": "just now",
+  "time.minsAgo": "{{mins}}m ago",
+  "time.hoursAgo": "{{hours}}h ago",
+  "time.daysAgo": "{{days}}d ago",
+  "time.monthsAgo": "{{months}}mo ago",
+
+  "time.sentJustNow": "Sent just now",
+  "time.sentMinsAgo": "Sent {{mins}}m ago",
+  "time.sentHoursAgo": "Sent {{hours}}h ago",
+  "time.sentDaysAgo": "Sent {{days}}d ago",
+  "time.sentMonthsAgo": "Sent {{months}}mo ago",
+
+  "time.overdue": "Overdue",
+  "time.daysOverdue": "{{days}}d overdue",
+
+  "btn.whatsapp": "WhatsApp",
+  "btn.email": "Email",
+  "btn.link": "Link"
+}

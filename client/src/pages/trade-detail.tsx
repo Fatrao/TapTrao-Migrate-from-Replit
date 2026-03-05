@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { apiRequest } from "@/lib/queryClient";
 import { useRoute, Link } from "wouter";
 import { AppShell } from "@/components/AppShell";
@@ -91,54 +92,55 @@ type AuditEvent = {
 };
 
 /* ── Status badge colors ── */
-const statusConfig: Record<string, { label: string; bg: string; text: string; icon: typeof Package }> = {
-  active: { label: "Active", bg: "rgba(109,184,154,0.1)", text: "#16a34a", icon: Package },
-  in_transit: { label: "In Transit", bg: "rgba(59,130,246,0.1)", text: "#3b82f6", icon: Anchor },
-  arrived: { label: "Arrived", bg: "rgba(139,92,246,0.1)", text: "#8b5cf6", icon: Anchor },
-  cleared: { label: "Cleared", bg: "rgba(34,197,94,0.1)", text: "var(--sage-l)", icon: CheckCircle2 },
-  closed: { label: "Closed", bg: "rgba(107,114,128,0.1)", text: "#6b7280", icon: Archive },
-  archived: { label: "Archived", bg: "rgba(107,114,128,0.1)", text: "#9ca3af", icon: Archive },
+const statusConfig: Record<string, { labelKey: string; bg: string; text: string; icon: typeof Package }> = {
+  active: { labelKey: "detail.status.active", bg: "rgba(109,184,154,0.1)", text: "#16a34a", icon: Package },
+  in_transit: { labelKey: "detail.status.in_transit", bg: "rgba(59,130,246,0.1)", text: "#3b82f6", icon: Anchor },
+  arrived: { labelKey: "detail.status.arrived", bg: "rgba(139,92,246,0.1)", text: "#8b5cf6", icon: Anchor },
+  cleared: { labelKey: "detail.status.cleared", bg: "rgba(34,197,94,0.1)", text: "var(--sage-l)", icon: CheckCircle2 },
+  closed: { labelKey: "detail.status.closed", bg: "rgba(107,114,128,0.1)", text: "#6b7280", icon: Archive },
+  archived: { labelKey: "detail.status.archived", bg: "rgba(107,114,128,0.1)", text: "#9ca3af", icon: Archive },
 };
 
 /* ── Event type display config ── */
-const eventConfig: Record<string, { icon: typeof CheckCircle2; color: string; label: string }> = {
-  compliance_check: { icon: Shield, color: "var(--sage)", label: "Compliance Check" },
-  account_created: { icon: CheckCircle2, color: "var(--sage-l)", label: "Account Created" },
-  lc_check: { icon: FileText, color: "#3b82f6", label: "LC Check" },
-  lc_recheck: { icon: FileText, color: "#8b5cf6", label: "LC Re-check" },
-  correction_sent: { icon: ArrowRight, color: "#f59e0b", label: "Correction Sent" },
-  supplier_link_created: { icon: ExternalLink, color: "var(--sage)", label: "Supplier Link Created" },
-  supplier_doc_uploaded: { icon: Upload, color: "var(--sage-l)", label: "Document Uploaded" },
-  buyer_doc_uploaded: { icon: Upload, color: "var(--sage)", label: "Document Uploaded (Buyer)" },
-  doc_verified: { icon: ShieldCheck, color: "#16a34a", label: "Document Verified" },
-  doc_flagged: { icon: Flag, color: "#ef4444", label: "Document Flagged" },
-  doc_ai_scanned: { icon: Sparkles, color: "#8b5cf6", label: "AI Document Scan" },
-  supplier_complete: { icon: CheckCircle2, color: "#16a34a", label: "Supplier Submission Complete" },
-  status_change: { icon: ArrowRight, color: "#3b82f6", label: "Status Changed" },
-  eta_set: { icon: Clock, color: "#8b5cf6", label: "ETA Set" },
-  arrival: { icon: Anchor, color: "var(--sage-l)", label: "Shipment Arrived" },
-  customs_cleared: { icon: CheckCircle2, color: "#16a34a", label: "Customs Cleared" },
-  twinlog_generated: { icon: Hash, color: "var(--sage)", label: "TwinLog Generated" },
-  eudr_created: { icon: Shield, color: "#059669", label: "EUDR Record Created" },
-  eudr_assessed: { icon: ShieldCheck, color: "#059669", label: "EUDR Assessment Run" },
-  cbam_created: { icon: Shield, color: "#2563eb", label: "CBAM Record Created" },
-  cbam_assessed: { icon: ShieldCheck, color: "#2563eb", label: "CBAM Assessment Run" },
-  trade_archived: { icon: Archive, color: "#9ca3af", label: "Trade Archived" },
-  trade_closed: { icon: Archive, color: "#6b7280", label: "Trade Closed" },
-  trade_value_set: { icon: Package, color: "var(--sage)", label: "Trade Value Set" },
+const eventConfig: Record<string, { icon: typeof CheckCircle2; color: string; labelKey: string }> = {
+  compliance_check: { icon: Shield, color: "var(--sage)", labelKey: "detail.event.complianceCheck" },
+  account_created: { icon: CheckCircle2, color: "var(--sage-l)", labelKey: "detail.event.accountCreated" },
+  lc_check: { icon: FileText, color: "#3b82f6", labelKey: "detail.event.lcCheck" },
+  lc_recheck: { icon: FileText, color: "#8b5cf6", labelKey: "detail.event.lcRecheck" },
+  correction_sent: { icon: ArrowRight, color: "#f59e0b", labelKey: "detail.event.correctionSent" },
+  supplier_link_created: { icon: ExternalLink, color: "var(--sage)", labelKey: "detail.event.supplierLinkCreated" },
+  supplier_doc_uploaded: { icon: Upload, color: "var(--sage-l)", labelKey: "detail.event.docUploaded" },
+  buyer_doc_uploaded: { icon: Upload, color: "var(--sage)", labelKey: "detail.event.docUploadedBuyer" },
+  doc_verified: { icon: ShieldCheck, color: "#16a34a", labelKey: "detail.event.docVerified" },
+  doc_flagged: { icon: Flag, color: "#ef4444", labelKey: "detail.event.docFlagged" },
+  doc_ai_scanned: { icon: Sparkles, color: "#8b5cf6", labelKey: "detail.event.aiDocScan" },
+  supplier_complete: { icon: CheckCircle2, color: "#16a34a", labelKey: "detail.event.supplierComplete" },
+  status_change: { icon: ArrowRight, color: "#3b82f6", labelKey: "detail.event.statusChanged" },
+  eta_set: { icon: Clock, color: "#8b5cf6", labelKey: "detail.event.etaSet" },
+  arrival: { icon: Anchor, color: "var(--sage-l)", labelKey: "detail.event.arrival" },
+  customs_cleared: { icon: CheckCircle2, color: "#16a34a", labelKey: "detail.event.customsCleared" },
+  twinlog_generated: { icon: Hash, color: "var(--sage)", labelKey: "detail.event.twinlogGenerated" },
+  eudr_created: { icon: Shield, color: "#059669", labelKey: "detail.event.eudrCreated" },
+  eudr_assessed: { icon: ShieldCheck, color: "#059669", labelKey: "detail.event.eudrAssessed" },
+  cbam_created: { icon: Shield, color: "#2563eb", labelKey: "detail.event.cbamCreated" },
+  cbam_assessed: { icon: ShieldCheck, color: "#2563eb", labelKey: "detail.event.cbamAssessed" },
+  trade_archived: { icon: Archive, color: "#9ca3af", labelKey: "detail.event.tradeArchived" },
+  trade_closed: { icon: Archive, color: "#6b7280", labelKey: "detail.event.tradeClosed" },
+  trade_value_set: { icon: Package, color: "var(--sage)", labelKey: "detail.event.tradeValueSet" },
 };
 
 /* ── Status Stepper ── */
 const STATUSES = ["active", "in_transit", "arrived", "cleared", "closed"];
-const STATUS_LABELS: Record<string, string> = {
-  active: "Active",
-  in_transit: "In Transit",
-  arrived: "Arrived",
-  cleared: "Cleared",
-  closed: "Closed",
+const STATUS_LABEL_KEYS: Record<string, string> = {
+  active: "detail.status.active",
+  in_transit: "detail.status.in_transit",
+  arrived: "detail.status.arrived",
+  cleared: "detail.status.cleared",
+  closed: "detail.status.closed",
 };
 
 function StatusStepper({ current }: { current: string }) {
+  const { t } = useTranslation("trades");
   const currentIndex = STATUSES.indexOf(current);
 
   return (
@@ -176,7 +178,7 @@ function StatusStepper({ current }: { current: string }) {
                 textTransform: "uppercase",
                 letterSpacing: "0.03em",
               }}>
-                {STATUS_LABELS[status]}
+                {t(STATUS_LABEL_KEYS[status])}
               </span>
             </div>
             {i < STATUSES.length - 1 && (
@@ -200,6 +202,7 @@ function StatusStepper({ current }: { current: string }) {
 
 /* ── Audit Timeline ── */
 function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainValid: boolean }) {
+  const { t } = useTranslation("trades");
   return (
     <div>
       {/* Event count header */}
@@ -219,17 +222,17 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
           fontWeight: 600,
           color: "var(--sage)",
         }}>
-          Audit Trail
+          {t("detail.auditTrail")}
         </span>
         <span style={{ fontSize: 13, color: "#166534", marginLeft: "auto" }}>
-          {events.length} event{events.length !== 1 ? "s" : ""}
+          {t("detail.event", { count: events.length })}
         </span>
       </div>
 
       {/* Timeline */}
       {events.length === 0 ? (
         <p style={{ fontSize: 13, color: "var(--t3)", textAlign: "center", padding: 20 }}>
-          No audit events recorded yet.
+          {t("detail.noAuditEvents")}
         </p>
       ) : (
         <div style={{ position: "relative", paddingLeft: 24 }}>
@@ -248,10 +251,11 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
             const cfg = eventConfig[event.eventType] || {
               icon: Clock,
               color: "#6b7280",
-              label: event.eventType.replace(/_/g, " "),
+              labelKey: "",
             };
             const Icon = cfg.icon;
             const date = new Date(event.createdAt);
+            const eventLabel = cfg.labelKey ? t(cfg.labelKey) : event.eventType.replace(/_/g, " ");
 
             return (
               <div key={event.id} style={{
@@ -280,7 +284,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                     <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>
-                      {cfg.label}
+                      {eventLabel}
                     </span>
                     <span style={{
                       fontSize: 14,
@@ -295,7 +299,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                   </div>
                   <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 2 }}>
                     {date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                    {" at "}
+                    {` ${t("detail.at")} `}
                     {date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
                   </div>
                   {/* Event-specific details */}
@@ -306,7 +310,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                   )}
                   {event.eventType === "lc_check" && event.eventData?.verdict && (
                     <div style={{ fontSize: 13, color: "var(--t2)", marginTop: 4 }}>
-                      Verdict: {event.eventData.verdict}
+                      {t("detail.verdict", { verdict: event.eventData.verdict })}
                     </div>
                   )}
                   {event.eventType === "supplier_doc_uploaded" && event.eventData?.docType && (
@@ -324,12 +328,12 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                   )}
                   {event.eventType === "doc_verified" && event.eventData?.docType && (
                     <div style={{ fontSize: 13, color: "#16a34a", marginTop: 4 }}>
-                      {event.eventData.docType} — Verified
+                      {event.eventData.docType} — {t("detail.verified")}
                     </div>
                   )}
                   {event.eventType === "doc_flagged" && event.eventData?.docType && (
                     <div style={{ fontSize: 13, color: "#ef4444", marginTop: 4 }}>
-                      {event.eventData.docType} — {event.eventData.finding || "Issue flagged"}
+                      {event.eventData.docType} — {event.eventData.finding || t("detail.issuesFlagged")}
                       {event.eventData.ucpRule && (
                         <span style={{ color: "var(--t3)", marginLeft: 6 }}>({event.eventData.ucpRule})</span>
                       )}
@@ -337,7 +341,7 @@ function AuditTimeline({ events, chainValid }: { events: AuditEvent[]; chainVali
                   )}
                   {event.eventType === "doc_ai_scanned" && event.eventData?.docType && (
                     <div style={{ fontSize: 13, color: "#8b5cf6", marginTop: 4 }}>
-                      {event.eventData.docType} — {event.eventData.verified ? "Passed" : "Issues found"}
+                      {event.eventData.docType} — {event.eventData.verified ? t("detail.passed") : t("detail.issuesFlagged")}
                       {event.eventData.confidence && (
                         <span style={{ color: "var(--t3)", marginLeft: 6 }}>({event.eventData.confidence} confidence)</span>
                       )}
@@ -383,6 +387,7 @@ function ScoreBar({ score, band }: { score: number | null; band: string | null }
 }
 
 function ChecksList({ checks }: { checks: any[] }) {
+  const { t } = useTranslation("trades");
   const [open, setOpen] = useState(false);
   if (!checks || checks.length === 0) return null;
   const passed = checks.filter(c => c.passed).length;
@@ -393,7 +398,7 @@ function ChecksList({ checks }: { checks: any[] }) {
         style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, padding: 0, fontSize: 14, fontWeight: 500, color: "var(--t3)" }}
       >
         {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-        All {checks.length} checks ({passed} passed, {checks.length - passed} failed)
+        {t("detail.allChecks", { total: checks.length, passed, failed: checks.length - passed })}
       </button>
       {open && (
         <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
@@ -416,10 +421,11 @@ function ChecksList({ checks }: { checks: any[] }) {
 }
 
 function TopDrivers({ drivers }: { drivers: any[] }) {
+  const { t } = useTranslation("trades");
   if (!drivers || drivers.length === 0) return null;
   return (
     <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
-      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: ".08em" }}>Top Issues</span>
+      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: ".08em" }}>{t("detail.topIssues")}</span>
       {drivers.map((d: any, i: number) => (
         <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 12 }}>
           <span style={{ flexShrink: 0 }}>{d.severity === "critical" ? "🔴" : "🟠"}</span>
@@ -435,12 +441,13 @@ function TopDrivers({ drivers }: { drivers: any[] }) {
 }
 
 function BreakdownRow({ breakdown }: { breakdown: any }) {
+  const { t } = useTranslation("trades");
   if (!breakdown) return null;
   const items = [
-    { label: "Completeness", val: breakdown.completeness, max: 55 },
-    { label: "Integrity", val: breakdown.deterministic, max: 30 },
-    { label: "Cross-doc", val: breakdown.crossDocument, max: 35 },
-    { label: "Mentions", val: breakdown.mentions, max: 10 },
+    { label: t("detail.completeness"), val: breakdown.completeness, max: 55 },
+    { label: t("detail.integrity"), val: breakdown.deterministic, max: 30 },
+    { label: t("detail.crossDoc"), val: breakdown.crossDocument, max: 35 },
+    { label: t("detail.mentions"), val: breakdown.mentions, max: 10 },
   ];
   return (
     <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
@@ -492,6 +499,7 @@ function FormField({ label, value, onChange, type = "text", placeholder, disable
 
 /* ── EUDR Inline Box ── */
 function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }) {
+  const { t } = useTranslation("trades");
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState(false);
   const [assessing, setAssessing] = useState(false);
@@ -559,7 +567,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <Leaf className="w-4 h-4" style={{ color: "#059669" }} />
             <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
-              EUDR Due Diligence
+              {t("detail.eudrDueDiligence")}
             </h3>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -576,7 +584,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               <span style={{ fontSize: 13, color: "var(--t3)", fontWeight: 500 }}>N/A</span>
             )}
             {!assessment && (
-              <span style={{ fontSize: 13, color: "var(--app-acapulco)", fontWeight: 500 }}>Not assessed</span>
+              <span style={{ fontSize: 13, color: "var(--app-acapulco)", fontWeight: 500 }}>{t("detail.notAssessed")}</span>
             )}
             {expanded ? <ChevronUp className="w-4 h-4" style={{ color: "var(--t3)" }} /> : <ChevronDown className="w-4 h-4" style={{ color: "var(--t3)" }} />}
           </div>
@@ -586,11 +594,11 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
         {!expanded && assessment && assessment.applicable && (
           <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 4, marginLeft: 28 }}>
             {assessment.canConcludeNegligibleRisk
-              ? "✅ Can conclude negligible risk"
-              : "❌ Cannot conclude negligible risk"}
+              ? `✅ ${t("detail.canConcludeNegligible")}`
+              : `❌ ${t("detail.cannotConcludeNegligible")}`}
             {assessment.assessedAt && (
               <span style={{ marginLeft: 8 }}>
-                · Last assessed {new Date(assessment.assessedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                · {t("detail.lastAssessed", { date: new Date(assessment.assessedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) })}
               </span>
             )}
           </div>
@@ -601,77 +609,77 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
           <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 12 }}>
 
             {/* 1. Geolocation */}
-            <FormSection title="Geolocation" icon={MapPin}>
-              <FormField label="Plot coordinates (JSON)" value={plotCoords} onChange={setPlotCoords} placeholder='[{"lat": 6.5, "lng": -1.5}]' />
-              <FormField label="Plot country (ISO2)" value={plotCountry} onChange={setPlotCountry} placeholder="GH" />
+            <FormSection title={t("detail.geolocation")} icon={MapPin}>
+              <FormField label={t("detail.plotCoordinates")} value={plotCoords} onChange={setPlotCoords} placeholder='[{"lat": 6.5, "lng": -1.5}]' />
+              <FormField label={t("detail.plotCountry")} value={plotCountry} onChange={setPlotCountry} placeholder="GH" />
               <Button size="sm" disabled={saving} onClick={() => saveEudrField({
                 plotCoordinates: plotCoords ? JSON.parse(plotCoords) : null,
                 plotCountryIso2: plotCountry || null,
               })} style={{ fontSize: 13, marginTop: 4 }}>
-                {saving ? "Saving..." : "Save"}
+                {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
 
             {/* 2. Evidence */}
-            <FormSection title="Evidence & Timeline" icon={Calendar}>
+            <FormSection title={t("detail.evidenceTimeline")} icon={Calendar}>
               <div className="form-group" style={{ marginBottom: 10 }}>
-                <label>Evidence type</label>
+                <label>{t("detail.evidenceType")}</label>
                 <select
                   value={evidenceType}
                   onChange={e => setEvidenceType(e.target.value)}
                 >
-                  <option value="">Select...</option>
-                  <option value="satellite_imagery">Satellite imagery</option>
-                  <option value="field_audit">Field audit report</option>
-                  <option value="certification">Certification (e.g., Rainforest Alliance)</option>
-                  <option value="government_permit">Government permit</option>
-                  <option value="other">Other</option>
+                  <option value="">{t("detail.select")}</option>
+                  <option value="satellite_imagery">{t("detail.evidenceTypeOptions.satellite")}</option>
+                  <option value="field_audit">{t("detail.evidenceTypeOptions.fieldAudit")}</option>
+                  <option value="certification">{t("detail.evidenceTypeOptions.certification")}</option>
+                  <option value="government_permit">{t("detail.evidenceTypeOptions.governmentPermit")}</option>
+                  <option value="other">{t("detail.evidenceTypeOptions.other")}</option>
                 </select>
               </div>
-              <FormField label="Evidence reference" value={evidenceRef} onChange={setEvidenceRef} placeholder="REF-12345" />
-              <FormField label="Evidence date" value={evidenceDate} onChange={setEvidenceDate} type="date" />
-              <FormField label="Deforestation-free since (must be ≤ 31 Dec 2020)" value={cutoffDate} onChange={setCutoffDate} type="date" />
+              <FormField label={t("detail.evidenceReference")} value={evidenceRef} onChange={setEvidenceRef} placeholder="REF-12345" />
+              <FormField label={t("detail.evidenceDate")} value={evidenceDate} onChange={setEvidenceDate} type="date" />
+              <FormField label={t("detail.deforestationFree")} value={cutoffDate} onChange={setCutoffDate} type="date" />
               <Button size="sm" disabled={saving} onClick={() => saveEudrField({
                 evidenceType: evidenceType || null,
                 evidenceReference: evidenceRef || null,
                 evidenceDate: evidenceDate || null,
                 cutoffDate: cutoffDate || null,
               })} style={{ fontSize: 13, marginTop: 4 }}>
-                {saving ? "Saving..." : "Save"}
+                {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
 
             {/* 3. Supplier */}
-            <FormSection title="Supplier" icon={Users}>
-              <FormField label="Supplier name" value={supplierName} onChange={setSupplierName} />
-              <FormField label="Supplier address" value={supplierAddr} onChange={setSupplierAddr} />
-              <FormField label="Registration number" value={supplierReg} onChange={setSupplierReg} />
+            <FormSection title={t("detail.supplier")} icon={Users}>
+              <FormField label={t("detail.supplierName")} value={supplierName} onChange={setSupplierName} />
+              <FormField label={t("detail.supplierAddress")} value={supplierAddr} onChange={setSupplierAddr} />
+              <FormField label={t("detail.registrationNumber")} value={supplierReg} onChange={setSupplierReg} />
               <Button size="sm" disabled={saving} onClick={() => saveEudrField({
                 supplierName: supplierName || null,
                 supplierAddress: supplierAddr || null,
                 supplierRegNumber: supplierReg || null,
               })} style={{ fontSize: 13, marginTop: 4 }}>
-                {saving ? "Saving..." : "Save"}
+                {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
 
             {/* 4. Risk Level */}
-            <FormSection title="Risk Level" icon={ShieldAlert}>
+            <FormSection title={t("detail.riskLevel")} icon={ShieldAlert}>
               <div className="form-group" style={{ marginBottom: 10 }}>
-                <label>Risk classification</label>
+                <label>{t("detail.riskClassification")}</label>
                 <select
                   value={riskLevel}
                   onChange={e => setRiskLevel(e.target.value)}
                 >
-                  <option value="low">Low</option>
-                  <option value="standard">Standard</option>
-                  <option value="high">High</option>
+                  <option value="low">{t("detail.riskOptions.low")}</option>
+                  <option value="standard">{t("detail.riskOptions.standard")}</option>
+                  <option value="high">{t("detail.riskOptions.high")}</option>
                 </select>
               </div>
               <Button size="sm" disabled={saving} onClick={() => saveEudrField({
                 riskLevel,
               })} style={{ fontSize: 13, marginTop: 4 }}>
-                {saving ? "Saving..." : "Save"}
+                {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
 
@@ -680,15 +688,15 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
                 <Button size="sm" onClick={runAssessment} disabled={assessing} style={{ fontSize: 12 }}>
                   {assessing ? (
-                    <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> Assessing...</>
+                    <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> {t("detail.assessing")}</>
                   ) : (
-                    <><RefreshCw className="w-3 h-3 mr-1" /> Run Assessment</>
+                    <><RefreshCw className="w-3 h-3 mr-1" /> {t("detail.runAssessment")}</>
                   )}
                 </Button>
                 {eudr && (
                   <Link href={`/eudr/${tradeId}`}>
                     <Button variant="outline" size="sm" style={{ fontSize: 11 }}>
-                      Generate PDF Statement
+                      {t("detail.generatePdfStatement")}
                     </Button>
                   </Link>
                 )}
@@ -698,10 +706,10 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
                 <div style={{ marginTop: 16 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 13, fontWeight: 600, color: bandC?.color || "var(--t3)" }}>
-                      Score: {assessment.score}/100 · {assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : ""}
+                      {t("detail.score", { score: assessment.score, band: assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : "" })}
                     </span>
                     <span style={{ fontSize: 14, color: "var(--t2)" }}>
-                      {assessment.canConcludeNegligibleRisk ? "✅ Can conclude negligible" : "❌ Cannot conclude negligible"}
+                      {assessment.canConcludeNegligibleRisk ? `✅ ${t("detail.canConcludeNegligible")}` : `❌ ${t("detail.cannotConcludeNegligible")}`}
                     </span>
                   </div>
                   <ScoreBar score={assessment.score} band={assessment.band} />
@@ -713,7 +721,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
 
               {assessment && assessment.applicable === false && (
                 <div style={{ marginTop: 12, fontSize: 14, color: "var(--t3)", padding: "8px 12px", background: "rgba(0,0,0,0.03)", borderRadius: 8 }}>
-                  EUDR does not apply to this trade corridor (commodity or destination not in scope).
+                  {t("detail.eudrNotApplicable")}
                 </div>
               )}
             </div>
@@ -726,6 +734,7 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
 
 /* ── CBAM Inline Box ── */
 function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }) {
+  const { t } = useTranslation("trades");
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState(false);
   const [assessing, setAssessing] = useState(false);
@@ -790,7 +799,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <Factory className="w-4 h-4" style={{ color: "#2563eb" }} />
             <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
-              CBAM Assessment
+              {t("detail.cbamAssessment")}
             </h3>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -807,7 +816,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
               <span style={{ fontSize: 13, color: "var(--t3)", fontWeight: 500 }}>N/A</span>
             )}
             {!assessment && (
-              <span style={{ fontSize: 13, color: "var(--app-acapulco)", fontWeight: 500 }}>Not assessed</span>
+              <span style={{ fontSize: 13, color: "var(--app-acapulco)", fontWeight: 500 }}>{t("detail.notAssessed")}</span>
             )}
             {expanded ? <ChevronUp className="w-4 h-4" style={{ color: "var(--t3)" }} /> : <ChevronDown className="w-4 h-4" style={{ color: "var(--t3)" }} />}
           </div>
@@ -817,11 +826,11 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
         {!expanded && assessment && assessment.applicable && (
           <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 4, marginLeft: 28 }}>
             {assessment.canConcludeCbamCompliant
-              ? "✅ Compliant"
-              : "❌ Compliance issues detected"}
+              ? `✅ ${t("detail.cbamCompliant")}`
+              : `❌ ${t("detail.cbamComplianceIssues")}`}
             {assessment.assessedAt && (
               <span style={{ marginLeft: 8 }}>
-                · Last assessed {new Date(assessment.assessedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                · {t("detail.lastAssessed", { date: new Date(assessment.assessedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) })}
               </span>
             )}
           </div>
@@ -832,36 +841,36 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
           <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 12 }}>
 
             {/* 1. Emissions Data */}
-            <FormSection title="Emissions Data" icon={Flame}>
-              <FormField label="Embedded emissions (tCO₂e per ton)" value={emissions} onChange={setEmissions} type="number" placeholder="0.00" />
-              <FormField label="Quantity (tons)" value={quantity} onChange={setQuantity} type="number" placeholder="0" />
+            <FormSection title={t("detail.emissionsData")} icon={Flame}>
+              <FormField label={t("detail.embeddedEmissions")} value={emissions} onChange={setEmissions} type="number" placeholder="0.00" />
+              <FormField label={t("detail.quantityTons")} value={quantity} onChange={setQuantity} type="number" placeholder="0" />
               <Button size="sm" disabled={saving} onClick={() => saveCbamField({
                 embeddedEmissions: emissions || null,
                 quantity: quantity || null,
               })} style={{ fontSize: 13, marginTop: 4 }}>
-                {saving ? "Saving..." : "Save"}
+                {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
 
             {/* 2. Installation */}
-            <FormSection title="Installation" icon={Building2}>
-              <FormField label="Installation name" value={installName} onChange={setInstallName} />
-              <FormField label="Installation country (ISO2)" value={installCountry} onChange={setInstallCountry} placeholder="NG" />
-              <FormField label="Reporting period" value={reportingPeriod} onChange={setReportingPeriod} placeholder="2026-Q1" />
+            <FormSection title={t("detail.installation")} icon={Building2}>
+              <FormField label={t("detail.installationName")} value={installName} onChange={setInstallName} />
+              <FormField label={t("detail.installationCountry")} value={installCountry} onChange={setInstallCountry} placeholder="NG" />
+              <FormField label={t("detail.reportingPeriod")} value={reportingPeriod} onChange={setReportingPeriod} placeholder="2026-Q1" />
               <Button size="sm" disabled={saving} onClick={() => saveCbamField({
                 installationName: installName || null,
                 installationCountry: installCountry || null,
                 reportingPeriod: reportingPeriod || null,
               })} style={{ fontSize: 13, marginTop: 4 }}>
-                {saving ? "Saving..." : "Save"}
+                {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
 
             {/* 3. Carbon Price */}
-            <FormSection title="Carbon Price" icon={DollarSign}>
-              <FormField label="Carbon price paid (EUR/tCO₂e)" value={carbonPrice} onChange={setCarbonPrice} type="number" placeholder="0.00" />
+            <FormSection title={t("detail.carbonPrice")} icon={DollarSign}>
+              <FormField label={t("detail.carbonPricePaid")} value={carbonPrice} onChange={setCarbonPrice} type="number" placeholder="0.00" />
               <div className="form-group" style={{ marginBottom: 10 }}>
-                <label>Currency</label>
+                <label>{t("detail.currency")}</label>
                 <select
                   value={carbonCurrency}
                   onChange={e => setCarbonCurrency(e.target.value)}
@@ -875,7 +884,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
                 carbonPricePaid: carbonPrice || null,
                 carbonPriceCurrency: carbonCurrency,
               })} style={{ fontSize: 13, marginTop: 4 }}>
-                {saving ? "Saving..." : "Save"}
+                {saving ? t("detail.saving") : t("detail.save")}
               </Button>
             </FormSection>
 
@@ -883,9 +892,9 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
             <div style={{ borderTop: "2px solid rgba(0,0,0,0.08)", paddingTop: 16, marginTop: 4 }}>
               <Button size="sm" onClick={runAssessment} disabled={assessing} style={{ fontSize: 12 }}>
                 {assessing ? (
-                  <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> Assessing...</>
+                  <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> {t("detail.assessing")}</>
                 ) : (
-                  <><RefreshCw className="w-3 h-3 mr-1" /> Run Assessment</>
+                  <><RefreshCw className="w-3 h-3 mr-1" /> {t("detail.runAssessment")}</>
                 )}
               </Button>
 
@@ -893,10 +902,10 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
                 <div style={{ marginTop: 16 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 13, fontWeight: 600, color: bandC?.color || "var(--t3)" }}>
-                      Score: {assessment.score}/100 · {assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : ""}
+                      {t("detail.score", { score: assessment.score, band: assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : "" })}
                     </span>
                     <span style={{ fontSize: 14, color: "var(--t2)" }}>
-                      {assessment.canConcludeCbamCompliant ? "✅ Compliant" : "❌ Compliance issues"}
+                      {assessment.canConcludeCbamCompliant ? `✅ ${t("detail.canConcludeCbamCompliant")}` : `❌ ${t("detail.cannotConcludeCbamCompliant")}`}
                     </span>
                   </div>
                   <ScoreBar score={assessment.score} band={assessment.band} />
@@ -908,7 +917,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
 
               {assessment && assessment.applicable === false && (
                 <div style={{ marginTop: 12, fontSize: 14, color: "var(--t3)", padding: "8px 12px", background: "rgba(0,0,0,0.03)", borderRadius: 8 }}>
-                  CBAM does not apply to this trade corridor (commodity or destination not in scope).
+                  {t("detail.cbamNotApplicable")}
                 </div>
               )}
             </div>
@@ -921,6 +930,7 @@ function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
 
 /* ── Main Page Component ── */
 export default function TradeDetail() {
+  const { t } = useTranslation("trades");
   const [match, params] = useRoute("/trades/:id");
   const tradeId = params?.id;
 
@@ -1091,8 +1101,8 @@ export default function TradeDetail() {
 
   usePageTitle(
     data?.lookup?.commodityName
-      ? `${data.lookup.commodityName} — Trade Detail`
-      : "Trade Detail",
+      ? `${data.lookup.commodityName} — ${t("detail.pageTitle")}`
+      : t("detail.pageTitle"),
     "View full trade information, compliance results, and audit trail"
   );
 
@@ -1115,11 +1125,11 @@ export default function TradeDetail() {
           letterSpacing: "0.03em",
         }}>
           <Link href="/trades" style={{ color: "var(--t3)", textDecoration: "none" }}>
-            My Trades
+            {t("detail.breadcrumb")}
           </Link>
           <ChevronRight size={12} />
           <span style={{ color: "var(--t1)" }}>
-            {isLoading ? "Loading..." : data?.lookup?.commodityName || "Trade Detail"}
+            {isLoading ? t("detail.loading") : data?.lookup?.commodityName || t("detail.pageTitle")}
           </span>
         </div>
 
@@ -1153,7 +1163,7 @@ export default function TradeDetail() {
                     fontWeight: 600,
                     padding: "3px 10px",
                   }}>
-                    {cfg.label}
+                    {t(cfg.labelKey)}
                   </Badge>
                 );
               })()}
@@ -1168,7 +1178,7 @@ export default function TradeDetail() {
                   fontWeight: 600,
                   padding: "3px 10px",
                 }}>
-                  Score: {data.lookup.readinessScore}/100
+                  {t("detail.scoreLabel", { score: data.lookup.readinessScore })}
                 </Badge>
               )}
             </div>
@@ -1190,7 +1200,7 @@ export default function TradeDetail() {
           </>
         ) : error ? (
           <h1 style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 28, color: "#ef4444", margin: 0 }}>
-            Trade Not Found
+            {t("detail.notFound")}
           </h1>
         ) : null}
       </div>
@@ -1205,11 +1215,11 @@ export default function TradeDetail() {
             <CardContent className="p-6 text-center">
               <XCircle className="w-8 h-8 mx-auto mb-3" style={{ color: "#ef4444" }} />
               <p style={{ fontSize: 14, color: "#ef4444" }}>
-                This trade was not found or you don't have access to it.
+                {t("detail.notFoundDescription")}
               </p>
               <Link href="/trades">
                 <Button variant="outline" size="sm" style={{ marginTop: 12 }}>
-                  Back to My Trades
+                  {t("detail.backToTrades")}
                 </Button>
               </Link>
             </CardContent>
@@ -1235,11 +1245,11 @@ export default function TradeDetail() {
                 <CardContent className="p-5">
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                     <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
-                      Compliance Summary
+                      {t("detail.complianceSummary")}
                     </h3>
                     <Link href={`/lookup?lookupId=${data.lookup.id}`}>
                       <Button variant="outline" size="sm" style={{ fontSize: 12 }}>
-                        View Full Report
+                        {t("detail.viewFullReport")}
                       </Button>
                     </Link>
                   </div>
@@ -1264,7 +1274,7 @@ export default function TradeDetail() {
                       </div>
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>
-                          Readiness Score
+                          {t("detail.readinessScore")}
                         </div>
                         <div style={{
                           fontSize: 14,
@@ -1292,11 +1302,11 @@ export default function TradeDetail() {
                   <CardContent className="p-5">
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                       <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
-                        LC Document Check
+                        {t("detail.lcDocCheck")}
                       </h3>
                       <Link href={`/lc-check?lookupId=${data.lookup.id}`}>
                         <Button variant="outline" size="sm" style={{ fontSize: 12 }}>
-                          {data.latestLcCheck ? "View / Re-check" : "Run LC Check"}
+                          {data.latestLcCheck ? t("detail.viewRecheck") : t("detail.runLcCheck")}
                         </Button>
                       </Link>
                     </div>
@@ -1320,19 +1330,19 @@ export default function TradeDetail() {
 
                         {data.lcCase.recheckCount > 0 && (
                           <p style={{ fontSize: 14, color: "var(--t3)", marginTop: 6 }}>
-                            {data.lcCase.recheckCount} re-check{data.lcCase.recheckCount > 1 ? "s" : ""} performed
+                            {t("detail.recheck", { count: data.lcCase.recheckCount })}
                           </p>
                         )}
 
                         {data.lcCase.correctionRequests && (data.lcCase.correctionRequests as any[]).length > 0 && (
                           <p style={{ fontSize: 14, color: "var(--t3)", marginTop: 4 }}>
-                            {(data.lcCase.correctionRequests as any[]).length} correction request{(data.lcCase.correctionRequests as any[]).length > 1 ? "s" : ""} sent
+                            {t("detail.correction", { count: (data.lcCase.correctionRequests as any[]).length })}
                           </p>
                         )}
                       </div>
                     ) : (
                       <p style={{ fontSize: 13, color: "var(--t3)" }}>
-                        No LC check has been run for this trade yet.
+                        {t("detail.noLcCheck")}
                       </p>
                     )}
                   </CardContent>
@@ -1344,7 +1354,7 @@ export default function TradeDetail() {
                 <CardContent className="p-5">
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                     <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
-                      Supplier Documents
+                      {t("detail.supplierDocs")}
                     </h3>
                     <div style={{ display: "flex", gap: 6 }}>
                       {data.supplierRequest && (
@@ -1355,13 +1365,13 @@ export default function TradeDetail() {
                           onClick={() => setShowBuyerUpload(!showBuyerUpload)}
                         >
                           <Upload size={12} style={{ marginRight: 4 }} />
-                          Upload on behalf
+                          {t("detail.uploadOnBehalf")}
                         </Button>
                       )}
                       {!data.supplierRequest && (
                         <Link href={`/lookup?lookupId=${data.lookup.id}`}>
                           <Button variant="outline" size="sm" style={{ fontSize: 12 }}>
-                            Send Upload Link
+                            {t("detail.sendUploadLink")}
                           </Button>
                         </Link>
                       )}
@@ -1388,7 +1398,7 @@ export default function TradeDetail() {
                       {/* Required docs list */}
                       <div style={{ marginBottom: 12 }}>
                         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 6 }}>
-                          Required ({(data.supplierRequest.docsRequired as string[] || []).length})
+                          {t("detail.required", { count: (data.supplierRequest.docsRequired as string[] || []).length })}
                         </div>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                           {(data.supplierRequest.docsRequired as string[] || []).map((doc: string) => {
@@ -1414,7 +1424,7 @@ export default function TradeDetail() {
                       {data.supplierUploads.length > 0 && (
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 8 }}>
-                            Received Documents
+                            {t("detail.receivedDocs")}
                           </div>
                           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                             {data.supplierUploads.map((upload: any) => (
@@ -1449,7 +1459,7 @@ export default function TradeDetail() {
                                         background: "rgba(0,0,0,0.04)", padding: "1px 5px",
                                         borderRadius: 4,
                                       }}>
-                                        Manual
+                                        {t("detail.manual")}
                                       </span>
                                     )}
                                     {upload.verified === true && (
@@ -1458,7 +1468,7 @@ export default function TradeDetail() {
                                         background: "rgba(34,197,94,0.1)", padding: "1px 6px",
                                         borderRadius: 4,
                                       }}>
-                                        Verified
+                                        {t("detail.verified")}
                                       </span>
                                     )}
                                     {upload.verified === false && upload.finding && (
@@ -1467,7 +1477,7 @@ export default function TradeDetail() {
                                         background: "rgba(239,68,68,0.1)", padding: "1px 6px",
                                         borderRadius: 4,
                                       }}>
-                                        Flagged
+                                        {t("detail.flagged")}
                                       </span>
                                     )}
                                   </div>
@@ -1479,7 +1489,7 @@ export default function TradeDetail() {
                                     ) : (
                                       <button
                                         onClick={() => handleAiScan(upload.id)}
-                                        title="AI Scan"
+                                        title={t("detail.docActions.aiScan")}
                                         style={{
                                           background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)",
                                           borderRadius: 5, padding: "3px 6px", cursor: "pointer",
@@ -1487,7 +1497,7 @@ export default function TradeDetail() {
                                           fontSize: 14, color: "#8b5cf6", fontWeight: 500,
                                         }}
                                       >
-                                        <Sparkles size={10} /> Scan
+                                        <Sparkles size={10} /> {t("detail.scan")}
                                       </button>
                                     )}
                                     {verifyingId === upload.id ? (
@@ -1495,7 +1505,7 @@ export default function TradeDetail() {
                                     ) : upload.verified !== true ? (
                                       <button
                                         onClick={() => handleVerify(upload.id)}
-                                        title="Mark as verified"
+                                        title={t("detail.docActions.verify")}
                                         style={{
                                           background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)",
                                           borderRadius: 5, padding: "3px 6px", cursor: "pointer",
@@ -1503,7 +1513,7 @@ export default function TradeDetail() {
                                           fontSize: 14, color: "#16a34a", fontWeight: 500,
                                         }}
                                       >
-                                        <CheckCircle2 size={10} /> Verify
+                                        <CheckCircle2 size={10} /> {t("detail.verify")}
                                       </button>
                                     ) : null}
                                     <button
@@ -1516,7 +1526,7 @@ export default function TradeDetail() {
                                           setFlagUcpRule(upload.ucpRule || "");
                                         }
                                       }}
-                                      title="Flag issue"
+                                      title={t("detail.docActions.flag")}
                                       style={{
                                         background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)",
                                         borderRadius: 5, padding: "3px 6px", cursor: "pointer",
@@ -1524,7 +1534,7 @@ export default function TradeDetail() {
                                         fontSize: 14, color: "#ef4444", fontWeight: 500,
                                       }}
                                     >
-                                      <Flag size={10} /> Flag
+                                      <Flag size={10} /> {t("detail.flag")}
                                     </button>
                                   </div>
                                 </div>
@@ -1565,7 +1575,7 @@ export default function TradeDetail() {
                                   }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 2 }}>
                                       <Sparkles size={10} />
-                                      <span style={{ fontWeight: 600 }}>AI Analysis</span>
+                                      <span style={{ fontWeight: 600 }}>{t("detail.aiAnalysis")}</span>
                                       <span style={{ fontSize: 13, color: "var(--t3)" }}>({scanResult?.confidence})</span>
                                     </div>
                                     {scanResult?.details}
@@ -1580,11 +1590,11 @@ export default function TradeDetail() {
                                     border: "1px solid rgba(0,0,0,0.06)",
                                   }}>
                                     <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t2)", marginBottom: 6 }}>
-                                      Flag issue with this document
+                                      {t("detail.flagIssueTitle")}
                                     </div>
                                     <input
                                       type="text"
-                                      placeholder="Issue found — e.g. Invoice amount doesn't match LC"
+                                      placeholder={t("detail.flagIssuePlaceholder")}
                                       value={flagFinding}
                                       onChange={(e) => setFlagFinding(e.target.value)}
                                       style={{
@@ -1595,7 +1605,7 @@ export default function TradeDetail() {
                                     />
                                     <input
                                       type="text"
-                                      placeholder="UCP rule (optional) — e.g. UCP 600 Art. 18(a)(iii)"
+                                      placeholder={t("detail.flagUcpPlaceholder")}
                                       value={flagUcpRule}
                                       onChange={(e) => setFlagUcpRule(e.target.value)}
                                       style={{
@@ -1615,7 +1625,7 @@ export default function TradeDetail() {
                                           opacity: flagFinding.trim() ? 1 : 0.5,
                                         }}
                                       >
-                                        Submit Flag
+                                        {t("detail.docActions.submitFlag")}
                                       </button>
                                       <button
                                         onClick={() => { setFlaggingUploadId(null); setFlagFinding(""); setFlagUcpRule(""); }}
@@ -1624,7 +1634,7 @@ export default function TradeDetail() {
                                           borderRadius: 6, padding: "5px 12px", fontSize: 13, cursor: "pointer",
                                         }}
                                       >
-                                        Cancel
+                                        {t("detail.docActions.cancelFlag")}
                                       </button>
                                     </div>
                                   </div>
@@ -1645,7 +1655,7 @@ export default function TradeDetail() {
                           borderRadius: 10,
                         }}>
                           <div style={{ fontSize: 14, fontWeight: 600, color: "var(--t2)", marginBottom: 10 }}>
-                            Upload document received outside TapTrao
+                            {t("detail.uploadOutside")}
                           </div>
                           <select
                             value={buyerDocType}
@@ -1661,7 +1671,7 @@ export default function TradeDetail() {
                               marginBottom: 8,
                             }}
                           >
-                            <option value="" style={{ background: "#1a1a1a" }}>Select document type...</option>
+                            <option value="" style={{ background: "#1a1a1a" }}>{t("detail.selectDocType")}</option>
                             {(data.supplierRequest.docsRequired as string[] || []).map((doc: string) => (
                               <option key={doc} value={doc} style={{ background: "#1a1a1a" }}>{doc}</option>
                             ))}
@@ -1679,7 +1689,7 @@ export default function TradeDetail() {
                           />
                           <input
                             type="text"
-                            placeholder="Note (optional) — e.g. Received via email"
+                            placeholder={t("detail.notePlaceholder")}
                             value={buyerNote}
                             onChange={(e) => setBuyerNote(e.target.value)}
                             style={{
@@ -1700,7 +1710,7 @@ export default function TradeDetail() {
                               disabled={!buyerDocType || buyerUploading}
                               onClick={handleBuyerUpload}
                             >
-                              {buyerUploading ? "Uploading..." : "Upload"}
+                              {buyerUploading ? t("detail.buyerUpload.uploading") : t("detail.buyerUpload.upload")}
                             </Button>
                             <Button
                               variant="ghost"
@@ -1708,7 +1718,7 @@ export default function TradeDetail() {
                               style={{ fontSize: 13, color: "var(--t3)" }}
                               onClick={() => setShowBuyerUpload(false)}
                             >
-                              Cancel
+                              {t("detail.buyerUpload.cancel")}
                             </Button>
                           </div>
                         </div>
@@ -1716,7 +1726,7 @@ export default function TradeDetail() {
                     </div>
                   ) : (
                     <p style={{ fontSize: 13, color: "var(--t3)" }}>
-                      No supplier upload link has been created yet.
+                      {t("detail.noSupplierLink")}
                     </p>
                   )}
                 </CardContent>
@@ -1736,7 +1746,7 @@ export default function TradeDetail() {
                 <CardContent className="p-5">
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                     <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
-                      Shipment Value
+                      {t("detail.shipmentValue")}
                     </h3>
                     {!editingValue && (
                       <button
@@ -1755,7 +1765,7 @@ export default function TradeDetail() {
                           cursor: "pointer",
                         }}
                       >
-                        {data.lookup.tradeValue ? "Edit" : "Add Value"}
+                        {data.lookup.tradeValue ? t("detail.edit") : t("detail.addValue")}
                       </button>
                     )}
                   </div>
@@ -1812,7 +1822,7 @@ export default function TradeDetail() {
                             opacity: savingValue || !tradeValueInput.trim() ? 0.5 : 1,
                           }}
                         >
-                          {savingValue ? "Saving..." : "Save"}
+                          {savingValue ? t("detail.saving") : t("detail.save")}
                         </button>
                         <button
                           onClick={() => setEditingValue(false)}
@@ -1826,7 +1836,7 @@ export default function TradeDetail() {
                             cursor: "pointer",
                           }}
                         >
-                          Cancel
+                          {t("detail.cancel")}
                         </button>
                       </div>
                     </div>
@@ -1841,7 +1851,7 @@ export default function TradeDetail() {
                     </div>
                   ) : (
                     <p style={{ fontSize: 13, color: "var(--t3)", margin: 0 }}>
-                      No value set yet. Click "Add Value" to record the shipment value.
+                      {t("detail.noValueSet")}
                     </p>
                   )}
                 </CardContent>
@@ -1860,40 +1870,40 @@ export default function TradeDetail() {
                   <Card>
                     <CardContent className="p-5">
                       <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: "0 0 12px", display: "flex", alignItems: "center", gap: 8 }}>
-                        <span>⚓</span> Demurrage Estimate
+                        <span>⚓</span> {t("detail.demurrage")}
                       </h3>
                       <div style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6, marginBottom: 10 }}>
                         <div style={{ marginBottom: 6 }}>
-                          <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Port</span>
+                          <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("detail.port")}</span>
                           <div style={{ fontWeight: 500, color: "var(--t1)" }}>
                             {estimate.port.label}
                             {estimate.allPorts.length > 1 && (
-                              <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 400 }}> (+ {estimate.allPorts.length - 1} more)</span>
+                              <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 400 }}> ({t("detail.more", { count: estimate.allPorts.length - 1 })})</span>
                             )}
                           </div>
                         </div>
                         <div style={{ marginBottom: 6 }}>
-                          <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Estimated delay</span>
+                          <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("detail.estimatedDelay")}</span>
                           <div>
                             <span style={{ color: verdictColor, fontWeight: 600 }}>{estimate.delayLabel}</span>
-                            <span style={{ color: "var(--t3)", fontSize: 11 }}> (based on {verdict || "AMBER"} readiness)</span>
+                            <span style={{ color: "var(--t3)", fontSize: 11 }}> {t("detail.basedOn", { verdict: verdict || "AMBER" })}</span>
                           </div>
                         </div>
                         <div style={{ marginBottom: 6 }}>
-                          <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Cost range (20ft)</span>
+                          <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("detail.costRange20ft")}</span>
                           <div style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 20, color: "var(--sage)" }}>
                             ${estimate.minCost.toLocaleString()} – ${estimate.maxCost.toLocaleString()}
                           </div>
                         </div>
                         {pctOfCargo && (
                           <div style={{ fontSize: 14, color: Number(pctOfCargo) > 5 ? "#ef4444" : "var(--t3)", marginTop: 2 }}>
-                            ≈ {pctOfCargo}% of cargo value
+                            {t("detail.percentOfCargo", { pct: pctOfCargo })}
                           </div>
                         )}
                       </div>
                       <Link href="/demurrage">
                         <span style={{ fontSize: 13, color: "var(--sage)", cursor: "pointer", fontWeight: 600 }}>
-                          Open full calculator ({estimate.allPorts.length} port{estimate.allPorts.length !== 1 ? "s" : ""}) →
+                          {t("detail.openFullCalculator", { count: estimate.allPorts.length, plural: estimate.allPorts.length !== 1 ? "s" : "" })}
                         </span>
                       </Link>
                     </CardContent>
@@ -1904,7 +1914,7 @@ export default function TradeDetail() {
               <Card>
                 <CardContent className="p-5">
                   <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: "0 0 16px" }}>
-                    TwinLog Audit Trail
+                    {t("detail.twinlogAuditTrail")}
                   </h3>
                   <AuditTimeline events={data.auditTrail} chainValid={data.chainValid} />
                 </CardContent>
@@ -1916,7 +1926,7 @@ export default function TradeDetail() {
                   <CardContent className="p-4">
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                       <Hash size={14} style={{ color: "var(--sage)" }} />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>TwinLog Reference</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{t("detail.twinlogReference")}</span>
                     </div>
                     <div style={{
                       fontFamily: "monospace",
@@ -1947,24 +1957,24 @@ export default function TradeDetail() {
               <Card style={{ marginTop: 16 }}>
                 <CardContent className="p-4 space-y-2">
                   <h3 style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)", marginBottom: 8 }}>
-                    Actions
+                    {t("detail.actions")}
                   </h3>
                   <Link href={`/lookup?lookupId=${data.lookup.id}`}>
                     <Button variant="outline" size="sm" style={{ width: "100%", justifyContent: "flex-start", fontSize: 12 }}>
-                      <Shield size={14} className="mr-2" /> View Compliance Report
+                      <Shield size={14} className="mr-2" /> {t("detail.viewComplianceReport")}
                     </Button>
                   </Link>
                   {!data.lcCase && (
                     <Link href={`/lc-check?lookupId=${data.lookup.id}`}>
                       <Button variant="outline" size="sm" style={{ width: "100%", justifyContent: "flex-start", fontSize: 14, marginTop: 6 }}>
-                        <FileText size={14} className="mr-2" /> Run LC Check
+                        <FileText size={14} className="mr-2" /> {t("detail.runLcCheck")}
                       </Button>
                     </Link>
                   )}
                   {data.twinlog.ref && (
                     <Link href={`/verify/${data.twinlog.ref}`}>
                       <Button variant="outline" size="sm" style={{ width: "100%", justifyContent: "flex-start", fontSize: 14, marginTop: 6 }}>
-                        <ExternalLink size={14} className="mr-2" /> Public Verify Link
+                        <ExternalLink size={14} className="mr-2" /> {t("detail.publicVerifyLink")}
                       </Button>
                     </Link>
                   )}

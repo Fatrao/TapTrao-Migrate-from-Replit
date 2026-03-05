@@ -1,0 +1,53 @@
+{
+  "loading": "Chargement...",
+  "secureUpload": "Telechargement securise",
+  "uploadDocs": "Veuillez televerser les documents ci-dessous pour cette expedition.",
+  "noAccountNeeded": "Aucun compte necessaire \u2014 vos fichiers vont directement a l'acheteur.",
+  "dueBy": "A remettre avant le {{date}}",
+  "deadline": "Date limite : {{date}}",
+  "uploadCount": "{{received}}/{{total}} televerses",
+
+  "status.verified": "Verifie",
+  "status.amend": "A modifier",
+  "status.received": "Recu",
+  "status.awaiting": "En attente",
+
+  "uploadedPending": "Televerse \u2014 verification en cours",
+  "dropOrTap": "Deposez un fichier ici ou appuyez pour choisir",
+  "fileTypes": "PDF, JPG, PNG \u00B7 max 20 Mo",
+  "uploading": "Telechargement...",
+
+  "progress.title": "Progression du telechargement",
+  "progress.received": "{{doc}} \u2014 recu",
+  "progress.needsAmendment": "{{doc}} \u2014 necessite une modification",
+  "progress.notUploaded": "{{doc}} \u2014 pas encore televerse",
+
+  "submit.submitting": "Envoi en cours...",
+  "submit.button": "Soumettre les documents",
+  "submit.uploadAll": "Televerser les {{count}} documents pour soumettre",
+
+  "success.title": "Documents soumis",
+  "success.message": "L'acheteur a ete notifie. Vous pouvez fermer cette page.",
+
+  "footer.secureMessage": "Vos fichiers vont directement et en toute securite a l'acheteur. Aucun compte TapTrao requis.",
+  "footer.linkExpires": "Ce lien expire le {{date}}.",
+
+  "expired.title": "Ce lien de telechargement a expire",
+  "expired.notFound": "Lien de telechargement introuvable",
+  "expired.contactBuyer": "Veuillez contacter l'acheteur pour demander un nouveau lien.",
+
+  "verify.loading": "Verification...",
+  "verify.notFoundTitle": "Reference introuvable.",
+  "verify.notFoundDescription": "La reference TwinLog que vous avez saisie ne correspond a aucun enregistrement dans notre systeme.",
+  "verify.heading": "Verification TwinLog",
+  "verify.lockedBanner": "Cet enregistrement a ete verrouille le {{date}} et n'a pas ete modifie.",
+  "verify.trade": "Trade",
+  "verify.reference": "Reference",
+  "verify.hash": "Hash",
+  "verify.locked": "Verrouille",
+  "verify.score": "Score",
+  "verify.lowRisk": "RISQUE FAIBLE",
+  "verify.moderateRisk": "RISQUE MODERE",
+  "verify.highRisk": "RISQUE ELEVE",
+  "verify.footerMessage": "Verification de conformite commerciale propulsee par TapTrao."
+}

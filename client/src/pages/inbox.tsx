@@ -1,8 +1,10 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/AppShell";
 import { useQuery } from "@tanstack/react-query";
 import { getAvatarColour } from "@/lib/avatarColours";
 import { usePageTitle } from "@/hooks/use-page-title";
+import type { TFunction } from "i18next";
 
 type InboxSummary = {
   awaiting: number;
@@ -30,35 +32,35 @@ type SupplierRequestRow = {
   dest_name: string;
 };
 
-function relativeTime(dateStr: string): string {
+function relativeTime(dateStr: string, t: TFunction): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return t("time.justNow");
+  if (mins < 60) return t("time.minsAgo", { mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return t("time.hoursAgo", { hours });
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return `${Math.floor(days / 30)}mo ago`;
+  if (days < 30) return t("time.daysAgo", { days });
+  return t("time.monthsAgo", { months: Math.floor(days / 30) });
 }
 
-function sentTime(dateStr: string): string {
+function sentTime(dateStr: string, t: TFunction): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "Sent just now";
-  if (mins < 60) return `Sent ${mins}m ago`;
+  if (mins < 1) return t("time.sentJustNow");
+  if (mins < 60) return t("time.sentMinsAgo", { mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `Sent ${hours}h ago`;
+  if (hours < 24) return t("time.sentHoursAgo", { hours });
   const days = Math.floor(hours / 24);
-  if (days < 30) return `Sent ${days}d ago`;
-  return `Sent ${Math.floor(days / 30)}mo ago`;
+  if (days < 30) return t("time.sentDaysAgo", { days });
+  return t("time.sentMonthsAgo", { months: Math.floor(days / 30) });
 }
 
-function overdueTime(dateStr: string): string {
+function overdueTime(dateStr: string, t: TFunction): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  if (days < 1) return "Overdue";
-  return `${days}d overdue`;
+  if (days < 1) return t("time.overdue");
+  return t("time.daysOverdue", { days });
 }
 
 type StatusInfo = {
@@ -67,22 +69,23 @@ type StatusInfo = {
   bg: string;
 };
 
-function getStatusInfo(status: string): StatusInfo {
+function getStatusInfo(status: string, t: TFunction): StatusInfo {
   switch (status) {
     case "blocking":
-      return { label: "Blocking", color: "var(--red)", bg: "var(--red-xs)" };
+      return { label: t("status.blocking"), color: "var(--red)", bg: "var(--red-xs)" };
     case "waiting":
-      return { label: "Awaiting", color: "var(--amber)", bg: "var(--amber-xs)" };
+      return { label: t("status.awaiting"), color: "var(--amber)", bg: "var(--amber-xs)" };
     case "partial":
-      return { label: "Awaiting", color: "var(--amber)", bg: "var(--amber-xs)" };
+      return { label: t("status.awaiting"), color: "var(--amber)", bg: "var(--amber-xs)" };
     case "complete":
-      return { label: "Complete", color: "var(--sage)", bg: "var(--sage-xs)" };
+      return { label: t("status.complete"), color: "var(--sage)", bg: "var(--sage-xs)" };
     default:
       return { label: status, color: "var(--t3)", bg: "rgba(0,0,0,0.04)" };
   }
 }
 
 export default function Inbox() {
+  const { t } = useTranslation("inbox");
   usePageTitle("Supplier Inbox", "Track supplier documents and uploads");
 
   const summaryQuery = useQuery<InboxSummary>({ queryKey: ["/api/supplier-inbox/summary"] });
@@ -104,9 +107,9 @@ export default function Inbox() {
   }, [requests]);
 
   const stats = [
-    { value: summary.awaiting, color: "var(--amber)", label: "Awaiting documents" },
-    { value: summary.blocking, color: "var(--red)", label: "Blocking issue" },
-    { value: summary.completeThisWeek, color: "var(--sage)", label: "Complete this week" },
+    { value: summary.awaiting, color: "var(--amber)", label: t("stat.awaitingDocuments") },
+    { value: summary.blocking, color: "var(--red)", label: t("stat.blockingIssue") },
+    { value: summary.completeThisWeek, color: "var(--sage)", label: t("stat.completeThisWeek") },
   ];
 
   return (
@@ -118,10 +121,14 @@ export default function Inbox() {
             style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 26, color: "var(--t1)", margin: 0, lineHeight: 1.1 }}
             data-testid="text-inbox-title"
           >
-            Supplier Inbox
+            {t("title")}
           </h1>
           <p style={{ fontSize: 14, color: "var(--t3)", marginTop: 4 }} data-testid="text-inbox-subtitle">
-            {summary.awaiting + summary.blocking} suppliers waiting &middot; {summary.blocking} blocking issue{summary.blocking !== 1 ? "s" : ""}
+            {t("subtitle", {
+              waiting: summary.awaiting + summary.blocking,
+              blocking: summary.blocking,
+              plural: summary.blocking !== 1 ? "s" : "",
+            })}
           </p>
         </div>
         <button
@@ -137,7 +144,7 @@ export default function Inbox() {
             color: "#fff",
           }}
         >
-          + New Upload Link
+          {t("newUploadLink")}
         </button>
       </div>
 
@@ -167,26 +174,26 @@ export default function Inbox() {
       {/* Content */}
       <div style={{ padding: "0 28px 60px" }}>
         {requestsQuery.isLoading ? (
-          <div style={{ padding: "80px 0", textAlign: "center", color: "var(--t3)", fontSize: 14 }}>Loading inbox...</div>
+          <div style={{ padding: "80px 0", textAlign: "center", color: "var(--t3)", fontSize: 14 }}>{t("loading")}</div>
         ) : requests.length === 0 ? (
           <div style={{ padding: "80px 0", textAlign: "center" }} data-testid="inbox-empty-state">
             <div style={{ fontFamily: "var(--fd)", fontWeight: 700, fontSize: 20, color: "var(--t1)" }}>
-              No supplier requests yet.
+              {t("empty.title")}
             </div>
             <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 8 }}>
-              Send your first supplier brief from the LC Checker or Compliance Lookup.
+              {t("empty.subtitle")}
             </div>
           </div>
         ) : (
           <>
             {grouped.awaiting.length > 0 && (
-              <InboxSection label="Awaiting Documents" items={grouped.awaiting} />
+              <InboxSection label={t("section.awaitingDocuments")} items={grouped.awaiting} t={t} />
             )}
             {grouped.blocking.length > 0 && (
-              <InboxSection label="Blocking Issue" items={grouped.blocking} />
+              <InboxSection label={t("section.blockingIssue")} items={grouped.blocking} t={t} />
             )}
             {grouped.complete.length > 0 && (
-              <InboxSection label="Complete" items={grouped.complete} dimmed />
+              <InboxSection label={t("section.complete")} items={grouped.complete} dimmed t={t} />
             )}
           </>
         )}
@@ -195,7 +202,7 @@ export default function Inbox() {
   );
 }
 
-function InboxSection({ label, items, dimmed }: { label: string; items: SupplierRequestRow[]; dimmed?: boolean }) {
+function InboxSection({ label, items, dimmed, t }: { label: string; items: SupplierRequestRow[]; dimmed?: boolean; t: TFunction }) {
   return (
     <div style={{ marginBottom: 24 }} data-testid={`inbox-group-${label.toLowerCase().replace(/\s+/g, "-")}`}>
       <div style={{
@@ -210,15 +217,15 @@ function InboxSection({ label, items, dimmed }: { label: string; items: Supplier
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {items.map((req) => (
-          <SupplierCard key={req.id} request={req} dimmed={dimmed} />
+          <SupplierCard key={req.id} request={req} dimmed={dimmed} t={t} />
         ))}
       </div>
     </div>
   );
 }
 
-function SupplierCard({ request, dimmed }: { request: SupplierRequestRow; dimmed?: boolean }) {
-  const statusInfo = getStatusInfo(request.status);
+function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dimmed?: boolean; t: TFunction }) {
+  const statusInfo = getStatusInfo(request.status, t);
   const docsRequired = Array.isArray(request.docs_required) ? request.docs_required : [];
   const docsReceived = Array.isArray(request.docs_received) ? request.docs_received : [];
   const receivedSet = new Set(docsReceived);
@@ -234,17 +241,17 @@ function SupplierCard({ request, dimmed }: { request: SupplierRequestRow; dimmed
 
   // Status description
   const statusText = request.status === "complete"
-    ? "All documents received"
+    ? t("card.allDocsReceived")
     : isBlocking && outstanding.length > 0
     ? outstanding.join(" and ")
-    : `Waiting for ${outstanding.join(" and ")}`;
+    : t("card.waitingFor", { docs: outstanding.join(" and ") });
 
   // Time label
   const timeLabel = isBlocking
-    ? overdueTime(request.updated_at)
+    ? overdueTime(request.updated_at, t)
     : request.status === "complete"
-    ? relativeTime(request.updated_at)
-    : sentTime(request.created_at);
+    ? relativeTime(request.updated_at, t)
+    : sentTime(request.created_at, t);
 
   return (
     <div
@@ -318,7 +325,7 @@ function SupplierCard({ request, dimmed }: { request: SupplierRequestRow; dimmed
             );
           })}
           <span style={{ fontSize: 14, color: "var(--t3)", marginLeft: 4 }}>
-            {docsReceived.length}/{docsRequired.length} docs
+            {t("card.docs", { received: docsReceived.length, total: docsRequired.length })}
           </span>
         </div>
       </div>
@@ -365,7 +372,7 @@ function SupplierCard({ request, dimmed }: { request: SupplierRequestRow; dimmed
             }}
             data-testid={`inbox-whatsapp-${request.id}`}
           >
-            WhatsApp
+            {t("btn.whatsapp")}
           </button>
           <button
             style={{
@@ -381,7 +388,7 @@ function SupplierCard({ request, dimmed }: { request: SupplierRequestRow; dimmed
             }}
             data-testid={`inbox-email-${request.id}`}
           >
-            Email
+            {t("btn.email")}
           </button>
           <button
             style={{
@@ -397,7 +404,7 @@ function SupplierCard({ request, dimmed }: { request: SupplierRequestRow; dimmed
             }}
             data-testid={`inbox-link-${request.id}`}
           >
-            Link
+            {t("btn.link")}
           </button>
         </div>
       </div>

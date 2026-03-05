@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/AppShell";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
@@ -10,6 +11,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
 
 export default function Dashboard() {
+  const { t } = useTranslation("dashboard");
+  const { t: tc } = useTranslation("common");
   const { user } = useAuth();
   const statsQuery = useQuery<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null; totalTradeValue: number }>({
     queryKey: ["/api/dashboard/stats"],
@@ -105,8 +108,8 @@ export default function Dashboard() {
         date: new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }),
         value: l.tradeValue ? `$${Number(l.tradeValue).toLocaleString()}` : "—",
         status: l.riskLevel === "LOW" ? "comp" : l.riskLevel === "MEDIUM" ? "pend" : "rev",
-        statusLabel: l.riskLevel === "LOW" ? "Compliant" : l.riskLevel === "MEDIUM" ? "Pending" : "Review",
-        btnLabel: l.riskLevel === "LOW" ? "View" : "Review",
+        statusLabel: l.riskLevel === "LOW" ? t("status.compliant") : l.riskLevel === "MEDIUM" ? t("status.pending") : t("status.review"),
+        btnLabel: l.riskLevel === "LOW" ? t("btn.view") : t("btn.review"),
         icon: ci.icon,
         iconBg: ci.bg,
         originIso2: oIso2,
@@ -124,26 +127,26 @@ export default function Dashboard() {
       {/* ── GREEN HERO BOX ── */}
       <div className="green-hero-box">
         <div className="dash-breadcrumb">
-          {user ? `Welcome back, ${user.displayName || user.email.split("@")[0]}` : "Dashboard"}
+          {user ? t("welcomeBack", { name: user.displayName || user.email.split("@")[0] }) : t("title")}
         </div>
         <div className="dash-alert">
           <span className="alert-label">
-            {totalLookups > 0 ? `${totalLookups} lookups` : "No checks yet"}
+            {totalLookups > 0 ? t("lookups_other", { count: totalLookups }) : t("lookups_zero")}
           </span>
           <span className="alert-text">
-            {stats?.totalLcChecks ?? 0} LC checks · {balance} Shield {balance === 1 ? "check" : "checks"} remaining
-            {stats?.topCorridor ? ` · Top corridor: ${stats.topCorridor}` : ""}
+            {t("lcChecksRemaining", { lcCount: stats?.totalLcChecks ?? 0, balance, checkWord: balance === 1 ? t("check") : t("checks") })}
+            {stats?.topCorridor ? t("topCorridor", { corridor: stats.topCorridor }) : ""}
           </span>
         </div>
         <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
           <Link href="/new-check">
             <button className="ai-btn" data-testid="stat-new-check" style={{ fontSize: 14, padding: "6px 16px" }}>
-              New Check
+              {t("newCheck")}
             </button>
           </Link>
           <Link href="/inbox">
             <button className="ai-btn" data-testid="stat-supplier-link" style={{ fontSize: 14, padding: "6px 16px", background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}>
-              Supplier Inbox
+              {t("supplierInbox")}
             </button>
           </Link>
         </div>
@@ -151,54 +154,54 @@ export default function Dashboard() {
 
       {/* ── TABS ── */}
       <div className="dash-tabs">
-        <div className={`dash-tab${activeTab === "overview" ? " active" : ""}`} onClick={() => setActiveTab("overview")} style={{ cursor: "pointer" }}>Overview</div>
-        <div className={`dash-tab${activeTab === "documents" ? " active" : ""}`} onClick={() => setActiveTab("documents")} style={{ cursor: "pointer" }}>Documents</div>
-        <div className={`dash-tab${activeTab === "activity" ? " active" : ""}`} onClick={() => setActiveTab("activity")} style={{ cursor: "pointer" }}>Activity</div>
+        <div className={`dash-tab${activeTab === "overview" ? " active" : ""}`} onClick={() => setActiveTab("overview")} style={{ cursor: "pointer" }}>{t("tab.overview")}</div>
+        <div className={`dash-tab${activeTab === "documents" ? " active" : ""}`} onClick={() => setActiveTab("documents")} style={{ cursor: "pointer" }}>{t("tab.documents")}</div>
+        <div className={`dash-tab${activeTab === "activity" ? " active" : ""}`} onClick={() => setActiveTab("activity")} style={{ cursor: "pointer" }}>{t("tab.activity")}</div>
       </div>
 
       {/* ── STAT CARDS ── */}
       <div className="stat-cards">
         <div className="stat-card stat-card-link" onClick={() => navigate("/trades")} style={{ cursor: "pointer" }}>
           <div className="stat-icon">🔍</div>
-          <div className="stat-label">Compliance Lookups</div>
+          <div className="stat-label">{t("stat.complianceLookups")}</div>
           <div className="stat-value" data-testid="stat-compliance-lookups">
-            {totalLookups} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>checks</span>
+            {totalLookups} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{t("stat.checks")}</span>
           </div>
-          <div className="stat-sub">All time</div>
+          <div className="stat-sub">{t("stat.allTime")}</div>
         </div>
 
         <div className="stat-card stat-card-link" onClick={() => navigate("/trades")} style={{ cursor: "pointer" }}>
           <div className="stat-icon">📄</div>
-          <div className="stat-label">LC Checks</div>
+          <div className="stat-label">{t("stat.lcChecks")}</div>
           <div className="stat-value">
-            {stats?.totalLcChecks ?? 0} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>checks</span>
+            {stats?.totalLcChecks ?? 0} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{t("stat.checks")}</span>
           </div>
-          <div className="stat-sub">Document validations</div>
+          <div className="stat-sub">{t("stat.docValidations")}</div>
         </div>
 
         <div className="stat-card stat-card-link" onClick={() => navigate("/pricing")} style={{ cursor: "pointer" }}>
           <div className="stat-icon">🛡️</div>
-          <div className="stat-label">Shield Balance</div>
+          <div className="stat-label">{t("stat.shieldBalance")}</div>
           <div className="stat-value">
-            {balance} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{balance === 1 ? "check" : "checks"}</span>
+            {balance} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{balance === 1 ? t("check") : t("checks")}</span>
           </div>
-          <div className="stat-sub">{balance === 0 ? "Buy checks to continue" : "Available for use"}</div>
+          <div className="stat-sub">{balance === 0 ? t("stat.buyChecks") : t("stat.availableForUse")}</div>
         </div>
 
         <div className="stat-card stat-card-link" onClick={() => navigate("/trades")} style={{ cursor: "pointer" }}>
           <div className="stat-icon">💰</div>
-          <div className="stat-label">Total Trade Value</div>
+          <div className="stat-label">{t("stat.totalTradeValue")}</div>
           <div className="stat-value" data-testid="stat-total-trade-value">
             {(stats?.totalTradeValue ?? 0) > 0
               ? <>
-                  ${(stats!.totalTradeValue).toLocaleString()} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>USD</span>
+                  ${(stats!.totalTradeValue).toLocaleString()} <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{t("stat.usd")}</span>
                 </>
               : <>
-                  — <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>not set</span>
+                  — <span style={{ fontSize: 13, color: "var(--app-regent)", fontWeight: 400, fontFamily: "var(--fb)" }}>{t("stat.notSet")}</span>
                 </>
             }
           </div>
-          <div className="stat-sub">{(stats?.totalTradeValue ?? 0) > 0 ? "Across all trades" : "Add values to your trades"}</div>
+          <div className="stat-sub">{(stats?.totalTradeValue ?? 0) > 0 ? t("stat.acrossAllTrades") : t("stat.addValues")}</div>
         </div>
       </div>
 
@@ -210,17 +213,17 @@ export default function Dashboard() {
         {/* LEFT: Recent Trades */}
         <div className="dash-card">
           <div className="dash-card-header">
-            <h3>Recent Trades <span className="count">{recentTrades.length}</span></h3>
-            <Link href="/trades"><span className="link" data-testid="link-view-all-lookups">View All ›</span></Link>
+            <h3>{t("recentTrades")} <span className="count">{recentTrades.length}</span></h3>
+            <Link href="/trades"><span className="link" data-testid="link-view-all-lookups">{t("viewAll")}</span></Link>
           </div>
 
           <table className="trade-table">
             <thead>
               <tr>
-                <th>Commodity</th>
-                <th>Corridor</th>
-                <th>Value</th>
-                <th>Status</th>
+                <th>{t("th.commodity")}</th>
+                <th>{t("th.corridor")}</th>
+                <th>{t("th.value")}</th>
+                <th>{t("th.status")}</th>
                 <th></th>
               </tr>
             </thead>
@@ -228,37 +231,37 @@ export default function Dashboard() {
               {recentTrades.length === 0 ? (
                 <tr>
                   <td colSpan={5} style={{ textAlign: "center", padding: 20, color: "var(--app-regent)" }}>
-                    No trades yet. Run your first compliance check.
+                    {t("emptyTrades")}
                   </td>
                 </tr>
-              ) : recentTrades.map((t) => (
-                <tr key={t.id}>
+              ) : recentTrades.map((tr) => (
+                <tr key={tr.id}>
                   <td>
                     <div className="trade-cell">
-                      <div className="trade-icon" style={{ background: t.iconBg }}>{t.icon}</div>
+                      <div className="trade-icon" style={{ background: tr.iconBg }}>{tr.icon}</div>
                       <div>
-                        <div className="trade-commodity" data-testid={`lookup-name-${t.id}`}>{t.name}</div>
-                        <div className="trade-hs">{t.hs}</div>
+                        <div className="trade-commodity" data-testid={`lookup-name-${tr.id}`}>{tr.name}</div>
+                        <div className="trade-hs">{tr.hs}</div>
                       </div>
                     </div>
                   </td>
                   <td>
-                    {t.corridor}<br />
-                    <span style={{ fontSize: 13, color: "var(--app-regent)" }}>{t.date}</span>
+                    {tr.corridor}<br />
+                    <span style={{ fontSize: 13, color: "var(--app-regent)" }}>{tr.date}</span>
                   </td>
-                  <td>{t.value}</td>
+                  <td>{tr.value}</td>
                   <td>
                     <span className={`status-badge ${
-                      t.status === "comp" ? "status-compliant" :
-                      t.status === "pend" ? "status-pending" : "status-review"
+                      tr.status === "comp" ? "status-compliant" :
+                      tr.status === "pend" ? "status-pending" : "status-review"
                     }`}>
-                      {t.statusLabel}
+                      {tr.statusLabel}
                     </span>
                   </td>
                   <td>
                     <button className="action-link" onClick={() => {
-                      navigate(`/trades/${t.id}`);
-                    }}>{t.btnLabel}</button>
+                      navigate(`/trades/${tr.id}`);
+                    }}>{tr.btnLabel}</button>
                   </td>
                 </tr>
               ))}
@@ -272,16 +275,16 @@ export default function Dashboard() {
           {/* Pending Compliance Docs */}
           <div className="dash-card">
             <div className="dash-card-header">
-              <h3>Pending Compliance Docs</h3>
-              <Link href="/inbox"><span className="link">All ›</span></Link>
+              <h3>{t("pendingDocs")}</h3>
+              <Link href="/inbox"><span className="link">{t("allLink")}</span></Link>
             </div>
 
             {[
-              { ic: "📄", name: "Bill of Lading", detail: "Cocoa Beans · GH → EU", st: "warn", stLabel: "⚠ 3" },
-              { ic: "🌍", name: "Country of Origin", detail: "COCOBOD / Ghana Customs", st: "partial", stLabel: "60%" },
-              { ic: "🔬", name: "Inspection Certificate", detail: "Port Health · Felixstowe", st: "warn", stLabel: "⚠ 2" },
-              { ic: "🌿", name: "EUDR Due Diligence", detail: "Geolocation pending", st: "warn", stLabel: "⚠ 3" },
-              { ic: "📋", name: "Customs Declaration", detail: "CDS · UK Import", st: "ok", stLabel: "✓ Ready" },
+              { ic: "📄", name: t("doc.billOfLading"), detail: t("doc.billOfLadingDetail"), st: "warn", stLabel: "⚠ 3" },
+              { ic: "🌍", name: t("doc.countryOfOrigin"), detail: t("doc.countryOfOriginDetail"), st: "partial", stLabel: "60%" },
+              { ic: "🔬", name: t("doc.inspectionCert"), detail: t("doc.inspectionCertDetail"), st: "warn", stLabel: "⚠ 2" },
+              { ic: "🌿", name: t("doc.eudrDueDiligence"), detail: t("doc.eudrDueDiligenceDetail"), st: "warn", stLabel: "⚠ 3" },
+              { ic: "📋", name: t("doc.customsDeclaration"), detail: t("doc.customsDeclarationDetail"), st: "ok", stLabel: "✓ Ready" },
             ].map((d) => (
               <div key={d.name} className="pending-item">
                 <div className="pending-icon">{d.ic}</div>
@@ -292,7 +295,7 @@ export default function Dashboard() {
                 <div className={`pending-status pending-st-${d.st}`}>{d.stLabel}</div>
               </div>
             ))}
-            <div className="pending-more">+ 2 more documents</div>
+            <div className="pending-more">{t("doc.moreDocuments")}</div>
           </div>
 
           {/* Country Card */}
@@ -300,15 +303,15 @@ export default function Dashboard() {
             <div className="country-card-top">
               <div>
                 <div className="country-name"><span className="live-dot" /> 🇬🇭 Ghana</div>
-                <div className="country-sub">Origin · ECOWAS / WAEMU</div>
+                <div className="country-sub">{t("country.originLabel")}</div>
               </div>
             </div>
             <div className="country-stats">
-              <div className="cs-row"><span className="cs-label">📊 ESG Score</span><span className="cs-value cs-amber">65 / 100</span></div>
-              <div className="cs-row"><span className="cs-label">⏱ Avg Customs Delay</span><span className="cs-value cs-amber">3.5 days</span></div>
-              <div className="cs-row"><span className="cs-label">🏛 Phyto Authority</span><span className="cs-value cs-green">PPRSD</span></div>
-              <div className="cs-row"><span className="cs-label">📜 CoO Issuing Body</span><span className="cs-value cs-muted">Ghana Nat. Chamber</span></div>
-              <div className="cs-row"><span className="cs-label">🍫 Cocoa Council</span><span className="cs-value cs-green">COCOBOD</span></div>
+              <div className="cs-row"><span className="cs-label">📊 {t("country.esgScore")}</span><span className="cs-value cs-amber">65 / 100</span></div>
+              <div className="cs-row"><span className="cs-label">⏱ {t("country.avgCustomsDelay")}</span><span className="cs-value cs-amber">3.5 days</span></div>
+              <div className="cs-row"><span className="cs-label">🏛 {t("country.phytoAuthority")}</span><span className="cs-value cs-green">PPRSD</span></div>
+              <div className="cs-row"><span className="cs-label">📜 {t("country.cooIssuingBody")}</span><span className="cs-value cs-muted">Ghana Nat. Chamber</span></div>
+              <div className="cs-row"><span className="cs-label">🍫 {t("country.cocoaCouncil")}</span><span className="cs-value cs-green">COCOBOD</span></div>
             </div>
           </div>
 
@@ -316,25 +319,25 @@ export default function Dashboard() {
           {(lcCasesQuery.data ?? []).length > 0 && (
             <div className="dash-card">
               <div className="dash-card-header">
-                <h3>My LC Cases <span className="count">{(lcCasesQuery.data ?? []).filter(c => c.status !== "closed").length}</span></h3>
-                <Link href="/trades"><span className="link">View All ›</span></Link>
+                <h3>{t("lcCases")} <span className="count">{(lcCasesQuery.data ?? []).filter(c => c.status !== "closed").length}</span></h3>
+                <Link href="/trades"><span className="link">{t("viewAll")}</span></Link>
               </div>
               {(lcCasesQuery.data ?? []).slice(0, 4).map((c) => {
                 const statusColors: Record<string, { color: string; bg: string; label: string }> = {
-                  checking: { color: "#2563eb", bg: "#eff6ff", label: "Checking" },
-                  all_clear: { color: "#15803d", bg: "#f0fdf4", label: "All Clear" },
-                  discrepancy: { color: "#dc2626", bg: "#fef2f2", label: "Discrepancy" },
-                  pending_correction: { color: "#b45309", bg: "#fefce8", label: "Pending" },
-                  rechecking: { color: "#2563eb", bg: "#eff6ff", label: "Re-checking" },
-                  resolved: { color: "#15803d", bg: "#f0fdf4", label: "Resolved" },
-                  closed: { color: "#666", bg: "#f5f5f5", label: "Closed" },
+                  checking: { color: "#2563eb", bg: "#eff6ff", label: t("lcCase.status.checking") },
+                  all_clear: { color: "#15803d", bg: "#f0fdf4", label: t("lcCase.status.allClear") },
+                  discrepancy: { color: "#dc2626", bg: "#fef2f2", label: t("lcCase.status.discrepancy") },
+                  pending_correction: { color: "#b45309", bg: "#fefce8", label: t("lcCase.status.pending") },
+                  rechecking: { color: "#2563eb", bg: "#eff6ff", label: t("lcCase.status.rechecking") },
+                  resolved: { color: "#15803d", bg: "#f0fdf4", label: t("lcCase.status.resolved") },
+                  closed: { color: "#666", bg: "#f5f5f5", label: t("lcCase.status.closed") },
                 };
                 const st = statusColors[c.status] ?? statusColors.checking;
                 const actionLabel = c.status === "discrepancy" || c.status === "pending_correction"
-                  ? "Follow Up →"
+                  ? t("lcCase.action.followUp")
                   : c.status === "all_clear" || c.status === "resolved"
-                  ? "View →"
-                  : "Continue →";
+                  ? t("lcCase.action.view")
+                  : t("lcCase.action.continue");
                 return (
                   <div key={c.id} className="pending-item" style={{ cursor: "pointer" }} onClick={() => {
                     if (c.sourceLookupId) {
@@ -344,10 +347,10 @@ export default function Dashboard() {
                     <div className="pending-icon" style={{ fontSize: 16 }}>📋</div>
                     <div className="pending-info">
                       <div className="pending-name" style={{ fontSize: 12.5 }}>
-                        {c.lcReference || "LC Case"}
+                        {c.lcReference || t("lcCase.defaultName")}
                       </div>
                       <div className="pending-detail" style={{ fontSize: 11 }}>
-                        {c.beneficiaryName || "Unknown"} · {c.recheckCount} re-check{c.recheckCount !== 1 ? "s" : ""}
+                        {c.beneficiaryName || t("lcCase.unknown")} · {t("lcCase.recheckCount", { count: c.recheckCount })}
                       </div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
@@ -367,30 +370,30 @@ export default function Dashboard() {
           {/* Compliance Status */}
           <div className="dash-card">
             <div className="dash-card-header">
-              <h3>Compliance Status</h3>
-              <Link href="/alerts"><span className="link">View All ›</span></Link>
+              <h3>{t("complianceStatus")}</h3>
+              <Link href="/alerts"><span className="link">{t("viewAll")}</span></Link>
             </div>
             <div className="comp-status-body">
               <div className="comp-row">
                 <span className="comp-pct">78%</span>
-                <span className="comp-sub">Verified · 8 of 10</span>
+                <span className="comp-sub">{t("compliance.verified", { count: 8, total: 10 })}</span>
               </div>
               <div className="comp-progress"><div className="comp-fill" style={{ width: "78%" }} /></div>
               <div className="comp-tiles">
                 <div className="comp-tile">
                   <div className="comp-tile-ic">📁</div>
-                  <div className="comp-tile-lbl">Documents</div>
-                  <div className="comp-tile-cnt comp-red">7 of 10</div>
+                  <div className="comp-tile-lbl">{t("compliance.documents")}</div>
+                  <div className="comp-tile-cnt comp-red">{t("compliance.documentsCount", { count: 7, total: 10 })}</div>
                 </div>
                 <div className="comp-tile">
                   <div className="comp-tile-ic">🛡️</div>
-                  <div className="comp-tile-lbl">Risks</div>
-                  <div className="comp-tile-cnt comp-amber">3 flagged</div>
+                  <div className="comp-tile-lbl">{t("compliance.risks")}</div>
+                  <div className="comp-tile-cnt comp-amber">{t("compliance.flagged", { count: 3 })}</div>
                 </div>
                 <div className="comp-tile">
                   <div className="comp-tile-ic">🚩</div>
-                  <div className="comp-tile-lbl">Sanctions</div>
-                  <div className="comp-tile-cnt comp-amber">Pending</div>
+                  <div className="comp-tile-lbl">{t("compliance.sanctions")}</div>
+                  <div className="comp-tile-cnt comp-amber">{tc("status.pending")}</div>
                 </div>
               </div>
             </div>
@@ -399,15 +402,15 @@ export default function Dashboard() {
           {/* Recent Activity */}
           <div className="dash-card">
             <div className="dash-card-header">
-              <h3>Recent Activity</h3>
-              <Link href="/trades"><span className="link">View ›</span></Link>
+              <h3>{t("recentActivity")}</h3>
+              <Link href="/trades"><span className="link">{t("viewLink")}</span></Link>
             </div>
             <div className="activity-list">
               {(lookupsQuery.data ?? []).slice(0, 2).map((l, i) => (
                 <div key={l.id} className="activity-item">
                   <div className="act-avatar" style={{ background: i === 0 ? "rgba(93,217,193,0.12)" : "rgba(234,179,8,0.12)", color: i === 0 ? "var(--app-acapulco)" : "#d97706" }}>F</div>
                   <div className="act-content">
-                    <div className="act-text"><strong>You</strong> ran compliance lookup · {l.commodityName}</div>
+                    <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.complianceLookup", { commodity: l.commodityName }) }} />
                     <div className="act-time">{new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</div>
                   </div>
                 </div>
@@ -416,13 +419,13 @@ export default function Dashboard() {
                 <div key={lc.id} className="activity-item">
                   <div className="act-avatar" style={{ background: "rgba(20,184,166,0.12)", color: "#0d9488" }}>F</div>
                   <div className="act-content">
-                    <div className="act-text"><strong>You</strong> submitted LC check</div>
+                    <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.lcCheck") }} />
                     <div className="act-time">{new Date(lc.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</div>
                   </div>
                 </div>
               ))}
               {(lookupsQuery.data ?? []).length === 0 && (lcQuery.data ?? []).length === 0 && (
-                <div style={{ textAlign: "center", padding: 16, color: "var(--app-regent)", fontSize: 13 }}>No recent activity</div>
+                <div style={{ textAlign: "center", padding: 16, color: "var(--app-regent)", fontSize: 13 }}>{t("noRecentActivity")}</div>
               )}
             </div>
           </div>
@@ -436,22 +439,22 @@ export default function Dashboard() {
       <div className="dash-grid" style={{ gridTemplateColumns: "1fr" }}>
         <div className="dash-card">
           <div className="dash-card-header">
-            <h3>Pending Compliance Documents</h3>
-            <Link href="/inbox"><span className="link">Supplier Inbox ›</span></Link>
+            <h3>{t("documentsTab.title")}</h3>
+            <Link href="/inbox"><span className="link">{t("documentsTab.supplierInbox")}</span></Link>
           </div>
           {recentTrades.length === 0 ? (
             <div style={{ textAlign: "center", padding: 32, color: "var(--app-regent)", fontSize: 13 }}>
-              No trades yet. Run a compliance check to see document requirements.
+              {t("documentsTab.empty")}
             </div>
-          ) : recentTrades.map((t) => (
-            <div key={t.id} className="pending-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/trades/${t.id}`)}>
-              <div className="pending-icon">{t.icon}</div>
+          ) : recentTrades.map((tr) => (
+            <div key={tr.id} className="pending-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/trades/${tr.id}`)}>
+              <div className="pending-icon">{tr.icon}</div>
               <div className="pending-info">
-                <div className="pending-name">{t.name}</div>
-                <div className="pending-detail">{t.corridor} · {t.hs}</div>
+                <div className="pending-name">{tr.name}</div>
+                <div className="pending-detail">{tr.corridor} · {tr.hs}</div>
               </div>
-              <div className={`pending-status pending-st-${t.status === "comp" ? "ok" : "warn"}`}>
-                {t.status === "comp" ? "✓ Ready" : t.statusLabel}
+              <div className={`pending-status pending-st-${tr.status === "comp" ? "ok" : "warn"}`}>
+                {tr.status === "comp" ? t("documentsTab.ready") : tr.statusLabel}
               </div>
             </div>
           ))}
@@ -463,15 +466,15 @@ export default function Dashboard() {
       <div className="dash-grid" style={{ gridTemplateColumns: "1fr" }}>
         <div className="dash-card">
           <div className="dash-card-header">
-            <h3>All Activity</h3>
-            <Link href="/trades"><span className="link">Trades ›</span></Link>
+            <h3>{t("activityTab.title")}</h3>
+            <Link href="/trades"><span className="link">{t("activityTab.tradesLink")}</span></Link>
           </div>
           <div className="activity-list">
             {(lookupsQuery.data ?? []).map((l) => (
               <div key={l.id} className="activity-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/trades/${l.id}`)}>
                 <div className="act-avatar" style={{ background: "rgba(93,217,193,0.12)", color: "var(--app-acapulco)" }}>F</div>
                 <div className="act-content">
-                  <div className="act-text"><strong>You</strong> ran compliance lookup · {l.commodityName}</div>
+                  <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.complianceLookup", { commodity: l.commodityName }) }} />
                   <div className="act-time">{new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</div>
                 </div>
               </div>
@@ -480,13 +483,13 @@ export default function Dashboard() {
               <div key={lc.id} className="activity-item">
                 <div className="act-avatar" style={{ background: "rgba(20,184,166,0.12)", color: "#0d9488" }}>F</div>
                 <div className="act-content">
-                  <div className="act-text"><strong>You</strong> submitted LC check</div>
+                  <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.lcCheck") }} />
                   <div className="act-time">{new Date(lc.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</div>
                 </div>
               </div>
             ))}
             {(lookupsQuery.data ?? []).length === 0 && (lcQuery.data ?? []).length === 0 && (
-              <div style={{ textAlign: "center", padding: 32, color: "var(--app-regent)", fontSize: 13 }}>No activity yet. Start a compliance check.</div>
+              <div style={{ textAlign: "center", padding: 32, color: "var(--app-regent)", fontSize: 13 }}>{t("activityTab.empty")}</div>
             )}
           </div>
         </div>

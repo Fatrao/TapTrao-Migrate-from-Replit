@@ -1,0 +1,44 @@
+{
+  "title": "Bo\u00eete Fournisseur",
+  "subtitle": "{{waiting}} fournisseurs en attente \u00b7 {{blocking}} probl\u00e8me{{plural}} bloquant{{plural}}",
+  "newUploadLink": "+ Nouveau lien d'envoi",
+
+  "stat.awaitingDocuments": "Documents en attente",
+  "stat.blockingIssue": "Probl\u00e8me bloquant",
+  "stat.completeThisWeek": "Compl\u00e9t\u00e9s cette semaine",
+
+  "loading": "Chargement de la bo\u00eete...",
+  "empty.title": "Aucune demande fournisseur.",
+  "empty.subtitle": "Envoyez votre premier brief fournisseur depuis le v\u00e9rificateur LC ou la recherche de conformit\u00e9.",
+
+  "section.awaitingDocuments": "Documents en attente",
+  "section.blockingIssue": "Probl\u00e8me bloquant",
+  "section.complete": "Termin\u00e9",
+
+  "status.blocking": "Bloquant",
+  "status.awaiting": "En attente",
+  "status.complete": "Termin\u00e9",
+
+  "card.allDocsReceived": "Tous les documents re\u00e7us",
+  "card.waitingFor": "En attente de {{docs}}",
+  "card.docs": "{{received}}/{{total}} docs",
+
+  "time.justNow": "\u00e0 l'instant",
+  "time.minsAgo": "il y a {{mins}}min",
+  "time.hoursAgo": "il y a {{hours}}h",
+  "time.daysAgo": "il y a {{days}}j",
+  "time.monthsAgo": "il y a {{months}}mois",
+
+  "time.sentJustNow": "Envoy\u00e9 \u00e0 l'instant",
+  "time.sentMinsAgo": "Envoy\u00e9 il y a {{mins}}min",
+  "time.sentHoursAgo": "Envoy\u00e9 il y a {{hours}}h",
+  "time.sentDaysAgo": "Envoy\u00e9 il y a {{days}}j",
+  "time.sentMonthsAgo": "Envoy\u00e9 il y a {{months}}mois",
+
+  "time.overdue": "En retard",
+  "time.daysOverdue": "{{days}}j de retard",
+
+  "btn.whatsapp": "WhatsApp",
+  "btn.email": "Email",
+  "btn.link": "Lien"
+}

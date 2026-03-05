@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { MessageCircle, Mail, Copy, Check } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
@@ -7,6 +8,7 @@ import { getDocEmoji, getDocIssuer, relativeTime } from "./helpers";
 import type { LcPrefillData, SupplierDocsResponse } from "./constants";
 
 export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | null }) {
+  const { t } = useTranslation("lcCheck");
   const [copiedLink, setCopiedLink] = useState(false);
   const lookupId = prefillData?.lookup_id;
 
@@ -94,8 +96,8 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
   if (!lookupId) {
     return (
       <div style={{ padding: "80px 24px", textAlign: "center", color: "var(--t2)", fontSize: 14 }}>
-        <p style={{ marginBottom: 8 }}>No lookup linked to this LC check.</p>
-        <p>Run a compliance lookup first, then start an LC check from the results page.</p>
+        <p style={{ marginBottom: 8 }}>{t("supplier.noLookupTitle")}</p>
+        <p>{t("supplier.noLookupBody")}</p>
       </div>
     );
   }
@@ -126,12 +128,12 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
           />
           <div style={{ position: "relative" }}>
             <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 16, color: "var(--t1)", marginBottom: 6 }}>
-              Send document request to supplier
+              {t("supplier.sendTitle")}
             </h3>
             <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.5, marginBottom: 14 }}>
               {sr?.lastSentAt
-                ? `Last sent via ${(sr.sentVia as string[])?.slice(-1)[0] || "link"} \u00B7 ${relativeTime(sr.lastSentAt as unknown as string)} \u00B7 ${sr.status}`
-                : "Generate a secure upload link and send it to your supplier. They can upload directly \u2014 no account required."}
+                ? t("supplier.lastSentVia", { channel: (sr.sentVia as string[])?.slice(-1)[0] || "link", time: relativeTime(sr.lastSentAt as unknown as string), status: sr.status })
+                : t("supplier.sendDescription")}
             </p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <button
@@ -151,7 +153,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
                 }}
                 data-testid="button-send-whatsapp"
               >
-                <MessageCircle size={14} /> Send via WhatsApp
+                <MessageCircle size={14} /> {t("supplier.sendWhatsApp")}
               </button>
               <button
                 onClick={handleSendEmail}
@@ -170,7 +172,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
                 }}
                 data-testid="button-send-email"
               >
-                <Mail size={14} /> Send via Email
+                <Mail size={14} /> {t("supplier.sendEmail")}
               </button>
               <button
                 onClick={handleCopyLink}
@@ -189,7 +191,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
                 }}
                 data-testid="button-copy-link"
               >
-                {copiedLink ? <><Check size={14} /> Copied!</> : <><Copy size={14} /> Copy upload link</>}
+                {copiedLink ? <><Check size={14} /> {t("supplier.copied")}</> : <><Copy size={14} /> {t("supplier.copyLink")}</>}
               </button>
             </div>
           </div>
@@ -198,7 +200,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
         {/* DOCUMENT CHECKLIST */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
           <span style={{ fontFamily: "var(--fb)", fontSize: 13, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", whiteSpace: "nowrap" }}>
-            Required documents ({totalCount})
+            {t("supplier.requiredDocs", { count: totalCount })}
           </span>
           <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
         </div>
@@ -215,22 +217,22 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
           let iconBd: string;
 
           if (isVerified) {
-            statusLabel = "\u2713 Verified";
+            statusLabel = `\u2713 ${t("supplier.verified")}`;
             statusColor = "var(--green)";
             iconBg = "var(--gbg)";
             iconBd = "var(--gbd)";
           } else if (hasFinding) {
-            statusLabel = "\u2297 Needs amendment";
+            statusLabel = `\u2297 ${t("supplier.needsAmendment")}`;
             statusColor = "var(--red)";
             iconBg = "var(--rbg)";
             iconBd = "var(--rbd)";
           } else if (isReceived || upload) {
-            statusLabel = "\u25CF Awaiting upload";
+            statusLabel = `\u25CF ${t("supplier.awaitingUpload")}`;
             statusColor = "var(--amber)";
             iconBg = "var(--abg)";
             iconBd = "var(--abd)";
           } else {
-            statusLabel = "\u25CB Not yet sent";
+            statusLabel = `\u25CB ${t("supplier.notYetSent")}`;
             statusColor = "var(--t3)";
             iconBg = "var(--card2)";
             iconBd = "var(--border)";
@@ -333,7 +335,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
                     </span>
                   </>
                 ) : (
-                  <span style={{ fontStyle: "italic", fontSize: 13, color: "var(--t3)", flex: 1 }}>Not yet uploaded</span>
+                  <span style={{ fontStyle: "italic", fontSize: 13, color: "var(--t3)", flex: 1 }}>{t("supplier.notYetUploaded")}</span>
                 )}
               </div>
             </div>
@@ -350,14 +352,14 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
         }}
       >
         <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 15, color: "var(--t1)", marginBottom: 4 }}>
-          Document progress
+          {t("supplier.docProgress")}
         </h3>
         <p style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)", marginBottom: 16 }}>
           {prefillData?.commodity_name || "Commodity"} \u00B7 {prefillData?.origin_name || ""} \u2192 {prefillData?.dest_name || ""}
         </p>
 
         <div style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)", marginBottom: 6 }}>
-          {receivedCount} of {totalCount} received
+          {t("supplier.receivedOf", { received: receivedCount, total: totalCount })}
         </div>
         <div style={{ height: 4, background: "var(--border)", borderRadius: 2, marginBottom: 12, overflow: "hidden" }}>
           <div
@@ -373,16 +375,16 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
 
         <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.5, marginBottom: 16 }}>
           {receivedCount === 0
-            ? "No documents received yet. Send a request to your supplier to get started."
+            ? t("supplier.noDocsReceived")
             : receivedCount === totalCount
-              ? "All documents received and ready for review."
-              : `${totalCount - receivedCount} document${totalCount - receivedCount > 1 ? "s" : ""} still pending from supplier.`}
+              ? t("supplier.allDocsReceived")
+              : t("supplier.docsPending", { count: totalCount - receivedCount })}
         </p>
 
         <div style={{ height: 1, background: "var(--border)", margin: "12px 0" }} />
 
         <div style={{ fontFamily: "var(--fb)", fontSize: 13, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", marginBottom: 10 }}>
-          Activity
+          {t("supplier.activity")}
         </div>
 
         {sr?.lastSentAt && (
@@ -390,7 +392,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--blue)", marginTop: 3, flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 13, color: "var(--t2)" }}>
-                Supplier brief sent via {(sr.sentVia as string[])?.slice(-1)[0] || "link"}
+                {t("supplier.briefSentVia", { channel: (sr.sentVia as string[])?.slice(-1)[0] || "link" })}
               </div>
               <div style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)" }}>
                 {relativeTime(sr.lastSentAt as unknown as string)}
@@ -404,7 +406,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: upload.verified ? "var(--green)" : "var(--amber)", marginTop: 3, flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 13, color: "var(--t2)" }}>
-                {upload.verified ? `${upload.docType} verified` : `${upload.docType} uploaded`}
+                {upload.verified ? t("supplier.docVerified", { docType: upload.docType }) : t("supplier.docUploaded", { docType: upload.docType })}
               </div>
               <div style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)" }}>
                 {upload.uploadedAt ? relativeTime(upload.uploadedAt as unknown as string) : ""}
@@ -415,17 +417,17 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
 
         {!sr?.lastSentAt && uploads.length === 0 && (
           <div style={{ fontSize: 13, color: "var(--t3)", fontStyle: "italic", padding: "8px 0" }}>
-            No activity yet
+            {t("supplier.noActivity")}
           </div>
         )}
 
         <div style={{ height: 1, background: "var(--border)", margin: "12px 0" }} />
 
         <div style={{ fontFamily: "var(--fb)", fontSize: 13, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--t3)", marginBottom: 6 }}>
-          Supplier
+          {t("supplier.supplierLabel")}
         </div>
         <div style={{ fontSize: 14, fontWeight: 600, color: "var(--t1)", marginBottom: 4 }}>
-          {sr?.supplierName || "Not yet assigned"}
+          {sr?.supplierName || t("supplier.notYetAssigned")}
         </div>
         {sr?.uploadToken && (
           <button
@@ -448,7 +450,7 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
             }}
             data-testid="button-view-upload-page"
           >
-            View upload page \u2192
+            {t("supplier.viewUploadPage")}
           </button>
         )}
       </div>

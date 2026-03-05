@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/AppShell";
 import { StepNav } from "@/components/StepNav";
@@ -59,6 +60,7 @@ import { CorrectionsTab } from "./lc-check/CorrectionsTab";
 
 
 export default function LcCheck() {
+  const { t } = useTranslation("lcCheck");
   const [step, setStep] = useState(1);
   const [prefillData, setPrefillData] = useState<LcPrefillData | null>(null);
   const [showPrefillBanner, setShowPrefillBanner] = useState(false);
@@ -391,24 +393,24 @@ export default function LcCheck() {
         {/* ═══════ HERO — matches design ref .green-hero-box ═══════ */}
         <div className="green-hero-box">
           <div className="hero-row">
-            <div className="breadcrumb">Compliance › LC Check › New Check</div>
+            <div className="breadcrumb">{t("breadcrumb")}</div>
             <div className="price-pill" data-testid="text-lc-title">
-              {isFreeCheck ? "FREE" : "1 credit per check"}
+              {isFreeCheck ? t("priceFree") : t("priceCredit")}
             </div>
           </div>
-          <h1>LC Document<br />Checker</h1>
+          <h1>{t("heroTitle").split("\n").map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}</h1>
           <p className="subtitle">
-            Cross-check supplier docs against your LC — UCP 600 &amp; ISBP 745 applied.
+            {t("heroSubtitle")}
           </p>
         </div>
 
         {/* ═══════ STEPPER — matches design ref .step-bar ═══════ */}
         <div className="step-bar">
           {([
-            { n: 1, label: "LC Terms" },
-            { n: 2, label: "Supplier Docs" },
-            { n: 3, label: "Review" },
-            { n: 4, label: "Results" },
+            { n: 1, label: t("step.lcTerms") },
+            { n: 2, label: t("step.supplierDocs") },
+            { n: 3, label: t("step.review") },
+            { n: 4, label: t("step.results") },
           ] as const).map((s, i, arr) => (
             <div key={s.n} style={{ display: "contents" }}>
               <div className={`step ${step >= s.n ? "active" : "inactive"}`}>
@@ -428,7 +430,7 @@ export default function LcCheck() {
             <ExternalLink size={18} style={{ color: "var(--app-acapulco)", flexShrink: 0, marginTop: 1 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontSize: 13, fontWeight: 600, color: "var(--app-acapulco)" }} data-testid="text-prefill-info">
-                Pre-filled from your compliance lookup
+                {t("prefill.title")}
               </p>
               <p style={{ fontSize: 13, color: "var(--app-regent)" }}>
                 {prefillData.commodity_name} — {prefillData.origin_name} → {prefillData.dest_name}
@@ -439,7 +441,7 @@ export default function LcCheck() {
                   style={{ fontSize: 13, color: "var(--app-acapulco)", textDecoration: "underline", marginTop: 4, display: "inline-block" }}
                   data-testid="link-view-lookup"
                 >
-                  View lookup →
+                  {t("prefill.viewLookup")}
                 </Link>
               )}
             </div>
@@ -457,13 +459,13 @@ export default function LcCheck() {
         {step === 1 && (
           <>
             <div className="form-card">
-              <div className="form-card-header"><span>📋</span><h2>Letter of Credit — Key Terms</h2></div>
-              <p className="form-card-subtitle">Enter exactly as they appear on your LC.</p>
+              <div className="form-card-header"><span>📋</span><h2>{t("step1.formTitle")}</h2></div>
+              <p className="form-card-subtitle">{t("step1.formSubtitle")}</p>
 
               {/* Row 1: LC Reference + Issuing Bank */}
               <div className="form-row cols-2">
                 <div className={`form-group ${confidenceClass("lcReference")}`}>
-                  <label>LC Reference</label>
+                  <label>{t("step1.lcReference")}</label>
                   <input type="text"
                     value={lcFields.lcReference}
                     onChange={e => updateLcField("lcReference", e.target.value)}
@@ -472,7 +474,7 @@ export default function LcCheck() {
                   />
                 </div>
                 <div className={`form-group ${confidenceClass("issuingBank")}`}>
-                  <label>Issuing Bank</label>
+                  <label>{t("step1.issuingBank")}</label>
                   <input type="text"
                     value={lcFields.issuingBank}
                     onChange={e => updateLcField("issuingBank", e.target.value)}
@@ -485,7 +487,7 @@ export default function LcCheck() {
               {/* Row 1b: Advising Bank + SWIFT Codes */}
               <div className="form-row cols-2">
                 <div className={`form-group ${confidenceClass("advisingBank")}`}>
-                  <label>Advising / Confirming Bank</label>
+                  <label>{t("step1.advisingBank")}</label>
                   <input type="text"
                     value={lcFields.advisingBank}
                     onChange={e => updateLcField("advisingBank", e.target.value)}
@@ -495,7 +497,7 @@ export default function LcCheck() {
                 </div>
                 <div className="form-row cols-2" style={{ gap: 12 }}>
                   <div className={`form-group ${confidenceClass("issuingBankSwift")}`}>
-                    <label>Issuing Bank SWIFT</label>
+                    <label>{t("step1.issuingBankSwift")}</label>
                     <input type="text"
                       value={lcFields.issuingBankSwift}
                       onChange={e => updateLcField("issuingBankSwift", e.target.value.toUpperCase())}
@@ -505,7 +507,7 @@ export default function LcCheck() {
                     />
                   </div>
                   <div className={`form-group ${confidenceClass("advisingBankSwift")}`}>
-                    <label>Advising Bank SWIFT</label>
+                    <label>{t("step1.advisingBankSwift")}</label>
                     <input type="text"
                       value={lcFields.advisingBankSwift}
                       onChange={e => updateLcField("advisingBankSwift", e.target.value.toUpperCase())}
@@ -520,7 +522,7 @@ export default function LcCheck() {
               {/* Row 2: Beneficiary + Applicant */}
               <div className="form-row cols-2">
                 <div className={`form-group ${confidenceClass("beneficiaryName")}`}>
-                  <label>Beneficiary (Supplier) {req}</label>
+                  <label>{t("step1.beneficiary")} {req}</label>
                   <input type="text"
                     value={lcFields.beneficiaryName}
                     onChange={e => updateLcField("beneficiaryName", e.target.value)}
@@ -529,7 +531,7 @@ export default function LcCheck() {
                   />
                 </div>
                 <div className={`form-group ${confidenceClass("applicantName")}`}>
-                  <label>Applicant (Buyer) {req}</label>
+                  <label>{t("step1.applicant")} {req}</label>
                   <input type="text"
                     value={lcFields.applicantName}
                     onChange={e => updateLcField("applicantName", e.target.value)}
@@ -542,7 +544,7 @@ export default function LcCheck() {
               {/* Goods Description (full width) */}
               <div className="form-row cols-1">
                 <div className={`form-group ${confidenceClass("goodsDescription")}`}>
-                  <label>Goods Description {req}</label>
+                  <label>{t("step1.goodsDescription")} {req}</label>
                   <input type="text"
                     value={lcFields.goodsDescription}
                     onChange={e => updateLcField("goodsDescription", e.target.value)}
@@ -555,7 +557,7 @@ export default function LcCheck() {
               {/* 3-col: Quantity, LC Amount, Currency */}
               <div className="form-row cols-3">
                 <div className={`form-group ${confidenceClass("quantity")}`}>
-                  <label>Quantity {req}</label>
+                  <label>{t("step1.quantity")} {req}</label>
                   <input type="text"
                     value={lcFields.quantity || ""}
                     onChange={e => updateLcField("quantity", parseFloat(e.target.value) || 0)}
@@ -564,7 +566,7 @@ export default function LcCheck() {
                   />
                 </div>
                 <div className={`form-group ${confidenceClass("totalAmount")}`}>
-                  <label>LC Amount {req}</label>
+                  <label>{t("step1.lcAmount")} {req}</label>
                   <input type="number"
                     value={lcFields.totalAmount || ""}
                     onChange={e => updateLcField("totalAmount", parseFloat(e.target.value) || 0)}
@@ -573,7 +575,7 @@ export default function LcCheck() {
                   />
                 </div>
                 <div className={`form-group ${confidenceClass("currency")}`}>
-                  <label>Currency</label>
+                  <label>{t("step1.currency")}</label>
                   <select
                     value={lcFields.currency}
                     onChange={e => updateLcField("currency", e.target.value)}
@@ -587,7 +589,7 @@ export default function LcCheck() {
               {/* 3-col: Ports + Country of Origin */}
               <div className="form-row cols-3">
                 <div className={`form-group ${confidenceClass("portOfLoading")}`}>
-                  <label>Port of Loading</label>
+                  <label>{t("step1.portOfLoading")}</label>
                   <input type="text"
                     value={lcFields.portOfLoading}
                     onChange={e => updateLcField("portOfLoading", e.target.value)}
@@ -596,7 +598,7 @@ export default function LcCheck() {
                   />
                 </div>
                 <div className={`form-group ${confidenceClass("portOfDischarge")}`}>
-                  <label>Port of Discharge</label>
+                  <label>{t("step1.portOfDischarge")}</label>
                   <input type="text"
                     value={lcFields.portOfDischarge}
                     onChange={e => updateLcField("portOfDischarge", e.target.value)}
@@ -605,7 +607,7 @@ export default function LcCheck() {
                   />
                 </div>
                 <div className={`form-group ${confidenceClass("countryOfOrigin")}`}>
-                  <label>Country of Origin</label>
+                  <label>{t("step1.countryOfOrigin")}</label>
                   <input type="text"
                     value={lcFields.countryOfOrigin}
                     onChange={e => updateLcField("countryOfOrigin", e.target.value)}
@@ -618,7 +620,7 @@ export default function LcCheck() {
               {/* 3-col: Dates + Incoterms */}
               <div className="form-row cols-3">
                 <div className={`form-group ${confidenceClass("latestShipmentDate")}`}>
-                  <label>Latest Shipment Date {req}</label>
+                  <label>{t("step1.latestShipmentDate")} {req}</label>
                   <input type="date"
                     value={lcFields.latestShipmentDate}
                     onChange={e => updateLcField("latestShipmentDate", e.target.value)}
@@ -626,7 +628,7 @@ export default function LcCheck() {
                   />
                 </div>
                 <div className={`form-group ${confidenceClass("lcExpiryDate")}`}>
-                  <label>LC Expiry Date {req}</label>
+                  <label>{t("step1.lcExpiryDate")} {req}</label>
                   <input type="date"
                     value={lcFields.lcExpiryDate}
                     onChange={e => updateLcField("lcExpiryDate", e.target.value)}
@@ -634,7 +636,7 @@ export default function LcCheck() {
                   />
                 </div>
                 <div className={`form-group ${confidenceClass("incoterms")}`}>
-                  <label>Incoterms</label>
+                  <label>{t("step1.incoterms")}</label>
                   <select
                     value={lcFields.incoterms}
                     onChange={e => updateLcField("incoterms", e.target.value)}
@@ -648,7 +650,7 @@ export default function LcCheck() {
               {/* 3-col: HS Code, Unit Price, Quantity Unit */}
               <div className="form-row cols-3">
                 <div className={`form-group ${confidenceClass("hsCode")}`}>
-                  <label>HS Code</label>
+                  <label>{t("step1.hsCode")}</label>
                   <input type="text"
                     value={lcFields.hsCode}
                     onChange={e => updateLcField("hsCode", e.target.value)}
@@ -657,7 +659,7 @@ export default function LcCheck() {
                   />
                 </div>
                 <div className={`form-group ${confidenceClass("unitPrice")}`}>
-                  <label>Unit Price</label>
+                  <label>{t("step1.unitPrice")}</label>
                   <input type="number"
                     value={lcFields.unitPrice || ""}
                     onChange={e => updateLcField("unitPrice", parseFloat(e.target.value) || 0)}
@@ -666,7 +668,7 @@ export default function LcCheck() {
                   />
                 </div>
                 <div className={`form-group ${confidenceClass("quantityUnit")}`}>
-                  <label>Quantity Unit</label>
+                  <label>{t("step1.quantityUnit")}</label>
                   <select
                     value={lcFields.quantityUnit}
                     onChange={e => updateLcField("quantityUnit", e.target.value)}
@@ -680,7 +682,7 @@ export default function LcCheck() {
               {/* Toggle: Partial Shipments — matches design ref .toggle-row */}
               <div className="toggle-row">
                 <div className="toggle-info">
-                  <h4>Partial Shipments Allowed</h4>
+                  <h4>{t("step1.partialShipmentsAllowed")}</h4>
                   <p>UCP 600 Art. 31</p>
                 </div>
                 <label className="lc-tog">
@@ -696,7 +698,7 @@ export default function LcCheck() {
               {/* Toggle: Transhipment */}
               <div className="toggle-row">
                 <div className="toggle-info">
-                  <h4>Transhipment Allowed</h4>
+                  <h4>{t("step1.transhipmentAllowed")}</h4>
                   <p>UCP 600 Art. 20</p>
                 </div>
                 <label className="lc-tog">
@@ -711,7 +713,7 @@ export default function LcCheck() {
 
               {/* Quantity Tolerance — SWIFT 39A/39B */}
               <div className="form-group" style={{ marginTop: 12 }}>
-                <label>Quantity Tolerance % <span style={{ fontSize: 13, color: "#888" }}>(SWIFT 39A — default 5%)</span></label>
+                <label>{t("step1.quantityTolerance")} <span style={{ fontSize: 13, color: "#888" }}>{t("step1.quantityToleranceHint")}</span></label>
                 <input
                   type="number"
                   min={0}
@@ -727,14 +729,14 @@ export default function LcCheck() {
 
             {/* Upload Card — LC PDF extraction */}
             <div className="upload-card">
-              <div className="upload-card-header"><span>📎</span><h2>Upload LC as PDF</h2></div>
-              <p className="upload-card-subtitle">Upload your LC document to auto-fill the fields above, or continue entering manually.</p>
+              <div className="upload-card-header"><span>📎</span><h2>{t("step1.upload.title")}</h2></div>
+              <p className="upload-card-subtitle">{t("step1.upload.subtitle")}</p>
 
               {extractionStatus === "idle" && !lcPdfFile && (
                 <UploadZone
                   icon="📄"
-                  title="Drop your LC here"
-                  subtitle="Browse or drop PDF"
+                  title={t("step1.upload.dropTitle")}
+                  subtitle={t("step1.upload.dropSubtitle")}
                   accept=".pdf,.jpg,.jpeg,.png"
                   onFileSelect={handleLcExtraction}
                 />
@@ -743,8 +745,8 @@ export default function LcCheck() {
               {extractionStatus === "extracting" && (
                 <div className="upload-note" style={{ padding: "24px 16px", textAlign: "center" }}>
                   <div style={{ fontSize: 22, marginBottom: 8, animation: "pulse 1.5s ease-in-out infinite" }}>🔍</div>
-                  <div style={{ fontWeight: 600, fontSize: 14, color: "#2a3d40", marginBottom: 4 }}>Extracting fields from your LC...</div>
-                  <div style={{ fontSize: 14, color: "#888" }}>This may take 10-20 seconds</div>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: "#2a3d40", marginBottom: 4 }}>{t("step1.upload.extracting")}</div>
+                  <div style={{ fontSize: 14, color: "#888" }}>{t("step1.upload.extractingTime")}</div>
                 </div>
               )}
 
@@ -758,7 +760,7 @@ export default function LcCheck() {
                     setExtractionWarnings([]);
                   }} />
                   <div className="upload-note" style={{ background: "#f0fdf4", borderColor: "#bbf7d0" }}>
-                    🤖 <span><strong>{extractionStats?.count} of {extractionStats?.total} fields extracted</strong> from your LC. Review highlighted fields below.</span>
+                    🤖 <span dangerouslySetInnerHTML={{ __html: t("step1.upload.fieldsExtracted", { count: extractionStats?.count, total: extractionStats?.total }) }} />
                   </div>
                   {extractionWarnings.length > 0 && (
                     <div className="upload-note" style={{ background: "#fffbeb", borderColor: "#fde68a", marginTop: 6 }}>
@@ -778,13 +780,13 @@ export default function LcCheck() {
                     }} />
                   )}
                   <div className="upload-note" style={{ background: "#fef2f2", borderColor: "#fecaca" }}>
-                    ❌ <span>{extractionError || "Extraction failed"} — enter fields manually.</span>
+                    ❌ <span>{t("step1.upload.extractionFailed", { error: extractionError || "Extraction failed" })}</span>
                   </div>
                   {!lcPdfFile && (
                     <UploadZone
                       icon="📄"
-                      title="Try again"
-                      subtitle="Browse or drop PDF"
+                      title={t("step1.upload.tryAgain")}
+                      subtitle={t("step1.upload.dropSubtitle")}
                       accept=".pdf,.jpg,.jpeg,.png"
                       onFileSelect={handleLcExtraction}
                     />
@@ -801,9 +803,9 @@ export default function LcCheck() {
                 onClick={() => goStep(2)}
                 data-testid="button-next-step-2"
               >
-                Continue to Supplier Docs →
+                {t("step1.continueToSupplierDocs")}
               </button>
-              <button className="btn-secondary">Save Draft</button>
+              <button className="btn-secondary">{t("step1.saveDraft")}</button>
             </div>
           </>
         )}
@@ -812,8 +814,8 @@ export default function LcCheck() {
         {step === 2 && (
           <>
             <div className="form-card">
-              <div className="form-card-header"><span>📦</span><h2>Supplier Documents</h2></div>
-              <p className="form-card-subtitle">Enter the key fields from each supplier document. Add up to 6 documents.</p>
+              <div className="form-card-header"><span>📦</span><h2>{t("step2.formTitle")}</h2></div>
+              <p className="form-card-subtitle">{t("step2.formSubtitle")}</p>
 
               {/* Document Tabs */}
               <div className="lc-doc-tabs">
@@ -830,7 +832,7 @@ export default function LcCheck() {
                 ))}
                 {documents.length < 6 && (
                   <div className="lc-dt-add" onClick={addDocument} data-testid="button-add-document">
-                    + Add doc
+                    {t("step2.addDoc")}
                   </div>
                 )}
               </div>
@@ -841,7 +843,7 @@ export default function LcCheck() {
                   {/* Document Type selector */}
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 13 }}>
                     <div className="form-group" style={{ flex: 1 }}>
-                      <label>Document Type</label>
+                      <label>{t("step2.documentType")}</label>
                       <select
                         value={documents[activeDocTab].documentType}
                         onChange={e => updateDocType(activeDocTab, e.target.value as LcDocumentType)}
@@ -869,8 +871,8 @@ export default function LcCheck() {
                       {(!docExtractionStatus[activeDocTab] || docExtractionStatus[activeDocTab] === "idle") && !docFiles[activeDocTab] && (
                         <UploadZone
                           icon="📄"
-                          title={`Upload ${docLabel(documents[activeDocTab].documentType)}`}
-                          subtitle="Auto-fill fields from PDF"
+                          title={t("step2.uploadDoc", { docType: docLabel(documents[activeDocTab].documentType) })}
+                          subtitle={t("step2.autoFillFromPdf")}
                           accept=".pdf,.jpg,.jpeg,.png"
                           onFileSelect={(file) => handleDocExtraction(file, activeDocTab, documents[activeDocTab].documentType)}
                         />
@@ -878,7 +880,7 @@ export default function LcCheck() {
                       {docExtractionStatus[activeDocTab] === "extracting" && (
                         <div className="upload-note" style={{ padding: "16px", textAlign: "center" }}>
                           <span style={{ animation: "pulse 1.5s ease-in-out infinite" }}>🔍</span>
-                          <span style={{ fontWeight: 600 }}>Extracting fields...</span>
+                          <span style={{ fontWeight: 600 }}>{t("step2.extractingFields")}</span>
                         </div>
                       )}
                       {docExtractionStatus[activeDocTab] === "done" && docFiles[activeDocTab] && (
@@ -889,13 +891,13 @@ export default function LcCheck() {
                             setDocFieldConfidence(prev => { const next = { ...prev }; delete next[activeDocTab]; return next; });
                           }} />
                           <div className="upload-note" style={{ background: "#f0fdf4", borderColor: "#bbf7d0", marginBottom: 12 }}>
-                            🤖 <span><strong>Fields extracted</strong> — review and correct below.</span>
+                            🤖 <span dangerouslySetInnerHTML={{ __html: t("step2.fieldsExtracted") }} />
                           </div>
                         </>
                       )}
                       {docExtractionStatus[activeDocTab] === "error" && (
                         <div className="upload-note" style={{ background: "#fef2f2", borderColor: "#fecaca", marginBottom: 12 }}>
-                          ❌ <span>{docExtractionError[activeDocTab] || "Extraction failed"} — enter fields manually.</span>
+                          ❌ <span>{t("step1.upload.extractionFailed", { error: docExtractionError[activeDocTab] || "Extraction failed" })}</span>
                         </div>
                       )}
                     </div>
@@ -930,10 +932,10 @@ export default function LcCheck() {
                 onClick={() => goStep(3)}
                 data-testid="button-next-step-3"
               >
-                Continue to Review →
+                {t("step2.continueToReview")}
               </button>
               <button className="btn-secondary" onClick={() => goStep(1)}>
-                ← Back
+                {t("step2.back")}
               </button>
             </div>
           </>
@@ -943,53 +945,53 @@ export default function LcCheck() {
         {step === 3 && (
           <>
             <div className="form-card">
-              <div className="form-card-header"><span>🔍</span><h2>Review Before Check</h2></div>
-              <p className="form-card-subtitle">Correct any errors now — changes cannot be made after the credit is consumed.</p>
+              <div className="form-card-header"><span>🔍</span><h2>{t("step3.formTitle")}</h2></div>
+              <p className="form-card-subtitle">{t("step3.formSubtitle")}</p>
 
               {/* Warning note */}
               <div className="upload-note" style={{ marginBottom: 20, fontSize: 15, fontWeight: 600, color: "#1a1a1a", padding: "16px 18px" }}>
-                ⚠️ <span>Check all extracted fields carefully. Confirm dates and names match exactly what's on your LC.</span>
+                ⚠️ <span>{t("step3.warning")}</span>
               </div>
 
               {/* Summary fields in 2-col */}
               <div className="form-row cols-2">
                 <div className="form-group">
-                  <label>LC Reference</label>
+                  <label>{t("step3.lcReference")}</label>
                   <input type="text" value={lcFields.lcReference} readOnly style={{ background: "#fff" }} />
                 </div>
                 <div className="form-group">
-                  <label>Beneficiary</label>
+                  <label>{t("step3.beneficiary")}</label>
                   <input type="text" value={lcFields.beneficiaryName} readOnly style={{ background: "#fff" }} />
                 </div>
               </div>
               <div className="form-row cols-2">
                 <div className="form-group">
-                  <label>LC Amount</label>
+                  <label>{t("step3.lcAmount")}</label>
                   <input type="text" value={`${lcFields.currency} ${lcFields.totalAmount.toLocaleString()}`} readOnly style={{ background: "#fff" }} />
                 </div>
                 <div className="form-group">
-                  <label>Goods Description</label>
+                  <label>{t("step3.goodsDescription")}</label>
                   <input type="text" value={lcFields.goodsDescription} readOnly style={{ background: "#fff" }} />
                 </div>
               </div>
               <div className="form-row cols-2">
                 <div className="form-group">
-                  <label>Latest Shipment Date</label>
+                  <label>{t("step3.latestShipmentDate")}</label>
                   <input type="text" value={lcFields.latestShipmentDate} readOnly style={{ background: "#fff" }} />
                 </div>
                 <div className="form-group">
-                  <label>LC Expiry Date</label>
+                  <label>{t("step3.lcExpiryDate")}</label>
                   <input type="text" value={lcFields.lcExpiryDate} readOnly style={{ background: "#fff" }} />
                 </div>
               </div>
 
               <div className="form-row cols-2">
                 <div className="form-group">
-                  <label>Incoterms</label>
+                  <label>{t("step3.incoterms")}</label>
                   <input type="text" value={lcFields.incoterms} readOnly style={{ background: "#fff" }} />
                 </div>
                 <div className="form-group">
-                  <label>Quantity Tolerance</label>
+                  <label>{t("step3.quantityTolerance")}</label>
                   <input type="text" value={`±${lcFields.tolerancePercent ?? 5}%`} readOnly style={{ background: "#fff" }} />
                 </div>
               </div>
@@ -997,7 +999,7 @@ export default function LcCheck() {
               {/* Documents summary */}
               <div style={{ background: "#f7f7f7", borderRadius: 9, padding: "12px 14px" }}>
                 <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--app-regent)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8, width: "100%" }}>
-                  Documents
+                  {t("step3.documents")}
                 </div>
                 {documents.map((doc, i) => (
                   <span key={i} className="lc-doc-badge filled">
@@ -1020,13 +1022,13 @@ export default function LcCheck() {
                 data-testid="button-run-lc-check"
               >
                 {checkMutation.isPending
-                  ? "⏳ Checking..."
+                  ? `⏳ ${t("step3.checking")}`
                   : isFreeCheck
-                  ? "▶ Run LC Check — Free"
-                  : "▶ Run LC Check — 1 credit"}
+                  ? `▶ ${t("step3.runFree")}`
+                  : `▶ ${t("step3.runCredit")}`}
               </button>
               <button className="btn-secondary" onClick={() => goStep(2)}>
-                ← Back
+                {t("step3.back")}
               </button>
             </div>
           </>
@@ -1047,28 +1049,28 @@ export default function LcCheck() {
                   </span>
                   <div>
                     <div className="lc-v-title">
-                      {cls === "fail" ? "Discrepancies Found" : cls === "warn" ? "Compliant With Notes" : "Fully Compliant"}
+                      {cls === "fail" ? t("step4.verdict.discrepanciesFound") : cls === "warn" ? t("step4.verdict.compliantWithNotes") : t("step4.verdict.compliant")}
                     </div>
                     <div className="lc-v-sub">
                       {resultData.summary.criticals > 0
-                        ? `${resultData.summary.criticals} critical issue${resultData.summary.criticals > 1 ? "s" : ""} will cause bank rejection.`
+                        ? t("step4.verdict.criticalIssue", { count: resultData.summary.criticals })
                         : resultData.summary.warnings > 0
-                        ? `${resultData.summary.warnings} warning${resultData.summary.warnings > 1 ? "s" : ""} to review.`
-                        : "All fields match LC terms."}
+                        ? t("step4.verdict.warning", { count: resultData.summary.warnings })
+                        : t("step4.verdict.allMatch")}
                     </div>
                   </div>
                   <div className="lc-v-stats">
                     <div className="lc-vs">
                       <div className="lc-vs-n g" data-testid="text-matches">{resultData.summary.matches}</div>
-                      <div className="lc-vs-l">Match</div>
+                      <div className="lc-vs-l">{t("step4.stat.match")}</div>
                     </div>
                     <div className="lc-vs">
                       <div className="lc-vs-n a" data-testid="text-warnings">{resultData.summary.warnings}</div>
-                      <div className="lc-vs-l">Warning</div>
+                      <div className="lc-vs-l">{t("step4.stat.warning")}</div>
                     </div>
                     <div className="lc-vs">
                       <div className="lc-vs-n r" data-testid="text-criticals">{resultData.summary.criticals}</div>
-                      <div className="lc-vs-l">Critical</div>
+                      <div className="lc-vs-l">{t("step4.stat.critical")}</div>
                     </div>
                   </div>
                 </div>
@@ -1084,7 +1086,7 @@ export default function LcCheck() {
 
             {/* Field-by-field Results */}
             <div className="form-card">
-              <div className="form-card-header"><span>📊</span><h2>Field-by-Field Results</h2></div>
+              <div className="form-card-header"><span>📊</span><h2>{t("step4.fieldResults")}</h2></div>
               <p className="form-card-subtitle">
                 Ref: TT-LC-{new Date().getFullYear()}-{resultData.integrityHash.substring(0, 6)} · {new Date(resultData.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
               </p>
@@ -1095,7 +1097,7 @@ export default function LcCheck() {
                 if (items.length === 0) return null;
                 const lcItems = items.filter(r => r.checkCategory !== "cross_document");
                 const crossItems = items.filter(r => r.checkCategory === "cross_document");
-                const label = severity === "RED" ? "\uD83D\uDD34 Critical \u2014 Bank will reject" : severity === "AMBER" ? "\uD83D\uDFE1 Warnings" : "\uD83D\uDFE2 Matched";
+                const label = severity === "RED" ? `\uD83D\uDD34 ${t("step4.criticalBankReject")}` : severity === "AMBER" ? `\uD83D\uDFE1 ${t("step4.warnings")}` : `\uD83D\uDFE2 ${t("step4.matched")}`;
                 const cssClass = severity === "RED" ? "fail" : severity === "AMBER" ? "warn" : "ok";
 
                 return (
@@ -1108,7 +1110,7 @@ export default function LcCheck() {
                       <>
                         {crossItems.length > 0 && (
                           <div style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", margin: "8px 0 4px", paddingLeft: 4 }}>
-                            LC Validation
+                            {t("step4.lcValidation")}
                           </div>
                         )}
                         {lcItems.map((r, i) => (
@@ -1121,7 +1123,7 @@ export default function LcCheck() {
                                   LC: <span className="lc-rr-lc">"{r.lcValue}"</span> · Doc: <span className="lc-rr-doc">"{r.documentValue}"</span>
                                 </div>
                               )}
-                              <div className="lc-rr-detail">{r.explanation || "All fields match LC terms \u2713"}</div>
+                              <div className="lc-rr-detail">{r.explanation || `${t("step4.allFieldsMatch")} \u2713`}</div>
                               {r.ucpRule && <span className="lc-rr-rule">{r.ucpRule}</span>}
                             </div>
                           </div>
@@ -1132,7 +1134,7 @@ export default function LcCheck() {
                     {crossItems.length > 0 && (
                       <>
                         <div style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", margin: "10px 0 4px", paddingLeft: 4 }}>
-                          Cross-Document Consistency
+                          {t("step4.crossDocConsistency")}
                         </div>
                         {crossItems.map((r, i) => (
                           <div key={`${cssClass}-cross-${i}`} className={`lc-rr ${cssClass}`} data-testid={`result-item-${cssClass}-cross-${i}`}>
@@ -1157,9 +1159,9 @@ export default function LcCheck() {
             {/* Correction Email Card */}
             {resultData.summary.criticals > 0 && resultData.correctionEmail && (
               <div className="form-card">
-                <div className="form-card-header"><span>✉️</span><h2>Supplier Correction Request</h2></div>
+                <div className="form-card-header"><span>✉️</span><h2>{t("step4.correction.title")}</h2></div>
                 <p className="form-card-subtitle">
-                  Ready to send — {resultData.summary.criticals} correction{resultData.summary.criticals > 1 ? "s" : ""} needed
+                  {t("step4.correction.subtitle", { count: resultData.summary.criticals })}
                 </p>
 
                 {/* Tab toggle: Email / WhatsApp */}
@@ -1179,7 +1181,7 @@ export default function LcCheck() {
                       cursor: "pointer",
                     }}
                   >
-                    📧 Email
+                    📧 {t("step4.correction.emailTab")}
                   </button>
                   <button
                     onClick={() => setCorrectionTab("whatsapp")}
@@ -1197,14 +1199,14 @@ export default function LcCheck() {
                       cursor: "pointer",
                     }}
                   >
-                    💬 WhatsApp
+                    💬 {t("step4.correction.whatsAppTab")}
                   </button>
                 </div>
 
                 {/* Correction text */}
                 <div style={{ background: "#f7f7f7", borderRadius: 10, padding: "16px 18px", border: "1px solid #e8e8e8" }}>
                   <div style={{ fontSize: 14, fontWeight: 600, color: "#555", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".05em" }}>
-                    {correctionTab === "email" ? "Email message" : "WhatsApp message"}
+                    {correctionTab === "email" ? t("step4.correction.emailMessage") : t("step4.correction.whatsAppMessage")}
                   </div>
                   <div className="lc-email-box" data-testid={`text-correction-${correctionTab}`}>
                     {correctionTab === "email" ? (resultData.correctionEmail || "") : (resultData.correctionWhatsApp || "")}
@@ -1235,7 +1237,7 @@ export default function LcCheck() {
                       }}
                       data-testid="button-send-email"
                     >
-                      📧 Open Email Client
+                      📧 {t("step4.correction.openEmail")}
                     </a>
                   ) : (
                     <a
@@ -1257,7 +1259,7 @@ export default function LcCheck() {
                       }}
                       data-testid="button-send-whatsapp"
                     >
-                      💬 Send via WhatsApp
+                      💬 {t("step4.correction.sendWhatsApp")}
                     </a>
                   )}
                 </div>
@@ -1270,13 +1272,13 @@ export default function LcCheck() {
                 <Hash size={18} style={{ color: "var(--app-regent)", flexShrink: 0, marginTop: 1 }} />
                 <div style={{ minWidth: 0 }}>
                   <p style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }} data-testid="text-lc-check-ref">
-                    LC check ref: TT-LC-{new Date().getFullYear()}-{resultData.integrityHash.substring(0, 6).toUpperCase()}
+                    {t("step4.integrityRef")} TT-LC-{new Date().getFullYear()}-{resultData.integrityHash.substring(0, 6).toUpperCase()}
                   </p>
                   <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--app-regent)", wordBreak: "break-all" }} data-testid="text-lc-integrity-hash">
-                    Integrity hash: sha256:{resultData.integrityHash}
+                    {t("step4.integrityHash")} sha256:{resultData.integrityHash}
                   </p>
                   <p style={{ fontSize: 13, color: "var(--app-regent)" }} data-testid="text-lc-check-timestamp">
-                    Checked: {new Date(resultData.timestamp).toLocaleString()}
+                    {t("step4.checked")} {new Date(resultData.timestamp).toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -1287,7 +1289,7 @@ export default function LcCheck() {
               <div style={{ margin: "0 32px 16px", padding: "12px 16px", background: "var(--sage-xs)", border: "1px solid rgba(74,124,94,0.2)", borderRadius: 10, display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontSize: 16 }}>🔄</span>
                 <span style={{ fontSize: 13, fontWeight: 600, color: "var(--sage)" }}>
-                  Re-check #{resultData.recheckNumber} · {resultData.freeRechecksRemaining} free re-check{resultData.freeRechecksRemaining !== 1 ? "s" : ""} remaining
+                  {t("step4.recheckBanner", { number: resultData.recheckNumber, remaining: resultData.freeRechecksRemaining, plural: resultData.freeRechecksRemaining !== 1 ? "s" : "" })}
                 </span>
               </div>
             )}
@@ -1316,7 +1318,7 @@ export default function LcCheck() {
                   }}
                   data-testid="button-send-correction"
                 >
-                  ✉️ Send Correction Request
+                  ✉️ {t("step4.action.sendCorrection")}
                 </button>
                 <button
                   className="btn-secondary"
@@ -1334,14 +1336,14 @@ export default function LcCheck() {
                   }}
                   data-testid="button-park-case"
                 >
-                  📦 Park Case
+                  📦 {t("step4.action.parkCase")}
                 </button>
                 <button
                   className="btn-secondary"
                   onClick={() => goStep(2)}
                   data-testid="button-upload-corrected"
                 >
-                  📄 Upload Corrected Docs
+                  📄 {t("step4.action.uploadCorrected")}
                 </button>
                 <button
                   style={{ background: "none", border: "none", color: "#999", fontSize: 14, cursor: "pointer", padding: "6px 0" }}
@@ -1360,14 +1362,14 @@ export default function LcCheck() {
                   }}
                   data-testid="button-close-case"
                 >
-                  Close Case
+                  {t("step4.action.closeCase")}
                 </button>
               </div>
             ) : (
               <div className="action-row">
                 {prefillData?.lookup_id && (
                   <button className="btn-primary" onClick={() => setLcActiveTab("TwinLog Trail")} data-testid="button-view-twinlog">
-                    View TwinLog Trail →
+                    {t("step4.action.viewTwinLog")}
                   </button>
                 )}
                 <button
@@ -1391,7 +1393,7 @@ export default function LcCheck() {
                   }}
                   data-testid="button-new-check"
                 >
-                  New Check
+                  {t("step4.action.newCheck")}
                 </button>
                 <button
                   style={{ background: "none", border: "none", color: "#999", fontSize: 14, cursor: "pointer", padding: "6px 0" }}
@@ -1410,7 +1412,7 @@ export default function LcCheck() {
                   }}
                   data-testid="button-close-case-clear"
                 >
-                  Close Case
+                  {t("step4.action.closeCase")}
                 </button>
               </div>
             )}
@@ -1430,17 +1432,17 @@ export default function LcCheck() {
         <Dialog open={showTokenModal} onOpenChange={setShowTokenModal}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>TapTrao Shield Required</DialogTitle>
+              <DialogTitle>{t("tokenModal.title")}</DialogTitle>
               <DialogDescription>
-                LC checks are included with every TapTrao Shield activation. Activate Shield to run your LC check.
+                {t("tokenModal.description")}
               </DialogDescription>
             </DialogHeader>
             <div className="flex gap-3 justify-end flex-wrap">
               <Button variant="outline" onClick={() => setShowTokenModal(false)} data-testid="button-lc-modal-cancel">
-                Cancel
+                {t("tokenModal.cancel")}
               </Button>
               <Button onClick={() => navigate("/pricing")} data-testid="button-lc-modal-buy-tokens">
-                Activate TapTrao Shield
+                {t("tokenModal.activate")}
               </Button>
             </div>
           </DialogContent>

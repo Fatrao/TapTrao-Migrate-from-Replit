@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/use-auth";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { AppShell } from "@/components/AppShell";
@@ -10,8 +11,9 @@ export default function Login() {
   const [error, setError] = useState("");
   const [, navigate] = useLocation();
   const { login, loginPending, isAuthenticated } = useAuth();
+  const { t } = useTranslation("auth");
 
-  usePageTitle("Log In");
+  usePageTitle(t("login.title"));
 
   // Redirect if already logged in
   if (isAuthenticated) {
@@ -29,7 +31,7 @@ export default function Login() {
       const redirect = params.get("redirect") || "/dashboard";
       navigate(redirect);
     } catch (err: any) {
-      const msg = err?.message || "Login failed";
+      const msg = err?.message || t("login.loginFailed");
       // Try to extract server message from response
       try {
         const parsed = JSON.parse(msg);
@@ -44,39 +46,39 @@ export default function Login() {
     <AppShell contentClassName="content-area">
       <div className="green-hero-box" style={{ margin: "4px 24px 16px" }}>
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }}>
-          Log In
+          {t("login.title")}
         </h1>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
-          Access your trades, documents, and compliance data
+          {t("login.subtitle")}
         </p>
       </div>
 
       <div className="form-card" style={{ margin: "0 24px 20px", maxWidth: 420 }}>
         {new URLSearchParams(window.location.search).get("registered") === "1" && (
           <div style={{ background: "rgba(14,78,69,0.12)", border: "1px solid var(--sage)", borderRadius: 8, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "var(--sage)" }}>
-            ✓ Account created successfully! Please log in.
+            ✓ {t("login.registeredSuccess")}
           </div>
         )}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Email</label>
+            <label>{t("login.emailLabel")}</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@company.com"
+              placeholder={t("login.emailPlaceholder")}
               autoFocus
               required
             />
           </div>
 
           <div className="form-group">
-            <label>Password</label>
+            <label>{t("login.passwordLabel")}</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder={t("login.passwordPlaceholder")}
               required
               minLength={8}
             />
@@ -84,7 +86,7 @@ export default function Login() {
 
           <div style={{ textAlign: "right", marginBottom: 4 }}>
             <a href="/forgot-password" style={{ fontSize: 14, color: "var(--sage)", textDecoration: "none" }}>
-              Forgot password?
+              {t("login.forgotPassword")}
             </a>
           </div>
 
@@ -108,14 +110,14 @@ export default function Login() {
               width: "100%",
             }}
           >
-            {loginPending ? "Logging in..." : "Log In"}
+            {loginPending ? t("login.submitting") : t("login.submit")}
           </button>
         </form>
 
         <p style={{ fontSize: 13, color: "#888", marginTop: 16, textAlign: "center" }}>
-          Don't have an account?{" "}
+          {t("login.noAccount")}{" "}
           <a href="/register" style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none" }}>
-            Create one free
+            {t("login.createOne")}
           </a>
         </p>
       </div>

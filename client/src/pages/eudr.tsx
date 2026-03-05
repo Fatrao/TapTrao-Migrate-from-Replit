@@ -1,16 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useRoute, useLocation } from "wouter";
 import { AppShell } from "@/components/AppShell";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { ComplianceResult } from "@shared/schema";
 
-const STEPS = [
-  { num: 1, label: "Geolocation" },
-  { num: 2, label: "Evidence" },
-  { num: 3, label: "Supplier" },
-  { num: 4, label: "Risk & Submit" },
-];
+const STEP_KEYS = ["step.geolocation", "step.evidence", "step.supplier", "step.riskSubmit"] as const;
 
 const s = {
   page: { maxWidth: 780, margin: "0 auto", padding: "24px 16px" } as React.CSSProperties,
@@ -66,6 +62,7 @@ const emptyDraft: EudrDraft = {
 };
 
 export default function EudrPage() {
+  const { t } = useTranslation("eudr");
   const [, params] = useRoute("/eudr/:lookupId");
   const [, navigate] = useLocation();
   const lookupId = params?.lookupId;
@@ -222,48 +219,51 @@ export default function EudrPage() {
     <AppShell>
       <div style={s.page}>
         <button data-testid="eudr-back" onClick={() => navigate(`/lookup?loadLookup=${lookupId}`)} style={{ background: "none", border: "none", color: "var(--t3)", cursor: "pointer", fontSize: 13, marginBottom: 12 }}>
-          ← Back to lookup results
+          ← {t("backToLookup")}
         </button>
 
-        <h1 style={s.heading}>EUDR Due Diligence</h1>
+        <h1 style={s.heading}>{t("title")}</h1>
         <p style={s.sub}>
-          EU Regulation 2023/1115 — Deforestation-free Products
-          {resultJson && ` — ${resultJson.commodity?.name} from ${resultJson.origin?.countryName} to ${resultJson.destination?.countryName}`}
+          {t("regulationRef")}
+          {resultJson && t("tradeContext", { commodity: resultJson.commodity?.name, origin: resultJson.origin?.countryName, destination: resultJson.destination?.countryName })}
         </p>
 
         {/* Step progress */}
         <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-          {STEPS.map((st) => (
-            <div
-              key={st.num}
-              data-testid={`eudr-step-${st.num}`}
-              style={{
-                flex: 1,
-                textAlign: "center",
-                padding: "8px 4px",
-                borderRadius: ".5rem",
-                background: step === st.num ? "var(--blue, #3B82F6)" : st.num < step ? "var(--green, #1B7340)" : "var(--s2, #232B3E)",
-                color: step >= st.num ? "#fff" : "var(--t3)",
-                fontSize: 14,
-                fontWeight: step === st.num ? 700 : 500,
-                cursor: st.num < step ? "pointer" : "default",
-                transition: "background .2s",
-              }}
-              onClick={() => st.num < step && setStep(st.num)}
-            >
-              {st.num}. {st.label}
-            </div>
-          ))}
+          {STEP_KEYS.map((key, i) => {
+            const num = i + 1;
+            return (
+              <div
+                key={num}
+                data-testid={`eudr-step-${num}`}
+                style={{
+                  flex: 1,
+                  textAlign: "center",
+                  padding: "8px 4px",
+                  borderRadius: ".5rem",
+                  background: step === num ? "var(--blue, #3B82F6)" : num < step ? "var(--green, #1B7340)" : "var(--s2, #232B3E)",
+                  color: step >= num ? "#fff" : "var(--t3)",
+                  fontSize: 14,
+                  fontWeight: step === num ? 700 : 500,
+                  cursor: num < step ? "pointer" : "default",
+                  transition: "background .2s",
+                }}
+                onClick={() => num < step && setStep(num)}
+              >
+                {num}. {t(key)}
+              </div>
+            );
+          })}
         </div>
 
         {/* Step 1: Geolocation */}
         {step === 1 && (
           <div style={s.card}>
-            <h2 style={{ ...s.heading, fontSize: 16 }}>Plot Geolocation</h2>
-            <p style={s.sub}>Provide coordinates of the production/harvest plot to verify origin.</p>
+            <h2 style={{ ...s.heading, fontSize: 16 }}>{t("geo.title")}</h2>
+            <p style={s.sub}>{t("geo.subtitle")}</p>
 
             <div style={s.field}>
-              <label style={s.label}>Coordinate type</label>
+              <label style={s.label}>{t("geo.coordType")}</label>
               <div style={{ display: "flex", gap: 12 }}>
                 {(["point", "polygon"] as const).map((ct) => (
                   <label key={ct} style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--t1)", fontSize: 13, cursor: "pointer" }}>
@@ -275,7 +275,7 @@ export default function EudrPage() {
                       style={s.check}
                       data-testid={`eudr-coord-${ct}`}
                     />
-                    {ct === "point" ? "Single point" : "Polygon (3+ points)"}
+                    {ct === "point" ? t("geo.singlePoint") : t("geo.polygon")}
                   </label>
                 ))}
               </div>
@@ -284,11 +284,11 @@ export default function EudrPage() {
             {draft.coordType === "point" ? (
               <div style={s.row}>
                 <div>
-                  <label style={s.label}>Latitude</label>
+                  <label style={s.label}>{t("geo.latitude")}</label>
                   <input data-testid="eudr-lat" style={s.input} type="number" step="any" placeholder="-4.3250" value={draft.lat} onChange={e => setDraft(d => ({ ...d, lat: e.target.value }))} />
                 </div>
                 <div>
-                  <label style={s.label}>Longitude</label>
+                  <label style={s.label}>{t("geo.longitude")}</label>
                   <input data-testid="eudr-lng" style={s.input} type="number" step="any" placeholder="15.3222" value={draft.lng} onChange={e => setDraft(d => ({ ...d, lng: e.target.value }))} />
                 </div>
               </div>
@@ -297,7 +297,7 @@ export default function EudrPage() {
                 {draft.polygonPoints.map((pt, i) => (
                   <div key={i} style={{ ...s.row, marginBottom: 8 }}>
                     <div>
-                      <label style={s.label}>Point {i + 1} Lat</label>
+                      <label style={s.label}>{t("geo.pointLat", { index: i + 1 })}</label>
                       <input style={s.input} type="number" step="any" value={pt.lat} onChange={e => {
                         const pts = [...draft.polygonPoints];
                         pts[i] = { ...pts[i], lat: e.target.value };
@@ -305,7 +305,7 @@ export default function EudrPage() {
                       }} data-testid={`eudr-poly-lat-${i}`} />
                     </div>
                     <div>
-                      <label style={s.label}>Point {i + 1} Lng</label>
+                      <label style={s.label}>{t("geo.pointLng", { index: i + 1 })}</label>
                       <input style={s.input} type="number" step="any" value={pt.lng} onChange={e => {
                         const pts = [...draft.polygonPoints];
                         pts[i] = { ...pts[i], lng: e.target.value };
@@ -315,17 +315,17 @@ export default function EudrPage() {
                   </div>
                 ))}
                 <button style={{ ...s.btnSecondary, fontSize: 14, padding: "6px 12px" }} onClick={() => setDraft(d => ({ ...d, polygonPoints: [...d.polygonPoints, { lat: "", lng: "" }] }))} data-testid="eudr-add-point">
-                  + Add point
+                  {t("geo.addPoint")}
                 </button>
               </div>
             )}
 
             <div style={{ ...s.field, marginTop: 16 }}>
-              <label style={s.label}>Plot country (ISO 2-letter code)</label>
+              <label style={s.label}>{t("geo.plotCountry")}</label>
               <input data-testid="eudr-plot-country" style={{ ...s.input, width: 100 }} maxLength={2} placeholder="GH" value={draft.plotCountryIso2} onChange={e => setDraft(d => ({ ...d, plotCountryIso2: e.target.value.toUpperCase() }))} />
               {draft.plotCountryValid === false && (
                 <p style={{ color: "var(--red, #DC2626)", fontSize: 14, marginTop: 6 }}>
-                  Warning: Plot country does not match the trade origin country ({resultJson?.origin?.iso2}).
+                  {t("geo.mismatchWarning", { originIso2: resultJson?.origin?.iso2 })}
                 </p>
               )}
             </div>
@@ -335,31 +335,31 @@ export default function EudrPage() {
         {/* Step 2: Evidence */}
         {step === 2 && (
           <div style={s.card}>
-            <h2 style={{ ...s.heading, fontSize: 16 }}>Deforestation-free Evidence</h2>
-            <p style={s.sub}>Provide evidence that the commodity was produced on land not subject to deforestation after 31 December 2020.</p>
+            <h2 style={{ ...s.heading, fontSize: 16 }}>{t("evidence.title")}</h2>
+            <p style={s.sub}>{t("evidence.subtitle")}</p>
 
             <div style={s.field}>
-              <label style={s.label}>Evidence type</label>
+              <label style={s.label}>{t("evidence.type")}</label>
               <select data-testid="eudr-evidence-type" style={s.select} value={draft.evidenceType} onChange={e => setDraft(d => ({ ...d, evidenceType: e.target.value }))}>
-                <option value="">Select evidence type…</option>
-                <option value="satellite_ref">Satellite imagery reference</option>
-                <option value="third_party_cert">Third-party certification (e.g. FSC, RSPO)</option>
-                <option value="geo_database">National geo-database / cadaster</option>
-                <option value="other">Other documented evidence</option>
+                <option value="">{t("evidence.typePlaceholder")}</option>
+                <option value="satellite_ref">{t("evidence.satelliteRef")}</option>
+                <option value="third_party_cert">{t("evidence.thirdPartyCert")}</option>
+                <option value="geo_database">{t("evidence.geoDatabase")}</option>
+                <option value="other">{t("evidence.otherEvidence")}</option>
               </select>
             </div>
 
             <div style={s.field}>
-              <label style={s.label}>Reference / certificate number</label>
-              <input data-testid="eudr-evidence-ref" style={s.input} placeholder="e.g. FSC-C123456 or imagery dataset ID" value={draft.evidenceReference} onChange={e => setDraft(d => ({ ...d, evidenceReference: e.target.value }))} />
+              <label style={s.label}>{t("evidence.reference")}</label>
+              <input data-testid="eudr-evidence-ref" style={s.input} placeholder={t("evidence.referencePlaceholder")} value={draft.evidenceReference} onChange={e => setDraft(d => ({ ...d, evidenceReference: e.target.value }))} />
             </div>
 
             <div style={s.field}>
-              <label style={s.label}>Evidence date (must post-date 31 Dec 2020)</label>
+              <label style={s.label}>{t("evidence.date")}</label>
               <input data-testid="eudr-evidence-date" style={{ ...s.input, width: 200 }} type="date" value={draft.evidenceDate} onChange={e => setDraft(d => ({ ...d, evidenceDate: e.target.value }))} />
               {draft.evidenceDate && new Date(draft.evidenceDate) <= new Date("2020-12-31") && (
                 <p style={{ color: "var(--red, #DC2626)", fontSize: 14, marginTop: 6 }}>
-                  Warning: Evidence date must be after 31 December 2020 (EUDR cutoff).
+                  {t("evidence.dateWarning")}
                 </p>
               )}
             </div>
@@ -369,22 +369,22 @@ export default function EudrPage() {
         {/* Step 3: Supplier Verification */}
         {step === 3 && (
           <div style={s.card}>
-            <h2 style={{ ...s.heading, fontSize: 16 }}>Supplier Verification</h2>
-            <p style={s.sub}>Identify the supplier and confirm sanctions screening has been performed.</p>
+            <h2 style={{ ...s.heading, fontSize: 16 }}>{t("supplier.title")}</h2>
+            <p style={s.sub}>{t("supplier.subtitle")}</p>
 
             <div style={s.field}>
-              <label style={s.label}>Supplier name</label>
-              <input data-testid="eudr-supplier-name" style={s.input} placeholder="e.g. ABC Cocoa Ltd" value={draft.supplierName} onChange={e => setDraft(d => ({ ...d, supplierName: e.target.value }))} />
+              <label style={s.label}>{t("supplier.name")}</label>
+              <input data-testid="eudr-supplier-name" style={s.input} placeholder={t("supplier.namePlaceholder")} value={draft.supplierName} onChange={e => setDraft(d => ({ ...d, supplierName: e.target.value }))} />
             </div>
 
             <div style={s.field}>
-              <label style={s.label}>Supplier address</label>
-              <input data-testid="eudr-supplier-address" style={s.input} placeholder="Full business address" value={draft.supplierAddress} onChange={e => setDraft(d => ({ ...d, supplierAddress: e.target.value }))} />
+              <label style={s.label}>{t("supplier.address")}</label>
+              <input data-testid="eudr-supplier-address" style={s.input} placeholder={t("supplier.addressPlaceholder")} value={draft.supplierAddress} onChange={e => setDraft(d => ({ ...d, supplierAddress: e.target.value }))} />
             </div>
 
             <div style={s.field}>
-              <label style={s.label}>Registration number (optional)</label>
-              <input data-testid="eudr-supplier-reg" style={s.input} placeholder="Company registration or tax ID" value={draft.supplierRegNumber} onChange={e => setDraft(d => ({ ...d, supplierRegNumber: e.target.value }))} />
+              <label style={s.label}>{t("supplier.regNumber")}</label>
+              <input data-testid="eudr-supplier-reg" style={s.input} placeholder={t("supplier.regPlaceholder")} value={draft.supplierRegNumber} onChange={e => setDraft(d => ({ ...d, supplierRegNumber: e.target.value }))} />
             </div>
 
             <div style={{ ...s.field, marginTop: 16, padding: "14px 16px", background: "var(--s2, #232B3E)", borderRadius: ".5rem" }}>
@@ -396,10 +396,7 @@ export default function EudrPage() {
                   style={{ ...s.check, marginTop: 2 }}
                   data-testid="eudr-sanctions-check"
                 />
-                <span>
-                  I confirm that I have screened this supplier against applicable sanctions lists
-                  (EU, UN, OFAC) and the supplier is <strong>not subject to any sanctions</strong>.
-                </span>
+                <span dangerouslySetInnerHTML={{ __html: t("supplier.sanctionsConfirm") }} />
               </label>
             </div>
           </div>
@@ -409,12 +406,10 @@ export default function EudrPage() {
         {step === 4 && (
           <div style={s.card}>
             <h2 style={{ ...s.heading, fontSize: 16 }}>
-              {isComplete ? "Due Diligence Complete" : "Risk Assessment & Statement"}
+              {isComplete ? t("risk.titleComplete") : t("risk.titleAssess")}
             </h2>
             <p style={s.sub}>
-              {isComplete
-                ? "Your EUDR due diligence statement has been generated and recorded."
-                : "Assess the overall risk level for this trade and generate your due diligence statement."}
+              {isComplete ? t("risk.subtitleComplete") : t("risk.subtitleAssess")}
             </p>
 
             {isComplete ? (
@@ -422,21 +417,21 @@ export default function EudrPage() {
                 <div style={{ background: "var(--green, #1B7340)", borderRadius: ".75rem", padding: "16px 20px", color: "#fff", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
                   <span style={{ fontSize: 24 }}>✓</span>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: 14 }}>Statement Generated</div>
+                    <div style={{ fontWeight: 700, fontSize: 14 }}>{t("risk.statementGenerated")}</div>
                     <div style={{ fontSize: 14, opacity: 0.85 }}>
-                      Reference: {(eudrQuery.data?.statementJson as any)?.reference || "—"}
-                      {eudrQuery.data?.retentionUntil && ` | Retained until ${eudrQuery.data.retentionUntil.split("T")[0]}`}
+                      {t("risk.reference", { ref: (eudrQuery.data?.statementJson as any)?.reference || "\u2014" })}
+                      {eudrQuery.data?.retentionUntil && ` | ${t("risk.retainedUntil", { date: eudrQuery.data.retentionUntil.split("T")[0] })}`}
                     </div>
                   </div>
                 </div>
                 <button data-testid="eudr-redownload" style={s.btnPrimary} onClick={generateStatement} disabled={generatingPdf}>
-                  {generatingPdf ? "Generating…" : "Re-download PDF"}
+                  {generatingPdf ? t("risk.generating") : t("risk.redownload")}
                 </button>
               </div>
             ) : (
               <>
                 <div style={s.field}>
-                  <label style={s.label}>Risk level assessment</label>
+                  <label style={s.label}>{t("risk.levelLabel")}</label>
                   <div style={{ display: "flex", gap: 10 }}>
                     {(["low", "standard", "high"] as const).map((lvl) => (
                       <label key={lvl} style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--t1)", fontSize: 13, cursor: "pointer" }}>
@@ -452,7 +447,7 @@ export default function EudrPage() {
                           fontWeight: 600,
                           color: lvl === "low" ? "var(--green, #1B7340)" : lvl === "high" ? "var(--red, #DC2626)" : "var(--amber, #F39C12)",
                         }}>
-                          {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
+                          {t(`risk.${lvl}`)}
                         </span>
                       </label>
                     ))}
@@ -461,11 +456,11 @@ export default function EudrPage() {
 
                 {draft.riskLevel === "high" && (
                   <div style={s.field}>
-                    <label style={s.label}>Reason for high risk (required for high risk)</label>
+                    <label style={s.label}>{t("risk.highReasonLabel")}</label>
                     <textarea
                       data-testid="eudr-high-risk-reason"
                       style={{ ...s.input, minHeight: 80, resize: "vertical" }}
-                      placeholder="Explain the reason for the high-risk assessment and any mitigating measures taken…"
+                      placeholder={t("risk.highReasonPlaceholder")}
                       value={draft.highRiskReason}
                       onChange={e => setDraft(d => ({ ...d, highRiskReason: e.target.value }))}
                     />
@@ -474,20 +469,20 @@ export default function EudrPage() {
 
                 {/* Summary */}
                 <div style={{ background: "var(--s2, #232B3E)", borderRadius: ".5rem", padding: 16, marginTop: 16, marginBottom: 16 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t1)", marginBottom: 8 }}>Summary</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t1)", marginBottom: 8 }}>{t("summary.title")}</div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px", fontSize: 14, color: "var(--t2)" }}>
-                    <span>Geolocation:</span>
+                    <span>{t("summary.geolocation")}</span>
                     <span style={{ color: draft.plotCountryValid !== false ? "var(--green)" : "var(--red)" }}>
-                      {draft.coordType === "point" ? `${draft.lat}, ${draft.lng}` : `${draft.polygonPoints.filter(p => p.lat).length} points`}
-                      {draft.plotCountryValid === false ? " — Mismatch" : " ✓"}
+                      {draft.coordType === "point" ? `${draft.lat}, ${draft.lng}` : t("summary.points", { count: draft.polygonPoints.filter(p => p.lat).length })}
+                      {draft.plotCountryValid === false ? ` ${t("summary.mismatch")}` : " \u2713"}
                     </span>
-                    <span>Evidence:</span>
-                    <span>{draft.evidenceType || "—"} / {draft.evidenceReference || "—"}</span>
-                    <span>Supplier:</span>
-                    <span>{draft.supplierName || "—"}</span>
-                    <span>Sanctions:</span>
+                    <span>{t("summary.evidence")}</span>
+                    <span>{draft.evidenceType || "\u2014"} / {draft.evidenceReference || "\u2014"}</span>
+                    <span>{t("summary.supplier")}</span>
+                    <span>{draft.supplierName || "\u2014"}</span>
+                    <span>{t("summary.sanctions")}</span>
                     <span style={{ color: draft.sanctionsChecked ? "var(--green)" : "var(--red)" }}>
-                      {draft.sanctionsChecked ? "Screened ✓" : "Not screened"}
+                      {draft.sanctionsChecked ? `${t("summary.screened")} \u2713` : t("summary.notScreened")}
                     </span>
                   </div>
                 </div>
@@ -502,7 +497,7 @@ export default function EudrPage() {
                   disabled={generatingPdf || (draft.riskLevel === "high" && !draft.highRiskReason)}
                   onClick={generateStatement}
                 >
-                  {generatingPdf ? "Generating Statement…" : "Generate EUDR Statement PDF"}
+                  {generatingPdf ? t("generate.generating") : t("generate.button")}
                 </button>
               </>
             )}
@@ -514,7 +509,7 @@ export default function EudrPage() {
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
             {step > 1 ? (
               <button data-testid="eudr-prev" style={s.btnSecondary} onClick={() => setStep(step - 1)}>
-                ← Previous
+                {t("nav.previous")}
               </button>
             ) : <div />}
             {step < 4 && (
@@ -524,7 +519,7 @@ export default function EudrPage() {
                 disabled={!canAdvance() || saving}
                 onClick={handleNext}
               >
-                {saving ? "Saving…" : "Next →"}
+                {saving ? t("nav.saving") : t("nav.next")}
               </button>
             )}
           </div>

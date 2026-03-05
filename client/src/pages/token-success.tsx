@@ -6,9 +6,11 @@ import { queryClient } from "@/lib/queryClient";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { trackEvent } from "@/lib/analytics";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function TokenSuccess() {
-  usePageTitle("Purchase Complete", "Your tokens have been added to your account");
+  const { t } = useTranslation("errors");
+  usePageTitle(t("tokenSuccess.purchaseComplete"), t("tokenSuccess.packAdded", { packName: "" }));
 
   const searchString = useSearch();
   const params = new URLSearchParams(searchString);
@@ -41,12 +43,12 @@ export default function TokenSuccess() {
     return (
       <AppShell>
         <div style={{ maxWidth: 480, margin: "0 auto", padding: "64px 16px", textAlign: "center" }}>
-          <p style={{ fontSize: 13, color: "var(--t2)" }}>No purchase session found.</p>
+          <p style={{ fontSize: 13, color: "var(--t2)" }}>{t("tokenSuccess.noSession")}</p>
           <Link href="/pricing">
             <button
               style={{ background: "var(--blue)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", marginTop: 16 }}
             >
-              Go to Pricing
+              {t("tokenSuccess.goToPricing")}
             </button>
           </Link>
         </div>
@@ -59,7 +61,7 @@ export default function TokenSuccess() {
       <AppShell>
         <div style={{ maxWidth: 480, margin: "0 auto", padding: "64px 16px", textAlign: "center" }}>
           <Loader2 size={32} style={{ color: "var(--blue)", animation: "spin 1s linear infinite", margin: "0 auto 16px" }} />
-          <p style={{ fontSize: 13, color: "var(--t2)" }}>Verifying your purchase...</p>
+          <p style={{ fontSize: 13, color: "var(--t2)" }}>{t("tokenSuccess.verifying")}</p>
         </div>
       </AppShell>
     );
@@ -78,10 +80,10 @@ export default function TokenSuccess() {
                 style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--t1)", marginBottom: 8 }}
                 data-testid="text-purchase-success"
               >
-                Purchase Complete
+                {t("tokenSuccess.purchaseComplete")}
               </h1>
               <p style={{ fontSize: 13, color: "var(--t2)", marginBottom: 24 }}>
-                Your {result.packName} pack has been added to your account.
+                {t("tokenSuccess.packAdded", { packName: result.packName })}
               </p>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
                 <span
@@ -92,7 +94,7 @@ export default function TokenSuccess() {
                   }}
                   data-testid="badge-tokens-added"
                 >
-                  +{result.tokensAdded} tokens
+                  {t("tokenSuccess.tokensAdded", { count: result.tokensAdded })}
                 </span>
                 <span
                   style={{
@@ -102,7 +104,7 @@ export default function TokenSuccess() {
                   }}
                   data-testid="badge-new-balance"
                 >
-                  <Hexagon size={12} /> Balance: {result.balance}
+                  <Hexagon size={12} /> {t("tokenSuccess.balance", { count: result.balance })}
                 </span>
               </div>
             </>
@@ -111,10 +113,10 @@ export default function TokenSuccess() {
               <h1
                 style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 24, color: "var(--t1)", marginBottom: 8 }}
               >
-                Processing
+                {t("tokenSuccess.processing")}
               </h1>
               <p style={{ fontSize: 13, color: "var(--t2)", marginBottom: 24 }}>
-                {result?.message || "Your payment is being processed. Tokens will appear shortly."}
+                {result?.message || t("tokenSuccess.processingDefault")}
               </p>
             </>
           )}
@@ -124,7 +126,7 @@ export default function TokenSuccess() {
                 style={{ background: "var(--blue)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
                 data-testid="button-go-lookup"
               >
-                Run a Lookup
+                {t("tokenSuccess.runLookup")}
               </button>
             </Link>
             <Link href="/dashboard">
@@ -132,7 +134,7 @@ export default function TokenSuccess() {
                 style={{ background: "var(--card2)", color: "var(--t2)", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
                 data-testid="button-go-dashboard"
               >
-                Dashboard
+                {t("tokenSuccess.dashboard")}
               </button>
             </Link>
           </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
 
@@ -20,16 +21,17 @@ function formatDate(dateStr: string): string {
   }) + " at " + new Date(dateStr).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 }
 
-function verdictLabel(v: string | null): string {
-  if (!v) return "";
-  if (v === "GREEN") return "LOW RISK";
-  if (v === "AMBER") return "MODERATE RISK";
-  return "HIGH RISK";
-}
-
 export default function VerifyPage() {
+  const { t } = useTranslation("supplierUpload");
   const params = useParams<{ ref: string }>();
   const ref = params.ref;
+
+  function verdictLabel(v: string | null): string {
+    if (!v) return "";
+    if (v === "GREEN") return t("verify.lowRisk");
+    if (v === "AMBER") return t("verify.moderateRisk");
+    return t("verify.highRisk");
+  }
 
   const query = useQuery<VerifyData>({
     queryKey: ["/api/verify", ref],
@@ -65,7 +67,7 @@ export default function VerifyPage() {
 
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "40px 20px" }}>
         {query.isLoading && (
-          <div style={{ textAlign: "center", color: "var(--t3)", fontSize: 13 }}>Verifying...</div>
+          <div style={{ textAlign: "center", color: "var(--t3)", fontSize: 13 }}>{t("verify.loading")}</div>
         )}
 
         {query.isError && (
@@ -74,10 +76,10 @@ export default function VerifyPage() {
               style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 20, color: "var(--t1)", marginBottom: 12 }}
               data-testid="text-not-found-title"
             >
-              Reference not found.
+              {t("verify.notFoundTitle")}
             </h2>
             <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.6 }}>
-              The TwinLog reference you entered does not match any record in our system.
+              {t("verify.notFoundDescription")}
             </p>
           </div>
         )}
@@ -88,7 +90,7 @@ export default function VerifyPage() {
               style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 22, color: "var(--t1)", marginBottom: 16 }}
               data-testid="text-verify-heading"
             >
-              TwinLog Verification
+              {t("verify.heading")}
             </h2>
 
             <div
@@ -105,7 +107,7 @@ export default function VerifyPage() {
             >
               <span style={{ fontSize: 16, color: "var(--green)" }}>{"\u2713"}</span>
               <span style={{ fontSize: 13, color: "var(--green)", lineHeight: 1.5 }}>
-                This record was locked on {formatDate(query.data.twinlogLockedAt)} and has not been modified.
+                {t("verify.lockedBanner", { date: formatDate(query.data.twinlogLockedAt) })}
               </span>
             </div>
 
@@ -118,7 +120,7 @@ export default function VerifyPage() {
             >
               <div style={{ marginBottom: 16 }}>
                 <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>
-                  Trade
+                  {t("verify.trade")}
                 </div>
                 <div style={{ fontSize: 14, color: "var(--t1)", fontWeight: 600 }}>
                   {query.data.commodityName}
@@ -133,7 +135,7 @@ export default function VerifyPage() {
               <div style={{ display: "grid", gap: 12 }}>
                 <div>
                   <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
-                    Reference
+                    {t("verify.reference")}
                   </div>
                   <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--blue)", fontWeight: 700 }} data-testid="text-verify-ref">
                     {query.data.twinlogRef}
@@ -142,7 +144,7 @@ export default function VerifyPage() {
 
                 <div>
                   <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
-                    Hash
+                    {t("verify.hash")}
                   </div>
                   <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)", wordBreak: "break-all" }} data-testid="text-verify-hash">
                     sha256:{query.data.twinlogHash}
@@ -151,7 +153,7 @@ export default function VerifyPage() {
 
                 <div>
                   <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
-                    Locked
+                    {t("verify.locked")}
                   </div>
                   <div style={{ fontSize: 14, color: "var(--t2)" }}>
                     {formatDate(query.data.twinlogLockedAt)}
@@ -161,7 +163,7 @@ export default function VerifyPage() {
                 {query.data.readinessScore != null && (
                   <div>
                     <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
-                      Score
+                      {t("verify.score")}
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: 18, fontWeight: 800, color: "var(--t1)" }}>
@@ -191,7 +193,7 @@ export default function VerifyPage() {
           <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "var(--t2)" }}>TapTrao</span>
         </div>
         <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.55 }}>
-          Trade compliance verification powered by TapTrao.
+          {t("verify.footerMessage")}
         </p>
       </div>
     </div>

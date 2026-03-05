@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 export function UploadZone({ icon, title, subtitle, accept, onFileSelect }: {
   icon: string;
@@ -40,12 +41,13 @@ export function UploadZone({ icon, title, subtitle, accept, onFileSelect }: {
 }
 
 export function FilePill({ name, size, onRemove }: { name: string; size: number; onRemove: () => void }) {
+  const { t } = useTranslation("lcCheck");
   return (
     <div className="lc-fp">
       <span>📄</span>
       <span className="lc-fp-name">{name}</span>
       <span className="lc-fp-size">{(size / 1024).toFixed(0)}KB</span>
-      <span className="lc-fp-ok">✓ Uploaded</span>
+      <span className="lc-fp-ok">✓ {t("upload.uploaded")}</span>
       <button className="lc-fp-x" onClick={onRemove} data-testid="button-remove-file">×</button>
     </div>
   );

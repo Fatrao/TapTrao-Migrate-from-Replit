@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import type { SupplierUpload } from "@shared/schema";
@@ -74,6 +75,7 @@ const sageHover = "#5a7a6b";
 /* ── page ── */
 
 export default function SupplierUpload() {
+  const { t } = useTranslation("supplierUpload");
   const params = useParams<{ token: string }>();
   const token = params.token;
   const [submitted, setSubmitted] = useState(false);
@@ -104,7 +106,7 @@ export default function SupplierUpload() {
   if (dataQuery.isLoading) {
     return (
       <div className="supplier-upload-page" style={{ background: lightBg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ color: textSecondary, fontSize: 14 }}>Loading...</div>
+        <div style={{ color: textSecondary, fontSize: 14 }}>{t("loading")}</div>
       </div>
     );
   }
@@ -136,10 +138,10 @@ export default function SupplierUpload() {
             {"\u2705"}
           </div>
           <h2 style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 22, color: textPrimary, marginBottom: 8 }}>
-            Documents submitted
+            {t("success.title")}
           </h2>
           <p style={{ fontSize: 15, color: textSecondary, lineHeight: 1.6 }}>
-            The buyer has been notified. You can close this page.
+            {t("success.message")}
           </p>
         </div>
         <Footer expiryDate={request.uploadExpiresAt} />
@@ -209,8 +211,8 @@ export default function SupplierUpload() {
           </div>
 
           <p style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", lineHeight: 1.6, margin: 0 }}>
-            Please upload the documents listed below for this shipment.
-            No account needed {"\u2014"} your files go directly to the buyer.
+            {t("uploadDocs")}
+            {" "}{t("noAccountNeeded")}
           </p>
 
           <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 8 }}>
@@ -221,17 +223,17 @@ export default function SupplierUpload() {
                 color: "#fcd34d", fontSize: 14, fontWeight: 600,
                 padding: "5px 12px", borderRadius: 6,
               }}>
-                {"\u23F1"} Due by {formatDate(request.uploadExpiresAt)}
+                {"\u23F1"} {t("dueBy", { date: formatDate(request.uploadExpiresAt) })}
               </span>
             ) : (
               <span style={{ fontSize: 14, color: "rgba(255,255,255,0.5)" }}>
-                Deadline: {formatDate(request.uploadExpiresAt)}
+                {t("deadline", { date: formatDate(request.uploadExpiresAt) })}
               </span>
             )}
             <span style={{
               fontSize: 14, color: "rgba(255,255,255,0.5)", marginLeft: "auto",
             }}>
-              {docsReceived.length}/{docsRequired.length} uploaded
+              {t("uploadCount", { received: docsReceived.length, total: docsRequired.length })}
             </span>
           </div>
         </div>
@@ -292,9 +294,9 @@ export default function SupplierUpload() {
                     hasFinding ? amberBg :
                     isReceived ? accentGreenLight : "#f3f4f6",
                 }}>
-                  {isVerified ? "\u2713 Verified" :
-                    hasFinding ? "\u26A0 Amend" :
-                    isReceived ? "\u2713 Received" : "Awaiting"}
+                  {isVerified ? `\u2713 ${t("status.verified")}` :
+                    hasFinding ? `\u26A0 ${t("status.amend")}` :
+                    isReceived ? `\u2713 ${t("status.received")}` : t("status.awaiting")}
                 </span>
               </div>
 
@@ -348,7 +350,7 @@ export default function SupplierUpload() {
           boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
         }}>
           <div style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: textMuted, marginBottom: 10 }}>
-            Upload progress
+            {t("progress.title")}
           </div>
           {docsRequired.map((docName, idx) => {
             const isReceived = docsReceived.includes(docName);
@@ -359,13 +361,13 @@ export default function SupplierUpload() {
             let label: string;
             if (upload?.verified || isReceived) {
               dotColor = accentGreen;
-              label = `${docName} \u2014 received`;
+              label = t("progress.received", { doc: docName });
             } else if (hasFinding) {
               dotColor = amberText;
-              label = `${docName} \u2014 needs amendment`;
+              label = t("progress.needsAmendment", { doc: docName });
             } else {
               dotColor = "#d1d5db";
-              label = `${docName} \u2014 not yet uploaded`;
+              label = t("progress.notUploaded", { doc: docName });
             }
 
             return (
@@ -406,7 +408,7 @@ export default function SupplierUpload() {
             if (allReceived) (e.target as HTMLButtonElement).style.background = sage;
           }}
         >
-          {submitMutation.isPending ? "Submitting..." : allReceived ? "Submit documents \u2192" : `Upload all ${docsRequired.length} documents to submit`}
+          {submitMutation.isPending ? t("submit.submitting") : allReceived ? `${t("submit.button")} \u2192` : t("submit.uploadAll", { count: docsRequired.length })}
         </button>
 
         <Footer expiryDate={request.uploadExpiresAt} />
@@ -418,6 +420,7 @@ export default function SupplierUpload() {
 /* ── Top bar ── */
 
 function TopBar() {
+  const { t } = useTranslation("supplierUpload");
   return (
     <div style={{
       position: "sticky", top: 0, height: 56,
@@ -434,7 +437,7 @@ function TopBar() {
         </span>
       </div>
       <span style={{ fontSize: 14, color: textMuted, display: "flex", alignItems: "center", gap: 5 }}>
-        {"\uD83D\uDD12"} Secure upload
+        {"\uD83D\uDD12"} {t("secureUpload")}
       </span>
     </div>
   );
@@ -443,6 +446,7 @@ function TopBar() {
 /* ── Footer ── */
 
 function Footer({ expiryDate }: { expiryDate: string }) {
+  const { t } = useTranslation("supplierUpload");
   return (
     <div style={{ textAlign: "center", marginTop: 40, padding: "0 20px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 6 }}>
@@ -452,10 +456,10 @@ function Footer({ expiryDate }: { expiryDate: string }) {
         </span>
       </div>
       <p style={{ fontSize: 14, color: textMuted, lineHeight: 1.55 }}>
-        Your files go directly and securely to the buyer. No TapTrao account required.
+        {t("footer.secureMessage")}
       </p>
       <p style={{ fontSize: 14, color: textMuted, lineHeight: 1.55, marginTop: 2 }}>
-        This link expires {formatDate(expiryDate)}.
+        {t("footer.linkExpires", { date: formatDate(expiryDate) })}
       </p>
     </div>
   );
@@ -464,6 +468,7 @@ function Footer({ expiryDate }: { expiryDate: string }) {
 /* ── Expired page ── */
 
 function ExpiredPage({ reason }: { reason: "expired" | "invalid" }) {
+  const { t } = useTranslation("supplierUpload");
   return (
     <div className="supplier-upload-page" style={{ background: lightBg, minHeight: "100vh" }}>
       <TopBar />
@@ -477,10 +482,10 @@ function ExpiredPage({ reason }: { reason: "expired" | "invalid" }) {
           {"\u26A0\uFE0F"}
         </div>
         <h2 style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 20, color: textPrimary, marginBottom: 12 }}>
-          {reason === "expired" ? "This upload link has expired" : "Upload link not found"}
+          {reason === "expired" ? t("expired.title") : t("expired.notFound")}
         </h2>
         <p style={{ fontSize: 15, color: textSecondary, lineHeight: 1.6 }}>
-          Please contact the buyer to request a new link.
+          {t("expired.contactBuyer")}
         </p>
       </div>
       <Footer expiryDate={new Date().toISOString()} />
@@ -503,6 +508,7 @@ function UploadZone({
   onFileSelect: (file: File) => void;
   hasExistingUpload: boolean;
 }) {
+  const { t } = useTranslation("supplierUpload");
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -528,7 +534,7 @@ function UploadZone({
         fontSize: 13, color: accentGreen, fontWeight: 500,
         display: "flex", alignItems: "center", gap: 6,
       }}>
-        {"\u2713"} Uploaded — pending verification
+        {"\u2713"} {t("uploadedPending")}
       </div>
     );
   }
@@ -556,14 +562,14 @@ function UploadZone({
         }}
       >
         {isUploading ? (
-          <div style={{ fontSize: 13, color: textSecondary }}>Uploading...</div>
+          <div style={{ fontSize: 13, color: textSecondary }}>{t("uploading")}</div>
         ) : (
           <>
             <div style={{ fontSize: 14, color: textSecondary, fontWeight: 500 }}>
-              {"\uD83D\uDCCE"} Drop file here or tap to choose
+              {"\uD83D\uDCCE"} {t("dropOrTap")}
             </div>
             <div style={{ fontSize: 14, color: textMuted, marginTop: 4 }}>
-              PDF, JPG, PNG {"\u00B7"} max 20MB
+              {t("fileTypes")}
             </div>
           </>
         )}

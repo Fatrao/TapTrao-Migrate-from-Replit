@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/use-auth";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { AppShell } from "@/components/AppShell";
@@ -11,8 +12,9 @@ export default function Register() {
   const [error, setError] = useState("");
   const [, navigate] = useLocation();
   const { register, registerPending, isAuthenticated } = useAuth();
+  const { t } = useTranslation("auth");
 
-  usePageTitle("Create Account");
+  usePageTitle(t("register.title"));
 
   // Redirect if already logged in
   if (isAuthenticated) {
@@ -32,7 +34,7 @@ export default function Register() {
         navigate("/dashboard");
       }
     } catch (err: any) {
-      const msg = err?.message || "Registration failed";
+      const msg = err?.message || t("register.registrationFailed");
       try {
         const parsed = JSON.parse(msg);
         setError(parsed.message || msg);
@@ -46,46 +48,46 @@ export default function Register() {
     <AppShell contentClassName="content-area">
       <div className="green-hero-box" style={{ margin: "4px 24px 16px" }}>
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }}>
-          Create Account
+          {t("register.title")}
         </h1>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
-          Save your compliance checks and trade data securely
+          {t("register.subtitle")}
         </p>
       </div>
 
       <div className="form-card" style={{ margin: "0 24px 20px", maxWidth: 420 }}>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Email</label>
+            <label>{t("register.emailLabel")}</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@company.com"
+              placeholder={t("register.emailPlaceholder")}
               autoFocus
               required
             />
           </div>
 
           <div className="form-group">
-            <label>Password</label>
+            <label>{t("register.passwordLabel")}</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="At least 8 characters"
+              placeholder={t("register.passwordPlaceholder")}
               required
               minLength={8}
             />
           </div>
 
           <div className="form-group">
-            <label>Company / Name <span style={{ color: "#999", fontWeight: 400 }}>(optional)</span></label>
+            <label>{t("register.companyLabel")} <span style={{ color: "#999", fontWeight: 400 }}>{t("register.companyOptional")}</span></label>
             <input
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Your company or name"
+              placeholder={t("register.companyPlaceholder")}
             />
           </div>
 
@@ -109,14 +111,14 @@ export default function Register() {
               width: "100%",
             }}
           >
-            {registerPending ? "Creating account..." : "Create Account"}
+            {registerPending ? t("register.submitting") : t("register.submit")}
           </button>
         </form>
 
         <p style={{ fontSize: 13, color: "#888", marginTop: 16, textAlign: "center" }}>
-          Already have an account?{" "}
+          {t("register.hasAccount")}{" "}
           <a href="/login" style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none" }}>
-            Log in
+            {t("register.logIn")}
           </a>
         </p>
       </div>

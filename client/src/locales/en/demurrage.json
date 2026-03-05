@@ -1,0 +1,43 @@
+{
+  "title": "Demurrage Calculator",
+  "subtitle": "Estimate demurrage if this shipment is delayed at port",
+
+  "port": "Port of discharge",
+  "containerType": "Container type",
+  "freeDays": "Free days included in contract",
+  "freeDaysHelper": "Check your Bill of Lading. Most contracts allow 7\u201314 free days.",
+  "arrivalDate": "Arrival date",
+  "daysHeld": "How many days have goods been held?",
+  "enterManually": "Enter days manually",
+  "calcFromDate": "Calculate from arrival date",
+  "cargoValue": "Estimated cargo value (USD)",
+  "cargoValueHelper": "Optional \u2014 used to calculate demurrage as % of cargo value",
+  "calculate": "Calculate",
+
+  "billableDays": "Billable days",
+  "dailyRate": "Daily rate",
+  "daysAtPort": "Days at port",
+
+  "costBreakdown": "Cost breakdown",
+  "period": "Period",
+  "days": "Days",
+  "ratePerDay": "Rate/day",
+  "subtotal": "Subtotal",
+  "noChargeableDays": "No chargeable days \u2014 within free period",
+
+  "totalDemurrage": "TOTAL DEMURRAGE",
+  "basedOnInputs": "Based on current inputs",
+  "pctOfCargo": "Demurrage as % of cargo value: {{pct}}%",
+  "pctWarning": "Consider whether re-export or destruction may be cheaper.",
+
+  "nextStep": "Next step: compare demurrage against alternatives",
+  "reExport": "Re-export",
+  "reExportDesc": "Often 30\u201350% of cargo value",
+  "destruction": "Destruction",
+  "destructionDesc": "Often $500\u20135,000, depending on port and volume",
+  "appealRetest": "Appeal / re-test",
+  "appealRetestDesc": "Re-testing fee typically $200-500 + additional storage",
+  "ratesNote": "Rates are indicative based on published port tariffs. Actual rates vary by carrier, season, and contract terms. Confirm final charges with your freight agent.",
+  "disclaimer": "TapTrao demurrage estimates are based on published port tariff data and are provided for planning purposes only. They do not constitute financial advice.",
+  "optional": "Optional"
+}

@@ -1,0 +1,19 @@
+{
+  "notFound": {
+    "title": "404 Page Not Found",
+    "description": "The page you're looking for doesn't exist."
+  },
+  "tokenSuccess": {
+    "noSession": "No purchase session found.",
+    "goToPricing": "Go to Pricing",
+    "verifying": "Verifying your purchase...",
+    "purchaseComplete": "Purchase Complete",
+    "packAdded": "Your {{packName}} pack has been added to your account.",
+    "tokensAdded": "+{{count}} tokens",
+    "balance": "Balance: {{count}}",
+    "processing": "Processing",
+    "processingDefault": "Your payment is being processed. Tokens will appear shortly.",
+    "runLookup": "Run a Lookup",
+    "dashboard": "Dashboard"
+  }
+}

@@ -1,9 +1,11 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
 import { AppShell } from "@/components/AppShell";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { Search, FileCheck } from "lucide-react";
 
 export default function NewCheck() {
+  const { t } = useTranslation("lookup");
   usePageTitle("New Check", "Choose which check to run for your shipment");
 
   return (
@@ -22,7 +24,7 @@ export default function NewCheck() {
           marginBottom: 14,
           letterSpacing: "0.03em",
         }}>
-          Compliance Tools
+          {t("newCheck.breadcrumb")}
         </div>
         <h1 style={{
           fontFamily: "'Clash Display', sans-serif",
@@ -32,7 +34,7 @@ export default function NewCheck() {
           margin: "0 0 8px",
           lineHeight: 1.2,
         }}>
-          New Check
+          {t("newCheck.title")}
         </h1>
         <p style={{
           fontSize: 14,
@@ -40,7 +42,7 @@ export default function NewCheck() {
           margin: 0,
           maxWidth: 500,
         }}>
-          Choose a check type for your shipment. Each check generates a hash-chained audit record.
+          {t("newCheck.subtitle")}
         </p>
       </div>
 
@@ -86,7 +88,7 @@ export default function NewCheck() {
               color: "#1a1a1a",
               margin: "0 0 8px",
             }}>
-              Compliance Check
+              {t("newCheck.complianceCheck")}
             </h3>
             <p style={{
               fontSize: 13,
@@ -94,14 +96,14 @@ export default function NewCheck() {
               lineHeight: 1.6,
               margin: "0 0 16px",
             }}>
-              What regulations apply to your shipment? Get duty rates, document requirements, risk assessments, and readiness scores for any commodity corridor.
+              {t("newCheck.complianceDesc")}
             </p>
             <div style={{
               fontSize: 13,
               fontWeight: 600,
               color: "#0e4e45",
             }}>
-              Start Check →
+              {t("newCheck.startCheck")} →
             </div>
           </div>
         </Link>
@@ -141,7 +143,7 @@ export default function NewCheck() {
               color: "#1a1a1a",
               margin: "0 0 8px",
             }}>
-              LC Document Check
+              {t("newCheck.lcDocCheck")}
             </h3>
             <p style={{
               fontSize: 13,
@@ -149,14 +151,14 @@ export default function NewCheck() {
               lineHeight: 1.6,
               margin: "0 0 16px",
             }}>
-              Do your documents match your LC terms? Cross-check Letter of Credit terms against supplier documents using UCP 600 rules to catch discrepancies before bank presentation.
+              {t("newCheck.lcDocDesc")}
             </p>
             <div style={{
               fontSize: 13,
               fontWeight: 600,
               color: "#0e4e45",
             }}>
-              Start LC Check →
+              {t("newCheck.startLcCheck")} →
             </div>
           </div>
         </Link>

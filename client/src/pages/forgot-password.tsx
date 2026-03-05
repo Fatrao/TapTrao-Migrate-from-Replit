@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { AppShell } from "@/components/AppShell";
 import { apiRequest } from "@/lib/queryClient";
@@ -10,8 +11,9 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [resent, setResent] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const { t } = useTranslation("auth");
 
-  usePageTitle("Forgot Password");
+  usePageTitle(t("forgotPassword.title"));
 
   const sendResetEmail = async (emailAddress: string) => {
     setError("");
@@ -20,7 +22,7 @@ export default function ForgotPassword() {
       await apiRequest("POST", "/api/auth/forgot-password", { email: emailAddress });
       return true;
     } catch (err: any) {
-      setError(err?.message || "Something went wrong. Please try again.");
+      setError(err?.message || t("forgotPassword.errorDefault"));
       return false;
     } finally {
       setLoading(false);
@@ -55,10 +57,10 @@ export default function ForgotPassword() {
     <AppShell contentClassName="content-area">
       <div className="green-hero-box" style={{ margin: "4px 24px 16px" }}>
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }}>
-          Forgot Password
+          {t("forgotPassword.title")}
         </h1>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
-          Enter your email to receive a password reset link
+          {t("forgotPassword.subtitle")}
         </p>
       </div>
 
@@ -67,8 +69,8 @@ export default function ForgotPassword() {
           <div>
             <div style={{ background: "rgba(14,78,69,0.12)", border: "1px solid var(--sage)", borderRadius: 8, padding: "14px 16px", marginBottom: 16, fontSize: 13, color: "var(--sage)" }}>
               {resent
-                ? "Reset link resent! Please check your inbox (and spam folder)."
-                : "If an account with that email exists, we've sent a password reset link. Please check your inbox."}
+                ? t("forgotPassword.resentMessage")
+                : t("forgotPassword.sentMessage")}
             </div>
 
             <button
@@ -89,10 +91,10 @@ export default function ForgotPassword() {
               }}
             >
               {loading
-                ? "Sending..."
+                ? t("forgotPassword.sending")
                 : resendCooldown > 0
-                  ? `Resend email (${resendCooldown}s)`
-                  : "Resend email"}
+                  ? t("forgotPassword.resendWithCooldown", { seconds: resendCooldown })
+                  : t("forgotPassword.resendEmail")}
             </button>
 
             {error && (
@@ -101,19 +103,19 @@ export default function ForgotPassword() {
 
             <p style={{ fontSize: 13, color: "#888", textAlign: "center" }}>
               <a href="/login" style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none" }}>
-                Back to Log In
+                {t("forgotPassword.backToLogin")}
               </a>
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Email</label>
+              <label>{t("forgotPassword.emailLabel")}</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
+                placeholder={t("forgotPassword.emailPlaceholder")}
                 autoFocus
                 required
               />
@@ -139,15 +141,15 @@ export default function ForgotPassword() {
                 width: "100%",
               }}
             >
-              {loading ? "Sending..." : "Send Reset Link"}
+              {loading ? t("forgotPassword.sending") : t("forgotPassword.sendResetLink")}
             </button>
           </form>
         )}
 
         <p style={{ fontSize: 13, color: "#888", marginTop: 16, textAlign: "center" }}>
-          Remember your password?{" "}
+          {t("forgotPassword.rememberPassword")}{" "}
           <a href="/login" style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none" }}>
-            Log In
+            {t("forgotPassword.logIn")}
           </a>
         </p>
       </div>

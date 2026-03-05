@@ -1,0 +1,53 @@
+{
+  "loading": "Loading...",
+  "secureUpload": "Secure upload",
+  "uploadDocs": "Please upload the documents listed below for this shipment.",
+  "noAccountNeeded": "No account needed \u2014 your files go directly to the buyer.",
+  "dueBy": "Due by {{date}}",
+  "deadline": "Deadline: {{date}}",
+  "uploadCount": "{{received}}/{{total}} uploaded",
+
+  "status.verified": "Verified",
+  "status.amend": "Amend",
+  "status.received": "Received",
+  "status.awaiting": "Awaiting",
+
+  "uploadedPending": "Uploaded \u2014 pending verification",
+  "dropOrTap": "Drop file here or tap to choose",
+  "fileTypes": "PDF, JPG, PNG \u00B7 max 20MB",
+  "uploading": "Uploading...",
+
+  "progress.title": "Upload progress",
+  "progress.received": "{{doc}} \u2014 received",
+  "progress.needsAmendment": "{{doc}} \u2014 needs amendment",
+  "progress.notUploaded": "{{doc}} \u2014 not yet uploaded",
+
+  "submit.submitting": "Submitting...",
+  "submit.button": "Submit documents",
+  "submit.uploadAll": "Upload all {{count}} documents to submit",
+
+  "success.title": "Documents submitted",
+  "success.message": "The buyer has been notified. You can close this page.",
+
+  "footer.secureMessage": "Your files go directly and securely to the buyer. No TapTrao account required.",
+  "footer.linkExpires": "This link expires {{date}}.",
+
+  "expired.title": "This upload link has expired",
+  "expired.notFound": "Upload link not found",
+  "expired.contactBuyer": "Please contact the buyer to request a new link.",
+
+  "verify.loading": "Verifying...",
+  "verify.notFoundTitle": "Reference not found.",
+  "verify.notFoundDescription": "The TwinLog reference you entered does not match any record in our system.",
+  "verify.heading": "TwinLog Verification",
+  "verify.lockedBanner": "This record was locked on {{date}} and has not been modified.",
+  "verify.trade": "Trade",
+  "verify.reference": "Reference",
+  "verify.hash": "Hash",
+  "verify.locked": "Locked",
+  "verify.score": "Score",
+  "verify.lowRisk": "LOW RISK",
+  "verify.moderateRisk": "MODERATE RISK",
+  "verify.highRisk": "HIGH RISK",
+  "verify.footerMessage": "Trade compliance verification powered by TapTrao."
+}

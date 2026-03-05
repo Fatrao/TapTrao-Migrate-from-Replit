@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/AppShell";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation, useSearch } from "wouter";
@@ -49,17 +50,17 @@ type FilterTab = "all" | "active" | "issues" | "closed";
 
 /* ─── Helpers ─── */
 
-function getStatusBadge(trade: EnrichedTrade): { label: string; cls: string } {
+function getStatusBadge(trade: EnrichedTrade, t: (key: string) => string): { label: string; cls: string } {
   const status = trade.tradeStatus || "active";
   if (status === "closed" || status === "archived")
-    return { label: "Closed", cls: "off" };
+    return { label: t("status.closed"), cls: "off" };
   if (trade.readinessScore !== null && trade.readinessScore >= 80 && trade.docsReceivedCount >= trade.docsRequiredCount && trade.docsRequiredCount > 0)
-    return { label: "Complete", cls: "ok" };
+    return { label: t("status.complete"), cls: "ok" };
   if (trade.readinessVerdict === "RED")
-    return { label: "Issues", cls: "e" };
+    return { label: t("status.issues"), cls: "e" };
   if (!trade.lcVerdict && trade.docsReceivedCount === 0)
-    return { label: "Waiting", cls: "w" };
-  return { label: "Active", cls: "ok" };
+    return { label: t("status.waiting"), cls: "w" };
+  return { label: t("status.active"), cls: "ok" };
 }
 
 function getComplianceClass(score: number | null): string {
@@ -76,11 +77,11 @@ function formatValue(v: string | null, currency: string | null): string {
   return `$${n.toLocaleString()}`;
 }
 
-function getEudrBadge(band: string | null): { label: string; cls: string } {
+function getEudrBadge(band: string | null, t: (key: string) => string): { label: string; cls: string } {
   if (!band) return { label: "—", cls: "" };
-  if (band === "negligible" || band === "low") return { label: "Low", cls: "ok" };
-  if (band === "medium") return { label: "Med", cls: "w" };
-  if (band === "high") return { label: "High", cls: "e" };
+  if (band === "negligible" || band === "low") return { label: t("eudr.low"), cls: "ok" };
+  if (band === "medium") return { label: t("eudr.med"), cls: "w" };
+  if (band === "high") return { label: t("eudr.high"), cls: "e" };
   return { label: band, cls: "" };
 }
 
@@ -254,7 +255,8 @@ const css = `
 /* ─── Main Component ─── */
 
 export default function Trades() {
-  usePageTitle("My Trades");
+  const { t } = useTranslation("trades");
+  usePageTitle(t("pageTitle"));
   const [, navigate] = useLocation();
   const searchString = useSearch();
   const [filter, setFilter] = useState<FilterTab>("all");
@@ -280,53 +282,53 @@ export default function Trades() {
 
   const filtered = useMemo(() => {
     let list = allTrades;
-    if (filter === "active") list = list.filter(t => {
-      const s = t.tradeStatus || "active";
-      return s !== "closed" && s !== "archived" && t.readinessVerdict !== "RED";
+    if (filter === "active") list = list.filter(tr => {
+      const s = tr.tradeStatus || "active";
+      return s !== "closed" && s !== "archived" && tr.readinessVerdict !== "RED";
     });
-    if (filter === "issues") list = list.filter(t => t.readinessVerdict === "RED");
-    if (filter === "closed") list = list.filter(t => t.tradeStatus === "closed" || t.tradeStatus === "archived");
+    if (filter === "issues") list = list.filter(tr => tr.readinessVerdict === "RED");
+    if (filter === "closed") list = list.filter(tr => tr.tradeStatus === "closed" || tr.tradeStatus === "archived");
     if (search.trim()) {
       const q = search.toLowerCase();
-      list = list.filter(t =>
-        t.commodityName.toLowerCase().includes(q) ||
-        t.originName.toLowerCase().includes(q) ||
-        t.destName.toLowerCase().includes(q)
+      list = list.filter(tr =>
+        tr.commodityName.toLowerCase().includes(q) ||
+        tr.originName.toLowerCase().includes(q) ||
+        tr.destName.toLowerCase().includes(q)
       );
     }
     return list;
   }, [allTrades, filter, search]);
 
   const eudrTrades = useMemo(() =>
-    allTrades.filter(t => t.eudrApplicable === true && t.tradeStatus !== "closed" && t.tradeStatus !== "archived"),
+    allTrades.filter(tr => tr.eudrApplicable === true && tr.tradeStatus !== "closed" && tr.tradeStatus !== "archived"),
   [allTrades]);
 
   const cbamTrades = useMemo(() =>
-    allTrades.filter(t => t.cbamApplicable === true && t.tradeStatus !== "closed" && t.tradeStatus !== "archived"),
+    allTrades.filter(tr => tr.cbamApplicable === true && tr.tradeStatus !== "closed" && tr.tradeStatus !== "archived"),
   [allTrades]);
 
   const filters: { key: FilterTab; label: string; count: number }[] = [
-    { key: "all", label: "All", count: allTrades.length },
-    { key: "active", label: "Active", count: allTrades.filter(t => (t.tradeStatus || "active") !== "closed" && (t.tradeStatus || "active") !== "archived").length },
-    { key: "issues", label: "Issues", count: allTrades.filter(t => t.readinessVerdict === "RED").length },
-    { key: "closed", label: "Closed", count: allTrades.filter(t => t.tradeStatus === "closed" || t.tradeStatus === "archived").length },
+    { key: "all", label: t("filter.all"), count: allTrades.length },
+    { key: "active", label: t("filter.active"), count: allTrades.filter(tr => (tr.tradeStatus || "active") !== "closed" && (tr.tradeStatus || "active") !== "archived").length },
+    { key: "issues", label: t("filter.issues"), count: allTrades.filter(tr => tr.readinessVerdict === "RED").length },
+    { key: "closed", label: t("filter.closed"), count: allTrades.filter(tr => tr.tradeStatus === "closed" || tr.tradeStatus === "archived").length },
   ];
 
   /* Compute analytics data from real trades */
   const corridorAnalytics = useMemo(() => {
     const map = new Map<string, { flags: string; label: string; count: number; value: number }>();
-    allTrades.forEach(t => {
-      if (t.tradeStatus === "closed" || t.tradeStatus === "archived") return;
-      const key = `${t.originIso2}-${t.destIso2}`;
+    allTrades.forEach(tr => {
+      if (tr.tradeStatus === "closed" || tr.tradeStatus === "archived") return;
+      const key = `${tr.originIso2}-${tr.destIso2}`;
       const existing = map.get(key);
-      const val = t.tradeValue ? Number(t.tradeValue) : 0;
+      const val = tr.tradeValue ? Number(tr.tradeValue) : 0;
       if (existing) {
         existing.count++;
         existing.value += val;
       } else {
         map.set(key, {
-          flags: `${iso2ToFlag(t.originIso2)}${iso2ToFlag(t.destIso2)}`,
-          label: `${t.originName} → ${t.destName}`,
+          flags: `${iso2ToFlag(tr.originIso2)}${iso2ToFlag(tr.destIso2)}`,
+          label: `${tr.originName} → ${tr.destName}`,
           count: 1,
           value: val,
         });
@@ -346,22 +348,22 @@ export default function Trades() {
         {/* ── Header ── */}
         <div className="mt-hdr">
           <div>
-            <h1 data-testid="text-trades-title">My Trades</h1>
+            <h1 data-testid="text-trades-title">{t("pageTitle")}</h1>
             <div className="sub" data-testid="text-trades-subtitle">
-              Active shipment value: ${totalValue.toLocaleString()} across {corridors.length || corridorAnalytics.length} corridor{(corridors.length || corridorAnalytics.length) !== 1 ? "s" : ""}
+              {t("subtitle", { value: totalValue.toLocaleString(), count: corridors.length || corridorAnalytics.length, plural: (corridors.length || corridorAnalytics.length) !== 1 ? "s" : "" })}
             </div>
           </div>
           <div className="mt-hdr-r">
             <input
               className="mt-srch"
-              placeholder="Search trades..."
+              placeholder={t("searchPlaceholder")}
               value={search}
               onChange={e => setSearch(e.target.value)}
               data-testid="input-search-trades"
             />
             <button className="mt-hbtn">🔔</button>
             <button className="mt-ntb" onClick={() => navigate("/lookup")} data-testid="button-new-trade">
-              <Plus size={12} /> New Trade
+              <Plus size={12} /> {t("newTrade")}
             </button>
           </div>
         </div>
@@ -370,7 +372,7 @@ export default function Trades() {
         <div className="mt-stats" data-testid="stat-cards">
           <div className="mt-st">
             <div>
-              <div className="sl">Active Shipments</div>
+              <div className="sl">{t("stat.activeShipments")}</div>
               <div className="sv">{stats.activeShipments}</div>
             </div>
             <div className="mt-st-bars">
@@ -381,14 +383,14 @@ export default function Trades() {
           </div>
           <div className="mt-st ac">
             <div>
-              <div className="sl">Pending Docs</div>
+              <div className="sl">{t("stat.pendingDocs")}</div>
               <div className="sv">{stats.pendingDocuments}</div>
             </div>
             <div style={{ fontSize: 16 }}>📄</div>
           </div>
           <div className="mt-st">
             <div>
-              <div className="sl">Total Value</div>
+              <div className="sl">{t("stat.totalValue")}</div>
               <div className="sv">${totalValue >= 1000 ? `${(totalValue / 1000).toFixed(0)}k` : totalValue.toLocaleString()}</div>
             </div>
             <svg width="48" height="20" viewBox="0 0 48 20">
@@ -397,8 +399,8 @@ export default function Trades() {
           </div>
           <div className="mt-st ac">
             <div>
-              <div className="sl">Shield Balance</div>
-              <div className="sv">{balance} check{balance !== 1 ? "s" : ""}</div>
+              <div className="sl">{t("stat.shieldBalance")}</div>
+              <div className="sv">{t("stat.check", { count: balance })}</div>
             </div>
             <div style={{ fontSize: 16 }}>🛡</div>
           </div>
@@ -409,7 +411,7 @@ export default function Trades() {
           {/* LEFT: Trades Card */}
           <div className="mt-tc">
             <div className="th">
-              <h3>Trades</h3>
+              <h3>{t("trades.title")}</h3>
               <div className="mt-pls" data-testid="filter-bar">
                 {filters.map(f => (
                   <button
@@ -424,27 +426,27 @@ export default function Trades() {
               </div>
             </div>
             <div className="tsub">
-              Total: <b>${totalValue.toLocaleString()}</b> · {allTrades.filter(t => (t.tradeStatus || "active") !== "closed").length} shipments
+              {t("trades.total")} <b>${totalValue.toLocaleString()}</b> · {t("trades.shipment", { count: allTrades.filter(tr => (tr.tradeStatus || "active") !== "closed").length })}
             </div>
 
             <div className="mt-tb">
               {tradesQuery.isLoading ? (
-                <div style={{ padding: "60px 0", textAlign: "center", color: "var(--t3)", fontSize: 13 }}>Loading trades...</div>
+                <div style={{ padding: "60px 0", textAlign: "center", color: "var(--t3)", fontSize: 13 }}>{t("trades.loading")}</div>
               ) : filtered.length === 0 && allTrades.length === 0 ? (
                 <div className="mt-empty">
-                  <h3>No trades yet</h3>
-                  <p>Run your first compliance check to create a trade.</p>
+                  <h3>{t("empty.title")}</h3>
+                  <p>{t("empty.body")}</p>
                   <Link href="/lookup">
                     <button className="mt-ntb" data-testid="button-empty-new-lookup">
-                      <Plus size={12} /> Start a new compliance check
+                      <Plus size={12} /> {t("empty.cta")}
                     </button>
                   </Link>
                 </div>
               ) : filtered.length === 0 ? (
-                <div style={{ padding: "60px 0", textAlign: "center", color: "var(--t3)", fontSize: 13 }}>No trades match your filter.</div>
+                <div style={{ padding: "60px 0", textAlign: "center", color: "var(--t3)", fontSize: 13 }}>{t("trades.noFilter")}</div>
               ) : (
                 filtered.map(trade => {
-                  const status = getStatusBadge(trade);
+                  const status = getStatusBadge(trade, t);
                   const isClosed = trade.tradeStatus === "closed" || trade.tradeStatus === "archived";
                   return (
                     <div
@@ -476,11 +478,11 @@ export default function Trades() {
           <div className="mt-right">
             {/* Trade Analytics */}
             <div className="mt-an">
-              <h3>Trade Analytics</h3>
+              <h3>{t("analytics.title")}</h3>
               <div className="mt-an-split">
                 <div>
                   {corridorAnalytics.length === 0 ? (
-                    <div style={{ fontSize: 13, color: "var(--t3)", padding: "16px 0" }}>No corridor data yet</div>
+                    <div style={{ fontSize: 13, color: "var(--t3)", padding: "16px 0" }}>{t("analytics.noData")}</div>
                   ) : (
                     corridorAnalytics.map((c, i) => (
                       <div key={i}>
@@ -488,7 +490,7 @@ export default function Trades() {
                           <div className="cfl">{c.flags}</div>
                           <div className="ci">
                             <div className="cn">{c.label}</div>
-                            <div className="cs">{c.count} shipment{c.count !== 1 ? "s" : ""}</div>
+                            <div className="cs">{t("analytics.shipment", { count: c.count })}</div>
                           </div>
                           <div className="cv">${c.value >= 1000 ? `${(c.value / 1000).toFixed(0)}k` : c.value}</div>
                         </div>
@@ -545,12 +547,12 @@ export default function Trades() {
 
             {/* Demurrage Estimate (placeholder — uses mock data structure) */}
             <div className="mt-dem">
-              <h3>Demurrage Estimate</h3>
+              <h3>{t("demurrage.title")}</h3>
               <div className="mt-dem-body">
                 {(() => {
-                  const tradesWithValue = allTrades.filter(t =>
-                    t.tradeValue && Number(t.tradeValue) > 0 &&
-                    t.tradeStatus !== "closed" && t.tradeStatus !== "archived"
+                  const tradesWithValue = allTrades.filter(tr =>
+                    tr.tradeValue && Number(tr.tradeValue) > 0 &&
+                    tr.tradeStatus !== "closed" && tr.tradeStatus !== "archived"
                   );
                   if (tradesWithValue.length === 0) {
                     return (
@@ -559,20 +561,20 @@ export default function Trades() {
                           <div className="mt-dem-ring" style={{ background: "conic-gradient(rgba(0,0,0,.04) 0deg 360deg)" }}>
                             <span>—</span>
                           </div>
-                          <div className="mt-dem-label">Total exposure</div>
+                          <div className="mt-dem-label">{t("demurrage.totalExposure")}</div>
                         </div>
                         <div className="mt-dem-list">
                           <div style={{ fontSize: 14, color: "var(--t3)", padding: "16px 0" }}>
-                            Add shipment values to see demurrage estimates
+                            {t("demurrage.addValues")}
                           </div>
                         </div>
                       </>
                     );
                   }
                   const demColors = ["var(--sage-l)", "var(--amber)", "var(--red)", "#8ecaad"];
-                  const demData = tradesWithValue.slice(0, 4).map(t => {
-                    const tv = Number(t.tradeValue);
-                    return { name: t.commodityName.split(" ")[0], origin: t.originIso2, est: Math.round(tv * 0.03), tv };
+                  const demData = tradesWithValue.slice(0, 4).map(tr => {
+                    const tv = Number(tr.tradeValue);
+                    return { name: tr.commodityName.split(" ")[0], origin: tr.originIso2, est: Math.round(tv * 0.03), tv };
                   });
                   const totalDem = demData.reduce((s, d) => s + d.est, 0);
                   let ang = 0;
@@ -588,7 +590,7 @@ export default function Trades() {
                         <div className="mt-dem-ring" style={{ background: `conic-gradient(${grad})` }}>
                           <span>${totalDem >= 1000 ? `${(totalDem / 1000).toFixed(1)}k` : totalDem}</span>
                         </div>
-                        <div className="mt-dem-label">Est. exposure</div>
+                        <div className="mt-dem-label">{t("demurrage.estExposure")}</div>
                       </div>
                       <div className="mt-dem-list">
                         {demData.map((d, i) => (
@@ -604,7 +606,7 @@ export default function Trades() {
                           </div>
                         ))}
                         <div className="mt-dem-total">
-                          <div className="dtl">Total est.</div>
+                          <div className="dtl">{t("demurrage.totalEst")}</div>
                           <div className="dtv">${totalDem.toLocaleString()}</div>
                         </div>
                       </div>
@@ -620,23 +622,23 @@ export default function Trades() {
         <div className="mt-bot">
           {/* EUDR Intelligence */}
           <div className="mt-eudr">
-            <h4>🌿 EUDR Intelligence</h4>
-            <div className="es">Deforestation regulation</div>
+            <h4>🌿 {t("eudr.title")}</h4>
+            <div className="es">{t("eudr.subtitle")}</div>
             <div className="mt-eb">
               {eudrTrades.length === 0 ? (
-                <div style={{ fontSize: 13, color: "var(--t3)", padding: "10px 0" }}>No EUDR-applicable trades</div>
+                <div style={{ fontSize: 13, color: "var(--t3)", padding: "10px 0" }}>{t("eudr.noTrades")}</div>
               ) : (
-                eudrTrades.slice(0, 5).map(t => {
-                  const badge = getEudrBadge(t.eudrBand);
+                eudrTrades.slice(0, 5).map(tr => {
+                  const badge = getEudrBadge(tr.eudrBand, t);
                   const dotColor = badge.cls === "e" ? "var(--red)" : badge.cls === "w" ? "var(--amber)" : "var(--sage-l)";
                   const egBg = badge.cls === "e" ? "var(--red-xs)" : badge.cls === "w" ? "var(--amber-xs)" : "var(--sage-xs)";
                   const egColor = badge.cls === "e" ? "var(--red)" : badge.cls === "w" ? "var(--amber)" : "var(--sage)";
                   return (
-                    <div key={t.id} className="mt-er" onClick={() => navigate(`/trades/${t.id}#eudr`)} style={{ cursor: "pointer" }}>
+                    <div key={tr.id} className="mt-er" onClick={() => navigate(`/trades/${tr.id}#eudr`)} style={{ cursor: "pointer" }}>
                       <div className="dot" style={{ background: dotColor }} />
                       <div className="ei">
-                        <div className="en">{iso2ToFlag(t.originIso2)} {t.commodityName.split(" ")[0]}</div>
-                        <div className="et">{t.eudrBand ? `Risk: ${t.eudrBand}` : "Not assessed"}</div>
+                        <div className="en">{iso2ToFlag(tr.originIso2)} {tr.commodityName.split(" ")[0]}</div>
+                        <div className="et">{tr.eudrBand ? t("eudr.risk", { band: tr.eudrBand }) : t("eudr.notAssessed")}</div>
                       </div>
                       <div className="eg" style={{ background: egBg, color: egColor }}>{badge.label}</div>
                     </div>
@@ -648,18 +650,18 @@ export default function Trades() {
 
           {/* CBAM Tariff */}
           <div className="mt-cbam">
-            <h4>⚠️ CBAM Tariff</h4>
+            <h4>⚠️ {t("cbam.title")}</h4>
             <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
               {cbamTrades.length === 0 ? (
-                <div style={{ fontSize: 13, color: "var(--t3)", padding: "10px 0" }}>No CBAM-applicable trades</div>
+                <div style={{ fontSize: 13, color: "var(--t3)", padding: "10px 0" }}>{t("cbam.noTrades")}</div>
               ) : (
-                cbamTrades.slice(0, 5).map(t => (
-                  <div key={t.id} className="mt-cbr" onClick={() => navigate(`/trades/${t.id}#cbam`)} style={{ cursor: "pointer" }}>
+                cbamTrades.slice(0, 5).map(tr => (
+                  <div key={tr.id} className="mt-cbr" onClick={() => navigate(`/trades/${tr.id}#cbam`)} style={{ cursor: "pointer" }}>
                     <div className="cc">
-                      <em>{iso2ToFlag(t.originIso2)}</em>
-                      <span>{t.commodityName.split(" ")[0]} {t.originIso2}→{t.destIso2}</span>
+                      <em>{iso2ToFlag(tr.originIso2)}</em>
+                      <span>{tr.commodityName.split(" ")[0]} {tr.originIso2}→{tr.destIso2}</span>
                     </div>
-                    <div className="cx">{t.cbamScore != null ? `${t.cbamScore}%` : "0%"}</div>
+                    <div className="cx">{tr.cbamScore != null ? `${tr.cbamScore}%` : "0%"}</div>
                   </div>
                 ))
               )}
@@ -668,21 +670,21 @@ export default function Trades() {
 
           {/* Trade Corridors Map */}
           <div className="mt-mp">
-            <h4>Trade Corridors</h4>
-            <div className="ms">{corridors.length || corridorAnalytics.length} active route{(corridors.length || corridorAnalytics.length) !== 1 ? "s" : ""}</div>
+            <h4>{t("map.title")}</h4>
+            <div className="ms">{t("map.activeRoute", { count: corridors.length || corridorAnalytics.length })}</div>
             <div className="mt-mp-inner">
               {corridors.length > 0 ? (
                 <TradeCorridorsMap corridors={corridors} />
               ) : (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", opacity: 0.3 }}>
-                  <span style={{ fontSize: 13, color: "#fff" }}>Map appears with trade data</span>
+                  <span style={{ fontSize: 13, color: "#fff" }}>{t("map.placeholder")}</span>
                 </div>
               )}
             </div>
             <div className="mt-ml">
-              <div className="mt-mll"><span style={{ background: "var(--sage-l)" }} />Primary</div>
-              <div className="mt-mll"><span style={{ background: "var(--amber)" }} />Secondary</div>
-              <div className="mt-mll"><span style={{ background: "var(--red)" }} />At Risk</div>
+              <div className="mt-mll"><span style={{ background: "var(--sage-l)" }} />{t("map.primary")}</div>
+              <div className="mt-mll"><span style={{ background: "var(--amber)" }} />{t("map.secondary")}</div>
+              <div className="mt-mll"><span style={{ background: "var(--red)" }} />{t("map.atRisk")}</div>
             </div>
           </div>
         </div>

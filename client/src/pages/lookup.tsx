@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link, useLocation, useSearch } from "wouter";
+import { useTranslation } from "react-i18next";
 import { estimateDemurrageRange } from "@/lib/demurrage-utils";
 import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
@@ -101,16 +102,20 @@ function TriggerBadge({
   );
 }
 
-const ruleLabels: Record<string, string> = {
-  WHOLLY_OBTAINED: "Wholly Obtained",
-  VALUE_ADD: "Value Addition",
-  CTH: "Change of Tariff Heading",
-  CTSH: "Change of Tariff Sub-Heading",
-  SPECIFIC_PROCESS: "Specific Process",
-};
+function useRuleLabels(): Record<string, string> {
+  const { t: tc } = useTranslation("common");
+  return {
+    WHOLLY_OBTAINED: tc("rule.whollyObtained"),
+    VALUE_ADD: tc("rule.valueAdd"),
+    CTH: tc("rule.cth"),
+    CTSH: tc("rule.ctsh"),
+    SPECIFIC_PROCESS: tc("rule.specificProcess"),
+  };
+}
 
 function CopyButton({ text, label }: { text: string; label: string }) {
   const [copied, setCopied] = useState(false);
+  const { t: tc } = useTranslation("common");
 
   const handleCopy = useCallback(async () => {
     try {
@@ -137,7 +142,7 @@ function CopyButton({ text, label }: { text: string; label: string }) {
       data-testid={`button-copy-${label}`}
     >
       {copied ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
-      {copied ? "Copied" : "Copy"}
+      {copied ? tc("button.copied") : tc("button.copy")}
     </Button>
   );
 }
@@ -148,23 +153,32 @@ const statusColors: Record<DocumentStatus, string> = {
   RISK_ACCEPTED: "",
 };
 
-const statusLabels: Record<DocumentStatus, string> = {
-  PENDING: "Pending",
-  READY: "Ready",
-  RISK_ACCEPTED: "Risk Accepted",
-};
+function useStatusLabels(): Record<DocumentStatus, string> {
+  const { t: tc } = useTranslation("common");
+  return {
+    PENDING: tc("status.pending"),
+    READY: tc("status.ready"),
+    RISK_ACCEPTED: tc("status.riskAccepted"),
+  };
+}
 
-const ownerLabels: Record<string, string> = {
-  IMPORTER: "You",
-  SUPPLIER: "Supplier",
-  BROKER: "Broker",
-};
+function useOwnerLabels(): Record<string, string> {
+  const { t: tc } = useTranslation("common");
+  return {
+    IMPORTER: tc("owner.importer"),
+    SUPPLIER: tc("owner.supplier"),
+    BROKER: tc("owner.broker"),
+  };
+}
 
-const dueByLabels: Record<string, string> = {
-  BEFORE_LOADING: "Before loading",
-  BEFORE_ARRIVAL: "Before arrival",
-  POST_ARRIVAL: "On arrival",
-};
+function useDueByLabels(): Record<string, string> {
+  const { t: tc } = useTranslation("common");
+  return {
+    BEFORE_LOADING: tc("dueBy.beforeLoading"),
+    BEFORE_ARRIVAL: tc("dueBy.beforeArrival"),
+    POST_ARRIVAL: tc("dueBy.onArrival"),
+  };
+}
 
 function StatusDropdown({
   status,
@@ -175,6 +189,7 @@ function StatusDropdown({
   onChange: (s: DocumentStatus) => void;
   index: number;
 }) {
+  const statusLabels = useStatusLabels();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -223,6 +238,9 @@ function InteractiveRequirement({
   onStatusChange: (s: DocumentStatus) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation("lookup");
+  const ownerLabels = useOwnerLabels();
+  const dueByLabels = useDueByLabels();
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -251,30 +269,30 @@ function InteractiveRequirement({
         <CollapsibleContent>
           <div className="ml-6 mt-2 mb-3 space-y-2 p-3 rounded-md" style={{ background: "var(--card2)" }} data-testid={`detail-requirement-${index}`}>
             <div>
-              <span className="text-xs font-medium text-muted-foreground">What it is</span>
+              <span className="text-xs font-medium text-muted-foreground">{t("requirement.whatItIs")}</span>
               <p className="text-sm">{req.description}</p>
             </div>
             <div>
-              <span className="text-xs font-medium text-muted-foreground">Who provides it</span>
+              <span className="text-xs font-medium text-muted-foreground">{t("requirement.whoProvides")}</span>
               <p className="text-sm">{req.issuedBy}</p>
             </div>
             <div>
-              <span className="text-xs font-medium text-muted-foreground">When needed</span>
+              <span className="text-xs font-medium text-muted-foreground">{t("requirement.whenNeeded")}</span>
               <p className="text-sm">{req.whenNeeded}</p>
             </div>
             <div>
-              <span className="text-xs font-medium text-muted-foreground">Practical tip</span>
+              <span className="text-xs font-medium text-muted-foreground">{t("requirement.practicalTip")}</span>
               <p className="text-sm italic">{req.tip}</p>
             </div>
             {req.portalGuide && (
               <div>
-                <span className="text-xs font-medium text-muted-foreground">Portal / submission guide</span>
+                <span className="text-xs font-medium text-muted-foreground">{t("requirement.portalGuide")}</span>
                 <p className="text-sm">{req.portalGuide}</p>
               </div>
             )}
             {req.documentCode && (
               <div>
-                <span className="text-xs font-medium text-muted-foreground">Document code</span>
+                <span className="text-xs font-medium text-muted-foreground">{t("requirement.documentCode")}</span>
                 <p className="text-sm font-mono">{req.documentCode}</p>
               </div>
             )}
@@ -285,18 +303,21 @@ function InteractiveRequirement({
   );
 }
 
-function getActionHint(req: RequirementDetail): string {
-  const t = req.title.toLowerCase();
-  if (t.includes("certificate of origin")) return `Issued by: ${req.issuedBy}`;
-  if (t.includes("phytosanitary") || t.includes("sps certificate")) return `Issued by: ${req.issuedBy}`;
-  if (t.includes("ipaffs")) return "Submit at: ipaffs.co.uk \u2014 24hrs before goods arrive";
-  if (t.includes("traces") || t.includes("ched")) return "Submit at: webgate.ec.europa.eu/tracesnt \u2014 before departure";
-  if (t.includes("customs") && t.includes("declaration")) return "Provide HS code, origin, and CHED reference to your broker";
-  if (t.includes("eudr") && t.includes("geolocation")) return "GPS coordinates of production plot required";
-  if (t.includes("iuu") && t.includes("catch certificate")) return "Issued by flag state of fishing vessel \u2014 not the exporter";
-  if (t.includes("flegt")) return "Only available from VPA partner countries";
-  if (t.includes("kimberley")) return "Must be tamper-evident sealed";
-  return "Required to avoid delays";
+function useGetActionHint() {
+  const { t } = useTranslation("lookup");
+  return (req: RequirementDetail): string => {
+    const title = req.title.toLowerCase();
+    if (title.includes("certificate of origin")) return t("actionHint.issuedBy", { issuer: req.issuedBy });
+    if (title.includes("phytosanitary") || title.includes("sps certificate")) return t("actionHint.issuedBy", { issuer: req.issuedBy });
+    if (title.includes("ipaffs")) return t("actionHint.ipaffs");
+    if (title.includes("traces") || title.includes("ched")) return t("actionHint.traces");
+    if (title.includes("customs") && title.includes("declaration")) return t("actionHint.customs");
+    if (title.includes("eudr") && title.includes("geolocation")) return t("actionHint.eudrGeo");
+    if (title.includes("iuu") && title.includes("catch certificate")) return t("actionHint.iuu");
+    if (title.includes("flegt")) return t("actionHint.flegt");
+    if (title.includes("kimberley")) return t("actionHint.kimberley");
+    return t("actionHint.default");
+  };
 }
 
 function NextActionsPanel({
@@ -310,6 +331,10 @@ function NextActionsPanel({
   hasStop: boolean;
   buyerDocsRef: React.RefObject<HTMLDivElement | null>;
 }) {
+  const { t } = useTranslation("lookup");
+  const ownerLabels = useOwnerLabels();
+  const dueByLabels = useDueByLabels();
+  const getActionHint = useGetActionHint();
 
   const pendingDocs = allDocs
     .map((doc, idx) => ({ doc, idx, status: statuses[idx] || "PENDING" }))
@@ -335,10 +360,10 @@ function NextActionsPanel({
   return (
     <div style={{ background: "rgba(109,184,154,0.06)", borderRadius: 14, border: "1px solid rgba(109,184,154,0.2)", padding: "20px 24px" }} data-testid="section-next-actions">
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Next Actions</span>
+        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("nextActions.title")}</span>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 13, color: "var(--t3)" }} data-testid="text-pending-count">
-            {pendingCount} pending
+            {t("nextActions.pending", { count: pendingCount })}
           </span>
           <span style={{ display: "flex", alignItems: "center", gap: 2 }}>
             {Array.from({ length: dotsTotal }).map((_, i) => (
@@ -356,7 +381,7 @@ function NextActionsPanel({
         <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 12, padding: 8, borderRadius: 8, background: "rgba(239,68,68,0.1)" }}>
           <AlertOctagon className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "#ef4444" }} />
           <p style={{ fontSize: 13, fontWeight: 500, color: "#ef4444", margin: 0 }}>
-            STOP flag active {"\u2014"} resolve trade restrictions before proceeding
+            {t("nextActions.stopFlagWarning")}
           </p>
         </div>
       )}
@@ -366,14 +391,14 @@ function NextActionsPanel({
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
             <CheckCircle2 className="w-5 h-5" style={{ color: "var(--sage)" }} />
             <p style={{ fontSize: 13, fontWeight: 500, color: "var(--sage)", margin: 0 }}>
-              All actions complete for this trade.
+              {t("nextActions.allComplete")}
             </p>
           </div>
           <p style={{ fontSize: 13, color: "var(--t3)", margin: "8px 0 12px" }}>
-            You can now download your compliance pack.
+            {t("nextActions.canDownload")}
           </p>
           <Button variant="outline" size="sm" disabled data-testid="button-download-compliance-pack">
-            <Download className="w-3 h-3 mr-1" /> Download Compliance Pack
+            <Download className="w-3 h-3 mr-1" /> {t("nextActions.downloadCompliancePack")}
           </Button>
         </div>
       ) : (
@@ -399,7 +424,7 @@ function NextActionsPanel({
               style={{ fontSize: 13, color: "var(--sage)", background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, padding: 0 }}
               data-testid="button-see-all-pending"
             >
-              See all {pendingCount} pending items <ArrowDown className="w-3 h-3" />
+              {t("nextActions.seeAllPending", { count: pendingCount })} <ArrowDown className="w-3 h-3" />
             </button>
           )}
         </div>
@@ -408,57 +433,58 @@ function NextActionsPanel({
   );
 }
 
-function generateSupplierBriefEmail(result: ComplianceResult): string {
+function generateSupplierBriefEmail(result: ComplianceResult, t: (key: string, opts?: Record<string, string>) => string): string {
   const supplierDocs = result.requirementsDetailed.filter(r => r.isSupplierSide);
   const lines: string[] = [];
-  lines.push(`Subject: Required Export Documents — ${result.commodity.name} (HS ${result.commodity.hsCode}) from ${result.origin.countryName} to ${result.destination.countryName}`);
+  lines.push(t("supplierEmail.subject", { commodity: result.commodity.name, hsCode: result.commodity.hsCode, origin: result.origin.countryName, destination: result.destination.countryName }));
   lines.push("");
-  lines.push("Dear Supplier,");
+  lines.push(t("supplierEmail.greeting"));
   lines.push("");
-  lines.push(`We are preparing a shipment of ${result.commodity.name} (HS ${result.commodity.hsCode}) from ${result.origin.countryName} to ${result.destination.countryName}. Please prepare the following documents:`);
+  lines.push(t("supplierEmail.intro", { commodity: result.commodity.name, hsCode: result.commodity.hsCode, origin: result.origin.countryName, destination: result.destination.countryName }));
   lines.push("");
   supplierDocs.forEach((doc, i) => {
     lines.push(`${i + 1}. ${doc.title}`);
-    lines.push(`   Issued by: ${doc.issuedBy}`);
-    lines.push(`   When needed: ${doc.whenNeeded}`);
+    lines.push(`   ${t("supplierEmail.issuedBy", { issuer: doc.issuedBy })}`);
+    lines.push(`   ${t("supplierEmail.whenNeeded", { when: doc.whenNeeded })}`);
     if (doc.documentCode) {
-      lines.push(`   Document code: ${doc.documentCode}`);
+      lines.push(`   ${t("supplierEmail.documentCode", { code: doc.documentCode })}`);
     }
     lines.push("");
   });
-  lines.push("Please confirm availability and expected timeline for each document.");
+  lines.push(t("supplierEmail.confirmAvailability"));
   lines.push("");
-  lines.push("Best regards");
+  lines.push(t("supplierEmail.bestRegards"));
   return lines.join("\n");
 }
 
-function generateSupplierBriefWhatsApp(result: ComplianceResult): string {
+function generateSupplierBriefWhatsApp(result: ComplianceResult, t: (key: string, opts?: Record<string, string>) => string): string {
   const supplierDocs = result.requirementsDetailed.filter(r => r.isSupplierSide);
   const lines: string[] = [];
-  lines.push(`*Required Documents* - ${result.commodity.name} (HS ${result.commodity.hsCode})`);
+  lines.push(t("supplierWhatsapp.title", { commodity: result.commodity.name, hsCode: result.commodity.hsCode }));
   lines.push(`${result.origin.countryName} -> ${result.destination.countryName}`);
   lines.push("");
   supplierDocs.forEach((doc, i) => {
     lines.push(`${i + 1}. ${doc.title}`);
-    lines.push(`   _Issued by: ${doc.issuedBy}_`);
+    lines.push(`   ${t("supplierWhatsapp.issuedBy", { issuer: doc.issuedBy })}`);
     if (doc.documentCode) {
-      lines.push(`   Code: ${doc.documentCode}`);
+      lines.push(`   ${t("supplierWhatsapp.code", { code: doc.documentCode })}`);
     }
   });
   lines.push("");
-  lines.push("Please confirm availability.");
+  lines.push(t("supplierWhatsapp.confirmAvailability"));
   return lines.join("\n");
 }
 
 function SupplierBriefSection({ result }: { result: ComplianceResult }) {
   const [showBrief, setShowBrief] = useState(false);
   const [activeTab, setActiveTab] = useState<"email" | "whatsapp">("email");
+  const { t } = useTranslation("lookup");
 
   const supplierDocs = result.requirementsDetailed.filter(r => r.isSupplierSide);
   if (supplierDocs.length === 0) return null;
 
-  const emailText = generateSupplierBriefEmail(result);
-  const whatsappText = generateSupplierBriefWhatsApp(result);
+  const emailText = generateSupplierBriefEmail(result, t);
+  const whatsappText = generateSupplierBriefWhatsApp(result, t);
 
   return (
     <div style={{ background: "rgba(109,184,154,0.06)", borderRadius: 14, border: "1px solid rgba(109,184,154,0.2)", padding: "20px 24px" }}>
@@ -469,7 +495,7 @@ function SupplierBriefSection({ result }: { result: ComplianceResult }) {
         data-testid="button-generate-supplier-brief"
       >
         <Mail className="w-4 h-4 mr-2" />
-        {showBrief ? "Hide supplier instructions" : `Supplier instructions (${supplierDocs.length} documents)`}
+        {showBrief ? t("supplierBrief.hideInstructions") : t("supplierBrief.showInstructions", { count: supplierDocs.length })}
       </Button>
 
       {showBrief && (
@@ -482,7 +508,7 @@ function SupplierBriefSection({ result }: { result: ComplianceResult }) {
               data-testid="button-tab-email"
             >
               <Mail className="w-3 h-3 mr-1" />
-              Email Format
+              {t("supplierBrief.emailFormat")}
             </Button>
             <Button
               variant={activeTab === "whatsapp" ? "default" : "outline"}
@@ -491,7 +517,7 @@ function SupplierBriefSection({ result }: { result: ComplianceResult }) {
               data-testid="button-tab-whatsapp"
             >
               <MessageCircle className="w-3 h-3 mr-1" />
-              WhatsApp Format
+              {t("supplierBrief.whatsappFormat")}
             </Button>
           </div>
 
@@ -515,35 +541,35 @@ function SupplierBriefSection({ result }: { result: ComplianceResult }) {
   );
 }
 
-function generateCustomsCSV(result: ComplianceResult): string {
+function generateCustomsCSV(result: ComplianceResult, t: (key: string, opts?: Record<string, string>) => string): string {
   const rows: string[][] = [];
-  rows.push(["Field", "Value"]);
-  rows.push(["Commodity", result.commodity.name]);
-  rows.push(["HS Code", result.commodity.hsCode]);
-  rows.push(["Commodity Type", result.commodity.commodityType]);
-  rows.push(["Origin Country", result.origin.countryName]);
-  rows.push(["Origin ISO", result.origin.iso2]);
-  rows.push(["Destination Country", result.destination.countryName]);
-  rows.push(["Destination ISO", result.destination.iso2]);
-  rows.push(["Tariff Source", result.destination.tariffSource]);
-  rows.push(["VAT/GST Rate (%)", String(result.destination.vatRate)]);
-  rows.push(["SPS Regime", result.destination.spsRegime]);
-  rows.push(["Security Filing", result.destination.securityFiling]);
-  rows.push(["AfCFTA Eligible", result.afcftaEligible ? "Yes" : "No"]);
-  rows.push(["CHED Reference", "___________________"]);
+  rows.push([t("csv.field"), t("csv.value")]);
+  rows.push([t("csv.commodity"), result.commodity.name]);
+  rows.push([t("csv.hsCode"), result.commodity.hsCode]);
+  rows.push([t("csv.commodityType"), result.commodity.commodityType]);
+  rows.push([t("csv.originCountry"), result.origin.countryName]);
+  rows.push([t("csv.originISO"), result.origin.iso2]);
+  rows.push([t("csv.destinationCountry"), result.destination.countryName]);
+  rows.push([t("csv.destinationISO"), result.destination.iso2]);
+  rows.push([t("csv.tariffSource"), result.destination.tariffSource]);
+  rows.push([t("csv.vatGstRate"), String(result.destination.vatRate)]);
+  rows.push([t("csv.spsRegime"), result.destination.spsRegime]);
+  rows.push([t("csv.securityFiling"), result.destination.securityFiling]);
+  rows.push([t("csv.afcftaEligible"), result.afcftaEligible ? t("csv.yes") : t("csv.no")]);
+  rows.push([t("csv.chedReference"), "___________________"]);
   rows.push([]);
-  rows.push(["Regulatory Triggers"]);
+  rows.push([t("csv.regulatoryTriggers")]);
   Object.entries(result.triggers).forEach(([key, val]) => {
-    if (val) rows.push(["Trigger", key.toUpperCase()]);
+    if (val) rows.push([t("csv.trigger"), key.toUpperCase()]);
   });
   rows.push([]);
-  rows.push(["Document Code", "Document Title", "Issued By", "Supplier Side"]);
+  rows.push([t("csv.documentCodeHeader"), t("csv.documentTitle"), t("csv.issuedByHeader"), t("csv.supplierSide")]);
   result.requirementsDetailed.forEach(r => {
     rows.push([
       r.documentCode || "—",
       r.title,
       r.issuedBy,
-      r.isSupplierSide ? "Yes" : "No",
+      r.isSupplierSide ? t("csv.yes") : t("csv.no"),
     ]);
   });
 
@@ -614,10 +640,11 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
   factors: ReadinessFactors;
   primaryRiskFactor: string;
 }) {
+  const { t } = useTranslation("lookup");
   const verdictStyles = {
-    GREEN: { badgeBg: "rgba(109,184,154,0.2)", badgeBorder: "rgba(109,184,154,0.25)", badgeColor: "var(--sage)", label: "LOW RISK" },
-    AMBER: { badgeBg: "rgba(234,179,8,0.12)", badgeBorder: "rgba(234,179,8,0.25)", badgeColor: "#eab308", label: "ATTENTION NEEDED" },
-    RED: { badgeBg: "rgba(239,68,68,0.12)", badgeBorder: "rgba(239,68,68,0.25)", badgeColor: "#ef4444", label: "HIGH RISK \u2014 ACTION REQUIRED" },
+    GREEN: { badgeBg: "rgba(109,184,154,0.2)", badgeBorder: "rgba(109,184,154,0.25)", badgeColor: "var(--sage)", label: t("readiness.lowRisk") },
+    AMBER: { badgeBg: "rgba(234,179,8,0.12)", badgeBorder: "rgba(234,179,8,0.25)", badgeColor: "#eab308", label: t("readiness.attentionNeeded") },
+    RED: { badgeBg: "rgba(239,68,68,0.12)", badgeBorder: "rgba(239,68,68,0.25)", badgeColor: "#ef4444", label: t("readiness.highRiskAction") },
   };
 
   const v = verdictStyles[verdict];
@@ -630,16 +657,16 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
   };
 
   const factorRows = [
-    { key: "regulatory_complexity", label: "Regulatory requirements", penalty: factors.regulatory_complexity.penalty, max: factors.regulatory_complexity.max },
-    { key: "hazard_exposure", label: "Product controls", penalty: factors.hazard_exposure.penalty, max: factors.hazard_exposure.max },
-    { key: "document_volume", label: "Document volume", penalty: factors.document_volume.penalty, max: factors.document_volume.max },
-    { key: "trade_restriction", label: "Trade restrictions", penalty: factors.trade_restriction.penalty, max: factors.trade_restriction.max },
+    { key: "regulatory_complexity", label: t("readiness.regulatoryRequirements"), penalty: factors.regulatory_complexity.penalty, max: factors.regulatory_complexity.max },
+    { key: "hazard_exposure", label: t("readiness.productControls"), penalty: factors.hazard_exposure.penalty, max: factors.hazard_exposure.max },
+    { key: "document_volume", label: t("readiness.documentVolume"), penalty: factors.document_volume.penalty, max: factors.document_volume.max },
+    { key: "trade_restriction", label: t("readiness.tradeRestrictions"), penalty: factors.trade_restriction.penalty, max: factors.trade_restriction.max },
   ];
 
   return (
     <div data-testid="section-readiness-score">
       <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 12 }}>
-        Readiness Score
+        {t("readiness.title")}
       </div>
       <div style={{ display: "flex", gap: 0 }}>
         <div style={{ width: 160, display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
@@ -720,7 +747,7 @@ function ReadinessBanner({ score, verdict, summary, factors, primaryRiskFactor }
                     flexShrink: 0,
                   }}
                 >
-                  {isPrimary ? "▲ primary" : `${f.penalty}/${f.max}`}
+                  {isPrimary ? `▲ ${t("readiness.primary")}` : `${f.penalty}/${f.max}`}
                 </span>
               </div>
             );
@@ -742,6 +769,7 @@ function TwinLogDownloadButton({
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation("lookup");
 
   const profileQuery = useQuery<{ profileComplete: boolean } | null>({
     queryKey: ["/api/company-profile"],
@@ -761,12 +789,12 @@ function TwinLogDownloadButton({
               data-testid="button-download-twinlog-locked"
             >
               <Lock className="w-4 h-4 mr-2" />
-              Download TwinLog Trail
+              {t("twinlog.downloadTitle")}
             </Button>
           </div>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs text-center">
-          <p>Included with TapTrao Shield — <a href="/pricing" style={{textDecoration:"underline"}}>see plans</a></p>
+          <p>{t("lcCta.includedWithShield")} — <a href="/pricing" style={{textDecoration:"underline"}}>{t("lcCta.seePlans")}</a></p>
         </TooltipContent>
       </Tooltip>
     );
@@ -800,7 +828,7 @@ function TwinLogDownloadButton({
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.message || "Failed to generate PDF");
+        setError(data.message || t("twinlog.failedGenerate"));
         return;
       }
 
@@ -820,7 +848,7 @@ function TwinLogDownloadButton({
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (e: any) {
-      setError(e.message || "Failed to generate PDF");
+      setError(e.message || t("twinlog.failedGenerate"));
     } finally {
       setLoading(false);
     }
@@ -838,15 +866,15 @@ function TwinLogDownloadButton({
               data-testid="button-download-twinlog-disabled"
             >
               <Download className="w-4 h-4 mr-2" />
-              Download TwinLog Trail
+              {t("twinlog.downloadTitle")}
             </Button>
           </div>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs text-center">
           <p>
-            Complete your company profile to download TwinLog Trail records.{" "}
+            {t("twinlog.profileRequired")}{" "}
             <Link href="/settings/profile" className="text-primary underline font-medium" data-testid="link-settings-from-twinlog">
-              Settings →
+              {t("twinlog.settingsLink")}
             </Link>
           </p>
         </TooltipContent>
@@ -864,7 +892,7 @@ function TwinLogDownloadButton({
         data-testid="button-download-twinlog"
       >
         <Download className="w-4 h-4 mr-2" />
-        {loading ? "Generating TwinLog Trail..." : "Download TwinLog Trail"}
+        {loading ? t("twinlog.generating") : t("twinlog.downloadTitle")}
       </Button>
       {error && (
         <p className="text-sm mt-1 text-center" style={{ color: "var(--red)" }} data-testid="text-twinlog-error">{error}</p>
@@ -875,6 +903,7 @@ function TwinLogDownloadButton({
 
 function CheckLcButton({ result, locked = false }: { result: ComplianceResult & { lookupId?: string }; locked?: boolean }) {
   const [, navigate] = useLocation();
+  const { t } = useTranslation("lookup");
 
   if (locked) {
     return (
@@ -888,12 +917,12 @@ function CheckLcButton({ result, locked = false }: { result: ComplianceResult & 
               data-testid="button-check-lc-locked"
             >
               <Lock className="w-4 h-4 mr-2" />
-              Check LC before submission
+              {t("lcCta.checkLcBeforeSubmission")}
             </Button>
           </div>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs text-center">
-          <p>Included with TapTrao Shield — <a href="/pricing" style={{textDecoration:"underline"}}>see plans</a></p>
+          <p>{t("lcCta.includedWithShield")} — <a href="/pricing" style={{textDecoration:"underline"}}>{t("lcCta.seePlans")}</a></p>
         </TooltipContent>
       </Tooltip>
     );
@@ -929,16 +958,17 @@ function CheckLcButton({ result, locked = false }: { result: ComplianceResult & 
         data-testid="button-check-lc-for-trade"
       >
         <ArrowRight className="w-4 h-4 mr-2" />
-        Check LC before submission
+        {t("lcCta.checkLcBeforeSubmission")}
       </Button>
       <p className="text-xs text-muted-foreground mt-1 text-center">
-        Pre-fills commodity, HS code, origin, destination, and required documents from this lookup.
+        {t("lcCta.prefillNote")}
       </p>
     </div>
   );
 }
 
 function SupplierBriefButton({ result }: { result: ComplianceResult }) {
+  const { t } = useTranslation("lookup");
   const supplierDocs = result.requirementsDetailed.filter(r => r.isSupplierSide);
   if (supplierDocs.length === 0) return null;
 
@@ -958,13 +988,14 @@ function SupplierBriefButton({ result }: { result: ComplianceResult }) {
       data-testid="button-supplier-brief-shortcut"
     >
       <Mail className="w-4 h-4 mr-2" />
-      Supplier instructions
+      {t("actions.supplierInstructions")}
     </Button>
   );
 }
 
 function EudrAlertBlock({ lookupId, result }: { lookupId?: string; result: ComplianceResult }) {
   const [, navigate] = useLocation();
+  const { t } = useTranslation("lookup");
   const isCH = result.destination.iso2 === "CH";
   const eudrQuery = useQuery<any>({
     queryKey: ["/api/eudr", lookupId],
@@ -989,13 +1020,10 @@ function EudrAlertBlock({ lookupId, result }: { lookupId?: string; result: Compl
         <div style={{ fontSize: 22, flexShrink: 0 }}>⚠</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 700, color: "var(--t1)", fontSize: 14 }}>
-            Swiss Due Diligence Act — Prepare EUDR-Equivalent Documentation
+            {t("eudr.swissTitle")}
           </div>
           <div style={{ color: "var(--t1)", fontSize: 14, marginTop: 4, lineHeight: 1.5 }}>
-            Switzerland has passed its own Due Diligence Act covering timber and minerals.
-            Cocoa, coffee, and other EUDR commodities are expected to be added.
-            Monitor FOEN/BAFU (<span style={{ fontWeight: 600 }}>bafu.admin.ch</span>) for confirmation of scope and timeline.
-            Prepare EUDR-equivalent documentation now — requirements will likely mirror the EU.
+            {t("eudr.swissDescription")}
           </div>
         </div>
       </div>
@@ -1018,12 +1046,12 @@ function EudrAlertBlock({ lookupId, result }: { lookupId?: string; result: Compl
       <div style={{ fontSize: 22 }}>{eudrComplete ? "✓" : "⚠"}</div>
       <div style={{ flex: 1 }}>
         <div style={{ fontWeight: 700, color: "var(--t1)", fontSize: 14 }}>
-          {eudrComplete ? "EUDR Due Diligence Complete" : "EUDR due diligence required"}
+          {eudrComplete ? t("eudr.dueDiligenceComplete") : t("eudr.dueDiligenceRequired")}
         </div>
         <div style={{ color: "var(--t1)", fontSize: 14, marginTop: 2 }}>
           {eudrComplete
-            ? "Your EUDR due diligence statement has been completed for this trade."
-            : "Additional requirement to ship legally and avoid penalties."}
+            ? t("eudr.completeMessage")
+            : t("eudr.requiredMessage")}
         </div>
       </div>
       {!eudrComplete && lookupId && (
@@ -1042,7 +1070,7 @@ function EudrAlertBlock({ lookupId, result }: { lookupId?: string; result: Compl
             whiteSpace: "nowrap",
           }}
         >
-          Prepare EUDR documents →
+          {t("eudr.prepareDocuments")}
         </button>
       )}
     </div>
@@ -1054,6 +1082,7 @@ function LeadCaptureCard({ result }: { result: ComplianceResult }) {
   const [companyName, setCompanyName] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation("lookup");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1096,7 +1125,7 @@ function LeadCaptureCard({ result }: { result: ComplianceResult }) {
       >
         <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: "var(--sage)" }} />
         <p style={{ fontSize: 13, color: "var(--sage)", margin: 0 }}>
-          Thanks! We'll send regulatory updates for this corridor.
+          {t("leadCapture.successMessage")}
         </p>
       </div>
     );
@@ -1113,15 +1142,15 @@ function LeadCaptureCard({ result }: { result: ComplianceResult }) {
       data-testid="lead-capture-card"
     >
       <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", fontFamily: "'Clash Display', sans-serif", margin: "0 0 6px" }}>
-        Save this compliance check
+        {t("leadCapture.title")}
       </h3>
       <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6, margin: "0 0 14px" }}>
-        Enter your email to get regulatory updates for this corridor.
+        {t("leadCapture.description")}
       </p>
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <Input
           type="email"
-          placeholder="work@company.com"
+          placeholder={t("leadCapture.emailPlaceholder")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -1130,7 +1159,7 @@ function LeadCaptureCard({ result }: { result: ComplianceResult }) {
         />
         <Input
           type="text"
-          placeholder="Company name (optional)"
+          placeholder={t("leadCapture.companyPlaceholder")}
           value={companyName}
           onChange={(e) => setCompanyName(e.target.value)}
           style={{ background: "rgba(0,0,0,0.07)", border: "1px solid rgba(0,0,0,0.1)", color: "var(--t1)", borderRadius: 8 }}
@@ -1143,11 +1172,11 @@ function LeadCaptureCard({ result }: { result: ComplianceResult }) {
           style={{ background: "rgba(0,0,0,0.06)", color: "var(--t1)", borderRadius: 10, border: "1px solid rgba(0,0,0,0.1)", alignSelf: "flex-start", marginTop: 4 }}
           data-testid="button-lead-submit"
         >
-          {loading ? "Saving..." : "Save & Get Updates →"}
+          {loading ? t("leadCapture.saving") : t("leadCapture.saveButton")}
         </Button>
         <p style={{ fontSize: 13, color: "var(--t3)", margin: "6px 0 0" }}>
-          By submitting, you agree to our{" "}
-          <Link href="/privacy-policy" style={{ color: "var(--t2)", textDecoration: "underline" }}>Privacy Policy</Link>.
+          {t("leadCapture.privacyNotice")}{" "}
+          <Link href="/privacy-policy" style={{ color: "var(--t2)", textDecoration: "underline" }}>{t("leadCapture.privacyPolicy")}</Link>.
         </p>
       </form>
     </div>
@@ -1175,6 +1204,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const fileInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  const { t } = useTranslation("lookup");
 
   const { data: readinessData, isLoading, refetch } = useQuery<{ readiness: RequirementReadiness[] }>({
     queryKey: [`/api/lookups/${lookupId}/document-readiness`],
@@ -1222,14 +1252,14 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
   };
 
   const statusConfig: Record<string, { label: string; color: string; bg: string; icon: string }> = {
-    not_uploaded: { label: "Not uploaded", color: "var(--t3)", bg: "transparent", icon: "○" },
-    pending: { label: "Queued", color: "#eab308", bg: "rgba(234,179,8,0.1)", icon: "⏳" },
-    processing: { label: "Validating...", color: "#3b82f6", bg: "rgba(59,130,246,0.1)", icon: "⚙" },
-    valid: { label: "Valid", color: "var(--sage)", bg: "rgba(109,184,154,0.1)", icon: "✓" },
-    issues: { label: "Issues found", color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: "!" },
-    wrong_doc: { label: "Wrong document", color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: "✗" },
-    failed: { label: "Failed", color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: "✗" },
-    overridden: { label: "Overridden", color: "#eab308", bg: "rgba(234,179,8,0.1)", icon: "↻" },
+    not_uploaded: { label: t("docReadiness.notUploaded"), color: "var(--t3)", bg: "transparent", icon: "○" },
+    pending: { label: t("docReadiness.queued"), color: "#eab308", bg: "rgba(234,179,8,0.1)", icon: "⏳" },
+    processing: { label: t("docReadiness.validating"), color: "#3b82f6", bg: "rgba(59,130,246,0.1)", icon: "⚙" },
+    valid: { label: t("docReadiness.valid"), color: "var(--sage)", bg: "rgba(109,184,154,0.1)", icon: "✓" },
+    issues: { label: t("docReadiness.issuesFound"), color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: "!" },
+    wrong_doc: { label: t("docReadiness.wrongDocument"), color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: "✗" },
+    failed: { label: t("docReadiness.failed"), color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: "✗" },
+    overridden: { label: t("docReadiness.overridden"), color: "#eab308", bg: "rgba(234,179,8,0.1)", icon: "↻" },
   };
 
   if (isLoading || readiness.length === 0) return null;
@@ -1247,10 +1277,10 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
         <div>
           <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 15, color: "var(--t1)", margin: 0 }}>
-            Document Readiness
+            {t("docReadiness.title")}
           </h3>
           <p style={{ fontSize: 14, color: "var(--t3)", margin: "4px 0 0" }}>
-            Upload documents to validate against requirements
+            {t("docReadiness.subtitle")}
           </p>
         </div>
         <span style={{
@@ -1259,7 +1289,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
           color: validCount === readiness.length ? "var(--sage)" : "var(--sage)",
           padding: "3px 10px", borderRadius: 4,
         }}>
-          {validCount}/{readiness.length} validated
+          {t("docReadiness.validatedCount", { valid: validCount, total: readiness.length })}
         </span>
       </div>
 
@@ -1325,7 +1355,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                       opacity: isUploading ? 0.5 : 1,
                     }}
                   >
-                    {isUploading ? "Uploading..." : req.status === "not_uploaded" ? "Upload" : "Replace"}
+                    {isUploading ? t("docReadiness.uploading") : req.status === "not_uploaded" ? t("docReadiness.upload") : t("docReadiness.replace")}
                   </button>
 
                   {/* Expand button if there are details */}
@@ -1350,7 +1380,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                   {req.fieldStatus.length > 0 && (
                     <div style={{ marginBottom: 10 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
-                        Field Checklist
+                        {t("docReadiness.fieldChecklist")}
                       </div>
                       {req.fieldStatus.map((f, fi) => {
                         const statusIcon = f.status === "present" ? "✅" : f.status === "missing" ? "❌" : "⚠";
@@ -1381,7 +1411,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                   {req.issues.length > 0 && (
                     <div style={{ marginBottom: 10 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
-                        Issues
+                        {t("docReadiness.issues")}
                       </div>
                       {req.issues.map((issue, ii) => (
                         <div key={ii} style={{
@@ -1392,7 +1422,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                           <div style={{ fontSize: 14, color: "var(--t1)" }}>{issue.explanation}</div>
                           {issue.found && (
                             <div style={{ fontSize: 14, color: "var(--t3)", marginTop: 2 }}>
-                              Found: {issue.found}
+                              {t("docReadiness.found", { value: issue.found })}
                             </div>
                           )}
                         </div>
@@ -1404,7 +1434,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                   {req.evidence.length > 0 && (
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--t4)", marginBottom: 6 }}>
-                        Evidence
+                        {t("docReadiness.evidence")}
                       </div>
                       {req.evidence.map((ev, ei) => (
                         <div key={ei} style={{
@@ -1416,7 +1446,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                             "{ev.quote}"
                           </div>
                           <div style={{ fontSize: 14, color: "var(--t3)", marginTop: 2 }}>
-                            {ev.page !== null ? `Page ${ev.page}` : ""} {ev.field ? `— ${ev.field}` : ""}
+                            {ev.page !== null ? t("docReadiness.page", { number: ev.page }) : ""} {ev.field ? `— ${ev.field}` : ""}
                           </div>
                         </div>
                       ))}
@@ -1426,7 +1456,7 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                   {/* Validation summary */}
                   {req.verdict && (
                     <div style={{ marginTop: 8, fontSize: 13, color: "var(--t2)", fontStyle: "italic" }}>
-                      Verdict: {req.verdict} (confidence: {req.confidence})
+                      {t("docReadiness.verdict", { verdict: req.verdict, confidence: req.confidence })}
                     </div>
                   )}
                 </div>
@@ -1440,6 +1470,9 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
 }
 
 function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated = false }: { result: ComplianceResult; freeLocked?: boolean; isAuthenticated?: boolean }) {
+  const { t } = useTranslation("lookup");
+  const { t: tc } = useTranslation("common");
+  const ruleLabels = useRuleLabels();
   const hasStopFlags = result.stopFlags && Object.keys(result.stopFlags).length > 0;
   const triggerCount = Object.values(result.triggers).filter(Boolean).length;
 
@@ -1457,10 +1490,10 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
     LOW: { background: "var(--gbg)", border: "1px solid var(--gbd)", color: "var(--green)" },
   };
   const riskLabels: Record<string, string> = {
-    STOP: "Trade Restricted",
-    HIGH: "High Risk",
-    MEDIUM: "Moderate Risk",
-    LOW: "Low Risk",
+    STOP: t("risk.tradeRestricted"),
+    HIGH: t("risk.highRisk"),
+    MEDIUM: t("risk.moderateRisk"),
+    LOW: t("risk.lowRisk"),
   };
 
   const [watchState, setWatchState] = useState<"idle" | "watching" | "limit">("idle");
@@ -1531,7 +1564,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
     <div style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: 24 }} data-testid="section-compliance-result">
       {/* ── Title: Pre-Shipment Report ── */}
       <div style={{ textAlign: "center" }}>
-        <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 22, color: "var(--t1)", margin: "0 0 6px" }}>Pre-Shipment Report</h2>
+        <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 22, color: "var(--t1)", margin: "0 0 6px" }}>{t("result.preShipmentReport")}</h2>
         <p style={{ fontSize: 13, color: "var(--t2)", margin: 0 }}>
           {"📦"} {result.commodity.name} › {result.origin.countryName} › {result.destination.countryName}
         </p>
@@ -1551,17 +1584,17 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <div style={dkCard} ref={buyerDocsRef}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
               <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "var(--t1)" }}>
-                Your Side - Buyer
+                {t("docs.yourSideBuyer")}
               </span>
               <span style={{
                 fontFamily: "'Inter', sans-serif", fontSize: 14,
                 background: "rgba(109,184,154,0.2)", color: "var(--sage)",
                 padding: "2px 8px", borderRadius: 4,
               }}>
-                {importerIndices.length} docs
+                {t("docs.docsCount", { count: importerIndices.length })}
               </span>
               <span style={{ marginLeft: "auto", fontSize: 13, color: "var(--t3)" }} data-testid="text-buyer-progress">
-                {importerReadyCount}/{importerIndices.length} ready
+                {t("docs.readyCount", { ready: importerReadyCount, total: importerIndices.length })}
               </span>
             </div>
             {importerIndices.map(({ r, i }) => {
@@ -1594,17 +1627,17 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <div style={dkCard}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
               <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 14, color: "var(--t1)" }}>
-                Their Side - Supplier
+                {t("docs.theirSideSupplier")}
               </span>
               <span style={{
                 fontFamily: "'Inter', sans-serif", fontSize: 14,
                 background: "rgba(109,184,154,0.2)", color: "var(--sage)",
                 padding: "2px 8px", borderRadius: 4,
               }}>
-                {supplierIndices.length} docs
+                {t("docs.docsCount", { count: supplierIndices.length })}
               </span>
               <span style={{ marginLeft: "auto", fontSize: 13, color: "var(--t3)" }} data-testid="text-supplier-progress">
-                {supplierReadyCount}/{supplierIndices.length} ready
+                {t("docs.readyCount", { ready: supplierReadyCount, total: supplierIndices.length })}
               </span>
             </div>
             {supplierIndices.map(({ r, i }) => {
@@ -1642,7 +1675,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         padding: "20px 32px",
       }}>
         <p style={{ fontSize: 13, color: "var(--t2)", marginBottom: 10, margin: "0 0 10px" }}>
-          Documents look good? Check your Letter of Credit next.
+          {t("lcCta.documentsLookGood")}
         </p>
         <CheckLcButton result={result} locked={freeLocked} />
       </div>
@@ -1660,14 +1693,14 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
               primaryRiskFactor={result.readinessScore.factors.primary_risk_factor}
             />
           ) : (
-            <p style={{ fontSize: 13, color: "var(--t3)" }}>Readiness score unavailable</p>
+            <p style={{ fontSize: 13, color: "var(--t3)" }}>{t("readiness.unavailable")}</p>
           )}
         </div>
 
         {/* Duty Estimate */}
         <div style={dkCard}>
           <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 12 }}>
-            Duty Estimate
+            {t("duty.title")}
           </div>
           {Array.isArray(result.destination.preferenceSchemes) && (result.destination.preferenceSchemes as string[]).length > 0 && (
             <span style={{
@@ -1679,20 +1712,20 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             </span>
           )}
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-            <span style={{ fontSize: 13, color: "var(--t2)" }}>VAT (Import)</span>
+            <span style={{ fontSize: 13, color: "var(--t2)" }}>{t("duty.vatImport")}</span>
             <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{result.destination.vatRate}%</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-            <span style={{ fontSize: 13, color: "var(--t2)" }}>Tariff Source</span>
+            <span style={{ fontSize: 13, color: "var(--t2)" }}>{t("duty.tariffSource")}</span>
             <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{result.destination.tariffSource}</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-            <span style={{ fontSize: 13, color: "var(--t2)" }}>SPS Regime</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{result.destination.spsRegime || "Standard"}</span>
+            <span style={{ fontSize: 13, color: "var(--t2)" }}>{t("duty.spsRegime")}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>{result.destination.spsRegime || t("duty.standard")}</span>
           </div>
           {result.destination.iso2 === "CH" && (
             <p style={{ fontSize: 13, color: "#eab308", margin: "0 0 8px", lineHeight: 1.5 }}>
-              Swiss agricultural tariffs are often specific (CHF/kg). Verify at tares.admin.ch.
+              {t("duty.swissTariffShort")}
             </p>
           )}
           {/* Hash embedded at bottom of duty card */}
@@ -1714,7 +1747,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
           <div>
             <p style={{ fontSize: 13, fontWeight: 600, color: "#d97706", margin: 0 }}>
-              ⚠ Flagged Origin — {result.originFlagReason ?? "Sanctions / Elevated Risk"}
+              ⚠ {t("origin.flaggedOrigin")} — {result.originFlagReason ?? t("origin.defaultFlagReason")}
             </p>
             {result.originFlagDetails && (
               <p style={{ fontSize: 14, color: "#92400e", margin: "4px 0 0", lineHeight: 1.5 }}>
@@ -1739,10 +1772,10 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <Shield className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
           <div>
             <p style={{ fontSize: 13, fontWeight: 600, color: "#16a34a", margin: 0 }}>
-              AGOA Eligible — Preferential Tariff Access
+              {t("agoa.eligible")}
             </p>
             <p style={{ fontSize: 14, color: "#166534", margin: "4px 0 0", lineHeight: 1.5 }}>
-              This origin qualifies under the African Growth and Opportunity Act for duty-free or reduced-tariff access to the US market. Ensure AGOA Certificate of Origin is prepared.
+              {t("agoa.description")}
             </p>
           </div>
         </div>
@@ -1758,7 +1791,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <div style={{ textAlign: "right", margin: "4px 0 8px" }}>
             <Link href="/demurrage" data-testid="link-demurrage-calculator">
               <span style={{ fontSize: 13, color: "var(--sage)", cursor: "pointer", fontWeight: 600 }}>
-                Demurrage Calculator →
+                {t("demurrage.calculatorLink")}
               </span>
             </Link>
           </div>
@@ -1778,21 +1811,21 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             <span style={{ fontSize: 18, marginTop: 1 }}>⚓</span>
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
-                Estimated Port Demurrage
+                {t("demurrage.estimatedPortDemurrage")}
               </p>
               <p style={{ fontSize: 14, color: "var(--t2)", margin: "4px 0 0", lineHeight: 1.6 }}>
                 At <strong style={{ color: "var(--t1)" }}>{estimate.port.label}</strong>
                 {estimate.allPorts.length > 1 && (
-                  <span style={{ color: "var(--t3)", fontSize: 11 }}> (+ {estimate.allPorts.length - 1} more port{estimate.allPorts.length > 2 ? "s" : ""})</span>
+                  <span style={{ color: "var(--t3)", fontSize: 11 }}> ({t("demurrage.morePorts", { count: estimate.allPorts.length - 1 })})</span>
                 )}
-                , if clearance is delayed by{" "}
-                <span style={{ color: verdictColor, fontWeight: 600 }}>{estimate.delayLabel}</span>{" "}
-                (based on your readiness score), a standard 20ft container could cost{" "}
+                {t("demurrage.costExplanation")}
+                <span style={{ color: verdictColor, fontWeight: 600 }}>{estimate.delayLabel}</span>
+                {t("demurrage.basedOnReadiness")}
                 <strong style={{ color: "var(--t1)" }}>${estimate.minCost.toLocaleString()} – ${estimate.maxCost.toLocaleString()}</strong>.
               </p>
               <Link href="/demurrage">
                 <span style={{ fontSize: 13, color: "var(--sage)", cursor: "pointer", fontWeight: 600, marginTop: 4, display: "inline-block" }}>
-                  Open full calculator ({estimate.allPorts.length} port{estimate.allPorts.length !== 1 ? "s" : ""}) →
+                  {t("demurrage.openFullCalculator", { count: estimate.allPorts.length, plural: estimate.allPorts.length !== 1 ? "s" : "" })}
                 </span>
               </Link>
             </div>
@@ -1821,12 +1854,12 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           data-testid="button-watch-corridor"
         >
           {watchState === "watching"
-            ? `◉ Watching — ${watchCount}/3 corridors watched`
-            : "◎ Watch this corridor"}
+            ? `◉ ${t("watch.watching", { count: watchCount })}`
+            : `◎ ${t("watch.watchCorridor")}`}
         </button>
         {watchState !== "watching" && (
           <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)" }}>
-            Get notified when regulations change for {result.commodity.name} → {result.destination.iso2}
+            {t("watch.getNotified", { commodity: result.commodity.name, destination: result.destination.iso2 })}
           </span>
         )}
       </div>
@@ -1834,14 +1867,14 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
       <Dialog open={showLimitModal} onOpenChange={setShowLimitModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Corridor watch limit reached</DialogTitle>
+            <DialogTitle>{t("watch.limitTitle")}</DialogTitle>
             <DialogDescription>
-              You're watching 3 corridors (free limit). Upgrade to Pro to watch more.
+              {t("watch.limitDescription")}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end">
             <Button variant="outline" onClick={() => setShowLimitModal(false)} data-testid="button-close-limit-modal">
-              Close
+              {tc("button.close")}
             </Button>
           </div>
         </DialogContent>
@@ -1860,7 +1893,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             <AlertOctagon className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "#ef4444" }} />
             <div>
               <p style={{ fontWeight: 600, color: "#ef4444", fontSize: 13, margin: "0 0 8px" }}>
-                STOP FLAGS — Trade Restrictions Apply
+                {t("stopFlags.title")}
               </p>
               {Object.entries(result.stopFlags!).map(([key, value]) => (
                 <p key={key} style={{ fontSize: 13, color: "#ef4444", opacity: 0.8, margin: "0 0 4px" }}>
@@ -1876,7 +1909,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <Leaf className="w-4 h-4" style={{ color: "var(--sage)" }} />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Commodity</span>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("info.commodity")}</span>
           </div>
           <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-commodity">{result.commodity.name}</p>
           <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", color: "var(--t3)", textTransform: "uppercase" as const, margin: 0 }}>
@@ -1887,7 +1920,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <Globe className="w-4 h-4" style={{ color: "var(--sage)" }} />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Origin</span>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("info.origin")}</span>
           </div>
           <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-origin">{result.origin.countryName}</p>
           <p style={{ fontSize: 14, color: "var(--t3)", margin: "0 0 4px" }}>
@@ -1907,7 +1940,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         <div style={dkCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <FileCheck className="w-4 h-4" style={{ color: "var(--sage)" }} />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Destination</span>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("info.destination")}</span>
           </div>
           <p style={{ fontWeight: 600, color: "var(--t1)", fontSize: 14, margin: "0 0 4px" }} data-testid="text-result-destination">{result.destination.countryName}</p>
           <p style={{ fontSize: 14, color: "var(--t3)", margin: 0 }}>
@@ -1926,9 +1959,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                 lineHeight: 1.5,
               }}
             >
-              Swiss agricultural tariffs are often specific (CHF/kg) not ad valorem.
-              TARES API provides exact rates — estimate may be indicative for food commodities.
-              Verify at <span style={{ fontWeight: 600 }}>tares.admin.ch</span> before quoting landed cost.
+              {t("duty.swissTariffLong")}
             </div>
           )}
         </div>
@@ -1939,7 +1970,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
             <Shield className="w-4 h-4" style={{ color: "var(--sage)" }} />
             <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
-              Regulatory Triggers ({triggerCount})
+              {t("triggers.titleWithCount", { count: triggerCount })}
             </span>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -1963,7 +1994,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <div style={dkCard}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
               <AlertTriangle className="w-4 h-4" style={{ color: "#eab308" }} />
-              <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Known Hazards</span>
+              <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>{t("hazards.title")}</span>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {result.hazards
@@ -1994,14 +2025,14 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
       <div style={{ ...dkCard, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
         <Info className="w-5 h-5 shrink-0" style={{ color: "var(--sage)" }} />
         <p style={{ fontSize: 13, fontWeight: 500, color: "var(--t1)", margin: 0 }}>
-          AfCFTA Eligibility:{" "}
+          {t("afcfta.eligibility")}{" "}
           {result.afcftaEligible ? (
             <span style={{ color: "var(--sage)" }}>
-              Both countries are AfCFTA members — preferential treatment may apply
+              {t("afcfta.eligible")}
             </span>
           ) : (
             <span style={{ color: "var(--t3)" }}>
-              Not applicable — destination is not an AfCFTA member
+              {t("afcfta.notApplicable")}
             </span>
           )}
         </p>
@@ -2012,7 +2043,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
             <Scale className="w-4 h-4" style={{ color: "var(--sage)" }} />
             <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
-              AfCFTA Rules of Origin — HS {result.afcftaRoo.hsHeading}
+              {t("afcfta.rooTitle", { hsHeading: result.afcftaRoo.hsHeading })}
             </span>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
@@ -2035,7 +2066,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
                 }}
                 data-testid="badge-roo-value-add"
               >
-                Min {result.afcftaRoo.minValueAddPct}% value addition
+                {t("afcfta.minValueAdd", { pct: result.afcftaRoo.minValueAddPct })}
               </span>
             )}
           </div>
@@ -2051,7 +2082,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           )}
           {result.afcftaRoo.alternativeCriteria != null && (
             <div style={{ fontSize: 13, marginBottom: 8 }} data-testid="text-roo-alt-criteria">
-              <span style={{ fontWeight: 500, color: "var(--t1)" }}>Alternative: </span>
+              <span style={{ fontWeight: 500, color: "var(--t1)" }}>{t("afcfta.alternative")} </span>
               <span style={{ color: "var(--t2)" }}>
                 {(() => {
                   const criteria = result.afcftaRoo!.alternativeCriteria as Record<string, string>;
@@ -2061,14 +2092,14 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             </div>
           )}
           <p style={{ fontSize: 13, color: "var(--t4)", margin: 0 }}>
-            Source: {String(result.afcftaRoo.sourceRef)}
+            {t("afcfta.source")} {String(result.afcftaRoo.sourceRef)}
           </p>
         </div>
       )}
 
       <div style={dkCard}>
         <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 14 }}>
-          Actions
+          {t("actions.title")}
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           <TwinLogDownloadButton result={result} docStatuses={docStatuses} locked={freeLocked} />
@@ -2079,18 +2110,18 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
             variant="outline"
             className="w-full"
             onClick={() => {
-              const csv = generateCustomsCSV(result);
+              const csv = generateCustomsCSV(result, t);
               const filename = `TapTrao_CustomsDataPack_${result.commodity.hsCode}_${result.origin.iso2}_${result.destination.iso2}.csv`;
               downloadCSV(csv, filename);
             }}
             data-testid="button-download-customs-pack"
           >
             <Download className="w-4 h-4 mr-2" />
-            Customs data pack (CSV)
+            {t("actions.customsDataPack")}
           </Button>
           <SupplierBriefButton result={result} />
         </div>
-        <p style={{ fontSize: 13, color: "var(--t3)", textAlign: "center", marginTop: 8, fontStyle: "italic" }}>Use directly or share with a broker if you have one</p>
+        <p style={{ fontSize: 13, color: "var(--t3)", textAlign: "center", marginTop: 8, fontStyle: "italic" }}>{t("actions.brokerNote")}</p>
       </div>
 
       <SupplierBriefSection result={result} />
@@ -2112,10 +2143,10 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           textAlign: "center",
         }} data-testid="banner-signup-conversion">
           <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", fontFamily: "'Clash Display', sans-serif", margin: "0 0 8px" }}>
-            Activate Shield to manage this shipment
+            {t("conversion.activateShield")}
           </h3>
           <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6, margin: "0 0 12px" }}>
-            Create a free account to save your results, run LC document checks, track supplier documents, and manage your shipment from a single dashboard.
+            {t("conversion.activateDescription")}
           </p>
           <Link href="/register">
             <Button
@@ -2123,7 +2154,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
               style={{ background: "var(--sage)", color: "#fff", borderRadius: 10, border: "none", padding: "10px 24px", fontSize: 13, fontWeight: 700 }}
               data-testid="button-conversion-register"
             >
-              Create Account & Activate Shield →
+              {t("conversion.createAccount")}
             </Button>
           </Link>
         </div>
@@ -2139,10 +2170,10 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
         }} data-testid="banner-open-trade-dashboard">
           <CheckCircle2 className="w-6 h-6 shrink-0" style={{ color: "var(--sage)", margin: "0 auto 10px" }} />
           <p style={{ fontSize: 15, fontWeight: 700, color: "var(--t1)", margin: "0 0 6px", fontFamily: "'Clash Display', sans-serif" }}>
-            Trade created — your shipment is live
+            {t("conversion.tradeCreated")}
           </p>
           <p style={{ fontSize: 14, color: "var(--t2)", margin: "0 0 16px", lineHeight: 1.5 }}>
-            Manage documents, run LC checks, track suppliers, and monitor compliance — all from your trade dashboard.
+            {t("conversion.tradeDescription")}
           </p>
           <Link href={`/trades/${(result as any).lookupId}`}>
             <Button
@@ -2150,7 +2181,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
               style={{ background: "var(--sage)", color: "#fff", borderRadius: 10, padding: "10px 28px", fontSize: 14, fontWeight: 700 }}
               data-testid="button-open-trade-dashboard"
             >
-              Open Trade Dashboard →
+              {t("conversion.openTradeDashboard")}
             </Button>
           </Link>
         </div>
@@ -2162,16 +2193,16 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
           background: "rgba(234,179,8,0.06)",
           border: "1px solid rgba(234,179,8,0.15)",
         }} data-testid="banner-conversion">
-          <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", fontFamily: "'Clash Display', sans-serif", margin: "0 0 8px" }}>Want another corridor?</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", fontFamily: "'Clash Display', sans-serif", margin: "0 0 8px" }}>{t("conversion.wantAnotherCorridor")}</h3>
           <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6, margin: "0 0 6px" }}>
-            Activate TapTrao Shield for full shipment protection — LC checks, document tracking, and late-document alerts until docking.
+            {t("conversion.shieldDescription")}
           </p>
           <p style={{ fontSize: 13, fontStyle: "italic", color: "var(--t3)", margin: "0 0 12px" }}>
-            ~30% of LC submissions are rejected on first presentation.
+            {t("conversion.lcRejectionStat")}
           </p>
           <Link href="/pricing">
             <Button size="sm" data-testid="button-conversion-see-packs">
-              View TapTrao Shield →
+              {t("conversion.viewShield")}
             </Button>
           </Link>
         </div>
@@ -2196,6 +2227,8 @@ function SaveTemplatePrompt({
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState("");
   const [saved, setSaved] = useState(false);
+  const { t } = useTranslation("lookup");
+  const { t: tc } = useTranslation("common");
 
   useEffect(() => {
     setName(`${result.commodity.name} ${originIso2} to ${destIso2}`);
@@ -2232,7 +2265,7 @@ function SaveTemplatePrompt({
       return (
         <div style={{ ...dkCardLocal, display: "flex", alignItems: "center", gap: 12 }}>
           <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: "var(--sage)" }} />
-          <p style={{ fontSize: 13, color: "var(--t1)", margin: 0 }}>Template saved. Find it in My Templates.</p>
+          <p style={{ fontSize: 13, color: "var(--t1)", margin: 0 }}>{t("template.saved")}</p>
         </div>
       );
     }
@@ -2243,7 +2276,7 @@ function SaveTemplatePrompt({
     <>
       <div style={{ ...dkCardLocal, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <p style={{ fontSize: 13, color: "var(--t2)", margin: 0 }}>
-          Save this trade as a template for next time? It's free.
+          {t("template.savePrompt")}
         </p>
         <Button
           variant="outline"
@@ -2252,35 +2285,35 @@ function SaveTemplatePrompt({
           data-testid="button-save-template-prompt"
         >
           <Bookmark className="w-3 h-3 mr-1" />
-          Save as Template
+          {t("template.saveAsTemplate")}
         </Button>
       </div>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Name this template</DialogTitle>
+            <DialogTitle>{t("template.nameTitle")}</DialogTitle>
             <DialogDescription>
-              Give your template a name so you can find it later.
+              {t("template.nameDescription")}
             </DialogDescription>
           </DialogHeader>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Cashew CI to GB"
+            placeholder={t("template.namePlaceholder")}
             className="text-gray-900"
             data-testid="input-template-name"
           />
           <div className="flex gap-3 justify-end flex-wrap">
             <Button variant="outline" onClick={() => setShowModal(false)}>
-              Cancel
+              {tc("button.cancel")}
             </Button>
             <Button
               onClick={() => saveMutation.mutate()}
               disabled={!name.trim() || saveMutation.isPending}
               data-testid="button-confirm-save-template"
             >
-              {saveMutation.isPending ? "Saving..." : "Save Template"}
+              {saveMutation.isPending ? t("template.saving") : t("template.saveButton")}
             </Button>
           </div>
         </DialogContent>
@@ -2290,6 +2323,8 @@ function SaveTemplatePrompt({
 }
 
 export default function Lookup() {
+  const { t } = useTranslation("lookup");
+  const { t: tc } = useTranslation("common");
   const searchString = useSearch();
   const searchParams = new URLSearchParams(searchString);
   const templateId = searchParams.get("templateId");
@@ -2481,15 +2516,15 @@ export default function Lookup() {
                 data-testid="button-back"
               >
                 <ArrowLeft className="w-4 h-4" />
-                {isAuthenticated ? "Back to Dashboard" : "Back to Home"}
+                {isAuthenticated ? t("backToDashboard") : t("backToHome")}
               </button>
             </Link>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }}>TapTrao / Pre-shipment Compliance Check</p>
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)" }}>{t("breadcrumb")}</p>
             <h1 style={{ fontFamily: "var(--fh)", fontWeight: 900, fontSize: 28, color: "var(--t1)" }} data-testid="text-lookup-title">
-              Pre-shipment compliance check
+              {t("title")}
             </h1>
             <p style={{ fontFamily: "var(--fb)", color: "var(--t2)", fontSize: 14 }}>
-              See regulatory requirements, documents, and risk indicators before a shipment moves.
+              {t("subtitle")}
             </p>
           </div>
 
@@ -2503,7 +2538,7 @@ export default function Lookup() {
               data-testid="text-template-current-banner"
             >
               <p style={{ fontSize: 13, color: "var(--blue)", fontWeight: 600, lineHeight: 1.5 }}>
-                Loading from template: {templateData?.name} — check the fields below and click Check compliance risk.
+                {t("template.loadingFrom", { name: templateData?.name })}
               </p>
             </div>
           )}
@@ -2518,7 +2553,7 @@ export default function Lookup() {
               data-testid="text-template-stale-banner"
             >
               <p style={{ fontSize: 13, color: "var(--amber)", fontWeight: 600, lineHeight: 1.5, marginBottom: 10 }}>
-                Showing saved results from {new Date(templateData!.createdAt).toLocaleDateString()}. Regulations may have changed.
+                {t("template.staleBanner", { date: new Date(templateData!.createdAt).toLocaleDateString() })}
               </p>
               <Button
                 size="sm"
@@ -2527,7 +2562,7 @@ export default function Lookup() {
                 data-testid="button-refresh-live"
               >
                 <RefreshCw className="w-3 h-3 mr-1" />
-                {refreshMutation.isPending ? "Refreshing..." : "Refresh with live data"}
+                {refreshMutation.isPending ? t("template.refreshing") : t("template.refreshWithLiveData")}
               </Button>
             </div>
           )}
@@ -2538,7 +2573,7 @@ export default function Lookup() {
               <div className="space-y-6">
                 <div className="space-y-2">
                   <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="commodity">
-                    What are you shipping?
+                    {t("form.commodityLabel")}
                   </label>
                   {isLoading ? (
                     <Skeleton className="h-9 w-full" />
@@ -2549,7 +2584,7 @@ export default function Lookup() {
                       disabled={isTemplateMode || isLookupMode}
                     >
                       <SelectTrigger data-testid="select-commodity">
-                        <SelectValue placeholder="Select commodity..." />
+                        <SelectValue placeholder={t("form.commodityPlaceholder")} />
                       </SelectTrigger>
                       <SelectContent>
                         {commoditiesData?.map((c) => (
@@ -2564,14 +2599,14 @@ export default function Lookup() {
 
                 <div className="space-y-2">
                   <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="origin">
-                    Where are the goods coming from?
+                    {t("form.originLabel")}
                   </label>
                   {isLoading ? (
                     <Skeleton className="h-9 w-full" />
                   ) : (
                     <Select value={originId} onValueChange={setOriginId} disabled={isTemplateMode || isLookupMode}>
                       <SelectTrigger data-testid="select-origin">
-                        <SelectValue placeholder="Select origin..." />
+                        <SelectValue placeholder={t("form.originPlaceholder")} />
                       </SelectTrigger>
                       <SelectContent>
                         {originsData?.map((o: any) => (
@@ -2592,7 +2627,7 @@ export default function Lookup() {
 
                 <div className="space-y-2">
                   <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t1)" }} htmlFor="destination">
-                    Where are the goods going?
+                    {t("form.destinationLabel")}
                   </label>
                   {isLoading ? (
                     <Skeleton className="h-9 w-full" />
@@ -2603,7 +2638,7 @@ export default function Lookup() {
                       disabled={isTemplateMode || isLookupMode}
                     >
                       <SelectTrigger data-testid="select-destination">
-                        <SelectValue placeholder="Select destination..." />
+                        <SelectValue placeholder={t("form.destinationPlaceholder")} />
                       </SelectTrigger>
                       <SelectContent>
                         {destinationsData?.map((d: any) => (
@@ -2629,19 +2664,19 @@ export default function Lookup() {
                   {complianceMutation.isPending ? (
                     <>
                       <Search className="w-4 h-4 mr-2 animate-spin" />
-                      Checking compliance risk...
+                      {t("form.checkButtonLoading")}
                     </>
                   ) : (
                     <>
                       <Search className="w-4 h-4 mr-2" />
-                      {isFreeCheck ? "Check compliance risk — Free" : "Check compliance risk"}
+                      {isFreeCheck ? t("form.checkButtonFree") : t("form.checkButton")}
                     </>
                   )}
                 </Button>
               )}
               {!isTemplateMode && !isFreeCheck && (
                 <p className="text-xs text-muted-foreground text-center mt-2" data-testid="text-token-balance-lookup">
-                  Balance: {balance} tokens · <Link href="/pricing" className="underline">Top up</Link>
+                  {t("form.balanceInfo", { balance })} · <Link href="/pricing" className="underline">{t("form.topUp")}</Link>
                 </p>
               )}
             </CardContent>
@@ -2658,7 +2693,7 @@ export default function Lookup() {
 
           {displayResult && (
             <>
-              <StepNav steps={["Enter trade", "Pre-ship report", "LC check 🔒", "Supplier brief 🔒"]} currentIndex={1} completedUpTo={1} />
+              <StepNav steps={[t("steps.enterTrade"), t("steps.preShipReport"), `${t("steps.lcCheck")} 🔒`, `${t("steps.supplierBrief")} 🔒`]} currentIndex={1} completedUpTo={1} />
               <ComplianceResultDisplay result={displayResult} freeLocked={freeLookupUsed && balance === 0} isAuthenticated={isAuthenticated} />
               {!isTemplateMode && !isLookupMode && (
                 <SaveTemplatePrompt
@@ -2675,23 +2710,22 @@ export default function Lookup() {
           <Dialog open={showTokenModal} onOpenChange={setShowTokenModal}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Insufficient Tokens</DialogTitle>
+                <DialogTitle>{t("tokenModal.title")}</DialogTitle>
                 <DialogDescription>
-                  You need 5 tokens to run a compliance lookup, but you have {balance}.
-                  Purchase a token pack to continue.
+                  {t("tokenModal.description", { balance })}
                 </DialogDescription>
               </DialogHeader>
               <div className="flex items-center justify-center gap-2 my-2">
                 <Badge variant="secondary" className="gap-1">
-                  <Hexagon className="w-3 h-3" /> {balance} Shield {balance === 1 ? "check" : "checks"}
+                  <Hexagon className="w-3 h-3" /> {t("tokenModal.shieldCheck", { count: balance })}
                 </Badge>
               </div>
               <div className="flex gap-3 justify-end flex-wrap">
                 <Button variant="outline" onClick={() => setShowTokenModal(false)} data-testid="button-modal-cancel">
-                  Cancel
+                  {tc("button.cancel")}
                 </Button>
                 <Button onClick={() => navigate("/pricing")} data-testid="button-modal-buy-tokens">
-                  Activate TapTrao Shield
+                  {t("tokenModal.activateShield")}
                 </Button>
               </div>
             </DialogContent>

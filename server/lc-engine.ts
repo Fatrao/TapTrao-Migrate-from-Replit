@@ -1,5 +1,6 @@
 import type { LcFields, LcDocument, CheckResultItem, LcCheckSummary, CheckSeverity, CheckCategory } from "@shared/schema";
 import { createHash } from "crypto";
+import { t } from "./locales";
 
 function normalizeName(name: string): string {
   return name
@@ -17,25 +18,25 @@ function normalizeName(name: string): string {
     .trim();
 }
 
-function compareNames(lcName: string, docName: string): { severity: CheckSeverity; explanation: string } {
+function compareNames(lcName: string, docName: string, locale: string): { severity: CheckSeverity; explanation: string } {
   if (!docName || !docName.trim()) {
-    return { severity: "RED", explanation: "Document field is empty. Bank will reject — UCP 600 Art. 14(d) requires consistency across documents." };
+    return { severity: "RED", explanation: t("lc.name_empty", locale) };
   }
   if (lcName.trim() === docName.trim()) {
-    return { severity: "GREEN", explanation: "Exact match with LC terms." };
+    return { severity: "GREEN", explanation: t("lc.name_exact_match", locale) };
   }
   if (lcName.trim().toLowerCase() === docName.trim().toLowerCase()) {
-    return { severity: "GREEN", explanation: "Case-insensitive match — acceptable under UCP 600 Art. 14(d)." };
+    return { severity: "GREEN", explanation: t("lc.name_case_insensitive", locale) };
   }
   const normLc = normalizeName(lcName);
   const normDoc = normalizeName(docName);
   if (normLc === normDoc) {
-    return { severity: "GREEN", explanation: "Match after normalizing common business abbreviations (Ltd/Limited, &/and, SARL, etc.)." };
+    return { severity: "GREEN", explanation: t("lc.name_normalized_match", locale) };
   }
   if (normLc.includes(normDoc) || normDoc.includes(normLc)) {
-    return { severity: "AMBER", explanation: "Partial match detected. Names are similar but not identical. Bank may query — review carefully per UCP 600 Art. 14(d)." };
+    return { severity: "AMBER", explanation: t("lc.name_partial_match", locale) };
   }
-  return { severity: "RED", explanation: "Name MISMATCH. The name on this document does not match the LC beneficiary. Bank will almost certainly reject — UCP 600 Art. 14(d)." };
+  return { severity: "RED", explanation: t("lc.name_mismatch", locale) };
 }
 
 function parseNumber(val: string): number {
@@ -43,7 +44,7 @@ function parseNumber(val: string): number {
   return parseFloat(val.replace(/[,\s]/g, "")) || 0;
 }
 
-function compareAmounts(lcAmount: number, docAmount: number, docType: string): CheckResultItem {
+function compareAmounts(lcAmount: number, docAmount: number, docType: string, locale: string): CheckResultItem {
   if (docAmount === 0) {
     return {
       fieldName: "Total Amount",
@@ -52,7 +53,7 @@ function compareAmounts(lcAmount: number, docAmount: number, docType: string): C
       documentType: docType,
       severity: "RED",
       ucpRule: "UCP 600 Art. 18(a)",
-      explanation: "Invoice amount is missing or zero. Cannot verify against LC amount.",
+      explanation: t("lc.amount_missing", locale),
       checkCategory: "lc_validation",
     };
   }
@@ -64,7 +65,7 @@ function compareAmounts(lcAmount: number, docAmount: number, docType: string): C
       documentType: docType,
       severity: "RED",
       ucpRule: "UCP 600 Art. 18(a)",
-      explanation: `Invoice amount (${docAmount}) exceeds LC amount (${lcAmount}). The amount drawn must not exceed the credit amount. Bank will reject.`,
+      explanation: t("lc.amount_exceeds", locale, { docAmount, lcAmount }),
       checkCategory: "lc_validation",
     };
   }
@@ -75,12 +76,12 @@ function compareAmounts(lcAmount: number, docAmount: number, docType: string): C
     documentType: docType,
     severity: "GREEN",
     ucpRule: "UCP 600 Art. 18(a)",
-    explanation: "Invoice amount does not exceed LC amount.",
+    explanation: t("lc.amount_ok", locale),
     checkCategory: "lc_validation",
   };
 }
 
-function compareQuantities(lcQty: number, docQty: number, docType: string, tolerancePct: number = 5): CheckResultItem {
+function compareQuantities(lcQty: number, docQty: number, docType: string, locale: string, tolerancePct: number = 5): CheckResultItem {
   if (docQty === 0) {
     return {
       fieldName: "Quantity",
@@ -89,7 +90,7 @@ function compareQuantities(lcQty: number, docQty: number, docType: string, toler
       documentType: docType,
       severity: "AMBER",
       ucpRule: "UCP 600 Art. 14(d)",
-      explanation: "Quantity not specified on this document.",
+      explanation: t("lc.qty_not_specified", locale),
       checkCategory: "lc_validation",
     };
   }
@@ -102,7 +103,7 @@ function compareQuantities(lcQty: number, docQty: number, docType: string, toler
       documentType: docType,
       severity: "GREEN",
       ucpRule: "UCP 600 Art. 14(d)",
-      explanation: "Quantity matches LC terms exactly.",
+      explanation: t("lc.qty_exact_match", locale),
       checkCategory: "lc_validation",
     };
   }
@@ -115,7 +116,7 @@ function compareQuantities(lcQty: number, docQty: number, docType: string, toler
       documentType: docType,
       severity: "AMBER",
       ucpRule: "ISBP 745",
-      explanation: `Quantity difference is ${(diff * 100).toFixed(1)}% (within \u00b1${tolerancePct}% tolerance). ISBP 745 tolerance may apply for bulk goods.`,
+      explanation: t("lc.qty_within_tolerance", locale, { diffPct: (diff * 100).toFixed(1), tolerancePct }),
       checkCategory: "lc_validation",
     };
   }
@@ -126,7 +127,7 @@ function compareQuantities(lcQty: number, docQty: number, docType: string, toler
     documentType: docType,
     severity: "RED",
     ucpRule: "UCP 600 Art. 14(d)",
-    explanation: `Quantity difference is ${(diff * 100).toFixed(1)}% (exceeds \u00b1${tolerancePct}% tolerance). Documents are inconsistent. Bank will reject.`,
+      explanation: t("lc.qty_exceeds_tolerance", locale, { diffPct: (diff * 100).toFixed(1), tolerancePct }),
     checkCategory: "lc_validation",
   };
 }
@@ -139,73 +140,73 @@ function parseNumericValue(str: string): number {
   return parseFloat(str.replace(/[,\s]/g, "").replace(/\s*(kg|mt|lbs?|tonnes?|pieces?|bags?|cartons?|drums?|litres?|cbm)\s*$/i, "")) || 0;
 }
 
-function compareGoodsDescription(descA: string, descB: string): { severity: CheckSeverity; explanation: string } {
+function compareGoodsDescription(descA: string, descB: string, locale: string): { severity: CheckSeverity; explanation: string } {
   const a = (descA || "").trim().toLowerCase();
   const b = (descB || "").trim().toLowerCase();
   if (!a || !b) {
-    return { severity: "AMBER", explanation: "Goods description is missing on one document. Cannot verify consistency." };
+    return { severity: "AMBER", explanation: t("lc.goods_missing", locale) };
   }
   if (a === b) {
-    return { severity: "GREEN", explanation: "Goods descriptions match exactly across documents." };
+    return { severity: "GREEN", explanation: t("lc.goods_exact_match", locale) };
   }
   if (a.includes(b) || b.includes(a)) {
-    return { severity: "GREEN", explanation: "Goods descriptions substantially correspond across documents." };
+    return { severity: "GREEN", explanation: t("lc.goods_substantial", locale) };
   }
   const wordsA = a.split(/\s+/).filter(w => w.length > 2);
   const wordsSetB = new Set(b.split(/\s+/).filter(w => w.length > 2));
   const overlap = wordsA.filter(w => wordsSetB.has(w)).length;
   const similarity = wordsA.length > 0 ? overlap / wordsA.length : 0;
   if (similarity >= 0.5) {
-    return { severity: "AMBER", explanation: "Goods descriptions partially match. Review wording carefully — UCP 600 Art. 14(d) requires data must not conflict." };
+    return { severity: "AMBER", explanation: t("lc.goods_partial", locale) };
   }
-  return { severity: "RED", explanation: "Goods descriptions do not match across documents. Bank will reject — UCP 600 Art. 14(d)." };
+  return { severity: "RED", explanation: t("lc.goods_mismatch", locale) };
 }
 
-function compareCountryOfOrigin(countryA: string, countryB: string): { severity: CheckSeverity; explanation: string } {
+function compareCountryOfOrigin(countryA: string, countryB: string, locale: string): { severity: CheckSeverity; explanation: string } {
   const a = (countryA || "").trim().toLowerCase();
   const b = (countryB || "").trim().toLowerCase();
   if (!a || !b) {
-    return { severity: "AMBER", explanation: "Country of origin is missing on one document." };
+    return { severity: "AMBER", explanation: t("lc.country_missing", locale) };
   }
   if (a === b || a.includes(b) || b.includes(a)) {
-    return { severity: "GREEN", explanation: "Country of origin matches across documents." };
+    return { severity: "GREEN", explanation: t("lc.country_match", locale) };
   }
-  return { severity: "RED", explanation: "Country of origin MISMATCH across documents. Bank will reject — UCP 600 Art. 14(d)." };
+  return { severity: "RED", explanation: t("lc.country_mismatch", locale) };
 }
 
-function comparePortNames(portA: string, portB: string): { severity: CheckSeverity; explanation: string } {
+function comparePortNames(portA: string, portB: string, locale: string): { severity: CheckSeverity; explanation: string } {
   const normalize = (p: string) => (p || "").trim().toLowerCase().replace(/^port\s+(of\s+)?/i, "").trim();
   const a = normalize(portA);
   const b = normalize(portB);
   if (!a || !b) {
-    return { severity: "AMBER", explanation: "Port name is missing on one document." };
+    return { severity: "AMBER", explanation: t("lc.port_missing", locale) };
   }
   if (a === b) {
-    return { severity: "GREEN", explanation: "Port names match across documents." };
+    return { severity: "GREEN", explanation: t("lc.port_match", locale) };
   }
   if (a.includes(b) || b.includes(a)) {
-    return { severity: "AMBER", explanation: "Port names partially match. Verify consistency across documents." };
+    return { severity: "AMBER", explanation: t("lc.port_partial", locale) };
   }
-  return { severity: "RED", explanation: "Port names do not match across documents. Bank will reject — UCP 600 Art. 14(d)." };
+  return { severity: "RED", explanation: t("lc.port_mismatch", locale) };
 }
 
-function compareNumericWithTolerance(valA: number, valB: number, tolerancePct: number): { severity: CheckSeverity; diffPct: number; explanation: string } {
+function compareNumericWithTolerance(valA: number, valB: number, tolerancePct: number, locale: string): { severity: CheckSeverity; diffPct: number; explanation: string } {
   if (valA === 0 && valB === 0) {
-    return { severity: "GREEN", diffPct: 0, explanation: "Both values are zero or not specified." };
+    return { severity: "GREEN", diffPct: 0, explanation: t("lc.numeric_both_zero", locale) };
   }
   if (valA === 0 || valB === 0) {
-    return { severity: "AMBER", diffPct: 100, explanation: "One value is missing or zero. Cannot compare." };
+    return { severity: "AMBER", diffPct: 100, explanation: t("lc.numeric_one_missing", locale) };
   }
   const diff = Math.abs(valA - valB);
   const base = Math.max(valA, valB);
   const diffPct = (diff / base) * 100;
   if (diffPct === 0) {
-    return { severity: "GREEN", diffPct: 0, explanation: "Values match exactly across documents." };
+    return { severity: "GREEN", diffPct: 0, explanation: t("lc.numeric_exact_match", locale) };
   }
   if (diffPct <= tolerancePct) {
-    return { severity: "AMBER", diffPct, explanation: `Difference is ${diffPct.toFixed(1)}% (within ±${tolerancePct}% tolerance). Check if this variance is acceptable.` };
+    return { severity: "AMBER", diffPct, explanation: t("lc.numeric_within_tolerance", locale, { diffPct: diffPct.toFixed(1), tolerancePct }) };
   }
-  return { severity: "RED", diffPct, explanation: `Difference is ${diffPct.toFixed(1)}% (exceeds ±${tolerancePct}% tolerance). Documents are inconsistent — bank will reject.` };
+  return { severity: "RED", diffPct, explanation: t("lc.numeric_exceeds_tolerance", locale, { diffPct: diffPct.toFixed(1), tolerancePct }) };
 }
 
 function crossDocLabel(typeA: string, typeB: string): string {
@@ -227,14 +228,14 @@ function crossDocLabel(typeA: string, typeB: string): string {
 
 // ── Phase 2: LC vs New Document Type Validations ──
 
-function validateLcVsInsurance(lcFields: LcFields, insurance: LcDocument, results: CheckResultItem[]): void {
+function validateLcVsInsurance(lcFields: LcFields, insurance: LcDocument, results: CheckResultItem[], locale: string): void {
   const f = insurance.fields;
   const dtLabel = "Insurance Certificate";
 
   // 1. Insured party vs beneficiary
   const insuredParty = f.insuredParty || "";
   if (insuredParty) {
-    const nameResult = compareNames(lcFields.beneficiaryName, insuredParty);
+    const nameResult = compareNames(lcFields.beneficiaryName, insuredParty, locale);
     results.push({
       fieldName: "Insured Party (vs Beneficiary)",
       lcValue: lcFields.beneficiaryName,
@@ -262,7 +263,7 @@ function validateLcVsInsurance(lcFields: LcFields, insurance: LcDocument, result
         documentType: dtLabel,
         severity: "GREEN",
         ucpRule: "UCP 600 Art. 28(b)",
-        explanation: `Insurance coverage (${coverageAmt}) meets the minimum ${requiredPct}% requirement${isCifCip ? " for CIF/CIP terms" : ""}.`,
+        explanation: t("lc.insurance_coverage_ok", locale, { coverageAmt, requiredPct, cifCipSuffix: isCifCip ? t("lc.cif_cip_suffix", locale) : "" }),
         checkCategory: "lc_validation",
       });
     } else {
@@ -273,7 +274,7 @@ function validateLcVsInsurance(lcFields: LcFields, insurance: LcDocument, result
         documentType: dtLabel,
         severity: "RED",
         ucpRule: "UCP 600 Art. 28(b)",
-        explanation: `Insurance coverage (${coverageAmt}) is BELOW the minimum ${requiredPct}% of LC amount (${requiredAmount.toFixed(2)})${isCifCip ? " required for CIF/CIP terms" : ""}. Bank will reject.`,
+        explanation: t("lc.insurance_coverage_below", locale, { coverageAmt, requiredPct, requiredAmount: requiredAmount.toFixed(2), cifCipSuffix: isCifCip ? t("lc.cif_cip_required_suffix", locale) : "" }),
         checkCategory: "lc_validation",
       });
     }
@@ -291,7 +292,7 @@ function validateLcVsInsurance(lcFields: LcFields, insurance: LcDocument, result
         documentType: dtLabel,
         severity: "RED",
         ucpRule: "UCP 600 Art. 28(b)",
-        explanation: `Insurance currency (${insCurrency}) does not match LC currency (${lcCurrency}). Bank will reject.`,
+        explanation: t("lc.insurance_currency_mismatch", locale, { insCurrency, lcCurrency }),
         checkCategory: "lc_validation",
       });
     } else {
@@ -302,7 +303,7 @@ function validateLcVsInsurance(lcFields: LcFields, insurance: LcDocument, result
         documentType: dtLabel,
         severity: "GREEN",
         ucpRule: "UCP 600 Art. 28(b)",
-        explanation: "Insurance currency matches LC terms.",
+        explanation: t("lc.insurance_currency_match", locale),
         checkCategory: "lc_validation",
       });
     }
@@ -311,7 +312,7 @@ function validateLcVsInsurance(lcFields: LcFields, insurance: LcDocument, result
   // 4. Voyage from vs port of loading
   const voyageFrom = f.voyageFrom || "";
   if (voyageFrom && lcFields.portOfLoading) {
-    const portResult = comparePortNames(voyageFrom, lcFields.portOfLoading);
+    const portResult = comparePortNames(voyageFrom, lcFields.portOfLoading, locale);
     results.push({
       fieldName: "Voyage From (vs Port of Loading)",
       lcValue: lcFields.portOfLoading,
@@ -327,7 +328,7 @@ function validateLcVsInsurance(lcFields: LcFields, insurance: LcDocument, result
   // 5. Voyage to vs port of discharge
   const voyageTo = f.voyageTo || "";
   if (voyageTo && lcFields.portOfDischarge) {
-    const portResult = comparePortNames(voyageTo, lcFields.portOfDischarge);
+    const portResult = comparePortNames(voyageTo, lcFields.portOfDischarge, locale);
     results.push({
       fieldName: "Voyage To (vs Port of Discharge)",
       lcValue: lcFields.portOfDischarge,
@@ -341,14 +342,14 @@ function validateLcVsInsurance(lcFields: LcFields, insurance: LcDocument, result
   }
 }
 
-function validateLcVsQuality(lcFields: LcFields, quality: LcDocument, results: CheckResultItem[]): void {
+function validateLcVsQuality(lcFields: LcFields, quality: LcDocument, results: CheckResultItem[], locale: string): void {
   const f = quality.fields;
   const dtLabel = "Quality Certificate";
 
   // 1. Goods description
   const goodsDesc = f.goodsDescription || "";
   if (goodsDesc && lcFields.goodsDescription) {
-    const gdResult = compareGoodsDescription(lcFields.goodsDescription, goodsDesc);
+    const gdResult = compareGoodsDescription(lcFields.goodsDescription, goodsDesc, locale);
     results.push({
       fieldName: "Goods Description",
       lcValue: lcFields.goodsDescription,
@@ -364,7 +365,7 @@ function validateLcVsQuality(lcFields: LcFields, quality: LcDocument, results: C
   // 2. Exporter vs beneficiary
   const exporterName = f.exporterName || "";
   if (exporterName) {
-    const nameResult = compareNames(lcFields.beneficiaryName, exporterName);
+    const nameResult = compareNames(lcFields.beneficiaryName, exporterName, locale);
     results.push({
       fieldName: "Exporter Name (vs Beneficiary)",
       lcValue: lcFields.beneficiaryName,
@@ -378,13 +379,13 @@ function validateLcVsQuality(lcFields: LcFields, quality: LcDocument, results: C
   }
 }
 
-function validateLcVsWeight(lcFields: LcFields, weight: LcDocument, results: CheckResultItem[]): void {
+function validateLcVsWeight(lcFields: LcFields, weight: LcDocument, results: CheckResultItem[], locale: string): void {
   const f = weight.fields;
   const dtLabel = "Weight Certificate";
 
   const goodsDesc = f.goodsDescription || "";
   if (goodsDesc && lcFields.goodsDescription) {
-    const gdResult = compareGoodsDescription(lcFields.goodsDescription, goodsDesc);
+    const gdResult = compareGoodsDescription(lcFields.goodsDescription, goodsDesc, locale);
     results.push({
       fieldName: "Goods Description",
       lcValue: lcFields.goodsDescription,
@@ -398,7 +399,7 @@ function validateLcVsWeight(lcFields: LcFields, weight: LcDocument, results: Che
   }
 }
 
-function validateLcVsEudr(lcFields: LcFields, eudr: LcDocument, results: CheckResultItem[]): void {
+function validateLcVsEudr(lcFields: LcFields, eudr: LcDocument, results: CheckResultItem[], locale: string): void {
   const f = eudr.fields;
   const dtLabel = "EUDR Declaration";
 
@@ -414,7 +415,7 @@ function validateLcVsEudr(lcFields: LcFields, eudr: LcDocument, results: CheckRe
         documentType: dtLabel,
         severity: "GREEN",
         ucpRule: "EU Reg. 2023/1115",
-        explanation: "HS code heading matches LC terms.",
+        explanation: t("lc.hs_heading_match", locale),
         checkCategory: "lc_validation",
       });
     } else {
@@ -425,7 +426,7 @@ function validateLcVsEudr(lcFields: LcFields, eudr: LcDocument, results: CheckRe
         documentType: dtLabel,
         severity: "RED",
         ucpRule: "EU Reg. 2023/1115",
-        explanation: `EUDR HS heading (${eudrHs}) does not match LC HS heading (${lcHs}). Product classification mismatch.`,
+        explanation: t("lc.hs_heading_mismatch_eudr", locale, { docHs: eudrHs, lcHs }),
         checkCategory: "lc_validation",
       });
     }
@@ -434,7 +435,7 @@ function validateLcVsEudr(lcFields: LcFields, eudr: LcDocument, results: CheckRe
   // 2. Country of origin
   const eudrCountry = f.countryOfOrigin || "";
   if (eudrCountry && lcFields.countryOfOrigin) {
-    const coResult = compareCountryOfOrigin(lcFields.countryOfOrigin, eudrCountry);
+    const coResult = compareCountryOfOrigin(lcFields.countryOfOrigin, eudrCountry, locale);
     results.push({
       fieldName: "Country of Origin",
       lcValue: lcFields.countryOfOrigin,
@@ -450,7 +451,7 @@ function validateLcVsEudr(lcFields: LcFields, eudr: LcDocument, results: CheckRe
   // 3. Operator vs beneficiary
   const operatorName = f.operatorName || "";
   if (operatorName) {
-    const nameResult = compareNames(lcFields.beneficiaryName, operatorName);
+    const nameResult = compareNames(lcFields.beneficiaryName, operatorName, locale);
     results.push({
       fieldName: "Operator Name (vs Beneficiary)",
       lcValue: lcFields.beneficiaryName,
@@ -464,7 +465,7 @@ function validateLcVsEudr(lcFields: LcFields, eudr: LcDocument, results: CheckRe
   }
 }
 
-function validateLcVsCbam(lcFields: LcFields, cbam: LcDocument, results: CheckResultItem[]): void {
+function validateLcVsCbam(lcFields: LcFields, cbam: LcDocument, results: CheckResultItem[], locale: string): void {
   const f = cbam.fields;
   const dtLabel = "CBAM Declaration";
 
@@ -480,7 +481,7 @@ function validateLcVsCbam(lcFields: LcFields, cbam: LcDocument, results: CheckRe
         documentType: dtLabel,
         severity: "GREEN",
         ucpRule: "EU Reg. 2023/956 (CBAM)",
-        explanation: "HS code heading matches LC terms.",
+        explanation: t("lc.hs_heading_match", locale),
         checkCategory: "lc_validation",
       });
     } else {
@@ -491,7 +492,7 @@ function validateLcVsCbam(lcFields: LcFields, cbam: LcDocument, results: CheckRe
         documentType: dtLabel,
         severity: "RED",
         ucpRule: "EU Reg. 2023/956 (CBAM)",
-        explanation: `CBAM HS heading (${cbamHs}) does not match LC HS heading (${lcHs}). Product classification mismatch.`,
+        explanation: t("lc.hs_heading_mismatch_cbam", locale, { docHs: cbamHs, lcHs }),
         checkCategory: "lc_validation",
       });
     }
@@ -500,7 +501,7 @@ function validateLcVsCbam(lcFields: LcFields, cbam: LcDocument, results: CheckRe
   // 2. Declarant vs beneficiary
   const declarantName = f.declarantName || "";
   if (declarantName) {
-    const nameResult = compareNames(lcFields.beneficiaryName, declarantName);
+    const nameResult = compareNames(lcFields.beneficiaryName, declarantName, locale);
     results.push({
       fieldName: "Declarant Name (vs Beneficiary)",
       lcValue: lcFields.beneficiaryName,
@@ -516,14 +517,14 @@ function validateLcVsCbam(lcFields: LcFields, cbam: LcDocument, results: CheckRe
 
 // ── Phase 2: Cross-Document Validation Functions ──
 
-function crossValidateInvoiceVsBl(invoice: LcDocument, bl: LcDocument, tolerancePct: number, results: CheckResultItem[]): void {
+function crossValidateInvoiceVsBl(invoice: LcDocument, bl: LcDocument, tolerancePct: number, results: CheckResultItem[], locale: string): void {
   const label = crossDocLabel("commercial_invoice", "bill_of_lading");
 
   // 1. Quantity match
   const invQty = parseNumericValue(invoice.fields.quantity || "");
   const blQty = parseNumericValue(bl.fields.quantity || "");
   if (invQty > 0 && blQty > 0) {
-    const qtyResult = compareNumericWithTolerance(invQty, blQty, tolerancePct);
+    const qtyResult = compareNumericWithTolerance(invQty, blQty, tolerancePct, locale);
     results.push({
       fieldName: "Quantity",
       lcValue: invoice.fields.quantity || "",
@@ -540,11 +541,11 @@ function crossValidateInvoiceVsBl(invoice: LcDocument, bl: LcDocument, tolerance
   const invGoods = invoice.fields.goodsDescription || "";
   const blGoods = bl.fields.goodsDescription || "";
   if (invGoods && blGoods) {
-    const gdResult = compareGoodsDescription(invGoods, blGoods);
+    const gdResult = compareGoodsDescription(invGoods, blGoods, locale);
     // Relax: if RED, downgrade to AMBER because B/L may use general terms
     const severity = gdResult.severity === "RED" ? "AMBER" as CheckSeverity : gdResult.severity;
     const explanation = gdResult.severity === "RED"
-      ? "B/L goods description differs from invoice. Note: per UCP 600 Art. 20(a)(vi), B/L may use general terms. Review if descriptions conflict."
+      ? t("lc.bl_goods_relaxed", locale)
       : gdResult.explanation;
     results.push({
       fieldName: "Goods Description",
@@ -562,7 +563,7 @@ function crossValidateInvoiceVsBl(invoice: LcDocument, bl: LcDocument, tolerance
   const shipperName = bl.fields.shipperName || "";
   const invBeneficiary = invoice.fields.beneficiaryName || "";
   if (shipperName && invBeneficiary) {
-    const nameResult = compareNames(invBeneficiary, shipperName);
+    const nameResult = compareNames(invBeneficiary, shipperName, locale);
     results.push({
       fieldName: "Shipper (vs Invoice Beneficiary)",
       lcValue: invBeneficiary,
@@ -576,14 +577,14 @@ function crossValidateInvoiceVsBl(invoice: LcDocument, bl: LcDocument, tolerance
   }
 }
 
-function crossValidateInvoiceVsPackingList(invoice: LcDocument, pl: LcDocument, tolerancePct: number, results: CheckResultItem[]): void {
+function crossValidateInvoiceVsPackingList(invoice: LcDocument, pl: LcDocument, tolerancePct: number, results: CheckResultItem[], locale: string): void {
   const label = crossDocLabel("commercial_invoice", "packing_list");
 
   // 1. Quantity match
   const invQty = parseNumericValue(invoice.fields.quantity || "");
   const plQty = parseNumericValue(pl.fields.quantity || "");
   if (invQty > 0 && plQty > 0) {
-    const qtyResult = compareNumericWithTolerance(invQty, plQty, tolerancePct);
+    const qtyResult = compareNumericWithTolerance(invQty, plQty, tolerancePct, locale);
     results.push({
       fieldName: "Quantity",
       lcValue: invoice.fields.quantity || "",
@@ -608,7 +609,7 @@ function crossValidateInvoiceVsPackingList(invoice: LcDocument, pl: LcDocument, 
         documentType: label,
         severity: "GREEN",
         ucpRule: "ISBP 745",
-        explanation: "Number of packages matches between invoice and packing list.",
+        explanation: t("lc.packages_match_inv_pl", locale),
         checkCategory: "cross_document",
       });
     } else {
@@ -619,21 +620,21 @@ function crossValidateInvoiceVsPackingList(invoice: LcDocument, pl: LcDocument, 
         documentType: label,
         severity: "AMBER",
         ucpRule: "ISBP 745",
-        explanation: "Number of packages differs between invoice and packing list. Packing list is the authoritative source — review.",
+        explanation: t("lc.packages_differ_inv_pl", locale),
         checkCategory: "cross_document",
       });
     }
   }
 }
 
-function crossValidateBlVsPackingList(bl: LcDocument, pl: LcDocument, tolerancePct: number, results: CheckResultItem[]): void {
+function crossValidateBlVsPackingList(bl: LcDocument, pl: LcDocument, tolerancePct: number, results: CheckResultItem[], locale: string): void {
   const label = crossDocLabel("bill_of_lading", "packing_list");
 
   // 1. Quantity match
   const blQty = parseNumericValue(bl.fields.quantity || "");
   const plQty = parseNumericValue(pl.fields.quantity || "");
   if (blQty > 0 && plQty > 0) {
-    const qtyResult = compareNumericWithTolerance(blQty, plQty, tolerancePct);
+    const qtyResult = compareNumericWithTolerance(blQty, plQty, tolerancePct, locale);
     results.push({
       fieldName: "Quantity",
       lcValue: bl.fields.quantity || "",
@@ -650,7 +651,7 @@ function crossValidateBlVsPackingList(bl: LcDocument, pl: LcDocument, toleranceP
   const blWeight = parseNumericValue(bl.fields.grossWeight || "");
   const plWeight = parseNumericValue(pl.fields.grossWeight || "");
   if (blWeight > 0 && plWeight > 0) {
-    const wtResult = compareNumericWithTolerance(blWeight, plWeight, 3);
+    const wtResult = compareNumericWithTolerance(blWeight, plWeight, 3, locale);
     results.push({
       fieldName: "Gross Weight",
       lcValue: bl.fields.grossWeight || "",
@@ -675,7 +676,7 @@ function crossValidateBlVsPackingList(bl: LcDocument, pl: LcDocument, toleranceP
         documentType: label,
         severity: "GREEN",
         ucpRule: "UCP 600 Art. 14(d)",
-        explanation: "Number of packages matches between B/L and packing list.",
+        explanation: t("lc.packages_match_bl_pl", locale),
         checkCategory: "cross_document",
       });
     } else {
@@ -686,14 +687,14 @@ function crossValidateBlVsPackingList(bl: LcDocument, pl: LcDocument, toleranceP
         documentType: label,
         severity: "RED",
         ucpRule: "UCP 600 Art. 14(d)",
-        explanation: `Package count mismatch: B/L shows ${blPackages}, packing list shows ${plPackages}. Bank will reject — UCP 600 Art. 14(d).`,
+        explanation: t("lc.packages_mismatch_bl_pl", locale, { blPackages, plPackages }),
         checkCategory: "cross_document",
       });
     }
   }
 }
 
-function crossValidateInvoiceVsInsurance(invoice: LcDocument, insurance: LcDocument, results: CheckResultItem[]): void {
+function crossValidateInvoiceVsInsurance(invoice: LcDocument, insurance: LcDocument, results: CheckResultItem[], locale: string): void {
   const label = crossDocLabel("commercial_invoice", "insurance_certificate");
 
   // 1. Currency match
@@ -708,7 +709,7 @@ function crossValidateInvoiceVsInsurance(invoice: LcDocument, insurance: LcDocum
         documentType: label,
         severity: "RED",
         ucpRule: "UCP 600 Art. 28(b)",
-        explanation: `Invoice currency (${invCurrency}) does not match insurance currency (${insCurrency}). Bank will reject.`,
+        explanation: t("lc.cross_currency_mismatch_inv_ins", locale, { invCurrency, insCurrency }),
         checkCategory: "cross_document",
       });
     } else {
@@ -719,7 +720,7 @@ function crossValidateInvoiceVsInsurance(invoice: LcDocument, insurance: LcDocum
         documentType: label,
         severity: "GREEN",
         ucpRule: "UCP 600 Art. 28(b)",
-        explanation: "Currency matches between invoice and insurance certificate.",
+        explanation: t("lc.cross_currency_match_inv_ins", locale),
         checkCategory: "cross_document",
       });
     }
@@ -737,7 +738,7 @@ function crossValidateInvoiceVsInsurance(invoice: LcDocument, insurance: LcDocum
         documentType: label,
         severity: "GREEN",
         ucpRule: "UCP 600 Art. 28(b)",
-        explanation: `Insurance coverage (${coverageAmt}) covers the invoice amount (${invAmount}).`,
+        explanation: t("lc.coverage_covers_invoice", locale, { coverageAmt, invAmount }),
         checkCategory: "cross_document",
       });
     } else {
@@ -748,21 +749,21 @@ function crossValidateInvoiceVsInsurance(invoice: LcDocument, insurance: LcDocum
         documentType: label,
         severity: "RED",
         ucpRule: "UCP 600 Art. 28(b)",
-        explanation: `Insurance coverage (${coverageAmt}) is LESS than invoice amount (${invAmount}). Goods are under-insured.`,
+        explanation: t("lc.coverage_below_invoice", locale, { coverageAmt, invAmount }),
         checkCategory: "cross_document",
       });
     }
   }
 }
 
-function crossValidateBlVsInsurance(bl: LcDocument, insurance: LcDocument, results: CheckResultItem[]): void {
+function crossValidateBlVsInsurance(bl: LcDocument, insurance: LcDocument, results: CheckResultItem[], locale: string): void {
   const label = crossDocLabel("bill_of_lading", "insurance_certificate");
 
   // 1. Voyage from vs port of loading
   const voyageFrom = insurance.fields.voyageFrom || "";
   const portOfLoading = bl.fields.portOfLoading || "";
   if (voyageFrom && portOfLoading) {
-    const portResult = comparePortNames(voyageFrom, portOfLoading);
+    const portResult = comparePortNames(voyageFrom, portOfLoading, locale);
     results.push({
       fieldName: "Voyage From (vs Port of Loading)",
       lcValue: portOfLoading,
@@ -779,7 +780,7 @@ function crossValidateBlVsInsurance(bl: LcDocument, insurance: LcDocument, resul
   const voyageTo = insurance.fields.voyageTo || "";
   const portOfDischarge = bl.fields.portOfDischarge || "";
   if (voyageTo && portOfDischarge) {
-    const portResult = comparePortNames(voyageTo, portOfDischarge);
+    const portResult = comparePortNames(voyageTo, portOfDischarge, locale);
     results.push({
       fieldName: "Voyage To (vs Port of Discharge)",
       lcValue: portOfDischarge,
@@ -793,14 +794,14 @@ function crossValidateBlVsInsurance(bl: LcDocument, insurance: LcDocument, resul
   }
 }
 
-function crossValidateCooVsPhyto(coo: LcDocument, phyto: LcDocument, results: CheckResultItem[]): void {
+function crossValidateCooVsPhyto(coo: LcDocument, phyto: LcDocument, results: CheckResultItem[], locale: string): void {
   const label = crossDocLabel("certificate_of_origin", "phytosanitary_certificate");
 
   // 1. Origin country match
   const cooOrigin = coo.fields.originCountry || "";
   const phytoOrigin = phyto.fields.originCountry || "";
   if (cooOrigin && phytoOrigin) {
-    const coResult = compareCountryOfOrigin(cooOrigin, phytoOrigin);
+    const coResult = compareCountryOfOrigin(cooOrigin, phytoOrigin, locale);
     results.push({
       fieldName: "Country of Origin",
       lcValue: cooOrigin,
@@ -817,7 +818,7 @@ function crossValidateCooVsPhyto(coo: LcDocument, phyto: LcDocument, results: Ch
   const cooExporter = coo.fields.exporterName || "";
   const phytoExporter = phyto.fields.exporterName || "";
   if (cooExporter && phytoExporter) {
-    const nameResult = compareNames(cooExporter, phytoExporter);
+    const nameResult = compareNames(cooExporter, phytoExporter, locale);
     results.push({
       fieldName: "Exporter Name",
       lcValue: cooExporter,
@@ -831,13 +832,13 @@ function crossValidateCooVsPhyto(coo: LcDocument, phyto: LcDocument, results: Ch
   }
 }
 
-function crossValidateCooVsEudr(coo: LcDocument, eudr: LcDocument, results: CheckResultItem[]): void {
+function crossValidateCooVsEudr(coo: LcDocument, eudr: LcDocument, results: CheckResultItem[], locale: string): void {
   const label = crossDocLabel("certificate_of_origin", "eudr_declaration");
 
   const cooOrigin = coo.fields.originCountry || "";
   const eudrOrigin = eudr.fields.countryOfOrigin || "";
   if (cooOrigin && eudrOrigin) {
-    const coResult = compareCountryOfOrigin(cooOrigin, eudrOrigin);
+    const coResult = compareCountryOfOrigin(cooOrigin, eudrOrigin, locale);
     results.push({
       fieldName: "Country of Origin",
       lcValue: cooOrigin,
@@ -851,7 +852,7 @@ function crossValidateCooVsEudr(coo: LcDocument, eudr: LcDocument, results: Chec
   }
 }
 
-function crossValidateEudrVsTraceability(eudr: LcDocument, trace: LcDocument, results: CheckResultItem[]): void {
+function crossValidateEudrVsTraceability(eudr: LcDocument, trace: LcDocument, results: CheckResultItem[], locale: string): void {
   const label = crossDocLabel("eudr_declaration", "traceability_certificate");
 
   // 1. GPS coordinates
@@ -868,7 +869,7 @@ function crossValidateEudrVsTraceability(eudr: LcDocument, trace: LcDocument, re
         documentType: label,
         severity: "GREEN",
         ucpRule: "EU Reg. 2023/1115 Art. 9",
-        explanation: "GPS coordinates match between EUDR declaration and traceability certificate.",
+        explanation: t("lc.gps_match", locale),
         checkCategory: "cross_document",
       });
     } else if (eudrNorm.includes(traceNorm) || traceNorm.includes(eudrNorm)) {
@@ -879,7 +880,7 @@ function crossValidateEudrVsTraceability(eudr: LcDocument, trace: LcDocument, re
         documentType: label,
         severity: "AMBER",
         ucpRule: "EU Reg. 2023/1115 Art. 9",
-        explanation: "GPS coordinates partially overlap. Verify geolocation data is consistent.",
+        explanation: t("lc.gps_partial", locale),
         checkCategory: "cross_document",
       });
     } else {
@@ -890,7 +891,7 @@ function crossValidateEudrVsTraceability(eudr: LcDocument, trace: LcDocument, re
         documentType: label,
         severity: "RED",
         ucpRule: "EU Reg. 2023/1115 Art. 9",
-        explanation: "GPS coordinates do NOT match between EUDR declaration and traceability certificate. Geolocation data is inconsistent.",
+        explanation: t("lc.gps_mismatch", locale),
         checkCategory: "cross_document",
       });
     }
@@ -900,7 +901,7 @@ function crossValidateEudrVsTraceability(eudr: LcDocument, trace: LcDocument, re
   const eudrCountry = eudr.fields.countryOfOrigin || "";
   const traceCountry = trace.fields.countryOfOrigin || "";
   if (eudrCountry && traceCountry) {
-    const coResult = compareCountryOfOrigin(eudrCountry, traceCountry);
+    const coResult = compareCountryOfOrigin(eudrCountry, traceCountry, locale);
     results.push({
       fieldName: "Country of Origin",
       lcValue: eudrCountry,
@@ -928,7 +929,7 @@ function crossValidateEudrVsTraceability(eudr: LcDocument, trace: LcDocument, re
         documentType: label,
         severity: "GREEN",
         ucpRule: "EU Reg. 2023/1115 Art. 9",
-        explanation: "Plot identifiers match exactly between EUDR declaration and traceability certificate.",
+        explanation: t("lc.plots_match", locale),
         checkCategory: "cross_document",
       });
     } else if (intersection.length > 0) {
@@ -939,7 +940,7 @@ function crossValidateEudrVsTraceability(eudr: LcDocument, trace: LcDocument, re
         documentType: label,
         severity: "AMBER",
         ucpRule: "EU Reg. 2023/1115 Art. 9",
-        explanation: `Plot identifiers partially overlap (${intersection.length} common out of ${eudrSet.size} EUDR / ${traceSet.size} Traceability). Verify all plots are accounted for.`,
+        explanation: t("lc.plots_partial", locale, { intersection: intersection.length, eudrSize: eudrSet.size, traceSize: traceSet.size }),
         checkCategory: "cross_document",
       });
     } else {
@@ -950,20 +951,20 @@ function crossValidateEudrVsTraceability(eudr: LcDocument, trace: LcDocument, re
         documentType: label,
         severity: "RED",
         ucpRule: "EU Reg. 2023/1115 Art. 9",
-        explanation: "Plot identifiers have NO overlap between EUDR declaration and traceability certificate. Data is inconsistent.",
+        explanation: t("lc.plots_mismatch", locale),
         checkCategory: "cross_document",
       });
     }
   }
 }
 
-function crossValidateQualityVsWeight(quality: LcDocument, weight: LcDocument, results: CheckResultItem[]): void {
+function crossValidateQualityVsWeight(quality: LcDocument, weight: LcDocument, results: CheckResultItem[], locale: string): void {
   const label = crossDocLabel("quality_certificate", "weight_certificate");
 
   const qualityGoods = quality.fields.goodsDescription || "";
   const weightGoods = weight.fields.goodsDescription || "";
   if (qualityGoods && weightGoods) {
-    const gdResult = compareGoodsDescription(qualityGoods, weightGoods);
+    const gdResult = compareGoodsDescription(qualityGoods, weightGoods, locale);
     results.push({
       fieldName: "Goods Description",
       lcValue: qualityGoods,
@@ -977,7 +978,7 @@ function crossValidateQualityVsWeight(quality: LcDocument, weight: LcDocument, r
   }
 }
 
-function crossValidateBlVsWeight(bl: LcDocument, weight: LcDocument, results: CheckResultItem[]): void {
+function crossValidateBlVsWeight(bl: LcDocument, weight: LcDocument, results: CheckResultItem[], locale: string): void {
   const label = crossDocLabel("bill_of_lading", "weight_certificate");
 
   // 1. Vessel name match
@@ -992,7 +993,7 @@ function crossValidateBlVsWeight(bl: LcDocument, weight: LcDocument, results: Ch
         documentType: label,
         severity: "GREEN",
         ucpRule: "UCP 600 Art. 14(d)",
-        explanation: "Vessel name matches between B/L and weight certificate.",
+        explanation: t("lc.vessel_match", locale),
         checkCategory: "cross_document",
       });
     } else {
@@ -1003,7 +1004,7 @@ function crossValidateBlVsWeight(bl: LcDocument, weight: LcDocument, results: Ch
         documentType: label,
         severity: "RED",
         ucpRule: "UCP 600 Art. 14(d)",
-        explanation: `Vessel name mismatch: B/L shows "${blVessel}", weight certificate shows "${wtVessel}". Bank will reject.`,
+        explanation: t("lc.vessel_mismatch", locale, { blVessel, wtVessel }),
         checkCategory: "cross_document",
       });
     }
@@ -1013,11 +1014,11 @@ function crossValidateBlVsWeight(bl: LcDocument, weight: LcDocument, results: Ch
   const blGoods = bl.fields.goodsDescription || "";
   const wtGoods = weight.fields.goodsDescription || "";
   if (blGoods && wtGoods) {
-    const gdResult = compareGoodsDescription(blGoods, wtGoods);
+    const gdResult = compareGoodsDescription(blGoods, wtGoods, locale);
     // Relax: B/L may use general terms
     const severity = gdResult.severity === "RED" ? "AMBER" as CheckSeverity : gdResult.severity;
     const explanation = gdResult.severity === "RED"
-      ? "Goods description differs between B/L and weight certificate. B/L may use general terms — review if descriptions conflict."
+      ? t("lc.bl_weight_goods_relaxed", locale)
       : gdResult.explanation;
     results.push({
       fieldName: "Goods Description",
@@ -1052,7 +1053,7 @@ function docTypeLabel(dt: string): string {
   return labels[dt] || dt;
 }
 
-export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { results: CheckResultItem[]; summary: LcCheckSummary } {
+export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[], locale: string = "en"): { results: CheckResultItem[]; summary: LcCheckSummary } {
   const results: CheckResultItem[] = [];
   const tolerancePct = lcFields.tolerancePercent ?? 5;
 
@@ -1064,7 +1065,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
       documentType: "LC Terms",
       severity: "AMBER",
       ucpRule: "General",
-      explanation: "LC reference number is empty. Ensure this is populated for traceability.",
+      explanation: t("lc.lc_ref_empty", locale),
       checkCategory: "lc_validation",
     });
   }
@@ -1074,7 +1075,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
 
     if (doc.documentType === "commercial_invoice") {
       const beneficiary = doc.fields.beneficiaryName || "";
-      const nameResult = compareNames(lcFields.beneficiaryName, beneficiary);
+      const nameResult = compareNames(lcFields.beneficiaryName, beneficiary, locale);
       results.push({
         fieldName: "Beneficiary Name",
         lcValue: lcFields.beneficiaryName,
@@ -1096,7 +1097,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
           documentType: dtLabel,
           severity: "RED",
           ucpRule: "UCP 600 Art. 18(a)",
-          explanation: `Invoice currency (${invCurrency}) does not match LC currency (${lcCurrency}). Bank will reject.`,
+          explanation: t("lc.currency_mismatch", locale, { invCurrency, lcCurrency }),
           checkCategory: "lc_validation",
         });
       } else if (invCurrency) {
@@ -1107,17 +1108,17 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
           documentType: dtLabel,
           severity: "GREEN",
           ucpRule: "UCP 600 Art. 18(a)",
-          explanation: "Currency matches LC terms.",
+          explanation: t("lc.currency_match", locale),
           checkCategory: "lc_validation",
         });
       }
 
       const invAmount = parseNumber(doc.fields.totalAmount || "");
-      results.push(compareAmounts(lcFields.totalAmount, invAmount, dtLabel));
+      results.push(compareAmounts(lcFields.totalAmount, invAmount, dtLabel, locale));
 
       const invQty = parseNumber(doc.fields.quantity || "");
       if (invQty > 0) {
-        results.push(compareQuantities(lcFields.quantity, invQty, dtLabel, tolerancePct));
+        results.push(compareQuantities(lcFields.quantity, invQty, dtLabel, locale, tolerancePct));
       }
 
       const invGoods = (doc.fields.goodsDescription || "").trim();
@@ -1132,7 +1133,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
             documentType: dtLabel,
             severity: "GREEN",
             ucpRule: "UCP 600 Art. 18(c)",
-            explanation: "Goods description on invoice corresponds exactly with LC.",
+            explanation: t("lc.goods_invoice_exact", locale),
             checkCategory: "lc_validation",
           });
         } else if (docGoods.includes(lcGoods) || lcGoods.includes(docGoods)) {
@@ -1143,7 +1144,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
             documentType: dtLabel,
             severity: "GREEN",
             ucpRule: "UCP 600 Art. 18(c)",
-            explanation: "Goods description on invoice substantially corresponds with LC terms.",
+            explanation: t("lc.goods_invoice_substantial", locale),
             checkCategory: "lc_validation",
           });
         } else {
@@ -1159,7 +1160,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
               documentType: dtLabel,
               severity: "AMBER",
               ucpRule: "UCP 600 Art. 18(c)",
-              explanation: "Goods description partially matches LC terms. Invoice must correspond with LC — review wording carefully.",
+              explanation: t("lc.goods_invoice_partial", locale),
               checkCategory: "lc_validation",
             });
           } else {
@@ -1170,7 +1171,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
               documentType: dtLabel,
               severity: "RED",
               ucpRule: "UCP 600 Art. 18(c)",
-              explanation: "Goods description on invoice does not correspond with LC terms. Bank will reject — Art. 18(c) requires the invoice description to correspond with the credit.",
+              explanation: t("lc.goods_invoice_mismatch", locale),
               checkCategory: "lc_validation",
             });
           }
@@ -1187,7 +1188,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
           documentType: dtLabel,
           severity: "RED",
           ucpRule: "UCP 600 Art. 18(c)",
-          explanation: `Invoice Incoterms (${doc.fields.incoterms}) do not match LC Incoterms (${lcFields.incoterms}). This is a critical discrepancy — bank will reject.`,
+          explanation: t("lc.incoterms_mismatch", locale, { docIncoterms: doc.fields.incoterms, lcIncoterms: lcFields.incoterms }),
           checkCategory: "lc_validation",
         });
       } else if (invIncoterms) {
@@ -1198,7 +1199,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
           documentType: dtLabel,
           severity: "GREEN",
           ucpRule: "UCP 600 Art. 18(c)",
-          explanation: "Incoterms on invoice match LC terms.",
+          explanation: t("lc.incoterms_match", locale),
           checkCategory: "lc_validation",
         });
       }
@@ -1207,7 +1208,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
     if (doc.documentType === "bill_of_lading") {
       const shipperName = doc.fields.shipperName || "";
       if (shipperName) {
-        const nameResult = compareNames(lcFields.beneficiaryName, shipperName);
+        const nameResult = compareNames(lcFields.beneficiaryName, shipperName, locale);
         results.push({
           fieldName: "Shipper Name (vs Beneficiary)",
           lcValue: lcFields.beneficiaryName,
@@ -1231,7 +1232,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
             documentType: dtLabel,
             severity: "GREEN",
             ucpRule: "UCP 600 Art. 20(a)(ii)",
-            explanation: "Port of loading matches LC terms.",
+            explanation: t("lc.port_loading_match", locale),
             checkCategory: "lc_validation",
           });
         } else if (blPort.includes(lcPort) || lcPort.includes(blPort)) {
@@ -1242,7 +1243,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
             documentType: dtLabel,
             severity: "AMBER",
             ucpRule: "UCP 600 Art. 20(a)(ii)",
-            explanation: "Port of loading partially matches. Verify the port name is consistent with LC terms.",
+            explanation: t("lc.port_loading_partial", locale),
             checkCategory: "lc_validation",
           });
         } else {
@@ -1253,7 +1254,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
             documentType: dtLabel,
             severity: "RED",
             ucpRule: "UCP 600 Art. 20(a)(ii)",
-            explanation: "Port of loading on B/L does not match LC. Bank will reject.",
+            explanation: t("lc.port_loading_mismatch", locale),
             checkCategory: "lc_validation",
           });
         }
@@ -1270,7 +1271,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
             documentType: dtLabel,
             severity: "GREEN",
             ucpRule: "UCP 600 Art. 20(a)(ii)",
-            explanation: "Port of discharge matches LC terms.",
+            explanation: t("lc.port_discharge_match", locale),
             checkCategory: "lc_validation",
           });
         } else if (blPortDischarge.includes(lcPortDischarge) || lcPortDischarge.includes(blPortDischarge)) {
@@ -1281,7 +1282,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
             documentType: dtLabel,
             severity: "AMBER",
             ucpRule: "UCP 600 Art. 20(a)(ii)",
-            explanation: "Port of discharge partially matches. Verify consistency.",
+            explanation: t("lc.port_discharge_partial", locale),
             checkCategory: "lc_validation",
           });
         } else {
@@ -1292,7 +1293,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
             documentType: dtLabel,
             severity: "RED",
             ucpRule: "UCP 600 Art. 20(a)(ii)",
-            explanation: "Port of discharge on B/L does not match LC. Bank will reject.",
+            explanation: t("lc.port_discharge_mismatch", locale),
             checkCategory: "lc_validation",
           });
         }
@@ -1311,7 +1312,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
               documentType: dtLabel,
               severity: "GREEN",
               ucpRule: "UCP 600 Art. 14(c)",
-              explanation: "B/L shipped date is on or before LC latest shipment date.",
+              explanation: t("lc.shipment_date_ok", locale),
               checkCategory: "lc_validation",
             });
           } else {
@@ -1322,7 +1323,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
               documentType: dtLabel,
               severity: "RED",
               ucpRule: "UCP 600 Art. 14(c)",
-              explanation: `B/L shipped date (${shippedDate}) is AFTER LC latest shipment date (${lcFields.latestShipmentDate}). Late shipment — bank will reject.`,
+              explanation: t("lc.shipment_date_late", locale, { shippedDate, latestDate: lcFields.latestShipmentDate }),
               checkCategory: "lc_validation",
             });
           }
@@ -1337,7 +1338,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
               documentType: dtLabel,
               severity: "RED",
               ucpRule: "UCP 600 Art. 14(c)",
-              explanation: `Presentation deadline exceeded. ${daysSinceShipment} days have passed since B/L date. UCP 600 Art. 14(c) requires presentation within 21 calendar days of shipment.`,
+              explanation: t("lc.presentation_exceeded", locale, { days: daysSinceShipment }),
               checkCategory: "lc_validation",
             });
           } else {
@@ -1348,7 +1349,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
               documentType: dtLabel,
               severity: "GREEN",
               ucpRule: "UCP 600 Art. 14(c)",
-              explanation: `${daysSinceShipment} days since shipment — within 21-day presentation period.`,
+              explanation: t("lc.presentation_ok", locale, { days: daysSinceShipment }),
               checkCategory: "lc_validation",
             });
           }
@@ -1364,21 +1365,21 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
           documentType: dtLabel,
           severity: "AMBER",
           ucpRule: "General",
-          explanation: "B/L number is empty. Ensure this reference is populated for document tracking.",
+          explanation: t("lc.bl_number_empty", locale),
           checkCategory: "lc_validation",
         });
       }
 
       const blQty = parseNumber(doc.fields.quantity || "");
       if (blQty > 0) {
-        results.push(compareQuantities(lcFields.quantity, blQty, dtLabel, tolerancePct));
+        results.push(compareQuantities(lcFields.quantity, blQty, dtLabel, locale, tolerancePct));
       }
     }
 
     if (doc.documentType === "certificate_of_origin") {
       const exporterName = doc.fields.exporterName || "";
       if (exporterName) {
-        const nameResult = compareNames(lcFields.beneficiaryName, exporterName);
+        const nameResult = compareNames(lcFields.beneficiaryName, exporterName, locale);
         results.push({
           fieldName: "Exporter Name (vs Beneficiary)",
           lcValue: lcFields.beneficiaryName,
@@ -1402,7 +1403,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
             documentType: dtLabel,
             severity: "GREEN",
             ucpRule: "UCP 600 Art. 14(d)",
-            explanation: "Country of origin on CoO matches LC.",
+            explanation: t("lc.coo_origin_match", locale),
             checkCategory: "lc_validation",
           });
         } else {
@@ -1413,7 +1414,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
             documentType: dtLabel,
             severity: "RED",
             ucpRule: "UCP 600 Art. 14(d)",
-            explanation: "Country of origin on CoO does not match LC. Bank will reject.",
+            explanation: t("lc.coo_origin_mismatch", locale),
             checkCategory: "lc_validation",
           });
         }
@@ -1423,7 +1424,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
     if (doc.documentType === "phytosanitary_certificate") {
       const exporterName = doc.fields.exporterName || "";
       if (exporterName) {
-        const nameResult = compareNames(lcFields.beneficiaryName, exporterName);
+        const nameResult = compareNames(lcFields.beneficiaryName, exporterName, locale);
         results.push({
           fieldName: "Exporter Name (vs Beneficiary)",
           lcValue: lcFields.beneficiaryName,
@@ -1440,7 +1441,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
     if (doc.documentType === "packing_list") {
       const plQty = parseNumber(doc.fields.quantity || "");
       if (plQty > 0) {
-        results.push(compareQuantities(lcFields.quantity, plQty, dtLabel, tolerancePct));
+        results.push(compareQuantities(lcFields.quantity, plQty, dtLabel, locale, tolerancePct));
       }
     }
 
@@ -1455,7 +1456,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
           documentType: dtLabel,
           severity: "AMBER",
           ucpRule: "General",
-          explanation: "CHED reference format appears incorrect. Expected: GBCHDYYYY.NNNNNNN (e.g. GBCHD2026.0012345).",
+          explanation: t("lc.ched_format_invalid", locale),
           checkCategory: "lc_validation",
         });
       } else {
@@ -1466,7 +1467,7 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
           documentType: dtLabel,
           severity: "GREEN",
           ucpRule: "General",
-          explanation: "CHED reference format is valid.",
+          explanation: t("lc.ched_format_valid", locale),
           checkCategory: "lc_validation",
         });
       }
@@ -1480,11 +1481,11 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
   const eudr = documents.find(d => d.documentType === "eudr_declaration");
   const cbam = documents.find(d => d.documentType === "cbam_declaration");
 
-  if (insurance) validateLcVsInsurance(lcFields, insurance, results);
-  if (quality) validateLcVsQuality(lcFields, quality, results);
-  if (weight) validateLcVsWeight(lcFields, weight, results);
-  if (eudr) validateLcVsEudr(lcFields, eudr, results);
-  if (cbam) validateLcVsCbam(lcFields, cbam, results);
+  if (insurance) validateLcVsInsurance(lcFields, insurance, results, locale);
+  if (quality) validateLcVsQuality(lcFields, quality, results, locale);
+  if (weight) validateLcVsWeight(lcFields, weight, results, locale);
+  if (eudr) validateLcVsEudr(lcFields, eudr, results, locale);
+  if (cbam) validateLcVsCbam(lcFields, cbam, results, locale);
 
   // ── Phase 2: Cross-Document Validations ──
   const invoice = documents.find(d => d.documentType === "commercial_invoice");
@@ -1494,16 +1495,16 @@ export function runLcCrossCheck(lcFields: LcFields, documents: LcDocument[]): { 
   const pl = documents.find(d => d.documentType === "packing_list");
   const trace = documents.find(d => d.documentType === "traceability_certificate");
 
-  if (invoice && bl) crossValidateInvoiceVsBl(invoice, bl, tolerancePct, results);
-  if (invoice && pl) crossValidateInvoiceVsPackingList(invoice, pl, tolerancePct, results);
-  if (bl && pl) crossValidateBlVsPackingList(bl, pl, tolerancePct, results);
-  if (invoice && insurance) crossValidateInvoiceVsInsurance(invoice, insurance, results);
-  if (bl && insurance) crossValidateBlVsInsurance(bl, insurance, results);
-  if (coo && phyto) crossValidateCooVsPhyto(coo, phyto, results);
-  if (coo && eudr) crossValidateCooVsEudr(coo, eudr, results);
-  if (eudr && trace) crossValidateEudrVsTraceability(eudr, trace, results);
-  if (quality && weight) crossValidateQualityVsWeight(quality, weight, results);
-  if (bl && weight) crossValidateBlVsWeight(bl, weight, results);
+  if (invoice && bl) crossValidateInvoiceVsBl(invoice, bl, tolerancePct, results, locale);
+  if (invoice && pl) crossValidateInvoiceVsPackingList(invoice, pl, tolerancePct, results, locale);
+  if (bl && pl) crossValidateBlVsPackingList(bl, pl, tolerancePct, results, locale);
+  if (invoice && insurance) crossValidateInvoiceVsInsurance(invoice, insurance, results, locale);
+  if (bl && insurance) crossValidateBlVsInsurance(bl, insurance, results, locale);
+  if (coo && phyto) crossValidateCooVsPhyto(coo, phyto, results, locale);
+  if (coo && eudr) crossValidateCooVsEudr(coo, eudr, results, locale);
+  if (eudr && trace) crossValidateEudrVsTraceability(eudr, trace, results, locale);
+  if (quality && weight) crossValidateQualityVsWeight(quality, weight, results, locale);
+  if (bl && weight) crossValidateBlVsWeight(bl, weight, results, locale);
 
   // ── Summary ──
   const matches = results.filter(r => r.severity === "GREEN").length;
@@ -1530,43 +1531,43 @@ export function computeLcHash(lcFields: LcFields, documents: LcDocument[], resul
   return createHash("sha256").update(JSON.stringify(stableObj)).digest("hex");
 }
 
-export function generateCorrectionEmail(lcFields: LcFields, results: CheckResultItem[]): { email: string; whatsapp: string } {
+export function generateCorrectionEmail(lcFields: LcFields, results: CheckResultItem[], locale: string = "en"): { email: string; whatsapp: string } {
   const criticals = results.filter(r => r.severity === "RED");
   if (criticals.length === 0) {
     return { email: "", whatsapp: "" };
   }
 
   const emailLines: string[] = [];
-  emailLines.push(`Subject: URGENT \u2014 Document Discrepancies Found \u2014 Please Amend`);
+  emailLines.push(t("lc.correction_subject", locale));
   emailLines.push("");
-  emailLines.push(`Dear ${lcFields.beneficiaryName},`);
+  emailLines.push(t("lc.correction_greeting", locale, { beneficiary: lcFields.beneficiaryName }));
   emailLines.push("");
-  emailLines.push(`We have reviewed the documents submitted against LC reference ${lcFields.lcReference || "(not specified)"} and found the following critical discrepancies that will cause the bank to reject the presentation:`);
+  emailLines.push(t("lc.correction_intro", locale, { lcRef: lcFields.lcReference || "(not specified)" }));
   emailLines.push("");
   criticals.forEach((c, i) => {
     emailLines.push(`${i + 1}. ${c.documentType} \u2014 ${c.fieldName}`);
-    emailLines.push(`   Your document shows: ${c.documentValue}`);
-    emailLines.push(`   The LC requires: ${c.lcValue}`);
-    emailLines.push(`   Rule: ${c.ucpRule}`);
-    emailLines.push(`   Please amend and reissue.`);
+    emailLines.push(t("lc.correction_item_doc_shows", locale, { value: c.documentValue }));
+    emailLines.push(t("lc.correction_item_lc_requires", locale, { value: c.lcValue }));
+    emailLines.push(t("lc.correction_item_rule", locale, { rule: c.ucpRule }));
+    emailLines.push(t("lc.correction_item_amend", locale));
     emailLines.push("");
   });
-  emailLines.push("Please correct these discrepancies and resubmit the amended documents as soon as possible.");
+  emailLines.push(t("lc.correction_closing", locale));
   emailLines.push("");
-  emailLines.push("Best regards");
+  emailLines.push(t("lc.correction_regards", locale));
 
   const waLines: string[] = [];
-  waLines.push(`*URGENT \u2014 Document Discrepancies*`);
+  waLines.push(t("lc.correction_wa_header", locale));
   waLines.push(`LC Ref: ${lcFields.lcReference || "(not specified)"}`);
   waLines.push("");
   criticals.forEach((c, i) => {
     waLines.push(`${i + 1}. *${c.documentType}* \u2014 ${c.fieldName}`);
-    waLines.push(`   Shows: ${c.documentValue}`);
-    waLines.push(`   LC requires: ${c.lcValue}`);
-    waLines.push(`   _Please amend and reissue._`);
+    waLines.push(t("lc.correction_wa_shows", locale, { value: c.documentValue }));
+    waLines.push(t("lc.correction_wa_lc_requires", locale, { value: c.lcValue }));
+    waLines.push(t("lc.correction_wa_amend", locale));
   });
   waLines.push("");
-  waLines.push("Please correct and resend ASAP.");
+  waLines.push(t("lc.correction_wa_closing", locale));
 
   return { email: emailLines.join("\n"), whatsapp: waLines.join("\n") };
 }

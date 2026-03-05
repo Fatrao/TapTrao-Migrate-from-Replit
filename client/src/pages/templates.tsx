@@ -1,23 +1,25 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { AppShell } from "@/components/AppShell";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Template } from "@shared/schema";
+import type { TFunction } from "i18next";
 
 type StaleInfo = { stale: boolean };
 
-function relativeTime(date: string | Date) {
+function relativeTime(date: string | Date, t: TFunction) {
   const ms = Date.now() - new Date(date).getTime();
   const mins = Math.floor(ms / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return t("time.justNow");
+  if (mins < 60) return t("time.minsAgo", { mins });
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
+  if (hrs < 24) return t("time.hoursAgo", { hrs });
   const days = Math.floor(hrs / 24);
-  if (days < 30) return `${days}d ago`;
-  return new Date(date).toLocaleDateString();
+  if (days < 30) return t("time.daysAgo", { days });
+  return t("time.monthsAgo", { months: Math.floor(days / 30) });
 }
 
 function originAvatar(iso2: string) {
@@ -47,11 +49,15 @@ function TemplateCard({
   staleInfo,
   onDelete,
   onUse,
+  t,
+  tc,
 }: {
   template: Template;
   staleInfo: StaleInfo | undefined;
   onDelete: (id: string) => void;
   onUse: (template: Template) => void;
+  t: TFunction;
+  tc: TFunction;
 }) {
   const isStale = staleInfo?.stale ?? false;
   const snapshot = template.snapshotJson as any;
@@ -88,8 +94,8 @@ function TemplateCard({
       </div>
 
       <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)", marginTop: 8 }}>
-        Used {template.timesUsed} time{template.timesUsed !== 1 ? "s" : ""}
-        {template.lastUsedAt ? ` · Last used ${relativeTime(template.lastUsedAt)}` : ""}
+        {t("card.usedCount", { count: template.timesUsed })}
+        {template.lastUsedAt ? t("card.lastUsed", { time: relativeTime(template.lastUsedAt, t) }) : ""}
       </div>
 
       {isStale && (
@@ -103,7 +109,7 @@ function TemplateCard({
           data-testid={`stale-warning-${template.id}`}
         >
           <span style={{ fontSize: 13, color: "var(--amber)", fontWeight: 600 }}>
-            Regulations may have changed since this template was last used
+            {t("card.staleWarning")}
           </span>
         </div>
       )}
@@ -124,7 +130,7 @@ function TemplateCard({
           }}
           data-testid={`button-use-template-${template.id}`}
         >
-          Use template →
+          {t("card.useTemplate")}
         </button>
         <button
           onClick={() => onDelete(template.id)}
@@ -140,7 +146,7 @@ function TemplateCard({
           }}
           data-testid={`button-delete-template-${template.id}`}
         >
-          Delete
+          {tc("button.delete")}
         </button>
       </div>
     </div>
@@ -148,6 +154,8 @@ function TemplateCard({
 }
 
 export default function Templates() {
+  const { t } = useTranslation("templates");
+  const { t: tc } = useTranslation("common");
   usePageTitle("Templates", "Your saved trade corridors for quick reuse");
   const [, navigate] = useLocation();
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -162,14 +170,14 @@ export default function Templates() {
       if (!templatesList || templatesList.length === 0) return {};
       const results: Record<string, StaleInfo> = {};
       await Promise.all(
-        templatesList.map(async (t) => {
+        templatesList.map(async (tmpl) => {
           try {
-            const res = await fetch(`/api/templates/${t.id}/stale-check`, { credentials: "include" });
+            const res = await fetch(`/api/templates/${tmpl.id}/stale-check`, { credentials: "include" });
             if (res.ok) {
-              results[t.id] = await res.json();
+              results[tmpl.id] = await res.json();
             }
           } catch {
-            results[t.id] = { stale: false };
+            results[tmpl.id] = { stale: false };
           }
         })
       );
@@ -214,10 +222,10 @@ export default function Templates() {
             }}
             data-testid="text-templates-title"
           >
-            Templates
+            {t("title")}
           </h1>
           <p style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t2)", marginTop: 6 }}>
-            {count} saved template{count !== 1 ? "s" : ""}
+            {t("subtitle", { count })}
           </p>
 
           {isLoading && (
@@ -247,20 +255,22 @@ export default function Templates() {
               data-testid="empty-state"
             >
               <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.6 }}>
-                No templates saved yet. Complete a lookup and save it as a template from the TwinLog Trail.
+                {t("empty")}
               </p>
             </div>
           )}
 
           {count > 0 && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 24 }}>
-              {templatesList!.map((t) => (
+              {templatesList!.map((tmpl) => (
                 <TemplateCard
-                  key={t.id}
-                  template={t}
-                  staleInfo={staleQueries.data?.[t.id]}
+                  key={tmpl.id}
+                  template={tmpl}
+                  staleInfo={staleQueries.data?.[tmpl.id]}
                   onDelete={(id) => setDeleteId(id)}
                   onUse={handleUse}
+                  t={t}
+                  tc={tc}
                 />
               ))}
             </div>
@@ -284,10 +294,10 @@ export default function Templates() {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 18, color: "var(--t1)", marginBottom: 8 }}>
-              Delete Template
+              {t("deleteModal.title")}
             </h3>
             <p style={{ fontSize: 13, color: "var(--t2)", marginBottom: 20, lineHeight: 1.5 }}>
-              Are you sure you want to delete this template? This cannot be undone.
+              {t("deleteModal.body")}
             </p>
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
               <button
@@ -298,7 +308,7 @@ export default function Templates() {
                 }}
                 data-testid="button-cancel-delete"
               >
-                Cancel
+                {tc("button.cancel")}
               </button>
               <button
                 onClick={() => deleteId && deleteMutation.mutate(deleteId)}
@@ -309,7 +319,7 @@ export default function Templates() {
                 }}
                 data-testid="button-confirm-delete"
               >
-                {deleteMutation.isPending ? "Deleting..." : "Delete"}
+                {deleteMutation.isPending ? t("deleteModal.deleting") : tc("button.delete")}
               </button>
             </div>
           </div>

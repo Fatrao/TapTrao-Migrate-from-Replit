@@ -1,7 +1,8 @@
 import { Link } from "wouter";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { usePageTitle } from "@/hooks/use-page-title";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Globe } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 /* ═══════════════════════════════════════════
@@ -12,8 +13,10 @@ import { useAuth } from "@/hooks/use-auth";
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useAuth();
+  const { t, i18n } = useTranslation("home");
+  const isEn = i18n.language === "en";
 
-  usePageTitle("TapTrao — Trade Compliance for Commodity Traders");
+  usePageTitle(t("pageTitle"));
 
   return (
     <div className="hp-page" style={{ fontFamily: "var(--fb)", background: "var(--bg)", color: "var(--t1)", minHeight: "100vh" }}>
@@ -34,13 +37,27 @@ export default function Home() {
 
         {/* Desktop nav links */}
         <div className="hidden md:flex" style={{ gap: 28 }}>
-          <a href="#how" style={{ fontSize: 13, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>How It Works</a>
-          <a href="#validation" style={{ fontSize: 13, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>Validation</a>
-          <a href="#pricing" style={{ fontSize: 13, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>Pricing</a>
+          <a href="#how" style={{ fontSize: 13, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.howItWorks")}</a>
+          <a href="#validation" style={{ fontSize: 13, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.validation")}</a>
+          <a href="#pricing" style={{ fontSize: 13, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.pricing")}</a>
         </div>
 
         {/* Desktop CTA */}
         <div className="hidden md:flex" style={{ alignItems: "center", gap: 12 }}>
+          <button
+            onClick={() => i18n.changeLanguage(isEn ? "fr" : "en")}
+            style={{
+              display: "flex", alignItems: "center", gap: 6,
+              background: "none", border: "1px solid rgba(0,0,0,0.12)",
+              borderRadius: 20, padding: "6px 14px", cursor: "pointer",
+              fontSize: 13, fontWeight: 500, color: "var(--t2)",
+              fontFamily: "var(--fb)",
+            }}
+            title={isEn ? "Passer en français" : "Switch to English"}
+          >
+            <Globe size={14} />
+            {isEn ? "FR" : "EN"}
+          </button>
           {isAuthenticated ? (
             <Link href="/trades" style={{
               padding: "9px 22px", borderRadius: 20, border: "none",
@@ -48,7 +65,7 @@ export default function Home() {
               fontFamily: "var(--fb)", fontSize: 14, fontWeight: 600,
               textDecoration: "none", cursor: "pointer",
             }}>
-              My Trades
+              {t("nav.myTrades")}
             </Link>
           ) : (
             <Link href="/lookup" style={{
@@ -57,7 +74,7 @@ export default function Home() {
               fontFamily: "var(--fb)", fontSize: 14, fontWeight: 600,
               textDecoration: "none", cursor: "pointer",
             }}>
-              Free Compliance Check
+              {t("nav.freeComplianceCheck")}
             </Link>
           )}
         </div>
@@ -79,20 +96,33 @@ export default function Home() {
           background: "#fff", padding: "24px 32px",
           display: "flex", flexDirection: "column", gap: 16,
         }}>
-          <a href="#how" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>How It Works</a>
-          <a href="#validation" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>Validation</a>
-          <a href="#pricing" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>Pricing</a>
+          <a href="#how" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>{t("nav.howItWorks")}</a>
+          <a href="#validation" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>{t("nav.validation")}</a>
+          <a href="#pricing" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>{t("nav.pricing")}</a>
+          <button
+            onClick={() => i18n.changeLanguage(isEn ? "fr" : "en")}
+            style={{
+              display: "flex", alignItems: "center", gap: 8,
+              background: "none", border: "1px solid rgba(0,0,0,0.12)",
+              borderRadius: 10, padding: "10px 16px", cursor: "pointer",
+              fontSize: 15, fontWeight: 500, color: "var(--t1)",
+              fontFamily: "var(--fb)",
+            }}
+          >
+            <Globe size={16} />
+            {isEn ? "Français" : "English"}
+          </button>
           <div style={{ borderTop: "1px solid var(--bg)", paddingTop: 16, display: "flex", flexDirection: "column", gap: 12 }}>
             {isAuthenticated ? (
               <Link href="/trades" onClick={() => setMobileMenuOpen(false)} style={{
                 padding: "12px 24px", borderRadius: 20, background: "var(--sage)", color: "#fff",
                 textAlign: "center", fontWeight: 600, textDecoration: "none", fontSize: 14,
-              }}>My Trades</Link>
+              }}>{t("nav.myTrades")}</Link>
             ) : (
               <Link href="/lookup" onClick={() => setMobileMenuOpen(false)} style={{
                 padding: "12px 24px", borderRadius: 20, background: "var(--sage)", color: "#fff",
                 textAlign: "center", fontWeight: 600, textDecoration: "none", fontSize: 14,
-              }}>Free Compliance Check</Link>
+              }}>{t("nav.freeComplianceCheck")}</Link>
             )}
           </div>
         </div>
@@ -127,13 +157,13 @@ export default function Home() {
             fontFamily: "var(--fd)", fontSize: 48, fontWeight: 600, color: "#fff",
             lineHeight: 1.15, marginBottom: 16, maxWidth: 700,
           }}>
-            De-risk your next shipment before spending.
+            {t("hero.heading")}
           </h1>
           <p style={{
             fontSize: 19, color: "rgba(255,255,255,.9)", lineHeight: 1.7,
             marginBottom: 32, maxWidth: 800, fontWeight: 500,
           }}>
-            Every document. Every regulation. Every corridor. Checked before you commit.
+            {t("hero.subheading")}
           </p>
 
           <div style={{ flex: 1, minHeight: 40 }} />
@@ -146,7 +176,7 @@ export default function Home() {
               cursor: "pointer", boxShadow: "0 6px 24px rgba(27,42,34,.4)",
               textDecoration: "none", display: "inline-block",
             }}>
-              Free Compliance Check &rarr;
+              {t("hero.ctaPrimary")}
             </Link>
             <a href="#validation" style={{
               padding: "16px 36px", borderRadius: 24, border: "none",
@@ -156,7 +186,7 @@ export default function Home() {
               boxShadow: "0 4px 16px rgba(0,0,0,.12)",
               textDecoration: "none", display: "inline-block",
             }}>
-              See Full Validation
+              {t("hero.ctaSecondary")}
             </a>
           </div>
         </div>
@@ -172,7 +202,7 @@ export default function Home() {
             fontSize: 14, fontWeight: 700, letterSpacing: 2.5,
             color: "#fff", marginBottom: 10,
           }}>
-            AFRICA &rarr; EU &middot; UK &middot; USA &middot; CANADA &middot; T&Uuml;RKIYE &middot; SWITZERLAND
+            {t("trustBar.corridors")}
           </div>
           <div style={{ fontSize: 32, letterSpacing: 8 }}>
             🇨🇮 🇬🇭 🇳🇬 🇰🇪 🇹🇿 🇪🇹{" "}
@@ -188,60 +218,42 @@ export default function Home() {
         padding: 60, boxShadow: "var(--shd)",
       }}>
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
-          The cost of getting it wrong
+          {t("costSection.heading")}
         </h2>
         <p style={{ fontSize: 16, color: "var(--t2)", marginBottom: 40, maxWidth: 500 }}>
-          A single document issue can cascade into thousands in losses.
+          {t("costSection.subheading")}
         </p>
 
         <div className="hp-cost-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 40 }}>
-          {[
-            { val: "$75\u2013$300/day", desc: "Demurrage while documents are on hold at port" },
-            { val: "$95\u2013$160", desc: "Bank fee for one LC discrepancy" },
-            { val: "$5,000", desc: "US ISF late-filing penalty per violation" },
-            { val: "$1,500+", desc: "Cascade cost from one missing document" },
-          ].map((c) => (
-            <div key={c.val} style={{ background: "var(--bg)", borderRadius: "var(--r)", padding: 24, textAlign: "center" }}>
-              <div style={{ fontFamily: "var(--fd)", fontSize: 22, fontWeight: 700, color: "var(--red)", marginBottom: 6 }}>{c.val}</div>
-              <div style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.5 }}>{c.desc}</div>
+          {(["demurrage", "bankFee", "isfPenalty", "cascadeCost"] as const).map((key) => (
+            <div key={key} style={{ background: "var(--bg)", borderRadius: "var(--r)", padding: 24, textAlign: "center" }}>
+              <div style={{ fontFamily: "var(--fd)", fontSize: 22, fontWeight: 700, color: "var(--red)", marginBottom: 6 }}>{t(`costSection.stats.${key}.value`)}</div>
+              <div style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.5 }}>{t(`costSection.stats.${key}.description`)}</div>
             </div>
           ))}
         </div>
 
         <div style={{ textAlign: "center", fontSize: 15, color: "var(--t2)", lineHeight: 1.8 }}>
-          A single bank rejection costs <b style={{ color: "var(--t1)" }}>$1,500 or more</b>. Full validation costs{" "}
-          <span style={{ fontFamily: "var(--fd)", fontSize: 28, fontWeight: 700, color: "var(--sage)" }}>$110</span>.
+          <span dangerouslySetInnerHTML={{ __html: t("costSection.summary", { amount: t("costSection.summaryAmount") }) }} />{" "}
+          <span style={{ fontFamily: "var(--fd)", fontSize: 28, fontWeight: 700, color: "var(--sage)" }}>{t("costSection.summaryValidationCost")}</span>.
         </div>
       </div>
 
       {/* ═══ HOW IT WORKS ═══ */}
       <section id="how" style={{ padding: "80px 60px" }}>
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
-          How It Works
+          {t("howItWorks.heading")}
         </h2>
         <p style={{ fontSize: 14, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
-          Knowledge. Action. Confidence.
+          {t("howItWorks.subheading")}
         </p>
 
         <div className="hp-steps-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
-          {[
-            {
-              num: "STEP 1", title: "Knowledge",
-              desc: "Enter your origin, destination, and commodity. TapTrao maps every regulation, required document, and compliance obligation for your corridor.",
-            },
-            {
-              num: "STEP 2", title: "Action",
-              desc: "Upload your trade documents. Our engine cross-validates every document against every other, checks LC terms, and flags mismatches before submission.",
-            },
-            {
-              num: "STEP 3", title: "Confidence",
-              desc: "Receive your Shield report with a compliance score, issue breakdown, and fix recommendations. Submit to the bank with confidence.",
-            },
-          ].map((s) => (
-            <div key={s.num} style={{ background: "#fff", borderRadius: "var(--r)", padding: 32, boxShadow: "var(--shd)" }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--sage-l)", letterSpacing: 1, marginBottom: 8 }}>{s.num}</div>
-              <h3 style={{ fontFamily: "var(--fd)", fontSize: 20, fontWeight: 600, marginBottom: 8 }}>{s.title}</h3>
-              <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.7 }}>{s.desc}</p>
+          {(["step1", "step2", "step3"] as const).map((stepKey) => (
+            <div key={stepKey} style={{ background: "#fff", borderRadius: "var(--r)", padding: 32, boxShadow: "var(--shd)" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--sage-l)", letterSpacing: 1, marginBottom: 8 }}>{t(`howItWorks.steps.${stepKey}.label`)}</div>
+              <h3 style={{ fontFamily: "var(--fd)", fontSize: 20, fontWeight: 600, marginBottom: 8 }}>{t(`howItWorks.steps.${stepKey}.title`)}</h3>
+              <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.7 }}>{t(`howItWorks.steps.${stepKey}.description`)}</p>
             </div>
           ))}
         </div>
@@ -253,10 +265,10 @@ export default function Home() {
         padding: 60, color: "#fff",
       }}>
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8, color: "#fff" }}>
-          Cross-Validation Report
+          {t("validationPreview.heading")}
         </h2>
         <p style={{ fontSize: 14, color: "rgba(255,255,255,.8)", marginBottom: 40, maxWidth: 500 }}>
-          Every document checked against every other. Every regulation mapped.
+          {t("validationPreview.subheading")}
         </p>
 
         <div style={{
@@ -276,20 +288,20 @@ export default function Home() {
 
           {/* Risk tags */}
           <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>LOW</span> Origin</span>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>LOW</span> Commodity</span>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--amber)", fontWeight: 600 }}>MED</span> Regulatory</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>LOW</span> {t("validationPreview.riskOrigin")}</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--sage-l)", fontWeight: 600 }}>LOW</span> {t("validationPreview.riskCommodity")}</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}><span style={{ color: "var(--amber)", fontWeight: 600 }}>MED</span> {t("validationPreview.riskRegulatory")}</span>
           </div>
 
           {/* Check items */}
           <div className="hp-check-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 16 }}>
             {[
-              { icon: "\u2713", label: "Certificate of Origin", status: "pass" },
-              { icon: "\u2713", label: "Phytosanitary Certificate", status: "pass" },
-              { icon: "\u2713", label: "Bill of Lading", status: "pass" },
-              { icon: "!", label: "Insurance \u2014 below 110% CIF", status: "warn" },
-              { icon: "\u2717", label: "Weight Certificate \u2014 missing", status: "fail" },
-              { icon: "\u2713", label: "Fumigation Certificate", status: "pass" },
+              { icon: "\u2713", labelKey: "certificateOfOrigin" as const, status: "pass" },
+              { icon: "\u2713", labelKey: "phytosanitaryCertificate" as const, status: "pass" },
+              { icon: "\u2713", labelKey: "billOfLading" as const, status: "pass" },
+              { icon: "!", labelKey: "insurance" as const, status: "warn" },
+              { icon: "\u2717", labelKey: "weightCertificate" as const, status: "fail" },
+              { icon: "\u2713", labelKey: "fumigationCertificate" as const, status: "pass" },
             ].map((c) => {
               const bg = c.status === "pass" ? "rgba(109,184,154,.1)"
                 : c.status === "warn" ? "rgba(196,136,42,.1)"
@@ -298,12 +310,12 @@ export default function Home() {
                 : c.status === "warn" ? "var(--amber)"
                 : "var(--red)";
               return (
-                <div key={c.label} style={{
+                <div key={c.labelKey} style={{
                   display: "flex", alignItems: "center", gap: 8,
                   padding: "8px 12px", borderRadius: 8,
                   fontSize: 13, fontWeight: 500, background: bg, color,
                 }}>
-                  {c.icon} {c.label}
+                  {c.icon} {t(`validationPreview.checkItems.${c.labelKey}`)}
                 </div>
               );
             })}
@@ -314,28 +326,19 @@ export default function Home() {
       {/* ═══ PRICING ═══ */}
       <section id="pricing" style={{ padding: "80px 60px" }}>
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
-          Pricing
+          {t("pricingSection.heading")}
         </h2>
         <p style={{ fontSize: 14, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
-          Simple, transparent. No subscription required.
+          {t("pricingSection.subheading")}
         </p>
 
         <div className="hp-pricing-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
-          {[
-            {
-              name: "Single Check", price: "$110", per: "per trade", featured: false,
-              feats: "Full cross-validation\nLC terms check\nEUDR + CBAM screening\nCompliance score + report\nFix recommendations",
-            },
-            {
-              name: "3-Pack", price: "$299", per: "$99.67 per trade", featured: true,
-              feats: "Everything in Single Check\nSave $31 per trade\nValid for 12 months\nPriority support",
-            },
-            {
-              name: "5-Pack", price: "$475", per: "$95 per trade", featured: false,
-              feats: "Everything in Single Check\nSave $75 total\nValid for 12 months\nPriority support\nDedicated onboarding",
-            },
-          ].map((plan) => (
-            <div key={plan.name} style={{
+          {([
+            { key: "single" as const, featured: false },
+            { key: "threePack" as const, featured: true },
+            { key: "fivePack" as const, featured: false },
+          ]).map((plan) => (
+            <div key={plan.key} style={{
               background: plan.featured ? "var(--dark)" : "#fff",
               color: plan.featured ? "#fff" : "var(--t1)",
               borderRadius: "var(--r)", padding: 32,
@@ -346,17 +349,17 @@ export default function Home() {
                 fontSize: 13, fontWeight: 600, letterSpacing: 1,
                 color: plan.featured ? "var(--sage-l)" : "var(--t3)",
                 marginBottom: 8, textTransform: "uppercase",
-              }}>{plan.name}</div>
-              <div style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 700, marginBottom: 4 }}>{plan.price}</div>
+              }}>{t(`pricingSection.plans.${plan.key}.name`)}</div>
+              <div style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 700, marginBottom: 4 }}>{t(`pricingSection.plans.${plan.key}.price`)}</div>
               <div style={{
                 fontSize: 13, color: plan.featured ? "rgba(255,255,255,.8)" : "var(--t3)",
                 marginBottom: 20,
-              }}>{plan.per}</div>
+              }}>{t(`pricingSection.plans.${plan.key}.per`)}</div>
               <div style={{
                 fontSize: 14, color: plan.featured ? "rgba(255,255,255,.85)" : "var(--t2)",
                 lineHeight: 2, textAlign: "left", marginBottom: 20,
               }}>
-                {plan.feats.split("\n").map((f) => <div key={f}>{f}</div>)}
+                {(t(`pricingSection.plans.${plan.key}.features`) as string).split("\n").map((f: string) => <div key={f}>{f}</div>)}
               </div>
               <Link href="/lookup" style={{
                 display: "block", width: "100%", padding: 12, borderRadius: 20,
@@ -366,7 +369,7 @@ export default function Home() {
                 color: plan.featured ? "var(--dark)" : "var(--t1)",
                 textAlign: "center",
               }}>
-                {plan.featured ? "Best Value \u2192" : "Get Started"}
+                {plan.featured ? t("pricingSection.ctaFeatured") : t("pricingSection.ctaDefault")}
               </Link>
             </div>
           ))}
@@ -376,10 +379,10 @@ export default function Home() {
       {/* ═══ FINAL CTA ═══ */}
       <div className="hp-cta" style={{ textAlign: "center", padding: "80px 60px" }}>
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 12 }}>
-          Ready to de-risk your next shipment?
+          {t("finalCta.heading")}
         </h2>
         <p style={{ fontSize: 14, color: "var(--t3)", marginBottom: 28 }}>
-          Start with a free compliance check. No account required.
+          {t("finalCta.subheading")}
         </p>
         <Link href="/lookup" style={{
           padding: "16px 36px", borderRadius: 24, border: "none",
@@ -388,7 +391,7 @@ export default function Home() {
           cursor: "pointer", boxShadow: "0 6px 24px rgba(27,42,34,.4)",
           textDecoration: "none", display: "inline-block",
         }}>
-          Free Compliance Check &rarr;
+          {t("finalCta.button")}
         </Link>
       </div>
 
@@ -404,25 +407,25 @@ export default function Home() {
             <img src="/logo.png?v=2" alt="TapTrao" style={{ width: 28, height: 28, borderRadius: 8, objectFit: "cover" }} />
             <span style={{ fontFamily: "var(--fd)", fontSize: 14, color: "#fff", fontWeight: 600 }}>TapTrao</span>
           </div>
-          <div>Trade compliance for African commodity corridors.</div>
-          <div style={{ marginTop: 12 }}>&copy; 2026 Fatrao Limited. All rights reserved.</div>
+          <div>{t("footer.tagline")}</div>
+          <div style={{ marginTop: 12 }}>{t("footer.copyright")}</div>
         </div>
 
         <div style={{ display: "flex", gap: 40, flexWrap: "wrap" }}>
           <div>
-            <h4 style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>Product</h4>
-            <Link href="/lookup" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>Free Check</Link>
-            <Link href="/pricing" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>Pricing</Link>
-            <Link href="/lc-check" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>LC Check</Link>
+            <h4 style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>{t("footer.product")}</h4>
+            <Link href="/lookup" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.freeCheck")}</Link>
+            <Link href="/pricing" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.pricing")}</Link>
+            <Link href="/lc-check" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.lcCheck")}</Link>
           </div>
           <div>
-            <h4 style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>Company</h4>
-            <a href="mailto:hello@taptrao.com" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>Contact</a>
+            <h4 style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>{t("footer.company")}</h4>
+            <a href="mailto:hello@taptrao.com" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.contact")}</a>
           </div>
           <div>
-            <h4 style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>Legal</h4>
-            <Link href="/privacy-policy" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>Privacy Policy</Link>
-            <Link href="/terms-of-service" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>Terms &amp; Conditions</Link>
+            <h4 style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>{t("footer.legal")}</h4>
+            <Link href="/privacy-policy" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.privacyPolicy")}</Link>
+            <Link href="/terms-of-service" style={{ display: "block", fontSize: 14, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.termsConditions")}</Link>
           </div>
         </div>
       </footer>

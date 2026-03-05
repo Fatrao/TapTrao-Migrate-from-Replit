@@ -1,0 +1,43 @@
+{
+  "title": "Calculateur de Surestaries",
+  "subtitle": "Estimez les surestaries si cette expedition est retardee au port",
+
+  "port": "Port de dechargement",
+  "containerType": "Type de conteneur",
+  "freeDays": "Jours gratuits inclus dans le contrat",
+  "freeDaysHelper": "Verifiez votre connaissement. La plupart des contrats accordent 7 a 14 jours gratuits.",
+  "arrivalDate": "Date d'arrivee",
+  "daysHeld": "Combien de jours les marchandises ont-elles ete retenues ?",
+  "enterManually": "Saisir les jours manuellement",
+  "calcFromDate": "Calculer a partir de la date d'arrivee",
+  "cargoValue": "Valeur estimee de la cargaison (USD)",
+  "cargoValueHelper": "Facultatif \u2014 utilise pour calculer les surestaries en % de la valeur de la cargaison",
+  "calculate": "Calculer",
+
+  "billableDays": "Jours facturables",
+  "dailyRate": "Taux journalier",
+  "daysAtPort": "Jours au port",
+
+  "costBreakdown": "Detail des couts",
+  "period": "Periode",
+  "days": "Jours",
+  "ratePerDay": "Taux/jour",
+  "subtotal": "Sous-total",
+  "noChargeableDays": "Aucun jour facturable \u2014 dans la periode gratuite",
+
+  "totalDemurrage": "TOTAL SURESTARIES",
+  "basedOnInputs": "Base sur les donnees actuelles",
+  "pctOfCargo": "Surestaries en % de la valeur de la cargaison : {{pct}}%",
+  "pctWarning": "Envisagez si la reexportation ou la destruction serait moins couteuse.",
+
+  "nextStep": "Prochaine etape : comparez les surestaries avec les alternatives",
+  "reExport": "Reexportation",
+  "reExportDesc": "Souvent 30 a 50% de la valeur de la cargaison",
+  "destruction": "Destruction",
+  "destructionDesc": "Souvent 500 a 5 000 $, selon le port et le volume",
+  "appealRetest": "Appel / nouveau test",
+  "appealRetestDesc": "Frais de nouveau test generalement 200 a 500 $ + stockage supplementaire",
+  "ratesNote": "Les tarifs sont indicatifs et bases sur les tarifs portuaires publies. Les taux reels varient selon le transporteur, la saison et les conditions du contrat. Confirmez les frais definitifs avec votre agent de fret.",
+  "disclaimer": "Les estimations de surestaries TapTrao sont basees sur les donnees tarifaires portuaires publiees et sont fournies a titre informatif uniquement. Elles ne constituent pas un conseil financier.",
+  "optional": "Facultatif"
+}

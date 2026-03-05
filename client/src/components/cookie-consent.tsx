@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 
 declare global {
@@ -76,6 +77,7 @@ export function usePageViewTracking() {
 }
 
 export function CookieConsentBanner() {
+  const { t } = useTranslation("common");
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -107,10 +109,9 @@ export function CookieConsentBanner() {
     >
       <div className="max-w-4xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <p className="text-white/80 text-sm flex-1" data-testid="text-cookie-message">
-          We use essential cookies to run TapTrao. We'd also like to use Google Analytics to
-          understand how people use the site. Do you accept analytics cookies?{" "}
+          {t("cookie.message")}{" "}
           <Link href="/privacy-policy">
-            <span className="underline text-white/60 cursor-pointer hover:text-white">Learn more</span>
+            <span className="underline text-white/60 cursor-pointer hover:text-white">{t("cookie.learnMore")}</span>
           </Link>
         </p>
         <div className="flex items-center gap-3 flex-shrink-0 flex-wrap">
@@ -120,7 +121,7 @@ export function CookieConsentBanner() {
             className="bg-[#1A3D2B] text-white border-[#1A3D2B]"
             data-testid="button-accept-analytics"
           >
-            Accept Analytics
+            {t("cookie.acceptAnalytics")}
           </Button>
           <Button
             onClick={handleReject}
@@ -129,7 +130,7 @@ export function CookieConsentBanner() {
             className="text-white/70 border-white/20"
             data-testid="button-essential-only"
           >
-            Essential Only
+            {t("cookie.essentialOnly")}
           </Button>
         </div>
       </div>

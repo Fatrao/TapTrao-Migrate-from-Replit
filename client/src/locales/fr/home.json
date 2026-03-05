@@ -1,0 +1,133 @@
+{
+  "pageTitle": "TapTrao \u2014 Conformit\u00e9 commerciale pour les n\u00e9gociants de mati\u00e8res premi\u00e8res",
+
+  "nav": {
+    "howItWorks": "Comment \u00e7a marche",
+    "validation": "Validation",
+    "pricing": "Tarifs",
+    "myTrades": "Mes transactions",
+    "freeComplianceCheck": "V\u00e9rification gratuite"
+  },
+
+  "hero": {
+    "heading": "S\u00e9curisez votre prochaine exp\u00e9dition avant de vous engager.",
+    "subheading": "Chaque document. Chaque r\u00e9glementation. Chaque corridor. V\u00e9rifi\u00e9 avant de vous engager.",
+    "ctaPrimary": "V\u00e9rification gratuite \u2192",
+    "ctaSecondary": "Voir la validation compl\u00e8te"
+  },
+
+  "trustBar": {
+    "corridors": "AFRIQUE \u2192 UE \u00b7 RU \u00b7 USA \u00b7 CANADA \u00b7 T\u00dcRKIYE \u00b7 SUISSE"
+  },
+
+  "costSection": {
+    "heading": "Le co\u00fbt d\u2019une erreur",
+    "subheading": "Un seul probl\u00e8me de document peut entra\u00eener des milliers de pertes.",
+    "stats": {
+      "demurrage": {
+        "value": "75\u2013300 $/jour",
+        "description": "Surestaries pendant que les documents sont bloqu\u00e9s au port"
+      },
+      "bankFee": {
+        "value": "95\u2013160 $",
+        "description": "Frais bancaires pour une divergence LC"
+      },
+      "isfPenalty": {
+        "value": "5 000 $",
+        "description": "Amende ISF am\u00e9ricaine pour d\u00e9claration tardive par infraction"
+      },
+      "cascadeCost": {
+        "value": "1 500 $+",
+        "description": "Co\u00fbt en cascade d\u2019un document manquant"
+      }
+    },
+    "summary": "Un seul rejet bancaire co\u00fbte <b>{{amount}} ou plus</b>. La validation compl\u00e8te co\u00fbte",
+    "summaryAmount": "1 500 $",
+    "summaryValidationCost": "110 $"
+  },
+
+  "howItWorks": {
+    "heading": "Comment \u00e7a marche",
+    "subheading": "Connaissance. Action. Confiance.",
+    "steps": {
+      "step1": {
+        "label": "\u00c9TAPE 1",
+        "title": "Connaissance",
+        "description": "Saisissez votre pays d\u2019origine, votre destination et votre mati\u00e8re premi\u00e8re. TapTrao identifie chaque r\u00e9glementation, document requis et obligation de conformit\u00e9 pour votre corridor."
+      },
+      "step2": {
+        "label": "\u00c9TAPE 2",
+        "title": "Action",
+        "description": "T\u00e9l\u00e9chargez vos documents commerciaux. Notre moteur contre-v\u00e9rifie chaque document, contr\u00f4le les termes LC et signale les divergences avant soumission."
+      },
+      "step3": {
+        "label": "\u00c9TAPE 3",
+        "title": "Confiance",
+        "description": "Recevez votre rapport Shield avec un score de conformit\u00e9, un d\u00e9tail des probl\u00e8mes et des recommandations de correction. Soumettez \u00e0 la banque en toute confiance."
+      }
+    }
+  },
+
+  "validationPreview": {
+    "heading": "Rapport de contre-validation",
+    "subheading": "Chaque document v\u00e9rifi\u00e9 par rapport \u00e0 tous les autres. Chaque r\u00e9glementation cartographi\u00e9e.",
+    "riskOrigin": "Origine",
+    "riskCommodity": "Mati\u00e8re premi\u00e8re",
+    "riskRegulatory": "R\u00e9glementaire",
+    "checkItems": {
+      "certificateOfOrigin": "Certificat d\u2019origine",
+      "phytosanitaryCertificate": "Certificat phytosanitaire",
+      "billOfLading": "Connaissement",
+      "insurance": "Assurance \u2014 inf\u00e9rieure \u00e0 110 % CIF",
+      "weightCertificate": "Certificat de poids \u2014 manquant",
+      "fumigationCertificate": "Certificat de fumigation"
+    }
+  },
+
+  "pricingSection": {
+    "heading": "Tarifs",
+    "subheading": "Simple, transparent. Aucun abonnement requis.",
+    "plans": {
+      "single": {
+        "name": "V\u00e9rification unique",
+        "price": "110 $",
+        "per": "par transaction",
+        "features": "Contre-validation compl\u00e8te\nV\u00e9rification des termes LC\nScreening EUDR + CBAM\nScore de conformit\u00e9 + rapport\nRecommandations de correction"
+      },
+      "threePack": {
+        "name": "Pack 3",
+        "price": "299 $",
+        "per": "99,67 $ par transaction",
+        "features": "Tout inclus dans V\u00e9rification unique\n\u00c9conomisez 31 $ par transaction\nValable 12 mois\nSupport prioritaire"
+      },
+      "fivePack": {
+        "name": "Pack 5",
+        "price": "475 $",
+        "per": "95 $ par transaction",
+        "features": "Tout inclus dans V\u00e9rification unique\n\u00c9conomisez 75 $ au total\nValable 12 mois\nSupport prioritaire\nInt\u00e9gration d\u00e9di\u00e9e"
+      }
+    },
+    "ctaFeatured": "Meilleur rapport qualit\u00e9-prix \u2192",
+    "ctaDefault": "Commencer"
+  },
+
+  "finalCta": {
+    "heading": "Pr\u00eat \u00e0 s\u00e9curiser votre prochaine exp\u00e9dition ?",
+    "subheading": "Commencez par une v\u00e9rification de conformit\u00e9 gratuite. Aucun compte requis.",
+    "button": "V\u00e9rification gratuite \u2192"
+  },
+
+  "footer": {
+    "tagline": "Conformit\u00e9 commerciale pour les corridors de mati\u00e8res premi\u00e8res africains.",
+    "copyright": "\u00a9 2026 Fatrao Limited. Tous droits r\u00e9serv\u00e9s.",
+    "product": "Produit",
+    "freeCheck": "V\u00e9rification gratuite",
+    "pricing": "Tarifs",
+    "lcCheck": "V\u00e9rification LC",
+    "company": "Entreprise",
+    "contact": "Contact",
+    "legal": "Mentions l\u00e9gales",
+    "privacyPolicy": "Politique de confidentialit\u00e9",
+    "termsConditions": "Conditions g\u00e9n\u00e9rales"
+  }
+}

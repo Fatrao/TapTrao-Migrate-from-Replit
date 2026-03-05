@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/AppShell";
 
 export default function AdminAlertsPage() {
+  const { t } = useTranslation("admin");
   const [source, setSource] = useState("MANUAL");
   const [hsCodes, setHsCodes] = useState("");
   const [destIso2, setDestIso2] = useState("");
@@ -43,7 +45,7 @@ export default function AdminAlertsPage() {
       setEffectiveDate("");
     } catch (err: any) {
       setStatus("error");
-      setErrorMsg(err.message || "Failed to create alert");
+      setErrorMsg(err.message || t("alerts.defaultError"));
     }
   };
 
@@ -84,12 +86,12 @@ export default function AdminAlertsPage() {
             }}
             data-testid="text-admin-alerts-title"
           >
-            Create Regulatory Alert
+            {t("alerts.title")}
           </h1>
 
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div>
-              <label style={labelStyle}>Source</label>
+              <label style={labelStyle}>{t("alerts.sourceLabel")}</label>
               <input
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
@@ -100,7 +102,7 @@ export default function AdminAlertsPage() {
             </div>
 
             <div>
-              <label style={labelStyle}>HS Codes Affected (comma-separated)</label>
+              <label style={labelStyle}>{t("alerts.hsCodesLabel")}</label>
               <input
                 value={hsCodes}
                 onChange={(e) => setHsCodes(e.target.value)}
@@ -111,7 +113,7 @@ export default function AdminAlertsPage() {
             </div>
 
             <div>
-              <label style={labelStyle}>Destination ISO2 (comma-separated)</label>
+              <label style={labelStyle}>{t("alerts.destIso2Label")}</label>
               <input
                 value={destIso2}
                 onChange={(e) => setDestIso2(e.target.value)}
@@ -122,7 +124,7 @@ export default function AdminAlertsPage() {
             </div>
 
             <div>
-              <label style={labelStyle}>Summary *</label>
+              <label style={labelStyle}>{t("alerts.summaryLabel")}</label>
               <textarea
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
@@ -133,7 +135,7 @@ export default function AdminAlertsPage() {
             </div>
 
             <div>
-              <label style={labelStyle}>Source URL</label>
+              <label style={labelStyle}>{t("alerts.sourceUrlLabel")}</label>
               <input
                 value={sourceUrl}
                 onChange={(e) => setSourceUrl(e.target.value)}
@@ -144,7 +146,7 @@ export default function AdminAlertsPage() {
             </div>
 
             <div>
-              <label style={labelStyle}>Effective Date</label>
+              <label style={labelStyle}>{t("alerts.effectiveDateLabel")}</label>
               <input
                 type="date"
                 value={effectiveDate}
@@ -155,7 +157,7 @@ export default function AdminAlertsPage() {
             </div>
 
             <div>
-              <label style={labelStyle}>Admin Password *</label>
+              <label style={labelStyle}>{t("alerts.adminPasswordLabel")}</label>
               <input
                 type="password"
                 value={adminPassword}
@@ -180,7 +182,7 @@ export default function AdminAlertsPage() {
               }}
               data-testid="button-create-alert"
             >
-              Create Alert
+              {t("alerts.createButton")}
             </button>
 
             {status === "success" && (
@@ -196,7 +198,7 @@ export default function AdminAlertsPage() {
                 }}
                 data-testid="text-alert-success"
               >
-                Alert created successfully.
+                {t("alerts.successMessage")}
               </div>
             )}
 

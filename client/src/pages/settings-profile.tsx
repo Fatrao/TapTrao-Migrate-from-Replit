@@ -2,6 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -88,6 +89,7 @@ const COUNTRIES = [
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 export default function SettingsProfile() {
+  const { t } = useTranslation("settings");
   usePageTitle("Company Profile | TapTrao");
 
   const { toast } = useToast();
@@ -134,31 +136,31 @@ export default function SettingsProfile() {
       const noEin = !savedProfile.einNumber;
       if (noEori && noEin) {
         toast({
-          title: "Profile saved",
-          description: "No EORI or EIN number saved. We recommend adding your EORI (EU/UK) or EIN (US) before sharing records with banks or customs authorities.",
+          title: t("toast.saved"),
+          description: t("toast.noCustomsId"),
           variant: "default",
         });
       } else if (noEori && !noEin) {
         toast({
-          title: "Profile saved",
-          description: "EIN saved. If you also trade with the EU/UK, consider adding your EORI number.",
+          title: t("toast.saved"),
+          description: t("toast.einSaved"),
         });
       } else if (!noEori && noEin) {
         toast({
-          title: "Profile saved",
-          description: "EORI saved. If you also trade with the US, consider adding your EIN.",
+          title: t("toast.saved"),
+          description: t("toast.eoriSaved"),
         });
       } else {
         toast({
-          title: "Profile saved",
-          description: "You can now download TwinLog Trail records.",
+          title: t("toast.saved"),
+          description: t("toast.allSaved"),
         });
       }
     },
     onError: (err: any) => {
       toast({
-        title: "Error saving profile",
-        description: err.message || "Something went wrong",
+        title: t("toast.errorTitle"),
+        description: err.message || t("toast.errorGeneric"),
         variant: "destructive",
       });
     },
@@ -174,10 +176,10 @@ export default function SettingsProfile() {
     <AppShell>
       <div style={{ padding: "32px 24px 0" }}>
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "var(--t1)", margin: 0 }}>
-          Company Profile
+          {t("pageTitle")}
         </h1>
         <p style={{ fontSize: 13, color: "var(--t3)", marginTop: 6 }}>
-          Your company details appear on every TwinLog Trail compliance record. Required for PDF generation.
+          {t("pageSubtitle")}
         </p>
       </div>
 
@@ -188,7 +190,7 @@ export default function SettingsProfile() {
             data-testid="banner-profile-complete"
           >
             <CheckCircle2 style={{ width: 18, height: 18, color: "var(--sage)", flexShrink: 0 }} />
-            <p style={{ fontSize: 13, color: "var(--sage)", margin: 0 }}>Profile complete. You can download TwinLog Trail records.</p>
+            <p style={{ fontSize: 13, color: "var(--sage)", margin: 0 }}>{t("profileComplete")}</p>
           </div>
         )}
 
@@ -199,11 +201,11 @@ export default function SettingsProfile() {
               name="companyName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Company Name *</FormLabel>
+                  <FormLabel>{t("companyName.label")}</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. Acme Trading Ltd" data-testid="input-company-name" />
+                    <Input {...field} placeholder={t("companyName.placeholder")} data-testid="input-company-name" />
                   </FormControl>
-                  <FormDescription>As it appears on your Certificate of Incorporation</FormDescription>
+                  <FormDescription>{t("companyName.description")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -214,11 +216,11 @@ export default function SettingsProfile() {
               name="registeredAddress"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Registered Office Address *</FormLabel>
+                  <FormLabel>{t("registeredAddress.label")}</FormLabel>
                   <FormControl>
-                    <Textarea {...field} rows={3} placeholder="Full address including postcode/ZIP" data-testid="input-registered-address" />
+                    <Textarea {...field} rows={3} placeholder={t("registeredAddress.placeholder")} data-testid="input-registered-address" />
                   </FormControl>
-                  <FormDescription>Full address including postcode/ZIP. Must match incorporation documents.</FormDescription>
+                  <FormDescription>{t("registeredAddress.description")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -229,11 +231,11 @@ export default function SettingsProfile() {
               name="countryIso2"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Country of Registration *</FormLabel>
+                  <FormLabel>{t("country.label")}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger data-testid="select-country">
-                        <SelectValue placeholder="Select a country" />
+                        <SelectValue placeholder={t("country.placeholder")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -254,11 +256,11 @@ export default function SettingsProfile() {
               name="vatNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>VAT Number</FormLabel>
+                  <FormLabel>{t("vat.label")}</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. GB123456789" data-testid="input-vat-number" />
+                    <Input {...field} placeholder={t("vat.placeholder")} data-testid="input-vat-number" />
                   </FormControl>
-                  <FormDescription>Used for EU/UK trade records.</FormDescription>
+                  <FormDescription>{t("vat.description")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -269,14 +271,12 @@ export default function SettingsProfile() {
               name="eoriNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>EORI Number</FormLabel>
+                  <FormLabel>{t("eori.label")}</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. GB205672212000" data-testid="input-eori-number" />
+                    <Input {...field} placeholder={t("eori.placeholder")} data-testid="input-eori-number" />
                   </FormControl>
                   <FormDescription>
-                    Economic Operators Registration and Identification number.
-                    Required by UK/EU customs to track every shipment.
-                    Without this, your compliance record cannot reference your customs identity.
+                    {t("eori.description")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -289,11 +289,9 @@ export default function SettingsProfile() {
               <div style={{ display: "flex", gap: 12 }}>
                 <Info style={{ width: 18, height: 18, color: "var(--sage)", flexShrink: 0, marginTop: 2 }} />
                 <div>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--sage)", marginBottom: 4 }}>Why EORI matters</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--sage)", marginBottom: 4 }}>{t("eori.whyTitle")}</p>
                   <p style={{ fontSize: 13, color: "#555", margin: 0, lineHeight: 1.6 }}>
-                    Your EORI number is what customs authorities use to identify you on every import declaration.
-                    A compliance record without an EORI cannot be linked to your customs activity.
-                    UK traders: apply at gov.uk/eori. EU traders: apply via your national customs authority.
+                    {t("eori.whyBody")}
                   </p>
                 </div>
               </div>
@@ -304,13 +302,12 @@ export default function SettingsProfile() {
               name="einNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>EIN (Employer Identification Number)</FormLabel>
+                  <FormLabel>{t("ein.label")}</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. 12-3456789" data-testid="input-ein-number" />
+                    <Input {...field} placeholder={t("ein.placeholder")} data-testid="input-ein-number" />
                   </FormControl>
                   <FormDescription>
-                    US Federal Tax ID issued by the IRS (format: XX-XXXXXXX).
-                    Used as the Importer of Record number for US Customs and Border Protection (CBP).
+                    {t("ein.description")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -323,12 +320,9 @@ export default function SettingsProfile() {
               <div style={{ display: "flex", gap: 12 }}>
                 <Info style={{ width: 18, height: 18, color: "var(--sage)", flexShrink: 0, marginTop: 2 }} />
                 <div>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--sage)", marginBottom: 4 }}>EIN for US trade</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--sage)", marginBottom: 4 }}>{t("ein.whyTitle")}</p>
                   <p style={{ fontSize: 13, color: "#555", margin: 0, lineHeight: 1.6 }}>
-                    The EIN is the US equivalent of the EORI number. It identifies your business on all US customs
-                    entry documents filed with CBP. If you import into the USA, your EIN serves as your Importer
-                    of Record (IOR) number. Apply at irs.gov/ein. Note: the USA does not use the EORI system —
-                    if you also ship to the EU/UK, you will need both an EIN and an EORI.
+                    {t("ein.whyBody")}
                   </p>
                 </div>
               </div>
@@ -339,11 +333,11 @@ export default function SettingsProfile() {
               name="contactEmail"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Contact Email</FormLabel>
+                  <FormLabel>{t("contactEmail.label")}</FormLabel>
                   <FormControl>
-                    <Input {...field} type="email" placeholder="trade@yourcompany.com" data-testid="input-contact-email" />
+                    <Input {...field} type="email" placeholder={t("contactEmail.placeholder")} data-testid="input-contact-email" />
                   </FormControl>
-                  <FormDescription>Appears on the compliance record as the responsible party contact.</FormDescription>
+                  <FormDescription>{t("contactEmail.description")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -356,7 +350,7 @@ export default function SettingsProfile() {
               data-testid="button-save-profile"
             >
               <Save className="w-4 h-4 mr-2" />
-              {saveMutation.isPending ? "Saving..." : "Save Profile"}
+              {saveMutation.isPending ? t("saving") : t("saveProfile")}
             </Button>
 
             {saveMutation.isSuccess && !form.getValues("eoriNumber") && !form.getValues("einNumber") && (
@@ -366,8 +360,7 @@ export default function SettingsProfile() {
               >
                 <AlertTriangle style={{ width: 18, height: 18, color: "#b45309", flexShrink: 0 }} />
                 <p style={{ fontSize: 13, color: "#b45309", margin: 0 }}>
-                  No customs identification number saved. Add your EORI (EU/UK traders) or EIN (US traders)
-                  before sharing records with banks or customs authorities.
+                  {t("warning.noCustomsId")}
                 </p>
               </div>
             )}

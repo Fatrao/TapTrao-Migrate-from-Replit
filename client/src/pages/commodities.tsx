@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/AppShell";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
@@ -231,6 +232,7 @@ const css = `
 /* ─── Component ─── */
 
 export default function Commodities() {
+  const { t } = useTranslation("lookup");
   usePageTitle("Commodities");
   const [, navigate] = useLocation();
   const [filter, setFilter] = useState<FilterTab>("all");
@@ -328,19 +330,19 @@ export default function Commodities() {
         {/* Header */}
         <div className="cm-hdr">
           <div>
-            <h1>Commodities</h1>
+            <h1>{t("commodities.title")}</h1>
             <div className="sub">
-              {trades.length} shipment{trades.length !== 1 ? "s" : ""} ·{" "}
-              {formatCurrency(String(totalValue))} total value
+              {t(trades.length !== 1 ? "commodities.subtitle_other" : "commodities.subtitle_one", { count: trades.length })} ·{" "}
+              {t("commodities.totalValue", { value: formatCurrency(String(totalValue)) })}
             </div>
           </div>
           <div className="cm-hdr-r">
-            <button className="cm-btn out">Export</button>
+            <button className="cm-btn out">{t("commodities.export")}</button>
             <button
               className="cm-btn pri"
               onClick={() => navigate("/lookup")}
             >
-              + New Trade
+              {t("commodities.newTrade")}
             </button>
           </div>
         </div>
@@ -350,41 +352,40 @@ export default function Commodities() {
           <div className="cm-hero-bg" />
           <div className="cm-hero-grad" />
           <div className="cm-hero-text">
-            <h2>Trade Corridors</h2>
+            <h2>{t("commodities.tradeCorridors")}</h2>
             <p>
-              {activeRoutes} active route{activeRoutes !== 1 ? "s" : ""} across
-              Africa
+              {t(activeRoutes !== 1 ? "commodities.activeRoutes_other" : "commodities.activeRoutes_one", { count: activeRoutes })}
             </p>
           </div>
           <div className="cm-port">
-            <div className="pl">PORTFOLIO OVERVIEW</div>
+            <div className="pl">{t("commodities.portfolioOverview")}</div>
             <div className="pv">{formatCurrency(String(totalValue))}</div>
             <div className="ps">
-              across {trades.length} shipment{trades.length !== 1 ? "s" : ""}
+              {t(trades.length !== 1 ? "commodities.acrossShipments_other" : "commodities.acrossShipments_one", { count: trades.length })}
             </div>
             <div className="cm-port-row">
               <div className="cm-port-st">
-                <div className="stl">TOP CORRIDOR</div>
+                <div className="stl">{t("commodities.topCorridor")}</div>
                 <div className="stv">{topCorridor.display}</div>
                 <div className="sts">
-                  {topCorridor.count} shipment{topCorridor.count !== 1 ? "s" : ""}
+                  {t(topCorridor.count !== 1 ? "commodities.subtitle_other" : "commodities.subtitle_one", { count: topCorridor.count })}
                 </div>
               </div>
               <div className="cm-port-st">
-                <div className="stl">AVG COMPLIANCE</div>
+                <div className="stl">{t("commodities.avgCompliance")}</div>
                 <div className="stv" style={{ color: "var(--sage)" }}>
                   {Math.round(avgCompliance)}%
                 </div>
-                <div className="sts">across active trades</div>
+                <div className="sts">{t("commodities.acrossActiveTrades")}</div>
               </div>
             </div>
             <div className="cm-port-bar">
               <div style={{ width: `${progressWidth}%` }} />
             </div>
             <div className="cm-port-leg">
-              <span>{counts.active} active</span>
-              <span>{counts.waiting} waiting</span>
-              <span>{counts.closed} closed</span>
+              <span>{counts.active} {t("commodities.active")}</span>
+              <span>{counts.waiting} {t("commodities.waiting")}</span>
+              <span>{counts.closed} {t("commodities.closed")}</span>
             </div>
           </div>
         </div>
@@ -405,7 +406,7 @@ export default function Commodities() {
               className={`cm-fp${filter === key ? " on" : ""}`}
               onClick={() => setFilter(key)}
             >
-              {key.charAt(0).toUpperCase() + key.slice(1)}
+              {t(`commodities.filter${key.charAt(0).toUpperCase() + key.slice(1)}`)}
               <span className="cnt">{count}</span>
             </button>
           ))}
@@ -415,17 +416,17 @@ export default function Commodities() {
         <div className="cm-grid">
           {filtered.length === 0 ? (
             <div className="cm-empty">
-              <h3>No trades found</h3>
+              <h3>{t("commodities.noTradesFound")}</h3>
               <p>
                 {filter === "all"
-                  ? "Run your first compliance check to see it here."
-                  : `No ${filter} trades at the moment.`}
+                  ? t("commodities.noTradesAll")
+                  : t("commodities.noTradesFilter", { filter })}
               </p>
               <button
                 className="cm-btn pri"
                 onClick={() => navigate("/lookup")}
               >
-                + New Trade
+                {t("commodities.newTrade")}
               </button>
             </div>
           ) : (
@@ -461,8 +462,7 @@ export default function Commodities() {
                   {/* Alert row for issues */}
                   {hasIssues && issueCount > 0 && (
                     <div className="cm-tc-alert">
-                      ⚠ {issueCount} issue{issueCount !== 1 ? "s" : ""} require
-                      attention
+                      ⚠ {t(issueCount !== 1 ? "commodities.issueCount_other" : "commodities.issueCount_one", { count: issueCount })}
                     </div>
                   )}
 
@@ -475,23 +475,23 @@ export default function Commodities() {
                   {/* Data grid */}
                   <div className="cm-tc-data">
                     <div className="cm-tc-d">
-                      <div className="dl">HS CODE</div>
-                      <div className="dv">{trade.hsCode || "—"}</div>
+                      <div className="dl">{t("commodities.hsCode")}</div>
+                      <div className="dv">{trade.hsCode || "\u2014"}</div>
                     </div>
                     <div className="cm-tc-d">
-                      <div className="dl">VALUE</div>
+                      <div className="dl">{t("commodities.value")}</div>
                       <div className="dv">
                         {formatCurrency(trade.tradeValue)}
                       </div>
                     </div>
                     <div className="cm-tc-d">
-                      <div className="dl">DOCUMENTS</div>
+                      <div className="dl">{t("commodities.documents")}</div>
                       <div className="dv">
-                        {trade.docsReceivedCount} of {trade.docsRequiredCount}
+                        {trade.docsReceivedCount} / {trade.docsRequiredCount}
                       </div>
                     </div>
                     <div className="cm-tc-d">
-                      <div className="dl">COMPLIANCE</div>
+                      <div className="dl">{t("commodities.compliance")}</div>
                       <div
                         className="dv"
                         style={{ color: complianceColor(score) }}
@@ -514,9 +514,9 @@ export default function Commodities() {
                   {/* Footer */}
                   <div className="cm-tc-foot">
                     <span>
-                      {isClosed ? "Closed" : "Updated"} {timeAgo(trade.createdAt)}
+                      {isClosed ? t("commodities.filterClosed") : t("commodities.updated")} {timeAgo(trade.createdAt)}
                     </span>
-                    <span className="open-link">Open →</span>
+                    <span className="open-link">{t("commodities.openLink")} →</span>
                   </div>
                 </Link>
               );

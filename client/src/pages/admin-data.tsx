@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,16 +22,18 @@ type CommodityStats = {
   stopFlagCommodities: { name: string; hsCode: string; stopFlags: Record<string, string> }[];
 };
 
-const TYPE_LABELS: Record<string, string> = {
-  agricultural: "Agricultural",
-  mineral: "Mineral",
-  forestry: "Forestry",
-  seafood: "Seafood",
-  livestock: "Livestock",
-  manufactured: "Manufactured",
+const TYPE_KEYS: Record<string, string> = {
+  agricultural: "data.typeAgricultural",
+  mineral: "data.typeMineral",
+  forestry: "data.typeForestry",
+  seafood: "data.typeSeafood",
+  livestock: "data.typeLivestock",
+  manufactured: "data.typeManufactured",
 };
 
 export default function AdminData() {
+  const { t } = useTranslation("admin");
+
   const { data, isLoading, isError } = useQuery<TableCounts>({
     queryKey: ["/api/table-counts"],
   });
@@ -57,7 +60,7 @@ export default function AdminData() {
           </div>
           <Badge className="bg-[#0e4e45] text-white text-xs hover:bg-[#0e4e45]">
             <Database className="w-3 h-3 mr-1" />
-            Data Overview
+            {t("data.badgeLabel")}
           </Badge>
         </div>
       </header>
@@ -71,10 +74,10 @@ export default function AdminData() {
               className="font-clash font-bold text-[28px] text-gray-900 tracking-tight"
               data-testid="text-admin-title"
             >
-              Data Overview
+              {t("data.title")}
             </h1>
             <p className="text-sm text-gray-500">
-              Record counts for each database table.
+              {t("data.subtitle")}
             </p>
           </div>
 
@@ -93,7 +96,7 @@ export default function AdminData() {
           {/* Table Counts - Error */}
           {isError && (
             <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-600">
-              Failed to load data counts. Make sure the database is seeded.
+              {t("data.errorMessage")}
             </div>
           )}
 
@@ -101,11 +104,11 @@ export default function AdminData() {
           {data && (
             <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
               {[
-                { label: "Destinations", count: data.destinations },
-                { label: "Frameworks", count: data.regionalFrameworks },
-                { label: "Origin Countries", count: data.originCountries },
-                { label: "Commodities", count: data.commodities },
-                { label: "AfCFTA RoO", count: data.afcftaRoo },
+                { label: t("data.destinations"), count: data.destinations },
+                { label: t("data.frameworks"), count: data.regionalFrameworks },
+                { label: t("data.originCountries"), count: data.originCountries },
+                { label: t("data.commodities"), count: data.commodities },
+                { label: t("data.afcftaRoo"), count: data.afcftaRoo },
               ].map((item) => (
                 <div
                   key={item.label}
@@ -144,13 +147,13 @@ export default function AdminData() {
               {/* By Type */}
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold text-gray-900" data-testid="text-section-by-type">
-                  Commodities by Type
+                  {t("data.commoditiesByType")}
                   <span className="ml-2 text-gray-400 font-normal text-sm">
-                    (Total: {stats.total})
+                    {t("data.total", { count: stats.total })}
                   </span>
                 </h2>
                 <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
-                  {Object.entries(TYPE_LABELS).map(([key, label]) => {
+                  {Object.entries(TYPE_KEYS).map(([key, tKey]) => {
                     const count = stats.byType[key] || 0;
                     if (count === 0) return null;
                     return (
@@ -160,7 +163,7 @@ export default function AdminData() {
                         data-testid={`card-type-${key}`}
                       >
                         <p className="text-3xl font-bold text-gray-900">{count}</p>
-                        <p className="text-sm text-gray-500 mt-1">{label}</p>
+                        <p className="text-sm text-gray-500 mt-1">{t(tKey)}</p>
                       </div>
                     );
                   })}
@@ -170,7 +173,7 @@ export default function AdminData() {
               {/* By Regulatory Trigger */}
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold text-gray-900" data-testid="text-section-by-trigger">
-                  Commodities by Regulatory Trigger
+                  {t("data.commoditiesByTrigger")}
                 </h2>
                 <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
                   {Object.entries(stats.byTrigger).map(([trigger, count]) => (
@@ -191,7 +194,7 @@ export default function AdminData() {
                 <div className="space-y-4">
                   <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" data-testid="text-section-stop-flags">
                     <AlertTriangle className="w-5 h-5 text-red-500" />
-                    STOP Flag Commodities
+                    {t("data.stopFlagCommodities")}
                   </h2>
                   <div className="grid gap-3">
                     {stats.stopFlagCommodities.map((item) => (

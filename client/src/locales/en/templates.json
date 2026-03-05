@@ -1,0 +1,23 @@
+{
+  "title": "Templates",
+  "subtitle_one": "{{count}} saved template",
+  "subtitle_other": "{{count}} saved templates",
+
+  "empty": "No templates saved yet. Complete a lookup and save it as a template from the TwinLog Trail.",
+
+  "card.usedCount_one": "Used {{count}} time",
+  "card.usedCount_other": "Used {{count}} times",
+  "card.lastUsed": " \u00b7 Last used {{time}}",
+  "card.staleWarning": "Regulations may have changed since this template was last used",
+  "card.useTemplate": "Use template \u2192",
+
+  "deleteModal.title": "Delete Template",
+  "deleteModal.body": "Are you sure you want to delete this template? This cannot be undone.",
+  "deleteModal.deleting": "Deleting...",
+
+  "time.justNow": "just now",
+  "time.minsAgo": "{{mins}}m ago",
+  "time.hoursAgo": "{{hrs}}h ago",
+  "time.daysAgo": "{{days}}d ago",
+  "time.monthsAgo": "{{months}}mo ago"
+}

@@ -1,0 +1,133 @@
+{
+  "pageTitle": "TapTrao \u2014 Trade Compliance for Commodity Traders",
+
+  "nav": {
+    "howItWorks": "How It Works",
+    "validation": "Validation",
+    "pricing": "Pricing",
+    "myTrades": "My Trades",
+    "freeComplianceCheck": "Free Compliance Check"
+  },
+
+  "hero": {
+    "heading": "De-risk your next shipment before spending.",
+    "subheading": "Every document. Every regulation. Every corridor. Checked before you commit.",
+    "ctaPrimary": "Free Compliance Check \u2192",
+    "ctaSecondary": "See Full Validation"
+  },
+
+  "trustBar": {
+    "corridors": "AFRICA \u2192 EU \u00b7 UK \u00b7 USA \u00b7 CANADA \u00b7 T\u00dcRKIYE \u00b7 SWITZERLAND"
+  },
+
+  "costSection": {
+    "heading": "The cost of getting it wrong",
+    "subheading": "A single document issue can cascade into thousands in losses.",
+    "stats": {
+      "demurrage": {
+        "value": "$75\u2013$300/day",
+        "description": "Demurrage while documents are on hold at port"
+      },
+      "bankFee": {
+        "value": "$95\u2013$160",
+        "description": "Bank fee for one LC discrepancy"
+      },
+      "isfPenalty": {
+        "value": "$5,000",
+        "description": "US ISF late-filing penalty per violation"
+      },
+      "cascadeCost": {
+        "value": "$1,500+",
+        "description": "Cascade cost from one missing document"
+      }
+    },
+    "summary": "A single bank rejection costs <b>${{amount}} or more</b>. Full validation costs",
+    "summaryAmount": "$1,500",
+    "summaryValidationCost": "$110"
+  },
+
+  "howItWorks": {
+    "heading": "How It Works",
+    "subheading": "Knowledge. Action. Confidence.",
+    "steps": {
+      "step1": {
+        "label": "STEP 1",
+        "title": "Knowledge",
+        "description": "Enter your origin, destination, and commodity. TapTrao maps every regulation, required document, and compliance obligation for your corridor."
+      },
+      "step2": {
+        "label": "STEP 2",
+        "title": "Action",
+        "description": "Upload your trade documents. Our engine cross-validates every document against every other, checks LC terms, and flags mismatches before submission."
+      },
+      "step3": {
+        "label": "STEP 3",
+        "title": "Confidence",
+        "description": "Receive your Shield report with a compliance score, issue breakdown, and fix recommendations. Submit to the bank with confidence."
+      }
+    }
+  },
+
+  "validationPreview": {
+    "heading": "Cross-Validation Report",
+    "subheading": "Every document checked against every other. Every regulation mapped.",
+    "riskOrigin": "Origin",
+    "riskCommodity": "Commodity",
+    "riskRegulatory": "Regulatory",
+    "checkItems": {
+      "certificateOfOrigin": "Certificate of Origin",
+      "phytosanitaryCertificate": "Phytosanitary Certificate",
+      "billOfLading": "Bill of Lading",
+      "insurance": "Insurance \u2014 below 110% CIF",
+      "weightCertificate": "Weight Certificate \u2014 missing",
+      "fumigationCertificate": "Fumigation Certificate"
+    }
+  },
+
+  "pricingSection": {
+    "heading": "Pricing",
+    "subheading": "Simple, transparent. No subscription required.",
+    "plans": {
+      "single": {
+        "name": "Single Check",
+        "price": "$110",
+        "per": "per trade",
+        "features": "Full cross-validation\nLC terms check\nEUDR + CBAM screening\nCompliance score + report\nFix recommendations"
+      },
+      "threePack": {
+        "name": "3-Pack",
+        "price": "$299",
+        "per": "$99.67 per trade",
+        "features": "Everything in Single Check\nSave $31 per trade\nValid for 12 months\nPriority support"
+      },
+      "fivePack": {
+        "name": "5-Pack",
+        "price": "$475",
+        "per": "$95 per trade",
+        "features": "Everything in Single Check\nSave $75 total\nValid for 12 months\nPriority support\nDedicated onboarding"
+      }
+    },
+    "ctaFeatured": "Best Value \u2192",
+    "ctaDefault": "Get Started"
+  },
+
+  "finalCta": {
+    "heading": "Ready to de-risk your next shipment?",
+    "subheading": "Start with a free compliance check. No account required.",
+    "button": "Free Compliance Check \u2192"
+  },
+
+  "footer": {
+    "tagline": "Trade compliance for African commodity corridors.",
+    "copyright": "\u00a9 2026 Fatrao Limited. All rights reserved.",
+    "product": "Product",
+    "freeCheck": "Free Check",
+    "pricing": "Pricing",
+    "lcCheck": "LC Check",
+    "company": "Company",
+    "contact": "Contact",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsConditions": "Terms & Conditions"
+  }
+}

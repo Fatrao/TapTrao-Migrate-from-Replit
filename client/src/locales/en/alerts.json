@@ -1,0 +1,12 @@
+{
+  "title": "Regulatory Alerts",
+  "subtitle": "Monitoring {{count}} corridor",
+  "subtitle_other": "Monitoring {{count}} corridors",
+  "loading": "Loading alerts...",
+  "emptyTitle": "You're not watching any corridors yet.",
+  "emptyHint": "Run a lookup and click \"Watch this corridor\".",
+  "viewSource": "View source",
+  "runFreshLookup": "Run fresh lookup",
+  "effective": "Effective {{date}}",
+  "hsMore": "+{{count}} more"
+}

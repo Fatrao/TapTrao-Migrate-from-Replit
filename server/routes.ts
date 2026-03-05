@@ -12,6 +12,7 @@ import { appendTradeEvent, getTradeAuditChain, verifyAuditChain } from "./audit"
 import { hashPassword, comparePasswords } from "./auth";
 import { lcCheckRequestSchema, registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, tokenTransactions, leadCaptureSchema, type ComplianceResult, type DocumentStatus } from "@shared/schema";
 import { sendPasswordResetEmail } from "./email";
+import { getLocale, t } from "./locales";
 import passport from "passport";
 import { db } from "./db";
 import multer from "multer";
@@ -28,7 +29,7 @@ function requireAuth(req: Request, res: Response, next: NextFunction): void {
   if (req.isAuthenticated?.()) {
     return next();
   }
-  res.status(401).json({ message: "Authentication required", code: "AUTH_REQUIRED" });
+  res.status(401).json({ message: t("routes.auth_required", getLocale(req)), code: "AUTH_REQUIRED" });
 }
 
 const TOKEN_PACKS: Record<string, { price: number; tokens: number; name: string }> = {
@@ -130,9 +131,10 @@ export async function registerRoutes(
 
   app.post("/api/auth/register", async (req, res) => {
     try {
+      const locale = getLocale(req);
       const parsed = registerSchema.safeParse(req.body);
       if (!parsed.success) {
-        res.status(400).json({ message: "Invalid input", errors: parsed.error.flatten().fieldErrors });
+        res.status(400).json({ message: t("routes.invalid_input", locale), errors: parsed.error.flatten().fieldErrors });
         return;
       }
 
@@ -141,7 +143,7 @@ export async function registerRoutes(
       // Check if email already exists
       const existing = await storage.getUserByEmail(email);
       if (existing) {
-        res.status(409).json({ message: "An account with this email already exists" });
+        res.status(409).json({ message: t("routes.account_exists", locale) });
         return;
       }
 
@@ -151,7 +153,7 @@ export async function registerRoutes(
       // Check if this sessionId is already claimed by another user
       const existingBySession = await storage.getUserBySessionId(sessionId);
       if (existingBySession) {
-        res.status(409).json({ message: "This session is already linked to an account. Please log in." });
+        res.status(409).json({ message: t("routes.session_linked", locale) });
         return;
       }
 
@@ -198,16 +200,17 @@ export async function registerRoutes(
   });
 
   app.post("/api/auth/login", (req, res, next) => {
+    const locale = getLocale(req);
     const parsed = loginSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ message: "Invalid input", errors: parsed.error.flatten().fieldErrors });
+      res.status(400).json({ message: t("routes.invalid_input", locale), errors: parsed.error.flatten().fieldErrors });
       return;
     }
 
     passport.authenticate("local", (err: any, user: Express.User | false, info: any) => {
       if (err) return next(err);
       if (!user) {
-        return res.status(401).json({ message: info?.message || "Invalid email or password" });
+        return res.status(401).json({ message: info?.message || t("routes.invalid_credentials", locale) });
       }
 
       req.login(user, (loginErr) => {
@@ -230,12 +233,13 @@ export async function registerRoutes(
   });
 
   app.post("/api/auth/logout", (req, res) => {
+    const locale = getLocale(req);
     req.logout((err) => {
       if (err) {
-        res.status(500).json({ message: "Logout failed" });
+        res.status(500).json({ message: t("routes.logout_failed", locale) });
         return;
       }
-      res.json({ message: "Logged out" });
+      res.json({ message: t("routes.logged_out", locale) });
     });
   });
 
@@ -253,15 +257,16 @@ export async function registerRoutes(
 
   app.post("/api/auth/forgot-password", async (req, res) => {
     try {
+      const locale = getLocale(req);
       const parsed = forgotPasswordSchema.safeParse(req.body);
       if (!parsed.success) {
-        res.status(400).json({ message: "Please enter a valid email address" });
+        res.status(400).json({ message: t("routes.valid_email_required", locale) });
         return;
       }
 
       const { email } = parsed.data;
       // Always return the same message to prevent user enumeration
-      const successMsg = "If an account with that email exists, we've sent a password reset link.";
+      const successMsg = t("routes.password_reset_sent", locale);
 
       const user = await storage.getUserByEmail(email);
       if (!user) {
@@ -294,15 +299,16 @@ export async function registerRoutes(
       res.json({ message: successMsg });
     } catch (error: any) {
       console.error("Forgot password error:", error);
-      res.status(500).json({ message: "Something went wrong. Please try again." });
+      res.status(500).json({ message: t("routes.something_went_wrong", locale) });
     }
   });
 
   app.post("/api/auth/reset-password", async (req, res) => {
     try {
+      const locale = getLocale(req);
       const parsed = resetPasswordSchema.safeParse(req.body);
       if (!parsed.success) {
-        res.status(400).json({ message: "Invalid input", errors: parsed.error.flatten().fieldErrors });
+        res.status(400).json({ message: t("routes.invalid_input", locale), errors: parsed.error.flatten().fieldErrors });
         return;
       }
 
@@ -310,7 +316,7 @@ export async function registerRoutes(
 
       const resetToken = await storage.getValidPasswordResetToken(token);
       if (!resetToken) {
-        res.status(400).json({ message: "This reset link is invalid or has expired. Please request a new one." });
+        res.status(400).json({ message: t("routes.reset_link_invalid", locale) });
         return;
       }
 
@@ -318,10 +324,10 @@ export async function registerRoutes(
       await storage.updateUserPassword(resetToken.userId, passwordHash);
       await storage.markPasswordResetTokenUsed(resetToken.id);
 
-      res.json({ message: "Your password has been reset. You can now log in with your new password." });
+      res.json({ message: t("routes.password_reset_success", locale) });
     } catch (error: any) {
       console.error("Reset password error:", error);
-      res.status(500).json({ message: "Something went wrong. Please try again." });
+      res.status(500).json({ message: t("routes.something_went_wrong", locale) });
     }
   });
 
@@ -386,15 +392,16 @@ export async function registerRoutes(
 
   app.post("/api/tokens/checkout", async (req, res) => {
     try {
+      const locale = getLocale(req);
       const { pack } = req.body;
       if (!pack || !TOKEN_PACKS[pack]) {
-        res.status(400).json({ message: "Invalid pack. Choose: shield_single, shield_3, shield_5, lc_standalone" });
+        res.status(400).json({ message: t("routes.invalid_pack", locale) });
         return;
       }
 
       const stripeKey = process.env.STRIPE_SECRET_KEY;
       if (!stripeKey) {
-        res.status(500).json({ message: "Stripe is not configured" });
+        res.status(500).json({ message: t("routes.stripe_not_configured", locale) });
         return;
       }
 
@@ -439,9 +446,10 @@ export async function registerRoutes(
 
   app.post("/api/tokens/lc-standalone-checkout", async (req, res) => {
     try {
+      const locale = getLocale(req);
       const stripeKey = process.env.STRIPE_SECRET_KEY;
       if (!stripeKey) {
-        res.status(500).json({ message: "Stripe is not configured" });
+        res.status(500).json({ message: t("routes.stripe_not_configured", locale) });
         return;
       }
 
@@ -485,10 +493,11 @@ export async function registerRoutes(
 
   app.post("/api/webhooks/stripe", async (req, res) => {
     try {
+      const locale = getLocale(req);
       const stripeKey = process.env.STRIPE_SECRET_KEY;
       const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
       if (!stripeKey || !webhookSecret) {
-        res.status(500).json({ message: "Stripe is not configured" });
+        res.status(500).json({ message: t("routes.stripe_not_configured", locale) });
         return;
       }
 
@@ -545,15 +554,16 @@ export async function registerRoutes(
 
   app.get("/api/tokens/verify-purchase", async (req, res) => {
     try {
+      const locale = getLocale(req);
       const stripeSessionId = req.query.session_id as string;
       if (!stripeSessionId) {
-        res.status(400).json({ message: "session_id is required" });
+        res.status(400).json({ message: t("routes.session_id_required", locale) });
         return;
       }
 
       const stripeKey = process.env.STRIPE_SECRET_KEY;
       if (!stripeKey) {
-        res.status(500).json({ message: "Stripe is not configured" });
+        res.status(500).json({ message: t("routes.stripe_not_configured", locale) });
         return;
       }
 
@@ -591,7 +601,7 @@ export async function registerRoutes(
         }
       }
 
-      res.json({ success: false, message: "Payment not completed" });
+      res.json({ success: false, message: t("routes.payment_not_completed", locale) });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -599,9 +609,10 @@ export async function registerRoutes(
 
   app.post("/api/compliance-check", async (req, res) => {
     try {
+      const locale = getLocale(req);
       const { commodityId, originId, destinationId } = req.body;
       if (!commodityId || !originId || !destinationId) {
-        res.status(400).json({ message: "commodityId, originId, and destinationId are required" });
+        res.status(400).json({ message: t("routes.compliance_fields_required", locale) });
         return;
       }
 
@@ -614,7 +625,7 @@ export async function registerRoutes(
           await storage.markDemoUsed(sessionId);
         } else if (balance < LOOKUP_COST) {
           res.status(402).json({
-            message: "Insufficient tokens",
+            message: t("routes.insufficient_tokens", locale),
             required: LOOKUP_COST,
             balance,
           });
@@ -749,7 +760,7 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const detail = await storage.getTradeDetail(req.params.id, sessionId);
       if (!detail) {
-        return res.status(404).json({ message: "Trade not found" });
+        return res.status(404).json({ message: t("routes.trade_not_found", getLocale(req)) });
       }
       res.json(detail);
     } catch (error: any) {
@@ -763,7 +774,7 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const lookup = await storage.getLookupById(req.params.id);
       if (!lookup || lookup.sessionId !== sessionId) {
-        return res.status(404).json({ message: "Trade not found" });
+        return res.status(404).json({ message: t("routes.trade_not_found", getLocale(req)) });
       }
       const auditTrail = await getTradeAuditChain(req.params.id);
       const chainResult = await verifyAuditChain(req.params.id);
@@ -780,15 +791,15 @@ export async function registerRoutes(
       const { status } = req.body;
       const validStatuses = ["active", "in_transit", "arrived", "cleared", "closed"];
       if (!validStatuses.includes(status)) {
-        return res.status(400).json({ message: "Invalid status" });
+        return res.status(400).json({ message: t("routes.invalid_status", getLocale(req)) });
       }
       const lookup = await storage.getLookupById(req.params.id);
       if (!lookup || lookup.sessionId !== sessionId) {
-        return res.status(404).json({ message: "Trade not found" });
+        return res.status(404).json({ message: t("routes.trade_not_found", getLocale(req)) });
       }
       const oldStatus = (lookup as any).tradeStatus || "active";
       const updated = await storage.updateTradeStatus(req.params.id, status, sessionId);
-      if (!updated) return res.status(404).json({ message: "Trade not found" });
+      if (!updated) return res.status(404).json({ message: t("routes.trade_not_found", getLocale(req)) });
       // Audit event
       await appendTradeEvent(req.params.id, sessionId, "status_change", { from: oldStatus, to: status });
       res.json(updated);
@@ -803,7 +814,7 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const { reason } = req.body || {};
       const updated = await storage.archiveTrade(req.params.id, sessionId);
-      if (!updated) return res.status(404).json({ message: "Trade not found" });
+      if (!updated) return res.status(404).json({ message: t("routes.trade_not_found", getLocale(req)) });
       await appendTradeEvent(req.params.id, sessionId, "trade_archived", { reason: reason || "User archived" });
       res.json(updated);
     } catch (error: any) {
@@ -817,7 +828,7 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const { notes, estimatedArrival, actualArrival, tradeValue, tradeValueCurrency } = req.body;
       const updated = await storage.updateTradeFields(req.params.id, { notes, estimatedArrival, actualArrival, tradeValue, tradeValueCurrency }, sessionId);
-      if (!updated) return res.status(404).json({ message: "Trade not found or no changes" });
+      if (!updated) return res.status(404).json({ message: t("routes.trade_not_found_no_changes", getLocale(req)) });
       // Audit events for date changes
       if (estimatedArrival) {
         await appendTradeEvent(req.params.id, sessionId, "eta_set", { date: estimatedArrival });
@@ -868,7 +879,7 @@ export async function registerRoutes(
     try {
       const lookup = await storage.getLookupById(req.params.id);
       if (!lookup) {
-        res.status(404).json({ message: "Lookup not found" });
+        res.status(404).json({ message: t("routes.lookup_not_found", getLocale(req)) });
         return;
       }
       res.json(lookup);
@@ -907,9 +918,10 @@ export async function registerRoutes(
 
   app.post("/api/lc-checks", async (req, res) => {
     try {
+      const locale = getLocale(req);
       const parsed = lcCheckRequestSchema.safeParse(req.body);
       if (!parsed.success) {
-        res.status(400).json({ message: "Invalid request", errors: parsed.error.flatten().fieldErrors });
+        res.status(400).json({ message: t("routes.lc_invalid_request", locale), errors: parsed.error.flatten().fieldErrors });
         return;
       }
 
@@ -936,7 +948,7 @@ export async function registerRoutes(
             // Paid re-check: costs 1 trade credit
             if (balance < 1) {
               res.status(402).json({
-                message: `Free re-checks used (${existingCase.maxFreeRechecks}). Additional re-checks cost 1 trade credit.`,
+                message: t("routes.lc_recheck_limit", locale, { limit: String(existingCase.maxFreeRechecks) }),
                 required: 1,
                 balance,
                 type: "trade_pack",
@@ -949,7 +961,7 @@ export async function registerRoutes(
           // New check: costs 1 trade credit
           if (balance < 1) {
             res.status(402).json({
-              message: "LC checks require a trade credit. Purchase a trade pack to continue.",
+              message: t("routes.lc_credit_required", locale),
               required: 1,
               balance,
               type: "trade_pack",
@@ -960,10 +972,10 @@ export async function registerRoutes(
       } // end if (!isAdmin)
 
       // ── Run the cross-check ──
-      const { results, summary } = runLcCrossCheck(lcFields, documents);
+      const { results, summary } = runLcCrossCheck(lcFields, documents, locale);
       const timestamp = new Date().toISOString();
       const integrityHash = computeLcHash(lcFields, documents, results, timestamp);
-      const correction = generateCorrectionEmail(lcFields, results);
+      const correction = generateCorrectionEmail(lcFields, results, locale);
 
       // Determine case status from verdict
       const caseStatus = summary.verdict === "COMPLIANT" || summary.verdict === "COMPLIANT_WITH_NOTES"
@@ -1078,7 +1090,7 @@ export async function registerRoutes(
     try {
       const { lookupIds } = req.body;
       if (!Array.isArray(lookupIds)) {
-        res.status(400).json({ message: "lookupIds array required" });
+        res.status(400).json({ message: t("routes.lookupids_required", getLocale(req)) });
         return;
       }
       const map = await storage.getLcChecksByLookupIds(lookupIds);
@@ -1092,7 +1104,7 @@ export async function registerRoutes(
     try {
       const check = await storage.getLcCheckById(req.params.id);
       if (!check) {
-        res.status(404).json({ message: "LC check not found" });
+        res.status(404).json({ message: t("routes.lc_check_not_found", getLocale(req)) });
         return;
       }
       res.json(check);
@@ -1117,13 +1129,13 @@ export async function registerRoutes(
     try {
       const lcCase = await storage.getLcCaseByLookupId(req.params.lookupId);
       if (!lcCase) {
-        res.status(404).json({ message: "No LC case found for this lookup" });
+        res.status(404).json({ message: t("routes.lc_case_no_lookup", getLocale(req)) });
         return;
       }
       const checkId = lcCase.latestCheckId || lcCase.initialCheckId;
       const check = checkId ? await storage.getLcCheckById(checkId) : null;
       if (!check) {
-        res.status(404).json({ message: "LC check not found for case" });
+        res.status(404).json({ message: t("routes.lc_check_not_found_for_case", getLocale(req)) });
         return;
       }
       res.json({
@@ -1148,7 +1160,7 @@ export async function registerRoutes(
     try {
       const lcCase = await storage.getLcCaseById(req.params.id);
       if (!lcCase) {
-        res.status(404).json({ message: "LC case not found" });
+        res.status(404).json({ message: t("routes.lc_case_not_found", getLocale(req)) });
         return;
       }
       res.json(lcCase);
@@ -1161,7 +1173,7 @@ export async function registerRoutes(
     try {
       const { channel, discrepancyCount } = req.body;
       if (!channel || typeof discrepancyCount !== "number") {
-        res.status(400).json({ message: "channel and discrepancyCount required" });
+        res.status(400).json({ message: t("routes.channel_discrepancy_required", getLocale(req)) });
         return;
       }
       const entry = {
@@ -1223,7 +1235,7 @@ export async function registerRoutes(
     try {
       const lcCase = await storage.getLcCaseById(req.params.id);
       if (!lcCase) {
-        res.status(404).json({ message: "LC case not found" });
+        res.status(404).json({ message: t("routes.lc_case_not_found", getLocale(req)) });
         return;
       }
 
@@ -1298,13 +1310,13 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const { name, commodityId, originIso2, destIso2, snapshotJson } = req.body;
       if (!name || !commodityId || !originIso2 || !destIso2 || !snapshotJson) {
-        res.status(400).json({ message: "name, commodityId, originIso2, destIso2, and snapshotJson are required" });
+        res.status(400).json({ message: t("routes.template_fields_required", getLocale(req)) });
         return;
       }
 
       const existing = await storage.getTemplateByCorridorAndSession(sessionId, commodityId, originIso2, destIso2);
       if (existing) {
-        res.status(409).json({ message: "A template for this corridor already exists", templateId: existing.id });
+        res.status(409).json({ message: t("routes.template_exists", getLocale(req)), templateId: existing.id });
         return;
       }
 
@@ -1328,7 +1340,7 @@ export async function registerRoutes(
     try {
       const template = await storage.getTemplateById(req.params.id);
       if (!template) {
-        res.status(404).json({ message: "Template not found" });
+        res.status(404).json({ message: t("routes.template_not_found", getLocale(req)) });
         return;
       }
       res.json(template);
@@ -1341,13 +1353,13 @@ export async function registerRoutes(
     try {
       const template = await storage.getTemplateById(req.params.id);
       if (!template) {
-        res.status(404).json({ message: "Template not found" });
+        res.status(404).json({ message: t("routes.template_not_found", getLocale(req)) });
         return;
       }
 
       const commodity = await storage.getCommodityById(template.commodityId);
       if (!commodity) {
-        res.json({ stale: true, reason: "Commodity no longer exists" });
+        res.json({ stale: true, reason: t("routes.commodity_no_longer_exists", getLocale(req)) });
         return;
       }
 
@@ -1357,7 +1369,7 @@ export async function registerRoutes(
       const dest = dests.find(d => d.iso2 === template.destIso2);
 
       if (!origin || !dest) {
-        res.json({ stale: true, reason: "Origin or destination no longer exists" });
+        res.json({ stale: true, reason: t("routes.origin_dest_no_longer_exists", getLocale(req)) });
         return;
       }
 
@@ -1375,23 +1387,23 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const template = await storage.getTemplateById(req.params.id);
       if (!template) {
-        res.status(404).json({ message: "Template not found" });
+        res.status(404).json({ message: t("routes.template_not_found", getLocale(req)) });
         return;
       }
       if (template.sessionId !== sessionId) {
-        res.status(403).json({ message: "Not your template" });
+        res.status(403).json({ message: t("routes.not_your_template", getLocale(req)) });
         return;
       }
 
       const { balance, freeLookupUsed } = await storage.getTokenBalance(sessionId);
       if (freeLookupUsed && balance < LOOKUP_COST) {
-        res.status(402).json({ message: "Insufficient tokens", required: LOOKUP_COST, balance });
+        res.status(402).json({ message: t("routes.insufficient_tokens", getLocale(req)), required: LOOKUP_COST, balance });
         return;
       }
 
       const commodity = await storage.getCommodityById(template.commodityId);
       if (!commodity) {
-        res.status(404).json({ message: "Commodity no longer exists" });
+        res.status(404).json({ message: t("routes.commodity_no_longer_exists", getLocale(req)) });
         return;
       }
 
@@ -1401,7 +1413,7 @@ export async function registerRoutes(
       const dest = dests.find(d => d.iso2 === template.destIso2);
 
       if (!origin || !dest) {
-        res.status(404).json({ message: "Origin or destination no longer exists" });
+        res.status(404).json({ message: t("routes.origin_dest_no_longer_exists", getLocale(req)) });
         return;
       }
 
@@ -1464,7 +1476,7 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const { companyName, registeredAddress, countryIso2, vatNumber, eoriNumber, einNumber, contactEmail } = req.body;
       if (!companyName || !registeredAddress || !countryIso2) {
-        res.status(400).json({ message: "companyName, registeredAddress, and countryIso2 are required" });
+        res.status(400).json({ message: t("routes.company_fields_required", getLocale(req)) });
         return;
       }
       const profile = await storage.upsertCompanyProfile({
@@ -1489,7 +1501,7 @@ export async function registerRoutes(
     try {
       const lookup = await storage.getLookupById(req.params.lookupId);
       if (!lookup) {
-        res.status(404).json({ message: "Lookup not found" });
+        res.status(404).json({ message: t("routes.lookup_not_found", getLocale(req)) });
         return;
       }
 
@@ -1557,7 +1569,7 @@ export async function registerRoutes(
     try {
       const lookup = await storage.getLookupByTwinlogRef(req.params.ref);
       if (!lookup) {
-        res.status(404).json({ message: "Reference not found" });
+        res.status(404).json({ message: t("routes.reference_not_found", getLocale(req)) });
         return;
       }
       res.json({
@@ -1584,7 +1596,7 @@ export async function registerRoutes(
       if (!profile || !profile.profileComplete) {
         res.status(403).json({
           error: "PROFILE_REQUIRED",
-          message: "Complete your company profile at /settings/profile before downloading TwinLog Trail records.",
+          message: t("routes.profile_required", getLocale(req)),
         });
         return;
       }
@@ -1597,7 +1609,7 @@ export async function registerRoutes(
       if (lookupId) {
         const lookup = await storage.getLookupById(lookupId);
         if (!lookup) {
-          res.status(404).json({ message: "Lookup not found" });
+          res.status(404).json({ message: t("routes.lookup_not_found", getLocale(req)) });
           return;
         }
         result = lookup.resultJson as ComplianceResult;
@@ -1607,7 +1619,7 @@ export async function registerRoutes(
       } else if (complianceResult) {
         result = complianceResult as ComplianceResult;
       } else {
-        res.status(400).json({ message: "lookupId or complianceResult is required" });
+        res.status(400).json({ message: t("routes.lookupid_or_result_required", getLocale(req)) });
         return;
       }
 
@@ -1655,7 +1667,7 @@ export async function registerRoutes(
       stream.on("error", (err: Error) => {
         console.error("PDF stream error:", err);
         if (!res.headersSent) {
-          res.status(500).json({ message: "PDF generation failed" });
+          res.status(500).json({ message: t("routes.pdf_generation_failed", getLocale(req)) });
         }
       });
       stream.pipe(res);
@@ -1723,13 +1735,13 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const { lookupId } = req.body;
       if (!lookupId) {
-        res.status(400).json({ message: "lookupId is required" });
+        res.status(400).json({ message: t("routes.lookupid_required", getLocale(req)) });
         return;
       }
 
       const lookup = await storage.getLookupById(lookupId);
       if (!lookup) {
-        res.status(404).json({ message: "Lookup not found" });
+        res.status(404).json({ message: t("routes.lookup_not_found", getLocale(req)) });
         return;
       }
 
@@ -1786,13 +1798,13 @@ export async function registerRoutes(
       const { id } = req.params;
       const { channel } = req.body;
       if (!channel || !["whatsapp", "email", "link"].includes(channel)) {
-        res.status(400).json({ message: "channel must be whatsapp, email, or link" });
+        res.status(400).json({ message: t("routes.channel_required", getLocale(req)) });
         return;
       }
 
       const request = await storage.getSupplierRequestById(id);
       if (!request) {
-        res.status(404).json({ message: "Supplier request not found" });
+        res.status(404).json({ message: t("routes.supplier_request_not_found", getLocale(req)) });
         return;
       }
 
@@ -1822,17 +1834,17 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const { requestId } = req.params;
       if (!requestId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(requestId)) {
-        res.status(400).json({ message: "Invalid request ID" });
+        res.status(400).json({ message: t("routes.invalid_request_id", getLocale(req)) });
         return;
       }
 
       const request = await storage.getSupplierRequestById(requestId);
       if (!request) {
-        res.status(404).json({ message: "Supplier request not found" });
+        res.status(404).json({ message: t("routes.supplier_request_not_found", getLocale(req)) });
         return;
       }
       if (request.userSessionId !== sessionId) {
-        res.status(403).json({ message: "Not authorized" });
+        res.status(403).json({ message: t("routes.not_authorized", getLocale(req)) });
         return;
       }
 
@@ -1870,19 +1882,19 @@ export async function registerRoutes(
 
         const docType = req.body?.doc_type;
         if (!docType) {
-          res.status(400).json({ message: "doc_type is required" });
+          res.status(400).json({ message: t("routes.doc_type_required", getLocale(req)) });
           return;
         }
 
         const docsRequired = (request.docsRequired as string[]) || [];
         if (!docsRequired.includes(docType)) {
-          res.status(400).json({ message: "Invalid document type for this request" });
+          res.status(400).json({ message: t("routes.invalid_doc_type", getLocale(req)) });
           return;
         }
 
         const file = req.file;
         if (!file) {
-          res.status(400).json({ message: "No file uploaded" });
+          res.status(400).json({ message: t("routes.no_file_uploaded", getLocale(req)) });
           return;
         }
 
@@ -1951,26 +1963,26 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const { id } = req.params;
       if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
-        res.status(400).json({ message: "Invalid upload ID" });
+        res.status(400).json({ message: t("routes.invalid_upload_id", getLocale(req)) });
         return;
       }
 
       const upload = await storage.getSupplierUploadById(id);
       if (!upload || !upload.requestId) {
-        res.status(404).json({ message: "Upload not found" });
+        res.status(404).json({ message: t("routes.upload_not_found", getLocale(req)) });
         return;
       }
 
       // Verify ownership: the supplier request must belong to this session
       const request = await storage.getSupplierRequestById(upload.requestId);
       if (!request || request.userSessionId !== sessionId) {
-        res.status(403).json({ message: "Not authorized" });
+        res.status(403).json({ message: t("routes.not_authorized", getLocale(req)) });
         return;
       }
 
       const { verified, finding, ucpRule } = req.body;
       if (typeof verified !== "boolean") {
-        res.status(400).json({ message: "verified (boolean) is required" });
+        res.status(400).json({ message: t("routes.verified_required", getLocale(req)) });
         return;
       }
 
@@ -2026,19 +2038,19 @@ export async function registerRoutes(
       const sessionId = getSessionId(req, res);
       const { id } = req.params;
       if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
-        res.status(400).json({ message: "Invalid upload ID" });
+        res.status(400).json({ message: t("routes.invalid_upload_id", getLocale(req)) });
         return;
       }
 
       const upload = await storage.getSupplierUploadById(id);
       if (!upload || !upload.requestId) {
-        res.status(404).json({ message: "Upload not found" });
+        res.status(404).json({ message: t("routes.upload_not_found", getLocale(req)) });
         return;
       }
 
       const request = await storage.getSupplierRequestById(upload.requestId);
       if (!request || request.userSessionId !== sessionId) {
-        res.status(403).json({ message: "Not authorized" });
+        res.status(403).json({ message: t("routes.not_authorized", getLocale(req)) });
         return;
       }
 
@@ -2058,7 +2070,7 @@ export async function registerRoutes(
       // Read the file to analyze
       const filePath = upload.fileKey;
       if (!fs.existsSync(filePath)) {
-        res.status(404).json({ message: "File not found on disk" });
+        res.status(404).json({ message: t("routes.file_not_found_on_disk", getLocale(req)) });
         return;
       }
 
@@ -2078,7 +2090,7 @@ export async function registerRoutes(
       // Call Anthropic API to analyze the document
       const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
       if (!ANTHROPIC_API_KEY) {
-        res.status(503).json({ message: "AI scanning not configured. Set ANTHROPIC_API_KEY to enable.", code: "AI_NOT_CONFIGURED" });
+        res.status(503).json({ message: t("routes.ai_not_configured", getLocale(req)), code: "AI_NOT_CONFIGURED" });
         return;
       }
 
@@ -2145,7 +2157,7 @@ Rules:
       if (!anthropicRes.ok) {
         const errorText = await anthropicRes.text();
         console.error("Anthropic API error:", anthropicRes.status, errorText);
-        res.status(502).json({ message: "AI scan failed. Please try again or verify manually." });
+        res.status(502).json({ message: t("routes.ai_scan_failed", getLocale(req)) });
         return;
       }
 
@@ -2161,7 +2173,7 @@ Rules:
         scanResult = JSON.parse(jsonMatch[0]);
       } catch (parseErr) {
         console.error("Failed to parse AI response:", responseText);
-        res.status(502).json({ message: "AI scan returned unparseable results. Please verify manually." });
+        res.status(502).json({ message: t("routes.ai_scan_unparseable", getLocale(req)) });
         return;
       }
 
@@ -2230,16 +2242,16 @@ Rules:
     try {
       const { token } = req.params;
       if (!UUID_REGEX.test(token)) {
-        res.status(404).json({ message: "Upload link not found" });
+        res.status(404).json({ message: t("routes.upload_link_not_found", getLocale(req)) });
         return;
       }
       const request = await storage.getSupplierRequestByToken(token);
       if (!request) {
-        res.status(404).json({ message: "Upload link not found" });
+        res.status(404).json({ message: t("routes.upload_link_not_found", getLocale(req)) });
         return;
       }
       if (new Date(request.uploadExpiresAt) < new Date()) {
-        res.status(410).json({ message: "Upload link has expired" });
+        res.status(410).json({ message: t("routes.upload_link_expired", getLocale(req)) });
         return;
       }
 
@@ -2309,34 +2321,34 @@ Rules:
     try {
       const token = req.params.token as string;
       if (!UUID_REGEX.test(token)) {
-        res.status(404).json({ message: "Upload link not found" });
+        res.status(404).json({ message: t("routes.upload_link_not_found", getLocale(req)) });
         return;
       }
       const request = await storage.getSupplierRequestByToken(token);
       if (!request) {
-        res.status(404).json({ message: "Upload link not found" });
+        res.status(404).json({ message: t("routes.upload_link_not_found", getLocale(req)) });
         return;
       }
       if (new Date(request.uploadExpiresAt) < new Date()) {
-        res.status(410).json({ message: "Upload link has expired" });
+        res.status(410).json({ message: t("routes.upload_link_expired", getLocale(req)) });
         return;
       }
 
       const docType = req.body?.doc_type;
       if (!docType) {
-        res.status(400).json({ message: "doc_type is required" });
+        res.status(400).json({ message: t("routes.doc_type_required", getLocale(req)) });
         return;
       }
 
       const docsRequired = (request.docsRequired as string[]) || [];
       if (!docsRequired.includes(docType)) {
-        res.status(400).json({ message: "Invalid document type for this request" });
+        res.status(400).json({ message: t("routes.invalid_doc_type", getLocale(req)) });
         return;
       }
 
       const file = req.file;
       if (!file) {
-        res.status(400).json({ message: "No file uploaded" });
+        res.status(400).json({ message: t("routes.no_file_uploaded", getLocale(req)) });
         return;
       }
 
@@ -2473,12 +2485,12 @@ Rules:
     try {
       const { token } = req.params;
       if (!UUID_REGEX.test(token)) {
-        res.status(404).json({ message: "Upload link not found" });
+        res.status(404).json({ message: t("routes.upload_link_not_found", getLocale(req)) });
         return;
       }
       const request = await storage.getSupplierRequestByToken(token);
       if (!request) {
-        res.status(404).json({ message: "Upload link not found" });
+        res.status(404).json({ message: t("routes.upload_link_not_found", getLocale(req)) });
         return;
       }
 
@@ -2529,7 +2541,7 @@ Rules:
       const sessionId = getSessionId(req, res);
       const deleted = await storage.deleteTemplate(req.params.id, sessionId);
       if (!deleted) {
-        res.status(404).json({ message: "Template not found or not yours" });
+        res.status(404).json({ message: t("routes.template_not_found_or_not_yours", getLocale(req)) });
         return;
       }
       res.json({ success: true });
@@ -2543,12 +2555,12 @@ Rules:
       const sessionId = getSessionId(req, res);
       const { commodityId, destIso2 } = req.body;
       if (!commodityId || !destIso2) {
-        res.status(400).json({ message: "commodityId and destIso2 are required" });
+        res.status(400).json({ message: t("routes.alert_fields_required", getLocale(req)) });
         return;
       }
       const count = await storage.getAlertSubscriptionCount(sessionId);
       if (count >= 3) {
-        res.status(403).json({ message: "Free limit reached. You can watch up to 3 corridors.", count });
+        res.status(403).json({ message: t("routes.alert_free_limit", getLocale(req)), count });
         return;
       }
       const sub = await storage.createAlertSubscription({ userSessionId: sessionId, commodityId, destIso2 });
@@ -2638,7 +2650,7 @@ Rules:
       const rateEntry = extractRateLimits.get(sessionId);
       if (rateEntry && now < rateEntry.resetAt) {
         if (rateEntry.count >= 20) {
-          res.status(429).json({ error: "Too many extraction requests. Please try again later." });
+          res.status(429).json({ error: t("routes.rate_limit_extract", getLocale(req)) });
           return;
         }
         rateEntry.count++;
@@ -2648,7 +2660,7 @@ Rules:
 
       const file = req.file;
       if (!file) {
-        res.status(400).json({ error: "No file uploaded" });
+        res.status(400).json({ error: t("routes.no_file_uploaded", getLocale(req)) });
         return;
       }
 
@@ -2661,7 +2673,7 @@ Rules:
       if (!validTypes.includes(documentType)) {
         // Clean up temp file
         try { fs.unlinkSync(file.path); } catch {}
-        res.status(400).json({ error: "Invalid document type" });
+        res.status(400).json({ error: t("routes.invalid_document_type", getLocale(req)) });
         return;
       }
 
@@ -2736,7 +2748,7 @@ Rules:
       const sessionId = getSessionId(req, res);
       const { lookupId, commodityId, originIso2, destIso2 } = req.body;
       if (!lookupId) {
-        res.status(400).json({ message: "lookupId is required" });
+        res.status(400).json({ message: t("routes.lookupid_required", getLocale(req)) });
         return;
       }
       const existing = await storage.getEudrRecordByLookupId(lookupId);
@@ -2785,7 +2797,7 @@ Rules:
       }
       const updated = await storage.updateEudrRecord(req.params.id, sanitized);
       if (!updated) {
-        res.status(404).json({ message: "EUDR record not found" });
+        res.status(404).json({ message: t("routes.eudr_not_found", getLocale(req)) });
         return;
       }
       res.json(updated);
@@ -2805,7 +2817,7 @@ Rules:
         eudrRecord = await storage.getEudrRecordByLookupId(req.params.id) || null;
       }
       if (!eudrRecord) {
-        res.status(404).json({ message: "EUDR record not found" });
+        res.status(404).json({ message: t("routes.eudr_not_found", getLocale(req)) });
         return;
       }
 
@@ -2899,7 +2911,7 @@ Rules:
       stream.on("error", (err: Error) => {
         console.error("EUDR PDF stream error:", err);
         if (!res.headersSent) {
-          res.status(500).json({ message: "PDF generation failed" });
+          res.status(500).json({ message: t("routes.pdf_generation_failed", getLocale(req)) });
         }
       });
       stream.pipe(res);
@@ -2928,7 +2940,7 @@ Rules:
       // 1. Verify ownership
       const lookup = await storage.getLookupById(lookupId);
       if (!lookup || lookup.sessionId !== sessionId) {
-        res.status(404).json({ message: "Trade not found" });
+        res.status(404).json({ message: t("routes.trade_not_found", getLocale(req)) });
         return;
       }
 
@@ -3000,7 +3012,7 @@ Rules:
       const sessionId = getSessionId(req, res);
       const { lookupId } = req.body;
       if (!lookupId) {
-        res.status(400).json({ message: "lookupId is required" });
+        res.status(400).json({ message: t("routes.lookupid_required", getLocale(req)) });
         return;
       }
       const existing = await storage.getCbamRecordByLookupId(lookupId);
@@ -3031,7 +3043,7 @@ Rules:
       if (updated) {
         res.json(updated);
       } else {
-        res.status(404).json({ message: "CBAM record not found" });
+        res.status(404).json({ message: t("routes.cbam_not_found", getLocale(req)) });
       }
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -3046,7 +3058,7 @@ Rules:
       // 1. Verify ownership
       const lookup = await storage.getLookupById(lookupId);
       if (!lookup || lookup.sessionId !== sessionId) {
-        res.status(404).json({ message: "Trade not found" });
+        res.status(404).json({ message: t("routes.trade_not_found", getLocale(req)) });
         return;
       }
 
@@ -3108,7 +3120,7 @@ Rules:
       const { password } = req.body;
       const adminPw = process.env.ADMIN_PASSWORD;
       if (!adminPw || password !== adminPw) {
-        res.status(401).json({ message: "Invalid admin password" });
+        res.status(401).json({ message: t("routes.invalid_admin_password", getLocale(req)) });
         return;
       }
       const sessionId = getSessionId(req, res);
@@ -3134,13 +3146,13 @@ Rules:
     try {
       const sessionId = getSessionId(req, res);
       const isAdmin = await storage.isAdminSession(sessionId);
-      if (!isAdmin) { res.status(401).json({ message: "Unauthorized" }); return; }
+      if (!isAdmin) { res.status(401).json({ message: t("routes.unauthorized", getLocale(req)) }); return; }
 
       const { code, tradeTokens, lcCredits, maxRedemptions, expiresAt } = req.body;
-      if (!code) { res.status(400).json({ message: "code is required" }); return; }
+      if (!code) { res.status(400).json({ message: t("routes.code_required", getLocale(req)) }); return; }
 
       const existing = await storage.getPromoCodeByCode(code);
-      if (existing) { res.status(409).json({ message: "Code already exists" }); return; }
+      if (existing) { res.status(409).json({ message: t("routes.code_already_exists", getLocale(req)) }); return; }
 
       const promoCode = await storage.createPromoCode({
         code: code.toUpperCase().trim(),
@@ -3159,7 +3171,7 @@ Rules:
     try {
       const sessionId = getSessionId(req, res);
       const isAdmin = await storage.isAdminSession(sessionId);
-      if (!isAdmin) { res.status(401).json({ message: "Unauthorized" }); return; }
+      if (!isAdmin) { res.status(401).json({ message: t("routes.unauthorized", getLocale(req)) }); return; }
       const codes = await storage.getPromoCodes();
       res.json(codes);
     } catch (error: any) {
@@ -3172,12 +3184,12 @@ Rules:
     try {
       const sessionId = getSessionId(req, res);
       const { code } = req.body;
-      if (!code || typeof code !== "string") { res.status(400).json({ message: "code is required" }); return; }
+      if (!code || typeof code !== "string") { res.status(400).json({ message: t("routes.code_required", getLocale(req)) }); return; }
 
       const promoCode = await storage.getPromoCodeByCode(code);
-      if (!promoCode) { res.status(404).json({ message: "Invalid promo code" }); return; }
-      if (!promoCode.isActive) { res.status(400).json({ message: "This promo code is no longer active" }); return; }
-      if (promoCode.expiresAt && new Date(promoCode.expiresAt) < new Date()) { res.status(400).json({ message: "This promo code has expired" }); return; }
+      if (!promoCode) { res.status(404).json({ message: t("routes.invalid_promo_code", getLocale(req)) }); return; }
+      if (!promoCode.isActive) { res.status(400).json({ message: t("routes.promo_inactive", getLocale(req)) }); return; }
+      if (promoCode.expiresAt && new Date(promoCode.expiresAt) < new Date()) { res.status(400).json({ message: t("routes.promo_expired", getLocale(req)) }); return; }
 
       const result = await storage.redeemPromoCode(promoCode.id, sessionId, promoCode.tradeTokens, promoCode.lcCredits, promoCode.code);
       if (!result.success) { res.status(400).json({ message: result.message }); return; }
@@ -3194,11 +3206,11 @@ Rules:
       const { admin_password, source, hs_codes_affected, dest_iso2_affected, summary, source_url, effective_date } = req.body;
       const adminPw = process.env.ADMIN_PASSWORD;
       if (!adminPw || admin_password !== adminPw) {
-        res.status(401).json({ message: "Unauthorized" });
+        res.status(401).json({ message: t("routes.unauthorized", getLocale(req)) });
         return;
       }
       if (!summary) {
-        res.status(400).json({ message: "summary is required" });
+        res.status(400).json({ message: t("routes.summary_required", getLocale(req)) });
         return;
       }
       const hsArr = typeof hs_codes_affected === "string"
@@ -3242,7 +3254,7 @@ Rules:
       try {
         const { baseRate, chargeableDays } = req.body;
         if (typeof baseRate !== "number" || typeof chargeableDays !== "number") {
-          res.status(400).json({ message: "baseRate and chargeableDays (numbers) are required" });
+          res.status(400).json({ message: "baseRate and chargeableDays (numbers) are required" }); // test-only: not translated
           return;
         }
         if (chargeableDays <= 0) {
@@ -3280,12 +3292,12 @@ Rules:
   async function requireApiKey(req: Request, res: Response): Promise<string | null> {
     const apiAuth = await getSessionFromApiKey(req);
     if (!apiAuth) {
-      res.status(401).json({ success: false, error: { code: "UNAUTHORIZED", message: "Invalid or missing API key. Use Authorization: Bearer tt_live_..." } });
+      res.status(401).json({ success: false, error: { code: "UNAUTHORIZED", message: t("routes.api_unauthorized", getLocale(req)) } });
       return null;
     }
     const rateCheck = checkRateLimit(apiAuth.apiKeyId);
     if (!rateCheck.allowed) {
-      res.status(429).set("Retry-After", String(rateCheck.retryAfter)).json({ success: false, error: { code: "RATE_LIMITED", message: `Rate limit exceeded. Retry after ${rateCheck.retryAfter}s.` } });
+      res.status(429).set("Retry-After", String(rateCheck.retryAfter)).json({ success: false, error: { code: "RATE_LIMITED", message: t("routes.api_rate_limited", getLocale(req), { retryAfter: rateCheck.retryAfter! }) } });
       return null;
     }
     // Touch last used (fire-and-forget)
@@ -3330,7 +3342,7 @@ Rules:
     try {
       const { commodityId, originId, destinationId } = req.body;
       if (!commodityId || !originId || !destinationId) {
-        res.status(400).json({ success: false, error: { code: "INVALID_REQUEST", message: "commodityId, originId, and destinationId are required" } });
+        res.status(400).json({ success: false, error: { code: "INVALID_REQUEST", message: t("routes.api_fields_required", getLocale(req)) } });
         return;
       }
 
@@ -3339,7 +3351,7 @@ Rules:
       if (!isAdmin) {
         const { balance } = await storage.getTokenBalance(sessionId);
         if (balance < LOOKUP_COST) {
-          res.status(402).json({ success: false, error: { code: "INSUFFICIENT_CREDITS", message: "Insufficient credits", required: LOOKUP_COST, balance } });
+          res.status(402).json({ success: false, error: { code: "INSUFFICIENT_CREDITS", message: t("routes.api_insufficient_credits", getLocale(req)), required: LOOKUP_COST, balance } });
           return;
         }
         await storage.spendTokens(sessionId, LOOKUP_COST, `API Compliance Lookup — ${commodityId}`);
@@ -3390,7 +3402,7 @@ Rules:
     try {
       const parsed = lcCheckRequestSchema.safeParse(req.body);
       if (!parsed.success) {
-        res.status(400).json({ success: false, error: { code: "INVALID_REQUEST", message: "Invalid request", details: parsed.error.flatten().fieldErrors } });
+        res.status(400).json({ success: false, error: { code: "INVALID_REQUEST", message: t("routes.lc_invalid_request", getLocale(req)), details: parsed.error.flatten().fieldErrors } });
         return;
       }
       const { lcFields, documents, sourceLookupId } = parsed.data;
@@ -3400,16 +3412,16 @@ Rules:
       if (!isAdmin) {
         const { balance } = await storage.getTokenBalance(sessionId);
         if (balance < 1) {
-          res.status(402).json({ success: false, error: { code: "INSUFFICIENT_CREDITS", message: "Insufficient credits", required: 1, balance } });
+          res.status(402).json({ success: false, error: { code: "INSUFFICIENT_CREDITS", message: t("routes.api_insufficient_credits", getLocale(req)), required: 1, balance } });
           return;
         }
         await storage.spendTokens(sessionId, 1, "API LC Check");
       }
 
-      const { results, summary } = runLcCrossCheck(lcFields, documents);
+      const { results, summary } = runLcCrossCheck(lcFields, documents, getLocale(req));
       const timestamp = new Date().toISOString();
       const integrityHash = computeLcHash(lcFields, documents, results, timestamp);
-      const correction = generateCorrectionEmail(lcFields, results);
+      const correction = generateCorrectionEmail(lcFields, results, getLocale(req));
 
       const saved = await storage.createLcCheck({
         lcFieldsJson: lcFields, documentsJson: documents,
@@ -3448,7 +3460,7 @@ Rules:
     try {
       const lookup = await storage.getLookupById(req.params.id);
       if (!lookup) {
-        res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: "Lookup not found" } });
+        res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: t("routes.lookup_not_found", getLocale(req)) } });
         return;
       }
       res.json({ success: true, data: lookup });
@@ -3463,7 +3475,7 @@ Rules:
     try {
       const check = await storage.getLcCheckById(req.params.id);
       if (!check) {
-        res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: "LC check not found" } });
+        res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: t("routes.lc_check_not_found", getLocale(req)) } });
         return;
       }
       res.json({ success: true, data: check });
@@ -3491,9 +3503,9 @@ Rules:
     try {
       const sessionId = getSessionId(req, res);
       const isAdmin = await storage.isAdminSession(sessionId);
-      if (!isAdmin) { res.status(401).json({ message: "Unauthorized" }); return; }
+      if (!isAdmin) { res.status(401).json({ message: t("routes.unauthorized", getLocale(req)) }); return; }
       const { name } = req.body;
-      if (!name) { res.status(400).json({ message: "name is required" }); return; }
+      if (!name) { res.status(400).json({ message: t("routes.api_key_name_required", getLocale(req)) }); return; }
       const apiKey = await storage.createApiKey(sessionId, name);
       res.json(apiKey);
     } catch (error: any) {
@@ -3505,7 +3517,7 @@ Rules:
     try {
       const sessionId = getSessionId(req, res);
       const isAdmin = await storage.isAdminSession(sessionId);
-      if (!isAdmin) { res.status(401).json({ message: "Unauthorized" }); return; }
+      if (!isAdmin) { res.status(401).json({ message: t("routes.unauthorized", getLocale(req)) }); return; }
       const keys = await storage.getApiKeysBySession(sessionId);
       res.json(keys);
     } catch (error: any) {
@@ -3517,9 +3529,9 @@ Rules:
     try {
       const sessionId = getSessionId(req, res);
       const isAdmin = await storage.isAdminSession(sessionId);
-      if (!isAdmin) { res.status(401).json({ message: "Unauthorized" }); return; }
+      if (!isAdmin) { res.status(401).json({ message: t("routes.unauthorized", getLocale(req)) }); return; }
       const ok = await storage.deactivateApiKey(req.params.id, sessionId);
-      if (!ok) { res.status(404).json({ message: "API key not found" }); return; }
+      if (!ok) { res.status(404).json({ message: t("routes.api_key_not_found", getLocale(req)) }); return; }
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -3532,11 +3544,11 @@ Rules:
       const sessionId = getSessionId(req, res);
       const hasPurchased = await storage.hasPurchased(sessionId);
       if (!hasPurchased) {
-        return res.status(403).json({ message: "Feature requests are available to paying customers" });
+        return res.status(403).json({ message: t("routes.feature_paying_only", getLocale(req)) });
       }
       const { title, description } = req.body;
       if (!title || typeof title !== "string" || title.trim().length < 3) {
-        return res.status(400).json({ message: "Title must be at least 3 characters" });
+        return res.status(400).json({ message: t("routes.feature_title_min", getLocale(req)) });
       }
       const request = await storage.createFeatureRequest(sessionId, title.trim(), description?.trim());
       res.json(request);
@@ -3559,7 +3571,7 @@ Rules:
     try {
       const sessionId = getSessionId(req, res);
       const isAdmin = await storage.isAdminSession(sessionId);
-      if (!isAdmin) return res.status(403).json({ message: "Admin only" });
+      if (!isAdmin) return res.status(403).json({ message: t("routes.admin_only", getLocale(req)) });
       const requests = await storage.getFeatureRequests();
       res.json(requests);
     } catch (error: any) {
@@ -3571,10 +3583,10 @@ Rules:
     try {
       const sessionId = getSessionId(req, res);
       const isAdmin = await storage.isAdminSession(sessionId);
-      if (!isAdmin) return res.status(403).json({ message: "Admin only" });
+      if (!isAdmin) return res.status(403).json({ message: t("routes.admin_only", getLocale(req)) });
       const { status, adminNote } = req.body;
       const updated = await storage.updateFeatureRequestStatus(req.params.id, status, adminNote);
-      if (!updated) return res.status(404).json({ message: "Not found" });
+      if (!updated) return res.status(404).json({ message: t("routes.not_found", getLocale(req)) });
       res.json(updated);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -3600,7 +3612,7 @@ Rules:
     try {
       const parsed = leadCaptureSchema.safeParse(req.body);
       if (!parsed.success) {
-        return res.status(400).json({ message: "Invalid input", errors: parsed.error.flatten().fieldErrors });
+        return res.status(400).json({ message: t("routes.invalid_input", getLocale(req)), errors: parsed.error.flatten().fieldErrors });
       }
       const sessionId = getSessionId(req, res);
       const { email, companyName, source, lookupId, commodityName, corridorDescription } = parsed.data;
@@ -3639,7 +3651,7 @@ Rules:
     try {
       const sessionId = getSessionId(req, res);
       const isAdmin = await storage.isAdminSession(sessionId);
-      if (!isAdmin) return res.status(403).json({ message: "Admin only" });
+      if (!isAdmin) return res.status(403).json({ message: t("routes.admin_only", getLocale(req)) });
       const allLeads = await storage.getLeads(500);
       res.json({ leads: allLeads });
     } catch (error: any) {
@@ -3781,25 +3793,25 @@ Rules:
       const requirementIndex = parseInt(reqIndex, 10);
 
       if (isNaN(requirementIndex) || requirementIndex < 0) {
-        return res.status(400).json({ message: "Invalid requirement index" });
+        return res.status(400).json({ message: t("routes.invalid_requirement_index", getLocale(req)) });
       }
 
       const file = req.file;
       if (!file) {
-        return res.status(400).json({ message: "No file uploaded" });
+        return res.status(400).json({ message: t("routes.no_file_uploaded", getLocale(req)) });
       }
 
       // Get the lookup
       const lookup = await storage.getLookupById(lookupId);
       if (!lookup) {
-        return res.status(404).json({ message: "Lookup not found" });
+        return res.status(404).json({ message: t("routes.lookup_not_found", getLocale(req)) });
       }
 
       // Get the requirement
       const result = lookup.resultJson as any;
       const requirements = result?.requirementsDetailed ?? [];
       if (requirementIndex >= requirements.length) {
-        return res.status(400).json({ message: "Requirement index out of range" });
+        return res.status(400).json({ message: t("routes.requirement_out_of_range", getLocale(req)) });
       }
 
       const requirement = requirements[requirementIndex];
@@ -3886,7 +3898,7 @@ Rules:
       const id = req.params.id as string;
       const validation = await storage.getDocumentValidationById(id);
       if (!validation) {
-        return res.status(404).json({ message: "Validation not found" });
+        return res.status(404).json({ message: t("routes.validation_not_found", getLocale(req)) });
       }
       return res.json(validation);
     } catch (error: any) {
@@ -3903,12 +3915,12 @@ Rules:
       const { verdict, reason } = req.body;
 
       if (!verdict || !reason) {
-        return res.status(400).json({ message: "verdict and reason are required" });
+        return res.status(400).json({ message: t("routes.verdict_reason_required", getLocale(req)) });
       }
 
       const updated = await storage.overrideDocumentValidation(id, sessionId, verdict, reason);
       if (!updated) {
-        return res.status(404).json({ message: "Validation not found or access denied" });
+        return res.status(404).json({ message: t("routes.validation_access_denied", getLocale(req)) });
       }
 
       return res.json(updated);
@@ -3926,11 +3938,11 @@ Rules:
 
       const validation = await storage.getDocumentValidationById(id);
       if (!validation || validation.sessionId !== sessionId) {
-        return res.status(404).json({ message: "Validation not found or access denied" });
+        return res.status(404).json({ message: t("routes.validation_access_denied", getLocale(req)) });
       }
 
       if (!validation.fileKey || !fs.existsSync(validation.fileKey)) {
-        return res.status(400).json({ message: "Original file no longer available" });
+        return res.status(400).json({ message: t("routes.file_no_longer_available", getLocale(req)) });
       }
 
       // Reset processing status
@@ -3945,7 +3957,7 @@ Rules:
       // Get the lookup for trade context
       const lookup = await storage.getLookupById(validation.lookupId);
       if (!lookup) {
-        return res.status(404).json({ message: "Lookup not found" });
+        return res.status(404).json({ message: t("routes.lookup_not_found", getLocale(req)) });
       }
 
       const result = lookup.resultJson as any;
@@ -3999,7 +4011,7 @@ Rules:
 
       const deleted = await storage.deleteDocumentValidation(id, sessionId);
       if (!deleted) {
-        return res.status(404).json({ message: "Validation not found or access denied" });
+        return res.status(404).json({ message: t("routes.validation_access_denied", getLocale(req)) });
       }
 
       return res.json({ success: true });

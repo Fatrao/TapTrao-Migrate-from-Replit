@@ -1,0 +1,54 @@
+{
+  "pageTitle": "Company Profile",
+  "pageSubtitle": "Your company details appear on every TwinLog Trail compliance record. Required for PDF generation.",
+
+  "profileComplete": "Profile complete. You can download TwinLog Trail records.",
+
+  "companyName.label": "Company Name *",
+  "companyName.placeholder": "e.g. Acme Trading Ltd",
+  "companyName.description": "As it appears on your Certificate of Incorporation",
+  "companyName.required": "Company name is required",
+
+  "registeredAddress.label": "Registered Office Address *",
+  "registeredAddress.placeholder": "Full address including postcode/ZIP",
+  "registeredAddress.description": "Full address including postcode/ZIP. Must match incorporation documents.",
+  "registeredAddress.required": "Registered address is required",
+
+  "country.label": "Country of Registration *",
+  "country.placeholder": "Select a country",
+  "country.required": "Country is required",
+
+  "vat.label": "VAT Number",
+  "vat.placeholder": "e.g. GB123456789",
+  "vat.description": "Used for EU/UK trade records.",
+
+  "eori.label": "EORI Number",
+  "eori.placeholder": "e.g. GB205672212000",
+  "eori.description": "Economic Operators Registration and Identification number. Required by UK/EU customs to track every shipment. Without this, your compliance record cannot reference your customs identity.",
+  "eori.whyTitle": "Why EORI matters",
+  "eori.whyBody": "Your EORI number is what customs authorities use to identify you on every import declaration. A compliance record without an EORI cannot be linked to your customs activity. UK traders: apply at gov.uk/eori. EU traders: apply via your national customs authority.",
+
+  "ein.label": "EIN (Employer Identification Number)",
+  "ein.placeholder": "e.g. 12-3456789",
+  "ein.description": "US Federal Tax ID issued by the IRS (format: XX-XXXXXXX). Used as the Importer of Record number for US Customs and Border Protection (CBP).",
+  "ein.whyTitle": "EIN for US trade",
+  "ein.whyBody": "The EIN is the US equivalent of the EORI number. It identifies your business on all US customs entry documents filed with CBP. If you import into the USA, your EIN serves as your Importer of Record (IOR) number. Apply at irs.gov/ein. Note: the USA does not use the EORI system \u2014 if you also ship to the EU/UK, you will need both an EIN and an EORI.",
+
+  "contactEmail.label": "Contact Email",
+  "contactEmail.placeholder": "trade@yourcompany.com",
+  "contactEmail.description": "Appears on the compliance record as the responsible party contact.",
+  "contactEmail.invalid": "Must be a valid email",
+
+  "saveProfile": "Save Profile",
+  "saving": "Saving...",
+
+  "toast.saved": "Profile saved",
+  "toast.noCustomsId": "No EORI or EIN number saved. We recommend adding your EORI (EU/UK) or EIN (US) before sharing records with banks or customs authorities.",
+  "toast.einSaved": "EIN saved. If you also trade with the EU/UK, consider adding your EORI number.",
+  "toast.eoriSaved": "EORI saved. If you also trade with the US, consider adding your EIN.",
+  "toast.allSaved": "You can now download TwinLog Trail records.",
+  "toast.errorTitle": "Error saving profile",
+  "toast.errorGeneric": "Something went wrong",
+
+  "warning.noCustomsId": "No customs identification number saved. Add your EORI (EU/UK traders) or EIN (US traders) before sharing records with banks or customs authorities."
+}

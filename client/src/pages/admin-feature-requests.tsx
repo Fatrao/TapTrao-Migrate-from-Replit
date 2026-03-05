@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { useTokenBalance } from "@/hooks/use-tokens";
@@ -25,6 +26,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 export default function AdminFeatureRequests() {
+  const { t } = useTranslation("admin");
   const [, navigate] = useLocation();
   const { data: tokenData } = useTokenBalance();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -66,13 +68,13 @@ export default function AdminFeatureRequests() {
     <AppShell>
       <div style={{ margin: "4px 24px 16px", padding: "32px 28px", borderRadius: 14, background: "linear-gradient(135deg, #0e4e45, #14574a, #1c6352, #327462, #3a7d6a)" }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
-          Admin
+          {t("featureRequests.adminLabel")}
         </div>
         <h1 style={{ fontSize: 28, fontWeight: 700, color: "#fff", margin: 0, fontFamily: "'Clash Display', sans-serif" }}>
-          🗳️ Feature Requests
+          {t("featureRequests.title")}
         </h1>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", marginTop: 6, marginBottom: 0 }}>
-          {requests.length} total request{requests.length !== 1 ? "s" : ""} from paying customers
+          {t("featureRequests.totalRequests", { count: requests.length })}
         </p>
       </div>
 
@@ -111,7 +113,7 @@ export default function AdminFeatureRequests() {
                           </div>
                         )}
                         <div style={{ fontSize: 13, color: "#999" }}>
-                          {new Date(req.createdAt).toLocaleDateString()} · Session: {req.sessionId.substring(0, 8)}…
+                          {new Date(req.createdAt).toLocaleDateString()} · {t("featureRequests.sessionPrefix")} {req.sessionId.substring(0, 8)}...
                         </div>
                         {req.adminNote && (
                           <div style={{
@@ -119,7 +121,7 @@ export default function AdminFeatureRequests() {
                             background: "#f8f8f8", fontSize: 14, color: "#555",
                             borderLeft: "3px solid #0e4e45",
                           }}>
-                            <strong>Note:</strong> {req.adminNote}
+                            <strong>{t("featureRequests.noteLabel")}</strong> {req.adminNote}
                           </div>
                         )}
                       </div>
@@ -138,7 +140,7 @@ export default function AdminFeatureRequests() {
                                 letterSpacing: "0.04em",
                               }}
                             >
-                              → {s}
+                              {s}
                             </button>
                           );
                         })}
@@ -152,7 +154,7 @@ export default function AdminFeatureRequests() {
                           type="text"
                           value={editNote}
                           onChange={(e) => setEditNote(e.target.value)}
-                          placeholder="Add admin note..."
+                          placeholder={t("featureRequests.addNotePlaceholder")}
                           style={{
                             flex: 1, padding: "6px 10px", borderRadius: 6,
                             border: "1px solid #ddd", fontSize: 14, outline: "none",
@@ -164,14 +166,14 @@ export default function AdminFeatureRequests() {
                             padding: "6px 12px", borderRadius: 6, fontSize: 13, fontWeight: 600,
                             background: "#0e4e45", color: "#fff", border: "none", cursor: "pointer",
                           }}
-                        >Save</button>
+                        >{t("featureRequests.saveButton")}</button>
                         <button
                           onClick={() => { setEditingId(null); setEditNote(""); }}
                           style={{
                             padding: "6px 10px", borderRadius: 6, fontSize: 13,
                             background: "#f3f3f3", color: "#666", border: "none", cursor: "pointer",
                           }}
-                        >Cancel</button>
+                        >{t("featureRequests.cancelButton")}</button>
                       </div>
                     ) : (
                       <button
@@ -181,7 +183,7 @@ export default function AdminFeatureRequests() {
                           border: "none", cursor: "pointer", padding: 0, fontWeight: 500,
                         }}
                       >
-                        {req.adminNote ? "Edit note" : "+ Add note"}
+                        {req.adminNote ? t("featureRequests.editNote") : t("featureRequests.addNote")}
                       </button>
                     )}
                   </div>
@@ -196,10 +198,10 @@ export default function AdminFeatureRequests() {
             textAlign: "center", padding: "60px 20px",
             background: "#fff", borderRadius: 14,
           }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>🗳️</div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: "#1a1a1a" }}>No feature requests yet</div>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>&#x1F5F3;&#xFE0F;</div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: "#1a1a1a" }}>{t("featureRequests.emptyTitle")}</div>
             <div style={{ fontSize: 13, color: "#888", marginTop: 6 }}>
-              Paying customers can submit requests via the sidebar button.
+              {t("featureRequests.emptySubtitle")}
             </div>
           </div>
         )}

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { AppShell } from "@/components/AppShell";
@@ -24,6 +25,7 @@ const sourceBadgeStyles: Record<string, { bg: string; border: string; color: str
 };
 
 function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: string) => void }) {
+  const { t } = useTranslation("alerts");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -94,13 +96,13 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
       {alert.hsCodesAffected && alert.hsCodesAffected.length > 0 && (
         <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)", margin: "2px 0" }}>
           HS: {alert.hsCodesAffected.slice(0, 6).join(", ")}
-          {alert.hsCodesAffected.length > 6 && ` +${alert.hsCodesAffected.length - 6} more`}
+          {alert.hsCodesAffected.length > 6 && ` ${t("hsMore", { count: alert.hsCodesAffected.length - 6 })}`}
         </p>
       )}
 
       {effectiveDateStr && (
         <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "var(--t3)", margin: "2px 0" }}>
-          Effective {effectiveDateStr}
+          {t("effective", { date: effectiveDateStr })}
         </p>
       )}
 
@@ -114,7 +116,7 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
               style={{ fontSize: 13, color: "var(--blue)", textDecoration: "none" }}
               data-testid={`link-alert-source-${alert.id}`}
             >
-              ↗ View source
+              ↗ {t("viewSource")}
             </a>
           )}
         </div>
@@ -132,7 +134,7 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
             }}
             data-testid={`button-alert-lookup-${alert.id}`}
           >
-            Run fresh lookup →
+            {t("runFreshLookup")} →
           </button>
         </Link>
       </div>
@@ -141,6 +143,7 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
 }
 
 export default function AlertsPage() {
+  const { t } = useTranslation("alerts");
   const alertsQuery = useQuery<AlertItem[]>({ queryKey: ["/api/alerts"] });
   const subsQuery = useQuery<{ subscriptions: any[]; count: number }>({ queryKey: ["/api/alerts/subscriptions"] });
   const alerts = alertsQuery.data ?? [];
@@ -169,7 +172,7 @@ export default function AlertsPage() {
             }}
             data-testid="text-alerts-title"
           >
-            Regulatory Alerts
+            {t("title")}
           </h1>
           <p
             style={{
@@ -180,11 +183,11 @@ export default function AlertsPage() {
             }}
             data-testid="text-alerts-subtitle"
           >
-            Monitoring {subCount} corridor{subCount !== 1 ? "s" : ""}
+            {t(subCount !== 1 ? "subtitle_other" : "subtitle", { count: subCount })}
           </p>
 
           {alertsQuery.isLoading ? (
-            <div style={{ color: "var(--t3)", fontSize: 13 }}>Loading alerts...</div>
+            <div style={{ color: "var(--t3)", fontSize: 13 }}>{t("loading")}</div>
           ) : alerts.length === 0 ? (
             <div
               style={{
@@ -196,9 +199,9 @@ export default function AlertsPage() {
               data-testid="empty-state"
             >
               <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6 }}>
-                You're not watching any corridors yet.
+                {t("emptyTitle")}
                 <br />
-                Run a lookup and click "Watch this corridor".
+                {t("emptyHint")}
               </p>
             </div>
           ) : (

@@ -1,21 +1,15 @@
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Menu, X, Settings } from "lucide-react";
+import { Menu, X, Settings, Globe } from "lucide-react";
 import { useState } from "react";
 import { useTokenBalance } from "@/hooks/use-tokens";
 
-const navLinks = [
-  { href: "/lookup", label: "Lookup" },
-  { href: "/lc-check", label: "LC Checker" },
-  { href: "/trades", label: "My Trades" },
-  { href: "/templates", label: "Templates", showCount: true },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/settings/profile", label: "Settings" },
-];
-
 export function NavBar() {
+  const { t, i18n } = useTranslation("common");
+  const isEn = i18n.language === "en";
   const [location] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const tokenQuery = useTokenBalance();
@@ -25,6 +19,15 @@ export function NavBar() {
     queryKey: ["/api/templates/count"],
   });
   const templateCount = templateCountQuery.data?.count ?? 0;
+
+  const navLinks = [
+    { href: "/lookup", label: t("nav.lookup"), testId: "lookup" },
+    { href: "/lc-check", label: t("nav.lcChecker"), testId: "lc-checker" },
+    { href: "/trades", label: t("nav.myTrades"), testId: "my-trades" },
+    { href: "/templates", label: t("nav.templates"), showCount: true, testId: "templates" },
+    { href: "/pricing", label: t("nav.pricing"), testId: "pricing" },
+    { href: "/settings/profile", label: t("nav.settings"), testId: "settings" },
+  ];
 
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border">
@@ -44,7 +47,7 @@ export function NavBar() {
                 <Button
                   variant={isActive ? "secondary" : "ghost"}
                   size="sm"
-                  data-testid={`nav-link-${link.label.toLowerCase().replace(/\s+/g, "-")}`}
+                  data-testid={`nav-link-${link.testId}`}
                 >
                   {link.label}
                   {link.showCount && templateCount > 0 && (
@@ -59,15 +62,25 @@ export function NavBar() {
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => i18n.changeLanguage(isEn ? "fr" : "en")}
+            title={isEn ? "Passer en français" : "Switch to English"}
+            data-testid="language-toggle-desktop"
+          >
+            <Globe className="w-4 h-4 mr-1" />
+            {isEn ? "FR" : "EN"}
+          </Button>
           <span
             className="inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1 text-sm font-medium"
             data-testid="badge-token-balance"
           >
-            {balance} {balance === 1 ? "trade" : "trades"}
+            {t("token.trade", { count: balance })}
           </span>
           <Link href="/pricing">
             <Button size="sm" variant="default" data-testid="button-top-up">
-              Top up
+              {t("token.topUp")}
             </Button>
           </Link>
         </div>
@@ -94,7 +107,7 @@ export function NavBar() {
                     variant={isActive ? "secondary" : "ghost"}
                     className="w-full justify-start"
                     onClick={() => setMobileOpen(false)}
-                    data-testid={`nav-mobile-link-${link.label.toLowerCase().replace(/\s+/g, "-")}`}
+                    data-testid={`nav-mobile-link-${link.testId}`}
                   >
                     {link.label}
                     {link.showCount && templateCount > 0 && (
@@ -106,16 +119,25 @@ export function NavBar() {
                 </Link>
               );
             })}
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => i18n.changeLanguage(isEn ? "fr" : "en")}
+              data-testid="language-toggle-mobile"
+            >
+              <Globe className="w-4 h-4 mr-2" />
+              {isEn ? "Français" : "English"}
+            </Button>
             <div className="flex items-center gap-2 pt-2 border-t border-border mt-1">
               <span
                 className="inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1 text-sm font-medium"
                 data-testid="badge-token-balance-mobile"
               >
-                {balance} {balance === 1 ? "trade" : "trades"}
+                {t("token.trade", { count: balance })}
               </span>
               <Link href="/pricing">
                 <Button size="sm" variant="default" onClick={() => setMobileOpen(false)} data-testid="button-top-up-mobile">
-                  Top up
+                  {t("token.topUp")}
                 </Button>
               </Link>
             </div>

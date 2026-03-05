@@ -1,0 +1,23 @@
+{
+  "title": "Mod\u00e8les",
+  "subtitle_one": "{{count}} mod\u00e8le enregistr\u00e9",
+  "subtitle_other": "{{count}} mod\u00e8les enregistr\u00e9s",
+
+  "empty": "Aucun mod\u00e8le enregistr\u00e9. Effectuez une recherche et enregistrez-la comme mod\u00e8le depuis le TwinLog Trail.",
+
+  "card.usedCount_one": "Utilis\u00e9 {{count}} fois",
+  "card.usedCount_other": "Utilis\u00e9 {{count}} fois",
+  "card.lastUsed": " \u00b7 Derni\u00e8re utilisation {{time}}",
+  "card.staleWarning": "La r\u00e9glementation a pu changer depuis la derni\u00e8re utilisation de ce mod\u00e8le",
+  "card.useTemplate": "Utiliser le mod\u00e8le \u2192",
+
+  "deleteModal.title": "Supprimer le mod\u00e8le",
+  "deleteModal.body": "\u00cates-vous s\u00fbr de vouloir supprimer ce mod\u00e8le ? Cette action est irr\u00e9versible.",
+  "deleteModal.deleting": "Suppression...",
+
+  "time.justNow": "\u00e0 l'instant",
+  "time.minsAgo": "il y a {{mins}}min",
+  "time.hoursAgo": "il y a {{hrs}}h",
+  "time.daysAgo": "il y a {{days}}j",
+  "time.monthsAgo": "il y a {{months}}mois"
+}

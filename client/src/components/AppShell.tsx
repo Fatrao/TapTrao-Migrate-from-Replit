@@ -2,10 +2,12 @@ import { Link, useLocation } from "wouter";
 import { X, LogOut, User, Hexagon } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTokenBalance } from "@/hooks/use-tokens";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 interface NavItem {
   icon: string;
@@ -15,31 +17,7 @@ interface NavItem {
   hasDot?: boolean;
 }
 
-/* ── Nav items ── */
-const mainItems: NavItem[] = [
-  { icon: "◉", label: "My Trades", href: "/trades", matchPaths: ["/trades"] },
-  { icon: "✦", label: "New Check", href: "/lookup" },
-  { icon: "📮", label: "Suppliers", href: "/inbox" },
-];
-
-const toolsItems: NavItem[] = [
-  { icon: "⌧", label: "Demurrage", href: "/demurrage" },
-  { icon: "📋", label: "Templates", href: "/templates" },
-  { icon: "🔔", label: "Alerts", href: "/alerts" },
-];
-
-const accountItems: NavItem[] = [
-  { icon: "⚙", label: "Settings", href: "/settings/profile" },
-  { icon: "◫", label: "Shield & Billing", href: "/pricing" },
-];
-
-const adminItems: NavItem[] = [
-  { icon: "🎟️", label: "Promo Codes", href: "/admin/promo-codes" },
-  { icon: "🔑", label: "API Keys", href: "/admin/api-keys" },
-  { icon: "📢", label: "Create Alert", href: "/admin/alerts/new" },
-  { icon: "🗳️", label: "Requests", href: "/admin/feature-requests" },
-  { icon: "🗂️", label: "Data", href: "/admin/data" },
-];
+/* ── Nav items (built with translations inside component) ── */
 
 function isNavActive(item: NavItem, pathname: string): boolean {
   if (item.matchPaths) {
@@ -57,6 +35,7 @@ interface AppShellProps {
 
 /* ── Feature Request Modal ── */
 function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation("common");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -93,15 +72,15 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
         {submitted ? (
           <div style={{ textAlign: "center", padding: "20px 0" }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>✅</div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>Thank you!</div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{t("featureModal.thankYou")}</div>
             <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 6 }}>
-              Your request has been submitted. We review every suggestion.
+              {t("featureModal.thankYouMessage")}
             </div>
           </div>
         ) : (
           <>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--t1)", margin: 0, fontFamily: "var(--fd)" }}>🗳️ Request a Feature</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--t1)", margin: 0, fontFamily: "var(--fd)" }}>🗳️ {t("featureModal.title")}</h3>
               <button onClick={onClose} style={{
                 background: "transparent", border: "none", color: "var(--t3)",
                 cursor: "pointer", fontSize: 18, padding: 4,
@@ -109,24 +88,24 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
             </div>
             <div style={{ marginBottom: 14 }}>
               <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
-                What would you like to see?
+                {t("featureModal.whatLabel")}
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Multi-currency support, Bulk LC checks..."
+                placeholder={t("featureModal.whatPlaceholder")}
                 maxLength={120}
               />
             </div>
             <div style={{ marginBottom: 20 }}>
               <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
-                Details (optional)
+                {t("featureModal.detailsLabel")}
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Tell us more about your use case..."
+                placeholder={t("featureModal.detailsPlaceholder")}
                 maxLength={1000}
                 rows={3}
               />
@@ -136,7 +115,7 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
                 padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 500,
                 background: "transparent", border: "1px solid rgba(0,0,0,0.12)",
                 color: "var(--t2)", cursor: "pointer",
-              }}>Cancel</button>
+              }}>{t("button.cancel")}</button>
               <button
                 onClick={() => mutation.mutate()}
                 disabled={title.trim().length < 3 || mutation.isPending}
@@ -146,12 +125,12 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
                   border: "none", color: "#fff", cursor: title.trim().length < 3 ? "not-allowed" : "pointer",
                   opacity: mutation.isPending ? 0.7 : 1,
                 }}>
-                {mutation.isPending ? "Submitting..." : "Submit Request"}
+                {mutation.isPending ? t("button.submitting") : t("featureModal.submitRequest")}
               </button>
             </div>
             {mutation.isError && (
               <div style={{ marginTop: 12, fontSize: 12, color: "var(--red)" }}>
-                {(mutation.error as any)?.message || "Failed to submit. Please try again."}
+                {(mutation.error as any)?.message || t("featureModal.failedSubmit")}
               </div>
             )}
           </>
@@ -162,6 +141,7 @@ function FeatureRequestModal({ open, onClose }: { open: boolean; onClose: () => 
 }
 
 export function AppShell({ children, contentClassName }: AppShellProps) {
+  const { t, i18n } = useTranslation("common");
   const [location, navigate] = useLocation();
   const isMobile = useIsMobile();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -171,6 +151,31 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
   const { user, isAuthenticated, logout } = useAuth();
   const alertsBadgeQuery = useQuery<{ count: number }>({ queryKey: ["/api/alerts/unread-count"] });
   const alertsBadge = alertsBadgeQuery.data?.count ?? 0;
+
+  const mainItems: NavItem[] = [
+    { icon: "◉", label: t("nav.myTrades"), href: "/trades", matchPaths: ["/trades"] },
+    { icon: "✦", label: t("nav.newCheck"), href: "/lookup" },
+    { icon: "📮", label: t("nav.suppliers"), href: "/inbox" },
+  ];
+
+  const toolsItems: NavItem[] = [
+    { icon: "⌧", label: t("nav.demurrage"), href: "/demurrage" },
+    { icon: "📋", label: t("nav.templates"), href: "/templates" },
+    { icon: "🔔", label: t("nav.alerts"), href: "/alerts" },
+  ];
+
+  const accountItems: NavItem[] = [
+    { icon: "⚙", label: t("nav.settings"), href: "/settings/profile" },
+    { icon: "◫", label: t("nav.shieldBilling"), href: "/pricing" },
+  ];
+
+  const adminItems: NavItem[] = [
+    { icon: "🎟️", label: t("nav.promoCodes"), href: "/admin/promo-codes" },
+    { icon: "🔑", label: t("nav.apiKeys"), href: "/admin/api-keys" },
+    { icon: "📢", label: t("nav.createAlert"), href: "/admin/alerts/new" },
+    { icon: "🗳️", label: t("nav.requests"), href: "/admin/feature-requests" },
+    { icon: "🗂️", label: t("nav.data"), href: "/admin/data" },
+  ];
 
   useEffect(() => {
     setMobileOpen(false);
@@ -197,7 +202,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
 
   /* Build nav items with live alert dot */
   const tItems: NavItem[] = toolsItems.map((item) => {
-    if (item.label === "Alerts" && alertsBadge > 0)
+    if (item.href === "/alerts" && alertsBadge > 0)
       return { ...item, hasDot: true };
     return item;
   });
@@ -259,8 +264,8 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
             data-testid="sidebar-feature-request-btn"
           >
             <div className="mi-icon">🗳️</div>
-            <span className="mi-label">Request Feature</span>
-            <div className="mi-tip">Request Feature</div>
+            <span className="mi-label">{t("nav.requestFeature")}</span>
+            <div className="mi-tip">{t("nav.requestFeature")}</div>
           </div>
         )}
 
@@ -273,6 +278,9 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
             ))}
           </>
         )}
+
+        {/* Language toggle */}
+        <LanguageToggle />
 
         {/* Spacer */}
         <div style={{ flex: 1 }} />
@@ -287,7 +295,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
           <Link href="/login">
             <div className="mi-av">
               <span>?</span>
-              <span className="av-label">Log in</span>
+              <span className="av-label">{t("auth.logIn")}</span>
             </div>
           </Link>
         )}
@@ -325,16 +333,16 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
           }}>
             <Hexagon size={14} style={{ color: "var(--sage-l)" }} />
             <span style={{ fontSize: 12, fontWeight: 600, color: "var(--sage-l)" }}>
-              {tokenData?.balance ?? 0} {(tokenData?.balance ?? 0) === 1 ? "Shield" : "Shields"}
+              {t("token.shield", { count: tokenData?.balance ?? 0 })}
             </span>
             <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginLeft: "auto" }}>
-              Buy More
+              {t("token.buyMore")}
             </span>
           </div>
         </Link>
 
         {/* Nav items */}
-        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>Main</div>
+        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>{t("section.main")}</div>
         {mainItems.map((item) => (
           <Link key={item.href} href={item.href}>
             <div
@@ -354,7 +362,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
 
         <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "8px 0" }} />
 
-        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>Tools</div>
+        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>{t("section.tools")}</div>
         {tItems.map((item) => (
           <Link key={item.href} href={item.href}>
             <div
@@ -380,7 +388,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
 
         <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "8px 0" }} />
 
-        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>Account</div>
+        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>{t("section.account")}</div>
         {accountItems.map((item) => (
           <Link key={item.href} href={item.href}>
             <div
@@ -402,7 +410,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
         {tokenData?.isAdmin && (
           <>
             <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "8px 0" }} />
-            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>Admin</div>
+            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: 6, paddingLeft: 10 }}>{t("section.admin")}</div>
             {adminItems.map((item) => (
               <Link key={item.href} href={item.href}>
                 <div
@@ -421,6 +429,22 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
             ))}
           </>
         )}
+
+        {/* Language toggle (mobile) */}
+        <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "8px 0" }} />
+        <div
+          onClick={() => {
+            const next = i18n.language === "en" ? "fr" : "en";
+            i18n.changeLanguage(next);
+          }}
+          style={{
+            display: "flex", alignItems: "center", gap: 12, padding: "10px 12px",
+            borderRadius: 8, cursor: "pointer", fontSize: 13.5, color: "rgba(255,255,255,0.5)",
+          }}
+        >
+          <span style={{ fontSize: 15 }}>{i18n.language === "en" ? "🇫🇷" : "🇬🇧"}</span>
+          <span>{i18n.language === "en" ? "Français" : "English"}</span>
+        </div>
 
         <div style={{ flex: 1 }} />
 
@@ -452,7 +476,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
               padding: "10px 14px", textAlign: "center", borderRadius: 8,
               border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)",
               fontSize: 13, fontWeight: 500, cursor: "pointer", marginTop: 8,
-            }}>Log in</div>
+            }}>{t("auth.logIn")}</div>
           </Link>
         )}
       </div>

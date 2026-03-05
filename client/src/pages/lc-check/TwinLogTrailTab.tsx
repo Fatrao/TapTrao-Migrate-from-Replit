@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { LcPrefillData, TwinlogData } from "./constants";
@@ -10,10 +11,11 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
   factors: any;
   primaryRiskFactor: string;
 }) {
+  const { t } = useTranslation("lcCheck");
   const verdictStyles = {
-    GREEN: { bg: "rgba(93,217,193,.05)", border: "rgba(93,217,193,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--app-acapulco)", label: "LOW RISK" },
-    AMBER: { bg: "rgba(234,139,67,.05)", border: "rgba(234,139,67,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", label: "MODERATE RISK" },
-    RED: { bg: "rgba(218,60,61,.05)", border: "rgba(218,60,61,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", label: "HIGH RISK" },
+    GREEN: { bg: "rgba(93,217,193,.05)", border: "rgba(93,217,193,.2)", badgeBg: "var(--gbg)", badgeBorder: "var(--gbd)", badgeColor: "var(--app-acapulco)", labelKey: "twinlog.riskLow" as const },
+    AMBER: { bg: "rgba(234,139,67,.05)", border: "rgba(234,139,67,.2)", badgeBg: "var(--abg)", badgeBorder: "var(--abd)", badgeColor: "var(--amber)", labelKey: "twinlog.riskModerate" as const },
+    RED: { bg: "rgba(218,60,61,.05)", border: "rgba(218,60,61,.2)", badgeBg: "var(--rbg)", badgeBorder: "var(--rbd)", badgeColor: "var(--red)", labelKey: "twinlog.riskHigh" as const },
   };
   const v = verdictStyles[verdict];
   const barColors: Record<string, string> = {
@@ -23,10 +25,10 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
     trade_restriction: "var(--red)",
   };
   const factorRows = [
-    { key: "regulatory_complexity", label: "Regulatory complexity", penalty: factors?.regulatory_complexity?.penalty ?? 0, max: factors?.regulatory_complexity?.max ?? 30 },
-    { key: "hazard_exposure", label: "Hazard exposure", penalty: factors?.hazard_exposure?.penalty ?? 0, max: factors?.hazard_exposure?.max ?? 30 },
-    { key: "document_volume", label: "Document volume", penalty: factors?.document_volume?.penalty ?? 0, max: factors?.document_volume?.max ?? 20 },
-    { key: "trade_restriction", label: "Trade restriction", penalty: factors?.trade_restriction?.penalty ?? 0, max: factors?.trade_restriction?.max ?? 20 },
+    { key: "regulatory_complexity", label: t("twinlog.regulatoryComplexity"), penalty: factors?.regulatory_complexity?.penalty ?? 0, max: factors?.regulatory_complexity?.max ?? 30 },
+    { key: "hazard_exposure", label: t("twinlog.hazardExposure"), penalty: factors?.hazard_exposure?.penalty ?? 0, max: factors?.hazard_exposure?.max ?? 30 },
+    { key: "document_volume", label: t("twinlog.documentVolume"), penalty: factors?.document_volume?.penalty ?? 0, max: factors?.document_volume?.max ?? 20 },
+    { key: "trade_restriction", label: t("twinlog.tradeRestriction"), penalty: factors?.trade_restriction?.penalty ?? 0, max: factors?.trade_restriction?.max ?? 20 },
   ];
   return (
     <div style={{ borderRadius: 14, background: v.bg, padding: "22px 26px" }} data-testid="twinlog-readiness-banner">
@@ -36,7 +38,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
             {score}
           </div>
           <span style={{ display: "inline-block", fontFamily: "var(--fb)", fontSize: 13, fontWeight: 600, padding: "3px 8px", borderRadius: 4, background: v.badgeBg, border: `1px solid ${v.badgeBorder}`, color: v.badgeColor, width: "fit-content", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
-            {v.label}
+            {t(v.labelKey)}
           </span>
           <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.65, marginTop: 6, maxWidth: 260 }}>
             {summary}
@@ -53,7 +55,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
                   <div style={{ width: `${pct}%`, height: "100%", borderRadius: 2, background: barColors[f.key] || "var(--t3)" }} />
                 </div>
                 <span style={{ fontFamily: "var(--fb)", fontSize: isPrimary ? 9 : 10, width: 48, textAlign: "right", color: isPrimary ? "var(--amber)" : "var(--t3)", flexShrink: 0 }}>
-                  {isPrimary ? "▲ primary" : `${f.penalty}/${f.max}`}
+                  {isPrimary ? `▲ ${t("twinlog.primary")}` : `${f.penalty}/${f.max}`}
                 </span>
               </div>
             );
@@ -65,6 +67,7 @@ function TwinLogReadinessBanner({ score, verdict, summary, factors, primaryRiskF
 }
 
 export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | null }) {
+  const { t } = useTranslation("lcCheck");
   const [copiedHash, setCopiedHash] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -85,7 +88,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
   if (!lookupId) {
     return (
       <div style={{ padding: "80px 24px", textAlign: "center", color: "var(--t2)", fontSize: 14 }}>
-        Run a compliance lookup first to view the TwinLog Trail.
+        {t("twinlog.noLookup")}
       </div>
     );
   }
@@ -93,7 +96,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
   if (trailQuery.isLoading) {
     return (
       <div style={{ padding: "60px 24px", textAlign: "center", color: "var(--t3)", fontSize: 13 }}>
-        Loading trail data...
+        {t("twinlog.loading")}
       </div>
     );
   }
@@ -101,7 +104,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
   if (trailQuery.isError || !trailQuery.data) {
     return (
       <div style={{ padding: "60px 24px", textAlign: "center", color: "var(--t2)", fontSize: 14 }}>
-        Unable to load TwinLog Trail data.
+        {t("twinlog.loadError")}
       </div>
     );
   }
@@ -133,10 +136,10 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
         body: JSON.stringify({ lookupId }),
       });
       if (res.status === 403) {
-        alert("Please complete your company profile at Settings > Profile first.");
+        alert(t("twinlog.profileRequired"));
         return;
       }
-      if (!res.ok) throw new Error("PDF generation failed");
+      if (!res.ok) throw new Error(t("twinlog.pdfFailed"));
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -172,37 +175,37 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
       {/* Left Panel */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <h2 style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 26, color: "var(--t1)", marginBottom: 4 }}>
-          TwinLog Trail
+          {t("twinlog.title")}
         </h2>
         <p style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)", marginBottom: 24, lineHeight: 1.5 }}>
           {lookup.commodityName} &middot; {lookup.originName} &rarr; {lookup.destinationName}
-          {lookup.twinlogLockedAt && <> &middot; locked {formatTimestamp(lookup.twinlogLockedAt)}</>}
+          {lookup.twinlogLockedAt && <> &middot; {t("twinlog.locked", { date: formatTimestamp(lookup.twinlogLockedAt) })}</>}
         </p>
 
         {/* Included Items */}
         <div style={{ marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
             <span style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1 }}>
-              Included Items
+              {t("twinlog.includedItems")}
             </span>
             <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
           </div>
 
           {[
-            { label: "Compliance lookup", status: "\u2713 Locked", color: "var(--app-acapulco)" },
+            { label: t("twinlog.complianceLookup"), status: `\u2713 ${t("twinlog.statusLocked")}`, color: "var(--app-acapulco)" },
             {
-              label: "LC check results",
-              status: lcCheck ? "\u2713 Locked" : "\u2014",
+              label: t("twinlog.lcCheckResults"),
+              status: lcCheck ? `\u2713 ${t("twinlog.statusLocked")}` : "\u2014",
               color: lcCheck ? "var(--app-acapulco)" : "var(--t3)",
             },
             {
-              label: "Supplier documents",
-              status: supplierRequest ? `${srDocsReceived.length}/${srDocsRequired.length} received` : "\u2014",
+              label: t("twinlog.supplierDocuments"),
+              status: supplierRequest ? t("twinlog.receivedCount", { received: srDocsReceived.length, total: srDocsRequired.length }) : "\u2014",
               color: supplierRequest ? "var(--t2)" : "var(--t3)",
             },
             {
-              label: "Readiness score",
-              status: lookup.readinessScore != null ? `Score: ${lookup.readinessScore}` : "\u2014",
+              label: t("twinlog.readinessScore"),
+              status: lookup.readinessScore != null ? t("twinlog.scoreValue", { score: lookup.readinessScore }) : "\u2014",
               color: lookup.readinessScore != null ? "var(--app-acapulco)" : "var(--t3)",
             },
           ].map((item, idx) => (
@@ -266,7 +269,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
                 }}
                 data-testid="button-copy-hash"
               >
-                {copiedHash ? "\u2713 Copied" : "\u2197 Copy full hash"}
+                {copiedHash ? `\u2713 ${t("twinlog.hashCopied")}` : `\u2197 ${t("twinlog.copyFullHash")}`}
               </button>
             </div>
           </div>
@@ -289,7 +292,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
       {/* Right Panel */}
       <div style={{ width: 292, flexShrink: 0 }}>
         <span style={{ fontFamily: "var(--fh)", fontWeight: 700, fontSize: 15, color: "var(--t1)", display: "block", marginBottom: 12 }}>
-          Export
+          {t("twinlog.export")}
         </span>
 
         <button
@@ -310,7 +313,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
           }}
           data-testid="button-download-pdf"
         >
-          {pdfLoading ? "Generating..." : "\u2193 Download TwinLog PDF"}
+          {pdfLoading ? t("twinlog.generating") : `\u2193 ${t("twinlog.downloadPdf")}`}
         </button>
 
         {/* Save as Template */}
@@ -337,11 +340,11 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
               }}
               data-testid="button-save-template"
             >
-              Save as template
+              {t("twinlog.saveAsTemplate")}
             </button>
           ) : (
             <div style={{ marginBottom: 16, padding: "12px 14px", background: "var(--card2)", borderRadius: 14 }}>
-              <div style={{ fontFamily: "var(--fb)", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)", marginBottom: 8 }}>Template name</div>
+              <div style={{ fontFamily: "var(--fb)", fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--t3)", marginBottom: 8 }}>{t("twinlog.templateName")}</div>
               <input
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
@@ -363,7 +366,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
                   onClick={async () => {
                     try {
                       if (!lookup.commodityId || !lookup.resultJson) {
-                        alert("Missing compliance data. Run a lookup first.");
+                        alert(t("twinlog.missingData"));
                         return;
                       }
                       await apiRequest("POST", "/api/templates", {
@@ -379,7 +382,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
                       setShowSaveModal(false);
                     } catch (err: any) {
                       const msg = err?.message || "Failed to save template";
-                      alert(msg.includes("409") ? "A template for this corridor already exists." : msg);
+                      alert(msg.includes("409") ? t("twinlog.duplicateTemplate") : msg);
                     }
                   }}
                   disabled={!templateName.trim()}
@@ -397,7 +400,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
                   }}
                   data-testid="button-confirm-save-template"
                 >
-                  Save template
+                  {t("twinlog.saveTemplate")}
                 </button>
                 <button
                   onClick={() => setShowSaveModal(false)}
@@ -411,7 +414,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
                   }}
                   data-testid="button-cancel-save-template"
                 >
-                  Cancel
+                  {t("twinlog.cancelSave")}
                 </button>
               </div>
             </div>
@@ -419,7 +422,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
         ) : (
           <div style={{ marginBottom: 16, padding: "10px 14px", background: "var(--gbg)", borderRadius: 8 }} data-testid="text-template-saved-success">
             <span style={{ fontSize: 14, color: "var(--app-acapulco)", fontWeight: 600 }}>
-              Template saved. Find it at /templates.
+              {t("twinlog.templateSaved")}
             </span>
           </div>
         )}
@@ -427,7 +430,7 @@ export function TwinLogTrailTab({ prefillData }: { prefillData: LcPrefillData | 
         {/* Activity Timeline */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
           <span style={{ fontFamily: "var(--fb)", fontSize: 13, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1 }}>
-            History
+            {t("twinlog.history")}
           </span>
           <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
         </div>

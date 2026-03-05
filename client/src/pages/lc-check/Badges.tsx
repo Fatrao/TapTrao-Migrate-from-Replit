@@ -1,9 +1,11 @@
 import { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, AlertTriangle, XCircle, Copy, Check } from "lucide-react";
 
 export function CopyBtn({ text, label }: { text: string; label: string }) {
+  const { t } = useTranslation("lcCheck");
   const [copied, setCopied] = useState(false);
   const handleCopy = useCallback(async () => {
     try {
@@ -23,27 +25,29 @@ export function CopyBtn({ text, label }: { text: string; label: string }) {
   return (
     <Button variant="outline" size="sm" onClick={handleCopy} data-testid={`button-copy-${label}`}>
       {copied ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
-      {copied ? "Copied" : "Copy"}
+      {copied ? t("badge.copied") : t("badge.copy")}
     </Button>
   );
 }
 
 export function SeverityBadge({ severity }: { severity: string }) {
+  const { t } = useTranslation("lcCheck");
   if (severity === "GREEN") {
-    return <Badge variant="secondary" style={{ fontFamily: "var(--fb)", fontSize: 13, padding: "3px 8px", borderRadius: 4, background: "var(--gbg)", border: "1px solid var(--gbd)", color: "var(--green)" }} data-testid="badge-severity-green"><CheckCircle2 className="w-3 h-3 mr-1" />Match</Badge>;
+    return <Badge variant="secondary" style={{ fontFamily: "var(--fb)", fontSize: 13, padding: "3px 8px", borderRadius: 4, background: "var(--gbg)", border: "1px solid var(--gbd)", color: "var(--green)" }} data-testid="badge-severity-green"><CheckCircle2 className="w-3 h-3 mr-1" />{t("badge.match")}</Badge>;
   }
   if (severity === "AMBER") {
-    return <Badge variant="secondary" style={{ fontFamily: "var(--fb)", fontSize: 13, padding: "3px 8px", borderRadius: 4, background: "var(--abg)", border: "1px solid var(--abd)", color: "var(--amber)" }} data-testid="badge-severity-amber"><AlertTriangle className="w-3 h-3 mr-1" />Warning</Badge>;
+    return <Badge variant="secondary" style={{ fontFamily: "var(--fb)", fontSize: 13, padding: "3px 8px", borderRadius: 4, background: "var(--abg)", border: "1px solid var(--abd)", color: "var(--amber)" }} data-testid="badge-severity-amber"><AlertTriangle className="w-3 h-3 mr-1" />{t("badge.warning")}</Badge>;
   }
-  return <Badge variant="destructive" style={{ fontFamily: "var(--fb)", fontSize: 13, padding: "3px 8px", borderRadius: 4, background: "var(--rbg)", border: "1px solid var(--rbd)", color: "var(--red)" }} data-testid="badge-severity-red"><XCircle className="w-3 h-3 mr-1" />Critical</Badge>;
+  return <Badge variant="destructive" style={{ fontFamily: "var(--fb)", fontSize: 13, padding: "3px 8px", borderRadius: 4, background: "var(--rbg)", border: "1px solid var(--rbd)", color: "var(--red)" }} data-testid="badge-severity-red"><XCircle className="w-3 h-3 mr-1" />{t("badge.critical")}</Badge>;
 }
 
 export function VerdictBadge({ verdict }: { verdict: string }) {
+  const { t } = useTranslation("lcCheck");
   if (verdict === "COMPLIANT") {
-    return <Badge variant="secondary" style={{ fontFamily: "var(--fb)", fontSize: 13, padding: "3px 8px", borderRadius: 4, background: "var(--gbg)", border: "1px solid var(--gbd)", color: "var(--green)" }} data-testid="badge-verdict">COMPLIANT</Badge>;
+    return <Badge variant="secondary" style={{ fontFamily: "var(--fb)", fontSize: 13, padding: "3px 8px", borderRadius: 4, background: "var(--gbg)", border: "1px solid var(--gbd)", color: "var(--green)" }} data-testid="badge-verdict">{t("badge.compliant")}</Badge>;
   }
   if (verdict === "COMPLIANT_WITH_NOTES") {
-    return <Badge variant="secondary" style={{ fontFamily: "var(--fb)", fontSize: 13, padding: "3px 8px", borderRadius: 4, background: "var(--abg)", border: "1px solid var(--abd)", color: "var(--amber)" }} data-testid="badge-verdict">COMPLIANT WITH NOTES</Badge>;
+    return <Badge variant="secondary" style={{ fontFamily: "var(--fb)", fontSize: 13, padding: "3px 8px", borderRadius: 4, background: "var(--abg)", border: "1px solid var(--abd)", color: "var(--amber)" }} data-testid="badge-verdict">{t("badge.compliantWithNotes")}</Badge>;
   }
-  return <Badge variant="destructive" style={{ fontFamily: "var(--fb)", fontSize: 13, padding: "3px 8px", borderRadius: 4, background: "var(--rbg)", border: "1px solid var(--rbd)", color: "var(--red)" }} data-testid="badge-verdict">DISCREPANCIES FOUND</Badge>;
+  return <Badge variant="destructive" style={{ fontFamily: "var(--fb)", fontSize: 13, padding: "3px 8px", borderRadius: 4, background: "var(--rbg)", border: "1px solid var(--rbd)", color: "var(--red)" }} data-testid="badge-verdict">{t("badge.discrepanciesFound")}</Badge>;
 }

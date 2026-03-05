@@ -1,0 +1,12 @@
+{
+  "title": "Alertes Reglementaires",
+  "subtitle": "Surveillance de {{count}} corridor",
+  "subtitle_other": "Surveillance de {{count}} corridors",
+  "loading": "Chargement des alertes...",
+  "emptyTitle": "Vous ne surveillez encore aucun corridor.",
+  "emptyHint": "Lancez une recherche et cliquez sur \"Surveiller ce corridor\".",
+  "viewSource": "Voir la source",
+  "runFreshLookup": "Nouvelle recherche",
+  "effective": "Effectif le {{date}}",
+  "hsMore": "+{{count}} de plus"
+}

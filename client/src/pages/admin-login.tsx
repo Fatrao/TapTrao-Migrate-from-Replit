@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { AppShell } from "@/components/AppShell";
 
 export default function AdminLogin() {
+  const { t } = useTranslation("admin");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [, navigate] = useLocation();
@@ -35,10 +37,10 @@ export default function AdminLogin() {
     <AppShell contentClassName="content-area">
       <div className="green-hero-box" style={{ margin: "4px 24px 16px" }}>
         <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 700, color: "#fff", margin: 0 }}>
-          Admin Login
+          {t("login.title")}
         </h1>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
-          Enter the admin password to activate admin mode
+          {t("login.subtitle")}
         </p>
       </div>
 
@@ -51,12 +53,12 @@ export default function AdminLogin() {
           }}
         >
           <div className="form-group">
-            <label>Admin Password</label>
+            <label>{t("login.passwordLabel")}</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter admin password"
+              placeholder={t("login.passwordPlaceholder")}
               autoFocus
             />
           </div>
@@ -80,7 +82,7 @@ export default function AdminLogin() {
               opacity: loginMutation.isPending || !password ? 0.5 : 1,
             }}
           >
-            {loginMutation.isPending ? "Logging in…" : "Activate Admin"}
+            {loginMutation.isPending ? t("login.submitting") : t("login.submitButton")}
           </button>
         </form>
       </div>

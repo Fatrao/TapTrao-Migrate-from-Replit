@@ -1,0 +1,54 @@
+{
+  "pageTitle": "Profil de l'entreprise",
+  "pageSubtitle": "Les informations de votre entreprise apparaissent sur chaque dossier de conformit\u00e9 TwinLog Trail. Requis pour la g\u00e9n\u00e9ration de PDF.",
+
+  "profileComplete": "Profil complet. Vous pouvez t\u00e9l\u00e9charger les dossiers TwinLog Trail.",
+
+  "companyName.label": "Nom de l'entreprise *",
+  "companyName.placeholder": "ex. Acme Trading SARL",
+  "companyName.description": "Tel qu'il appara\u00eet sur votre extrait Kbis / Certificat d'immatriculation",
+  "companyName.required": "Le nom de l'entreprise est requis",
+
+  "registeredAddress.label": "Adresse du si\u00e8ge social *",
+  "registeredAddress.placeholder": "Adresse compl\u00e8te avec code postal",
+  "registeredAddress.description": "Adresse compl\u00e8te avec code postal. Doit correspondre aux documents d'immatriculation.",
+  "registeredAddress.required": "L'adresse du si\u00e8ge social est requise",
+
+  "country.label": "Pays d'immatriculation *",
+  "country.placeholder": "S\u00e9lectionnez un pays",
+  "country.required": "Le pays est requis",
+
+  "vat.label": "Num\u00e9ro de TVA",
+  "vat.placeholder": "ex. FR12345678901",
+  "vat.description": "Utilis\u00e9 pour les dossiers commerciaux UE/UK.",
+
+  "eori.label": "Num\u00e9ro EORI",
+  "eori.placeholder": "ex. FR12345678901234",
+  "eori.description": "Num\u00e9ro d'enregistrement et d'identification des op\u00e9rateurs \u00e9conomiques. Requis par les douanes UK/UE pour suivre chaque exp\u00e9dition. Sans celui-ci, votre dossier de conformit\u00e9 ne peut pas r\u00e9f\u00e9rencer votre identit\u00e9 douani\u00e8re.",
+  "eori.whyTitle": "Pourquoi l'EORI est important",
+  "eori.whyBody": "Votre num\u00e9ro EORI est ce que les autorit\u00e9s douani\u00e8res utilisent pour vous identifier sur chaque d\u00e9claration d'importation. Un dossier de conformit\u00e9 sans EORI ne peut pas \u00eatre li\u00e9 \u00e0 votre activit\u00e9 douani\u00e8re. Commer\u00e7ants UK : demandez sur gov.uk/eori. Commer\u00e7ants UE : demandez via votre autorit\u00e9 douani\u00e8re nationale.",
+
+  "ein.label": "EIN (Num\u00e9ro d'identification de l'employeur)",
+  "ein.placeholder": "ex. 12-3456789",
+  "ein.description": "Identifiant fiscal f\u00e9d\u00e9ral am\u00e9ricain d\u00e9livr\u00e9 par l'IRS (format : XX-XXXXXXX). Utilis\u00e9 comme num\u00e9ro d'importateur officiel pour les douanes am\u00e9ricaines (CBP).",
+  "ein.whyTitle": "EIN pour le commerce am\u00e9ricain",
+  "ein.whyBody": "L'EIN est l'\u00e9quivalent am\u00e9ricain du num\u00e9ro EORI. Il identifie votre entreprise sur tous les documents douaniers am\u00e9ricains d\u00e9pos\u00e9s aupr\u00e8s du CBP. Si vous importez aux \u00c9tats-Unis, votre EIN sert de num\u00e9ro d'importateur officiel (IOR). Demandez sur irs.gov/ein. Note : les \u00c9tats-Unis n'utilisent pas le syst\u00e8me EORI \u2014 si vous exp\u00e9diez aussi vers l'UE/UK, vous aurez besoin des deux.",
+
+  "contactEmail.label": "Email de contact",
+  "contactEmail.placeholder": "commerce@votreentreprise.com",
+  "contactEmail.description": "Appara\u00eet sur le dossier de conformit\u00e9 comme contact du responsable.",
+  "contactEmail.invalid": "L'email doit \u00eatre valide",
+
+  "saveProfile": "Enregistrer le profil",
+  "saving": "Enregistrement...",
+
+  "toast.saved": "Profil enregistr\u00e9",
+  "toast.noCustomsId": "Aucun num\u00e9ro EORI ou EIN enregistr\u00e9. Nous vous recommandons d'ajouter votre EORI (UE/UK) ou EIN (US) avant de partager des dossiers avec les banques ou les autorit\u00e9s douani\u00e8res.",
+  "toast.einSaved": "EIN enregistr\u00e9. Si vous commercez aussi avec l'UE/UK, pensez \u00e0 ajouter votre num\u00e9ro EORI.",
+  "toast.eoriSaved": "EORI enregistr\u00e9. Si vous commercez aussi avec les US, pensez \u00e0 ajouter votre EIN.",
+  "toast.allSaved": "Vous pouvez maintenant t\u00e9l\u00e9charger les dossiers TwinLog Trail.",
+  "toast.errorTitle": "Erreur lors de l'enregistrement du profil",
+  "toast.errorGeneric": "Une erreur est survenue",
+
+  "warning.noCustomsId": "Aucun num\u00e9ro d'identification douani\u00e8re enregistr\u00e9. Ajoutez votre EORI (commer\u00e7ants UE/UK) ou EIN (commer\u00e7ants US) avant de partager des dossiers avec les banques ou les autorit\u00e9s douani\u00e8res."
+}
