@@ -92,5 +92,12 @@
   "cookie.essentialOnly": "Essential Only",
 
   "language.french": "Français",
-  "language.english": "English"
+  "language.english": "English",
+
+  "error.title": "Something went wrong",
+  "error.description": "An unexpected error occurred. This has been logged and we'll look into it.",
+  "error.reload": "Reload page",
+
+  "country.flagged": "Flagged Country",
+  "country.enhancedDueDiligence": "Enhanced due diligence required"
 }

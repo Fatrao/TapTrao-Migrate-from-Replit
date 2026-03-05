@@ -80,5 +80,12 @@
   "cookie.acceptAnalytics": "Accepter les cookies analytiques",
   "cookie.essentialOnly": "Essentiels uniquement",
   "language.french": "Français",
-  "language.english": "English"
+  "language.english": "English",
+
+  "error.title": "Une erreur est survenue",
+  "error.description": "Une erreur inattendue s'est produite. Cela a été enregistré et nous allons y remédier.",
+  "error.reload": "Recharger la page",
+
+  "country.flagged": "Pays signalé",
+  "country.enhancedDueDiligence": "Diligence raisonnable renforcée requise"
 }

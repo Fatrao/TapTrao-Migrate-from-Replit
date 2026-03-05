@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import i18n from "@/lib/i18n";
 
 interface Props {
   children: ReactNode;
@@ -25,6 +26,8 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      const t = (key: string) => i18n.t(key, { ns: "common" });
+
       return (
         <div
           style={{
@@ -73,7 +76,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 margin: "0 0 8px",
               }}
             >
-              Something went wrong
+              {t("error.title")}
             </h2>
             <p
               style={{
@@ -84,7 +87,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 lineHeight: 1.5,
               }}
             >
-              An unexpected error occurred. This has been logged and we'll look into it.
+              {t("error.description")}
             </p>
             <button
               onClick={() => window.location.reload()}
@@ -100,7 +103,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 cursor: "pointer",
               }}
             >
-              Reload page
+              {t("error.reload")}
             </button>
           </div>
         </div>

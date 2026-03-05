@@ -1,4 +1,5 @@
 import { AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Tooltip,
   TooltipContent,
@@ -36,6 +37,7 @@ export default function CountryFlagBadge({
   compact = false,
   className,
 }: CountryFlagBadgeProps) {
+  const { t } = useTranslation("common");
   const isFlagged = status === "FLAG";
   const flag = iso2ToFlag(iso2);
 
@@ -60,7 +62,7 @@ export default function CountryFlagBadge({
             >
               <div className="space-y-1.5 p-1">
                 <p className="font-semibold text-amber-400 text-xs">
-                  {flagReason ?? "Flagged Country"}
+                  {flagReason ?? t("country.flagged")}
                 </p>
                 {flagDetails && (
                   <p className="text-[11px] text-gray-300 leading-relaxed">
@@ -68,7 +70,7 @@ export default function CountryFlagBadge({
                   </p>
                 )}
                 <p className="text-[10px] text-gray-500 italic">
-                  Enhanced due diligence required
+                  {t("country.enhancedDueDiligence")}
                 </p>
               </div>
             </TooltipContent>
