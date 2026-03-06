@@ -240,6 +240,13 @@ export const lookups = pgTable("lookups", {
   notes: text("notes"),
   tradeValue: text("trade_value"),
   tradeValueCurrency: varchar("trade_value_currency", { length: 3 }).default("USD"),
+  // Demurrage persistence (per-trade)
+  demurragePort: text("demurrage_port"),
+  demurrageContainerType: varchar("demurrage_container_type", { length: 10 }),
+  demurrageDailyRate: text("demurrage_daily_rate"),
+  demurrageFreeDays: integer("demurrage_free_days").default(7),
+  demurrageDaysHeld: integer("demurrage_days_held"),
+  demurrageTotal: text("demurrage_total"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => [
   index("lookups_session_idx").on(table.sessionId),

@@ -51,6 +51,7 @@ import {
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
 import { estimateDemurrageRange } from "@/lib/demurrage-utils";
 import { translateCommodity } from "@/lib/commodity-i18n";
+import { calculateTradeRisk } from "@/lib/risk-utils";
 
 /* ── Map common country/region names to ISO2 for flag display ── */
 const nameToIso2: Record<string, string> = {
@@ -1354,6 +1355,55 @@ export default function TradeDetail() {
                   )}
                 </CardContent>
               </Card>
+
+              {/* Risk Exposure Estimate */}
+              {(() => {
+                const result = data.lookup.resultJson;
+                const spsFlagged = result?.triggers?.sps === true;
+                const lcFlagged = data.latestLcCheck?.verdict === "DISCREPANCIES_FOUND";
+                const dailyRate = data.lookup.demurrageDailyRate ? Number(data.lookup.demurrageDailyRate) : null;
+                const risk = calculateTradeRisk({
+                  readinessScore: data.lookup.readinessScore,
+                  dailyRate,
+                  spsFlagged,
+                  lcFlagged,
+                });
+                if (risk.expectedLoss === 0 && risk.worstCase === 0) return null;
+                return (
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 16,
+                    padding: "14px 18px",
+                    borderRadius: 12,
+                    background: "linear-gradient(135deg, rgba(234,179,8,0.08), rgba(239,68,68,0.06))",
+                    border: "1px solid rgba(234,179,8,0.18)",
+                  }}>
+                    <div style={{ fontSize: 22 }}>⚠️</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", marginBottom: 2 }}>
+                        Risk Exposure
+                      </div>
+                      <div style={{ fontSize: 15, color: "var(--t2)" }}>
+                        Expected exposure{" "}
+                        <span style={{ fontWeight: 700, color: "#eab308" }}>
+                          ${risk.expectedLoss.toLocaleString()}
+                        </span>
+                        {" · "}Worst case{" "}
+                        <span style={{ fontWeight: 700, color: "#ef4444" }}>
+                          ${risk.worstCase.toLocaleString()}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12, color: "var(--t3)", marginTop: 4 }}>
+                        {risk.components.demurrageExpected > 0 && `Demurrage delay`}
+                        {risk.components.spsCostExpected > 0 && ` · SPS flag`}
+                        {risk.components.lcCostExpected > 0 && ` · LC discrepancy`}
+                        {!dailyRate && risk.components.demurrageExpected === 0 && `Set demurrage inputs for full estimate`}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* LC Status */}
               {data.lcCase && (

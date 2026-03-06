@@ -34,6 +34,13 @@ type EnrichedTrade = {
   cbamBand: string | null;
   docsRequiredCount: number;
   docsReceivedCount: number;
+  spsFlagged: boolean;
+  demurragePort: string | null;
+  demurrageContainerType: string | null;
+  demurrageDailyRate: string | null;
+  demurrageFreeDays: number | null;
+  demurrageDaysHeld: number | null;
+  demurrageTotal: string | null;
 };
 
 type MyTradesStats = {

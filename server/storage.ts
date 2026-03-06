@@ -242,7 +242,7 @@ export interface IStorage {
   // Trade lifecycle
   updateTradeStatus(lookupId: string, status: TradeStatus, sessionId: string): Promise<Lookup | undefined>;
   archiveTrade(lookupId: string, sessionId: string): Promise<Lookup | undefined>;
-  updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string; tradeValue?: string; tradeValueCurrency?: string }, sessionId: string): Promise<Lookup | undefined>;
+  updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string; tradeValue?: string; tradeValueCurrency?: string; demurragePort?: string; demurrageContainerType?: string; demurrageDailyRate?: string; demurrageFreeDays?: number; demurrageDaysHeld?: number; demurrageTotal?: string }, sessionId: string): Promise<Lookup | undefined>;
   // Trade detail (unified view)
   getTradeDetail(lookupId: string, sessionId: string): Promise<TradeDetail | null>;
   // Feature requests
@@ -297,6 +297,15 @@ export type EnrichedTrade = {
   // Doc progress
   docsRequiredCount: number;
   docsReceivedCount: number;
+  // SPS flag (from compliance result triggers)
+  spsFlagged: boolean;
+  // Demurrage persistence
+  demurragePort: string | null;
+  demurrageContainerType: string | null;
+  demurrageDailyRate: string | null;
+  demurrageFreeDays: number | null;
+  demurrageDaysHeld: number | null;
+  demurrageTotal: string | null;
 };
 
 export type MyTradesStats = {
@@ -818,7 +827,14 @@ export class DatabaseStorage implements IStorage {
         ca.score AS "cbamScore",
         ca.band AS "cbamBand",
         COALESCE(jsonb_array_length(sr.docs_required), 0)::int AS "docsRequiredCount",
-        COALESCE(jsonb_array_length(sr.docs_received), 0)::int AS "docsReceivedCount"
+        COALESCE(jsonb_array_length(sr.docs_received), 0)::int AS "docsReceivedCount",
+        COALESCE((l.result_json->'triggers'->>'sps')::boolean, false) AS "spsFlagged",
+        l.demurrage_port AS "demurragePort",
+        l.demurrage_container_type AS "demurrageContainerType",
+        l.demurrage_daily_rate AS "demurrageDailyRate",
+        l.demurrage_free_days AS "demurrageFreeDays",
+        l.demurrage_days_held AS "demurrageDaysHeld",
+        l.demurrage_total AS "demurrageTotal"
       FROM lookups l
       INNER JOIN origin_countries o ON l.origin_id = o.id
       INNER JOIN destinations d ON l.destination_id = d.id
@@ -1495,13 +1511,19 @@ export class DatabaseStorage implements IStorage {
     return row;
   }
 
-  async updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string; tradeValue?: string; tradeValueCurrency?: string }, sessionId: string): Promise<Lookup | undefined> {
+  async updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string; tradeValue?: string; tradeValueCurrency?: string; demurragePort?: string; demurrageContainerType?: string; demurrageDailyRate?: string; demurrageFreeDays?: number; demurrageDaysHeld?: number; demurrageTotal?: string }, sessionId: string): Promise<Lookup | undefined> {
     const updates: Record<string, unknown> = {};
     if (fields.notes !== undefined) updates.notes = fields.notes;
     if (fields.estimatedArrival !== undefined) updates.estimatedArrival = fields.estimatedArrival;
     if (fields.actualArrival !== undefined) updates.actualArrival = fields.actualArrival;
     if (fields.tradeValue !== undefined) updates.tradeValue = fields.tradeValue;
     if (fields.tradeValueCurrency !== undefined) updates.tradeValueCurrency = fields.tradeValueCurrency;
+    if (fields.demurragePort !== undefined) updates.demurragePort = fields.demurragePort;
+    if (fields.demurrageContainerType !== undefined) updates.demurrageContainerType = fields.demurrageContainerType;
+    if (fields.demurrageDailyRate !== undefined) updates.demurrageDailyRate = fields.demurrageDailyRate;
+    if (fields.demurrageFreeDays !== undefined) updates.demurrageFreeDays = fields.demurrageFreeDays;
+    if (fields.demurrageDaysHeld !== undefined) updates.demurrageDaysHeld = fields.demurrageDaysHeld;
+    if (fields.demurrageTotal !== undefined) updates.demurrageTotal = fields.demurrageTotal;
 
     if (Object.keys(updates).length === 0) return undefined;
 

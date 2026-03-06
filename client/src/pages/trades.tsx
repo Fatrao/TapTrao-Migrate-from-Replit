@@ -12,6 +12,7 @@ import { TradeCorridorsMap } from "@/components/TradeCorridorsMap";
 import type { Corridor } from "@/components/TradeCorridorsMap";
 import { Plus, Loader2 } from "lucide-react";
 import { translateCommodity } from "@/lib/commodity-i18n";
+import { calculateTradeRisk, calculatePortfolioRisk } from "@/lib/risk-utils";
 
 /* ─── Types ─── */
 
@@ -40,6 +41,15 @@ type EnrichedTrade = {
   cbamBand: string | null;
   docsRequiredCount: number;
   docsReceivedCount: number;
+  // SPS flag (from compliance result triggers)
+  spsFlagged: boolean;
+  // Demurrage persistence
+  demurragePort: string | null;
+  demurrageContainerType: string | null;
+  demurrageDailyRate: string | null;
+  demurrageFreeDays: number | null;
+  demurrageDaysHeld: number | null;
+  demurrageTotal: string | null;
 };
 
 type MyTradesStats = {
@@ -480,12 +490,16 @@ export default function Trades() {
               <div className="sl">{t("stat.riskExposure")}</div>
               <div className="sv" style={{ color: "var(--amber)" }}>
                 {(() => {
-                  const issuesTrades = allTrades.filter(tr => tr.readinessVerdict === "RED");
-                  const riskTotal = issuesTrades.reduce((s, tr) => s + (tr.tradeValue ? Number(tr.tradeValue) * 0.05 : 0), 0);
-                  const riskHigh = issuesTrades.reduce((s, tr) => s + (tr.tradeValue ? Number(tr.tradeValue) * 0.15 : 0), 0);
-                  if (riskTotal === 0 && riskHigh === 0) return "—";
-                  const fmtLow = riskTotal >= 1000 ? `$${(riskTotal / 1000).toFixed(0)}k` : `$${Math.round(riskTotal)}`;
-                  const fmtHigh = riskHigh >= 1000 ? `$${(riskHigh / 1000).toFixed(0)}k` : `$${Math.round(riskHigh)}`;
+                  const portfolio = calculatePortfolioRisk(allTrades.map(tr => ({
+                    readinessScore: tr.readinessScore,
+                    dailyRate: tr.demurrageDailyRate ? Number(tr.demurrageDailyRate) : null,
+                    spsFlagged: tr.spsFlagged,
+                    lcFlagged: tr.lcVerdict === "DISCREPANCIES_FOUND",
+                    tradeStatus: tr.tradeStatus,
+                  })));
+                  if (portfolio.totalExpected === 0 && portfolio.totalWorstCase === 0) return "—";
+                  const fmtLow = portfolio.totalExpected >= 1000 ? `$${(portfolio.totalExpected / 1000).toFixed(1)}k` : `$${portfolio.totalExpected}`;
+                  const fmtHigh = portfolio.totalWorstCase >= 1000 ? `$${(portfolio.totalWorstCase / 1000).toFixed(1)}k` : `$${portfolio.totalWorstCase}`;
                   return `${fmtLow}–${fmtHigh}`;
                 })()}
               </div>
@@ -503,38 +517,51 @@ export default function Trades() {
 
         {/* ── Money at Risk Banner ── */}
         {(() => {
-          const atRiskTrades = allTrades.filter(tr =>
-            tr.readinessVerdict === "RED" && tr.tradeStatus !== "closed" && tr.tradeStatus !== "archived"
+          const activeTrades = allTrades.filter(tr =>
+            tr.tradeStatus !== "closed" && tr.tradeStatus !== "archived"
           );
-          const totalAtRisk = atRiskTrades.reduce((s, tr) => s + (tr.tradeValue ? Number(tr.tradeValue) * 0.1 : 0), 0);
-          const highestTrade = atRiskTrades.reduce<EnrichedTrade | null>((best, tr) => {
-            const v = tr.tradeValue ? Number(tr.tradeValue) : 0;
-            return !best || v > (best.tradeValue ? Number(best.tradeValue) : 0) ? tr : best;
-          }, null);
-          const highestVal = highestTrade?.tradeValue ? Number(highestTrade.tradeValue) * 0.1 : 0;
-          const disputeCount = atRiskTrades.filter(tr => tr.docsReceivedCount < tr.docsRequiredCount).length;
-          const totalActive = allTrades.filter(tr => tr.tradeStatus !== "closed" && tr.tradeStatus !== "archived").length;
-          const resolvedCount = totalActive > 0 ? totalActive - atRiskTrades.length : 0;
+          // Calculate real risk per trade
+          const tradeRisks = activeTrades.map(tr => ({
+            trade: tr,
+            risk: calculateTradeRisk({
+              readinessScore: tr.readinessScore,
+              dailyRate: tr.demurrageDailyRate ? Number(tr.demurrageDailyRate) : null,
+              spsFlagged: tr.spsFlagged,
+              lcFlagged: tr.lcVerdict === "DISCREPANCIES_FOUND",
+            }),
+          })).filter(r => r.risk.expectedLoss > 0 || r.risk.worstCase > 0);
+
+          if (tradeRisks.length === 0) return null;
+
+          const totalExpected = tradeRisks.reduce((s, r) => s + r.risk.expectedLoss, 0);
+          const highestRisk = tradeRisks.reduce((best, r) =>
+            r.risk.worstCase > best.risk.worstCase ? r : best
+          , tradeRisks[0]);
+          const disputeCount = tradeRisks.filter(r =>
+            r.trade.docsReceivedCount < r.trade.docsRequiredCount
+          ).length;
+          const totalActive = activeTrades.length;
+          const resolvedCount = totalActive > 0 ? totalActive - tradeRisks.length : 0;
           const resRate = totalActive > 0 ? Math.round((resolvedCount / totalActive) * 100) : 0;
 
-          if (atRiskTrades.length === 0) return null;
-
-          const fmtRisk = totalAtRisk >= 1000 ? `$${(totalAtRisk / 1000).toFixed(1)}k` : `$${Math.round(totalAtRisk)}`;
-          const fmtHighest = highestVal >= 1000 ? `$${(highestVal / 1000).toFixed(1)}k` : `$${Math.round(highestVal)}`;
+          const fmtRisk = totalExpected >= 1000 ? `$${(totalExpected / 1000).toFixed(1)}k` : `$${totalExpected}`;
+          const fmtHighest = highestRisk.risk.worstCase >= 1000
+            ? `$${(highestRisk.risk.worstCase / 1000).toFixed(1)}k`
+            : `$${highestRisk.risk.worstCase}`;
 
           return (
             <div className="mt-risk-banner">
               <div className="mt-rb-cell">
                 <div className="mt-rb-label">{t("risk.totalAtRisk")}</div>
                 <div className="mt-rb-value danger">{fmtRisk}</div>
-                <div className="mt-rb-sub">{t("risk.acrossTrades", { count: atRiskTrades.length })}</div>
+                <div className="mt-rb-sub">{t("risk.acrossTrades", { count: tradeRisks.length })}</div>
               </div>
               <div className="mt-rb-cell">
                 <div className="mt-rb-label">{t("risk.highestSingle")}</div>
                 <div className="mt-rb-value warn">{fmtHighest}</div>
                 <div className="mt-rb-sub">
-                  {highestTrade
-                    ? `${translateCommodity(highestTrade.commodityName, lang).split(" ")[0]} ${highestTrade.originIso2}→${highestTrade.destIso2}`
+                  {highestRisk
+                    ? `${translateCommodity(highestRisk.trade.commodityName, lang).split(" ")[0]} ${highestRisk.trade.originIso2}→${highestRisk.trade.destIso2}`
                     : "—"}
                 </div>
               </div>
@@ -761,7 +788,9 @@ export default function Trades() {
                   const demColors = ["var(--sage-l)", "var(--amber)", "var(--red)", "#8ecaad"];
                   const demData = tradesWithValue.slice(0, 4).map(tr => {
                     const tv = Number(tr.tradeValue);
-                    return { name: translateCommodity(tr.commodityName, lang).split(" ")[0], origin: tr.originIso2, est: Math.round(tv * 0.03), tv };
+                    // Use real demurrage total if saved, otherwise estimate at 3%
+                    const est = tr.demurrageTotal ? Math.round(Number(tr.demurrageTotal)) : Math.round(tv * 0.03);
+                    return { name: translateCommodity(tr.commodityName, lang).split(" ")[0], origin: tr.originIso2, est, tv, hasReal: !!tr.demurrageTotal };
                   });
                   const totalDem = demData.reduce((s, d) => s + d.est, 0);
                   let ang = 0;
@@ -785,7 +814,7 @@ export default function Trades() {
                             <div className="mt-dem-dot" style={{ background: demColors[i % demColors.length] }} />
                             <div className="di">
                               <div className="dn">{iso2ToFlag(d.origin)} {d.name}</div>
-                              <div className="dd">~3% of ${d.tv >= 1000 ? `${(d.tv / 1000).toFixed(0)}k` : d.tv}</div>
+                              <div className="dd">{d.hasReal ? "Calculated" : `~3% of $${d.tv >= 1000 ? `${(d.tv / 1000).toFixed(0)}k` : d.tv}`}</div>
                             </div>
                             <div className="dv" style={{ color: d.est > 1000 ? "var(--red)" : "var(--amber)" }}>
                               ${d.est.toLocaleString()}

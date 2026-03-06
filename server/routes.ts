@@ -845,6 +845,26 @@ export async function registerRoutes(
     }
   });
 
+  // Trade lifecycle: save demurrage position per trade
+  app.patch("/api/trades/:id/demurrage", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { port, containerType, dailyRate, freeDays, daysHeld, total } = req.body;
+      const updated = await storage.updateTradeFields(req.params.id, {
+        demurragePort: port,
+        demurrageContainerType: containerType,
+        demurrageDailyRate: dailyRate != null ? String(dailyRate) : undefined,
+        demurrageFreeDays: freeDays != null ? Number(freeDays) : undefined,
+        demurrageDaysHeld: daysHeld != null ? Number(daysHeld) : undefined,
+        demurrageTotal: total != null ? String(total) : undefined,
+      }, sessionId);
+      if (!updated) return res.status(404).json({ message: t("routes.trade_not_found_no_changes", getLocale(req)) });
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   app.get("/api/trades", async (req, res) => {
     try {
       const sessionId = getSessionId(req, res);
