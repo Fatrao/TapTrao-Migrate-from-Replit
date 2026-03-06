@@ -513,25 +513,27 @@ function DocPickerStep({
 }) {
   return (
     <div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 20 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
         {docs.map((doc) => (
           <label
             key={doc}
             style={{
               display: "flex", alignItems: "center", gap: 10,
-              padding: "10px 14px", borderRadius: 8,
-              border: selectedDocs.has(doc) ? "1px solid var(--sage)" : "1px solid rgba(0,0,0,0.08)",
-              background: selectedDocs.has(doc) ? "var(--sage-xs)" : "#fff",
+              padding: "12px 16px", borderRadius: 10,
+              border: selectedDocs.has(doc) ? "2px solid var(--sage)" : "1px solid rgba(0,0,0,0.15)",
+              background: selectedDocs.has(doc) ? "var(--sage-pale)" : "#fff",
               cursor: "pointer",
+              boxShadow: selectedDocs.has(doc) ? "0 2px 8px rgba(74,124,94,0.15)" : "0 1px 3px rgba(0,0,0,0.04)",
+              transition: "all 0.15s ease",
             }}
           >
             <input
               type="checkbox"
               checked={selectedDocs.has(doc)}
               onChange={() => onToggle(doc)}
-              style={{ accentColor: "var(--sage)", width: 16, height: 16 }}
+              style={{ accentColor: "var(--sage)", width: 18, height: 18, flexShrink: 0 }}
             />
-            <span style={{ fontSize: 15, color: "var(--t1)" }}>{doc}</span>
+            <span style={{ fontSize: 14, color: "var(--t1)", fontWeight: 500 }}>{doc}</span>
           </label>
         ))}
       </div>
@@ -539,8 +541,9 @@ function DocPickerStep({
         <button
           onClick={onBack}
           style={{
-            padding: "8px 18px", borderRadius: 8, border: "1px solid rgba(0,0,0,0.1)",
-            background: "transparent", fontSize: 14, fontWeight: 600, cursor: "pointer", color: "var(--t2)",
+            padding: "10px 20px", borderRadius: 8, border: "1px solid rgba(0,0,0,0.18)",
+            background: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", color: "var(--t1)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
           }}
         >
           {t("dialog.back")}
@@ -549,11 +552,12 @@ function DocPickerStep({
           onClick={onConfirm}
           disabled={selectedDocs.size === 0 || creating}
           style={{
-            padding: "8px 18px", borderRadius: 8, border: "none",
-            background: selectedDocs.size === 0 ? "rgba(0,0,0,0.1)" : "var(--sage)",
+            padding: "10px 20px", borderRadius: 8, border: "none",
+            background: selectedDocs.size === 0 ? "rgba(0,0,0,0.12)" : "var(--sage)",
             color: selectedDocs.size === 0 ? "var(--t3)" : "#fff",
-            fontSize: 14, fontWeight: 600, cursor: selectedDocs.size === 0 ? "default" : "pointer",
+            fontSize: 14, fontWeight: 700, cursor: selectedDocs.size === 0 ? "default" : "pointer",
             opacity: creating ? 0.6 : 1,
+            boxShadow: selectedDocs.size > 0 ? "0 2px 6px rgba(74,124,94,0.25)" : "none",
           }}
         >
           {creating ? t("dialog.creating") : t("dialog.createLink")}
@@ -785,9 +789,10 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
   return (
     <div
       style={{
-        background: "var(--card)",
+        background: "#fff",
         borderRadius: "var(--r)",
-        boxShadow: "var(--shd)",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+        border: "1px solid rgba(0,0,0,0.1)",
         borderLeft: `4px solid ${accentColor}`,
         padding: "18px 20px",
         opacity: dimmed ? 0.65 : 1,
@@ -923,12 +928,13 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
         <button
           onClick={handleWhatsApp}
           style={{
-            flex: 1, padding: "9px 14px", borderRadius: 8,
-            border: "1px solid rgba(37,211,102,0.4)",
-            background: "rgba(37,211,102,0.08)",
+            flex: 1, padding: "10px 14px", borderRadius: 8,
+            border: "1px solid #25D366",
+            background: "#fff",
             fontSize: 13, fontWeight: 700, cursor: "pointer",
             color: "#1a9e4a", fontFamily: "var(--fb)",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
           }}
           data-testid={`inbox-whatsapp-${request.id}`}
         >
@@ -937,12 +943,13 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
         <button
           onClick={handleEmail}
           style={{
-            flex: 1, padding: "9px 14px", borderRadius: 8,
-            border: "1px solid rgba(74,124,94,0.35)",
-            background: "rgba(74,124,94,0.08)",
+            flex: 1, padding: "10px 14px", borderRadius: 8,
+            border: "1px solid var(--sage)",
+            background: "#fff",
             fontSize: 13, fontWeight: 700, cursor: "pointer",
             color: "var(--sage)", fontFamily: "var(--fb)",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
           }}
           data-testid={`inbox-email-${request.id}`}
         >
@@ -951,12 +958,13 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
         <button
           onClick={handleCopyLink}
           style={{
-            flex: 1, padding: "9px 14px", borderRadius: 8,
-            border: "1px solid rgba(0,0,0,0.15)",
-            background: "rgba(0,0,0,0.04)",
+            flex: 1, padding: "10px 14px", borderRadius: 8,
+            border: "1px solid rgba(0,0,0,0.2)",
+            background: "#fff",
             fontSize: 13, fontWeight: 700, cursor: "pointer",
             color: "var(--t1)", fontFamily: "var(--fb)",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
           }}
           data-testid={`inbox-link-${request.id}`}
         >
