@@ -366,21 +366,22 @@ function NewRequestDialog({ onClose, onCreated }: { onClose: () => void; onCreat
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div style={{
-        background: "var(--card)", borderRadius: 16, width: "100%", maxWidth: 520,
+        background: "linear-gradient(135deg, #0e4e45, #14574a, #1c6352, #327462)",
+        borderRadius: 16, width: "100%", maxWidth: 520,
         maxHeight: "80vh", overflow: "hidden", display: "flex", flexDirection: "column",
-        boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
       }}>
         {/* Dialog Header */}
         <div style={{
-          padding: "20px 24px 16px", borderBottom: "1px solid rgba(0,0,0,0.06)",
+          padding: "20px 24px 16px", borderBottom: "1px solid rgba(255,255,255,0.1)",
           display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
           <div>
-            <div style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 18, color: "var(--t1)" }}>
+            <div style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 18, color: "#fff" }}>
               {step === "trade" ? t("dialog.selectTrade") : step === "docs" ? t("dialog.selectDocs") : t("dialog.shareLink")}
             </div>
             {step === "docs" && selectedLookup && (
-              <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 2 }}>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>
                 {flag(getOriginIso2(selectedLookup))} {selectedLookup.originName} → {flag(getDestIso2(selectedLookup))} {selectedLookup.destinationName} · {selectedLookup.commodityName}
               </div>
             )}
@@ -389,7 +390,7 @@ function NewRequestDialog({ onClose, onCreated }: { onClose: () => void; onCreat
             onClick={onClose}
             style={{
               width: 28, height: 28, borderRadius: 8, border: "none",
-              background: "rgba(0,0,0,0.06)", cursor: "pointer", fontSize: 16, color: "var(--t3)",
+              background: "rgba(255,255,255,0.15)", cursor: "pointer", fontSize: 16, color: "#fff",
               display: "flex", alignItems: "center", justifyContent: "center",
             }}
           >
@@ -449,12 +450,12 @@ function TradePickerStep({
   t: TFunction;
 }) {
   if (loading) {
-    return <div style={{ padding: "40px 0", textAlign: "center", color: "var(--t3)", fontSize: 15 }}>{t("dialog.loadingTrades")}</div>;
+    return <div style={{ padding: "40px 0", textAlign: "center", color: "rgba(255,255,255,0.6)", fontSize: 15 }}>{t("dialog.loadingTrades")}</div>;
   }
   if (lookups.length === 0) {
     return (
       <div style={{ padding: "40px 0", textAlign: "center" }}>
-        <div style={{ fontSize: 15, color: "var(--t3)" }}>{t("dialog.noTrades")}</div>
+        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.6)" }}>{t("dialog.noTrades")}</div>
       </div>
     );
   }
@@ -469,8 +470,9 @@ function TradePickerStep({
             onClick={() => onSelect(lookup)}
             style={{
               display: "flex", alignItems: "center", gap: 12,
-              padding: "12px 16px", borderRadius: 10, border: "1px solid rgba(0,0,0,0.08)",
+              padding: "12px 16px", borderRadius: 10, border: "none",
               background: "#fff", cursor: "pointer", textAlign: "left", width: "100%",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
             }}
             data-testid={`dialog-trade-${lookup.id}`}
           >
@@ -520,10 +522,10 @@ function DocPickerStep({
             style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "12px 16px", borderRadius: 10,
-              border: selectedDocs.has(doc) ? "2px solid var(--sage)" : "1px solid rgba(0,0,0,0.15)",
-              background: selectedDocs.has(doc) ? "var(--sage-pale)" : "#fff",
+              border: selectedDocs.has(doc) ? "2px solid #4ade80" : "none",
+              background: "#fff",
               cursor: "pointer",
-              boxShadow: selectedDocs.has(doc) ? "0 2px 8px rgba(74,124,94,0.15)" : "0 1px 3px rgba(0,0,0,0.04)",
+              boxShadow: selectedDocs.has(doc) ? "0 2px 10px rgba(74,222,128,0.2)" : "0 2px 8px rgba(0,0,0,0.1)",
               transition: "all 0.15s ease",
             }}
           >
@@ -541,9 +543,8 @@ function DocPickerStep({
         <button
           onClick={onBack}
           style={{
-            padding: "10px 20px", borderRadius: 8, border: "1px solid rgba(0,0,0,0.18)",
-            background: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", color: "var(--t1)",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+            padding: "10px 20px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.25)",
+            background: "rgba(255,255,255,0.1)", fontSize: 14, fontWeight: 600, cursor: "pointer", color: "#fff",
           }}
         >
           {t("dialog.back")}
@@ -553,11 +554,11 @@ function DocPickerStep({
           disabled={selectedDocs.size === 0 || creating}
           style={{
             padding: "10px 20px", borderRadius: 8, border: "none",
-            background: selectedDocs.size === 0 ? "rgba(0,0,0,0.12)" : "var(--sage)",
-            color: selectedDocs.size === 0 ? "var(--t3)" : "#fff",
+            background: selectedDocs.size === 0 ? "rgba(255,255,255,0.15)" : "#fff",
+            color: selectedDocs.size === 0 ? "rgba(255,255,255,0.4)" : "var(--sage)",
             fontSize: 14, fontWeight: 700, cursor: selectedDocs.size === 0 ? "default" : "pointer",
             opacity: creating ? 0.6 : 1,
-            boxShadow: selectedDocs.size > 0 ? "0 2px 6px rgba(74,124,94,0.25)" : "none",
+            boxShadow: selectedDocs.size > 0 ? "0 2px 8px rgba(0,0,0,0.15)" : "none",
           }}
         >
           {creating ? t("dialog.creating") : t("dialog.createLink")}
@@ -581,16 +582,16 @@ function ShareStep({
     <div>
       {/* Upload URL display */}
       <div style={{
-        padding: "12px 16px", borderRadius: 8, background: "rgba(0,0,0,0.03)",
-        border: "1px solid rgba(0,0,0,0.06)", marginBottom: 16,
-        fontSize: 13, color: "var(--t2)", wordBreak: "break-all",
+        padding: "12px 16px", borderRadius: 8, background: "rgba(255,255,255,0.1)",
+        border: "1px solid rgba(255,255,255,0.15)", marginBottom: 16,
+        fontSize: 13, color: "rgba(255,255,255,0.8)", wordBreak: "break-all",
       }}>
         {created.uploadUrl}
       </div>
 
       {/* Documents requested */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, color: "var(--t4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>
           {t("dialog.docsRequested")} ({created.docsRequired.length})
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -599,11 +600,11 @@ function ShareStep({
             return (
               <div key={i} style={{
                 display: "flex", alignItems: "center", gap: 6,
-                fontSize: 13, color: "var(--t2)",
+                fontSize: 13, color: "rgba(255,255,255,0.85)",
               }}>
                 <span style={{
                   width: 6, height: 6, borderRadius: "50%",
-                  background: "var(--sage)", flexShrink: 0,
+                  background: "#4ade80", flexShrink: 0,
                 }} />
                 {core}
               </div>
@@ -618,37 +619,37 @@ function ShareStep({
           onClick={onWhatsApp}
           style={{
             flex: 1, padding: "10px 16px", borderRadius: 8,
-            border: "1px solid rgba(37,211,102,0.2)", background: "transparent",
-            color: "#25D366", fontSize: 14, fontWeight: 600, cursor: "pointer",
-            fontFamily: "var(--fb)",
+            border: "none", background: "#fff",
+            color: "#1a9e4a", fontSize: 14, fontWeight: 700, cursor: "pointer",
+            fontFamily: "var(--fb)", boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           }}
           data-testid="dialog-share-whatsapp"
         >
-          {t("btn.whatsapp")}
+          💬 {t("btn.whatsapp")}
         </button>
         <button
           onClick={onEmail}
           style={{
             flex: 1, padding: "10px 16px", borderRadius: 8,
-            border: "1px solid rgba(74,124,94,0.2)", background: "transparent",
-            color: "var(--sage)", fontSize: 14, fontWeight: 600, cursor: "pointer",
-            fontFamily: "var(--fb)",
+            border: "none", background: "#fff",
+            color: "var(--sage)", fontSize: 14, fontWeight: 700, cursor: "pointer",
+            fontFamily: "var(--fb)", boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           }}
           data-testid="dialog-share-email"
         >
-          {t("btn.email")}
+          📧 {t("btn.email")}
         </button>
         <button
           onClick={onCopyLink}
           style={{
             flex: 1, padding: "10px 16px", borderRadius: 8,
-            border: "1px solid rgba(0,0,0,0.08)", background: "transparent",
-            color: "var(--t2)", fontSize: 14, fontWeight: 600, cursor: "pointer",
-            fontFamily: "var(--fb)",
+            border: "none", background: "#fff",
+            color: "var(--t1)", fontSize: 14, fontWeight: 700, cursor: "pointer",
+            fontFamily: "var(--fb)", boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           }}
           data-testid="dialog-share-link"
         >
-          {t("btn.link")}
+          🔗 {t("btn.link")}
         </button>
       </div>
 
@@ -657,8 +658,8 @@ function ShareStep({
         onClick={onDone}
         style={{
           width: "100%", padding: "10px 20px", borderRadius: 8, border: "none",
-          background: "var(--sage)", color: "#fff", fontSize: 14, fontWeight: 600,
-          cursor: "pointer",
+          background: "#fff", color: "var(--sage)", fontSize: 14, fontWeight: 700,
+          cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
         }}
         data-testid="dialog-done"
       >
