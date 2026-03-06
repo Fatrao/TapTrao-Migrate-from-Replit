@@ -200,11 +200,16 @@ export default function Inbox() {
         {requestsQuery.isLoading ? (
           <div style={{ padding: "80px 0", textAlign: "center", color: "var(--t3)", fontSize: 15 }}>{t("loading")}</div>
         ) : requests.length === 0 ? (
-          <div style={{ padding: "80px 0", textAlign: "center" }} data-testid="inbox-empty-state">
+          <div style={{
+            padding: "60px 40px", textAlign: "center",
+            background: "var(--card)", borderRadius: "var(--r)",
+            boxShadow: "var(--shd)", borderLeft: "4px solid var(--sage)",
+          }} data-testid="inbox-empty-state">
+            <div style={{ fontSize: 36, marginBottom: 12 }}>📦</div>
             <div style={{ fontFamily: "var(--fd)", fontWeight: 700, fontSize: 20, color: "var(--t1)" }}>
               {t("empty.title")}
             </div>
-            <div style={{ fontSize: 15, color: "var(--t3)", marginTop: 8 }}>
+            <div style={{ fontSize: 14, color: "var(--t3)", marginTop: 8, maxWidth: 360, margin: "8px auto 0" }}>
               {t("empty.subtitle")}
             </div>
           </div>
@@ -643,18 +648,32 @@ function ShareStep({
 
 function InboxSection({ label, items, dimmed, t }: { label: string; items: SupplierRequestRow[]; dimmed?: boolean; t: TFunction }) {
   return (
-    <div style={{ marginBottom: 24 }} data-testid={`inbox-group-${label.toLowerCase().replace(/\s+/g, "-")}`}>
+    <div style={{ marginBottom: 28 }} data-testid={`inbox-group-${label.toLowerCase().replace(/\s+/g, "-")}`}>
       <div style={{
-        fontSize: 15,
-        fontWeight: 600,
-        letterSpacing: "1.2px",
-        color: "var(--t3)",
-        textTransform: "uppercase",
-        padding: "8px 0",
+        display: "flex", alignItems: "center", gap: 8,
+        padding: "8px 0 10px",
       }}>
-        {label}
+        <span style={{
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: "1.2px",
+          color: "var(--t4)",
+          textTransform: "uppercase",
+        }}>
+          {label}
+        </span>
+        <span style={{
+          padding: "1px 8px",
+          borderRadius: 10,
+          fontSize: 11,
+          fontWeight: 700,
+          background: "var(--sage-xs)",
+          color: "var(--sage)",
+        }}>
+          {items.length}
+        </span>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {items.map((req) => (
           <SupplierCard key={req.id} request={req} dimmed={dimmed} t={t} />
         ))}
@@ -708,16 +727,15 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
   const receivedSet = new Set(docsReceived);
   const outstanding = docsRequired.filter((d) => !receivedSet.has(d));
   const isBlocking = request.status === "blocking";
+  const isComplete = request.status === "complete";
+  const progressPct = docsRequired.length > 0 ? Math.round((docsReceived.length / docsRequired.length) * 100) : 0;
 
-  // Avatar color based on status
-  const avatarStyle = isBlocking
-    ? { background: "var(--red-xs)", color: "var(--red)" }
-    : request.status === "complete"
-    ? { background: "var(--sage-xs)", color: "var(--sage)" }
-    : { background: "var(--amber-xs)", color: "var(--amber)" };
+  // Card accent: sage for default/complete, red for blocking
+  const accentColor = isBlocking ? "var(--red)" : "var(--sage)";
+  const accentBg = isBlocking ? "var(--red-xs)" : "var(--sage-xs)";
 
   // Status description
-  const statusText = request.status === "complete"
+  const statusText = isComplete
     ? t("card.allDocsReceived")
     : isBlocking && outstanding.length > 0
     ? outstanding.join(" and ")
@@ -726,167 +744,194 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
   // Time label
   const timeLabel = isBlocking
     ? overdueTime(request.updated_at, t)
-    : request.status === "complete"
+    : isComplete
     ? relativeTime(request.updated_at, t)
     : sentTime(request.created_at, t);
+
+  // Use commodity as the card title (more meaningful than generic "Supplier")
+  const cardTitle = request.commodity_name;
+  const routeLabel = `${flag(request.origin_iso2)} ${request.origin_name || request.origin_iso2} → ${flag(request.dest_iso2)} ${request.dest_name || request.dest_iso2}`;
 
   return (
     <div
       style={{
         background: "var(--card)",
         borderRadius: "var(--r)",
-        boxShadow: isBlocking
-          ? "var(--shd), inset 3px 0 0 var(--red)"
-          : "var(--shd)",
-        padding: "16px 20px",
+        boxShadow: "var(--shd)",
+        borderLeft: `4px solid ${accentColor}`,
+        padding: "18px 20px",
+        opacity: dimmed ? 0.65 : 1,
         display: "flex",
-        alignItems: "center",
+        flexDirection: "column",
         gap: 14,
-        opacity: dimmed ? 0.7 : 1,
       }}
       data-testid={`inbox-card-${request.id}`}
     >
-      {/* Avatar */}
-      <div
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: 10,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 15,
-          fontWeight: 700,
-          flexShrink: 0,
-          ...avatarStyle,
-        }}
-      >
-        {request.origin_iso2}
+      {/* Top row: info + status badge */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+        {/* Flag avatar */}
+        <div
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 12,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 22,
+            flexShrink: 0,
+            background: accentBg,
+          }}
+        >
+          {flag(request.origin_iso2) || request.origin_iso2}
+        </div>
+
+        {/* Info */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <span style={{ fontFamily: "var(--fd)", fontSize: 16, fontWeight: 700, color: "var(--t1)" }}>{cardTitle}</span>
+            <span
+              style={{
+                padding: "2px 8px",
+                borderRadius: 6,
+                fontSize: 11,
+                fontWeight: 600,
+                background: statusInfo.bg,
+                color: statusInfo.color,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                letterSpacing: ".02em",
+              }}
+            >
+              <span style={{
+                width: 5, height: 5, borderRadius: "50%",
+                background: "currentColor", display: "inline-block",
+              }} />
+              {statusInfo.label}
+            </span>
+          </div>
+          <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 2 }}>
+            {routeLabel}
+          </div>
+          <div style={{
+            fontSize: 13,
+            color: isBlocking ? "var(--red)" : "var(--t3)",
+            fontWeight: isBlocking ? 600 : 400,
+            marginTop: 4,
+          }}>
+            {statusText}
+          </div>
+        </div>
+
+        {/* Time */}
+        <div style={{ fontSize: 12, color: "var(--t4)", flexShrink: 0, textAlign: "right", paddingTop: 2 }}>
+          {timeLabel}
+        </div>
       </div>
 
-      {/* Info */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 15, fontWeight: 600 }}>{request.supplier_name}</span>
-          <span style={{ fontSize: 15, fontWeight: 400, color: "var(--t3)" }}>
-            {request.origin_iso2} → {request.dest_iso2} · {request.commodity_name}
+      {/* Progress bar + doc count */}
+      <div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t3)" }}>
+            {t("card.docs", { received: docsReceived.length, total: docsRequired.length })}
+          </span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: accentColor }}>
+            {progressPct}%
           </span>
         </div>
         <div style={{
-          fontSize: 15,
-          color: isBlocking ? "var(--red)" : "var(--t3)",
-          fontWeight: isBlocking ? 600 : 400,
-          marginTop: 2,
+          width: "100%", height: 6, borderRadius: 3,
+          background: "rgba(0,0,0,0.06)",
+          overflow: "hidden",
         }}>
-          {statusText}
+          <div style={{
+            width: `${progressPct}%`,
+            height: "100%",
+            borderRadius: 3,
+            background: isComplete ? "var(--sage)" : isBlocking ? "var(--red)" : "var(--sage-l)",
+            transition: "width 0.3s ease",
+          }} />
         </div>
-        {/* Document pips */}
-        <div style={{ display: "flex", gap: 3, marginTop: 4, alignItems: "center" }}>
+        {/* Individual doc pips */}
+        <div style={{ display: "flex", gap: 4, marginTop: 8, flexWrap: "wrap" }}>
           {docsRequired.map((doc, i) => {
             const received = receivedSet.has(doc);
             const isMissing = !received && isBlocking;
+            const pipColor = received ? "var(--sage)" : isMissing ? "var(--red)" : "rgba(0,0,0,0.12)";
+            const pipBg = received ? "var(--sage-xs)" : isMissing ? "var(--red-xs)" : "rgba(0,0,0,0.03)";
+            const pipTextColor = received ? "var(--sage)" : isMissing ? "var(--red)" : "var(--t4)";
+            // Short doc label: first 2 words
+            const shortLabel = doc.split(/\s+/).slice(0, 2).join(" ");
             return (
-              <div
+              <span
                 key={i}
+                title={doc}
                 style={{
-                  width: 18,
-                  height: 5,
-                  borderRadius: 2,
-                  background: received
-                    ? "var(--sage)"
-                    : isMissing
-                    ? "var(--red)"
-                    : "var(--amber)",
+                  display: "inline-flex", alignItems: "center", gap: 4,
+                  padding: "3px 8px", borderRadius: 6,
+                  fontSize: 11, fontWeight: 600,
+                  background: pipBg,
+                  color: pipTextColor,
+                  border: `1px solid ${pipColor}`,
+                  letterSpacing: ".01em",
                 }}
-              />
+              >
+                <span style={{
+                  width: 6, height: 6, borderRadius: "50%",
+                  background: pipColor, flexShrink: 0,
+                }} />
+                {shortLabel}
+              </span>
             );
           })}
-          <span style={{ fontSize: 15, color: "var(--t3)", marginLeft: 4 }}>
-            {t("card.docs", { received: docsReceived.length, total: docsRequired.length })}
-          </span>
         </div>
       </div>
 
-      {/* Right side: badge, time, actions */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flexShrink: 0 }}>
-        <div
+      {/* Action buttons */}
+      <div style={{ display: "flex", gap: 8, borderTop: "1px solid rgba(0,0,0,0.05)", paddingTop: 12 }}>
+        <button
+          onClick={handleWhatsApp}
           style={{
-            padding: "4px 10px",
-            borderRadius: 10,
-            fontSize: 15,
-            fontWeight: 600,
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-            background: statusInfo.bg,
-            color: statusInfo.color,
+            flex: 1, padding: "8px 12px", borderRadius: 8,
+            border: "1px solid rgba(37,211,102,0.15)",
+            background: "rgba(37,211,102,0.04)",
+            fontSize: 13, fontWeight: 600, cursor: "pointer",
+            color: "#25D366", fontFamily: "var(--fb)",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
           }}
+          data-testid={`inbox-whatsapp-${request.id}`}
         >
-          <span style={{
-            width: 5,
-            height: 5,
-            borderRadius: "50%",
-            background: "currentColor",
-            display: "inline-block",
-          }} />
-          {statusInfo.label}
-        </div>
-        <div style={{ fontSize: 15, color: "var(--t4)" }}>
-          {timeLabel}
-        </div>
-        <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
-          <button
-            onClick={handleWhatsApp}
-            style={{
-              padding: "4px 10px",
-              borderRadius: 8,
-              border: "1px solid rgba(37,211,102,0.2)",
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: "pointer",
-              background: "transparent",
-              color: "#25D366",
-              fontFamily: "var(--fb)",
-            }}
-            data-testid={`inbox-whatsapp-${request.id}`}
-          >
-            {t("btn.whatsapp")}
-          </button>
-          <button
-            onClick={handleEmail}
-            style={{
-              padding: "4px 10px",
-              borderRadius: 8,
-              border: "1px solid rgba(74,124,94,0.2)",
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: "pointer",
-              background: "transparent",
-              color: "var(--sage)",
-              fontFamily: "var(--fb)",
-            }}
-            data-testid={`inbox-email-${request.id}`}
-          >
-            {t("btn.email")}
-          </button>
-          <button
-            onClick={handleCopyLink}
-            style={{
-              padding: "4px 10px",
-              borderRadius: 8,
-              border: "1px solid rgba(0,0,0,0.08)",
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: "pointer",
-              background: "transparent",
-              color: "var(--t2)",
-              fontFamily: "var(--fb)",
-            }}
-            data-testid={`inbox-link-${request.id}`}
-          >
-            {t("btn.link")}
-          </button>
-        </div>
+          <span style={{ fontSize: 15 }}>💬</span> {t("btn.whatsapp")}
+        </button>
+        <button
+          onClick={handleEmail}
+          style={{
+            flex: 1, padding: "8px 12px", borderRadius: 8,
+            border: "1px solid rgba(74,124,94,0.15)",
+            background: "rgba(74,124,94,0.04)",
+            fontSize: 13, fontWeight: 600, cursor: "pointer",
+            color: "var(--sage)", fontFamily: "var(--fb)",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+          }}
+          data-testid={`inbox-email-${request.id}`}
+        >
+          <span style={{ fontSize: 15 }}>📧</span> {t("btn.email")}
+        </button>
+        <button
+          onClick={handleCopyLink}
+          style={{
+            flex: 1, padding: "8px 12px", borderRadius: 8,
+            border: "1px solid rgba(0,0,0,0.06)",
+            background: "rgba(0,0,0,0.02)",
+            fontSize: 13, fontWeight: 600, cursor: "pointer",
+            color: "var(--t2)", fontFamily: "var(--fb)",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+          }}
+          data-testid={`inbox-link-${request.id}`}
+        >
+          <span style={{ fontSize: 15 }}>🔗</span> {t("btn.link")}
+        </button>
       </div>
     </div>
   );
