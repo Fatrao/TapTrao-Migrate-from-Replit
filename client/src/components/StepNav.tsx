@@ -44,10 +44,10 @@ export function StepNav({ steps, currentIndex, completedUpTo }: StepNavProps) {
                   fontFamily: "var(--fh)",
                   transition: "all 0.2s",
                   ...(isDone
-                    ? { background: "var(--green)", color: "#000" }
+                    ? { background: "var(--sage)", color: "#fff" }
                     : isActive
-                      ? { background: "rgba(255,255,255,0.15)", color: "#fff", border: "2px solid var(--green)" }
-                      : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.1)" }),
+                      ? { background: "var(--sage)", color: "#fff" }
+                      : { background: "rgba(0,0,0,0.06)", color: "var(--t4)", border: "1px solid rgba(0,0,0,0.1)" }),
                 }}
               >
                 {isDone ? <Check size={12} strokeWidth={3} /> : i + 1}
@@ -58,10 +58,10 @@ export function StepNav({ steps, currentIndex, completedUpTo }: StepNavProps) {
                   fontWeight: 600,
                   whiteSpace: "nowrap",
                   ...(isDone
-                    ? { color: "var(--green)" }
+                    ? { color: "var(--sage)" }
                     : isActive
-                      ? { color: "#fff" }
-                      : { color: "rgba(255,255,255,0.5)" }),
+                      ? { color: "var(--t1)" }
+                      : { color: "var(--t4)" }),
                 }}
               >
                 {step}
@@ -72,7 +72,7 @@ export function StepNav({ steps, currentIndex, completedUpTo }: StepNavProps) {
                 style={{
                   flex: 1,
                   height: 1,
-                  background: isDone ? "var(--green)" : "rgba(255,255,255,0.1)",
+                  background: isDone ? "var(--sage)" : "rgba(0,0,0,0.1)",
                   margin: "0 10px",
                   minWidth: 24,
                   transition: "background 0.3s",

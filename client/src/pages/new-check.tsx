@@ -11,7 +11,7 @@ export default function NewCheck() {
   return (
     <AppShell>
       {/* Green hero */}
-      <div className="green-hero" style={{ margin: "4px 24px 16px" }}>
+      <div className="green-hero-box" style={{ margin: "4px 24px 16px" }}>
         <div style={{
           display: "inline-flex",
           alignItems: "center",
