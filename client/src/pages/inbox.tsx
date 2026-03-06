@@ -872,25 +872,26 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
         </div>
         <div style={{
           width: "100%", height: 6, borderRadius: 3,
-          background: "rgba(0,0,0,0.06)",
+          background: "rgba(0,0,0,0.12)",
           overflow: "hidden",
         }}>
           <div style={{
             width: `${progressPct}%`,
             height: "100%",
             borderRadius: 3,
-            background: isComplete ? "var(--sage)" : isBlocking ? "var(--red)" : "var(--sage-l)",
+            background: isComplete ? "var(--sage)" : isBlocking ? "var(--red)" : "var(--sage)",
             transition: "width 0.3s ease",
           }} />
         </div>
         {/* Individual doc pips */}
-        <div style={{ display: "flex", gap: 4, marginTop: 8, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 5, marginTop: 8, flexWrap: "wrap" }}>
           {docsRequired.map((doc, i) => {
             const received = receivedSet.has(doc);
             const isMissing = !received && isBlocking;
-            const pipColor = received ? "var(--sage)" : isMissing ? "var(--red)" : "rgba(0,0,0,0.12)";
-            const pipBg = received ? "var(--sage-xs)" : isMissing ? "var(--red-xs)" : "rgba(0,0,0,0.03)";
-            const pipTextColor = received ? "var(--sage)" : isMissing ? "var(--red)" : "var(--t4)";
+            const pipDot = received ? "var(--sage)" : isMissing ? "var(--red)" : "var(--t4)";
+            const pipBg = received ? "var(--sage-pale)" : isMissing ? "var(--red-pale)" : "rgba(0,0,0,0.05)";
+            const pipText = received ? "var(--sage)" : isMissing ? "var(--red)" : "var(--t2)";
+            const pipBorder = received ? "var(--sage)" : isMissing ? "var(--red)" : "rgba(0,0,0,0.15)";
             // Short doc label: core doc type
             const shortLabel = shortDocName(doc);
             return (
@@ -899,17 +900,16 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
                 title={doc}
                 style={{
                   display: "inline-flex", alignItems: "center", gap: 4,
-                  padding: "3px 8px", borderRadius: 6,
-                  fontSize: 11, fontWeight: 600,
+                  padding: "4px 10px", borderRadius: 6,
+                  fontSize: 12, fontWeight: 600,
                   background: pipBg,
-                  color: pipTextColor,
-                  border: `1px solid ${pipColor}`,
-                  letterSpacing: ".01em",
+                  color: pipText,
+                  border: `1px solid ${pipBorder}`,
                 }}
               >
                 <span style={{
-                  width: 6, height: 6, borderRadius: "50%",
-                  background: pipColor, flexShrink: 0,
+                  width: 7, height: 7, borderRadius: "50%",
+                  background: pipDot, flexShrink: 0,
                 }} />
                 {shortLabel}
               </span>
@@ -919,48 +919,48 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
       </div>
 
       {/* Action buttons */}
-      <div style={{ display: "flex", gap: 8, borderTop: "1px solid rgba(0,0,0,0.05)", paddingTop: 12 }}>
+      <div style={{ display: "flex", gap: 8, borderTop: "1px solid rgba(0,0,0,0.1)", paddingTop: 12 }}>
         <button
           onClick={handleWhatsApp}
           style={{
-            flex: 1, padding: "8px 12px", borderRadius: 8,
-            border: "1px solid rgba(37,211,102,0.15)",
-            background: "rgba(37,211,102,0.04)",
-            fontSize: 13, fontWeight: 600, cursor: "pointer",
-            color: "#25D366", fontFamily: "var(--fb)",
+            flex: 1, padding: "9px 14px", borderRadius: 8,
+            border: "1px solid rgba(37,211,102,0.4)",
+            background: "rgba(37,211,102,0.08)",
+            fontSize: 13, fontWeight: 700, cursor: "pointer",
+            color: "#1a9e4a", fontFamily: "var(--fb)",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
           }}
           data-testid={`inbox-whatsapp-${request.id}`}
         >
-          <span style={{ fontSize: 15 }}>💬</span> {t("btn.whatsapp")}
+          💬 {t("btn.whatsapp")}
         </button>
         <button
           onClick={handleEmail}
           style={{
-            flex: 1, padding: "8px 12px", borderRadius: 8,
-            border: "1px solid rgba(74,124,94,0.15)",
-            background: "rgba(74,124,94,0.04)",
-            fontSize: 13, fontWeight: 600, cursor: "pointer",
+            flex: 1, padding: "9px 14px", borderRadius: 8,
+            border: "1px solid rgba(74,124,94,0.35)",
+            background: "rgba(74,124,94,0.08)",
+            fontSize: 13, fontWeight: 700, cursor: "pointer",
             color: "var(--sage)", fontFamily: "var(--fb)",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
           }}
           data-testid={`inbox-email-${request.id}`}
         >
-          <span style={{ fontSize: 15 }}>📧</span> {t("btn.email")}
+          📧 {t("btn.email")}
         </button>
         <button
           onClick={handleCopyLink}
           style={{
-            flex: 1, padding: "8px 12px", borderRadius: 8,
-            border: "1px solid rgba(0,0,0,0.06)",
-            background: "rgba(0,0,0,0.02)",
-            fontSize: 13, fontWeight: 600, cursor: "pointer",
-            color: "var(--t2)", fontFamily: "var(--fb)",
+            flex: 1, padding: "9px 14px", borderRadius: 8,
+            border: "1px solid rgba(0,0,0,0.15)",
+            background: "rgba(0,0,0,0.04)",
+            fontSize: 13, fontWeight: 700, cursor: "pointer",
+            color: "var(--t1)", fontFamily: "var(--fb)",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
           }}
           data-testid={`inbox-link-${request.id}`}
         >
-          <span style={{ fontSize: 15 }}>🔗</span> {t("btn.link")}
+          🔗 {t("btn.link")}
         </button>
       </div>
     </div>
