@@ -362,44 +362,51 @@ function NewRequestDialog({ onClose, onCreated }: { onClose: () => void; onCreat
       style={{
         position: "fixed", inset: 0, zIndex: 1000,
         background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "2rem",
       }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div style={{
-        background: "linear-gradient(160deg, #3d6b52, #4a7c5e, #5a8d6e)",
-        borderRadius: 16, width: "100%", maxWidth: 520,
+        background: "#1b2a22",
+        borderRadius: 18, width: "100%", maxWidth: 500,
         maxHeight: "80vh", overflow: "hidden", display: "flex", flexDirection: "column",
-        boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
+        boxShadow: "0 24px 64px rgba(0,0,0,0.28)",
+        position: "relative",
+        padding: "28px 24px 24px",
       }}>
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          style={{
+            position: "absolute", top: 18, right: 18,
+            width: 28, height: 28, borderRadius: 6, border: "none",
+            background: "#2e3e34", cursor: "pointer", fontSize: 14, color: "#a8b8b0",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}
+        >
+          ✕
+        </button>
+
         {/* Dialog Header */}
-        <div style={{
-          padding: "20px 24px 16px", borderBottom: "1px solid rgba(255,255,255,0.15)",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-        }}>
-          <div>
-            <div style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 18, color: "#fff" }}>
-              {step === "trade" ? t("dialog.selectTrade") : step === "docs" ? t("dialog.selectDocs") : t("dialog.shareLink")}
-            </div>
-            {step === "docs" && selectedLookup && (
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>
-                {flag(getOriginIso2(selectedLookup))} {selectedLookup.originName} → {flag(getDestIso2(selectedLookup))} {selectedLookup.destinationName} · {selectedLookup.commodityName}
-              </div>
-            )}
+        <div style={{ marginBottom: step === "docs" ? 20 : 16 }}>
+          <div style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 20, color: "#e8e2da" }}>
+            {step === "trade" ? t("dialog.selectTrade") : step === "docs" ? t("dialog.selectDocs") : t("dialog.shareLink")}
           </div>
-          <button
-            onClick={onClose}
-            style={{
-              width: 28, height: 28, borderRadius: 8, border: "none",
-              background: "rgba(255,255,255,0.15)", cursor: "pointer", fontSize: 16, color: "#fff",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}
-          >
-            ×
-          </button>
+          {step === "docs" && selectedLookup && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#a8b8b0", marginTop: 6 }}>
+              <span style={{ fontSize: 15 }}>{flag(getOriginIso2(selectedLookup))}</span>
+              <span>{selectedLookup.originName}</span>
+              <span style={{ color: "#6b8c7a" }}>→</span>
+              <span style={{ fontSize: 15 }}>{flag(getDestIso2(selectedLookup))}</span>
+              <span>{selectedLookup.destinationName}</span>
+              <span>·</span>
+              <span style={{ color: "#c9a96e", fontWeight: 500 }}>{selectedLookup.commodityName}</span>
+            </div>
+          )}
         </div>
 
         {/* Dialog Body */}
-        <div style={{ padding: "16px 24px 24px", overflowY: "auto", flex: 1 }}>
+        <div style={{ overflowY: "auto", flex: 1 }}>
           {step === "trade" && (
             <TradePickerStep
               lookups={lookups}
@@ -450,12 +457,12 @@ function TradePickerStep({
   t: TFunction;
 }) {
   if (loading) {
-    return <div style={{ padding: "40px 0", textAlign: "center", color: "rgba(255,255,255,0.6)", fontSize: 15 }}>{t("dialog.loadingTrades")}</div>;
+    return <div style={{ padding: "40px 0", textAlign: "center", color: "#a8b8b0", fontSize: 15 }}>{t("dialog.loadingTrades")}</div>;
   }
   if (lookups.length === 0) {
     return (
       <div style={{ padding: "40px 0", textAlign: "center" }}>
-        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.6)" }}>{t("dialog.noTrades")}</div>
+        <div style={{ fontSize: 15, color: "#a8b8b0" }}>{t("dialog.noTrades")}</div>
       </div>
     );
   }
@@ -515,30 +522,48 @@ function DocPickerStep({
 }) {
   return (
     <div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
         {docs.map((doc) => {
           const checked = selectedDocs.has(doc);
           return (
-            <label
+            <div
               key={doc}
+              onClick={() => onToggle(doc)}
               style={{
-                display: "flex", alignItems: "center", gap: 10,
-                padding: "12px 16px", borderRadius: 10,
-                border: "none",
-                background: checked ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.15)",
+                display: "flex", alignItems: "flex-start", gap: 14,
+                padding: "14px 16px", borderRadius: 10,
+                background: checked ? "#2d4a37" : "#243329",
+                border: `1.5px solid ${checked ? "#4a6355" : "transparent"}`,
                 cursor: "pointer",
-                boxShadow: checked ? "inset 0 1px 4px rgba(0,0,0,0.15)" : "none",
-                transition: "all 0.15s ease",
+                transition: "background 0.15s",
               }}
             >
-              <input
-                type="checkbox"
-                checked={checked}
-                onChange={() => onToggle(doc)}
-                style={{ accentColor: "#4ade80", width: 18, height: 18, flexShrink: 0 }}
-              />
-              <span style={{ fontSize: 14, color: "#fff", fontWeight: checked ? 600 : 400 }}>{doc}</span>
-            </label>
+              {/* Custom checkbox */}
+              <div style={{
+                width: 20, height: 20, minWidth: 20,
+                borderRadius: 5,
+                border: `1.5px solid ${checked ? "#4a6355" : "#4a6355"}`,
+                background: checked ? "#4a6355" : "transparent",
+                marginTop: 1,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "background 0.15s, border-color 0.15s",
+              }}>
+                {checked && (
+                  <svg width="12" height="9" viewBox="0 0 12 9" fill="none">
+                    <path d="M1 4L4.5 7.5L11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+              <span style={{
+                fontSize: 12.5, fontWeight: 500,
+                color: "#e8e2da",
+                lineHeight: 1.5,
+                letterSpacing: "0.02em",
+                textTransform: "uppercase",
+              }}>
+                {doc}
+              </span>
+            </div>
           );
         })}
       </div>
@@ -546,8 +571,11 @@ function DocPickerStep({
         <button
           onClick={onBack}
           style={{
-            padding: "10px 20px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.25)",
-            background: "rgba(255,255,255,0.1)", fontSize: 14, fontWeight: 600, cursor: "pointer", color: "#fff",
+            padding: "11px 24px", borderRadius: 9, border: "none",
+            background: "#2e3e34", fontSize: 14, fontWeight: 600,
+            cursor: "pointer", color: "#a8b8b0",
+            fontFamily: "var(--fb)",
+            transition: "opacity 0.15s",
           }}
         >
           {t("dialog.back")}
@@ -556,12 +584,14 @@ function DocPickerStep({
           onClick={onConfirm}
           disabled={selectedDocs.size === 0 || creating}
           style={{
-            padding: "10px 20px", borderRadius: 8, border: "none",
-            background: selectedDocs.size === 0 ? "rgba(255,255,255,0.15)" : "#fff",
-            color: selectedDocs.size === 0 ? "rgba(255,255,255,0.4)" : "var(--sage)",
-            fontSize: 14, fontWeight: 700, cursor: selectedDocs.size === 0 ? "default" : "pointer",
-            opacity: creating ? 0.6 : 1,
-            boxShadow: selectedDocs.size > 0 ? "0 2px 8px rgba(0,0,0,0.15)" : "none",
+            padding: "11px 24px", borderRadius: 9, border: "none",
+            background: "#c9a96e",
+            color: "#1b2a22",
+            fontSize: 14, fontWeight: 600,
+            cursor: selectedDocs.size === 0 ? "not-allowed" : "pointer",
+            opacity: (selectedDocs.size === 0 || creating) ? 0.4 : 1,
+            fontFamily: "var(--fb)",
+            transition: "opacity 0.15s, background 0.15s",
           }}
         >
           {creating ? t("dialog.creating") : t("dialog.createLink")}
@@ -585,16 +615,16 @@ function ShareStep({
     <div>
       {/* Upload URL display */}
       <div style={{
-        padding: "12px 16px", borderRadius: 8, background: "rgba(255,255,255,0.1)",
-        border: "1px solid rgba(255,255,255,0.15)", marginBottom: 16,
-        fontSize: 13, color: "rgba(255,255,255,0.8)", wordBreak: "break-all",
+        padding: "12px 16px", borderRadius: 10, background: "#243329",
+        border: "1.5px solid #4a6355", marginBottom: 16,
+        fontSize: 13, color: "#e8e2da", wordBreak: "break-all",
       }}>
         {created.uploadUrl}
       </div>
 
       {/* Documents requested */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: "#a8b8b0", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>
           {t("dialog.docsRequested")} ({created.docsRequired.length})
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -603,11 +633,11 @@ function ShareStep({
             return (
               <div key={i} style={{
                 display: "flex", alignItems: "center", gap: 6,
-                fontSize: 13, color: "rgba(255,255,255,0.85)",
+                fontSize: 13, color: "#e8e2da",
               }}>
                 <span style={{
                   width: 6, height: 6, borderRadius: "50%",
-                  background: "#4ade80", flexShrink: 0,
+                  background: "#6b8c7a", flexShrink: 0,
                 }} />
                 {core}
               </div>
@@ -621,10 +651,10 @@ function ShareStep({
         <button
           onClick={onWhatsApp}
           style={{
-            flex: 1, padding: "10px 16px", borderRadius: 8,
-            border: "none", background: "#fff",
-            color: "#1a9e4a", fontSize: 14, fontWeight: 700, cursor: "pointer",
-            fontFamily: "var(--fb)", boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            flex: 1, padding: "11px 16px", borderRadius: 9,
+            border: "none", background: "#2e3e34",
+            color: "#25D366", fontSize: 14, fontWeight: 600, cursor: "pointer",
+            fontFamily: "var(--fb)", transition: "opacity 0.15s",
           }}
           data-testid="dialog-share-whatsapp"
         >
@@ -633,10 +663,10 @@ function ShareStep({
         <button
           onClick={onEmail}
           style={{
-            flex: 1, padding: "10px 16px", borderRadius: 8,
-            border: "none", background: "#fff",
-            color: "var(--sage)", fontSize: 14, fontWeight: 700, cursor: "pointer",
-            fontFamily: "var(--fb)", boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            flex: 1, padding: "11px 16px", borderRadius: 9,
+            border: "none", background: "#2e3e34",
+            color: "#e8e2da", fontSize: 14, fontWeight: 600, cursor: "pointer",
+            fontFamily: "var(--fb)", transition: "opacity 0.15s",
           }}
           data-testid="dialog-share-email"
         >
@@ -645,10 +675,10 @@ function ShareStep({
         <button
           onClick={onCopyLink}
           style={{
-            flex: 1, padding: "10px 16px", borderRadius: 8,
-            border: "none", background: "#fff",
-            color: "var(--t1)", fontSize: 14, fontWeight: 700, cursor: "pointer",
-            fontFamily: "var(--fb)", boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            flex: 1, padding: "11px 16px", borderRadius: 9,
+            border: "none", background: "#2e3e34",
+            color: "#e8e2da", fontSize: 14, fontWeight: 600, cursor: "pointer",
+            fontFamily: "var(--fb)", transition: "opacity 0.15s",
           }}
           data-testid="dialog-share-link"
         >
@@ -660,9 +690,10 @@ function ShareStep({
       <button
         onClick={onDone}
         style={{
-          width: "100%", padding: "10px 20px", borderRadius: 8, border: "none",
-          background: "#fff", color: "var(--sage)", fontSize: 14, fontWeight: 700,
-          cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          width: "100%", padding: "11px 24px", borderRadius: 9, border: "none",
+          background: "#c9a96e", color: "#1b2a22", fontSize: 14, fontWeight: 600,
+          cursor: "pointer", fontFamily: "var(--fb)",
+          transition: "opacity 0.15s",
         }}
         data-testid="dialog-done"
       >
