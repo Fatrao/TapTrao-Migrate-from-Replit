@@ -366,14 +366,14 @@ function NewRequestDialog({ onClose, onCreated }: { onClose: () => void; onCreat
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div style={{
-        background: "linear-gradient(135deg, #0e4e45, #14574a, #1c6352, #327462)",
+        background: "linear-gradient(160deg, #3d6b52, #4a7c5e, #5a8d6e)",
         borderRadius: 16, width: "100%", maxWidth: 520,
         maxHeight: "80vh", overflow: "hidden", display: "flex", flexDirection: "column",
         boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
       }}>
         {/* Dialog Header */}
         <div style={{
-          padding: "20px 24px 16px", borderBottom: "1px solid rgba(255,255,255,0.1)",
+          padding: "20px 24px 16px", borderBottom: "1px solid rgba(255,255,255,0.15)",
           display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
           <div>
@@ -516,28 +516,31 @@ function DocPickerStep({
   return (
     <div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
-        {docs.map((doc) => (
-          <label
-            key={doc}
-            style={{
-              display: "flex", alignItems: "center", gap: 10,
-              padding: "12px 16px", borderRadius: 10,
-              border: selectedDocs.has(doc) ? "2px solid #4ade80" : "none",
-              background: "#fff",
-              cursor: "pointer",
-              boxShadow: selectedDocs.has(doc) ? "0 2px 10px rgba(74,222,128,0.2)" : "0 2px 8px rgba(0,0,0,0.1)",
-              transition: "all 0.15s ease",
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={selectedDocs.has(doc)}
-              onChange={() => onToggle(doc)}
-              style={{ accentColor: "var(--sage)", width: 18, height: 18, flexShrink: 0 }}
-            />
-            <span style={{ fontSize: 14, color: "var(--t1)", fontWeight: 500 }}>{doc}</span>
-          </label>
-        ))}
+        {docs.map((doc) => {
+          const checked = selectedDocs.has(doc);
+          return (
+            <label
+              key={doc}
+              style={{
+                display: "flex", alignItems: "center", gap: 10,
+                padding: "12px 16px", borderRadius: 10,
+                border: "none",
+                background: checked ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.15)",
+                cursor: "pointer",
+                boxShadow: checked ? "inset 0 1px 4px rgba(0,0,0,0.15)" : "none",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={checked}
+                onChange={() => onToggle(doc)}
+                style={{ accentColor: "#4ade80", width: 18, height: 18, flexShrink: 0 }}
+              />
+              <span style={{ fontSize: 14, color: "#fff", fontWeight: checked ? 600 : 400 }}>{doc}</span>
+            </label>
+          );
+        })}
       </div>
       <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
         <button
