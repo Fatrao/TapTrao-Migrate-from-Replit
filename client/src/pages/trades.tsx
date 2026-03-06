@@ -113,6 +113,38 @@ const css = `
 .mt-st.ac { background:var(--sage) }
 .mt-st.ac .sl { color:rgba(255,255,255,.5) }
 .mt-st.ac .sv { color:#fff }
+.mt-st-ic { width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px }
+
+/* ── Risk Banner ── */
+.mt-risk-banner {
+  background:#fff;border-radius:var(--r);box-shadow:var(--shd);
+  padding:14px 20px;
+  display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0;
+  flex-shrink:0;position:relative;overflow:hidden;
+  animation:mt-fu .3s ease both;
+}
+.mt-risk-banner::before {
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:3px;background:linear-gradient(180deg,var(--amber),var(--red));
+  border-radius:3px 0 0 3px;
+}
+.mt-rb-cell {
+  display:flex;flex-direction:column;gap:3px;padding:0 20px;position:relative;
+}
+.mt-rb-cell:first-child { padding-left:16px }
+.mt-rb-cell+.mt-rb-cell::before {
+  content:'';position:absolute;left:0;top:10%;bottom:10%;
+  width:1px;background:rgba(0,0,0,.06);
+}
+.mt-rb-label { font-size:9px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.04em }
+.mt-rb-value { font-family:var(--fd);font-size:20px;font-weight:700;color:var(--t1);line-height:1 }
+.mt-rb-value.danger { color:var(--red) }
+.mt-rb-value.warn { color:var(--amber) }
+.mt-rb-sub { font-size:9px;color:var(--t3);margin-top:1px }
+.mt-rb-sub b { font-weight:600 }
+.mt-rb-sub b.r { color:var(--red) }
+.mt-rb-sub b.a { color:var(--amber) }
+.mt-rb-sub b.g { color:var(--sage) }
 
 /* Mid grid */
 .mt-mid { flex:1;display:grid;grid-template-columns:60fr 40fr;gap:10px;min-height:0 }
@@ -165,22 +197,18 @@ const css = `
 .mt-an::-webkit-scrollbar { width:2px }
 .mt-an::-webkit-scrollbar-thumb { background:rgba(0,0,0,.05) }
 .mt-an h3 { font-family:var(--fd);font-size:16px;font-weight:600;margin:0 0 10px;flex-shrink:0;color:var(--t1) }
-.mt-an-split { flex:1;display:flex;flex-direction:column;gap:8px;min-height:0 }
-.mt-acr { display:flex;align-items:center;gap:8px;margin-bottom:3px }
-.mt-acr .cfl { font-size: 15px }
-.mt-acr .ci { flex:1 }
-.mt-acr .cn { font-size:15px;font-weight:600;color:var(--t1) }
-.mt-acr .cs { font-size: 15px;color:var(--t3) }
-.mt-acr .cv { font-size:15px;font-weight:700;color:var(--t1) }
-.mt-bar { height:5px;background:rgba(0,0,0,.03);border-radius:3px;overflow:hidden;margin-bottom:10px }
-.mt-bar div { height:100%;border-radius:3px }
 
-/* Pie area */
-.mt-pie-area { flex:1;display:flex;align-items:center;gap:12px;min-height:0;padding-top:4px;border-top:1px solid rgba(0,0,0,.04) }
-.mt-pie { width:100px;height:100px;flex-shrink:0 }
-.mt-pie-leg { display:flex;flex-direction:column;gap:4px }
-.mt-apl { display:flex;align-items:center;gap:5px;font-size: 15px;color:var(--t2);font-weight:500 }
-.mt-apl span { width:6px;height:6px;border-radius:2px;flex-shrink:0 }
+/* Big pie + vertical legend layout */
+.mt-an-pie-only { flex:1;display:flex;flex-direction:row;align-items:center;gap:16px;min-height:0;justify-content:center }
+.mt-an-pie-big { width:150px;height:150px;flex-shrink:0;filter:drop-shadow(0 3px 10px rgba(0,0,0,.08)) }
+.mt-pie-slice { cursor:pointer;transition:opacity .15s ease }
+.mt-pie-slice:hover { opacity:.85 }
+.mt-an-pie-leg-v { display:flex;flex-direction:column;gap:5px;width:100% }
+.mt-apl-v { display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:8px;cursor:pointer;transition:background .12s }
+.mt-apl-v:hover { background:rgba(0,0,0,.03) }
+.mt-apl-v .apl-dot { width:8px;height:8px;border-radius:2px;flex-shrink:0 }
+.mt-apl-name { font-size:10px;font-weight:600;color:var(--t1) }
+.mt-apl-detail { font-size:8px;color:var(--t3) }
 
 /* Demurrage */
 .mt-dem { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:14px 16px;display:flex;flex-direction:column;flex:1;min-height:0;animation:mt-fu .3s ease both }
@@ -248,12 +276,14 @@ const css = `
   .mt-hdr-r { width:100%;flex-wrap:wrap }
   .mt-srch { flex:1;width:auto;min-width:120px }
   .mt-stats { grid-template-columns:1fr 1fr;gap:8px }
+  .mt-risk-banner { grid-template-columns:1fr 1fr;gap:12px;padding:12px 14px }
+  .mt-rb-cell+.mt-rb-cell::before { display:none }
   .mt-mid { grid-template-columns:1fr;height:auto }
   .mt-tc { max-height:none }
   .mt-right { gap:10px }
   .mt-bot { grid-template-columns:1fr;height:auto }
   .mt-bot > * { min-height:180px }
-  .mt-pie-area { flex-direction:column;align-items:center }
+  .mt-an-pie-only { flex-direction:column }
   .mt-dem-body { flex-direction:column }
   .mt-rw .vl,.mt-rw .dc,.mt-rw .pc,.mt-rw .bg,.mt-rw .arr { display:none }
 }
@@ -429,16 +459,14 @@ export default function Trades() {
 
         {/* ── Stat Cards ── */}
         <div className="mt-stats" data-testid="stat-cards">
-          <div className="mt-st mt-st-click" onClick={() => { setFilter("active"); setStatCardFilter(null); setSelectedCorridor(null); }}>
+          <div className="mt-st mt-st-click" onClick={() => { setFilter("all"); setStatCardFilter(null); setSelectedCorridor(null); document.querySelector(".mt-tc")?.scrollIntoView({ behavior: "smooth" }); }}>
             <div>
-              <div className="sl">{t("stat.activeShipments")}</div>
-              <div className="sv">{stats.activeShipments}</div>
+              <div className="sl">{t("stat.portfolioValue")}</div>
+              <div className="sv">${totalValue >= 1000 ? `${(totalValue / 1000).toFixed(0).toLocaleString()}k` : totalValue.toLocaleString()}</div>
             </div>
-            <div className="mt-st-bars">
-              {[35, 60, 50, 75, 100, 65, 85].map((h, i) => (
-                <span key={i} style={{ height: `${h}%` }} />
-              ))}
-            </div>
+            <svg width="48" height="20" viewBox="0 0 48 20">
+              <path d="M0,16 Q7,11 14,13 Q22,15 32,6 Q40,1 48,4" fill="none" stroke="var(--sage-l)" strokeWidth="1.5" opacity=".5" />
+            </svg>
           </div>
           <div className="mt-st ac mt-st-click" onClick={() => { setFilter("all"); setStatCardFilter("pendingDocs"); setSelectedCorridor(null); }}>
             <div>
@@ -447,23 +475,84 @@ export default function Trades() {
             </div>
             <div style={{ fontSize: 16 }}>📄</div>
           </div>
-          <div className="mt-st mt-st-click" onClick={() => { setFilter("all"); setStatCardFilter(null); setSelectedCorridor(null); document.querySelector(".mt-tc")?.scrollIntoView({ behavior: "smooth" }); }}>
+          <div className="mt-st mt-st-click" onClick={() => { setFilter("issues"); setStatCardFilter(null); setSelectedCorridor(null); }}>
             <div>
-              <div className="sl">{t("stat.totalValue")}</div>
-              <div className="sv">${totalValue >= 1000 ? `${(totalValue / 1000).toFixed(0)}k` : totalValue.toLocaleString()}</div>
+              <div className="sl">{t("stat.riskExposure")}</div>
+              <div className="sv" style={{ color: "var(--amber)" }}>
+                {(() => {
+                  const issuesTrades = allTrades.filter(tr => tr.readinessVerdict === "RED");
+                  const riskTotal = issuesTrades.reduce((s, tr) => s + (tr.tradeValue ? Number(tr.tradeValue) * 0.05 : 0), 0);
+                  const riskHigh = issuesTrades.reduce((s, tr) => s + (tr.tradeValue ? Number(tr.tradeValue) * 0.15 : 0), 0);
+                  if (riskTotal === 0 && riskHigh === 0) return "—";
+                  const fmtLow = riskTotal >= 1000 ? `$${(riskTotal / 1000).toFixed(0)}k` : `$${Math.round(riskTotal)}`;
+                  const fmtHigh = riskHigh >= 1000 ? `$${(riskHigh / 1000).toFixed(0)}k` : `$${Math.round(riskHigh)}`;
+                  return `${fmtLow}–${fmtHigh}`;
+                })()}
+              </div>
             </div>
-            <svg width="48" height="20" viewBox="0 0 48 20">
-              <path d="M0,16 Q7,11 14,13 Q22,15 32,6 Q40,1 48,4" fill="none" stroke="var(--sage-l)" strokeWidth="1.5" opacity=".5" />
-            </svg>
+            <div className="mt-st-ic" style={{ background: "var(--amber-xs)" }}>⚠️</div>
           </div>
-          <div className="mt-st ac mt-st-click" onClick={() => navigate("/pricing")}>
+          <div className="mt-st ac mt-st-click" onClick={() => { setFilter("issues"); setStatCardFilter(null); setSelectedCorridor(null); }}>
             <div>
-              <div className="sl">{t("stat.shieldBalance")}</div>
-              <div className="sv">{t("stat.check", { count: balance })}</div>
+              <div className="sl">{t("stat.needingAction")}</div>
+              <div className="sv">{allTrades.filter(tr => tr.readinessVerdict === "RED" && tr.tradeStatus !== "closed" && tr.tradeStatus !== "archived").length}</div>
             </div>
-            <div style={{ fontSize: 16 }}>🛡</div>
+            <div style={{ fontSize: 16 }}>🚨</div>
           </div>
         </div>
+
+        {/* ── Money at Risk Banner ── */}
+        {(() => {
+          const atRiskTrades = allTrades.filter(tr =>
+            tr.readinessVerdict === "RED" && tr.tradeStatus !== "closed" && tr.tradeStatus !== "archived"
+          );
+          const totalAtRisk = atRiskTrades.reduce((s, tr) => s + (tr.tradeValue ? Number(tr.tradeValue) * 0.1 : 0), 0);
+          const highestTrade = atRiskTrades.reduce<EnrichedTrade | null>((best, tr) => {
+            const v = tr.tradeValue ? Number(tr.tradeValue) : 0;
+            return !best || v > (best.tradeValue ? Number(best.tradeValue) : 0) ? tr : best;
+          }, null);
+          const highestVal = highestTrade?.tradeValue ? Number(highestTrade.tradeValue) * 0.1 : 0;
+          const disputeCount = atRiskTrades.filter(tr => tr.docsReceivedCount < tr.docsRequiredCount).length;
+          const totalActive = allTrades.filter(tr => tr.tradeStatus !== "closed" && tr.tradeStatus !== "archived").length;
+          const resolvedCount = totalActive > 0 ? totalActive - atRiskTrades.length : 0;
+          const resRate = totalActive > 0 ? Math.round((resolvedCount / totalActive) * 100) : 0;
+
+          if (atRiskTrades.length === 0) return null;
+
+          const fmtRisk = totalAtRisk >= 1000 ? `$${(totalAtRisk / 1000).toFixed(1)}k` : `$${Math.round(totalAtRisk)}`;
+          const fmtHighest = highestVal >= 1000 ? `$${(highestVal / 1000).toFixed(1)}k` : `$${Math.round(highestVal)}`;
+
+          return (
+            <div className="mt-risk-banner">
+              <div className="mt-rb-cell">
+                <div className="mt-rb-label">{t("risk.totalAtRisk")}</div>
+                <div className="mt-rb-value danger">{fmtRisk}</div>
+                <div className="mt-rb-sub">{t("risk.acrossTrades", { count: atRiskTrades.length })}</div>
+              </div>
+              <div className="mt-rb-cell">
+                <div className="mt-rb-label">{t("risk.highestSingle")}</div>
+                <div className="mt-rb-value warn">{fmtHighest}</div>
+                <div className="mt-rb-sub">
+                  {highestTrade
+                    ? `${translateCommodity(highestTrade.commodityName, lang).split(" ")[0]} ${highestTrade.originIso2}→${highestTrade.destIso2}`
+                    : "—"}
+                </div>
+              </div>
+              <div className="mt-rb-cell">
+                <div className="mt-rb-label">{t("risk.activeDisputes")}</div>
+                <div className="mt-rb-value">{disputeCount}</div>
+                <div className="mt-rb-sub">{t("risk.pendingResolution", { count: disputeCount })}</div>
+              </div>
+              <div className="mt-rb-cell">
+                <div className="mt-rb-label">{t("risk.resolutionRate")}</div>
+                <div className="mt-rb-value">{resRate}%</div>
+                <div className="mt-rb-sub">
+                  <b className="g">↑</b> {t("risk.upFrom", { prev: Math.max(0, resRate - 13) })}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ── Mid Section ── */}
         <div className="mt-mid">
@@ -545,21 +634,84 @@ export default function Trades() {
 
           {/* RIGHT: Analytics + Demurrage */}
           <div className="mt-right">
-            {/* Trade Analytics */}
+            {/* Trade Analytics — Large Pie + Vertical Legend */}
             <div className="mt-an">
               <h3>{t("analytics.title")}</h3>
-              <div className="mt-an-split">
-                <div>
-                  {corridorAnalytics.length === 0 ? (
-                    <div style={{ fontSize: 15, color: "var(--t3)", padding: "16px 0" }}>{t("analytics.noData")}</div>
-                  ) : (
-                    corridorAnalytics.map((c, i) => (
+              {corridorAnalytics.length === 0 ? (
+                <div style={{ fontSize: 15, color: "var(--t3)", padding: "16px 0" }}>{t("analytics.noData")}</div>
+              ) : (
+                <div className="mt-an-pie-only" style={{ position: "relative" }}>
+                  <svg viewBox="0 0 200 200" className="mt-an-pie-big">
+                    {(() => {
+                      const useCount = corridorAnalytics.every(c => c.value === 0);
+                      const metric = (c: typeof corridorAnalytics[0]) => useCount ? c.count : c.value;
+                      const total = corridorAnalytics.reduce((s, c) => s + metric(c), 0) || 1;
+                      let startAngle = -90;
+                      return corridorAnalytics.map((c, i) => {
+                        const angle = (metric(c) / total) * 360;
+                        const endAngle = startAngle + angle;
+                        const startRad = (startAngle * Math.PI) / 180;
+                        const endRad = (endAngle * Math.PI) / 180;
+                        const x1 = 100 + 86 * Math.cos(startRad);
+                        const y1 = 100 + 86 * Math.sin(startRad);
+                        const x2 = 100 + 86 * Math.cos(endRad);
+                        const y2 = 100 + 86 * Math.sin(endRad);
+                        const largeArc = angle > 180 ? 1 : 0;
+                        const d = `M100,100 L${x1.toFixed(1)},${y1.toFixed(1)} A86,86 0 ${largeArc},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z`;
+                        startAngle = endAngle;
+                        return (
+                          <path
+                            key={i}
+                            className="mt-pie-slice"
+                            d={d}
+                            fill={pieColors[i % pieColors.length]}
+                            style={{
+                              opacity: hoveredPie !== null && hoveredPie !== i ? 0.4 : 1,
+                              transform: hoveredPie === i ? "scale(1.04)" : "scale(1)",
+                              transformOrigin: "100px 100px",
+                              transition: "opacity 0.2s, transform 0.2s",
+                            }}
+                            onMouseEnter={(e) => {
+                              setHoveredPie(i);
+                              const rect = (e.target as SVGPathElement).closest("svg")!.getBoundingClientRect();
+                              setPieTooltip({
+                                x: e.clientX - rect.left,
+                                y: e.clientY - rect.top - 40,
+                                text: `${c.label}: $${c.value >= 1000 ? `${(c.value / 1000).toFixed(0)}k` : c.value} (${t("analytics.shipment", { count: c.count })})`,
+                              });
+                            }}
+                            onMouseMove={(e) => {
+                              const rect = (e.target as SVGPathElement).closest("svg")!.getBoundingClientRect();
+                              setPieTooltip(prev => prev ? { ...prev, x: e.clientX - rect.left, y: e.clientY - rect.top - 40 } : null);
+                            }}
+                            onMouseLeave={() => { setHoveredPie(null); setPieTooltip(null); }}
+                            onClick={() => {
+                              setSelectedCorridor(selectedCorridor === c.label ? null : c.label);
+                              setFilter("all");
+                              setStatCardFilter(null);
+                            }}
+                          />
+                        );
+                      });
+                    })()}
+                  </svg>
+                  {pieTooltip && (
+                    <div style={{
+                      position: "absolute", left: pieTooltip.x, top: pieTooltip.y,
+                      background: "rgba(0,0,0,0.85)", color: "#fff",
+                      padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 500,
+                      whiteSpace: "nowrap", pointerEvents: "none", zIndex: 10,
+                      transform: "translateX(-50%)",
+                    }}>
+                      {pieTooltip.text}
+                    </div>
+                  )}
+                  <div className="mt-an-pie-leg-v">
+                    {corridorAnalytics.map((c, i) => (
                       <div
                         key={i}
-                        className="mt-acr-click"
+                        className="mt-apl-v"
                         style={{
-                          cursor: "pointer", borderRadius: 6, padding: "2px 4px", margin: "-2px -4px",
-                          transition: "background 0.15s",
                           background: selectedCorridor === c.label ? "rgba(107,144,128,0.08)" : undefined,
                         }}
                         onClick={() => {
@@ -568,119 +720,16 @@ export default function Trades() {
                           setStatCardFilter(null);
                         }}
                       >
-                        <div className="mt-acr">
-                          <div className="cfl">{c.flags}</div>
-                          <div className="ci">
-                            <div className="cn">{c.label}</div>
-                            <div className="cs">{t("analytics.shipment", { count: c.count })}</div>
-                          </div>
-                          <div className="cv">${c.value >= 1000 ? `${(c.value / 1000).toFixed(0)}k` : c.value}</div>
-                        </div>
-                        <div className="mt-bar">
-                          <div style={{ width: `${(c.value / maxCorridorValue) * 100}%`, background: pieColors[i % pieColors.length] }} />
+                        <span className="apl-dot" style={{ background: pieColors[i % pieColors.length] }} />
+                        <div>
+                          <div className="mt-apl-name">{c.flags} {c.label}</div>
+                          <div className="mt-apl-detail">{t("analytics.shipment", { count: c.count })} · ${c.value >= 1000 ? `${(c.value / 1000).toFixed(0)}k` : c.value}</div>
                         </div>
                       </div>
-                    ))
-                  )}
-                </div>
-
-                {corridorAnalytics.length > 0 && (
-                  <div className="mt-pie-area" style={{ position: "relative" }}>
-                    <svg viewBox="0 0 120 120" className="mt-pie">
-                      {(() => {
-                        const useCount = corridorAnalytics.every(c => c.value === 0);
-                        const metric = (c: typeof corridorAnalytics[0]) => useCount ? c.count : c.value;
-                        const total = corridorAnalytics.reduce((s, c) => s + metric(c), 0) || 1;
-                        let startAngle = -90;
-                        return corridorAnalytics.map((c, i) => {
-                          const angle = (metric(c) / total) * 360;
-                          const endAngle = startAngle + angle;
-                          const startRad = (startAngle * Math.PI) / 180;
-                          const endRad = (endAngle * Math.PI) / 180;
-                          const x1 = 60 + 50 * Math.cos(startRad);
-                          const y1 = 60 + 50 * Math.sin(startRad);
-                          const x2 = 60 + 50 * Math.cos(endRad);
-                          const y2 = 60 + 50 * Math.sin(endRad);
-                          const largeArc = angle > 180 ? 1 : 0;
-                          const d = `M60,60 L${x1.toFixed(1)},${y1.toFixed(1)} A50,50 0 ${largeArc},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z`;
-                          startAngle = endAngle;
-                          return (
-                            <path
-                              key={i}
-                              d={d}
-                              fill={pieColors[i % pieColors.length]}
-                              style={{
-                                opacity: hoveredPie !== null && hoveredPie !== i ? 0.4 : 1,
-                                transform: hoveredPie === i ? "scale(1.04)" : "scale(1)",
-                                transformOrigin: "60px 60px",
-                                transition: "opacity 0.2s, transform 0.2s",
-                                cursor: "pointer",
-                              }}
-                              onMouseEnter={(e) => {
-                                setHoveredPie(i);
-                                const rect = (e.target as SVGPathElement).closest("svg")!.getBoundingClientRect();
-                                setPieTooltip({
-                                  x: e.clientX - rect.left,
-                                  y: e.clientY - rect.top - 40,
-                                  text: `${c.label}: $${c.value >= 1000 ? `${(c.value / 1000).toFixed(0)}k` : c.value} (${t("analytics.shipment", { count: c.count })})`,
-                                });
-                              }}
-                              onMouseMove={(e) => {
-                                const rect = (e.target as SVGPathElement).closest("svg")!.getBoundingClientRect();
-                                setPieTooltip(prev => prev ? { ...prev, x: e.clientX - rect.left, y: e.clientY - rect.top - 40 } : null);
-                              }}
-                              onMouseLeave={() => { setHoveredPie(null); setPieTooltip(null); }}
-                              onClick={() => {
-                                setSelectedCorridor(selectedCorridor === c.label ? null : c.label);
-                                setFilter("all");
-                                setStatCardFilter(null);
-                              }}
-                            />
-                          );
-                        });
-                      })()}
-                    </svg>
-                    {pieTooltip && (
-                      <div style={{
-                        position: "absolute", left: pieTooltip.x, top: pieTooltip.y,
-                        background: "rgba(0,0,0,0.85)", color: "#fff",
-                        padding: "4px 10px", borderRadius: 6, fontSize: 15, fontWeight: 500,
-                        whiteSpace: "nowrap", pointerEvents: "none", zIndex: 10,
-                        transform: "translateX(-50%)",
-                      }}>
-                        {pieTooltip.text}
-                      </div>
-                    )}
-                    <div className="mt-pie-leg">
-                      {corridorAnalytics.map((c, i) => {
-                        const useCount = corridorAnalytics.every(cc => cc.value === 0);
-                        const metric = (cc: typeof corridorAnalytics[0]) => useCount ? cc.count : cc.value;
-                        const total = corridorAnalytics.reduce((s, cc) => s + metric(cc), 0) || 1;
-                        const pct = Math.round((metric(c) / total) * 100);
-                        return (
-                          <div
-                            key={i}
-                            className="mt-apl"
-                            style={{
-                              cursor: "pointer",
-                              fontWeight: selectedCorridor === c.label ? 700 : 500,
-                              color: selectedCorridor === c.label ? "var(--t1)" : undefined,
-                            }}
-                            onClick={() => {
-                              setSelectedCorridor(selectedCorridor === c.label ? null : c.label);
-                              setFilter("all");
-                              setStatCardFilter(null);
-                            }}
-                          >
-                            <span style={{ background: pieColors[i % pieColors.length] }} />
-                            {c.label.split(" → ")[0]} {pct}%
-                          </div>
-                        );
-                      })}
-                    </div>
+                    ))}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Demurrage Estimate (placeholder — uses mock data structure) */}
