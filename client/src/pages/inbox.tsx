@@ -585,8 +585,27 @@ function ShareStep({
       </div>
 
       {/* Documents requested */}
-      <div style={{ fontSize: 13, color: "var(--t3)", marginBottom: 16 }}>
-        {t("dialog.docsRequested")}: <strong style={{ color: "var(--t1)" }}>{created.docsRequired.join(", ")}</strong>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: "var(--t4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>
+          {t("dialog.docsRequested")} ({created.docsRequired.length})
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {created.docsRequired.map((doc, i) => {
+            const core = doc.replace(/\s+(issued by|with HS Code|customs code:).*/i, "").trim();
+            return (
+              <div key={i} style={{
+                display: "flex", alignItems: "center", gap: 6,
+                fontSize: 13, color: "var(--t2)",
+              }}>
+                <span style={{
+                  width: 6, height: 6, borderRadius: "50%",
+                  background: "var(--sage)", flexShrink: 0,
+                }} />
+                {core}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Share buttons */}
@@ -735,12 +754,22 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
   const accentColor = isBlocking ? "var(--red)" : "var(--sage)";
   const accentBg = isBlocking ? "var(--red-xs)" : "var(--sage-xs)";
 
-  // Status description
+  // Short doc name: first 2–3 meaningful words
+  const shortDocName = (doc: string) => {
+    // Strip "issued by..." / "with HS Code..." suffixes, keep the core doc type
+    const core = doc.replace(/\s+(issued by|with HS Code|customs code:).*/i, "").trim();
+    const words = core.split(/\s+/);
+    return words.length > 3 ? words.slice(0, 3).join(" ") + "…" : core;
+  };
+
+  // Status description — concise, never the full doc names
   const statusText = isComplete
     ? t("card.allDocsReceived")
-    : isBlocking && outstanding.length > 0
-    ? outstanding.join(" and ")
-    : t("card.waitingFor", { docs: outstanding.join(" and ") });
+    : outstanding.length === 0
+    ? t("card.allDocsReceived")
+    : outstanding.length === 1
+    ? t("card.waitingFor", { docs: shortDocName(outstanding[0]) })
+    : t("card.waitingFor", { docs: `${outstanding.length} documents` });
 
   // Time label
   const timeLabel = isBlocking
@@ -862,8 +891,8 @@ function SupplierCard({ request, dimmed, t }: { request: SupplierRequestRow; dim
             const pipColor = received ? "var(--sage)" : isMissing ? "var(--red)" : "rgba(0,0,0,0.12)";
             const pipBg = received ? "var(--sage-xs)" : isMissing ? "var(--red-xs)" : "rgba(0,0,0,0.03)";
             const pipTextColor = received ? "var(--sage)" : isMissing ? "var(--red)" : "var(--t4)";
-            // Short doc label: first 2 words
-            const shortLabel = doc.split(/\s+/).slice(0, 2).join(" ");
+            // Short doc label: core doc type
+            const shortLabel = shortDocName(doc);
             return (
               <span
                 key={i}
