@@ -107,11 +107,12 @@ function flag(iso2: string): string {
 export default function Inbox() {
   const { t } = useTranslation("inbox");
   const [, navigate] = useLocation();
+  const queryClient = useQueryClient();
   usePageTitle("Supplier Inbox", "Track supplier documents and uploads");
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const summaryQuery = useQuery<InboxSummary>({ queryKey: ["/api/supplier-inbox/summary"] });
-  const requestsQuery = useQuery<SupplierRequestRow[]>({ queryKey: ["/api/supplier-inbox"] });
+  const summaryQuery = useQuery<InboxSummary>({ queryKey: ["/api/supplier-inbox/summary"], refetchOnMount: "always" });
+  const requestsQuery = useQuery<SupplierRequestRow[]>({ queryKey: ["/api/supplier-inbox"], refetchOnMount: "always" });
 
   const summary = summaryQuery.data ?? { awaiting: 0, blocking: 0, completeThisWeek: 0 };
   const requests = requestsQuery.data ?? [];
@@ -233,8 +234,8 @@ export default function Inbox() {
         <NewRequestDialog
           onClose={() => setDialogOpen(false)}
           onCreated={() => {
-            requestsQuery.refetch();
-            summaryQuery.refetch();
+            queryClient.invalidateQueries({ queryKey: ["/api/supplier-inbox"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/supplier-inbox/summary"] });
           }}
         />
       )}
