@@ -121,7 +121,7 @@ export default function TokenSuccess() {
             </>
           )}
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-            <Link href="/lookup">
+            <Link href="/new-check">
               <button
                 style={{ background: "var(--blue)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 15, fontWeight: 600, cursor: "pointer" }}
                 data-testid="button-go-lookup"

@@ -1,11 +1,12 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/AppShell";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAvatarColour } from "@/lib/avatarColours";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
 import type { TFunction } from "i18next";
 
 type InboxSummary = {
@@ -32,6 +33,16 @@ type SupplierRequestRow = {
   dest_iso2: string;
   origin_name: string;
   dest_name: string;
+};
+
+type LookupRow = {
+  id: string;
+  commodityName: string;
+  originName: string;
+  destinationName: string;
+  hsCode: string;
+  resultJson: any;
+  createdAt: string;
 };
 
 function relativeTime(dateStr: string, t: TFunction): string {
@@ -86,10 +97,18 @@ function getStatusInfo(status: string, t: TFunction): StatusInfo {
   }
 }
 
+// Country code → emoji flag
+function flag(iso2: string): string {
+  if (!iso2 || iso2.length !== 2) return "";
+  const upper = iso2.toUpperCase();
+  return String.fromCodePoint(0x1F1E6 + upper.charCodeAt(0) - 65, 0x1F1E6 + upper.charCodeAt(1) - 65);
+}
+
 export default function Inbox() {
   const { t } = useTranslation("inbox");
   const [, navigate] = useLocation();
   usePageTitle("Supplier Inbox", "Track supplier documents and uploads");
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const summaryQuery = useQuery<InboxSummary>({ queryKey: ["/api/supplier-inbox/summary"] });
   const requestsQuery = useQuery<SupplierRequestRow[]>({ queryKey: ["/api/supplier-inbox"] });
@@ -135,7 +154,7 @@ export default function Inbox() {
           </p>
         </div>
         <button
-          onClick={() => navigate("/lookup")}
+          onClick={() => setDialogOpen(true)}
           style={{
             padding: "9px 20px",
             borderRadius: 20,
@@ -147,6 +166,7 @@ export default function Inbox() {
             background: "var(--sage)",
             color: "#fff",
           }}
+          data-testid="button-new-request"
         >
           {t("newUploadLink")}
         </button>
@@ -202,9 +222,424 @@ export default function Inbox() {
           </>
         )}
       </div>
+
+      {/* New Request Dialog */}
+      {dialogOpen && (
+        <NewRequestDialog
+          onClose={() => setDialogOpen(false)}
+          onCreated={() => {
+            requestsQuery.refetch();
+            summaryQuery.refetch();
+          }}
+        />
+      )}
     </AppShell>
   );
 }
+
+/* ── New Request Dialog ── */
+
+type DialogStep = "trade" | "docs" | "share";
+
+type CreatedRequest = {
+  uploadUrl: string;
+  uploadToken: string;
+  requestId: string;
+  docsRequired: string[];
+  commodityName: string;
+  destinationName: string;
+};
+
+function NewRequestDialog({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const { t } = useTranslation("inbox");
+  const { toast } = useToast();
+  const [step, setStep] = useState<DialogStep>("trade");
+  const [selectedLookup, setSelectedLookup] = useState<LookupRow | null>(null);
+  const [supplierDocs, setSupplierDocs] = useState<string[]>([]);
+  const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
+  const [creating, setCreating] = useState(false);
+  const [created, setCreated] = useState<CreatedRequest | null>(null);
+
+  // Fetch user's trades/lookups
+  const lookupsQuery = useQuery<LookupRow[]>({ queryKey: ["/api/lookups"] });
+  const lookups = lookupsQuery.data ?? [];
+
+  const handleSelectTrade = (lookup: LookupRow) => {
+    setSelectedLookup(lookup);
+    // Extract supplier-side documents from the compliance result
+    const result = lookup.resultJson;
+    const requirements = result?.requirementsDetailed ?? result?.origin?.requirementsDetailed ?? [];
+    const docs: string[] = requirements
+      .filter((r: any) => r.isSupplierSide)
+      .map((r: any) => r.title);
+    // If no supplier-side docs found, use common defaults
+    const finalDocs = docs.length > 0 ? docs : ["Commercial Invoice", "Certificate of Origin", "Packing List"];
+    setSupplierDocs(finalDocs);
+    setSelectedDocs(new Set(finalDocs));
+    setStep("docs");
+  };
+
+  const toggleDoc = (doc: string) => {
+    setSelectedDocs(prev => {
+      const next = new Set(prev);
+      if (next.has(doc)) next.delete(doc);
+      else next.add(doc);
+      return next;
+    });
+  };
+
+  const handleCreate = async () => {
+    if (!selectedLookup || selectedDocs.size === 0) return;
+    setCreating(true);
+    try {
+      const res = await apiRequest("POST", "/api/supplier-requests/create-or-get", {
+        lookupId: selectedLookup.id,
+        selectedDocs: Array.from(selectedDocs),
+      });
+      const data = await res.json();
+      setCreated({
+        uploadUrl: data.uploadUrl,
+        uploadToken: data.uploadToken,
+        requestId: data.requestId,
+        docsRequired: Array.from(selectedDocs),
+        commodityName: selectedLookup.commodityName,
+        destinationName: selectedLookup.destinationName,
+      });
+      setStep("share");
+      onCreated();
+    } catch (err: any) {
+      toast({ title: err.message || "Failed to create request", variant: "destructive" });
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleWhatsApp = () => {
+    if (!created) return;
+    const docList = created.docsRequired.join(", ");
+    const msg = encodeURIComponent(
+      `Please upload your ${docList} for the ${created.commodityName} shipment to ${created.destinationName} using this link: ${created.uploadUrl}`
+    );
+    window.open(`https://wa.me/?text=${msg}`, "_blank");
+  };
+
+  const handleEmail = () => {
+    if (!created) return;
+    const docList = created.docsRequired.join(", ");
+    const subject = encodeURIComponent(`Document Upload Request – ${created.commodityName}`);
+    const body = encodeURIComponent(
+      `Hello,\n\nPlease upload your ${docList} for the ${created.commodityName} shipment to ${created.destinationName} using the secure link below:\n\n${created.uploadUrl}\n\nThank you.`
+    );
+    window.open(`mailto:?subject=${subject}&body=${body}`, "_self");
+  };
+
+  const handleCopyLink = async () => {
+    if (!created) return;
+    try {
+      await navigator.clipboard.writeText(created.uploadUrl);
+      toast({ title: t("share.linkCopied") });
+    } catch {
+      toast({ title: t("share.linkCopyFailed"), variant: "destructive" });
+    }
+  };
+
+  // Extract origin ISO2 from resultJson for flag display
+  const getOriginIso2 = (lookup: LookupRow): string => {
+    return lookup.resultJson?.origin?.iso2 || "";
+  };
+  const getDestIso2 = (lookup: LookupRow): string => {
+    return lookup.resultJson?.destination?.iso2 || "";
+  };
+
+  return (
+    <div
+      style={{
+        position: "fixed", inset: 0, zIndex: 1000,
+        background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center",
+      }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div style={{
+        background: "var(--card)", borderRadius: 16, width: "100%", maxWidth: 520,
+        maxHeight: "80vh", overflow: "hidden", display: "flex", flexDirection: "column",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+      }}>
+        {/* Dialog Header */}
+        <div style={{
+          padding: "20px 24px 16px", borderBottom: "1px solid rgba(0,0,0,0.06)",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+        }}>
+          <div>
+            <div style={{ fontFamily: "var(--fd)", fontWeight: 600, fontSize: 18, color: "var(--t1)" }}>
+              {step === "trade" ? t("dialog.selectTrade") : step === "docs" ? t("dialog.selectDocs") : t("dialog.shareLink")}
+            </div>
+            {step === "docs" && selectedLookup && (
+              <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 2 }}>
+                {flag(getOriginIso2(selectedLookup))} {selectedLookup.originName} → {flag(getDestIso2(selectedLookup))} {selectedLookup.destinationName} · {selectedLookup.commodityName}
+              </div>
+            )}
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              width: 28, height: 28, borderRadius: 8, border: "none",
+              background: "rgba(0,0,0,0.06)", cursor: "pointer", fontSize: 16, color: "var(--t3)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Dialog Body */}
+        <div style={{ padding: "16px 24px 24px", overflowY: "auto", flex: 1 }}>
+          {step === "trade" && (
+            <TradePickerStep
+              lookups={lookups}
+              loading={lookupsQuery.isLoading}
+              onSelect={handleSelectTrade}
+              getOriginIso2={getOriginIso2}
+              getDestIso2={getDestIso2}
+              t={t}
+            />
+          )}
+
+          {step === "docs" && (
+            <DocPickerStep
+              docs={supplierDocs}
+              selectedDocs={selectedDocs}
+              onToggle={toggleDoc}
+              onBack={() => setStep("trade")}
+              onConfirm={handleCreate}
+              creating={creating}
+              t={t}
+            />
+          )}
+
+          {step === "share" && created && (
+            <ShareStep
+              created={created}
+              onWhatsApp={handleWhatsApp}
+              onEmail={handleEmail}
+              onCopyLink={handleCopyLink}
+              onDone={onClose}
+              t={t}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TradePickerStep({
+  lookups, loading, onSelect, getOriginIso2, getDestIso2, t,
+}: {
+  lookups: LookupRow[];
+  loading: boolean;
+  onSelect: (l: LookupRow) => void;
+  getOriginIso2: (l: LookupRow) => string;
+  getDestIso2: (l: LookupRow) => string;
+  t: TFunction;
+}) {
+  if (loading) {
+    return <div style={{ padding: "40px 0", textAlign: "center", color: "var(--t3)", fontSize: 15 }}>{t("dialog.loadingTrades")}</div>;
+  }
+  if (lookups.length === 0) {
+    return (
+      <div style={{ padding: "40px 0", textAlign: "center" }}>
+        <div style={{ fontSize: 15, color: "var(--t3)" }}>{t("dialog.noTrades")}</div>
+      </div>
+    );
+  }
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {lookups.map((lookup) => {
+        const oIso = getOriginIso2(lookup);
+        const dIso = getDestIso2(lookup);
+        return (
+          <button
+            key={lookup.id}
+            onClick={() => onSelect(lookup)}
+            style={{
+              display: "flex", alignItems: "center", gap: 12,
+              padding: "12px 16px", borderRadius: 10, border: "1px solid rgba(0,0,0,0.08)",
+              background: "#fff", cursor: "pointer", textAlign: "left", width: "100%",
+            }}
+            data-testid={`dialog-trade-${lookup.id}`}
+          >
+            <div style={{
+              width: 36, height: 36, borderRadius: 8,
+              background: "var(--sage-xs)", color: "var(--sage)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 13, fontWeight: 700, flexShrink: 0,
+            }}>
+              {oIso || "??"}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>
+                {lookup.commodityName}
+              </div>
+              <div style={{ fontSize: 13, color: "var(--t3)", marginTop: 1 }}>
+                {flag(oIso)} {lookup.originName} → {flag(dIso)} {lookup.destinationName}
+              </div>
+            </div>
+            <div style={{ fontSize: 12, color: "var(--t4)", flexShrink: 0 }}>
+              {lookup.hsCode}
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function DocPickerStep({
+  docs, selectedDocs, onToggle, onBack, onConfirm, creating, t,
+}: {
+  docs: string[];
+  selectedDocs: Set<string>;
+  onToggle: (doc: string) => void;
+  onBack: () => void;
+  onConfirm: () => void;
+  creating: boolean;
+  t: TFunction;
+}) {
+  return (
+    <div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 20 }}>
+        {docs.map((doc) => (
+          <label
+            key={doc}
+            style={{
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "10px 14px", borderRadius: 8,
+              border: selectedDocs.has(doc) ? "1px solid var(--sage)" : "1px solid rgba(0,0,0,0.08)",
+              background: selectedDocs.has(doc) ? "var(--sage-xs)" : "#fff",
+              cursor: "pointer",
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={selectedDocs.has(doc)}
+              onChange={() => onToggle(doc)}
+              style={{ accentColor: "var(--sage)", width: 16, height: 16 }}
+            />
+            <span style={{ fontSize: 15, color: "var(--t1)" }}>{doc}</span>
+          </label>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+        <button
+          onClick={onBack}
+          style={{
+            padding: "8px 18px", borderRadius: 8, border: "1px solid rgba(0,0,0,0.1)",
+            background: "transparent", fontSize: 14, fontWeight: 600, cursor: "pointer", color: "var(--t2)",
+          }}
+        >
+          {t("dialog.back")}
+        </button>
+        <button
+          onClick={onConfirm}
+          disabled={selectedDocs.size === 0 || creating}
+          style={{
+            padding: "8px 18px", borderRadius: 8, border: "none",
+            background: selectedDocs.size === 0 ? "rgba(0,0,0,0.1)" : "var(--sage)",
+            color: selectedDocs.size === 0 ? "var(--t3)" : "#fff",
+            fontSize: 14, fontWeight: 600, cursor: selectedDocs.size === 0 ? "default" : "pointer",
+            opacity: creating ? 0.6 : 1,
+          }}
+        >
+          {creating ? t("dialog.creating") : t("dialog.createLink")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ShareStep({
+  created, onWhatsApp, onEmail, onCopyLink, onDone, t,
+}: {
+  created: CreatedRequest;
+  onWhatsApp: () => void;
+  onEmail: () => void;
+  onCopyLink: () => void;
+  onDone: () => void;
+  t: TFunction;
+}) {
+  return (
+    <div>
+      {/* Upload URL display */}
+      <div style={{
+        padding: "12px 16px", borderRadius: 8, background: "rgba(0,0,0,0.03)",
+        border: "1px solid rgba(0,0,0,0.06)", marginBottom: 16,
+        fontSize: 13, color: "var(--t2)", wordBreak: "break-all",
+      }}>
+        {created.uploadUrl}
+      </div>
+
+      {/* Documents requested */}
+      <div style={{ fontSize: 13, color: "var(--t3)", marginBottom: 16 }}>
+        {t("dialog.docsRequested")}: <strong style={{ color: "var(--t1)" }}>{created.docsRequired.join(", ")}</strong>
+      </div>
+
+      {/* Share buttons */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+        <button
+          onClick={onWhatsApp}
+          style={{
+            flex: 1, padding: "10px 16px", borderRadius: 8,
+            border: "1px solid rgba(37,211,102,0.2)", background: "transparent",
+            color: "#25D366", fontSize: 14, fontWeight: 600, cursor: "pointer",
+            fontFamily: "var(--fb)",
+          }}
+          data-testid="dialog-share-whatsapp"
+        >
+          {t("btn.whatsapp")}
+        </button>
+        <button
+          onClick={onEmail}
+          style={{
+            flex: 1, padding: "10px 16px", borderRadius: 8,
+            border: "1px solid rgba(74,124,94,0.2)", background: "transparent",
+            color: "var(--sage)", fontSize: 14, fontWeight: 600, cursor: "pointer",
+            fontFamily: "var(--fb)",
+          }}
+          data-testid="dialog-share-email"
+        >
+          {t("btn.email")}
+        </button>
+        <button
+          onClick={onCopyLink}
+          style={{
+            flex: 1, padding: "10px 16px", borderRadius: 8,
+            border: "1px solid rgba(0,0,0,0.08)", background: "transparent",
+            color: "var(--t2)", fontSize: 14, fontWeight: 600, cursor: "pointer",
+            fontFamily: "var(--fb)",
+          }}
+          data-testid="dialog-share-link"
+        >
+          {t("btn.link")}
+        </button>
+      </div>
+
+      {/* Done button */}
+      <button
+        onClick={onDone}
+        style={{
+          width: "100%", padding: "10px 20px", borderRadius: 8, border: "none",
+          background: "var(--sage)", color: "#fff", fontSize: 14, fontWeight: 600,
+          cursor: "pointer",
+        }}
+        data-testid="dialog-done"
+      >
+        {t("dialog.done")}
+      </button>
+    </div>
+  );
+}
+
+/* ── Inbox Section & Card (unchanged) ── */
 
 function InboxSection({ label, items, dimmed, t }: { label: string; items: SupplierRequestRow[]; dimmed?: boolean; t: TFunction }) {
   return (

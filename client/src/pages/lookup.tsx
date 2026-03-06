@@ -1201,7 +1201,7 @@ type RequirementReadiness = {
   uploadedAt: string | null;
 };
 
-function DocumentReadinessSection({ lookupId, result }: { lookupId: string; result: ComplianceResult }) {
+function DocumentReadinessSection({ lookupId, result, canUpload = false }: { lookupId: string; result: ComplianceResult; canUpload?: boolean }) {
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const fileInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
@@ -1332,32 +1332,36 @@ function DocumentReadinessSection({ lookupId, result }: { lookupId: string; resu
                   </div>
                 </div>
 
-                {/* Upload button */}
+                {/* Upload button — only for authenticated users */}
                 <div style={{ flexShrink: 0 }}>
-                  <input
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png,.webp,.html,.txt"
-                    style={{ display: "none" }}
-                    ref={(el) => { fileInputRefs.current[req.requirementIndex] = el; }}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleUpload(req.requirementIndex, file);
-                      e.target.value = "";
-                    }}
-                  />
-                  <button
-                    onClick={() => fileInputRefs.current[req.requirementIndex]?.click()}
-                    disabled={isUploading}
-                    style={{
-                      background: req.status === "not_uploaded" ? "var(--sage)" : "rgba(0,0,0,0.06)",
-                      color: req.status === "not_uploaded" ? "#fff" : "var(--t2)",
-                      border: "none", borderRadius: 6, padding: "6px 12px",
-                      fontSize: 15, fontWeight: 500, cursor: isUploading ? "wait" : "pointer",
-                      opacity: isUploading ? 0.5 : 1,
-                    }}
-                  >
-                    {isUploading ? t("docReadiness.uploading") : req.status === "not_uploaded" ? t("docReadiness.upload") : t("docReadiness.replace")}
-                  </button>
+                  {canUpload && (
+                    <>
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.webp,.html,.txt"
+                        style={{ display: "none" }}
+                        ref={(el) => { fileInputRefs.current[req.requirementIndex] = el; }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleUpload(req.requirementIndex, file);
+                          e.target.value = "";
+                        }}
+                      />
+                      <button
+                        onClick={() => fileInputRefs.current[req.requirementIndex]?.click()}
+                        disabled={isUploading}
+                        style={{
+                          background: req.status === "not_uploaded" ? "var(--sage)" : "rgba(0,0,0,0.06)",
+                          color: req.status === "not_uploaded" ? "#fff" : "var(--t2)",
+                          border: "none", borderRadius: 6, padding: "6px 12px",
+                          fontSize: 15, fontWeight: 500, cursor: isUploading ? "wait" : "pointer",
+                          opacity: isUploading ? 0.5 : 1,
+                        }}
+                      >
+                        {isUploading ? t("docReadiness.uploading") : req.status === "not_uploaded" ? t("docReadiness.upload") : t("docReadiness.replace")}
+                      </button>
+                    </>
+                  )}
 
                   {/* Expand button if there are details */}
                   {(req.fieldStatus.length > 0 || req.issues.length > 0) && (
@@ -2128,7 +2132,7 @@ function ComplianceResultDisplay({ result, freeLocked = false, isAuthenticated =
       <SupplierBriefSection result={result} />
 
       {/* ── Phase 4: Document Readiness ── */}
-      {(result as any).lookupId && <DocumentReadinessSection lookupId={(result as any).lookupId} result={result} />}
+      {(result as any).lookupId && <DocumentReadinessSection lookupId={(result as any).lookupId} result={result} canUpload={isAuthenticated} />}
 
       {/* Hash now embedded in Duty Estimate card above */}
 

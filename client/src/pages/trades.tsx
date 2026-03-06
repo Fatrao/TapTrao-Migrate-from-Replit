@@ -461,7 +461,7 @@ export default function Trades() {
               data-testid="input-search-trades"
             />
             <button className="mt-hbtn">🔔</button>
-            <button className="mt-ntb" onClick={() => navigate("/lookup")} data-testid="button-new-trade">
+            <button className="mt-ntb" onClick={() => navigate("/new-check")} data-testid="button-new-trade">
               <Plus size={12} /> {t("newTrade")}
             </button>
           </div>
@@ -498,8 +498,8 @@ export default function Trades() {
                     tradeStatus: tr.tradeStatus,
                   })));
                   if (portfolio.totalExpected === 0 && portfolio.totalWorstCase === 0) return "—";
-                  const fmtLow = portfolio.totalExpected >= 1000 ? `$${(portfolio.totalExpected / 1000).toFixed(1)}k` : `$${portfolio.totalExpected}`;
-                  const fmtHigh = portfolio.totalWorstCase >= 1000 ? `$${(portfolio.totalWorstCase / 1000).toFixed(1)}k` : `$${portfolio.totalWorstCase}`;
+                  const fmtLow = portfolio.totalExpected >= 1000 ? `$${(portfolio.totalExpected / 1000).toFixed(1)}k` : `$${portfolio.totalExpected.toLocaleString()}`;
+                  const fmtHigh = portfolio.totalWorstCase >= 1000 ? `$${(portfolio.totalWorstCase / 1000).toFixed(1)}k` : `$${portfolio.totalWorstCase.toLocaleString()}`;
                   return `${fmtLow}–${fmtHigh}`;
                 })()}
               </div>
@@ -621,7 +621,7 @@ export default function Trades() {
                 <div className="mt-empty">
                   <h3>{t("empty.title")}</h3>
                   <p>{t("empty.body")}</p>
-                  <Link href="/lookup">
+                  <Link href="/new-check">
                     <button className="mt-ntb" data-testid="button-empty-new-lookup">
                       <Plus size={12} /> {t("empty.cta")}
                     </button>

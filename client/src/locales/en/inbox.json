@@ -1,7 +1,7 @@
 {
   "title": "Supplier Inbox",
   "subtitle": "{{waiting}} suppliers waiting \u00b7 {{blocking}} blocking issue{{plural}}",
-  "newUploadLink": "+ New Upload Link",
+  "newUploadLink": "+ New Request",
 
   "stat.awaitingDocuments": "Awaiting documents",
   "stat.blockingIssue": "Blocking issue",
@@ -9,7 +9,7 @@
 
   "loading": "Loading inbox...",
   "empty.title": "No supplier requests yet.",
-  "empty.subtitle": "Send your first supplier brief from the LC Checker or Compliance Lookup.",
+  "empty.subtitle": "Create your first document request using the button above.",
 
   "section.awaitingDocuments": "Awaiting Documents",
   "section.blockingIssue": "Blocking Issue",
@@ -46,5 +46,16 @@
   "share.emailSubject": "Document Upload Request – {{commodity}}",
   "share.emailBody": "Dear {{supplier}},\n\nPlease upload the required documents for the {{commodity}} shipment using the secure link below:\n\n{{url}}\n\nThank you.",
   "share.linkCopied": "Upload link copied to clipboard",
-  "share.linkCopyFailed": "Failed to copy link"
+  "share.linkCopyFailed": "Failed to copy link",
+
+  "dialog.selectTrade": "Select a trade",
+  "dialog.selectDocs": "Select documents to request",
+  "dialog.shareLink": "Share upload link",
+  "dialog.loadingTrades": "Loading your trades...",
+  "dialog.noTrades": "No trades found. Run a compliance check first.",
+  "dialog.back": "Back",
+  "dialog.createLink": "Create Upload Link",
+  "dialog.creating": "Creating...",
+  "dialog.docsRequested": "Documents requested",
+  "dialog.done": "Done"
 }

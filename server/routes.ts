@@ -1757,7 +1757,7 @@ export async function registerRoutes(
   app.post("/api/supplier-requests/create-or-get", async (req, res) => {
     try {
       const sessionId = getSessionId(req, res);
-      const { lookupId } = req.body;
+      const { lookupId, selectedDocs } = req.body;
       if (!lookupId) {
         res.status(400).json({ message: t("routes.lookupid_required", getLocale(req)) });
         return;
@@ -1780,7 +1780,10 @@ export async function registerRoutes(
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + 30);
 
-        const docsRequired = supplierDocs.length > 0 ? supplierDocs : ["Commercial Invoice", "Certificate of Origin", "Packing List"];
+        // If buyer specified docs, use those; otherwise fall back to auto-detection
+        const docsRequired = Array.isArray(selectedDocs) && selectedDocs.length > 0
+          ? selectedDocs
+          : supplierDocs.length > 0 ? supplierDocs : ["Commercial Invoice", "Certificate of Origin", "Packing List"];
         request = await storage.createSupplierRequest({
           lookupId,
           userSessionId: sessionId,
@@ -1853,10 +1856,10 @@ export async function registerRoutes(
   // Uses the same multer config defined below for public supplier uploads
   // (the `upload` const is hoisted via `var` behavior in the IIFE / function scope)
 
-  app.post("/api/supplier-requests/:requestId/buyer-upload", async (req, res) => {
+  app.post("/api/supplier-requests/:requestId/buyer-upload", requireAuth, async (req, res) => {
     try {
       const sessionId = getSessionId(req, res);
-      const { requestId } = req.params;
+      const requestId = req.params.requestId as string;
       if (!requestId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(requestId)) {
         res.status(400).json({ message: t("routes.invalid_request_id", getLocale(req)) });
         return;
@@ -3809,7 +3812,7 @@ Rules:
 
   // POST /api/lookups/:lookupId/requirements/:reqIndex/validate
   // Upload a document to validate against a specific requirement
-  app.post("/api/lookups/:lookupId/requirements/:reqIndex/validate", docValUpload.single("file"), async (req, res) => {
+  app.post("/api/lookups/:lookupId/requirements/:reqIndex/validate", requireAuth, docValUpload.single("file"), async (req, res) => {
     try {
       const sessionId = getSessionId(req, res);
       const lookupId = req.params.lookupId as string;
@@ -3829,6 +3832,9 @@ Rules:
       const lookup = await storage.getLookupById(lookupId);
       if (!lookup) {
         return res.status(404).json({ message: t("routes.lookup_not_found", getLocale(req)) });
+      }
+      if (lookup.sessionId !== sessionId) {
+        return res.status(403).json({ message: t("routes.not_authorized", getLocale(req)) });
       }
 
       // Get the requirement
@@ -3905,9 +3911,17 @@ Rules:
 
   // GET /api/lookups/:lookupId/document-readiness
   // Get per-requirement readiness status
-  app.get("/api/lookups/:lookupId/document-readiness", async (req, res) => {
+  app.get("/api/lookups/:lookupId/document-readiness", requireAuth, async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const lookupId = req.params.lookupId as string;
+      const lookup = await storage.getLookupById(lookupId);
+      if (!lookup) {
+        return res.status(404).json({ message: t("routes.lookup_not_found", getLocale(req)) });
+      }
+      if (lookup.sessionId !== sessionId) {
+        return res.status(403).json({ message: t("routes.not_authorized", getLocale(req)) });
+      }
       const readiness = await storage.getRequirementReadiness(lookupId);
       return res.json({ readiness });
     } catch (error: any) {
@@ -3917,12 +3931,16 @@ Rules:
 
   // GET /api/document-validations/:id
   // Single validation (for polling processing status)
-  app.get("/api/document-validations/:id", async (req, res) => {
+  app.get("/api/document-validations/:id", requireAuth, async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const id = req.params.id as string;
       const validation = await storage.getDocumentValidationById(id);
       if (!validation) {
         return res.status(404).json({ message: t("routes.validation_not_found", getLocale(req)) });
+      }
+      if (validation.sessionId !== sessionId) {
+        return res.status(403).json({ message: t("routes.not_authorized", getLocale(req)) });
       }
       return res.json(validation);
     } catch (error: any) {
@@ -3932,7 +3950,7 @@ Rules:
 
   // POST /api/document-validations/:id/override
   // Buyer overrides AI verdict
-  app.post("/api/document-validations/:id/override", async (req, res) => {
+  app.post("/api/document-validations/:id/override", requireAuth, async (req, res) => {
     try {
       const sessionId = getSessionId(req, res);
       const id = req.params.id as string;
@@ -3955,7 +3973,7 @@ Rules:
 
   // POST /api/document-validations/:id/revalidate
   // Re-run AI on existing upload
-  app.post("/api/document-validations/:id/revalidate", async (req, res) => {
+  app.post("/api/document-validations/:id/revalidate", requireAuth, async (req, res) => {
     try {
       const sessionId = getSessionId(req, res);
       const id = req.params.id as string;

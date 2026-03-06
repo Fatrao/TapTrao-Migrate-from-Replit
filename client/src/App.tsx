@@ -54,7 +54,7 @@ function Router() {
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/terms-of-service" component={TermsOfService} />
       {/* Protected routes — require authentication */}
-      <Route path="/new-check">{() => <Redirect to="/lookup" />}</Route>
+      <Route path="/new-check">{() => <AuthGuard><NewCheck /></AuthGuard>}</Route>
       <Route path="/dashboard">{() => <Redirect to="/trades" />}</Route>
       <Route path="/demurrage">{() => <AuthGuard><DemurragePage /></AuthGuard>}</Route>
       <Route path="/lc-check">{() => <AuthGuard><LcCheck /></AuthGuard>}</Route>

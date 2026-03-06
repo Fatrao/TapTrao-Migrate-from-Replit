@@ -376,7 +376,7 @@ export default function Commodities() {
             <button className="cm-btn out" onClick={handleExport}>{t("commodities.export")}</button>
             <button
               className="cm-btn pri"
-              onClick={() => navigate("/lookup")}
+              onClick={() => navigate("/new-check")}
             >
               {t("commodities.newTrade")}
             </button>
@@ -460,7 +460,7 @@ export default function Commodities() {
               </p>
               <button
                 className="cm-btn pri"
-                onClick={() => navigate("/lookup")}
+                onClick={() => navigate("/new-check")}
               >
                 {t("commodities.newTrade")}
               </button>

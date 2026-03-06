@@ -154,7 +154,7 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
 
   const mainItems: NavItem[] = [
     { icon: "◉", label: t("nav.myTrades"), href: "/trades", matchPaths: ["/trades"] },
-    { icon: "✦", label: t("nav.newCheck"), href: "/lookup" },
+    { icon: "✦", label: t("nav.newCheck"), href: "/new-check" },
     { icon: "📮", label: t("nav.suppliers"), href: "/inbox" },
   ];
 
