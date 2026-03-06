@@ -2,7 +2,7 @@
   "pageTitle": "TapTrao — Conformité commerciale pour les négociants en matières premières",
   "nav": {
     "howItWorks": "Comment ça marche",
-    "validation": "Validation",
+    "validation": "Démo",
     "pricing": "Tarifs",
     "myTrades": "Mes transactions",
     "freeComplianceCheck": "Vérification de conformité gratuite"
@@ -11,7 +11,7 @@
     "heading": "Réduisez les risques avant d'engager vos dépenses.",
     "subheading": "Chaque document. Chaque réglementation. Chaque corridor. Vérifiés avant que vous ne vous engagiez.",
     "ctaPrimary": "Vérification gratuite →",
-    "ctaSecondary": "Voir la validation complète"
+    "ctaSecondary": "Voir la démo complète"
   },
   "trustBar": {
     "corridors": "AFRIQUE → UE · UK · USA · CANADA · TÜRKIYE · SUISSE"

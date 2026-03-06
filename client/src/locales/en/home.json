@@ -3,7 +3,7 @@
 
   "nav": {
     "howItWorks": "How It Works",
-    "validation": "Validation",
+    "validation": "Demo",
     "pricing": "Pricing",
     "myTrades": "My Trades",
     "freeComplianceCheck": "Free Compliance Check"
@@ -13,7 +13,7 @@
     "heading": "De-risk your next shipment before spending.",
     "subheading": "Every document. Every regulation. Every corridor. Checked before you commit.",
     "ctaPrimary": "Free Compliance Check \u2192",
-    "ctaSecondary": "See Full Validation"
+    "ctaSecondary": "See Full Demo"
   },
 
   "trustBar": {
