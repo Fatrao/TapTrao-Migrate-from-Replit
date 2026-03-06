@@ -357,7 +357,7 @@ export default function Home() {
             src={["/demo/compliance.png", "/demo/trades.png", "/demo/lc-check.png", "/demo/inbox.png"][activeDemo]}
             alt={[t("demo.tabs.check"), t("demo.tabs.dashboard"), t("demo.tabs.lcVerify"), t("demo.tabs.inbox")][activeDemo]}
             style={{
-              width: "100%", height: "auto", display: "block",
+              width: "100%", maxHeight: "60vh", objectFit: "cover", objectPosition: "top left", display: "block",
             }}
           />
         </div>
