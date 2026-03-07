@@ -90,6 +90,7 @@ export default function Home() {
           <a href="#how" style={{ fontSize: 15, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.howItWorks")}</a>
           <a href="#validation" style={{ fontSize: 15, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.validation")}</a>
           <a href="#pricing" style={{ fontSize: 15, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.pricing")}</a>
+          <Link href="/blog" style={{ fontSize: 15, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>Blog</Link>
         </div>
 
         {/* Desktop CTA */}
@@ -149,6 +150,7 @@ export default function Home() {
           <a href="#how" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>{t("nav.howItWorks")}</a>
           <a href="#validation" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>{t("nav.validation")}</a>
           <a href="#pricing" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>{t("nav.pricing")}</a>
+          <Link href="/blog" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>Blog</Link>
           <button
             onClick={() => i18n.changeLanguage(isEn ? "fr" : "en")}
             style={{
@@ -374,6 +376,104 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ═══ BLOG PREVIEW ═══ */}
+      <section id="blog" style={{ padding: "80px 60px" }}>
+        <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
+          From the TapTrao Blog
+        </h2>
+        <p style={{ fontSize: 15, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
+          What every small importer needs to know — before the next shipment.
+        </p>
+
+        <div className="hp-blog-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
+          {([
+            {
+              slug: "/blog/sesame-seeds-nigeria",
+              image: "/blog/sesame.jpg",
+              tag: "Food Safety · EU MRLs",
+              title: "Why sesame seeds from Nigeria keep getting rejected at Rotterdam",
+              readTime: "7 min read",
+            },
+            {
+              slug: "/blog/cocoa-eudr-importers",
+              image: "/blog/cocoa.jpg",
+              tag: "EUDR · Cocoa · Ghana",
+              title: "What EUDR actually requires from cocoa importers — and why most small businesses aren't ready",
+              readTime: "8 min read",
+            },
+            {
+              slug: "/blog/tropical-fruits-phytosanitary",
+              image: "/blog/fruits.jpg",
+              tag: "Phytosanitary · UK Border",
+              title: "The 14-day window that catches tropical fruit importers off guard",
+              readTime: "7 min read",
+            },
+            {
+              slug: "/blog/bamboo-eudr-forest-product",
+              image: "/blog/bamboo.jpg",
+              tag: "EUDR · Forest Products",
+              title: "Bamboo is a forest product under EUDR. Most importers don't know that yet.",
+              readTime: "7 min read",
+            },
+          ]).map((post) => (
+            <Link
+              key={post.slug}
+              href={post.slug}
+              style={{
+                background: "#fff", borderRadius: "var(--r)", overflow: "hidden",
+                textDecoration: "none", color: "inherit", display: "flex", flexDirection: "column",
+                boxShadow: "var(--shd)", transition: "box-shadow 0.25s, transform 0.25s",
+              }}
+              className="hp-blog-card"
+            >
+              <img
+                src={post.image}
+                alt={post.title}
+                style={{ width: "100%", height: 180, objectFit: "cover", display: "block" }}
+              />
+              <div style={{ padding: "20px 22px 24px", display: "flex", flexDirection: "column", flex: 1 }}>
+                <span style={{
+                  fontSize: 10, fontWeight: 600, letterSpacing: "0.11em", textTransform: "uppercase",
+                  color: "var(--sage)", background: "rgba(107,144,128,0.1)",
+                  padding: "3px 10px", borderRadius: 100, alignSelf: "flex-start", marginBottom: 10,
+                }}>
+                  {post.tag}
+                </span>
+                <div style={{
+                  fontFamily: "var(--fd)", fontSize: 15, fontWeight: 700, lineHeight: 1.35,
+                  color: "var(--dark)", marginBottom: 12, flex: 1,
+                }}>
+                  {post.title}
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{
+                    fontSize: 13, fontWeight: 600, color: "var(--dark)",
+                    borderBottom: "2px solid var(--sage)", paddingBottom: 1,
+                  }}>
+                    Continue reading →
+                  </span>
+                  <span style={{ fontSize: 12, color: "var(--t3)", opacity: 0.6 }}>{post.readTime}</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: 32 }}>
+          <Link
+            href="/blog"
+            style={{
+              display: "inline-block", padding: "12px 32px", borderRadius: 24,
+              border: "2px solid var(--sage)", color: "var(--sage)",
+              fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600, textDecoration: "none",
+              transition: "all 0.2s",
+            }}
+          >
+            View All Articles
+          </Link>
+        </div>
+      </section>
+
       {/* ═══ PRICING ═══ */}
       <section id="pricing" style={{ padding: "80px 60px" }}>
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
@@ -562,6 +662,7 @@ export default function Home() {
           .hp-demo-panel { padding: 0 !important; }
 
           /* Pricing */
+          .hp-blog-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
           .hp-pricing-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
           .hp-pricing-grid > div { padding: 24px !important; }
 

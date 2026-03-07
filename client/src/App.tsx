@@ -39,6 +39,11 @@ import NewCheck from "@/pages/new-check";
 import TradeDetail from "@/pages/trade-detail";
 import TradeReport from "@/pages/trade-report";
 import Commodities from "@/pages/commodities";
+import BlogIndex from "@/pages/blog-index";
+import BlogSesame from "@/pages/blog-sesame";
+import BlogCocoa from "@/pages/blog-cocoa";
+import BlogFruits from "@/pages/blog-fruits";
+import BlogBamboo from "@/pages/blog-bamboo";
 
 function Router() {
   return (
@@ -54,6 +59,13 @@ function Router() {
       <Route path="/verify/:ref" component={VerifyPage} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/terms-of-service" component={TermsOfService} />
+
+      {/* Blog routes — public */}
+      <Route path="/blog" component={BlogIndex} />
+      <Route path="/blog/sesame-seeds-nigeria" component={BlogSesame} />
+      <Route path="/blog/cocoa-eudr-importers" component={BlogCocoa} />
+      <Route path="/blog/tropical-fruits-phytosanitary" component={BlogFruits} />
+      <Route path="/blog/bamboo-eudr-forest-product" component={BlogBamboo} />
       {/* Protected routes — require authentication */}
       <Route path="/new-check">{() => <AuthGuard><NewCheck /></AuthGuard>}</Route>
       <Route path="/dashboard">{() => <Redirect to="/trades" />}</Route>
