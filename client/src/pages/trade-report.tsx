@@ -95,13 +95,7 @@ function nameFlag(name: string | null | undefined): string {
   return iso2 ? iso2ToFlag(iso2) : "";
 }
 
-const TRADE_STEPS = [
-  { key: "active", label: "Active" },
-  { key: "in_transit", label: "In Transit" },
-  { key: "arrived", label: "Arrived" },
-  { key: "cleared", label: "Cleared" },
-  { key: "closed", label: "Closed" },
-];
+const TRADE_STEP_KEYS = ["active", "in_transit", "arrived", "cleared", "closed"];
 
 /* ── StatusDropdown ── */
 
@@ -139,6 +133,7 @@ export default function TradeReport() {
   const { t, i18n } = useTranslation("lookup");
   const lang = i18n.language;
   const { t: tc } = useTranslation("common");
+  const { t: tt } = useTranslation("trades");
   const [, params] = useRoute("/trades/:tradeId/report");
   const tradeId = params?.tradeId;
   usePageTitle("Trade Report", "Full compliance report for your trade");
@@ -195,10 +190,10 @@ export default function TradeReport() {
       <AppShell>
         <div style={{ padding: "28px 40px", maxWidth: 1100 }}>
           <p style={{ color: "var(--red)", fontSize: 15 }}>
-            {error ? "Failed to load trade data." : "Trade not found."}
+            {error ? tt("report.loadError") : tt("report.notFound")}
           </p>
           <Link href="/trades">
-            <Button variant="outline" className="mt-4">← Back to trades</Button>
+            <Button variant="outline" className="mt-4">{tt("report.backToTrades")}</Button>
           </Link>
         </div>
       </AppShell>
@@ -231,10 +226,10 @@ export default function TradeReport() {
   const primaryRiskFactor = factors?.primary_risk_factor || "";
 
   const verdictStyle = {
-    GREEN: { bg: "var(--sage-pale)", color: "var(--sage)", label: "Low Risk" },
-    AMBER: { bg: "var(--amber-pale)", color: "var(--amber)", label: "Attention Needed" },
-    RED: { bg: "var(--red-pale)", color: "var(--red)", label: "High Risk — Action Required" },
-  }[verdict as string] || { bg: "var(--amber-pale)", color: "var(--amber)", label: "Attention Needed" };
+    GREEN: { bg: "var(--sage-pale)", color: "var(--sage)", label: tt("report.lowRisk") },
+    AMBER: { bg: "var(--amber-pale)", color: "var(--amber)", label: tt("report.attentionNeeded") },
+    RED: { bg: "var(--red-pale)", color: "var(--red)", label: tt("report.highRiskAction") },
+  }[verdict as string] || { bg: "var(--amber-pale)", color: "var(--amber)", label: tt("report.attentionNeeded") };
 
   /* Demurrage estimate */
   const demurrage = estimateDemurrageRange(result.destination.iso2, (verdict as "GREEN" | "AMBER" | "RED") || "AMBER");
@@ -244,7 +239,7 @@ export default function TradeReport() {
   const twinlogHash = twinlog?.hash || lookup?.twinlogHash || null;
 
   /* Step index */
-  const currentStepIdx = TRADE_STEPS.findIndex(s => s.key === tradeStatus);
+  const currentStepIdx = TRADE_STEP_KEYS.indexOf(tradeStatus);
 
   /* ── CSS tokens for the mockup's cream theme ── */
   const S = {
@@ -274,7 +269,7 @@ export default function TradeReport() {
 
         {/* ── BREADCRUMB ── */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: S.textMuted, marginBottom: 20 }}>
-          <Link href="/trades"><span style={{ color: S.mutedSage, fontWeight: 500, cursor: "pointer" }}>My Trades</span></Link>
+          <Link href="/trades"><span style={{ color: S.mutedSage, fontWeight: 500, cursor: "pointer" }}>{tt("report.myTrades")}</span></Link>
           <span>›</span>
           <span>{commodityName} — {originFlag} {originName} → {destFlag} {destName}</span>
         </div>
@@ -285,7 +280,7 @@ export default function TradeReport() {
             <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 600, color: S.darkSage, marginBottom: 6, display: "flex", alignItems: "center", gap: 10 }}>
               {commodityName}
               <span style={{ fontSize: 11, fontWeight: 600, background: S.sageTint, color: S.mutedSage, padding: "3px 10px", borderRadius: 20 }}>
-                {tradeStatus === "active" ? "Active" : tradeStatus === "in_transit" ? "In Transit" : tradeStatus === "arrived" ? "Arrived" : tradeStatus === "cleared" ? "Cleared" : tradeStatus === "closed" ? "Closed" : "Active"}
+                {tt(`detail.status.${tradeStatus}` as any) || tt("detail.status.active")}
               </span>
             </h1>
             <div style={{ fontSize: 13, color: S.textMuted, display: "flex", alignItems: "center", gap: 10 }}>
@@ -301,14 +296,14 @@ export default function TradeReport() {
                 const csv = generateCustomsCSV(result, t, lang);
                 downloadCSV(csv, `TapTrao_CustomsDataPack_${hsCode}_${result.origin.iso2}_${result.destination.iso2}.csv`);
               }}>
-              <Download className="w-3.5 h-3.5 mr-1.5" /> Customs CSV
+              <Download className="w-3.5 h-3.5 mr-1.5" /> {tt("report.customsCsv")}
             </Button>
             <Button variant="outline" size="sm" style={{ fontSize: 12, fontWeight: 500, borderRadius: 8, background: S.white, boxShadow: S.shadowCard, border: "none" }}>
-              <Mail className="w-3.5 h-3.5 mr-1.5" /> Supplier brief
+              <Mail className="w-3.5 h-3.5 mr-1.5" /> {tt("report.supplierBrief")}
             </Button>
             <Link href={`/lc-check?commodityId=${result.commodity.id}&originIso2=${result.origin.iso2}&destIso2=${result.destination.iso2}`}>
               <Button size="sm" style={{ fontSize: 12, fontWeight: 500, borderRadius: 8, background: S.darkSage, color: "white" }}>
-                <ArrowRight className="w-3.5 h-3.5 mr-1.5" /> Run LC Check
+                <ArrowRight className="w-3.5 h-3.5 mr-1.5" /> {tt("report.runLcCheck")}
               </Button>
             </Link>
           </div>
@@ -316,8 +311,8 @@ export default function TradeReport() {
 
         {/* ── STEPPER ── */}
         <div style={{ display: "flex", alignItems: "center", background: S.white, borderRadius: S.radius, padding: "16px 24px", boxShadow: S.shadowCard, marginBottom: 24 }}>
-          {TRADE_STEPS.map((step, idx) => (
-            <div key={step.key} style={{ display: "contents" }}>
+          {TRADE_STEP_KEYS.map((stepKey, idx) => (
+            <div key={stepKey} style={{ display: "contents" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
                 <div style={{
                   width: 26, height: 26, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
@@ -331,10 +326,10 @@ export default function TradeReport() {
                   fontSize: 12, fontWeight: idx === currentStepIdx ? 600 : 500,
                   color: idx < currentStepIdx ? S.mutedSage : idx === currentStepIdx ? S.darkSage : "#bbb",
                 }}>
-                  {step.label}
+                  {tt(`detail.status.${stepKey}` as any)}
                 </span>
               </div>
-              {idx < TRADE_STEPS.length - 1 && (
+              {idx < TRADE_STEP_KEYS.length - 1 && (
                 <div style={{ flex: "0 0 28px", height: 1, background: idx < currentStepIdx ? S.mutedSage : "#e0e0e0" }} />
               )}
             </div>
@@ -351,7 +346,7 @@ export default function TradeReport() {
             <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>⚠️</span>
             <div>
               <h4 style={{ fontSize: 13, fontWeight: 600, color: S.textDark, marginBottom: 3 }}>
-                Flagged Origin — {result.originFlagReason}
+                {tt("report.flaggedOrigin", { reason: result.originFlagReason! })}
               </h4>
               {result.originFlagDetails && (
                 <p style={{ fontSize: 12, color: S.textMid, lineHeight: 1.5 }}>{result.originFlagDetails}</p>
@@ -382,9 +377,9 @@ export default function TradeReport() {
           }}>
             <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>📋</span>
             <div>
-              <h4 style={{ fontSize: 13, fontWeight: 600, color: S.textDark, marginBottom: 3 }}>CBAM applies to this shipment</h4>
+              <h4 style={{ fontSize: 13, fontWeight: 600, color: S.textDark, marginBottom: 3 }}>{tt("report.cbamApplies")}</h4>
               <p style={{ fontSize: 12, color: S.textMid, lineHeight: 1.5 }}>
-                {commodityName} (HS {hsCode}) is subject to EU Carbon Border Adjustment Mechanism. CBAM embedded-emissions declaration required from your supplier before import.
+                {tt("report.cbamDescription", { commodity: commodityName, hsCode })}
               </p>
             </div>
           </div>
@@ -398,9 +393,9 @@ export default function TradeReport() {
           }}>
             <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>🌿</span>
             <div>
-              <h4 style={{ fontSize: 13, fontWeight: 600, color: S.textDark, marginBottom: 3 }}>EUDR applies to this shipment</h4>
+              <h4 style={{ fontSize: 13, fontWeight: 600, color: S.textDark, marginBottom: 3 }}>{tt("report.eudrApplies")}</h4>
               <p style={{ fontSize: 12, color: S.textMid, lineHeight: 1.5 }}>
-                {commodityName} (HS {hsCode}) is subject to EU Deforestation Regulation. Geolocation and due diligence data required.
+                {tt("report.eudrDescription", { commodity: commodityName, hsCode })}
               </p>
             </div>
           </div>
@@ -431,10 +426,10 @@ export default function TradeReport() {
             <div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 28px" }}>
                 {[
-                  { key: "regulatory_complexity", label: "Regulatory requirements" },
-                  { key: "hazard_exposure", label: "Product controls" },
-                  { key: "document_volume", label: "Document volume" },
-                  { key: "trade_restriction", label: "Trade restrictions" },
+                  { key: "regulatory_complexity", label: tt("report.regulatoryRequirements") },
+                  { key: "hazard_exposure", label: tt("report.productControls") },
+                  { key: "document_volume", label: tt("report.documentVolume") },
+                  { key: "trade_restriction", label: tt("report.tradeRestrictions") },
                 ].map(item => {
                   const f = (factors as any)[item.key];
                   if (!f) return null;
@@ -443,7 +438,7 @@ export default function TradeReport() {
                     <div key={item.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13 }}>
                       <span style={{ color: S.textMuted }}>{item.label}</span>
                       <span style={{ fontWeight: 600, color: isPrimary ? S.amber : f.penalty > 15 ? S.amber : S.mutedSage }}>
-                        {isPrimary ? `⚠ ${item.key === "document_volume" ? "primary" : `${f.penalty}/${f.max}`}` : `${f.penalty}/${f.max}`}
+                        {isPrimary ? `⚠ ${item.key === "document_volume" ? tt("report.primary") : `${f.penalty}/${f.max}`}` : `${f.penalty}/${f.max}`}
                       </span>
                     </div>
                   );
@@ -462,7 +457,7 @@ export default function TradeReport() {
             {/* Duty mini */}
             <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 160 }}>
               <div style={{ background: S.cream, borderRadius: S.radiusSm, padding: "12px 14px" }}>
-                <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: S.textMuted, marginBottom: 8 }}>Duty Estimate</div>
+                <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: S.textMuted, marginBottom: 8 }}>{tt("report.dutyEstimate")}</div>
                 {Array.isArray(result.destination.preferenceSchemes) && (result.destination.preferenceSchemes as string[]).length > 0 && (
                   <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 8 }}>
                     {(result.destination.preferenceSchemes as string[]).map(s => (
@@ -471,16 +466,16 @@ export default function TradeReport() {
                   </div>
                 )}
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
-                  <span style={{ color: S.textMuted }}>VAT</span>
+                  <span style={{ color: S.textMuted }}>{tt("report.vat")}</span>
                   <span style={{ fontWeight: 600, color: S.textDark }}>{result.destination.vatRate}%</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
-                  <span style={{ color: S.textMuted }}>Tariff</span>
+                  <span style={{ color: S.textMuted }}>{tt("report.tariff")}</span>
                   <span style={{ fontWeight: 600, color: S.textDark }}>{result.destination.tariffSource}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
-                  <span style={{ color: S.textMuted }}>SPS</span>
-                  <span style={{ fontWeight: 600, color: S.textDark }}>{result.destination.spsRegime || "Standard"}</span>
+                  <span style={{ color: S.textMuted }}>{tt("report.sps")}</span>
+                  <span style={{ fontWeight: 600, color: S.textDark }}>{result.destination.spsRegime || tt("report.standard")}</span>
                 </div>
               </div>
             </div>
@@ -489,9 +484,9 @@ export default function TradeReport() {
 
         {/* ── DOCUMENT READINESS ── */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-          <h2 style={{ fontFamily: "var(--fh)", fontSize: 18, fontWeight: 600, color: S.darkSage }}>Document Readiness</h2>
+          <h2 style={{ fontFamily: "var(--fh)", fontSize: 18, fontWeight: 600, color: S.darkSage }}>{tt("report.docReadiness")}</h2>
           <span style={{ fontSize: 12, color: S.textMuted, background: S.white, padding: "4px 12px", borderRadius: 20, boxShadow: S.shadowCard }}>
-            {totalReady} / {totalDocs} validated
+            {tt("report.validated", { ready: totalReady, total: totalDocs })}
           </span>
         </div>
 
@@ -500,10 +495,10 @@ export default function TradeReport() {
           {importerDocs.length > 0 && (
             <div style={{ background: S.white, borderRadius: S.radius, padding: 22, boxShadow: S.shadowCard }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, paddingBottom: 12, borderBottom: `1px solid ${S.cream}` }}>
-                <h3 style={{ fontSize: 13, fontWeight: 600, color: S.darkSage }}>Your Side — Buyer</h3>
+                <h3 style={{ fontSize: 13, fontWeight: 600, color: S.darkSage }}>{tt("report.yourSideBuyer")}</h3>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ background: S.darkSage, color: "white", fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 20 }}>{importerDocs.length} docs</span>
-                  <span style={{ fontSize: 11, color: S.textMuted }}>{importerReady}/{importerDocs.length} ready</span>
+                  <span style={{ background: S.darkSage, color: "white", fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 20 }}>{tt("report.docsCount", { count: importerDocs.length })}</span>
+                  <span style={{ fontSize: 11, color: S.textMuted }}>{tt("report.readyCount", { ready: importerReady, total: importerDocs.length })}</span>
                 </div>
               </div>
               {importerDocs.map(({ r, i }) => {
@@ -530,7 +525,7 @@ export default function TradeReport() {
                       borderRadius: 6, fontSize: 11, fontWeight: 500, cursor: "pointer",
                       fontFamily: "var(--fb)", flexShrink: 0, whiteSpace: "nowrap",
                     }}>
-                      Upload
+                      {tt("report.upload")}
                     </button>
                   </div>
                 );
@@ -542,10 +537,10 @@ export default function TradeReport() {
           {supplierDocs.length > 0 && (
             <div style={{ background: S.white, borderRadius: S.radius, padding: 22, boxShadow: S.shadowCard }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, paddingBottom: 12, borderBottom: `1px solid ${S.cream}` }}>
-                <h3 style={{ fontSize: 13, fontWeight: 600, color: S.darkSage }}>Their Side — Supplier</h3>
+                <h3 style={{ fontSize: 13, fontWeight: 600, color: S.darkSage }}>{tt("report.theirSideSupplier")}</h3>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ background: S.darkSage, color: "white", fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 20 }}>{supplierDocs.length} docs</span>
-                  <span style={{ fontSize: 11, color: S.textMuted }}>{supplierReady}/{supplierDocs.length} ready</span>
+                  <span style={{ background: S.darkSage, color: "white", fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 20 }}>{tt("report.docsCount", { count: supplierDocs.length })}</span>
+                  <span style={{ fontSize: 11, color: S.textMuted }}>{tt("report.readyCount", { ready: supplierReady, total: supplierDocs.length })}</span>
                 </div>
               </div>
               {supplierDocs.map(({ r, i }) => {
@@ -572,7 +567,7 @@ export default function TradeReport() {
                       padding: "5px 10px", borderRadius: 6, fontSize: 11, fontWeight: 500,
                       cursor: "pointer", fontFamily: "var(--fb)", flexShrink: 0, whiteSpace: "nowrap",
                     }}>
-                      ✉ Send link
+                      {tt("report.sendLink")}
                     </button>
                   </div>
                 );
@@ -590,7 +585,7 @@ export default function TradeReport() {
             onClick={() => setDemurrageOpen(v => !v)}
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: S.textMuted }}>Demurrage Estimate</span>
+              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: S.textMuted }}>{tt("report.demurrageEstimate")}</span>
               <span style={{ fontSize: 11, color: S.textMuted, transform: demurrageOpen ? "rotate(180deg)" : "none", display: "inline-block", transition: "transform 0.15s" }}>▾</span>
             </div>
             {demurrage ? (
@@ -604,21 +599,21 @@ export default function TradeReport() {
                 {demurrageOpen && (
                   <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${S.cream}` }}>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 6 }}>
-                      <span style={{ color: S.textMuted }}>Port</span>
+                      <span style={{ color: S.textMuted }}>{tt("report.port")}</span>
                       <span style={{ fontWeight: 500, color: S.textDark }}>{demurrage.port.label}</span>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 6 }}>
-                      <span style={{ color: S.textMuted }}>Delay estimate</span>
+                      <span style={{ color: S.textMuted }}>{tt("report.delayEstimate")}</span>
                       <span style={{ fontWeight: 500, color: S.textDark }}>{demurrage.delayLabel} ({verdict})</span>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 6 }}>
-                      <span style={{ color: S.textMuted }}>20ft container</span>
+                      <span style={{ color: S.textMuted }}>{tt("report.container20ft")}</span>
                       <span style={{ fontWeight: 500, color: S.textDark }}>${demurrage.minCost.toLocaleString()} – ${demurrage.maxCost.toLocaleString()}</span>
                     </div>
                     <div style={{ marginTop: 8 }}>
                       <Link href="/demurrage">
                         <span style={{ fontSize: 12, color: S.mutedSage, fontWeight: 500, cursor: "pointer" }}>
-                          Open full calculator ({demurrage.allPorts.length} ports) →
+                          {tt("report.openCalculator", { count: demurrage.allPorts.length })}
                         </span>
                       </Link>
                     </div>
@@ -626,7 +621,7 @@ export default function TradeReport() {
                 )}
               </>
             ) : (
-              <div style={{ fontSize: 14, color: S.textMuted, paddingTop: 4 }}>Not available</div>
+              <div style={{ fontSize: 14, color: S.textMuted, paddingTop: 4 }}>{tt("report.notAvailable")}</div>
             )}
           </div>
 
@@ -636,11 +631,11 @@ export default function TradeReport() {
             onClick={() => setTriggersOpen(v => !v)}
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: S.textMuted }}>Regulatory Triggers</span>
+              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: S.textMuted }}>{tt("report.regulatoryTriggers")}</span>
               <span style={{ fontSize: 11, color: S.textMuted, transform: triggersOpen ? "rotate(180deg)" : "none", display: "inline-block", transition: "transform 0.15s" }}>▾</span>
             </div>
             <div style={{ fontFamily: "var(--fh)", fontSize: 20, fontWeight: 600, color: S.darkSage, marginBottom: 2 }}>
-              {triggerCount} active
+              {tt("report.activeCount", { count: triggerCount })}
             </div>
             <div style={{ fontSize: 11, color: S.textMuted }}>
               {Object.entries(result.triggers).filter(([, v]) => v).map(([k]) => k.toUpperCase()).join(", ") || "None"}
@@ -667,7 +662,7 @@ export default function TradeReport() {
                     <div key={item.key} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 6 }}>
                       <span style={{ color: S.textMuted }}>{item.label}</span>
                       <span style={{ fontWeight: 500, color: active ? S.red : S.mutedSage }}>
-                        {active ? "Required" : "Not applicable"}
+                        {active ? tt("report.required") : tt("report.notApplicable")}
                       </span>
                     </div>
                   );
@@ -682,7 +677,7 @@ export default function TradeReport() {
             onClick={() => setValueOpen(v => !v)}
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: S.textMuted }}>Shipment Value</span>
+              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: S.textMuted }}>{tt("report.shipmentValue")}</span>
               <span style={{ fontSize: 11, color: S.textMuted, transform: valueOpen ? "rotate(180deg)" : "none", display: "inline-block", transition: "transform 0.15s" }}>▾</span>
             </div>
             <div style={{
@@ -693,16 +688,16 @@ export default function TradeReport() {
               marginBottom: 2,
               paddingTop: lookup?.tradeValue ? 0 : 4,
             }}>
-              {lookup?.tradeValue ? `${lookup.tradeValueCurrency || "USD"} ${Number(lookup.tradeValue).toLocaleString()}` : "Not set"}
+              {lookup?.tradeValue ? `${lookup.tradeValueCurrency || "USD"} ${Number(lookup.tradeValue).toLocaleString()}` : tt("report.notSet")}
             </div>
             <div style={{ fontSize: 11, color: S.textMuted }}>
-              {lookup?.tradeValue ? "FOB declared value" : "Add value for risk exposure calc"}
+              {lookup?.tradeValue ? tt("report.fobDeclared") : tt("report.addValueHint")}
             </div>
             {valueOpen && (
               <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${S.cream}` }}>
                 <input
                   type="text"
-                  placeholder="Enter FOB value (USD)"
+                  placeholder={tt("report.enterFob")}
                   defaultValue={lookup?.tradeValue || ""}
                   style={{
                     width: "100%", padding: "8px 12px", background: S.cream, border: "none",
@@ -713,7 +708,7 @@ export default function TradeReport() {
                   width: "100%", background: S.darkSage, color: "white", border: "none",
                   padding: 8, borderRadius: 6, fontFamily: "var(--fb)", fontSize: 12, fontWeight: 500, cursor: "pointer",
                 }}>
-                  Save value
+                  {tt("report.saveValue")}
                 </button>
               </div>
             )}
@@ -722,7 +717,7 @@ export default function TradeReport() {
 
         {/* ── ACTIONS ── */}
         <div style={{ background: S.white, borderRadius: S.radius, padding: 22, boxShadow: S.shadowCard, marginBottom: 16 }}>
-          <h3 style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: S.textMuted, marginBottom: 14 }}>Actions</h3>
+          <h3 style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: S.textMuted, marginBottom: 14 }}>{tt("report.actions")}</h3>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
             <div style={{
               display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderRadius: S.radiusSm,
@@ -730,8 +725,8 @@ export default function TradeReport() {
             }}>
               <span style={{ fontSize: 16, flexShrink: 0 }}>⬇</span>
               <div>
-                <h5 style={{ fontSize: 13, fontWeight: 600, color: "#aaa", marginBottom: 1 }}>Download TwinLog Trail</h5>
-                <p style={{ fontSize: 11, color: S.textMuted, margin: 0 }}>Available after first document upload</p>
+                <h5 style={{ fontSize: 13, fontWeight: 600, color: "#aaa", marginBottom: 1 }}>{tt("report.downloadTwinlog")}</h5>
+                <p style={{ fontSize: 11, color: S.textMuted, margin: 0 }}>{tt("report.twinlogAvailableAfter")}</p>
               </div>
             </div>
             <Link href={`/lc-check?commodityId=${result.commodity.id}&originIso2=${result.origin.iso2}&destIso2=${result.destination.iso2}`}>
@@ -744,8 +739,8 @@ export default function TradeReport() {
               >
                 <span style={{ fontSize: 16, flexShrink: 0 }}>→</span>
                 <div>
-                  <h5 style={{ fontSize: 13, fontWeight: 600, color: S.darkSage, marginBottom: 1 }}>Run LC Check</h5>
-                  <p style={{ fontSize: 11, color: S.textMuted, margin: 0 }}>Pre-filled with this trade's data</p>
+                  <h5 style={{ fontSize: 13, fontWeight: 600, color: S.darkSage, marginBottom: 1 }}>{tt("report.runLcCheck")}</h5>
+                  <p style={{ fontSize: 11, color: S.textMuted, margin: 0 }}>{tt("report.lcCheckPreFilled")}</p>
                 </div>
               </div>
             </Link>
@@ -762,8 +757,8 @@ export default function TradeReport() {
             >
               <span style={{ fontSize: 16, flexShrink: 0 }}>⬇</span>
               <div>
-                <h5 style={{ fontSize: 13, fontWeight: 600, color: S.darkSage, marginBottom: 1 }}>Customs data pack (CSV)</h5>
-                <p style={{ fontSize: 11, color: S.textMuted, margin: 0 }}>Share with your broker</p>
+                <h5 style={{ fontSize: 13, fontWeight: 600, color: S.darkSage, marginBottom: 1 }}>{tt("report.customsDataPack")}</h5>
+                <p style={{ fontSize: 11, color: S.textMuted, margin: 0 }}>{tt("report.shareWithBroker")}</p>
               </div>
             </div>
             <div style={{
@@ -775,8 +770,8 @@ export default function TradeReport() {
             >
               <span style={{ fontSize: 16, flexShrink: 0 }}>✉</span>
               <div>
-                <h5 style={{ fontSize: 13, fontWeight: 600, color: S.darkSage, marginBottom: 1 }}>Send supplier brief</h5>
-                <p style={{ fontSize: 11, color: S.textMuted, margin: 0 }}>Email document checklist to supplier</p>
+                <h5 style={{ fontSize: 13, fontWeight: 600, color: S.darkSage, marginBottom: 1 }}>{tt("report.sendSupplierBrief")}</h5>
+                <p style={{ fontSize: 11, color: S.textMuted, margin: 0 }}>{tt("report.emailChecklist")}</p>
               </div>
             </div>
           </div>
@@ -795,7 +790,7 @@ export default function TradeReport() {
             <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: S.textMid }}>
               <span>🔗</span>
               <span style={{ fontSize: 12, fontWeight: 600, color: S.mutedSage }}>{twinlogRef}</span>
-              <span style={{ color: S.textMuted, fontSize: 12 }}>· TwinLog Audit Trail · {auditTrail.length} events</span>
+              <span style={{ color: S.textMuted, fontSize: 12 }}>· {tt("report.twinlogAuditTrail")} · {tt("report.auditEvents", { count: auditTrail.length })}</span>
             </div>
             <span style={{ fontSize: 12, color: S.textMuted }}>▾</span>
             {auditOpen && twinlogHash && (
@@ -818,9 +813,9 @@ export default function TradeReport() {
         {/* ── WATCH CORRIDOR ── */}
         <div style={{ textAlign: "center", padding: 16, fontSize: 13, color: S.textMuted }}>
           <Link href="/alerts">
-            <span style={{ color: S.mutedSage, fontWeight: 500, cursor: "pointer" }}>⊙ Watch this corridor</span>
+            <span style={{ color: S.mutedSage, fontWeight: 500, cursor: "pointer" }}>{tt("report.watchCorridor")}</span>
           </Link>
-          {" — get notified when regulations change for "}
+          {" "}{tt("report.watchNotified")}{" "}
           {commodityName} → {destName}
         </div>
 

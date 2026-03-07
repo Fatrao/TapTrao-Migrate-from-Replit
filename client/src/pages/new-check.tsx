@@ -419,6 +419,7 @@ export default function NewCheck() {
   const { t, i18n } = useTranslation("lookup");
   const lang = i18n.language;
   const { t: tc } = useTranslation("common");
+  const { t: tt } = useTranslation("trades");
   usePageTitle("New Check", "Run a compliance check for your shipment");
 
   const [commodityId, setCommodityId] = useState("");
@@ -463,13 +464,13 @@ export default function NewCheck() {
           {/* Green hero */}
           <div className="green-hero-box" style={{ margin: "4px 0 16px", padding: "28px 32px" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.08)", borderRadius: 20, padding: "5px 14px", fontSize: 15, color: "rgba(255,255,255,0.55)", marginBottom: 14, letterSpacing: "0.03em" }}>
-              TAPTRAO / NEW CHECK
+              {tt("newCheck.heroBreadcrumb")}
             </div>
             <h1 style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 32, color: "#fff", margin: "0 0 8px", lineHeight: 1.2 }}>
               New Check
             </h1>
             <p style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", margin: 0, maxWidth: 500 }}>
-              Each check generates a hash-chained audit record for your shipment.
+              {tt("newCheck.heroSubtitle")}
             </p>
           </div>
 
@@ -495,7 +496,7 @@ export default function NewCheck() {
                 </div>
                 <div className="space-y-2" style={{ minWidth: 0 }}>
                   <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t1)", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    Origin
+                    {tt("newCheck.originLabel")}
                   </label>
                   {isLoading ? <Skeleton className="h-9 w-full" /> : (
                     <Select value={originId} onValueChange={setOriginId}>
