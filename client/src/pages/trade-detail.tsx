@@ -1307,7 +1307,7 @@ export default function TradeDetail() {
                     <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
                       {t("detail.complianceSummary")}
                     </h3>
-                    <Link href={`/lookup?lookupId=${data.lookup.id}`}>
+                    <Link href={`/trades/${data.lookup.id}/report`}>
                       <Button variant="outline" size="sm" style={{ fontSize: 15 }}>
                         {t("detail.viewFullReport")}
                       </Button>
@@ -2068,7 +2068,7 @@ export default function TradeDetail() {
                   <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", marginBottom: 8 }}>
                     {t("detail.actions")}
                   </h3>
-                  <Link href={`/lookup?lookupId=${data.lookup.id}`}>
+                  <Link href={`/trades/${data.lookup.id}/report`}>
                     <Button variant="outline" size="sm" style={{ width: "100%", justifyContent: "flex-start", fontSize: 15 }}>
                       <Shield size={14} className="mr-2" /> {t("detail.viewComplianceReport")}
                     </Button>

@@ -37,6 +37,7 @@ import ForgotPassword from "@/pages/forgot-password";
 import ResetPassword from "@/pages/reset-password";
 import NewCheck from "@/pages/new-check";
 import TradeDetail from "@/pages/trade-detail";
+import TradeReport from "@/pages/trade-report";
 import Commodities from "@/pages/commodities";
 
 function Router() {
@@ -58,6 +59,7 @@ function Router() {
       <Route path="/dashboard">{() => <Redirect to="/trades" />}</Route>
       <Route path="/demurrage">{() => <AuthGuard><DemurragePage /></AuthGuard>}</Route>
       <Route path="/lc-check">{() => <AuthGuard><LcCheck /></AuthGuard>}</Route>
+      <Route path="/trades/:tradeId/report">{() => <AuthGuard><TradeReport /></AuthGuard>}</Route>
       <Route path="/trades/:id">{() => <AuthGuard><TradeDetail /></AuthGuard>}</Route>
       <Route path="/trades">{() => <AuthGuard><Trades /></AuthGuard>}</Route>
       <Route path="/commodities">{() => <AuthGuard><Commodities /></AuthGuard>}</Route>
