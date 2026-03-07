@@ -478,8 +478,8 @@ export default function NewCheck() {
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(109,184,154,0.3), transparent)" }} />
             <CardContent className="p-6">
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 20 }} className="new-check-form-grid">
-                <div className="space-y-2">
-                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t1)", display: "block" }}>
+                <div className="space-y-2" style={{ minWidth: 0 }}>
+                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t1)", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {t("form.commodityLabel")}
                   </label>
                   {isLoading ? <Skeleton className="h-9 w-full" /> : (
@@ -493,9 +493,9 @@ export default function NewCheck() {
                     </Select>
                   )}
                 </div>
-                <div className="space-y-2">
-                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t1)", display: "block" }}>
-                    {t("form.originLabel")}
+                <div className="space-y-2" style={{ minWidth: 0 }}>
+                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t1)", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    Origin
                   </label>
                   {isLoading ? <Skeleton className="h-9 w-full" /> : (
                     <Select value={originId} onValueChange={setOriginId}>
@@ -510,8 +510,8 @@ export default function NewCheck() {
                     </Select>
                   )}
                 </div>
-                <div className="space-y-2">
-                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t1)", display: "block" }}>
+                <div className="space-y-2" style={{ minWidth: 0 }}>
+                  <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t1)", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {t("form.destinationLabel")}
                   </label>
                   {isLoading ? <Skeleton className="h-9 w-full" /> : (
