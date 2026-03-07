@@ -12,7 +12,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div style={{ fontFamily: "var(--fb)", background: "var(--bg)", color: "var(--t1)", minHeight: "100vh" }}>
+    <div className="blog-page" style={{ fontFamily: "var(--fb)", background: "var(--bg)", color: "var(--t1)", minHeight: "100vh" }}>
       {/* ── Nav ── */}
       <nav style={{
         position: "sticky", top: 0, zIndex: 100,
