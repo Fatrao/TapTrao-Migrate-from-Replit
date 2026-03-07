@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { AppShell } from "@/components/AppShell";
 import { StepNav } from "@/components/StepNav";
+import FreeCheckResults from "@/components/FreeCheckResults";
 import {
   Select,
   SelectContent,
@@ -2696,7 +2697,11 @@ export default function Lookup() {
             </div>
           )}
 
-          {displayResult && (
+          {displayResult && !isAuthenticated && (
+            <FreeCheckResults result={displayResult} />
+          )}
+
+          {displayResult && isAuthenticated && (
             <>
               <StepNav steps={[t("steps.enterTrade"), t("steps.preShipReport"), `${t("steps.lcCheck")} 🔒`, `${t("steps.supplierBrief")} 🔒`]} currentIndex={1} completedUpTo={1} />
               <ComplianceResultDisplay result={displayResult} freeLocked={freeLookupUsed && balance === 0} isAuthenticated={isAuthenticated} />
