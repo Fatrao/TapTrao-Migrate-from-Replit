@@ -348,7 +348,7 @@ export default function Home() {
                     onChange={(e) => setCommodityId(e.target.value)}
                     style={{
                       flex: 1, padding: "12px 14px", borderRadius: 10,
-                      border: "1px solid rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.15)",
+                      border: "none", background: "var(--sage)",
                       color: commodityId ? "#fff" : "rgba(255,255,255,0.6)",
                       fontSize: 15, fontFamily: "var(--fb)", cursor: "pointer",
                       outline: "none",
@@ -372,7 +372,7 @@ export default function Home() {
                     onChange={(e) => setOriginId(e.target.value)}
                     style={{
                       flex: 1, padding: "12px 14px", borderRadius: 10,
-                      border: "1px solid rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.15)",
+                      border: "none", background: "var(--sage)",
                       color: originId ? "#fff" : "rgba(255,255,255,0.6)",
                       fontSize: 15, fontFamily: "var(--fb)", cursor: "pointer",
                       outline: "none",
@@ -392,7 +392,7 @@ export default function Home() {
                     onChange={(e) => setDestinationId(e.target.value)}
                     style={{
                       flex: 1, padding: "12px 14px", borderRadius: 10,
-                      border: "1px solid rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.15)",
+                      border: "none", background: "var(--sage)",
                       color: destinationId ? "#fff" : "rgba(255,255,255,0.6)",
                       fontSize: 15, fontFamily: "var(--fb)", cursor: "pointer",
                       outline: "none",
