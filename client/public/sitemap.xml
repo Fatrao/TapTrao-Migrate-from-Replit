@@ -46,6 +46,21 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://taptrao.com/demurrage</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://taptrao.com/alerts</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://taptrao.com/templates</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://taptrao.com/privacy-policy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
