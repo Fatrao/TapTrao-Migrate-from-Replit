@@ -328,7 +328,7 @@ export default function Home() {
 
           {/* Corridor input card */}
           <div className="hp-corridor-card" style={{
-            background: "var(--sage)", borderRadius: 16, padding: "24px 28px",
+            background: "var(--sage-mid)", borderRadius: 16, padding: "24px 28px",
             boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
             maxWidth: 800,
           }}>
