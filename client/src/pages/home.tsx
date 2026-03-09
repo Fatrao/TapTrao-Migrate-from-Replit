@@ -349,7 +349,7 @@ export default function Home() {
                     style={{
                       flex: 1, padding: "12px 14px", borderRadius: 10,
                       border: "none", background: "var(--sage)",
-                      color: commodityId ? "#fff" : "rgba(255,255,255,0.6)",
+                      color: commodityId ? "#fff" : "#fff",
                       fontSize: 15, fontFamily: "var(--fb)", cursor: "pointer",
                       outline: "none",
                     }}
@@ -373,7 +373,7 @@ export default function Home() {
                     style={{
                       flex: 1, padding: "12px 14px", borderRadius: 10,
                       border: "none", background: "var(--sage)",
-                      color: originId ? "#fff" : "rgba(255,255,255,0.6)",
+                      color: originId ? "#fff" : "#fff",
                       fontSize: 15, fontFamily: "var(--fb)", cursor: "pointer",
                       outline: "none",
                     }}
@@ -393,7 +393,7 @@ export default function Home() {
                     style={{
                       flex: 1, padding: "12px 14px", borderRadius: 10,
                       border: "none", background: "var(--sage)",
-                      color: destinationId ? "#fff" : "rgba(255,255,255,0.6)",
+                      color: destinationId ? "#fff" : "#fff",
                       fontSize: 15, fontFamily: "var(--fb)", cursor: "pointer",
                       outline: "none",
                     }}
@@ -414,8 +414,9 @@ export default function Home() {
                     width: "100%", padding: "14px 24px", borderRadius: 12,
                     border: "none", fontFamily: "var(--fb)", fontSize: 16, fontWeight: 700,
                     cursor: canCheck ? "pointer" : "not-allowed",
-                    background: canCheck ? "#fff" : "rgba(255,255,255,0.15)",
-                    color: canCheck ? "var(--sage)" : "rgba(255,255,255,0.4)",
+                    background: "#fff",
+                    color: "var(--sage-mid)",
+                    opacity: canCheck ? 1 : 0.5,
                     transition: "all .2s",
                   }}
                 >
@@ -767,7 +768,7 @@ export default function Home() {
               background: "linear-gradient(135deg, #1b3a2e, #2d4a38)", borderRadius: 12, padding: 20, marginBottom: 16,
             }}>
               <div style={{ fontSize: 16, fontWeight: 600, color: "#fff", marginBottom: 4 }}>🥜 Raw Cashew Nuts</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>🇨🇮 Cote d'Ivoire &rarr; 🇬🇧 United Kingdom</div>
+              <div style={{ fontSize: 13, color: "#fff" }}>🇨🇮 Cote d'Ivoire &rarr; 🇬🇧 United Kingdom</div>
             </div>
             {["Certificate of Origin", "Phytosanitary Cert", "Bill of Lading"].map((doc, i) => (
               <div key={doc} style={{
