@@ -10,6 +10,25 @@ export function serveStatic(app: Express) {
     );
   }
 
+  // Serve SEO files with explicit content types so the SPA fallback never intercepts them
+  const seoFiles: Record<string, string> = {
+    "/sitemap.xml": "application/xml; charset=utf-8",
+    "/robots.txt": "text/plain; charset=utf-8",
+    "/llms.txt": "text/plain; charset=utf-8",
+  };
+
+  for (const [route, contentType] of Object.entries(seoFiles)) {
+    app.get(route, (_req, res) => {
+      const filePath = path.resolve(distPath, route.slice(1));
+      if (fs.existsSync(filePath)) {
+        res.setHeader("Content-Type", contentType);
+        res.sendFile(filePath);
+      } else {
+        res.status(404).send("Not found");
+      }
+    });
+  }
+
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist
