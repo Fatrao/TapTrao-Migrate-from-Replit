@@ -1,37 +1,39 @@
 # TapTrao
 
-> Trade compliance SaaS for commodity traders sourcing from Africa. Check every document, duty, and regulation for any African commodity corridor — before you commit.
+> TapTrao helps small importers understand compliance requirements before spending money on a shipment, then provides a one-off per-shipment "Shield" pack to request missing supplier documents, manage documents (including LC cross-check), and monitor compliance risk until docking and release.
 
 ## What TapTrao does
 
-- **Compliance checks**: Enter commodity + origin + destination to see every required document, duty rate, and regulatory trigger for that corridor
-- **Regulatory screening**: EUDR (deforestation), CBAM (carbon), SPS (phytosanitary), IUU (fishing), CITES (endangered species), Kimberley Process, Lacey Act, REACH
-- **LC cross-validation**: Upload Letter of Credit terms and trade documents for automated cross-checking against UCP 600 rules
-- **Supplier document collection**: Generate zero-login upload links for suppliers — they see exactly which documents to provide, no account needed
-- **Readiness scoring**: Get a compliance score with specific fix recommendations before shipping
-- **TwinLog audit trail**: Every compliance event recorded with SHA-256 integrity hashing for audit-proof evidence
-- **Regulatory alerts**: Monitor corridors for regulatory changes (EUDR deadlines, duty rate updates, SPS rule changes)
-- **Demurrage calculator**: Estimate port demurrage costs before shipment
+- **Free Corridor Preview**: Users can enter their trade corridor on the homepage to instantly see a compliance readiness score and the first 3 regulatory requirements for free. Unlocking the full checklist, supplier messaging, and audit tools requires Shield.
+- **Pre-shipment compliance requirements**: Identifies every document, duty rate, and regulatory trigger needed before purchase or shipment. Covers EUDR, CBAM, SPS, IUU, CITES, Kimberley Process, Lacey Act, REACH, Section 232, FSIS, and Conflict Minerals.
+- **EUDR due diligence**: Automated due diligence statements for EU Deforestation Regulation reporting, including geolocation data capture.
+- **Supplier document requests**: Generate zero-login upload links for suppliers — they see exactly which documents to provide from their phone, no account needed.
+- **Document vault and LC cross-check**: Upload shipment documents and cross-validate Letters of Credit against UCP 600 rules. Flags discrepancies before bank submission.
+- **TwinLog audit trail**: Every compliance event recorded with SHA-256 integrity hashing for audit-proof evidence records.
+- **Trade templates**: Save and reuse compliance corridors with automatic stale-detection when regulations change.
+- **Regulatory alerts**: Monitor up to 3 corridors for regulatory changes (EUDR deadlines, duty rate updates, SPS rule changes).
+- **Demurrage calculator**: Estimate port demurrage costs based on destination and readiness verdict.
 
 ## Coverage
 
 - **191 commodities**: cocoa, coffee, cashew nuts, shea butter, sesame seeds, timber, rubber, cotton, gold, diamonds, vanilla, tea, tobacco, palm oil, and 177 more
 - **54 African origin countries**: Ghana, Cote d'Ivoire, Nigeria, Kenya, Tanzania, Ethiopia, Uganda, Cameroon, Senegal, Madagascar, Mozambique, DRC, Rwanda, Burkina Faso, and 40 more
 - **7 destination markets**: EU, UK, USA, Canada, Switzerland, Turkiye, UAE
+- Automatically checks AfCFTA Rules of Origin eligibility and AGOA (African Growth and Opportunity Act) status
 
 ## Pricing (USD)
 
 - **TapTrao Shield — Single shipment**: $189
 - **3-Pack**: $499 ($166 per shipment)
 - **5-Pack**: $799 ($160 per shipment)
-- **LC-only check**: $49.99 (standalone, without trade credit)
+- **LC-only check**: $49.99 (standalone, without Shield)
 - **LC check is included free** with every Shield pack
 
-No subscription. No contract. No ERP integration required. Preview any corridor for free on the homepage.
+No subscription. No contract. No ERP integration required. No account needed — sessions are cookie-based.
 
 ## Who it's for
 
-- Small and mid-size commodity traders importing from Africa who lack dedicated compliance departments
+- Small to medium EU/UK/US commodity importers who want to stay on the phone doing deals while the platform handles the administrative paper-chase
 - Traders who need to understand regulatory requirements before committing to a purchase
 - Importers coordinating with overseas suppliers for missing export/import documents
 - Companies using letters of credit who need document cross-checking and an audit trail
@@ -49,6 +51,9 @@ No subscription. No contract. No ERP integration required. Preview any corridor 
 - [Compliance Check](https://taptrao.com/lookup)
 - [LC Document Check](https://taptrao.com/lc-check)
 - [Pricing](https://taptrao.com/pricing)
+- [Demurrage Calculator](https://taptrao.com/demurrage)
+- [Regulatory Alerts](https://taptrao.com/alerts)
+- [Trade Templates](https://taptrao.com/templates)
 - [Blog](https://taptrao.com/blog)
 
 ## Company
@@ -56,3 +61,24 @@ No subscription. No contract. No ERP integration required. Preview any corridor 
 - **Legal name**: Fatrao Limited
 - **Website**: https://taptrao.com
 - **Contact**: hello@taptrao.com
+
+## Optional
+
+### Blog articles
+
+- [Sesame Seeds from Nigeria: Compliance Guide](https://taptrao.com/blog/sesame-seeds-nigeria)
+- [Cocoa and EUDR: What Importers Need to Know](https://taptrao.com/blog/cocoa-eudr-importers)
+- [Tropical Fruits: Phytosanitary Requirements](https://taptrao.com/blog/tropical-fruits-phytosanitary)
+- [Bamboo as a Forest Product Under EUDR](https://taptrao.com/blog/bamboo-eudr-forest-product)
+
+### Regulatory detail
+
+- **EUDR & CBAM**: Maps exact implementation dates and requirements for the EU Deforestation Regulation and Carbon Border Adjustment Mechanism.
+- **SPS**: Automatically flags Sanitary and Phytosanitary certificate requirements based on commodity and origin-destination pairing.
+- **Conflict Minerals**: Dodd-Frank 3TG due diligence for tin, tantalum, tungsten, and gold from conflict-affected regions.
+
+### Technical details
+
+- **TwinLog hashing**: SHA-256 cryptographic hashing for immutable, audit-proof compliance history.
+- **LC cross-check**: Aligns with UCP 600 and ISBP standards for Letter of Credit document validation.
+- **Readiness scoring**: 0–100 score based on regulatory complexity, hazard exposure, document volume, and trade restrictions.
