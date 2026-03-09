@@ -473,8 +473,8 @@ export default function Home() {
               </div>
             )}
 
-            {/* Requirements list */}
-            <div className="hp-pain-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 24px", marginBottom: 24 }}>
+            {/* Requirements list — first 3 visible, rest locked */}
+            <div className="hp-pain-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 24px", marginBottom: 0 }}>
               {preview.requirementTitles.map((title, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
                   <XCircle size={16} style={{ color: "var(--red)", marginTop: 2, flexShrink: 0 }} />
@@ -482,6 +482,47 @@ export default function Home() {
                 </div>
               ))}
             </div>
+
+            {/* Locked requirements teaser */}
+            {preview.requirementCount > preview.requirementTitles.length && (
+              <div style={{
+                position: "relative", marginTop: 8, marginBottom: 24,
+                padding: "20px 24px", borderRadius: 12,
+                background: "linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.06) 100%)",
+                border: "1px solid rgba(0,0,0,0.06)",
+              }}>
+                {/* Blurred fake rows */}
+                <div style={{ filter: "blur(5px)", userSelect: "none", pointerEvents: "none" }}>
+                  <div className="hp-pain-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 24px" }}>
+                    {Array.from({ length: Math.min(preview.requirementCount - preview.requirementTitles.length, 4) }).map((_, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                        <XCircle size={16} style={{ color: "var(--red)", marginTop: 2, flexShrink: 0, opacity: 0.4 }} />
+                        <span style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.5 }}>
+                          Certificate of compliance requirement #{i + 4}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Lock overlay */}
+                <div style={{
+                  position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                  borderRadius: 12,
+                }}>
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    background: "#fff", padding: "10px 20px", borderRadius: 10,
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.08)", border: "1px solid rgba(0,0,0,0.08)",
+                  }}>
+                    <Shield size={16} style={{ color: "var(--sage)" }} />
+                    <span style={{ fontSize: 14, fontWeight: 600, color: "var(--t1)" }}>
+                      +{preview.requirementCount - preview.requirementTitles.length} more requirements
+                    </span>
+                    <span style={{ fontSize: 13, color: "var(--t3)" }}>— unlock with Shield</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Triggers + Score row */}
             <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>

@@ -37,13 +37,13 @@
   },
 
   "relief": {
-    "heading": "TapTrao handles this for you",
-    "line1": "Maps every document and regulation in seconds",
-    "line2": "Cross-validates your LC against all trade documents",
-    "line3": "Generates ready-to-send supplier upload links",
-    "line4": "Produces audit-ready evidence records (TwinLog)",
-    "cta": "Get the full report for $189",
-    "ctaSub": "This is a preview. The full Shield report includes detailed fix recommendations, portal guides, and LC cross-validation.",
+    "heading": "Activate Shield to manage this shipment",
+    "line1": "Upload and track every document until customs clearance",
+    "line2": "Request missing documents from suppliers via upload links",
+    "line3": "Cross-validate your LC against UCP 600 rules",
+    "line4": "Generate audit-ready TwinLog evidence records",
+    "cta": "Activate Shield — $189",
+    "ctaSub": "Shield stays active until this shipment clears. Includes full document checklist, supplier requests, LC cross-check, risk analytics, and audit trail.",
     "ctaAnother": "Check another corridor"
   },
 

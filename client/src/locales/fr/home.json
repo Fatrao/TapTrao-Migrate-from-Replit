@@ -37,13 +37,13 @@
   },
 
   "relief": {
-    "heading": "TapTrao s'en charge pour vous",
-    "line1": "Cartographie chaque document et réglementation en quelques secondes",
-    "line2": "Valide croisément votre LC contre tous les documents commerciaux",
-    "line3": "Génère des liens d'envoi prêts à l'emploi pour vos fournisseurs",
-    "line4": "Produit des preuves d'audit infalsifiables (TwinLog)",
-    "cta": "Obtenez le rapport complet pour 189 $",
-    "ctaSub": "Ceci est un aperçu. Le rapport Shield complet inclut des recommandations correctives détaillées, des guides de portails et la validation croisée LC.",
+    "heading": "Activez Shield pour gérer cette expédition",
+    "line1": "Téléchargez et suivez chaque document jusqu'au dédouanement",
+    "line2": "Demandez les documents manquants à vos fournisseurs via des liens d'envoi",
+    "line3": "Validez croisément votre LC contre les règles UCP 600",
+    "line4": "Générez des dossiers de preuve d'audit TwinLog",
+    "cta": "Activer Shield — 189 $",
+    "ctaSub": "Shield reste actif jusqu'au dédouanement. Inclut la liste complète des documents, les demandes fournisseurs, la vérification LC, l'analyse des risques et la piste d'audit.",
     "ctaAnother": "Vérifier un autre corridor"
   },
 

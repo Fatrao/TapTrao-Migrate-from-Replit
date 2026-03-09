@@ -145,43 +145,47 @@ function ReadinessScoreBanner({
           </p>
         </div>
 
-        <div style={{ flex: 1, paddingLeft: 28 }}>
-          {factorRows.map((f) => {
-            const pct = f.max > 0 ? (f.penalty / f.max) * 100 : 0;
-            const isPrimary = primaryRiskFactor === f.key && f.penalty > 10;
-            return (
-              <div
-                key={f.key}
-                style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}
-              >
-                <span style={{ width: 120, fontSize: 15, color: "var(--t2)", textAlign: "right", flexShrink: 0 }}>
-                  {f.label}
-                </span>
-                <div style={{ flex: 1, height: 3, background: "rgba(0,0,0,0.07)", borderRadius: 2, position: "relative" }}>
-                  <div
-                    style={{
-                      width: `${pct}%`,
-                      height: "100%",
-                      borderRadius: 2,
-                      background: barColors[f.key] || "var(--t4)",
-                    }}
-                  />
-                </div>
-                <span
-                  style={{
-                    fontFamily: "'Inter', sans-serif",
-                    fontSize: isPrimary ? 9 : 10,
-                    width: 48,
-                    textAlign: "right",
-                    color: isPrimary ? "#eab308" : "var(--t3)",
-                    flexShrink: 0,
-                  }}
+        {/* Factor breakdown — blurred in free preview */}
+        <div style={{ flex: 1, paddingLeft: 28, position: "relative" }}>
+          <div style={{ filter: "blur(5px)", userSelect: "none", pointerEvents: "none" }}>
+            {factorRows.map((f) => {
+              const pct = f.max > 0 ? (f.penalty / f.max) * 100 : 0;
+              return (
+                <div
+                  key={f.key}
+                  style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}
                 >
-                  {isPrimary ? `▲ ${t("readiness.primary")}` : `${f.penalty}/${f.max}`}
-                </span>
-              </div>
-            );
-          })}
+                  <span style={{ width: 120, fontSize: 15, color: "var(--t2)", textAlign: "right", flexShrink: 0 }}>
+                    {f.label}
+                  </span>
+                  <div style={{ flex: 1, height: 3, background: "rgba(0,0,0,0.07)", borderRadius: 2, position: "relative" }}>
+                    <div
+                      style={{
+                        width: `${pct}%`,
+                        height: "100%",
+                        borderRadius: 2,
+                        background: barColors[f.key] || "var(--t4)",
+                      }}
+                    />
+                  </div>
+                  <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, width: 48, textAlign: "right", color: "var(--t3)", flexShrink: 0 }}>
+                    {`${f.penalty}/${f.max}`}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{
+            position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <span style={{
+              fontSize: 12, fontWeight: 600, color: "var(--sage)",
+              background: "#fff", padding: "4px 12px", borderRadius: 6,
+              boxShadow: "0 1px 6px rgba(0,0,0,0.08)", border: "1px solid rgba(0,0,0,0.06)",
+            }}>
+              Unlock breakdown with Shield
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -264,38 +268,45 @@ export default function FreeCheckResults({ result }: { result: ComplianceResult 
           )}
         </div>
 
-        {/* Duty Estimate */}
-        <div style={dkCard}>
+        {/* Duty Estimate — blurred values in free preview */}
+        <div style={{ ...dkCard, position: "relative" }}>
           <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 12 }}>
             {t("duty.title")}
           </div>
-          {Array.isArray(result.destination.preferenceSchemes) && (result.destination.preferenceSchemes as string[]).length > 0 && (
+          <div style={{ filter: "blur(5px)", userSelect: "none", pointerEvents: "none" }}>
+            {Array.isArray(result.destination.preferenceSchemes) && (result.destination.preferenceSchemes as string[]).length > 0 && (
+              <span style={{
+                fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em",
+                background: "rgba(109,184,154,0.2)", color: "var(--sage)",
+                padding: "3px 8px", borderRadius: 4, display: "inline-block", marginBottom: 12,
+              }}>
+                {(result.destination.preferenceSchemes as string[]).join(" · ")}
+              </span>
+            )}
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
+              <span style={{ fontSize: 15, color: "var(--t2)" }}>{t("duty.vatImport")}</span>
+              <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{result.destination.vatRate}%</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
+              <span style={{ fontSize: 15, color: "var(--t2)" }}>{t("duty.tariffSource")}</span>
+              <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{result.destination.tariffSource}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
+              <span style={{ fontSize: 15, color: "var(--t2)" }}>{t("duty.spsRegime")}</span>
+              <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{result.destination.spsRegime || t("duty.standard")}</span>
+            </div>
+          </div>
+          <div style={{
+            position: "absolute", left: 0, right: 0, bottom: 20, display: "flex", justifyContent: "center",
+          }}>
             <span style={{
-              fontFamily: "'Inter', sans-serif", fontSize: 15, letterSpacing: "0.08em",
-              background: "rgba(109,184,154,0.2)", color: "var(--sage)",
-              padding: "3px 8px", borderRadius: 4, display: "inline-block", marginBottom: 12,
+              fontSize: 12, fontWeight: 600, color: "var(--sage)",
+              background: "#fff", padding: "4px 12px", borderRadius: 6,
+              boxShadow: "0 1px 6px rgba(0,0,0,0.08)", border: "1px solid rgba(0,0,0,0.06)",
             }}>
-              {(result.destination.preferenceSchemes as string[]).join(" · ")}
+              Unlock duty details with Shield
             </span>
-          )}
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-            <span style={{ fontSize: 15, color: "var(--t2)" }}>{t("duty.vatImport")}</span>
-            <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{result.destination.vatRate}%</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-            <span style={{ fontSize: 15, color: "var(--t2)" }}>{t("duty.tariffSource")}</span>
-            <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{result.destination.tariffSource}</span>
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-            <span style={{ fontSize: 15, color: "var(--t2)" }}>{t("duty.spsRegime")}</span>
-            <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{result.destination.spsRegime || t("duty.standard")}</span>
-          </div>
-          {result.destination.iso2 === "CH" && (
-            <p style={{ fontSize: 15, color: "#eab308", margin: "0 0 8px", lineHeight: 1.5 }}>
-              {t("duty.swissTariffShort")}
-            </p>
-          )}
-          <EvidenceHash result={result} />
         </div>
       </div>
 

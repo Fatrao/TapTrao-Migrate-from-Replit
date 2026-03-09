@@ -395,7 +395,9 @@ export async function registerRoutes(
         destinationId as string
       );
 
-      // Return preview-safe subset only (no tips, portal guides, or detailed recommendations)
+      // Return preview-safe subset only — show first 3 requirements as teaser,
+      // hide the rest behind paywall to prevent free riders
+      const MAX_FREE_REQUIREMENTS = 3;
       res.json({
         commodity: {
           name: result.commodity.name,
@@ -411,7 +413,7 @@ export async function registerRoutes(
           iso2: result.destination.iso2,
         },
         triggers: result.triggers,
-        requirementTitles: result.requirements,
+        requirementTitles: result.requirements.slice(0, MAX_FREE_REQUIREMENTS),
         requirementCount: result.requirements.length,
         readinessScore: {
           score: result.readinessScore.score,
