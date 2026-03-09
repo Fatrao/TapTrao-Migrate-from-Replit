@@ -328,15 +328,14 @@ export default function Home() {
 
           {/* Corridor input card */}
           <div className="hp-corridor-card" style={{
-            background: "var(--bg)", borderRadius: 16, padding: "24px 28px",
-            border: "1px solid rgba(0,0,0,0.08)",
-            boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
+            background: "var(--sage)", borderRadius: 16, padding: "24px 28px",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
             maxWidth: 800,
           }}>
             {phase === "loading" ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, padding: "20px 0" }}>
-                <Loader2 size={32} style={{ color: "var(--sage)", animation: "spin 1s linear infinite" }} />
-                <div style={{ fontSize: 16, color: "var(--t1)", fontWeight: 500, animation: "pulse 1s ease-in-out infinite" }}>
+                <Loader2 size={32} style={{ color: "#fff", animation: "spin 1s linear infinite" }} />
+                <div style={{ fontSize: 16, color: "#fff", fontWeight: 500, animation: "pulse 1s ease-in-out infinite" }}>
                   {loadingMsg}
                 </div>
               </div>
@@ -349,8 +348,8 @@ export default function Home() {
                     onChange={(e) => setCommodityId(e.target.value)}
                     style={{
                       flex: 1, padding: "12px 14px", borderRadius: 10,
-                      border: "1px solid rgba(0,0,0,0.12)", background: "#fff",
-                      color: commodityId ? "var(--t1)" : "var(--t3)",
+                      border: "1px solid rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.15)",
+                      color: commodityId ? "#fff" : "rgba(255,255,255,0.6)",
                       fontSize: 15, fontFamily: "var(--fb)", cursor: "pointer",
                       outline: "none",
                     }}
@@ -373,8 +372,8 @@ export default function Home() {
                     onChange={(e) => setOriginId(e.target.value)}
                     style={{
                       flex: 1, padding: "12px 14px", borderRadius: 10,
-                      border: "1px solid rgba(0,0,0,0.12)", background: "#fff",
-                      color: originId ? "var(--t1)" : "var(--t3)",
+                      border: "1px solid rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.15)",
+                      color: originId ? "#fff" : "rgba(255,255,255,0.6)",
                       fontSize: 15, fontFamily: "var(--fb)", cursor: "pointer",
                       outline: "none",
                     }}
@@ -393,8 +392,8 @@ export default function Home() {
                     onChange={(e) => setDestinationId(e.target.value)}
                     style={{
                       flex: 1, padding: "12px 14px", borderRadius: 10,
-                      border: "1px solid rgba(0,0,0,0.12)", background: "#fff",
-                      color: destinationId ? "var(--t1)" : "var(--t3)",
+                      border: "1px solid rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.15)",
+                      color: destinationId ? "#fff" : "rgba(255,255,255,0.6)",
                       fontSize: 15, fontFamily: "var(--fb)", cursor: "pointer",
                       outline: "none",
                     }}
@@ -415,8 +414,8 @@ export default function Home() {
                     width: "100%", padding: "14px 24px", borderRadius: 12,
                     border: "none", fontFamily: "var(--fb)", fontSize: 16, fontWeight: 700,
                     cursor: canCheck ? "pointer" : "not-allowed",
-                    background: canCheck ? "var(--sage)" : "rgba(0,0,0,0.06)",
-                    color: canCheck ? "#fff" : "var(--t3)",
+                    background: canCheck ? "#fff" : "rgba(255,255,255,0.15)",
+                    color: canCheck ? "var(--sage)" : "rgba(255,255,255,0.4)",
                     transition: "all .2s",
                   }}
                 >
