@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /upload/
+Disallow: /settings/
+Disallow: /tokens/
+
+Sitemap: https://taptrao.com/sitemap.xml

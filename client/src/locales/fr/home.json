@@ -1,84 +1,98 @@
 {
-  "pageTitle": "TapTrao — Conformité commerciale pour les négociants en matières premières",
+  "pageTitle": "TapTrao — Conformité commerciale pour les corridors de matières premières africaines",
+
   "nav": {
     "howItWorks": "Comment ça marche",
     "validation": "Démo",
     "pricing": "Tarifs",
     "myTrades": "Mes transactions",
-    "freeComplianceCheck": "Vérification de conformité gratuite"
+    "freeComplianceCheck": "Aperçu gratuit"
   },
+
   "hero": {
-    "heading": "Réduisez les risques avant d'engager vos dépenses.",
-    "subheading": "Chaque document. Chaque réglementation. Chaque corridor. Vérifiés avant que vous ne vous engagiez.",
-    "ctaPrimary": "Vérification gratuite →",
-    "ctaSecondary": "Voir la démo complète"
+    "heading": "Voyez ce qui se dresse entre vous et le dédouanement.",
+    "subheading": "Entrez votre corridor commercial. Nous vous montrons chaque document, droit et réglementation sur votre chemin — et comment les gérer.",
+    "ctaPrimary": "Vérifier les exigences du corridor",
+    "commodityPlaceholder": "Qu'achetez-vous ?",
+    "originPlaceholder": "D'où ?",
+    "destinationPlaceholder": "Vers où ?",
+    "loading": {
+      "eudr": "Vérification de la conformité EUDR...",
+      "sps": "Vérification des règles phytosanitaires...",
+      "docs": "Construction de la liste de documents...",
+      "duties": "Calcul des droits de douane...",
+      "score": "Calcul du score de conformité...",
+      "cbam": "Analyse des exigences CBAM...",
+      "cites": "Vérification des obligations CITES..."
+    }
   },
+
+  "pain": {
+    "heading": "Pour dédouaner cette expédition, il vous faut :",
+    "triggers": "Déclencheurs réglementaires :",
+    "readinessLabel": "Score de conformité",
+    "hazards": "Risques connus :",
+    "stopFlags": "Stop — ce corridor a des restrictions bloquantes",
+    "andMore": "et {{count}} de plus"
+  },
+
+  "relief": {
+    "heading": "TapTrao s'en charge pour vous",
+    "line1": "Cartographie chaque document et réglementation en quelques secondes",
+    "line2": "Valide croisément votre LC contre tous les documents commerciaux",
+    "line3": "Génère des liens d'envoi prêts à l'emploi pour vos fournisseurs",
+    "line4": "Produit des preuves d'audit infalsifiables (TwinLog)",
+    "cta": "Obtenez le rapport complet pour 189 $",
+    "ctaSub": "Ceci est un aperçu. Le rapport Shield complet inclut des recommandations correctives détaillées, des guides de portails et la validation croisée LC.",
+    "ctaAnother": "Vérifier un autre corridor"
+  },
+
   "trustBar": {
     "corridors": "AFRIQUE → UE · UK · USA · CANADA · TÜRKIYE · SUISSE"
   },
-  "costSection": {
-    "heading": "Le coût d'une erreur",
-    "subheading": "Un seul problème documentaire peut entraîner des milliers de pertes.",
-    "stats": {
-      "demurrage": {
-        "value": "75–300 $/jour",
-        "description": "Surestaries pendant le blocage des documents au port"
-      },
-      "bankFee": {
-        "value": "95–160 $",
-        "description": "Frais bancaires pour une divergence de crédit documentaire"
-      },
-      "isfPenalty": {
-        "value": "5 000 $",
-        "description": "Pénalité ISF américaine par infraction pour dépôt tardif"
-      },
-      "cascadeCost": {
-        "value": "1 500 $+",
-        "description": "Coût en cascade pour un document manquant"
-      }
+
+  "factsSection": {
+    "heading": "Ce que tout importateur de matières premières africaines doit savoir",
+    "subheading": "191 marchandises. 54 origines africaines. 7 destinations. Chaque réglementation cartographiée.",
+    "regulations": {
+      "heading": "Échéances réglementaires à venir",
+      "eudr": "EUDR : Entrée en application le 30 déc. 2025 pour les grands/moyens opérateurs ; 30 juin 2026 pour les micro/petites entreprises. Couvre le cacao, café, huile de palme, caoutchouc, soja, bois, bétail — et leurs dérivés.",
+      "cbam": "CBAM : Pleinement opérationnel à partir du 1er janv. 2026. Les importateurs au-dessus du seuil doivent acheter des certificats CBAM reflétant le carbone incorporé. Concerne l'aluminium, l'acier, le ciment, les engrais, l'hydrogène.",
+      "ukBtom": "Frontière UK : Contrôles SPS complets sur toutes les importations alimentaires/végétales. Certificats phytosanitaires obligatoires — l'absence signifie un refus automatique à la frontière."
     },
-    "summary": "Un seul refus bancaire coûte <b>{{amount}} $ ou plus</b>. La validation complète coûte",
-    "summaryAmount": "1 500 $",
-    "summaryValidationCost": "189 $"
-  },
-  "howItWorks": {
-    "heading": "Comment ça marche",
-    "subheading": "Connaissance. Action. Confiance.",
-    "steps": {
-      "step1": {
-        "label": "ÉTAPE 1",
-        "title": "Connaissance",
-        "description": "Saisissez votre origine, destination et marchandise. TapTrao cartographie chaque réglementation, document requis et obligation de conformité pour votre corridor."
-      },
-      "step2": {
-        "label": "ÉTAPE 2",
-        "title": "Action",
-        "description": "Importez vos documents commerciaux. Notre moteur valide croisément chaque document, vérifie les conditions LC et signale les incohérences avant la soumission."
-      },
-      "step3": {
-        "label": "ÉTAPE 3",
-        "title": "Confiance",
-        "description": "Recevez votre rapport Shield avec un score de conformité, le détail des problèmes et des recommandations correctives. Soumettez à la banque en toute confiance."
-      }
+    "costs": {
+      "heading": "Coût des défaillances de conformité",
+      "demurrage": "75–300 $/jour de surestaries à Felixstowe, Rotterdam, Hambourg pendant le blocage des documents",
+      "bankFee": "95–160 $ de frais bancaires pour une seule divergence LC",
+      "isfPenalty": "5 000 $ d'amende ISF américaine par infraction pour dépôt tardif",
+      "cascadeCost": "Un seul certificat d'origine manquant du Ghana, de Côte d'Ivoire ou du Kenya peut entraîner 1 500 $+ de retards et frais"
     }
   },
-  "validationPreview": {
-    "heading": "Rapport de validation croisée",
-    "subheading": "Chaque document vérifié par rapport à tous les autres. Chaque réglementation cartographiée.",
-    "riskOrigin": "Origine",
-    "riskCommodity": "Marchandise",
-    "riskRegulatory": "Réglementaire",
-    "mockTrade": "🥜 Noix de cajou brutes · CI → UK",
-    "riskLow": "FAIBLE",
-    "riskMed": "MOY",
-    "riskHigh": "ÉLEVÉ",
-    "checkItems": {
-      "certificateOfOrigin": "Certificat d'origine",
-      "phytosanitaryCertificate": "Certificat phytosanitaire",
-      "billOfLading": "Connaissement",
-      "insurance": "Assurance — inférieure à 110 % CAF",
-      "weightCertificate": "Certificat de poids — manquant",
-      "fumigationCertificate": "Certificat de fumigation"
+
+  "howItWorks": {
+    "heading": "Comment ça marche",
+    "subheading": "De la vérification du corridor au dédouanement en quatre étapes.",
+    "steps": {
+      "step1": {
+        "label": "CONNAÎTRE",
+        "title": "Cartographiez votre corridor",
+        "description": "Entrez votre marchandise, origine et destination. TapTrao cartographie chaque document requis, taux de droit et déclencheur réglementaire — EUDR, CBAM, SPS, CITES, et plus."
+      },
+      "step2": {
+        "label": "DEMANDER",
+        "title": "Collectez auprès des fournisseurs",
+        "description": "Générez un lien d'envoi sans connexion pour votre fournisseur. Il voit exactement quels documents fournir et les envoie directement depuis son téléphone. Aucun compte requis."
+      },
+      "step3": {
+        "label": "PROUVER",
+        "title": "Validez croisément tout",
+        "description": "Importez votre LC et vos documents commerciaux. TapTrao vérifie croisément chaque champ selon les règles UCP 600 et signale les divergences avant votre soumission à la banque."
+      },
+      "step4": {
+        "label": "SURVEILLER",
+        "title": "Surveillez les changements",
+        "description": "Configurez des alertes corridor. Soyez notifié quand les taux de droits changent, de nouvelles réglementations s'appliquent ou des échéances approchent — avant qu'elles n'impactent votre expédition."
+      }
     }
   },
 
@@ -193,42 +207,55 @@
       "chainValid": "Chaîne valide — 4 événements vérifiés"
     }
   },
+
+  "supplierPreview": {
+    "heading": "Ce que votre fournisseur voit",
+    "subheading": "Un lien d'envoi sans connexion. Il voit exactement quels documents fournir — depuis son téléphone.",
+    "noLogin": "Aucune connexion ni compte requis",
+    "exactDocs": "Liste claire des documents exacts à envoyer",
+    "tracked": "Progression suivie dans votre tableau de bord TapTrao",
+    "cta": "Lancez un aperçu gratuit pour le voir en action"
+  },
+
   "pricingSection": {
-    "heading": "Tarifs",
-    "subheading": "Simple et transparent. Sans abonnement.",
+    "heading": "189 $ par expédition. Paiement unique. Sans engagement.",
+    "subheading": "Sans abonnement. Sans ERP. Aperçu de tout corridor gratuit.",
     "plans": {
       "single": {
-        "name": "Vérification unique",
+        "name": "Shield unique",
         "price": "189 $",
-        "per": "par transaction",
-        "features": "Validation croisée complète\nVérification des conditions LC\nContrôle EUDR + CBAM\nScore de conformité + rapport\nRecommandations correctives"
+        "per": "par expédition",
+        "features": "Rapport de conformité complet\nValidation croisée LC (UCP 600)\nContrôle EUDR + CBAM\nScore de conformité + recommandations\nLien d'envoi fournisseur\nPiste d'audit TwinLog"
       },
       "threePack": {
         "name": "Pack 3",
         "price": "499 $",
-        "per": "166,33 $ par transaction",
-        "features": "Tout ce qui est inclus dans la vérification unique\nÉconomisez 68 $ au total\nValable 12 mois\nSupport prioritaire"
+        "per": "166 $ par expédition",
+        "features": "Tout ce qui est inclus dans le Shield unique\nÉconomisez 68 $ au total\nValable 12 mois\nSupport prioritaire"
       },
       "fivePack": {
         "name": "Pack 5",
         "price": "799 $",
-        "per": "159,80 $ par transaction",
-        "features": "Tout ce qui est inclus dans la vérification unique\nÉconomisez 146 $ au total\nValable 12 mois\nSupport prioritaire\nIntégration dédiée"
+        "per": "160 $ par expédition",
+        "features": "Tout ce qui est inclus dans le Shield unique\nÉconomisez 146 $ au total\nValable 12 mois\nSupport prioritaire\nIntégration dédiée"
       }
     },
     "ctaFeatured": "Meilleur rapport qualité/prix →",
-    "ctaDefault": "Commencer"
+    "ctaDefault": "Commencer",
+    "previewBadge": "Aperçu gratuit"
   },
+
   "finalCta": {
-    "heading": "Prêt à réduire les risques de votre prochain envoi ?",
-    "subheading": "Commencez avec une vérification de conformité gratuite. Aucun compte requis.",
-    "button": "Vérification gratuite →"
+    "heading": "Prêt à voir ce qui se dresse sur votre chemin ?",
+    "subheading": "Aperçu des exigences de conformité pour tout corridor de matières premières africaines. Gratuit.",
+    "button": "Vérifiez votre corridor →"
   },
+
   "footer": {
-    "tagline": "Conformité commerciale pour les corridors de matières premières africaines.",
+    "tagline": "Chaque document. Chaque réglementation. Chaque corridor africain.",
     "copyright": "© 2026 Fatrao Limited. Tous droits réservés.",
     "product": "Produit",
-    "freeCheck": "Vérification gratuite",
+    "freeCheck": "Aperçu gratuit",
     "pricing": "Tarifs",
     "lcCheck": "Vérification LC",
     "company": "Société",

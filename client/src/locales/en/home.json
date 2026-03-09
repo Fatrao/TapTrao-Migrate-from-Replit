@@ -1,90 +1,98 @@
 {
-  "pageTitle": "TapTrao \u2014 Trade Compliance for Commodity Traders",
+  "pageTitle": "TapTrao — Trade Compliance for African Commodity Corridors",
 
   "nav": {
     "howItWorks": "How It Works",
     "validation": "Demo",
     "pricing": "Pricing",
     "myTrades": "My Trades",
-    "freeComplianceCheck": "Free Compliance Check"
+    "freeComplianceCheck": "Free Preview"
   },
 
   "hero": {
-    "heading": "De-risk your next shipment before spending.",
-    "subheading": "Every document. Every regulation. Every corridor. Checked before you commit.",
-    "ctaPrimary": "Free Compliance Check \u2192",
-    "ctaSecondary": "See Full Demo"
+    "heading": "See what's between you and customs clearance.",
+    "subheading": "Enter your trade corridor. We'll show you every document, duty, and regulation standing in the way — and how to handle each one.",
+    "ctaPrimary": "Check Corridor Requirements",
+    "commodityPlaceholder": "What are you buying?",
+    "originPlaceholder": "Where from?",
+    "destinationPlaceholder": "Where to?",
+    "loading": {
+      "eudr": "Checking EUDR compliance...",
+      "sps": "Verifying phytosanitary rules...",
+      "docs": "Building document checklist...",
+      "duties": "Calculating duty rates...",
+      "score": "Computing readiness score...",
+      "cbam": "Screening CBAM requirements...",
+      "cites": "Checking CITES obligations..."
+    }
+  },
+
+  "pain": {
+    "heading": "To clear this shipment, you need:",
+    "triggers": "Regulatory triggers:",
+    "readinessLabel": "Readiness Score",
+    "hazards": "Known hazards:",
+    "stopFlags": "Stop — this corridor has blocking restrictions",
+    "andMore": "and {{count}} more"
+  },
+
+  "relief": {
+    "heading": "TapTrao handles this for you",
+    "line1": "Maps every document and regulation in seconds",
+    "line2": "Cross-validates your LC against all trade documents",
+    "line3": "Generates ready-to-send supplier upload links",
+    "line4": "Produces audit-ready evidence records (TwinLog)",
+    "cta": "Get the full report for $189",
+    "ctaSub": "This is a preview. The full Shield report includes detailed fix recommendations, portal guides, and LC cross-validation.",
+    "ctaAnother": "Check another corridor"
   },
 
   "trustBar": {
-    "corridors": "AFRICA \u2192 EU \u00b7 UK \u00b7 USA \u00b7 CANADA \u00b7 T\u00dcRKIYE \u00b7 SWITZERLAND"
+    "corridors": "AFRICA → EU · UK · USA · CANADA · TÜRKIYE · SWITZERLAND"
   },
 
-  "costSection": {
-    "heading": "The cost of getting it wrong",
-    "subheading": "A single document issue can cascade into thousands in losses.",
-    "stats": {
-      "demurrage": {
-        "value": "$75\u2013$300/day",
-        "description": "Demurrage while documents are on hold at port"
-      },
-      "bankFee": {
-        "value": "$95\u2013$160",
-        "description": "Bank fee for one LC discrepancy"
-      },
-      "isfPenalty": {
-        "value": "$5,000",
-        "description": "US ISF late-filing penalty per violation"
-      },
-      "cascadeCost": {
-        "value": "$1,500+",
-        "description": "Cascade cost from one missing document"
-      }
+  "factsSection": {
+    "heading": "What every African commodity importer should know",
+    "subheading": "191 commodities. 54 African origins. 7 destinations. Every regulation mapped.",
+    "regulations": {
+      "heading": "Upcoming regulatory deadlines",
+      "eudr": "EUDR: Entry into application 30 Dec 2025 for large/medium operators; 30 Jun 2026 for micro/small enterprises. Covers cocoa, coffee, palm oil, rubber, soy, wood, cattle — and derived products.",
+      "cbam": "CBAM: Fully operational from 1 Jan 2026. Importers above the threshold must purchase CBAM certificates reflecting embedded carbon. Affects aluminium, iron, steel, cement, fertilisers, hydrogen.",
+      "ukBtom": "UK Border: Full SPS checks on all food/plant imports. Phytosanitary certificates mandatory — missing one means automatic rejection at the border."
     },
-    "summary": "A single bank rejection costs <b>${{amount}} or more</b>. Full validation costs",
-    "summaryAmount": "$1,500",
-    "summaryValidationCost": "$189"
+    "costs": {
+      "heading": "Cost of compliance failures",
+      "demurrage": "$75–$300/day demurrage at Felixstowe, Rotterdam, Hamburg while documents are stuck",
+      "bankFee": "$95–$160 bank fee for a single LC discrepancy",
+      "isfPenalty": "$5,000 US ISF late-filing penalty per violation",
+      "cascadeCost": "A single missing Certificate of Origin from Ghana, Côte d'Ivoire, or Kenya can cascade into $1,500+ in delays and fees"
+    }
   },
 
   "howItWorks": {
     "heading": "How It Works",
-    "subheading": "Knowledge. Action. Confidence.",
+    "subheading": "From corridor check to customs clearance in four steps.",
     "steps": {
       "step1": {
-        "label": "STEP 1",
-        "title": "Knowledge",
-        "description": "Enter your origin, destination, and commodity. TapTrao maps every regulation, required document, and compliance obligation for your corridor."
+        "label": "KNOW",
+        "title": "Map your corridor",
+        "description": "Enter your commodity, origin, and destination. TapTrao maps every required document, duty rate, and regulatory trigger — EUDR, CBAM, SPS, CITES, and more."
       },
       "step2": {
-        "label": "STEP 2",
-        "title": "Action",
-        "description": "Upload your trade documents. Our engine cross-validates every document against every other, checks LC terms, and flags mismatches before submission."
+        "label": "ASK",
+        "title": "Collect from suppliers",
+        "description": "Generate a zero-login upload link for your supplier. They see exactly which documents to provide and upload directly from their phone. No account needed."
       },
       "step3": {
-        "label": "STEP 3",
-        "title": "Confidence",
-        "description": "Receive your Shield report with a compliance score, issue breakdown, and fix recommendations. Submit to the bank with confidence."
+        "label": "PROVE",
+        "title": "Cross-validate everything",
+        "description": "Upload your LC and trade documents. TapTrao cross-checks every field against UCP 600 rules and flags discrepancies before you submit to the bank."
+      },
+      "step4": {
+        "label": "MONITOR",
+        "title": "Watch for changes",
+        "description": "Set up corridor alerts. Get notified when duty rates change, new regulations apply, or deadlines approach — before they impact your shipment."
       }
-    }
-  },
-
-  "validationPreview": {
-    "heading": "Cross-Validation Report",
-    "subheading": "Every document checked against every other. Every regulation mapped.",
-    "riskOrigin": "Origin",
-    "riskCommodity": "Commodity",
-    "riskRegulatory": "Regulatory",
-    "mockTrade": "\ud83e\udd5c Raw Cashew \u00b7 CI \u2192 UK",
-    "riskLow": "LOW",
-    "riskMed": "MED",
-    "riskHigh": "HIGH",
-    "checkItems": {
-      "certificateOfOrigin": "Certificate of Origin",
-      "phytosanitaryCertificate": "Phytosanitary Certificate",
-      "billOfLading": "Bill of Lading",
-      "insurance": "Insurance \u2014 below 110% CIF",
-      "weightCertificate": "Weight Certificate \u2014 missing",
-      "fumigationCertificate": "Fumigation Certificate"
     }
   },
 
@@ -99,21 +107,21 @@
       "audit": "Audit Trail"
     },
     "check": {
-      "commodity": "\ud83e\udd5c Raw Cashew Nuts",
+      "commodity": "🥜 Raw Cashew Nuts",
       "hsCode": "HS 0801.31",
       "ref": "TT-2026-a3f9c1",
-      "corridor": "\ud83c\udde8\ud83c\uddee CI \u2192 \ud83c\uddec\ud83c\udde7 UK",
+      "corridor": "🇨🇮 CI → 🇬🇧 UK",
       "riskLow": "LOW",
       "riskMed": "MED",
       "origin": "Origin",
       "commodity2": "Commodity",
       "regulatory": "Regulatory",
-      "verdict": "READY TO SHIP \u2014 Low Risk",
+      "verdict": "READY TO SHIP — Low Risk",
       "certOrigin": "Certificate of Origin",
       "phyto": "Phytosanitary Certificate",
       "bol": "Bill of Lading",
-      "insurance": "Insurance \u2014 below 110% CIF",
-      "weight": "Weight Certificate \u2014 missing",
+      "insurance": "Insurance — below 110% CIF",
+      "weight": "Weight Certificate — missing",
       "fumigation": "Fumigation Certificate"
     },
     "dashboard": {
@@ -126,19 +134,19 @@
       "shieldN": "5",
       "valN": "$2.4M",
       "recentTrades": "Recent Trades",
-      "cocoa": "\ud83c\udf6b Cocoa Beans",
-      "cashew": "\ud83e\udd5c Raw Cashew",
-      "coffee": "\u2615 Green Coffee",
-      "ciEu": "\ud83c\udde8\ud83c\uddee \u2192 \ud83c\uddea\ud83c\uddfa",
-      "ciUk": "\ud83c\udde8\ud83c\uddee \u2192 \ud83c\uddec\ud83c\udde7",
-      "etDe": "\ud83c\uddea\ud83c\uddf9 \u2192 \ud83c\udde9\ud83c\uddea",
+      "cocoa": "🍫 Cocoa Beans",
+      "cashew": "🥜 Raw Cashew",
+      "coffee": "☕ Green Coffee",
+      "ciEu": "🇨🇮 → 🇪🇺",
+      "ciUk": "🇨🇮 → 🇬🇧",
+      "etDe": "🇪🇹 → 🇩🇪",
       "compliant": "Compliant",
       "pending": "Pending",
       "compliance": "Compliance",
       "docsVerified": "8/10 docs verified",
       "pendingDocs": "Pending Documents",
-      "bolPending": "Bill of Lading \u2014 awaiting upload",
-      "weightPending": "Weight Certificate \u2014 not received"
+      "bolPending": "Bill of Lading — awaiting upload",
+      "weightPending": "Weight Certificate — not received"
     },
     "inbox": {
       "awaiting": "Awaiting",
@@ -148,19 +156,19 @@
       "blockingN": "1",
       "completeN": "2",
       "supplier1": "Komoe Trading",
-      "supplier1Trade": "\ud83e\udd5c Raw Cashew \u00b7 CI \u2192 UK",
+      "supplier1Trade": "🥜 Raw Cashew · CI → UK",
       "supplier1Status": "Awaiting",
       "supplier1Time": "Sent 2 days ago",
-      "certOriginDone": "\u2713 Certificate of Origin",
-      "phytoDone": "\u2713 Phytosanitary Cert",
-      "weightPending": "\u23f3 Weight Certificate",
-      "fumigPending": "\u23f3 Fumigation Cert",
+      "certOriginDone": "✓ Certificate of Origin",
+      "phytoDone": "✓ Phytosanitary Cert",
+      "weightPending": "⏳ Weight Certificate",
+      "fumigPending": "⏳ Fumigation Cert",
       "supplier2": "Nana Farms",
-      "supplier2Trade": "\ud83c\udf6b Cocoa \u00b7 CI \u2192 EU",
+      "supplier2Trade": "🍫 Cocoa · CI → EU",
       "supplier2Status": "Blocking",
       "supplier2Time": "5 days overdue",
-      "bolOverdue": "\u26a0 Bill of Lading \u2014 overdue",
-      "inspDone": "\u2713 Inspection Certificate"
+      "bolOverdue": "⚠ Bill of Lading — overdue",
+      "inspDone": "✓ Inspection Certificate"
     },
     "lc": {
       "uploadLabel": "LC + Trade Documents",
@@ -196,48 +204,58 @@
       "ev4": "Customs Cleared",
       "ev4date": "28 Feb 2026",
       "ev4hash": "e1f5b203",
-      "chainValid": "Chain Valid \u2014 4 events verified"
+      "chainValid": "Chain Valid — 4 events verified"
     }
   },
 
+  "supplierPreview": {
+    "heading": "What your supplier sees",
+    "subheading": "A zero-login upload link. They see exactly which documents to provide — from their phone.",
+    "noLogin": "No login or account required",
+    "exactDocs": "Clear checklist of exactly which documents to upload",
+    "tracked": "Progress tracked in your TapTrao dashboard",
+    "cta": "Run a free preview to see it in action"
+  },
+
   "pricingSection": {
-    "heading": "Pricing",
-    "subheading": "Simple, transparent. No subscription required.",
+    "heading": "$189 per shipment. One-off. No contract.",
+    "subheading": "No subscription. No ERP. Preview any corridor for free.",
     "plans": {
       "single": {
-        "name": "Single Check",
+        "name": "Single Shield",
         "price": "$189",
-        "per": "per trade",
-        "features": "Full cross-validation\nLC terms check\nEUDR + CBAM screening\nCompliance score + report\nFix recommendations"
+        "per": "per shipment",
+        "features": "Full compliance report\nLC cross-validation (UCP 600)\nEUDR + CBAM screening\nReadiness score + fix recommendations\nSupplier upload link\nTwinLog audit trail"
       },
       "threePack": {
         "name": "3-Pack",
         "price": "$499",
-        "per": "$166.33 per trade",
-        "features": "Everything in Single Check\nSave $68 total\nValid for 12 months\nPriority support"
+        "per": "$166 per shipment",
+        "features": "Everything in Single Shield\nSave $68 total\nValid for 12 months\nPriority support"
       },
       "fivePack": {
         "name": "5-Pack",
         "price": "$799",
-        "per": "$159.80 per trade",
-        "features": "Everything in Single Check\nSave $146 total\nValid for 12 months\nPriority support\nDedicated onboarding"
+        "per": "$160 per shipment",
+        "features": "Everything in Single Shield\nSave $146 total\nValid for 12 months\nPriority support\nDedicated onboarding"
       }
     },
-    "ctaFeatured": "Best Value \u2192",
-    "ctaDefault": "Get Started"
+    "ctaFeatured": "Best Value →",
+    "ctaDefault": "Get Started",
+    "previewBadge": "Free Preview"
   },
 
   "finalCta": {
-    "heading": "Ready to de-risk your next shipment?",
-    "subheading": "Start with a free compliance check. No account required.",
-    "button": "Free Compliance Check \u2192"
+    "heading": "Ready to see what's standing in your way?",
+    "subheading": "Preview compliance requirements for any African commodity corridor. Free.",
+    "button": "Check Your Corridor →"
   },
 
   "footer": {
-    "tagline": "Trade compliance for African commodity corridors.",
-    "copyright": "\u00a9 2026 Fatrao Limited. All rights reserved.",
+    "tagline": "Every document. Every regulation. Every African corridor.",
+    "copyright": "© 2026 Fatrao Limited. All rights reserved.",
     "product": "Product",
-    "freeCheck": "Free Check",
+    "freeCheck": "Free Preview",
     "pricing": "Pricing",
     "lcCheck": "LC Check",
     "company": "Company",

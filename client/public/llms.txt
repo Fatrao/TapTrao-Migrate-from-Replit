@@ -1,0 +1,58 @@
+# TapTrao
+
+> Trade compliance SaaS for commodity traders sourcing from Africa. Check every document, duty, and regulation for any African commodity corridor — before you commit.
+
+## What TapTrao does
+
+- **Compliance checks**: Enter commodity + origin + destination to see every required document, duty rate, and regulatory trigger for that corridor
+- **Regulatory screening**: EUDR (deforestation), CBAM (carbon), SPS (phytosanitary), IUU (fishing), CITES (endangered species), Kimberley Process, Lacey Act, REACH
+- **LC cross-validation**: Upload Letter of Credit terms and trade documents for automated cross-checking against UCP 600 rules
+- **Supplier document collection**: Generate zero-login upload links for suppliers — they see exactly which documents to provide, no account needed
+- **Readiness scoring**: Get a compliance score with specific fix recommendations before shipping
+- **TwinLog audit trail**: Every compliance event recorded with SHA-256 integrity hashing for audit-proof evidence
+- **Regulatory alerts**: Monitor corridors for regulatory changes (EUDR deadlines, duty rate updates, SPS rule changes)
+- **Demurrage calculator**: Estimate port demurrage costs before shipment
+
+## Coverage
+
+- **191 commodities**: cocoa, coffee, cashew nuts, shea butter, sesame seeds, timber, rubber, cotton, gold, diamonds, vanilla, tea, tobacco, palm oil, and 177 more
+- **54 African origin countries**: Ghana, Cote d'Ivoire, Nigeria, Kenya, Tanzania, Ethiopia, Uganda, Cameroon, Senegal, Madagascar, Mozambique, DRC, Rwanda, Burkina Faso, and 40 more
+- **7 destination markets**: EU, UK, USA, Canada, Switzerland, Turkiye, UAE
+
+## Pricing (USD)
+
+- **TapTrao Shield — Single shipment**: $189
+- **3-Pack**: $499 ($166 per shipment)
+- **5-Pack**: $799 ($160 per shipment)
+- **LC-only check**: $49.99 (standalone, without trade credit)
+- **LC check is included free** with every Shield pack
+
+No subscription. No contract. No ERP integration required. Preview any corridor for free on the homepage.
+
+## Who it's for
+
+- Small and mid-size commodity traders importing from Africa who lack dedicated compliance departments
+- Traders who need to understand regulatory requirements before committing to a purchase
+- Importers coordinating with overseas suppliers for missing export/import documents
+- Companies using letters of credit who need document cross-checking and an audit trail
+- Anyone preparing for EUDR (30 Dec 2025) or CBAM (1 Jan 2026) enforcement
+
+## Key regulatory dates
+
+- **EUDR**: Entry into application 30 December 2025 for large/medium operators; 30 June 2026 for micro/small enterprises
+- **CBAM**: Fully operational from 1 January 2026
+- **UK Border Target Operating Model**: Full SPS checks on all food/plant imports
+
+## Official pages
+
+- [Homepage](https://taptrao.com)
+- [Compliance Check](https://taptrao.com/lookup)
+- [LC Document Check](https://taptrao.com/lc-check)
+- [Pricing](https://taptrao.com/pricing)
+- [Blog](https://taptrao.com/blog)
+
+## Company
+
+- **Legal name**: Fatrao Limited
+- **Website**: https://taptrao.com
+- **Contact**: hello@taptrao.com

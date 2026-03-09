@@ -367,6 +367,69 @@ export async function registerRoutes(
     }
   });
 
+  // ── Compliance preview (public, no tokens, no DB write) ──
+  const previewRateLimits = new Map<string, { count: number; resetAt: number }>();
+  app.get("/api/compliance-preview", async (req, res) => {
+    try {
+      const { commodityId, originId, destinationId } = req.query;
+      if (!commodityId || !originId || !destinationId) {
+        return res.status(400).json({ message: "Missing required parameters: commodityId, originId, destinationId" });
+      }
+
+      // Simple IP-based rate limit: 10 requests/minute
+      const ip = req.ip || "unknown";
+      const now = Date.now();
+      const entry = previewRateLimits.get(ip);
+      if (entry && now < entry.resetAt && entry.count >= 10) {
+        return res.status(429).json({ message: "Too many requests. Try again in a minute." });
+      }
+      if (!entry || now > (entry?.resetAt ?? 0)) {
+        previewRateLimits.set(ip, { count: 1, resetAt: now + 60_000 });
+      } else {
+        entry.count++;
+      }
+
+      const result = await runComplianceCheck(
+        commodityId as string,
+        originId as string,
+        destinationId as string
+      );
+
+      // Return preview-safe subset only (no tips, portal guides, or detailed recommendations)
+      res.json({
+        commodity: {
+          name: result.commodity.name,
+          hsCode: result.commodity.hsCode,
+          commodityType: result.commodity.commodityType,
+        },
+        origin: {
+          countryName: result.origin.countryName,
+          iso2: result.origin.iso2,
+        },
+        destination: {
+          countryName: result.destination.countryName,
+          iso2: result.destination.iso2,
+        },
+        triggers: result.triggers,
+        requirementTitles: result.requirements,
+        requirementCount: result.requirements.length,
+        readinessScore: {
+          score: result.readinessScore.score,
+          verdict: result.readinessScore.verdict,
+        },
+        hazards: result.hazards,
+        hasStopFlags: result.stopFlags !== null && Object.keys(result.stopFlags).length > 0,
+      });
+    } catch (error: any) {
+      const msg = error.message || "";
+      if (msg.includes("not found")) {
+        res.status(404).json({ message: msg });
+      } else {
+        res.status(500).json({ message: "Preview check failed" });
+      }
+    }
+  });
+
   app.get("/api/tokens/balance", async (req, res) => {
     try {
       const sessionId = getSessionId(req, res);

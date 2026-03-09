@@ -1139,6 +1139,79 @@ export const leadCaptureSchema = z.object({
   corridorDescription: z.string().optional(),
 });
 
+// ── Prospect Companies (Lead Generation Pipeline) ────────────────
+export const prospectCompanies = pgTable(
+  "prospect_companies",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    companyName: text("company_name").notNull(),
+    countryIso2: varchar("country_iso2", { length: 2 }),
+    addressLine1: text("address_line_1"),
+    addressLine2: text("address_line_2"),
+    addressLine3: text("address_line_3"),
+    addressLine4: text("address_line_4"),
+    addressLine5: text("address_line_5"),
+    postcode: varchar("postcode", { length: 20 }),
+    city: text("city"),
+    companiesHouseNumber: varchar("companies_house_number", { length: 20 }),
+    sicCodes: text("sic_codes").array(),
+    companyStatus: text("company_status"),
+    incorporationDate: date("incorporation_date"),
+    hsCodesImported: text("hs_codes_imported").array(),
+    commodityNames: text("commodity_names").array(),
+    originCountries: text("origin_countries").array(),
+    importYears: integer("import_years").array(),
+    totalImportValueGbp: numeric("total_import_value_gbp", { precision: 14, scale: 2 }),
+    relevanceScore: integer("relevance_score").default(0),
+    commodityTypes: text("commodity_types").array(),
+    isEudrRelevant: boolean("is_eudr_relevant").default(false),
+    isConflictMineral: boolean("is_conflict_mineral").default(false),
+    source: text("source").notNull(),
+    sourceId: text("source_id"),
+    sourceUrl: text("source_url"),
+    website: text("website"),
+    email: text("email"),
+    phone: text("phone"),
+    firstSeenAt: timestamp("first_seen_at").defaultNow().notNull(),
+    lastEnrichedAt: timestamp("last_enriched_at").defaultNow().notNull(),
+    enrichmentSources: text("enrichment_sources").array(),
+    notes: text("notes"),
+    outreachStatus: text("outreach_status").default("new"),
+    outreachDate: timestamp("outreach_date"),
+    outreachNotes: text("outreach_notes"),
+  },
+  (table) => [
+    index("idx_prospect_country").on(table.countryIso2),
+    index("idx_prospect_source").on(table.source),
+    index("idx_prospect_relevance").on(table.relevanceScore),
+    index("idx_prospect_outreach").on(table.outreachStatus),
+    uniqueIndex("idx_prospect_dedup").on(table.companyName, table.countryIso2, table.source),
+  ]
+);
+
+export const marketIntelligence = pgTable(
+  "market_intelligence",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    source: text("source").notNull(),
+    hsCode: varchar("hs_code", { length: 10 }).notNull(),
+    commodityName: text("commodity_name"),
+    originIso2: varchar("origin_iso2", { length: 2 }),
+    destinationIso2: varchar("destination_iso2", { length: 2 }),
+    year: integer("year").notNull(),
+    month: integer("month"),
+    importValueUsd: numeric("import_value_usd", { precision: 16, scale: 2 }),
+    importQuantity: numeric("import_quantity", { precision: 16, scale: 2 }),
+    quantityUnit: text("quantity_unit"),
+    fetchedAt: timestamp("fetched_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_mi_unique").on(table.source, table.hsCode, table.originIso2, table.destinationIso2, table.year, table.month),
+    index("idx_mi_corridor").on(table.originIso2, table.destinationIso2),
+    index("idx_mi_hs").on(table.hsCode),
+  ]
+);
+
 /* ══════════════════════════════════════════════════════════════════
  * Phase 4: Requirement-Driven Document Validation
  * ════════════════════════════════════════════════════════════════ */
