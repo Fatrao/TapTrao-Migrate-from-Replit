@@ -356,15 +356,16 @@ export default function Home() {
                     }}
                   >
                     <option value="" style={{ color: "#333", background: "#fff" }}>{t("hero.commodityPlaceholder")}</option>
-                    {Object.entries(groupedCommodities).map(([type, items]) => (
-                      <optgroup key={type} label={`── ${(TYPE_LABELS[type] || type).toUpperCase()} ──`} style={{ fontWeight: 800, fontStyle: "normal", color: "#0e4e45", background: "#c8ddd2", fontSize: 14, letterSpacing: "0.5px" }}>
-                        {items.map((c) => (
-                          <option key={c.id} value={c.id} style={{ color: "#333", background: "#fff", fontWeight: 400 }}>
-                            {c.name} ({c.hsCode})
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
+                    {Object.entries(groupedCommodities).flatMap(([type, items]) => [
+                      <option key={`hdr-${type}`} disabled style={{ fontWeight: 900, color: "#000", background: "#d4e8db" }}>
+                        {"━━━  " + (TYPE_LABELS[type] || type).toUpperCase() + "  ━━━"}
+                      </option>,
+                      ...items.map((c) => (
+                        <option key={c.id} value={c.id} style={{ color: "#333", background: "#fff", fontWeight: 400 }}>
+                          {"   "}{c.name} ({c.hsCode})
+                        </option>
+                      )),
+                    ])}
                   </select>
 
                   {/* Origin */}
