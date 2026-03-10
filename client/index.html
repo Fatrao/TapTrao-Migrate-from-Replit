@@ -143,8 +143,8 @@ document.head.appendChild(o)}initApollo();</script>
   </head>
   <body>
     <div id="root">
-      <!-- Fallback content for crawlers that don't execute JavaScript -->
-      <div style="max-width:800px;margin:40px auto;padding:0 20px;font-family:system-ui,-apple-system,sans-serif;color:#1b2a22">
+      <!-- Fallback content for crawlers that don't execute JavaScript — hidden until JS fails -->
+      <div id="seo-fallback" style="display:none;max-width:800px;margin:40px auto;padding:0 20px;font-family:system-ui,-apple-system,sans-serif;color:#1b2a22">
         <h1>TapTrao &mdash; Trade Compliance for African Commodity Corridors</h1>
         <p>Check compliance requirements for any commodity corridor from Africa before you commit. 191 commodities. 54 African origins. 7 destinations. Every regulation mapped.</p>
 
@@ -181,6 +181,7 @@ document.head.appendChild(o)}initApollo();</script>
       </div>
     </div>
     <noscript>
+      <style>#seo-fallback{display:block!important}</style>
       <div style="max-width:800px;margin:40px auto;padding:0 20px;font-family:system-ui,sans-serif">
         <h1>TapTrao &mdash; Trade Compliance for African Commodity Corridors</h1>
         <p>TapTrao requires JavaScript to run the interactive compliance checker. Please enable JavaScript or contact <a href="mailto:hello@taptrao.com">hello@taptrao.com</a> for assistance.</p>
