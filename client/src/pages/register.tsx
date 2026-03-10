@@ -17,9 +17,12 @@ export default function Register() {
 
   usePageTitle(t("register.title"));
 
+  // Preserve redirect URL through the auth flow
+  const redirectUrl = new URLSearchParams(window.location.search).get("redirect") || "/dashboard";
+
   // Redirect if already logged in
   if (isAuthenticated) {
-    navigate("/dashboard");
+    navigate(redirectUrl);
     return null;
   }
 
@@ -29,10 +32,10 @@ export default function Register() {
     try {
       const result = await register({ email, password, displayName: displayName || undefined });
       if (result?.needsLogin) {
-        // Account created but auto-login failed — redirect to login page
-        navigate("/login?registered=1");
+        // Account created but auto-login failed — redirect to login page with redirect preserved
+        navigate(`/login?registered=1${redirectUrl !== "/dashboard" ? `&redirect=${encodeURIComponent(redirectUrl)}` : ""}`);
       } else {
-        navigate("/dashboard");
+        navigate(redirectUrl);
       }
     } catch (err: any) {
       const msg = err?.message || t("register.registrationFailed");
@@ -118,7 +121,7 @@ export default function Register() {
 
         <p style={{ fontSize: 15, color: "#888", marginTop: 16, textAlign: "center" }}>
           {t("register.hasAccount")}{" "}
-          <a href="/login" style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none" }}>
+          <a href={`/login${redirectUrl !== "/dashboard" ? `?redirect=${encodeURIComponent(redirectUrl)}` : ""}`} style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none" }}>
             {t("register.logIn")}
           </a>
         </p>

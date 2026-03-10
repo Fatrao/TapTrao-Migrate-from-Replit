@@ -16,8 +16,9 @@ export default function Login() {
   usePageTitle(t("login.title"));
 
   // Redirect if already logged in
+  const redirectUrl = new URLSearchParams(window.location.search).get("redirect") || "/dashboard";
   if (isAuthenticated) {
-    navigate("/dashboard");
+    navigate(redirectUrl);
     return null;
   }
 
@@ -116,7 +117,7 @@ export default function Login() {
 
         <p style={{ fontSize: 15, color: "#888", marginTop: 16, textAlign: "center" }}>
           {t("login.noAccount")}{" "}
-          <a href="/register" style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none" }}>
+          <a href={`/register${redirectUrl !== "/dashboard" ? `?redirect=${encodeURIComponent(redirectUrl)}` : ""}`} style={{ color: "var(--sage)", fontWeight: 600, textDecoration: "none" }}>
             {t("login.createOne")}
           </a>
         </p>

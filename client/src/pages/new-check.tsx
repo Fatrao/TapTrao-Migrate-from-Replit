@@ -423,9 +423,11 @@ export default function NewCheck() {
   const { t: tt } = useTranslation("trades");
   usePageTitle("New Check", "Run a compliance check for your shipment");
 
-  const [commodityId, setCommodityId] = useState("");
-  const [originId, setOriginId] = useState("");
-  const [destinationId, setDestinationId] = useState("");
+  /* Read URL params to pre-fill from landing page "Activate Shield" flow */
+  const urlParams = new URLSearchParams(window.location.search);
+  const [commodityId, setCommodityId] = useState(urlParams.get("commodityId") || "");
+  const [originId, setOriginId] = useState(urlParams.get("originId") || "");
+  const [destinationId, setDestinationId] = useState(urlParams.get("destinationId") || "");
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [, navigate] = useLocation();
 

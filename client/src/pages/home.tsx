@@ -582,7 +582,7 @@ export default function Home() {
 
             <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
               <Link
-                href={`/lookup?commodityId=${commodityId}&originId=${originId}&destinationId=${destinationId}`}
+                href={`/new-check?commodityId=${commodityId}&originId=${originId}&destinationId=${destinationId}`}
                 style={{
                   padding: "14px 32px", borderRadius: 12, border: "none",
                   background: "var(--sage)", color: "#fff",
