@@ -29,7 +29,7 @@ export default function PromoCodeRedeem({ variant = "light" }: { variant?: "ligh
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <div style={{ fontSize: 13, fontWeight: 600, color: isDark ? "rgba(255,255,255,0.6)" : "#555", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: isDark ? "rgba(255,255,255,0.6)" : "#1a1a1a", textTransform: "uppercase", letterSpacing: "0.5px" }}>
         Have a promo code?
       </div>
       <div style={{ display: "flex", gap: 8 }}>
@@ -44,8 +44,8 @@ export default function PromoCodeRedeem({ variant = "light" }: { variant?: "ligh
             fontFamily: "monospace",
             fontSize: 15,
             padding: "9px 12px",
-            background: isDark ? "rgba(255,255,255,0.08)" : "#f5f5f5",
-            border: isDark ? "1px solid rgba(255,255,255,0.15)" : "1px solid #e0e0e0",
+            background: isDark ? "rgba(255,255,255,0.08)" : "#fff",
+            border: isDark ? "1px solid rgba(255,255,255,0.15)" : "2px solid #c0c0c0",
             borderRadius: 8,
             outline: "none",
             color: isDark ? "#fff" : "#333",

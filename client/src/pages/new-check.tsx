@@ -468,9 +468,13 @@ export default function NewCheck() {
     onError: (err: Error) => {
       if (err.message === "Insufficient tokens") setShowTokenModal(true);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/tokens/balance"] });
       queryClient.invalidateQueries({ queryKey: ["/api/lookups/recent"] });
+      // Navigate to the trade detail page for the full view
+      if (data?.lookupId) {
+        navigate(`/trades/${data.lookupId}`);
+      }
     },
   });
 

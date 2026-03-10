@@ -357,7 +357,7 @@ export default function Home() {
                   >
                     <option value="" style={{ color: "#333", background: "#fff" }}>{t("hero.commodityPlaceholder")}</option>
                     {Object.entries(groupedCommodities).map(([type, items]) => (
-                      <optgroup key={type} label={`── ${(TYPE_LABELS[type] || type).toUpperCase()} ──`} style={{ fontWeight: 700, fontStyle: "normal", color: "#1a1a1a", background: "#e8f0ec" }}>
+                      <optgroup key={type} label={`── ${(TYPE_LABELS[type] || type).toUpperCase()} ──`} style={{ fontWeight: 800, fontStyle: "normal", color: "#0e4e45", background: "#c8ddd2", fontSize: 14, letterSpacing: "0.5px" }}>
                         {items.map((c) => (
                           <option key={c.id} value={c.id} style={{ color: "#333", background: "#fff", fontWeight: 400 }}>
                             {c.name} ({c.hsCode})
@@ -946,10 +946,10 @@ export default function Home() {
         {/* Promo Code */}
         <div style={{
           marginTop: 32, maxWidth: 400, marginLeft: "auto", marginRight: "auto",
-          background: "rgba(255,255,255,0.06)", borderRadius: 14, padding: "20px 24px",
-          border: "1px solid rgba(255,255,255,0.1)",
+          background: "#fff", borderRadius: 14, padding: "20px 24px",
+          border: "2px solid #c0c0c0", boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
         }}>
-          <PromoCodeRedeem variant="dark" />
+          <PromoCodeRedeem variant="light" />
         </div>
       </section>
 
