@@ -83,6 +83,11 @@ export default function Register() {
               required
               minLength={8}
             />
+            {password.length > 0 && password.length < 8 && (
+              <span style={{ fontSize: 12, color: "var(--amber)", marginTop: 4, display: "block" }}>
+                {t("register.passwordMinLength")}
+              </span>
+            )}
           </div>
 
           <div className="form-group">
