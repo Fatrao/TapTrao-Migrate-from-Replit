@@ -55,8 +55,8 @@
   "lcCta.includedWithShield": "Included with TapTrao Shield",
   "lcCta.seePlans": "see plans",
 
-  "readiness.title": "Readiness Score",
-  "readiness.unavailable": "Readiness score unavailable",
+  "readiness.title": "Corridor Risk Rating",
+  "readiness.unavailable": "Corridor risk rating unavailable",
   "readiness.lowRisk": "LOW RISK",
   "readiness.attentionNeeded": "ATTENTION NEEDED",
   "readiness.highRiskAction": "HIGH RISK \u2014 ACTION REQUIRED",
@@ -88,7 +88,7 @@
   "demurrage.morePorts_one": "+ {{count}} more port",
   "demurrage.morePorts_other": "+ {{count}} more ports",
   "demurrage.costExplanation": ", if clearance is delayed by ",
-  "demurrage.basedOnReadiness": " (based on your readiness score), a standard 20ft container could cost ",
+  "demurrage.basedOnReadiness": " (based on your corridor risk rating), a standard 20ft container could cost ",
   "demurrage.openFullCalculator": "Open full calculator ({{count}} port{{plural}}) \u2192",
   "demurrage.calculatorLink": "Demurrage Calculator \u2192",
 
@@ -285,7 +285,7 @@
   "newCheck.title": "New Check",
   "newCheck.subtitle": "Choose a check type for your shipment. Each check generates a hash-chained audit record.",
   "newCheck.complianceCheck": "Compliance Check",
-  "newCheck.complianceDesc": "What regulations apply to your shipment? Get duty rates, document requirements, risk assessments, and readiness scores for any commodity corridor.",
+  "newCheck.complianceDesc": "What regulations apply to your shipment? Get duty rates, document requirements, risk assessments, and corridor risk ratings for any commodity corridor.",
   "newCheck.startCheck": "Start Check",
   "newCheck.lcDocCheck": "LC Document Check",
   "newCheck.lcDocDesc": "Do your documents match your LC terms? Cross-check Letter of Credit terms against supplier documents using UCP 600 rules to catch discrepancies before bank presentation.",

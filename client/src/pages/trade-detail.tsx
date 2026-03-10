@@ -1193,6 +1193,27 @@ export default function TradeDetail() {
           </span>
         </div>
 
+        {/* ── REPORT | WORKSPACE TAB TOGGLE ── */}
+        <div style={{
+          display: "inline-flex", background: "rgba(0,0,0,0.04)", borderRadius: 10, padding: 3, marginBottom: 16,
+          border: "1px solid rgba(0,0,0,0.06)",
+        }}>
+          <Link href={`/trades/${tradeId}/report`}>
+            <span style={{
+              padding: "7px 18px", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer",
+              color: "var(--t3)", background: "transparent",
+            }}>
+              {t("report.tabReport")}
+            </span>
+          </Link>
+          <span style={{
+            padding: "7px 18px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "default",
+            background: "#fff", color: "var(--t1)", boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+          }}>
+            {t("report.tabWorkspace")}
+          </span>
+        </div>
+
         {isLoading ? (
           <div className="space-y-2">
             <Skeleton className="h-8 w-64" style={{ background: "rgba(74,124,94,0.06)" }} />

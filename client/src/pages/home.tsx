@@ -7,7 +7,9 @@ import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/analytics";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { Menu, X, Globe, Loader2, AlertTriangle, CheckCircle2, XCircle, Shield, FileCheck, Upload, Bell } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/use-auth";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
 import PromoCodeRedeem from "@/components/promo-code-redeem";
 import type { Commodity, OriginCountry, Destination } from "@shared/schema";
@@ -26,6 +28,10 @@ type CompliancePreview = {
   readinessScore: { score: number; verdict: string };
   hazards: string[];
   hasStopFlags: boolean;
+  buyerDocCount: number;
+  supplierDocCount: number;
+  riskCount: number;
+  cbamTriggered: boolean;
 };
 
 const LOADING_KEYS = ["eudr", "sps", "docs", "duties", "score", "cbam", "cites"] as const;
@@ -39,6 +45,7 @@ const TRIGGER_LABELS: Record<string, string> = {
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useAuth();
+  const isMobile = useIsMobile();
   const { t, i18n } = useTranslation("home");
   const isEn = i18n.language === "en";
 
@@ -434,17 +441,15 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ═══ CORRIDOR RESULT — Pain + Relief ═══ */}
+      {/* ═══ CORRIDOR RESULT — Risk Briefing ═══ */}
       {phase === "result" && preview && (
         <div ref={resultRef} className="hp-result-section" style={{
           margin: "0 40px", animation: "fadeInUp 0.5s ease both",
         }}>
-          {/* Pain card */}
+          {/* Risk briefing card */}
           <div style={{
             background: "#fff", borderRadius: 20, padding: "40px 48px",
-            boxShadow: "var(--shd)", marginBottom: 0,
-            borderBottom: "1px solid rgba(0,0,0,0.06)",
-            borderBottomLeftRadius: 0, borderBottomRightRadius: 0,
+            boxShadow: "var(--shd)", marginBottom: 40,
           }}>
             {/* Corridor header */}
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
@@ -463,9 +468,50 @@ export default function Home() {
               </span>
             </div>
 
+            {/* Risk-led headline */}
             <h3 style={{ fontFamily: "var(--fd)", fontSize: 22, fontWeight: 600, marginBottom: 20, color: "var(--t1)" }}>
-              {t("pain.heading")}
+              {t("pain.heading", { count: preview.riskCount })}
             </h3>
+
+            {/* Two prominent number cards: buyer docs + supplier docs */}
+            <div className="hp-doc-count-cards" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
+              <div style={{
+                background: "rgba(0,0,0,0.03)", borderRadius: 12, padding: "16px 20px",
+                border: "1px solid rgba(0,0,0,0.06)",
+              }}>
+                <div style={{ fontFamily: "var(--fd)", fontSize: 28, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>
+                  {preview.buyerDocCount}
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: "var(--t3)" }}>
+                  {t("pain.buyerDocs")}
+                </div>
+              </div>
+              <div style={{
+                background: "rgba(0,0,0,0.03)", borderRadius: 12, padding: "16px 20px",
+                border: "1px solid rgba(0,0,0,0.06)",
+              }}>
+                <div style={{ fontFamily: "var(--fd)", fontSize: 28, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>
+                  {preview.supplierDocCount}
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: "var(--t3)" }}>
+                  {t("pain.supplierDocs")}
+                </div>
+              </div>
+            </div>
+
+            {/* CBAM explicit callout */}
+            {preview.cbamTriggered && (
+              <div style={{
+                display: "flex", alignItems: "flex-start", gap: 10, padding: "14px 18px",
+                background: "var(--amber-pale)", borderRadius: 10, marginBottom: 16,
+                borderLeft: "3px solid var(--amber)",
+              }}>
+                <AlertTriangle size={18} style={{ color: "var(--amber)", flexShrink: 0, marginTop: 1 }} />
+                <span style={{ fontSize: 14, fontWeight: 500, color: "var(--t1)", lineHeight: 1.5 }}>
+                  {t("pain.cbamCallout")}
+                </span>
+              </div>
+            )}
 
             {/* Stop flags warning */}
             {preview.hasStopFlags && (
@@ -531,7 +577,7 @@ export default function Home() {
             )}
 
             {/* Triggers + Score row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap", marginBottom: 28 }}>
               {activeTriggers.length > 0 && (
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 0.5 }}>
@@ -559,53 +605,96 @@ export default function Home() {
                 </span>
               </div>
             </div>
-          </div>
 
-          {/* Relief card */}
-          <div style={{
-            background: "rgba(74,124,94,0.04)", borderRadius: 20, padding: "36px 48px",
-            border: "1px solid rgba(74,124,94,0.12)",
-            borderTopLeftRadius: 0, borderTopRightRadius: 0,
-            marginBottom: 40,
-          }}>
-            <h3 style={{ fontFamily: "var(--fd)", fontSize: 20, fontWeight: 600, marginBottom: 20, color: "var(--sage)" }}>
-              {t("relief.heading")}
-            </h3>
-            <div className="hp-pain-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 32px", marginBottom: 28 }}>
-              {(["line1", "line2", "line3", "line4"] as const).map((key) => (
-                <div key={key} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                  <CheckCircle2 size={18} style={{ color: "var(--sage)", marginTop: 1, flexShrink: 0 }} />
-                  <span style={{ fontSize: 15, color: "var(--t2)", lineHeight: 1.5 }}>{t(`relief.${key}`)}</span>
-                </div>
-              ))}
-            </div>
-
+            {/* CTA section with tooltip */}
             <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-              <Link
-                href={`/new-check?commodityId=${commodityId}&originId=${originId}&destinationId=${destinationId}`}
-                style={{
-                  padding: "14px 32px", borderRadius: 12, border: "none",
-                  background: "var(--sage)", color: "#fff",
-                  fontFamily: "var(--fb)", fontSize: 16, fontWeight: 700,
-                  cursor: "pointer", boxShadow: "0 4px 16px rgba(74,124,94,.3)",
-                  textDecoration: "none", display: "inline-block",
-                }}
-                onClick={() => trackEvent("corridor_check_cta_clicked", { source: "relief" })}
-              >
-                {t("relief.cta")} &rarr;
-              </Link>
+              {isMobile ? (
+                /* Mobile: button + inline tooltip content */
+                <Link
+                  href={`/new-check?commodityId=${commodityId}&originId=${originId}&destinationId=${destinationId}`}
+                  style={{
+                    padding: "14px 32px", borderRadius: 12, border: "none",
+                    background: "var(--sage)", color: "#fff",
+                    fontFamily: "var(--fb)", fontSize: 16, fontWeight: 700,
+                    cursor: "pointer", boxShadow: "0 4px 16px rgba(74,124,94,.3)",
+                    textDecoration: "none", display: "inline-block",
+                  }}
+                  onClick={() => trackEvent("corridor_check_cta_clicked", { source: "risk_briefing" })}
+                >
+                  {t("pain.cta")} &rarr;
+                </Link>
+              ) : (
+                /* Desktop: hover tooltip */
+                <Tooltip delayDuration={100}>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href={`/new-check?commodityId=${commodityId}&originId=${originId}&destinationId=${destinationId}`}
+                      style={{
+                        padding: "14px 32px", borderRadius: 12, border: "none",
+                        background: "var(--sage)", color: "#fff",
+                        fontFamily: "var(--fb)", fontSize: 16, fontWeight: 700,
+                        cursor: "pointer", boxShadow: "0 4px 16px rgba(74,124,94,.3)",
+                        textDecoration: "none", display: "inline-block",
+                      }}
+                      onClick={() => trackEvent("corridor_check_cta_clicked", { source: "risk_briefing" })}
+                    >
+                      {t("pain.cta")} &rarr;
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="top"
+                    align="start"
+                    sideOffset={12}
+                    style={{
+                      background: "#1b2a22", color: "#fff",
+                      minWidth: 320, maxWidth: 420, padding: 24,
+                      borderRadius: 14, border: "none",
+                      boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+                    }}
+                  >
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#eab308", marginBottom: 14 }}>
+                      {t("pain.tooltipHeader")}
+                    </div>
+                    {([1,2,3,4,5,6] as const).map(n => (
+                      <div key={n} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
+                        <span style={{ color: "#eab308", fontWeight: 700, flexShrink: 0, fontSize: 14, lineHeight: 1.6 }}>✓</span>
+                        <span style={{ fontSize: 14, fontWeight: 500, lineHeight: 1.6, color: "rgba(255,255,255,0.92)" }}>
+                          {t(`pain.tooltipItem${n}`)}
+                        </span>
+                      </div>
+                    ))}
+                  </TooltipContent>
+                </Tooltip>
+              )}
               <button onClick={resetChecker} style={{
                 padding: "14px 24px", borderRadius: 12,
                 background: "none", border: "1px solid rgba(0,0,0,0.12)",
                 color: "var(--t2)", fontFamily: "var(--fb)", fontSize: 15, fontWeight: 500,
                 cursor: "pointer",
               }}>
-                {t("relief.ctaAnother")}
+                {t("pain.ctaAnother")}
               </button>
             </div>
-            <p style={{ fontSize: 13, color: "var(--t3)", marginTop: 12, lineHeight: 1.6 }}>
-              {t("relief.ctaSub")}
-            </p>
+
+            {/* Mobile: show tooltip content inline below button */}
+            {isMobile && (
+              <div style={{
+                background: "#1b2a22", color: "#fff",
+                padding: 20, borderRadius: 14, marginTop: 20,
+              }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#eab308", marginBottom: 14 }}>
+                  {t("pain.tooltipHeader")}
+                </div>
+                {([1,2,3,4,5,6] as const).map(n => (
+                  <div key={n} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
+                    <span style={{ color: "#eab308", fontWeight: 700, flexShrink: 0, fontSize: 14, lineHeight: 1.6 }}>✓</span>
+                    <span style={{ fontSize: 14, fontWeight: 500, lineHeight: 1.6, color: "rgba(255,255,255,0.92)" }}>
+                      {t(`pain.tooltipItem${n}`)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

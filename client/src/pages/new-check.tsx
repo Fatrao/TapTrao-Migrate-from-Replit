@@ -473,9 +473,9 @@ export default function NewCheck() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/tokens/balance"] });
       queryClient.invalidateQueries({ queryKey: ["/api/lookups/recent"] });
-      // Navigate to the trade detail page for the full view
+      // Navigate to the full report view (risk briefing) after payment
       if (data?.lookupId) {
-        navigate(`/trades/${data.lookupId}`);
+        navigate(`/trades/${data.lookupId}/report`);
       }
     },
   });

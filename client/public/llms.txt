@@ -4,7 +4,7 @@
 
 ## What TapTrao does
 
-- **Free Corridor Preview**: Users can enter their trade corridor on the homepage to instantly see a compliance readiness score and the first 3 regulatory requirements for free. Unlocking the full checklist, supplier messaging, and audit tools requires Shield.
+- **Free Corridor Preview**: Users can enter their trade corridor on the homepage to instantly see a corridor risk rating and the first 3 regulatory requirements for free. Unlocking the full checklist, supplier messaging, and audit tools requires Shield.
 - **Pre-shipment compliance requirements**: Identifies every document, duty rate, and regulatory trigger needed before purchase or shipment. Covers EUDR, CBAM, SPS, IUU, CITES, Kimberley Process, Lacey Act, REACH, Section 232, FSIS, and Conflict Minerals.
 - **EUDR due diligence**: Automated due diligence statements for EU Deforestation Regulation reporting, including geolocation data capture.
 - **Supplier document requests**: Generate zero-login upload links for suppliers — they see exactly which documents to provide from their phone, no account needed.
@@ -12,7 +12,7 @@
 - **TwinLog audit trail**: Every compliance event recorded with SHA-256 integrity hashing for audit-proof evidence records.
 - **Trade templates**: Save and reuse compliance corridors with automatic stale-detection when regulations change.
 - **Regulatory alerts**: Monitor up to 3 corridors for regulatory changes (EUDR deadlines, duty rate updates, SPS rule changes).
-- **Demurrage calculator**: Estimate port demurrage costs based on destination and readiness verdict.
+- **Demurrage calculator**: Estimate port demurrage costs based on destination and corridor risk verdict.
 
 ## Coverage
 
@@ -81,4 +81,4 @@ No subscription. No contract. No ERP integration required. No account needed —
 
 - **TwinLog hashing**: SHA-256 cryptographic hashing for immutable, audit-proof compliance history.
 - **LC cross-check**: Aligns with UCP 600 and ISBP standards for Letter of Credit document validation.
-- **Readiness scoring**: 0–100 score based on regulatory complexity, hazard exposure, document volume, and trade restrictions.
+- **Corridor risk rating**: 0–100 score based on regulatory complexity, hazard exposure, document volume, and trade restrictions.

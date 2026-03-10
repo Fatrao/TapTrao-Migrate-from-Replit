@@ -421,6 +421,11 @@ export async function registerRoutes(
         },
         hazards: result.hazards,
         hasStopFlags: result.stopFlags !== null && Object.keys(result.stopFlags).length > 0,
+        // UX Rebuild: risk-led preview data
+        buyerDocCount: result.requirementsDetailed.filter(r => !r.isSupplierSide).length,
+        supplierDocCount: result.requirementsDetailed.filter(r => r.isSupplierSide).length,
+        riskCount: Object.values(result.triggers).filter(Boolean).length + (result.stopFlags ? Object.keys(result.stopFlags).length : 0),
+        cbamTriggered: !!result.triggers.cbam,
       });
     } catch (error: any) {
       const msg = error.message || "";

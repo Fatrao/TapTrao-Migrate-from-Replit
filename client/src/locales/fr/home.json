@@ -21,29 +21,30 @@
       "sps": "Vérification des règles phytosanitaires...",
       "docs": "Construction de la liste de documents...",
       "duties": "Calcul des droits de douane...",
-      "score": "Calcul du score de conformité...",
+      "score": "Calcul de l'indice de risque du corridor...",
       "cbam": "Analyse des exigences CBAM...",
       "cites": "Vérification des obligations CITES..."
     }
   },
 
   "pain": {
-    "heading": "Pour dédouaner cette expédition, il vous faut :",
+    "heading": "Votre expédition présente {{count}} risques pouvant retarder ou bloquer le dédouanement.",
     "triggers": "Déclencheurs réglementaires :",
-    "readinessLabel": "Score de conformité",
+    "readinessLabel": "Indice de risque du corridor",
     "hazards": "Risques connus :",
     "stopFlags": "Stop — ce corridor a des restrictions bloquantes",
-    "andMore": "et {{count}} de plus"
-  },
-
-  "relief": {
-    "heading": "Activez Shield pour gérer cette expédition",
-    "line1": "Téléchargez et suivez chaque document jusqu'au dédouanement",
-    "line2": "Demandez les documents manquants à vos fournisseurs via des liens d'envoi",
-    "line3": "Validez croisément votre LC contre les règles UCP 600",
-    "line4": "Générez des dossiers de preuve d'audit TwinLog",
-    "cta": "Activer Shield — 189 $",
-    "ctaSub": "Shield reste actif jusqu'au dédouanement. Inclut la liste complète des documents, les demandes fournisseurs, la vérification LC, l'analyse des risques et la piste d'audit.",
+    "andMore": "et {{count}} de plus",
+    "buyerDocs": "Documents acheteur requis",
+    "supplierDocs": "Documents fournisseur requis",
+    "cbamCallout": "Le CBAM s'applique — déclaration carbone requise avant l'importation. Il s'agit d'une obligation financière, pas d'une formalité documentaire.",
+    "tooltipHeader": "Ce que TapTrao Shield vous apporte",
+    "tooltipItem1": "Tous les documents nécessaires à votre expédition — côté acheteur et côté fournisseur — au même endroit",
+    "tooltipItem2": "Envoyez des demandes de documents directement à votre fournisseur depuis la plateforme — pas d'emails, pas de WhatsApp",
+    "tooltipItem3": "Suivez chaque soumission — voyez ce qui a été envoyé, validé et ce qui manque encore",
+    "tooltipItem4": "Surveillance réglementaire — CBAM, EUDR, SPS expliqués en langage clair avec l'exposition financière en termes monétaires",
+    "tooltipItem5": "Exposition aux droits et surestaries — connaissez votre coût maximal avant que l'expédition ne parte",
+    "tooltipItem6": "Piste d'audit TwinLog — un enregistrement horodaté de chaque action, chaque document, chaque vérification. Votre preuve de diligence raisonnable",
+    "cta": "Obtenir mon rapport de conformité complet",
     "ctaAnother": "Vérifier un autre corridor"
   },
 
@@ -225,7 +226,7 @@
         "name": "Shield unique",
         "price": "189 $",
         "per": "par expédition",
-        "features": "Rapport de conformité complet\nValidation croisée LC (UCP 600)\nContrôle EUDR + CBAM\nScore de conformité + recommandations\nLien d'envoi fournisseur\nPiste d'audit TwinLog"
+        "features": "Rapport de conformité complet\nValidation croisée LC (UCP 600)\nContrôle EUDR + CBAM\nIndice de risque du corridor + recommandations\nLien d'envoi fournisseur\nPiste d'audit TwinLog"
       },
       "threePack": {
         "name": "Pack 3",

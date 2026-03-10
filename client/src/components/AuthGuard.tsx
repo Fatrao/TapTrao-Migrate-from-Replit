@@ -13,7 +13,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate(`/login?redirect=${encodeURIComponent(location)}`);
+      // Use window.location to preserve query params (wouter's location is pathname only)
+      const fullPath = window.location.pathname + window.location.search;
+      navigate(`/login?redirect=${encodeURIComponent(fullPath)}`);
     }
   }, [isLoading, isAuthenticated, location, navigate]);
 

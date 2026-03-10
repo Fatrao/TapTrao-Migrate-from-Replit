@@ -278,7 +278,7 @@
   "twinlog.lcCheckResults": "LC check results",
   "twinlog.supplierDocuments": "Supplier documents",
   "twinlog.receivedCount": "{{received}}/{{total}} received",
-  "twinlog.readinessScore": "Readiness score",
+  "twinlog.readinessScore": "Corridor risk rating",
   "twinlog.scoreValue": "Score: {{score}}",
   "twinlog.statusLocked": "Locked",
   "twinlog.copyFullHash": "Copy full hash",

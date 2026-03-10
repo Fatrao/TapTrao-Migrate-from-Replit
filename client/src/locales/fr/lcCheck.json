@@ -258,7 +258,7 @@
   "twinlog.lcCheckResults": "Résultats de vérification LC",
   "twinlog.supplierDocuments": "Documents fournisseur",
   "twinlog.receivedCount": "{{received}}/{{total}} reçus",
-  "twinlog.readinessScore": "Score de préparation",
+  "twinlog.readinessScore": "Indice de risque du corridor",
   "twinlog.scoreValue": "Score : {{score}}",
   "twinlog.statusLocked": "Verrouillé",
   "twinlog.copyFullHash": "Copier l'empreinte complète",

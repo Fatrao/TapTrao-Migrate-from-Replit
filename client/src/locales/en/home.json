@@ -21,29 +21,30 @@
       "sps": "Verifying phytosanitary rules...",
       "docs": "Building document checklist...",
       "duties": "Calculating duty rates...",
-      "score": "Computing readiness score...",
+      "score": "Computing corridor risk rating...",
       "cbam": "Screening CBAM requirements...",
       "cites": "Checking CITES obligations..."
     }
   },
 
   "pain": {
-    "heading": "To clear this shipment, you need:",
+    "heading": "Your shipment has {{count}} risks that could delay or block clearance.",
     "triggers": "Regulatory triggers:",
-    "readinessLabel": "Readiness Score",
+    "readinessLabel": "Corridor Risk Rating",
     "hazards": "Known hazards:",
     "stopFlags": "Stop — this corridor has blocking restrictions",
-    "andMore": "and {{count}} more"
-  },
-
-  "relief": {
-    "heading": "Activate Shield to manage this shipment",
-    "line1": "Upload and track every document until customs clearance",
-    "line2": "Request missing documents from suppliers via upload links",
-    "line3": "Cross-validate your LC against UCP 600 rules",
-    "line4": "Generate audit-ready TwinLog evidence records",
-    "cta": "Activate Shield — $189",
-    "ctaSub": "Shield stays active until this shipment clears. Includes full document checklist, supplier requests, LC cross-check, risk analytics, and audit trail.",
+    "andMore": "and {{count}} more",
+    "buyerDocs": "Buyer documents required",
+    "supplierDocs": "Supplier documents required",
+    "cbamCallout": "CBAM applies — carbon declaration required before import. This is a financial obligation, not a document formality.",
+    "tooltipHeader": "What you get with TapTrao Shield",
+    "tooltipItem1": "Every document your shipment needs — buyer side and supplier side — in one place",
+    "tooltipItem2": "Send document requests directly to your supplier from the platform — no emails, no WhatsApp",
+    "tooltipItem3": "Track every submission — see what's been sent, what's been validated, what's still missing",
+    "tooltipItem4": "Regulatory risk monitoring — CBAM, EUDR, SPS flags explained in plain language with financial exposure in money terms",
+    "tooltipItem5": "Duty and demurrage exposure — know your worst-case cost before the shipment moves",
+    "tooltipItem6": "TwinLog audit trail — a timestamped compliance record of every action, every document, every check. Your proof of due diligence",
+    "cta": "Get my full compliance report",
     "ctaAnother": "Check another corridor"
   },
 
@@ -225,7 +226,7 @@
         "name": "Single Shield",
         "price": "$189",
         "per": "per shipment",
-        "features": "Full compliance report\nLC cross-validation (UCP 600)\nEUDR + CBAM screening\nReadiness score + fix recommendations\nSupplier upload link\nTwinLog audit trail"
+        "features": "Full compliance report\nLC cross-validation (UCP 600)\nEUDR + CBAM screening\nCorridor risk rating + fix recommendations\nSupplier upload link\nTwinLog audit trail"
       },
       "threePack": {
         "name": "3-Pack",
