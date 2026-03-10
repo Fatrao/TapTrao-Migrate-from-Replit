@@ -9,6 +9,7 @@ import { usePageTitle } from "@/hooks/use-page-title";
 import { Menu, X, Globe, Loader2, AlertTriangle, CheckCircle2, XCircle, Shield, FileCheck, Upload, Bell } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
+import PromoCodeRedeem from "@/components/promo-code-redeem";
 import type { Commodity, OriginCountry, Destination } from "@shared/schema";
 
 /* ═══════════════════════════════════════════
@@ -356,9 +357,9 @@ export default function Home() {
                   >
                     <option value="" style={{ color: "#333", background: "#fff" }}>{t("hero.commodityPlaceholder")}</option>
                     {Object.entries(groupedCommodities).map(([type, items]) => (
-                      <optgroup key={type} label={TYPE_LABELS[type] || type} style={{ color: "#333", background: "#fff" }}>
+                      <optgroup key={type} label={`── ${(TYPE_LABELS[type] || type).toUpperCase()} ──`} style={{ fontWeight: 700, fontStyle: "normal", color: "#1a1a1a", background: "#e8f0ec" }}>
                         {items.map((c) => (
-                          <option key={c.id} value={c.id} style={{ color: "#333", background: "#fff" }}>
+                          <option key={c.id} value={c.id} style={{ color: "#333", background: "#fff", fontWeight: 400 }}>
                             {c.name} ({c.hsCode})
                           </option>
                         ))}
@@ -940,6 +941,15 @@ export default function Home() {
               </button>
             </div>
           ))}
+        </div>
+
+        {/* Promo Code */}
+        <div style={{
+          marginTop: 32, maxWidth: 400, marginLeft: "auto", marginRight: "auto",
+          background: "rgba(255,255,255,0.06)", borderRadius: 14, padding: "20px 24px",
+          border: "1px solid rgba(255,255,255,0.1)",
+        }}>
+          <PromoCodeRedeem variant="dark" />
         </div>
       </section>
 

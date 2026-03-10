@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/use-auth";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { AppShell } from "@/components/AppShell";
+import PromoCodeRedeem from "@/components/promo-code-redeem";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -121,6 +122,10 @@ export default function Register() {
             {t("register.logIn")}
           </a>
         </p>
+
+        <div style={{ borderTop: "1px solid #eee", marginTop: 20, paddingTop: 20 }}>
+          <PromoCodeRedeem />
+        </div>
       </div>
     </AppShell>
   );

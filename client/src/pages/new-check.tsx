@@ -6,7 +6,7 @@
  * Shows: form → stepper → full pre-shipment report with doc boxes,
  * readiness score, duty estimate, demurrage, actions, and trade-created banner.
  */
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
@@ -17,6 +17,7 @@ import { AppShell } from "@/components/AppShell";
 import { StepNav } from "@/components/StepNav";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  SelectGroup, SelectLabel,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import CountryFlagBadge, { iso2ToFlag } from "@/components/CountryFlagBadge";
@@ -437,6 +438,24 @@ export default function NewCheck() {
   const isLoading = loadingCommodities || loadingOrigins || loadingDestinations;
   const canSubmit = commodityId && originId && destinationId;
 
+  const TYPE_LABELS: Record<string, string> = {
+    agricultural: "Agricultural", mineral: "Mineral", forestry: "Forestry",
+    seafood: "Seafood", livestock: "Livestock", manufactured: "Manufactured", other: "Other",
+  };
+  const groupedCommodities = useMemo(() => {
+    if (!commoditiesData) return {};
+    const groups: Record<string, typeof commoditiesData> = {};
+    for (const c of commoditiesData) {
+      const type = c.commodityType || "other";
+      if (!groups[type]) groups[type] = [];
+      groups[type].push(c);
+    }
+    for (const type of Object.keys(groups)) {
+      groups[type].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    return groups;
+  }, [commoditiesData]);
+
   const complianceMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/compliance-check", { commodityId, originId, destinationId });
@@ -487,8 +506,15 @@ export default function NewCheck() {
                     <Select value={commodityId} onValueChange={setCommodityId}>
                       <SelectTrigger data-testid="select-commodity"><SelectValue placeholder={t("form.commodityPlaceholder")} /></SelectTrigger>
                       <SelectContent>
-                        {commoditiesData?.map(c => (
-                          <SelectItem key={c.id} value={c.id}>{translateCommodity(c.name, lang)} (HS {c.hsCode})</SelectItem>
+                        {Object.entries(groupedCommodities).map(([type, items]) => (
+                          <SelectGroup key={type}>
+                            <SelectLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-2 py-1.5">
+                              {TYPE_LABELS[type] || type}
+                            </SelectLabel>
+                            {items.map(c => (
+                              <SelectItem key={c.id} value={c.id}>{translateCommodity(c.name, lang)} (HS {c.hsCode})</SelectItem>
+                            ))}
+                          </SelectGroup>
                         ))}
                       </SelectContent>
                     </Select>
