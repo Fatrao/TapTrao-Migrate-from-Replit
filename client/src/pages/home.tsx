@@ -346,7 +346,11 @@ export default function Home() {
                   {/* Commodity */}
                   <select
                     value={commodityId}
-                    onChange={(e) => setCommodityId(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val.startsWith("__hdr__")) { e.target.value = commodityId; return; }
+                      setCommodityId(val);
+                    }}
                     style={{
                       flex: 1, padding: "12px 14px", borderRadius: 10,
                       border: "none", background: "var(--sage)",
@@ -357,7 +361,7 @@ export default function Home() {
                   >
                     <option value="" style={{ color: "#333", background: "#fff" }}>{t("hero.commodityPlaceholder")}</option>
                     {Object.entries(groupedCommodities).flatMap(([type, items]) => [
-                      <option key={`hdr-${type}`} disabled style={{ fontWeight: 900, color: "#000", background: "#d4e8db" }}>
+                      <option key={`hdr-${type}`} value={`__hdr__${type}`} style={{ fontWeight: 900, color: "#0e4e45", background: "#c8ddd2", fontSize: "14px" }}>
                         {"━━━  " + (TYPE_LABELS[type] || type).toUpperCase() + "  ━━━"}
                       </option>,
                       ...items.map((c) => (
