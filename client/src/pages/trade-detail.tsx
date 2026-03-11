@@ -52,6 +52,7 @@ import { iso2ToFlag } from "@/components/CountryFlagBadge";
 import { estimateDemurrageRange } from "@/lib/demurrage-utils";
 import { translateCommodity } from "@/lib/commodity-i18n";
 import { calculateTradeRisk } from "@/lib/risk-utils";
+import "@/styles/single-trade.css";
 
 /* ── Map common country/region names to ISO2 for flag display ── */
 const nameToIso2: Record<string, string> = {
@@ -1168,952 +1169,449 @@ export default function TradeDetail() {
 
   if (!match) return null;
 
+  // ── Derived data ──
+  const lookup = data?.lookup;
+  const result = lookup?.resultJson;
+  const spsFlagged = result?.triggers?.sps === true;
+  const lcFlagged = data?.latestLcCheck?.verdict === "DISCREPANCIES_FOUND";
+  const dailyRate = lookup?.demurrageDailyRate ? Number(lookup.demurrageDailyRate) : null;
+  const risk = lookup ? calculateTradeRisk({ readinessScore: lookup.readinessScore, dailyRate, spsFlagged, lcFlagged }) : null;
+  const destIso2 = lookup ? nameToIso2[lookup.destinationName] : undefined;
+  const verdict = lookup?.readinessVerdict as "GREEN" | "AMBER" | "RED" | undefined;
+  const demEstimate = destIso2 ? estimateDemurrageRange(destIso2, verdict || "AMBER") : null;
+  const tradeVal = lookup?.tradeValue ? Number(lookup.tradeValue) : 0;
+  const pctOfCargo = tradeVal > 0 && demEstimate ? ((demEstimate.maxCost / tradeVal) * 100).toFixed(1) : null;
+
+  const LC_STEPS = ["active", "in_transit", "arrived", "cleared", "closed"];
+  const LC_LABELS: Record<string, string> = { active: "Active", in_transit: "In Transit", arrived: "Arrived", cleared: "Cleared", closed: "Closed" };
+  const lcIndex = data ? LC_STEPS.indexOf(data.tradeStatus) : 0;
+
+  const eudr = data?.eudrRecord;
+  const eudrAssessment = data?.eudrAssessment;
+  const cbamAssessment = data?.cbamAssessment;
+
+  const scoreColor = verdict === "RED" ? "#f08878" : verdict === "AMBER" ? "#f0bc6e" : "#8de0b8";
+  const scoreClass = verdict === "RED" ? "red" : verdict === "AMBER" ? "amber" : "";
+
   return (
-    <AppShell>
-      {/* Green hero */}
-      <div className="green-hero" style={{ margin: "4px 24px 16px" }}>
-        <div style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 6,
-          background: "rgba(0,0,0,0.04)",
-          borderRadius: 20,
-          padding: "5px 14px",
-          fontSize: 15,
-          color: "var(--t3)",
-          marginBottom: 14,
-          letterSpacing: "0.03em",
-        }}>
-          <Link href="/trades" style={{ color: "var(--t3)", textDecoration: "none" }}>
-            {t("detail.breadcrumb")}
-          </Link>
-          <ChevronRight size={12} />
-          <span style={{ color: "var(--t1)" }}>
-            {isLoading ? t("detail.loading") : (data?.lookup?.commodityName ? translateCommodity(data.lookup.commodityName, lang) : t("detail.pageTitle"))}
-          </span>
+    <AppShell contentClassName="stp">
+      {isLoading ? (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#8a9a8c" }}>
+          <Loader2 className="w-6 h-6 animate-spin" />
         </div>
-
-        {/* ── REPORT | WORKSPACE TAB TOGGLE ── */}
-        <div style={{
-          display: "inline-flex", background: "rgba(0,0,0,0.04)", borderRadius: 10, padding: 3, marginBottom: 16,
-          border: "1px solid rgba(0,0,0,0.06)",
-        }}>
-          <Link href={`/trades/${tradeId}/report`}>
-            <span style={{
-              padding: "7px 18px", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer",
-              color: "var(--t3)", background: "transparent",
-            }}>
-              {t("report.tabReport")}
-            </span>
+      ) : error || !data ? (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: 12 }}>
+          <XCircle className="w-8 h-8" style={{ color: "#ef4444" }} />
+          <p style={{ fontSize: 14, color: "#8a9a8c" }}>{t("detail.notFoundDescription")}</p>
+          <Link href="/trades">
+            <button className="stp-btn-outline-light" style={{ color: "#8a9a8c", borderColor: "#8a9a8c" }}>{t("detail.backToTrades")}</button>
           </Link>
-          <span style={{
-            padding: "7px 18px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "default",
-            background: "#fff", color: "var(--t1)", boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
-          }}>
-            {t("report.tabWorkspace")}
-          </span>
         </div>
-
-        {isLoading ? (
-          <div className="space-y-2">
-            <Skeleton className="h-8 w-64" style={{ background: "rgba(74,124,94,0.06)" }} />
-            <Skeleton className="h-4 w-48" style={{ background: "rgba(0,0,0,0.03)" }} />
-          </div>
-        ) : data ? (
-          <>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-              <h1 style={{
-                fontFamily: "'Clash Display', sans-serif",
-                fontWeight: 700,
-                fontSize: 28,
-                color: "var(--t1)",
-                margin: 0,
-              }}>
-                {translateCommodity(data.lookup.commodityName, lang)}
-              </h1>
-
-              {/* Status badge */}
-              {(() => {
-                const cfg = statusConfig[data.tradeStatus] || statusConfig.active;
-                return (
-                  <Badge style={{
-                    background: cfg.bg,
-                    color: cfg.text,
-                    border: "none",
-                    fontSize: 15,
-                    fontWeight: 600,
-                    padding: "3px 10px",
-                  }}>
-                    {t(cfg.labelKey)}
-                  </Badge>
-                );
-              })()}
-
-              {/* Readiness score badge */}
-              {data.lookup.readinessScore != null && (
-                <Badge style={{
-                  background: "rgba(74,124,94,0.06)",
-                  color: "var(--t1)",
-                  border: "1px solid rgba(0,0,0,0.08)",
-                  fontSize: 15,
-                  fontWeight: 600,
-                  padding: "3px 10px",
-                }}>
-                  {t("detail.scoreLabel", { score: data.lookup.readinessScore })}
-                </Badge>
-              )}
+      ) : (
+        <>
+          {/* ── DARK HEADER ── */}
+          <div className="stp-header">
+            <div className="stp-bc">
+              <Link href="/trades"><a>{t("detail.breadcrumb")}</a></Link>
+              <span className="stp-bc-sep">›</span>
+              <span className="stp-bc-cur">{translateCommodity(data.lookup.commodityName, lang)}</span>
+              <div className="stp-bc-actions">
+                <Link href={`/trades/${tradeId}/report`}>
+                  <button className="stp-btn-outline-light">{t("report.tabReport")}</button>
+                </Link>
+                <button className="stp-btn-light-fill">{t("report.tabWorkspace")}</button>
+              </div>
             </div>
 
-            <p style={{
-              fontSize: 15,
-              color: "var(--t3)",
-              margin: "6px 0 0",
-            }}>
-              {nameFlag(data.lookup.originName)} {data.lookup.originName}
-              {" → "}
-              {nameFlag(data.lookup.destinationName)} {data.lookup.destinationName}
-              {data.lookup.hsCode && (
-                <span style={{ marginLeft: 10, fontFamily: "monospace", fontSize: 15, color: "var(--t3)" }}>
-                  HS {data.lookup.hsCode}
-                </span>
-              )}
-            </p>
-          </>
-        ) : error ? (
-          <h1 style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 28, color: "#ef4444", margin: 0 }}>
-            {t("detail.notFound")}
-          </h1>
-        ) : null}
-      </div>
+            <div className="stp-title-row">
+              <div>
+                <div className="stp-title">{translateCommodity(data.lookup.commodityName, lang)}</div>
+                <div className="stp-corridor">
+                  {nameFlag(data.lookup.originName)} {data.lookup.originName} → {nameFlag(data.lookup.destinationName)} {data.lookup.destinationName}
+                </div>
+                <div className="stp-tags">
+                  <span className="stp-tag stp-tag-active">{t(statusConfig[data.tradeStatus]?.labelKey || "detail.status.active")}</span>
+                  {data.lookup.readinessScore != null && (
+                    <span className="stp-tag stp-tag-score">Score: {data.lookup.readinessScore}/100</span>
+                  )}
+                  {data.lookup.hsCode && (
+                    <span className="stp-tag stp-tag-hs">HS {data.lookup.hsCode}</span>
+                  )}
+                </div>
+              </div>
+            </div>
 
-      {isLoading ? (
-        <div style={{ padding: "0 24px 24px" }}>
-          <Skeleton className="h-48 w-full" style={{ borderRadius: 14 }} />
-        </div>
-      ) : error ? (
-        <div style={{ padding: "0 24px" }}>
-          <Card>
-            <CardContent className="p-6 text-center">
-              <XCircle className="w-8 h-8 mx-auto mb-3" style={{ color: "#ef4444" }} />
-              <p style={{ fontSize: 15, color: "#ef4444" }}>
-                {t("detail.notFoundDescription")}
-              </p>
-              <Link href="/trades">
-                <Button variant="outline" size="sm" style={{ marginTop: 12 }}>
-                  {t("detail.backToTrades")}
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-      ) : data ? (
-        <>
-          {/* Status Stepper */}
-          <StatusStepper current={data.tradeStatus} tradeId={tradeId!} onStatusAdvanced={() => queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] })} />
+            {/* Money strip */}
+            <div className="stp-money">
+              <div className="stp-ms">
+                <div className="stp-ms-label">{t("detail.shipmentValue")}</div>
+                {tradeVal > 0 ? (
+                  <>
+                    <div className="stp-ms-value">{data.lookup.tradeValueCurrency || "USD"} {tradeVal.toLocaleString()}</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="stp-ms-value muted">{t("detail.noValueSet")}</div>
+                    <div className="stp-ms-sub amber" style={{ cursor: "pointer" }} onClick={() => { setTradeValueInput(""); setTradeValueCurrencyInput("USD"); setEditingValue(true); }}>+ {t("detail.addValue")} →</div>
+                  </>
+                )}
+              </div>
+              <div className="stp-ms">
+                <div className="stp-ms-label">Expected Exposure</div>
+                {risk && risk.expectedLoss > 0 ? (
+                  <>
+                    <div className="stp-ms-value amber">${risk.expectedLoss.toLocaleString()}</div>
+                    <div className="stp-ms-bar"><div className="stp-ms-fill" style={{ width: `${Math.min((risk.expectedLoss / Math.max(risk.worstCase, 1)) * 100, 100)}%`, background: "var(--stp-amber)" }} /></div>
+                    <div className="stp-ms-sub">{spsFlagged ? "SPS flag" : ""}{dailyRate ? " · Demurrage" : ""}</div>
+                  </>
+                ) : (
+                  <div className="stp-ms-value muted">—</div>
+                )}
+              </div>
+              <div className="stp-ms">
+                <div className="stp-ms-label">Worst Case</div>
+                {risk && risk.worstCase > 0 ? (
+                  <>
+                    <div className="stp-ms-value red">${risk.worstCase.toLocaleString()}</div>
+                    <div className="stp-ms-bar"><div className="stp-ms-fill" style={{ width: `${Math.min((risk.worstCase / 2000) * 100, 100)}%`, background: "#c44e3a" }} /></div>
+                    <div className="stp-ms-sub">All risk scenarios</div>
+                  </>
+                ) : (
+                  <div className="stp-ms-value muted">—</div>
+                )}
+              </div>
+              <div className="stp-ms">
+                <div className="stp-ms-label">Corridor Risk</div>
+                <div className={`stp-ms-value ${scoreClass}`}>{verdict || "—"}</div>
+                {data.lookup.readinessScore != null && (
+                  <>
+                    <div className="stp-ms-bar"><div className="stp-ms-fill" style={{ width: `${data.lookup.readinessScore}%`, background: scoreColor }} /></div>
+                    <div className="stp-ms-sub">{data.lookup.readinessScore} / 100</div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
 
-          {/* Content grid */}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 340px",
-            gap: 16,
-            padding: "0 24px 32px",
-          }}>
-            {/* LEFT COLUMN — Main content */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* ── LIFECYCLE STEPPER ── */}
+          <div className="stp-lc-wrap">
+            <div className="stp-lc">
+              {LC_STEPS.map((step, i) => {
+                const state = i < lcIndex ? "done" : i === lcIndex ? "active" : "future";
+                return (
+                  <div key={step} className={`stp-lc-step stp-lc-step--${state}`}>
+                    <div className="stp-lc-bar" />
+                    <div className="stp-lc-body">
+                      <div className="stp-lc-num">{state === "done" ? "✓" : i + 1}</div>
+                      <span className="stp-lc-name">{LC_LABELS[step]}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Status advance dialog — reuse existing StatusStepper's confirm */}
+          <StatusStepper
+            current={data.tradeStatus}
+            tradeId={tradeId!}
+            onStatusAdvanced={() => queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] })}
+          />
+
+          {/* ── CONTENT GRID ── */}
+          <div className="stp-content">
+
+            {/* ── LEFT COLUMN ── */}
+            <div className="stp-left">
 
               {/* Compliance Summary */}
-              <Card>
-                <CardContent className="p-5">
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                    <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
-                      {t("detail.complianceSummary")}
-                    </h3>
-                    <Link href={`/trades/${data.lookup.id}/report`}>
-                      <Button variant="outline" size="sm" style={{ fontSize: 15 }}>
-                        {t("detail.viewFullReport")}
-                      </Button>
+              <div className="stp-card">
+                <div className="stp-card-hdr">
+                  <span className="stp-card-title">{t("detail.complianceSummary")}</span>
+                  <Link href={`/trades/${data.lookup.id}/report`}>
+                    <a className="stp-card-link">{t("detail.viewFullReport")}</a>
+                  </Link>
+                </div>
+                {data.lookup.readinessScore != null && (
+                  <div className="stp-score-block">
+                    <div className="stp-score-num">{data.lookup.readinessScore}</div>
+                    <div className="stp-score-right">
+                      <div className="stp-sr-rating">{verdict || "—"} — Corridor Risk Rating</div>
+                      <div className="stp-sr-desc">{data.lookup.readinessSummary || ""}</div>
+                    </div>
+                  </div>
+                )}
+                {risk && (risk.expectedLoss > 0 || risk.worstCase > 0) && (
+                  <div className="stp-risk-cells">
+                    <div className="stp-rc exp">
+                      <div className="stp-rc-l">Expected exposure</div>
+                      <div className="stp-rc-v">${risk.expectedLoss.toLocaleString()}</div>
+                    </div>
+                    <div className="stp-rc worst">
+                      <div className="stp-rc-l">Worst case</div>
+                      <div className="stp-rc-v">${risk.worstCase.toLocaleString()}</div>
+                    </div>
+                  </div>
+                )}
+                {(spsFlagged || (!dailyRate && risk?.expectedLoss === 0)) && (
+                  <div className="stp-risk-flag">
+                    ⚠️ {spsFlagged ? "SPS flag" : ""}{!dailyRate ? " · Demurrage inputs missing for full estimate" : ""}
+                  </div>
+                )}
+              </div>
+
+              {/* Documents */}
+              <div className="stp-card">
+                <div className="stp-card-hdr">
+                  <span className="stp-card-title">{t("detail.supplierDocs")}</span>
+                </div>
+                <div className="stp-doc-lanes">
+                  <div className="stp-doc-lane mine">
+                    <span className="stp-dl-label">Your documents</span>
+                    <span className="stp-dl-desc">Upload your own certificates, phytosanitary docs, or LC copies.</span>
+                    {data.supplierRequest ? (
+                      <button className="stp-btn-sm stp-btn-sage" onClick={() => setShowBuyerUpload(!showBuyerUpload)}>
+                        Upload Document
+                      </button>
+                    ) : (
+                      <Link href={`/lookup?lookupId=${data.lookup.id}`}>
+                        <button className="stp-btn-sm stp-btn-sage">Upload Document</button>
+                      </Link>
+                    )}
+                  </div>
+                  <div className="stp-doc-lane theirs">
+                    <span className="stp-dl-label">From supplier</span>
+                    <span className="stp-dl-desc">Send a secure link for your supplier to upload their documents.</span>
+                    {!data.supplierRequest ? (
+                      <Link href={`/lookup?lookupId=${data.lookup.id}`}>
+                        <button className="stp-btn-sm stp-btn-ghost">{t("detail.sendUploadLink")}</button>
+                      </Link>
+                    ) : (
+                      <button className="stp-btn-sm stp-btn-ghost" disabled>{t("detail.sendUploadLink")}</button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Received docs detail */}
+                {data.supplierUploads.length > 0 && (
+                  <div style={{ marginTop: 12 }}>
+                    {data.supplierUploads.map((upload: any) => (
+                      <div key={upload.id} style={{
+                        padding: "8px 10px", marginBottom: 6, borderRadius: 8, fontSize: 11,
+                        background: upload.verified === true ? "rgba(34,197,94,0.06)" : upload.verified === false && upload.finding ? "rgba(239,68,68,0.06)" : "rgba(0,0,0,0.02)",
+                        border: `1px solid ${upload.verified === true ? "rgba(34,197,94,0.15)" : upload.verified === false && upload.finding ? "rgba(239,68,68,0.15)" : "rgba(0,0,0,0.03)"}`,
+                      }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                            {upload.verified === true ? <ShieldCheck size={11} style={{ color: "#16a34a" }} /> :
+                             upload.verified === false && upload.finding ? <ShieldAlert size={11} style={{ color: "#ef4444" }} /> :
+                             <FileText size={11} style={{ color: "#8a9a8c" }} />}
+                            <span style={{ fontWeight: 500 }}>{upload.docType}</span>
+                            {upload.verified === true && <span style={{ fontSize: 9, fontWeight: 600, color: "#16a34a", background: "rgba(34,197,94,0.1)", padding: "1px 5px", borderRadius: 3 }}>{t("detail.verified")}</span>}
+                            {upload.verified === false && upload.finding && <span style={{ fontSize: 9, fontWeight: 600, color: "#ef4444", background: "rgba(239,68,68,0.1)", padding: "1px 5px", borderRadius: 3 }}>{t("detail.flagged")}</span>}
+                          </div>
+                          <div style={{ display: "flex", gap: 3 }}>
+                            <button onClick={() => handleAiScan(upload.id)} style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)", borderRadius: 4, padding: "2px 5px", cursor: "pointer", fontSize: 10, color: "#8b5cf6", fontWeight: 500, display: "flex", alignItems: "center", gap: 2 }}>
+                              {scanningId === upload.id ? <Loader2 size={9} className="animate-spin" /> : <Sparkles size={9} />} Scan
+                            </button>
+                            {upload.verified !== true && (
+                              <button onClick={() => handleVerify(upload.id)} style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 4, padding: "2px 5px", cursor: "pointer", fontSize: 10, color: "#16a34a", fontWeight: 500, display: "flex", alignItems: "center", gap: 2 }}>
+                                <CheckCircle2 size={9} /> {t("detail.verify")}
+                              </button>
+                            )}
+                            <button onClick={() => { flaggingUploadId === upload.id ? setFlaggingUploadId(null) : (setFlaggingUploadId(upload.id), setFlagFinding(upload.finding || ""), setFlagUcpRule(upload.ucpRule || "")); }} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 4, padding: "2px 5px", cursor: "pointer", fontSize: 10, color: "#ef4444", fontWeight: 500, display: "flex", alignItems: "center", gap: 2 }}>
+                              <Flag size={9} /> {t("detail.flag")}
+                            </button>
+                          </div>
+                        </div>
+                        <div style={{ fontSize: 10, color: "#8a9a8c", marginTop: 3 }}>{upload.originalFilename}</div>
+                        {upload.finding && <div style={{ marginTop: 4, padding: "4px 6px", borderRadius: 4, background: upload.verified === false ? "rgba(239,68,68,0.06)" : "rgba(34,197,94,0.06)", fontSize: 10, color: upload.verified === false ? "#ef4444" : "#16a34a" }}>{upload.finding}</div>}
+                        {scanResult?.uploadId === upload.id && <div style={{ marginTop: 4, padding: "4px 6px", borderRadius: 4, background: "rgba(139,92,246,0.06)", fontSize: 10, color: "#8b5cf6" }}><Sparkles size={9} /> {scanResult.details} ({scanResult.confidence})</div>}
+                        {flaggingUploadId === upload.id && (
+                          <div style={{ marginTop: 6, padding: 8, borderRadius: 6, background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.06)" }}>
+                            <input type="text" placeholder={t("detail.flagIssuePlaceholder")} value={flagFinding} onChange={e => setFlagFinding(e.target.value)} style={{ width: "100%", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 4, padding: "4px 6px", fontSize: 11, marginBottom: 4, color: "#2c3e2e" }} />
+                            <input type="text" placeholder={t("detail.flagUcpPlaceholder")} value={flagUcpRule} onChange={e => setFlagUcpRule(e.target.value)} style={{ width: "100%", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 4, padding: "4px 6px", fontSize: 11, marginBottom: 6, color: "#2c3e2e" }} />
+                            <div style={{ display: "flex", gap: 4 }}>
+                              <button onClick={() => handleFlag(upload.id)} disabled={!flagFinding.trim()} style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 4, padding: "3px 8px", fontSize: 10, fontWeight: 500, cursor: flagFinding.trim() ? "pointer" : "not-allowed", opacity: flagFinding.trim() ? 1 : 0.5 }}>{t("detail.docActions.submitFlag")}</button>
+                              <button onClick={() => { setFlaggingUploadId(null); setFlagFinding(""); setFlagUcpRule(""); }} style={{ background: "transparent", color: "#8a9a8c", border: "1px solid rgba(0,0,0,0.06)", borderRadius: 4, padding: "3px 8px", fontSize: 10, cursor: "pointer" }}>{t("detail.docActions.cancelFlag")}</button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Buyer upload form */}
+                {showBuyerUpload && data.supplierRequest && (
+                  <div style={{ marginTop: 12, padding: 12, background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.06)", borderRadius: 10 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: "#5e7060", marginBottom: 8 }}>{t("detail.uploadOutside")}</div>
+                    <select value={buyerDocType} onChange={e => setBuyerDocType(e.target.value)} style={{ width: "100%", background: "#fff", border: "1px solid #ddd8d1", borderRadius: 6, padding: "6px 8px", fontSize: 11, marginBottom: 6, color: "#2c3e2e" }}>
+                      <option value="">{t("detail.selectDocType")}</option>
+                      {(data.supplierRequest.docsRequired as string[] || []).map((doc: string) => <option key={doc} value={doc}>{doc}</option>)}
+                    </select>
+                    <input ref={buyerFileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" style={{ width: "100%", fontSize: 11, color: "#5e7060", marginBottom: 6 }} />
+                    <input type="text" placeholder={t("detail.notePlaceholder")} value={buyerNote} onChange={e => setBuyerNote(e.target.value)} style={{ width: "100%", background: "#fff", border: "1px solid #ddd8d1", borderRadius: 6, padding: "6px 8px", fontSize: 11, marginBottom: 8, color: "#2c3e2e" }} />
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <button className="stp-btn-sm stp-btn-sage" disabled={!buyerDocType || buyerUploading} onClick={handleBuyerUpload}>{buyerUploading ? t("detail.buyerUpload.uploading") : t("detail.buyerUpload.upload")}</button>
+                      <button className="stp-btn-sm stp-btn-ghost" onClick={() => setShowBuyerUpload(false)}>{t("detail.buyerUpload.cancel")}</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* EUDR Recap */}
+              {result?.triggers?.eudr && (
+                <div className="stp-card">
+                  <div className="stp-card-hdr" style={{ marginBottom: 0 }}>
+                    <span className="stp-card-title">🌿 {t("detail.eudrDueDiligence")}</span>
+                  </div>
+                  <div className="stp-eudr-status-row" style={{ marginTop: 8 }}>
+                    {eudrAssessment && eudrAssessment.applicable && eudrAssessment.score != null ? (
+                      <span className="stp-status-badge stp-status-done">
+                        Score: {eudrAssessment.score} · {eudrAssessment.band ? eudrAssessment.band.charAt(0).toUpperCase() + eudrAssessment.band.slice(1) : ""}
+                      </span>
+                    ) : (
+                      <span className="stp-status-badge stp-status-pending">{t("detail.notAssessed")}</span>
+                    )}
+                    <span style={{ fontSize: 10, color: "#b8c2ba" }}>EU Reg 2023/1115</span>
+                  </div>
+                  <div className="stp-eudr-facts">
+                    <div className="stp-ef"><span className="stp-ef-l">Commodity</span><span className="stp-ef-v">{data.lookup.commodityName?.split(" ")[0]} / HS {(data.lookup.hsCode || "").substring(0, 2)}</span></div>
+                    <div className="stp-ef"><span className="stp-ef-l">Geolocation</span><span className={`stp-ef-v ${eudr?.plotCoordinates ? "ok" : "warn"}`}>{eudr?.plotCoordinates ? "Set" : "Pending"}</span></div>
+                    <div className="stp-ef"><span className="stp-ef-l">Evidence</span><span className={`stp-ef-v ${eudr?.evidenceType ? "ok" : "warn"}`}>{eudr?.evidenceType || "Pending"}</span></div>
+                    <div className="stp-ef"><span className="stp-ef-l">Supplier</span><span className={`stp-ef-v ${eudr?.supplierName ? "ok" : "warn"}`}>{eudr?.supplierName ? "Set" : "Pending"}</span></div>
+                    <div className="stp-ef"><span className="stp-ef-l">Risk verdict</span><span className={`stp-ef-v ${eudrAssessment?.band ? "ok" : "na"}`}>{eudrAssessment?.band ? eudrAssessment.band.charAt(0).toUpperCase() + eudrAssessment.band.slice(1) : "—"}</span></div>
+                    <div className="stp-ef"><span className="stp-ef-l">Statement</span><span className={`stp-ef-v ${data.lookup.eudrComplete ? "ok" : "na"}`}>{data.lookup.eudrComplete ? "Generated" : "—"}</span></div>
+                  </div>
+                  <div className="stp-eudr-sep" />
+                  <div className="stp-eudr-cta-row">
+                    <p>Complete the 4-step due diligence to generate your EUDR statement for this shipment.</p>
+                    <Link href={`/eudr/${tradeId}`}>
+                      <button className="stp-btn-dark">Start EUDR Check →</button>
                     </Link>
                   </div>
-
-                  {data.lookup.readinessScore != null && (
-                    <div style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 16,
-                      padding: "12px 16px",
-                      borderRadius: 10,
-                      background: "rgba(14,78,69,0.06)",
-                      marginBottom: 12,
-                    }}>
-                      <div style={{
-                        fontFamily: "'Clash Display', sans-serif",
-                        fontWeight: 700,
-                        fontSize: 28,
-                        color: "var(--sage-l)",
-                      }}>
-                        {data.lookup.readinessScore}
-                      </div>
-                      <div>
-                        <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>
-                          {t("detail.readinessScore")}
-                        </div>
-                        <div style={{
-                          fontSize: 15,
-                          fontWeight: 700,
-                          color: data.lookup.readinessVerdict === "RED" ? "#ef4444" :
-                            data.lookup.readinessVerdict === "AMBER" ? "#eab308" : "var(--sage-l)",
-                        }}>
-                          {data.lookup.readinessVerdict || "—"}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {data.lookup.readinessSummary && (
-                    <p style={{ fontSize: 15, color: "var(--t2)", lineHeight: 1.6, margin: 0 }}>
-                      {data.lookup.readinessSummary}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Risk Exposure Estimate */}
-              {(() => {
-                const result = data.lookup.resultJson;
-                const spsFlagged = result?.triggers?.sps === true;
-                const lcFlagged = data.latestLcCheck?.verdict === "DISCREPANCIES_FOUND";
-                const dailyRate = data.lookup.demurrageDailyRate ? Number(data.lookup.demurrageDailyRate) : null;
-                const risk = calculateTradeRisk({
-                  readinessScore: data.lookup.readinessScore,
-                  dailyRate,
-                  spsFlagged,
-                  lcFlagged,
-                });
-                if (risk.expectedLoss === 0 && risk.worstCase === 0) return null;
-                return (
-                  <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 16,
-                    padding: "14px 18px",
-                    borderRadius: 12,
-                    background: "linear-gradient(135deg, rgba(234,179,8,0.08), rgba(239,68,68,0.06))",
-                    border: "1px solid rgba(234,179,8,0.18)",
-                  }}>
-                    <div style={{ fontSize: 22 }}>⚠️</div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", marginBottom: 2 }}>
-                        Risk Exposure
-                      </div>
-                      <div style={{ fontSize: 15, color: "var(--t2)" }}>
-                        Expected exposure{" "}
-                        <span style={{ fontWeight: 700, color: "#eab308" }}>
-                          ${risk.expectedLoss.toLocaleString()}
-                        </span>
-                        {" · "}Worst case{" "}
-                        <span style={{ fontWeight: 700, color: "#ef4444" }}>
-                          ${risk.worstCase.toLocaleString()}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: 12, color: "var(--t3)", marginTop: 4 }}>
-                        {risk.components.demurrageExpected > 0 && `Demurrage delay`}
-                        {risk.components.spsCostExpected > 0 && ` · SPS flag`}
-                        {risk.components.lcCostExpected > 0 && ` · LC discrepancy`}
-                        {!dailyRate && risk.components.demurrageExpected === 0 && `Set demurrage inputs for full estimate`}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* LC Status */}
-              {data.lcCase && (
-                <Card>
-                  <CardContent className="p-5">
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                      <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
-                        {t("detail.lcDocCheck")}
-                      </h3>
-                      <Link href={`/lc-check?lookupId=${data.lookup.id}`}>
-                        <Button variant="outline" size="sm" style={{ fontSize: 15 }}>
-                          {data.latestLcCheck ? t("detail.viewRecheck") : t("detail.runLcCheck")}
-                        </Button>
-                      </Link>
-                    </div>
-
-                    {data.latestLcCheck ? (
-                      <div>
-                        <Badge style={{
-                          background: data.latestLcCheck.verdict === "COMPLIANT" ? "rgba(34,197,94,0.1)" :
-                            data.latestLcCheck.verdict === "COMPLIANT_WITH_NOTES" ? "rgba(245,158,11,0.1)" :
-                            "rgba(239,68,68,0.1)",
-                          color: data.latestLcCheck.verdict === "COMPLIANT" ? "#16a34a" :
-                            data.latestLcCheck.verdict === "COMPLIANT_WITH_NOTES" ? "#d97706" :
-                            "#ef4444",
-                          border: "none",
-                          fontSize: 15,
-                          fontWeight: 600,
-                          marginBottom: 10,
-                        }}>
-                          {data.latestLcCheck.verdict?.replace(/_/g, " ")}
-                        </Badge>
-
-                        {data.lcCase.recheckCount > 0 && (
-                          <p style={{ fontSize: 15, color: "var(--t3)", marginTop: 6 }}>
-                            {t("detail.recheck", { count: data.lcCase.recheckCount })}
-                          </p>
-                        )}
-
-                        {data.lcCase.correctionRequests && (data.lcCase.correctionRequests as any[]).length > 0 && (
-                          <p style={{ fontSize: 15, color: "var(--t3)", marginTop: 4 }}>
-                            {t("detail.correction", { count: (data.lcCase.correctionRequests as any[]).length })}
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      <p style={{ fontSize: 15, color: "var(--t3)" }}>
-                        {t("detail.noLcCheck")}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
+                </div>
               )}
 
-              {/* Supplier Documents */}
-              <Card>
-                <CardContent className="p-5">
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                    <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
-                      {t("detail.supplierDocs")}
-                    </h3>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      {data.supplierRequest && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          style={{ fontSize: 15 }}
-                          onClick={() => setShowBuyerUpload(!showBuyerUpload)}
-                        >
-                          <Upload size={12} style={{ marginRight: 4 }} />
-                          {t("detail.uploadOnBehalf")}
-                        </Button>
-                      )}
-                      {!data.supplierRequest && (
-                        <Link href={`/lookup?lookupId=${data.lookup.id}`}>
-                          <Button variant="outline" size="sm" style={{ fontSize: 15 }}>
-                            {t("detail.sendUploadLink")}
-                          </Button>
-                        </Link>
-                      )}
-                    </div>
+              {/* CBAM */}
+              {result?.triggers?.cbam && (
+                <div className="stp-card">
+                  <div className="stp-card-hdr">
+                    <span className="stp-card-title">⚡ {t("detail.cbamAssessment")}</span>
+                    {cbamAssessment && cbamAssessment.applicable && cbamAssessment.score != null ? (
+                      <span style={{ fontSize: 11, color: "#4a7c5e", fontWeight: 600 }}>Score: {cbamAssessment.score}</span>
+                    ) : (
+                      <span style={{ fontSize: 11, color: "#b8c2ba" }}>{t("detail.notAssessed")}</span>
+                    )}
                   </div>
+                  <div className="stp-cbam-row"><span className="stp-cbam-l">Carbon border adjustment</span><span className={`stp-cbam-v ${cbamAssessment?.applicable ? "ok" : "na"}`}>{cbamAssessment?.applicable ? "Applicable" : "Check required"}</span></div>
+                  <div className="stp-cbam-row"><span className="stp-cbam-l">Estimated carbon levy</span><span className="stp-cbam-v na">—</span></div>
+                  <div className="stp-cbam-row"><span className="stp-cbam-l">Reporting deadline</span><span className="stp-cbam-v na">—</span></div>
+                </div>
+              )}
 
-                  {data.supplierRequest ? (
-                    <div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                        <Badge style={{
-                          background: data.supplierRequest.status === "complete" ? "rgba(34,197,94,0.1)" :
-                            data.supplierRequest.status === "partial" ? "rgba(245,158,11,0.1)" :
-                            "rgba(107,114,128,0.1)",
-                          color: data.supplierRequest.status === "complete" ? "#16a34a" :
-                            data.supplierRequest.status === "partial" ? "#d97706" :
-                            "#6b7280",
-                          border: "none",
-                          fontSize: 15,
-                        }}>
-                          {data.supplierRequest.status}
-                        </Badge>
-                      </div>
-
-                      {/* Required docs list */}
-                      <div style={{ marginBottom: 12 }}>
-                        <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 6 }}>
-                          {t("detail.required", { count: (data.supplierRequest.docsRequired as string[] || []).length })}
-                        </div>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                          {(data.supplierRequest.docsRequired as string[] || []).map((doc: string) => {
-                            const received = data.supplierUploads.some((u: any) => u.docType === doc);
-                            return (
-                              <span key={doc} style={{
-                                fontSize: 15,
-                                padding: "2px 8px",
-                                borderRadius: 6,
-                                background: received ? "rgba(34,197,94,0.1)" : "rgba(0,0,0,0.03)",
-                                color: received ? "#16a34a" : "var(--t3)",
-                                border: `1px solid ${received ? "rgba(34,197,94,0.15)" : "rgba(0,0,0,0.04)"}`,
-                              }}>
-                                {received && <CheckCircle2 size={9} style={{ display: "inline", marginRight: 3, verticalAlign: "middle" }} />}
-                                {doc}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Received documents with verification */}
-                      {data.supplierUploads.length > 0 && (
-                        <div>
-                          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t3)", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 8 }}>
-                            {t("detail.receivedDocs")}
-                          </div>
-                          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                            {data.supplierUploads.map((upload: any) => (
-                              <div key={upload.id} style={{
-                                padding: "10px 12px",
-                                background: upload.verified === true ? "rgba(34,197,94,0.06)" :
-                                  (upload.verified === false && upload.finding) ? "rgba(239,68,68,0.06)" :
-                                  "rgba(0,0,0,0.02)",
-                                border: `1px solid ${
-                                  upload.verified === true ? "rgba(34,197,94,0.15)" :
-                                  (upload.verified === false && upload.finding) ? "rgba(239,68,68,0.15)" :
-                                  "rgba(0,0,0,0.03)"
-                                }`,
-                                borderRadius: 8,
-                              }}>
-                                {/* Doc header row */}
-                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                    {upload.verified === true ? (
-                                      <ShieldCheck size={13} style={{ color: "#16a34a" }} />
-                                    ) : (upload.verified === false && upload.finding) ? (
-                                      <ShieldAlert size={13} style={{ color: "#ef4444" }} />
-                                    ) : (
-                                      <FileText size={13} style={{ color: "var(--t3)" }} />
-                                    )}
-                                    <span style={{ fontSize: 15, fontWeight: 500, color: "var(--t1)" }}>
-                                      {upload.docType}
-                                    </span>
-                                    {upload.uploadedBy === "buyer" && (
-                                      <span style={{
-                                        fontSize: 15, fontWeight: 600, color: "var(--t3)",
-                                        background: "rgba(0,0,0,0.04)", padding: "1px 5px",
-                                        borderRadius: 4,
-                                      }}>
-                                        {t("detail.manual")}
-                                      </span>
-                                    )}
-                                    {upload.verified === true && (
-                                      <span style={{
-                                        fontSize: 15, fontWeight: 600, color: "#16a34a",
-                                        background: "rgba(34,197,94,0.1)", padding: "1px 6px",
-                                        borderRadius: 4,
-                                      }}>
-                                        {t("detail.verified")}
-                                      </span>
-                                    )}
-                                    {upload.verified === false && upload.finding && (
-                                      <span style={{
-                                        fontSize: 15, fontWeight: 600, color: "#ef4444",
-                                        background: "rgba(239,68,68,0.1)", padding: "1px 6px",
-                                        borderRadius: 4,
-                                      }}>
-                                        {t("detail.flagged")}
-                                      </span>
-                                    )}
-                                  </div>
-
-                                  {/* Action buttons */}
-                                  <div style={{ display: "flex", gap: 4 }}>
-                                    {scanningId === upload.id ? (
-                                      <Loader2 size={14} style={{ color: "#8b5cf6", animation: "spin 1s linear infinite" }} />
-                                    ) : (
-                                      <button
-                                        onClick={() => handleAiScan(upload.id)}
-                                        title={t("detail.docActions.aiScan")}
-                                        style={{
-                                          background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)",
-                                          borderRadius: 5, padding: "3px 6px", cursor: "pointer",
-                                          display: "flex", alignItems: "center", gap: 3,
-                                          fontSize: 15, color: "#8b5cf6", fontWeight: 500,
-                                        }}
-                                      >
-                                        <Sparkles size={10} /> {t("detail.scan")}
-                                      </button>
-                                    )}
-                                    {verifyingId === upload.id ? (
-                                      <Loader2 size={14} style={{ color: "var(--sage)", animation: "spin 1s linear infinite" }} />
-                                    ) : upload.verified !== true ? (
-                                      <button
-                                        onClick={() => handleVerify(upload.id)}
-                                        title={t("detail.docActions.verify")}
-                                        style={{
-                                          background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)",
-                                          borderRadius: 5, padding: "3px 6px", cursor: "pointer",
-                                          display: "flex", alignItems: "center", gap: 3,
-                                          fontSize: 15, color: "#16a34a", fontWeight: 500,
-                                        }}
-                                      >
-                                        <CheckCircle2 size={10} /> {t("detail.verify")}
-                                      </button>
-                                    ) : null}
-                                    <button
-                                      onClick={() => {
-                                        if (flaggingUploadId === upload.id) {
-                                          setFlaggingUploadId(null);
-                                        } else {
-                                          setFlaggingUploadId(upload.id);
-                                          setFlagFinding(upload.finding || "");
-                                          setFlagUcpRule(upload.ucpRule || "");
-                                        }
-                                      }}
-                                      title={t("detail.docActions.flag")}
-                                      style={{
-                                        background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)",
-                                        borderRadius: 5, padding: "3px 6px", cursor: "pointer",
-                                        display: "flex", alignItems: "center", gap: 3,
-                                        fontSize: 15, color: "#ef4444", fontWeight: 500,
-                                      }}
-                                    >
-                                      <Flag size={10} /> {t("detail.flag")}
-                                    </button>
-                                  </div>
-                                </div>
-
-                                {/* File info */}
-                                <div style={{ fontSize: 15, color: "var(--t3)", marginTop: 4 }}>
-                                  {upload.originalFilename}
-                                  {upload.filesizeBytes && (
-                                    <span style={{ marginLeft: 8 }}>
-                                      {(upload.filesizeBytes / 1024).toFixed(0)} KB
-                                    </span>
-                                  )}
-                                </div>
-
-                                {/* Finding display */}
-                                {upload.finding && (
-                                  <div style={{
-                                    marginTop: 6, padding: "6px 8px", borderRadius: 6,
-                                    background: upload.verified === false ? "rgba(239,68,68,0.06)" : "rgba(34,197,94,0.06)",
-                                    fontSize: 15, color: upload.verified === false ? "#ef4444" : "#16a34a",
-                                  }}>
-                                    {upload.finding}
-                                    {upload.ucpRule && (
-                                      <span style={{ display: "block", marginTop: 2, fontSize: 15, color: "var(--t3)" }}>
-                                        {upload.ucpRule}
-                                      </span>
-                                    )}
-                                  </div>
-                                )}
-
-                                {/* AI scan result toast */}
-                                {scanResult?.uploadId === upload.id && (
-                                  <div style={{
-                                    marginTop: 6, padding: "6px 8px", borderRadius: 6,
-                                    background: "rgba(139,92,246,0.06)",
-                                    border: "1px solid rgba(139,92,246,0.12)",
-                                    fontSize: 15, color: "#8b5cf6",
-                                  }}>
-                                    <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 2 }}>
-                                      <Sparkles size={10} />
-                                      <span style={{ fontWeight: 600 }}>{t("detail.aiAnalysis")}</span>
-                                      <span style={{ fontSize: 15, color: "var(--t3)" }}>({scanResult?.confidence})</span>
-                                    </div>
-                                    {scanResult?.details}
-                                  </div>
-                                )}
-
-                                {/* Flag form (inline) */}
-                                {flaggingUploadId === upload.id && (
-                                  <div style={{
-                                    marginTop: 8, padding: 10, borderRadius: 6,
-                                    background: "rgba(0,0,0,0.02)",
-                                    border: "1px solid rgba(0,0,0,0.06)",
-                                  }}>
-                                    <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t2)", marginBottom: 6 }}>
-                                      {t("detail.flagIssueTitle")}
-                                    </div>
-                                    <input
-                                      type="text"
-                                      placeholder={t("detail.flagIssuePlaceholder")}
-                                      value={flagFinding}
-                                      onChange={(e) => setFlagFinding(e.target.value)}
-                                      style={{
-                                        width: "100%", background: "rgba(0,0,0,0.03)",
-                                        border: "1px solid rgba(0,0,0,0.08)", color: "var(--t1)",
-                                        borderRadius: 6, padding: "6px 8px", fontSize: 15, marginBottom: 6,
-                                      }}
-                                    />
-                                    <input
-                                      type="text"
-                                      placeholder={t("detail.flagUcpPlaceholder")}
-                                      value={flagUcpRule}
-                                      onChange={(e) => setFlagUcpRule(e.target.value)}
-                                      style={{
-                                        width: "100%", background: "rgba(0,0,0,0.03)",
-                                        border: "1px solid rgba(0,0,0,0.08)", color: "var(--t1)",
-                                        borderRadius: 6, padding: "6px 8px", fontSize: 15, marginBottom: 8,
-                                      }}
-                                    />
-                                    <div style={{ display: "flex", gap: 6 }}>
-                                      <button
-                                        onClick={() => handleFlag(upload.id)}
-                                        disabled={!flagFinding.trim()}
-                                        style={{
-                                          background: "#ef4444", color: "#fff", border: "none",
-                                          borderRadius: 6, padding: "5px 12px", fontSize: 15,
-                                          fontWeight: 500, cursor: flagFinding.trim() ? "pointer" : "not-allowed",
-                                          opacity: flagFinding.trim() ? 1 : 0.5,
-                                        }}
-                                      >
-                                        {t("detail.docActions.submitFlag")}
-                                      </button>
-                                      <button
-                                        onClick={() => { setFlaggingUploadId(null); setFlagFinding(""); setFlagUcpRule(""); }}
-                                        style={{
-                                          background: "transparent", color: "var(--t3)", border: "1px solid rgba(0,0,0,0.06)",
-                                          borderRadius: 6, padding: "5px 12px", fontSize: 15, cursor: "pointer",
-                                        }}
-                                      >
-                                        {t("detail.docActions.cancelFlag")}
-                                      </button>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Buyer upload form */}
-                      {showBuyerUpload && (
-                        <div style={{
-                          marginTop: 14,
-                          padding: 14,
-                          background: "rgba(0,0,0,0.02)",
-                          border: "1px solid rgba(0,0,0,0.06)",
-                          borderRadius: 10,
-                        }}>
-                          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t2)", marginBottom: 10 }}>
-                            {t("detail.uploadOutside")}
-                          </div>
-                          <select
-                            value={buyerDocType}
-                            onChange={(e) => setBuyerDocType(e.target.value)}
-                            style={{
-                              width: "100%",
-                              background: "rgba(0,0,0,0.03)",
-                              border: "1px solid rgba(0,0,0,0.08)",
-                              color: "var(--t1)",
-                              borderRadius: 6,
-                              padding: "8px 10px",
-                              fontSize: 15,
-                              marginBottom: 8,
-                            }}
-                          >
-                            <option value="" style={{ background: "#1a1a1a" }}>{t("detail.selectDocType")}</option>
-                            {(data.supplierRequest.docsRequired as string[] || []).map((doc: string) => (
-                              <option key={doc} value={doc} style={{ background: "#1a1a1a" }}>{doc}</option>
-                            ))}
-                          </select>
-                          <input
-                            ref={buyerFileRef}
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            style={{
-                              width: "100%",
-                              fontSize: 15,
-                              color: "var(--t2)",
-                              marginBottom: 8,
-                            }}
-                          />
-                          <input
-                            type="text"
-                            placeholder={t("detail.notePlaceholder")}
-                            value={buyerNote}
-                            onChange={(e) => setBuyerNote(e.target.value)}
-                            style={{
-                              width: "100%",
-                              background: "rgba(0,0,0,0.03)",
-                              border: "1px solid rgba(0,0,0,0.08)",
-                              color: "var(--t1)",
-                              borderRadius: 6,
-                              padding: "8px 10px",
-                              fontSize: 15,
-                              marginBottom: 10,
-                            }}
-                          />
-                          <div style={{ display: "flex", gap: 8 }}>
-                            <Button
-                              size="sm"
-                              style={{ fontSize: 15, background: "var(--sage)", color: "#fff" }}
-                              disabled={!buyerDocType || buyerUploading}
-                              onClick={handleBuyerUpload}
-                            >
-                              {buyerUploading ? t("detail.buyerUpload.uploading") : t("detail.buyerUpload.upload")}
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              style={{ fontSize: 15, color: "var(--t3)" }}
-                              onClick={() => setShowBuyerUpload(false)}
-                            >
-                              {t("detail.buyerUpload.cancel")}
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <p style={{ fontSize: 15, color: "var(--t3)" }}>
-                      {t("detail.noSupplierLink")}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* EUDR Due Diligence — Inline Box */}
-              <EudrInlineBox data={data} tradeId={tradeId!} />
-
-              {/* CBAM Assessment — Inline Box */}
-              <CbamInlineBox data={data} tradeId={tradeId!} />
             </div>
 
-            {/* RIGHT COLUMN — Trade Info + Audit Timeline */}
-            <div>
-              {/* Shipment Value */}
-              <Card style={{ marginBottom: 16 }}>
-                <CardContent className="p-5">
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                    <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
-                      {t("detail.shipmentValue")}
-                    </h3>
-                    {!editingValue && (
-                      <button
-                        onClick={() => {
-                          setTradeValueInput(data.lookup.tradeValue || "");
-                          setTradeValueCurrencyInput(data.lookup.tradeValueCurrency || "USD");
-                          setEditingValue(true);
-                        }}
-                        style={{
-                          background: "none",
-                          border: "1px solid rgba(14,78,69,0.3)",
-                          borderRadius: 6,
-                          padding: "3px 10px",
-                          fontSize: 15,
-                          color: "var(--sage)",
-                          cursor: "pointer",
-                        }}
-                      >
-                        {data.lookup.tradeValue ? t("detail.edit") : t("detail.addValue")}
-                      </button>
-                    )}
-                  </div>
+            {/* ── RIGHT COLUMN ── */}
+            <div className="stp-right">
 
-                  {editingValue ? (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                      <div style={{ display: "flex", gap: 8 }}>
-                        <select
-                          value={tradeValueCurrencyInput}
-                          onChange={(e) => setTradeValueCurrencyInput(e.target.value)}
-                          style={{
-                            width: 72,
-                            padding: "6px 8px",
-                            fontSize: 15,
-                            borderRadius: 6,
-                            border: "1px solid rgba(0,0,0,0.15)",
-                            background: "#fff",
-                          }}
-                        >
-                          <option value="USD">USD</option>
-                          <option value="EUR">EUR</option>
-                          <option value="GBP">GBP</option>
-                          <option value="CHF">CHF</option>
-                        </select>
-                        <input
-                          type="number"
-                          placeholder="e.g. 125000"
-                          value={tradeValueInput}
-                          onChange={(e) => setTradeValueInput(e.target.value)}
-                          style={{
-                            flex: 1,
-                            padding: "6px 10px",
-                            fontSize: 15,
-                            borderRadius: 6,
-                            border: "1px solid rgba(0,0,0,0.15)",
-                          }}
-                          autoFocus
-                        />
-                      </div>
-                      <div style={{ display: "flex", gap: 6 }}>
-                        <button
-                          onClick={handleSaveTradeValue}
-                          disabled={savingValue || !tradeValueInput.trim()}
-                          style={{
-                            flex: 1,
-                            padding: "6px 0",
-                            fontSize: 15,
-                            fontWeight: 600,
-                            borderRadius: 6,
-                            border: "none",
-                            background: "var(--sage)",
-                            color: "#fff",
-                            cursor: savingValue ? "wait" : "pointer",
-                            opacity: savingValue || !tradeValueInput.trim() ? 0.5 : 1,
-                          }}
-                        >
-                          {savingValue ? t("detail.saving") : t("detail.save")}
-                        </button>
-                        <button
-                          onClick={() => setEditingValue(false)}
-                          style={{
-                            padding: "6px 14px",
-                            fontSize: 15,
-                            borderRadius: 6,
-                            border: "1px solid rgba(0,0,0,0.15)",
-                            background: "#fff",
-                            color: "var(--t2)",
-                            cursor: "pointer",
-                          }}
-                        >
-                          {t("detail.cancel")}
-                        </button>
-                      </div>
-                    </div>
-                  ) : data.lookup.tradeValue ? (
-                    <div style={{
-                      fontFamily: "'Clash Display', sans-serif",
-                      fontWeight: 700,
-                      fontSize: 24,
-                      color: "var(--sage-l)",
+              {/* Shipment Value */}
+              <div className="stp-card">
+                <div className="stp-card-hdr" style={{ marginBottom: 6 }}>
+                  <span className="stp-card-title">{t("detail.shipmentValue")}</span>
+                  {!editingValue && (
+                    <button className="stp-btn-sm stp-btn-ghost" style={{ fontSize: 10.5 }} onClick={() => {
+                      setTradeValueInput(data.lookup.tradeValue || "");
+                      setTradeValueCurrencyInput(data.lookup.tradeValueCurrency || "USD");
+                      setEditingValue(true);
                     }}>
-                      {data.lookup.tradeValueCurrency || "USD"} {Number(data.lookup.tradeValue).toLocaleString()}
-                    </div>
-                  ) : (
-                    <p style={{ fontSize: 15, color: "var(--t3)", margin: 0 }}>
-                      {t("detail.noValueSet")}
-                    </p>
+                      {data.lookup.tradeValue ? t("detail.edit") : t("detail.addValue")}
+                    </button>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+                {editingValue ? (
+                  <div className="stp-val-form">
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <select value={tradeValueCurrencyInput} onChange={e => setTradeValueCurrencyInput(e.target.value)} style={{ width: 68 }}>
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                        <option value="CHF">CHF</option>
+                      </select>
+                      <input type="number" placeholder="e.g. 125000" value={tradeValueInput} onChange={e => setTradeValueInput(e.target.value)} style={{ flex: 1 }} autoFocus />
+                    </div>
+                    <div style={{ display: "flex", gap: 4 }}>
+                      <button className="stp-btn-sm stp-btn-sage" style={{ flex: 1 }} disabled={savingValue || !tradeValueInput.trim()} onClick={handleSaveTradeValue}>{savingValue ? t("detail.saving") : t("detail.save")}</button>
+                      <button className="stp-btn-sm stp-btn-ghost" onClick={() => setEditingValue(false)}>{t("detail.cancel")}</button>
+                    </div>
+                  </div>
+                ) : tradeVal > 0 ? (
+                  <div style={{ fontFamily: "var(--stp-fd)", fontWeight: 700, fontSize: 20, color: "#4a7c5e" }}>
+                    {data.lookup.tradeValueCurrency || "USD"} {tradeVal.toLocaleString()}
+                  </div>
+                ) : (
+                  <div className="stp-val-empty">
+                    <p>No value set yet. Add the shipment value to see risk as a percentage of cargo worth.</p>
+                    <div className="stp-hint">Risk % unlocked once value is set</div>
+                  </div>
+                )}
+              </div>
 
               {/* Demurrage Estimate */}
-              {(() => {
-                const destIso2 = nameToIso2[data.lookup.destinationName];
-                const verdict = data.lookup.readinessVerdict as "GREEN" | "AMBER" | "RED" | undefined;
-                const estimate = destIso2 ? estimateDemurrageRange(destIso2, verdict || "AMBER") : null;
-                if (!estimate) return null;
-                const tradeVal = data.lookup.tradeValue ? Number(data.lookup.tradeValue) : 0;
-                const pctOfCargo = tradeVal > 0 ? ((estimate.maxCost / tradeVal) * 100).toFixed(1) : null;
-                const verdictColor = verdict === "RED" ? "#ef4444" : verdict === "AMBER" ? "#eab308" : "var(--sage-l)";
-                return (
-                  <Card>
-                    <CardContent className="p-5">
-                      <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: "0 0 12px", display: "flex", alignItems: "center", gap: 8 }}>
-                        <span>⚓</span> {t("detail.demurrage")}
-                      </h3>
-                      <div style={{ fontSize: 15, color: "var(--t2)", lineHeight: 1.6, marginBottom: 10 }}>
-                        <div style={{ marginBottom: 6 }}>
-                          <span style={{ color: "var(--t3)", fontSize: 15, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("detail.port")}</span>
-                          <div style={{ fontWeight: 500, color: "var(--t1)" }}>
-                            {estimate.port.label}
-                            {estimate.allPorts.length > 1 && (
-                              <span style={{ color: "var(--t3)", fontSize: 15, fontWeight: 400 }}> ({t("detail.more", { count: estimate.allPorts.length - 1 })})</span>
-                            )}
-                          </div>
-                        </div>
-                        <div style={{ marginBottom: 6 }}>
-                          <span style={{ color: "var(--t3)", fontSize: 15, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("detail.estimatedDelay")}</span>
-                          <div>
-                            <span style={{ color: verdictColor, fontWeight: 600 }}>{estimate.delayLabel}</span>
-                            <span style={{ color: "var(--t3)", fontSize: 15 }}> {t("detail.basedOn", { verdict: verdict || "AMBER" })}</span>
-                          </div>
-                        </div>
-                        <div style={{ marginBottom: 6 }}>
-                          <span style={{ color: "var(--t3)", fontSize: 15, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("detail.costRange20ft")}</span>
-                          <div style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 20, color: "var(--sage)" }}>
-                            ${estimate.minCost.toLocaleString()} – ${estimate.maxCost.toLocaleString()}
-                          </div>
-                        </div>
-                        {pctOfCargo && (
-                          <div style={{ fontSize: 15, color: Number(pctOfCargo) > 5 ? "#ef4444" : "var(--t3)", marginTop: 2 }}>
-                            {t("detail.percentOfCargo", { pct: pctOfCargo })}
-                          </div>
-                        )}
-                      </div>
-                      <Link href="/demurrage">
-                        <span style={{ fontSize: 15, color: "var(--sage)", cursor: "pointer", fontWeight: 600 }}>
-                          {t("detail.openFullCalculator", { count: estimate.allPorts.length, plural: estimate.allPorts.length !== 1 ? "s" : "" })}
-                        </span>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                );
-              })()}
-
-              <Card>
-                <CardContent className="p-5">
-                  <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: "0 0 16px" }}>
-                    {t("detail.twinlogAuditTrail")}
-                  </h3>
-                  <AuditTimeline events={data.auditTrail} chainValid={data.chainValid} />
-                </CardContent>
-              </Card>
-
-              {/* TwinLog ref */}
-              {data.twinlog.ref && (
-                <Card style={{ marginTop: 16 }}>
-                  <CardContent className="p-4">
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                      <Hash size={14} style={{ color: "var(--sage)" }} />
-                      <span style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>{t("detail.twinlogReference")}</span>
-                    </div>
-                    <div style={{
-                      fontFamily: "monospace",
-                      fontSize: 15,
-                      color: "var(--sage)",
-                      background: "rgba(14,78,69,0.06)",
-                      padding: "8px 12px",
-                      borderRadius: 8,
-                      wordBreak: "break-all",
-                    }}>
-                      {data.twinlog.ref}
-                    </div>
-                    {data.twinlog.hash && (
-                      <div style={{
-                        fontFamily: "monospace",
-                        fontSize: 15,
-                        color: "var(--t3)",
-                        marginTop: 6,
-                      }}>
-                        sha256:{data.twinlog.hash.slice(0, 12)}...
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+              {demEstimate && (
+                <div className="stp-card">
+                  <div className="stp-card-hdr" style={{ marginBottom: 2 }}>
+                    <span className="stp-card-title">{t("detail.demurrage")}</span>
+                  </div>
+                  <div style={{ fontSize: 11, color: "#8a9a8c", marginBottom: 10 }}>
+                    {demEstimate.port.label}
+                    {demEstimate.allPorts.length > 1 && ` (+${demEstimate.allPorts.length - 1} more)`}
+                  </div>
+                  <div className="stp-dem-row"><span className="stp-dem-l">Estimated delay</span><span className="stp-dem-v amber">{demEstimate.delayLabel}</span></div>
+                  <div className="stp-dem-row"><span className="stp-dem-l">Based on</span><span className="stp-dem-v" style={{ fontSize: 11 }}>{verdict || "AMBER"} corridor risk</span></div>
+                  <div className="stp-dem-row"><span className="stp-dem-l">Cost range (20ft)</span><span className="stp-dem-v">${demEstimate.minCost.toLocaleString()}–${demEstimate.maxCost.toLocaleString()}</span></div>
+                  {pctOfCargo && <div className="stp-dem-row"><span className="stp-dem-l">% of cargo</span><span className={`stp-dem-v ${Number(pctOfCargo) > 5 ? "red" : ""}`}>{pctOfCargo}%</span></div>}
+                  <div className="stp-dem-total">
+                    <span className="stp-dem-tl">Worst case total</span>
+                    <span className="stp-dem-tv">${demEstimate.maxCost.toLocaleString()}</span>
+                  </div>
+                  <div className="stp-dem-cta"><Link href="/demurrage"><a>Open full calculator ({demEstimate.allPorts.length} ports) →</a></Link></div>
+                </div>
               )}
 
-              {/* Quick Actions */}
-              <Card style={{ marginTop: 16 }}>
-                <CardContent className="p-4 space-y-2">
-                  <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", marginBottom: 8 }}>
-                    {t("detail.actions")}
-                  </h3>
-                  <Link href={`/trades/${data.lookup.id}/report`}>
-                    <Button variant="outline" size="sm" style={{ width: "100%", justifyContent: "flex-start", fontSize: 15 }}>
-                      <Shield size={14} className="mr-2" /> {t("detail.viewComplianceReport")}
-                    </Button>
-                  </Link>
-                  {!data.lcCase && (
-                    <Link href={`/lc-check?lookupId=${data.lookup.id}`}>
-                      <Button variant="outline" size="sm" style={{ width: "100%", justifyContent: "flex-start", fontSize: 15, marginTop: 6 }}>
-                        <FileText size={14} className="mr-2" /> {t("detail.runLcCheck")}
-                      </Button>
-                    </Link>
-                  )}
-                  {data.twinlog.ref && (
-                    <Link href={`/verify/${data.twinlog.ref}`}>
-                      <Button variant="outline" size="sm" style={{ width: "100%", justifyContent: "flex-start", fontSize: 15, marginTop: 6 }}>
-                        <ExternalLink size={14} className="mr-2" /> {t("detail.publicVerifyLink")}
-                      </Button>
-                    </Link>
-                  )}
-                </CardContent>
-              </Card>
+              {/* Audit Trail */}
+              <div className="stp-card">
+                <div className="stp-card-hdr">
+                  <span className="stp-card-title">TwinLog Audit Trail</span>
+                  <span style={{ fontSize: 11, color: "#8a9a8c" }}>{data.auditTrail.length} events</span>
+                </div>
+                {data.auditTrail.length === 0 ? (
+                  <div style={{ fontSize: 11, color: "#8a9a8c", padding: "8px 0" }}>{t("detail.noAuditEvents")}</div>
+                ) : (
+                  data.auditTrail.slice(0, 8).map((event, i) => {
+                    const cfg = eventConfig[event.eventType] || { icon: Clock, color: "#6b7280", labelKey: "" };
+                    const eventLabel = cfg.labelKey ? t(cfg.labelKey) : event.eventType.replace(/_/g, " ");
+                    const date = new Date(event.createdAt);
+                    const isRecent = Date.now() - date.getTime() < 86400000 * 2;
+                    return (
+                      <div key={event.id} className="stp-audit-event">
+                        <div className={`stp-ae-dot ${isRecent ? "new" : ""}`} />
+                        <div>
+                          <div className="stp-ae-title">{eventLabel}</div>
+                          <div className="stp-ae-hash">{event.eventHash.slice(0, 8)}</div>
+                          <div className="stp-ae-time">{date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })} at {date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
             </div>
           </div>
         </>
-      ) : null}
+      )}
     </AppShell>
   );
 }

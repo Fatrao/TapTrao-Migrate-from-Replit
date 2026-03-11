@@ -876,7 +876,7 @@ export default function Trades() {
                   const egBg = badge.cls === "e" ? "var(--red-xs)" : badge.cls === "w" ? "var(--amber-xs)" : "var(--sage-xs)";
                   const egColor = badge.cls === "e" ? "var(--red)" : badge.cls === "w" ? "var(--amber)" : "var(--sage)";
                   return (
-                    <div key={tr.id} className="mt-er" onClick={() => navigate(`/trades/${tr.id}#eudr`)} style={{ cursor: "pointer" }}>
+                    <div key={tr.id} className="mt-er" onClick={() => navigate(`/eudr/${tr.id}`)} style={{ cursor: "pointer" }}>
                       <div className="dot" style={{ background: dotColor }} />
                       <div className="ei">
                         <div className="en">{iso2ToFlag(tr.originIso2)} {translateCommodity(tr.commodityName, lang).split(" ")[0]}</div>
