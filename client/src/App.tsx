@@ -81,7 +81,7 @@ function Router() {
       <Route path="/settings/profile">{() => <AuthGuard><SettingsProfile /></AuthGuard>}</Route>
       <Route path="/inbox">{() => <AuthGuard><Inbox /></AuthGuard>}</Route>
       <Route path="/alerts">{() => <AuthGuard><AlertsPage /></AuthGuard>}</Route>
-      <Route path="/eudr/:lookupId">{(params) => <Redirect to={`/trades/${params.lookupId}`} />}</Route>
+      <Route path="/eudr/:lookupId">{() => <AuthGuard><EudrPage /></AuthGuard>}</Route>
 
       {/* Admin routes */}
       <Route path="/admin/data">{() => <AuthGuard><AdminData /></AuthGuard>}</Route>

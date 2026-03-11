@@ -8,6 +8,7 @@ import { runLcCrossCheck, computeLcHash, generateCorrectionEmail } from "./lc-en
 import { generateTwinlogPdf } from "./twinlog-pdf";
 import { generateEudrPdf } from "./eudr-pdf";
 import { runEudrAssessment, runCbamAssessment } from "./regulatory-assess";
+import { fetchGeospatialData, type GeospatialResult } from "./geospatial";
 import { appendTradeEvent, getTradeAuditChain, verifyAuditChain } from "./audit";
 import { hashPassword, comparePasswords } from "./auth";
 import { lcCheckRequestSchema, registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, tokenTransactions, leadCaptureSchema, type ComplianceResult, type DocumentStatus } from "@shared/schema";
@@ -2881,7 +2882,7 @@ Rules:
   app.patch("/api/eudr/:id", async (req, res) => {
     try {
       const allowedFields = [
-        "plotCoordinates", "plotCountryIso2", "plotCountryValid",
+        "plotCoordinates", "plotCountryIso2", "plotCountryValid", "geospatialData",
         "evidenceType", "evidenceReference", "evidenceDate",
         "supplierName", "supplierAddress", "supplierRegNumber",
         "sanctionsChecked", "sanctionsClear",
@@ -2898,6 +2899,40 @@ Rules:
         return;
       }
       res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Geospatial verification — query GFW/OpenEPI for deforestation data at plot coordinates
+  app.post("/api/eudr/:lookupId/geospatial", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { lookupId } = req.params;
+
+      const lookup = await storage.getLookupById(lookupId);
+      if (!lookup || lookup.sessionId !== sessionId) {
+        res.status(404).json({ message: t("routes.trade_not_found", getLocale(req)) });
+        return;
+      }
+
+      const { plotCoordinates, plotCountryIso2 } = req.body;
+      const geoData = await fetchGeospatialData(plotCoordinates, plotCountryIso2 || "");
+
+      // Store on EUDR record
+      const eudrRecord = await storage.getEudrRecordByLookupId(lookupId);
+      if (eudrRecord) {
+        await storage.updateEudrRecord(eudrRecord.id, { geospatialData: geoData });
+      }
+
+      await appendTradeEvent(lookupId, sessionId, "geospatial_verified", {
+        source: geoData.source,
+        totalLossHa: geoData.totalLossHa,
+        lossAfterCutoff: geoData.lossAfterCutoff,
+        alertCount: geoData.alertCount,
+      });
+
+      res.json(geoData);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -2978,6 +3013,14 @@ Rules:
         await storage.markLookupEudrComplete(eudrRecord.lookupId);
       }
 
+      // Fetch latest assessment for enhanced data
+      const latestAssessment = eudrRecord.lookupId
+        ? await storage.getEudrAssessmentByLookupId(eudrRecord.lookupId)
+        : null;
+      const assessBreakdown = latestAssessment?.breakdown as any;
+      const enhancedData = assessBreakdown?.enhanced || null;
+      const scenarioData = assessBreakdown?.scenarios || null;
+
       const { stream, hashPromise } = generateEudrPdf({
         reference: eudrRef,
         companyName,
@@ -2999,6 +3042,11 @@ Rules:
         highRiskReason: statementData.highRiskReason,
         twinlogRef,
         twinlogHash,
+        computedRiskScore: latestAssessment?.score ?? undefined,
+        computedRiskBand: latestAssessment?.band ?? undefined,
+        riskDrivers: (eudrRecord.riskFactors as any[]) || undefined,
+        scenarioResults: scenarioData || undefined,
+        geospatialData: (eudrRecord.geospatialData as GeospatialResult) || undefined,
       });
 
       const filename = `EUDR-Statement-${eudrRef.replace(/[^a-zA-Z0-9-]/g, "_")}.pdf`;
@@ -3044,7 +3092,13 @@ Rules:
       // 2. Get commodity trigger info
       const commodity = lookup.commodityId ? await storage.getCommodityById(lookup.commodityId) : null;
       const destination = lookup.destinationId ? await storage.getDestinationById(lookup.destinationId) : null;
-      const destIso2 = destination?.iso2 || "";
+      const destIso2 = destination?.iso2 || (lookup.resultJson as any)?.destination?.iso2 || "";
+
+      // Use resultJson triggers as fallback (more reliable than DB column which may be camelCase vs snake_case)
+      const triggersEudr = commodity?.triggersEudr
+        ?? (lookup.resultJson as any)?.triggers?.eudr
+        ?? (lookup.resultJson as any)?.commodity?.triggersEudr
+        ?? false;
 
       // 3. Get EUDR record
       const eudrRecord = await storage.getEudrRecordByLookupId(lookupId) || null;
@@ -3057,37 +3111,55 @@ Rules:
       }
       const crossCheckResults = (latestLcCheck?.resultsJson as any[]) || [];
 
-      // 5. Run the assessment engine
+      // 5. Run the enhanced assessment engine (include cached geospatial data)
+      const geospatialData = (eudrRecord?.geospatialData as GeospatialResult) || null;
       const result = runEudrAssessment({
         lookup,
         eudrRecord,
         lcCheck: latestLcCheck || null,
         crossCheckResults,
-        commodityTriggersEudr: commodity?.triggersEudr ?? false,
+        commodityTriggersEudr: triggersEudr,
         destinationIso2: destIso2,
+        geospatialData,
       });
 
-      // 6. Upsert to eudr_assessments
+      // 6. Upsert to eudr_assessments (store enhanced data in breakdown JSONB)
       const assessment = await storage.createOrUpdateEudrAssessment({
         lookupId,
         applicable: result.applicable,
         score: result.score,
         band: result.band,
         canConcludeNegligibleRisk: result.canConcludeNegligibleRisk,
-        breakdown: result.breakdown,
+        breakdown: result.enhanced
+          ? { ...(result.breakdown || {}), enhanced: result.enhanced.breakdown, scenarios: result.enhanced.scenarios }
+          : result.breakdown,
         topDrivers: result.topDrivers,
         checksRun: result.checksRun,
       });
 
-      // 7. Audit event
+      // 7. Auto-populate riskLevel and riskFactors on eudr_records
+      if (result.enhanced && eudrRecord) {
+        await storage.updateEudrRecord(eudrRecord.id, {
+          riskLevel: result.enhanced.autoRiskLevel,
+          riskFactors: result.enhanced.riskFactorsSummary,
+        });
+      }
+
+      // 8. Audit event
       await appendTradeEvent(lookupId, sessionId, "eudr_assessed", {
         score: result.score,
         band: result.band,
         applicable: result.applicable,
         canConcludeNegligibleRisk: result.canConcludeNegligibleRisk,
+        compositeScore: result.enhanced?.breakdown?.compositeScore,
+        autoRiskLevel: result.enhanced?.autoRiskLevel,
       });
 
-      res.json(assessment);
+      // 9. Return full payload including enhanced data
+      res.json({
+        ...assessment,
+        enhanced: result.enhanced || null,
+      });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

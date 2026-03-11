@@ -693,6 +693,7 @@ export const eudrRecords = pgTable(
     plotCoordinates: jsonb("plot_coordinates"),
     plotCountryIso2: varchar("plot_country_iso2", { length: 2 }),
     plotCountryValid: boolean("plot_country_valid"),
+    geospatialData: jsonb("geospatial_data"),
     cutoffDate: date("cutoff_date").default("2020-12-31"),
     evidenceType: text("evidence_type"),
     evidenceReference: text("evidence_reference"),
@@ -840,6 +841,51 @@ export type RegulatoryTopDriver = {
 };
 
 export type RegulatoryRiskBand = "negligible" | "low" | "medium" | "high";
+
+/** Enhanced EUDR assessment types (Phase 1) */
+
+export type EnhancedScoreBreakdown = {
+  deterministicBase: number;
+  countryRiskPoints: number;
+  countryRiskTier: string;
+  commodityRiskPoints: number;
+  commodityRiskCategory: string;
+  commodityRiskLabel: string;
+  temporalDecayPoints: number;
+  evidenceAgeYears: number;
+  evidenceFreshness: number;
+  completenessPoints: number;
+  missingFields: Array<{ field: string; severity: "critical" | "warning"; points: number }>;
+  geospatialPoints: number;
+  geospatialSource: string;
+  geospatialDetail: string;
+  rawSum: number;
+  compositeScore: number;
+};
+
+export type ScenarioResult = {
+  scenario: string;
+  label: string;
+  description: string;
+  approvalProbability: number;
+  verdict: "likely_pass" | "uncertain" | "likely_fail";
+};
+
+export type RiskFactorSummary = {
+  factor: string;
+  impact: "high" | "medium" | "low";
+  detail: string;
+  remediation: string;
+};
+
+export type EnhancedEudrData = {
+  breakdown: EnhancedScoreBreakdown;
+  scenarios: ScenarioResult[];
+  trend: "RISING" | "STABLE" | "DECLINING";
+  trendReason: string;
+  autoRiskLevel: "low" | "standard" | "high";
+  riskFactorsSummary: RiskFactorSummary[];
+};
 
 export type DocumentStatus = "PENDING" | "READY" | "RISK_ACCEPTED";
 export type DocumentOwner = "IMPORTER" | "SUPPLIER" | "BROKER";

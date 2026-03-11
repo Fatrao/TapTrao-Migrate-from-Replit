@@ -16,7 +16,12 @@ import type {
   RegulatoryScoreBreakdown,
   RegulatoryTopDriver,
   RegulatoryRiskBand,
+  EnhancedScoreBreakdown,
+  ScenarioResult,
+  RiskFactorSummary,
+  EnhancedEudrData,
 } from "@shared/schema";
+import type { GeospatialResult } from "./geospatial";
 
 // ═══════════════════════════════════════════════════════════════
 // CONSTANTS
@@ -76,6 +81,59 @@ export const COUNTRY_BOUNDING_BOXES: Record<string, { minLat: number; maxLat: nu
 };
 
 // ═══════════════════════════════════════════════════════════════
+// ENHANCED RISK FACTORS — Phase 1
+// ═══════════════════════════════════════════════════════════════
+
+export type CountryRiskTier = "high" | "medium" | "low" | "unknown";
+
+/** Country risk tiers based on Global Forest Watch deforestation rates */
+export const COUNTRY_RISK_TIERS: Record<string, CountryRiskTier> = {
+  CD: "high", CM: "high", NG: "high", LR: "high", SL: "high",
+  GH: "medium", CI: "medium", UG: "medium", GN: "medium", TG: "medium", BF: "medium",
+  KE: "low", ET: "low", TZ: "low", ZA: "low", MZ: "low", SN: "low", ML: "low",
+};
+
+const COUNTRY_TIER_POINTS: Record<CountryRiskTier, number> = {
+  high: 12, medium: 6, low: 0, unknown: 8,
+};
+
+export type CommodityRiskCategory = "very_high" | "high" | "moderate" | "low";
+
+const COMMODITY_RISK_BY_HS_PREFIX: Array<{
+  prefixes: string[];
+  category: CommodityRiskCategory;
+  label: string;
+}> = [
+  { prefixes: ["1511", "1513"], category: "very_high", label: "Palm oil" },
+  { prefixes: ["1801", "1802", "1803", "1804", "1805"], category: "very_high", label: "Cocoa" },
+  { prefixes: ["1201", "1507"], category: "very_high", label: "Soya" },
+  { prefixes: ["0102"], category: "high", label: "Cattle" },
+  { prefixes: ["4403", "4407", "4408", "4410", "4412", "4401", "4703", "9401", "9403"], category: "high", label: "Timber & wood" },
+  { prefixes: ["4001", "4005", "4006", "4007"], category: "moderate", label: "Rubber" },
+  { prefixes: ["0901"], category: "moderate", label: "Coffee" },
+];
+
+const COMMODITY_RISK_POINTS: Record<CommodityRiskCategory, number> = {
+  very_high: 10, high: 6, moderate: 3, low: 0,
+};
+
+const TEMPORAL_DECAY_HALF_LIFE = 2.0;
+
+export type InspectionScenario = "standard" | "enhanced" | "high_risk";
+
+const SCENARIO_LABELS: Record<InspectionScenario, string> = {
+  standard: "Standard Customs Review",
+  enhanced: "Enhanced Due Diligence (EDD)",
+  high_risk: "High-Risk Country Inspection",
+};
+
+const SCENARIO_DESCRIPTIONS: Record<InspectionScenario, string> = {
+  standard: "Routine customs processing with document spot-checks",
+  enhanced: "Detailed examination triggered by commodity type or country tier",
+  high_risk: "Full inspection with geolocation verification and supply chain audit",
+};
+
+// ═══════════════════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════════════════
 
@@ -83,8 +141,10 @@ function cap(s: string): string {
   return s.length > MAX_DETAIL_LENGTH ? s.slice(0, MAX_DETAIL_LENGTH - 3) + "..." : s;
 }
 
-function isEuDestination(iso2: string): boolean {
-  return EU_COUNTRIES.has(iso2?.toUpperCase());
+function isEuDestination(iso2: string | null | undefined): boolean {
+  const code = iso2?.toUpperCase();
+  if (!code) return false;
+  return code === "EU" || EU_COUNTRIES.has(code);
 }
 
 function hsMatchesAny(hs: string | null, prefixes: string[]): boolean {
@@ -168,6 +228,287 @@ export function computeRegulatoryScore(checks: RegulatoryCheckResult[]): {
 
   return { score, band, breakdown, topDrivers };
 }
+
+// ═══════════════════════════════════════════════════════════════
+// ENHANCED EUDR SCORING — Phase 1
+// ═══════════════════════════════════════════════════════════════
+
+export function getCountryRiskTier(originIso2: string | null | undefined): CountryRiskTier {
+  if (!originIso2) return "unknown";
+  return COUNTRY_RISK_TIERS[originIso2.toUpperCase()] ?? "unknown";
+}
+
+export function getCommodityRiskCategory(hsCode: string | null | undefined): {
+  category: CommodityRiskCategory;
+  label: string;
+} {
+  if (!hsCode) return { category: "low", label: "Unknown" };
+  const clean = hsCode.replace(/\./g, "").trim();
+  for (const entry of COMMODITY_RISK_BY_HS_PREFIX) {
+    if (entry.prefixes.some(p => clean.startsWith(p))) {
+      return { category: entry.category, label: entry.label };
+    }
+  }
+  return { category: "low", label: "Other" };
+}
+
+/**
+ * Temporal decay weighting for evidence freshness.
+ * weight = exp(-ln(2) * ageYears / halfLife)
+ * Fresh evidence (today) → weight ~1.0, penalty 0
+ * 2 years old → weight ~0.5, penalty ~5
+ * 4 years old → weight ~0.25, penalty ~7.5
+ */
+export function computeTemporalDecay(
+  evidenceDate: string | null | undefined,
+  referenceDate?: Date,
+): { weight: number; ageYears: number; points: number } {
+  if (!evidenceDate) return { weight: 0, ageYears: Infinity, points: 10 };
+  const ref = referenceDate || new Date();
+  const evDate = new Date(evidenceDate);
+  if (isNaN(evDate.getTime())) return { weight: 0, ageYears: Infinity, points: 10 };
+  const diffMs = ref.getTime() - evDate.getTime();
+  const ageYears = Math.max(0, diffMs / (365.25 * 24 * 60 * 60 * 1000));
+  const weight = Math.exp(-Math.LN2 * ageYears / TEMPORAL_DECAY_HALF_LIFE);
+  const points = Math.round(Math.min(10, (1 - weight) * 10) * 10) / 10;
+  return { weight: Math.round(weight * 1000) / 1000, ageYears: Math.round(ageYears * 10) / 10, points };
+}
+
+function computeDataCompletenessScore(eudr: EudrRecord | null): {
+  points: number;
+  missing: Array<{ field: string; severity: "critical" | "warning"; points: number }>;
+} {
+  const missing: Array<{ field: string; severity: "critical" | "warning"; points: number }> = [];
+  const coords = parseCoords(eudr?.plotCoordinates);
+  if (coords.length === 0) missing.push({ field: "Plot coordinates", severity: "critical", points: 5 });
+  if (!eudr?.plotCountryIso2) missing.push({ field: "Plot country", severity: "critical", points: 2 });
+  if (!eudr?.evidenceType) missing.push({ field: "Evidence type", severity: "warning", points: 2 });
+  if (!eudr?.evidenceDate) missing.push({ field: "Evidence date", severity: "critical", points: 3 });
+  if (!eudr?.supplierName?.trim()) missing.push({ field: "Supplier name", severity: "warning", points: 2 });
+  if (!eudr?.supplierAddress?.trim()) missing.push({ field: "Supplier address", severity: "warning", points: 1 });
+  const points = missing.reduce((sum, m) => sum + m.points, 0);
+  return { points: Math.min(15, points), missing };
+}
+
+/**
+ * Monte Carlo-style scenario simulation.
+ * Uses deterministic pseudo-random noise (seeded by compositeScore) for reproducibility.
+ */
+function runScenarioSimulation(
+  compositeScore: number,
+  countryTier: CountryRiskTier,
+  commodityCategory: CommodityRiskCategory,
+  evidenceFreshness: number,
+): ScenarioResult[] {
+  const baseApproval = 100 - compositeScore;
+  const configs: Array<{
+    scenario: InspectionScenario;
+    scrutinyMultiplier: number;
+    freshnessBonus: number;
+    countryPenalty: Record<CountryRiskTier, number>;
+  }> = [
+    { scenario: "standard", scrutinyMultiplier: 0.85, freshnessBonus: 5,
+      countryPenalty: { high: 3, medium: 1, low: 0, unknown: 2 } },
+    { scenario: "enhanced", scrutinyMultiplier: 1.0, freshnessBonus: 8,
+      countryPenalty: { high: 8, medium: 4, low: 0, unknown: 5 } },
+    { scenario: "high_risk", scrutinyMultiplier: 1.25, freshnessBonus: 12,
+      countryPenalty: { high: 15, medium: 8, low: 2, unknown: 10 } },
+  ];
+
+  const N = 200;
+  return configs.map(cfg => {
+    let approvals = 0;
+    for (let i = 0; i < N; i++) {
+      const noise = ((Math.sin(i * 12.9898 + compositeScore * 78.233) * 43758.5453) % 1) * 10 - 5;
+      let prob = baseApproval
+        - (compositeScore * (cfg.scrutinyMultiplier - 1))
+        + (evidenceFreshness * cfg.freshnessBonus)
+        - cfg.countryPenalty[countryTier]
+        + noise;
+      if (prob > 50) approvals++;
+    }
+    const pct = Math.min(99, Math.max(1, Math.round((approvals / N) * 100)));
+    const verdict: ScenarioResult["verdict"] =
+      pct >= 70 ? "likely_pass" : pct >= 40 ? "uncertain" : "likely_fail";
+    return {
+      scenario: cfg.scenario,
+      label: SCENARIO_LABELS[cfg.scenario],
+      description: SCENARIO_DESCRIPTIONS[cfg.scenario],
+      approvalProbability: pct,
+      verdict,
+    };
+  });
+}
+
+function computeTrend(
+  countryTier: CountryRiskTier,
+  commodityCategory: CommodityRiskCategory,
+  evidenceFreshness: number,
+  completenessGap: number,
+): { trend: "RISING" | "STABLE" | "DECLINING"; trendReason: string } {
+  if (countryTier === "high" && (commodityCategory === "very_high" || commodityCategory === "high")) {
+    return { trend: "RISING", trendReason: "High-risk origin country combined with high deforestation-linked commodity." };
+  }
+  if (evidenceFreshness < 0.3 && completenessGap > 8) {
+    return { trend: "RISING", trendReason: "Stale evidence and significant data gaps increase compliance exposure." };
+  }
+  if (countryTier === "low" && evidenceFreshness > 0.7 && completenessGap < 4) {
+    return { trend: "DECLINING", trendReason: "Low-risk origin with fresh evidence and complete data." };
+  }
+  return { trend: "STABLE", trendReason: "Risk profile is within expected range for this corridor." };
+}
+
+function buildRiskFactorsSummary(
+  bd: EnhancedScoreBreakdown,
+  checks: RegulatoryCheckResult[],
+  originIso2: string | null | undefined,
+  hsCode: string | null | undefined,
+): RiskFactorSummary[] {
+  const factors: RiskFactorSummary[] = [];
+
+  if (bd.countryRiskPoints > 0) {
+    const tier = bd.countryRiskTier.charAt(0).toUpperCase() + bd.countryRiskTier.slice(1);
+    factors.push({
+      factor: `${tier}-risk origin country`,
+      impact: bd.countryRiskTier === "high" ? "high" : "medium",
+      detail: `${(originIso2 || "").toUpperCase()} is classified as ${bd.countryRiskTier}-risk based on deforestation rates.`,
+      remediation: bd.countryRiskTier === "high"
+        ? "Provide additional evidence: satellite imagery, third-party certifications, or field audit reports."
+        : "Consider obtaining third-party certification to reduce country risk premium.",
+    });
+  }
+
+  if (bd.commodityRiskPoints > 0) {
+    factors.push({
+      factor: `${bd.commodityRiskLabel} deforestation linkage`,
+      impact: bd.commodityRiskCategory === "very_high" ? "high" : "medium",
+      detail: `${bd.commodityRiskLabel} (HS ${hsCode || "N/A"}) is a ${bd.commodityRiskCategory.replace(/_/g, " ")}-deforestation commodity.`,
+      remediation: "Source from certified sustainable supply chains (FSC, RSPO, Rainforest Alliance).",
+    });
+  }
+
+  if (bd.temporalDecayPoints > 3) {
+    factors.push({
+      factor: "Stale evidence",
+      impact: bd.temporalDecayPoints > 6 ? "high" : "medium",
+      detail: `Evidence is ${bd.evidenceAgeYears} years old (freshness: ${Math.round(bd.evidenceFreshness * 100)}%).`,
+      remediation: "Obtain updated satellite imagery or a recent field audit report.",
+    });
+  }
+
+  if (bd.completenessPoints > 0) {
+    const critMissing = bd.missingFields.filter(m => m.severity === "critical").map(m => m.field);
+    if (critMissing.length > 0) {
+      factors.push({
+        factor: "Incomplete due diligence data",
+        impact: "high",
+        detail: `Missing critical fields: ${critMissing.join(", ")}.`,
+        remediation: "Complete all required fields in the EUDR wizard before generating your statement.",
+      });
+    }
+  }
+
+  if (bd.geospatialPoints > 4) {
+    factors.push({
+      factor: "Geospatial deforestation risk",
+      impact: bd.geospatialPoints > 8 ? "high" : "medium",
+      detail: bd.geospatialDetail,
+      remediation: bd.geospatialSource === "none"
+        ? "Satellite verification unavailable — provide third-party field audit or certification."
+        : "Provide third-party satellite imagery certification or field audit report to address detected tree cover loss.",
+    });
+  }
+
+  const failedCritical = checks.filter(c => !c.passed && c.severity === "critical");
+  for (const fc of failedCritical.slice(0, Math.max(0, 6 - factors.length))) {
+    factors.push({
+      factor: fc.label,
+      impact: "high",
+      detail: fc.detail,
+      remediation: fc.fixSuggestion || "Review and correct the flagged data.",
+    });
+  }
+
+  const impactOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
+  factors.sort((a, b) => (impactOrder[a.impact] ?? 2) - (impactOrder[b.impact] ?? 2));
+  return factors.slice(0, 6);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GEOSPATIAL SCORING (satellite deforestation verification)
+// ═══════════════════════════════════════════════════════════════
+
+export function computeGeospatialScore(
+  geoData: GeospatialResult | null | undefined,
+): { points: number; detail: string; source: string } {
+  if (!geoData || geoData.source === "none") {
+    return { points: 10, detail: "No geospatial verification data available.", source: "none" };
+  }
+
+  let points = 0;
+
+  // 1. Post-cutoff loss (0-8 points)
+  if (geoData.lossAfterCutoff > 10) points += 8;
+  else if (geoData.lossAfterCutoff > 1) points += 4;
+
+  // 2. Near-real-time alerts (0-4 points)
+  if (geoData.alertCount > 5) points += 4;
+  else if (geoData.alertCount > 0) points += 2;
+
+  // 3. Data source precision penalty (0-3 points)
+  if (geoData.source === "openepi") points += 3;
+  else if (geoData.source === "gfw" && geoData.queryGeometry === "point") points += 1;
+
+  const detail = geoData.source === "gfw"
+    ? `GFW satellite: ${geoData.totalLossHa.toFixed(1)} ha total loss, ${geoData.lossAfterCutoff.toFixed(1)} ha post-2020, ${geoData.alertCount} alert(s).`
+    : `OpenEPI basin: ${geoData.totalLossHa.toFixed(1)} ha total loss in river basin (coarse estimate).`;
+
+  return { points: Math.min(15, points), detail, source: geoData.source };
+}
+
+export function computeEnhancedEudrScore(
+  checks: RegulatoryCheckResult[],
+  originIso2: string | null | undefined,
+  hsCode: string | null | undefined,
+  eudr: EudrRecord | null,
+  geospatialData?: GeospatialResult | null,
+): EnhancedEudrData {
+  const { score: deterministicBase } = computeRegulatoryScore(checks);
+  const countryRiskTier = getCountryRiskTier(originIso2);
+  const countryRiskPoints = COUNTRY_TIER_POINTS[countryRiskTier];
+  const { category: commodityRiskCategory, label: commodityRiskLabel } = getCommodityRiskCategory(hsCode);
+  const commodityRiskPoints = COMMODITY_RISK_POINTS[commodityRiskCategory];
+  const { weight: evidenceFreshness, ageYears: evidenceAgeYears, points: temporalDecayPoints } =
+    computeTemporalDecay(eudr?.evidenceDate);
+  const { points: completenessPoints, missing: missingFields } = computeDataCompletenessScore(eudr);
+  const { points: geospatialPoints, detail: geospatialDetail, source: geospatialSource } =
+    computeGeospatialScore(geospatialData);
+
+  // Max possible: 35 + 12 + 10 + 10 + 15 + 15 = 97
+  const rawSum = deterministicBase + countryRiskPoints + commodityRiskPoints + temporalDecayPoints + completenessPoints + geospatialPoints;
+  const compositeScore = Math.min(100, Math.round((rawSum / 97) * 100));
+
+  const breakdown: EnhancedScoreBreakdown = {
+    deterministicBase, countryRiskPoints, countryRiskTier,
+    commodityRiskPoints, commodityRiskCategory, commodityRiskLabel,
+    temporalDecayPoints, evidenceAgeYears, evidenceFreshness,
+    completenessPoints, missingFields,
+    geospatialPoints, geospatialSource, geospatialDetail,
+    rawSum, compositeScore,
+  };
+
+  const scenarios = runScenarioSimulation(compositeScore, countryRiskTier, commodityRiskCategory, evidenceFreshness);
+  const { trend, trendReason } = computeTrend(countryRiskTier, commodityRiskCategory, evidenceFreshness, completenessPoints);
+  const autoRiskLevel: "low" | "standard" | "high" =
+    compositeScore < 25 ? "low" : compositeScore < 55 ? "standard" : "high";
+  const riskFactorsSummary = buildRiskFactorsSummary(breakdown, checks, originIso2, hsCode);
+
+  return { breakdown, scenarios, trend, trendReason, autoRiskLevel, riskFactorsSummary };
+}
+
+export type EnhancedAssessmentOutput = AssessmentOutput & {
+  enhanced: EnhancedEudrData | null;
+};
 
 // ═══════════════════════════════════════════════════════════════
 // EUDR CHECKS
@@ -663,6 +1004,7 @@ export type EudrAssessmentInput = {
   crossCheckResults: any[];              // CheckResultItem[]
   commodityTriggersEudr: boolean;
   destinationIso2: string;
+  geospatialData?: GeospatialResult | null;
 };
 
 export type AssessmentOutput = {
@@ -675,13 +1017,13 @@ export type AssessmentOutput = {
   checksRun: RegulatoryCheckResult[];
 };
 
-export function runEudrAssessment(input: EudrAssessmentInput): AssessmentOutput {
+export function runEudrAssessment(input: EudrAssessmentInput): EnhancedAssessmentOutput {
   const { lookup, eudrRecord, crossCheckResults, commodityTriggersEudr, destinationIso2 } = input;
 
   // Applicability: commodity triggers EUDR + destination is EU
   const applicable = commodityTriggersEudr && (isEuDestination(destinationIso2) || destinationIso2?.toUpperCase() === "GB");
   if (!applicable) {
-    return { applicable: false, score: null, band: null, canConcludeNegligibleRisk: false, breakdown: null, topDrivers: [], checksRun: [] };
+    return { applicable: false, score: null, band: null, canConcludeNegligibleRisk: false, breakdown: null, topDrivers: [], checksRun: [], enhanced: null };
   }
 
   // Run all 15 checks
@@ -694,11 +1036,33 @@ export function runEudrAssessment(input: EudrAssessmentInput): AssessmentOutput 
   ];
 
   const { score, band, breakdown, topDrivers } = computeRegulatoryScore(checks);
-
-  // Cannot conclude negligible risk if any critical check fails
   const canConcludeNegligibleRisk = !checks.some(c => c.severity === "critical" && !c.passed);
 
-  return { applicable: true, score, band, canConcludeNegligibleRisk, breakdown, topDrivers, checksRun: checks };
+  // Enhanced scoring — prefer EUDR record origin, fall back to plot country or lookup origin
+  const originIso2 = eudrRecord?.originIso2
+    || eudrRecord?.plotCountryIso2
+    || (lookup as any).resultJson?.origin?.iso2
+    || null;
+  const hsCode = (lookup as any).hsCode
+    || (lookup as any).resultJson?.commodity?.hsCode
+    || null;
+  const enhanced = computeEnhancedEudrScore(checks, originIso2, hsCode, eudrRecord, input.geospatialData);
+
+  // Use composite score as primary, with recalibrated bands
+  const compositeScore = enhanced.breakdown.compositeScore;
+  const enhancedBand = compositeScore < 25 ? "negligible" as const
+    : compositeScore < 45 ? "low" as const
+    : compositeScore < 70 ? "medium" as const
+    : "high" as const;
+
+  return {
+    applicable: true,
+    score: compositeScore,
+    band: enhancedBand,
+    canConcludeNegligibleRisk,
+    breakdown, topDrivers, checksRun: checks,
+    enhanced,
+  };
 }
 
 export type CbamAssessmentInput = {
