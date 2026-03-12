@@ -1856,6 +1856,17 @@ export async function registerRoutes(
         const docsRequired = Array.isArray(selectedDocs) && selectedDocs.length > 0
           ? selectedDocs
           : supplierDocs.length > 0 ? supplierDocs : ["Commercial Invoice", "Certificate of Origin", "Packing List"];
+        // Auto-fill supplier name from document extractions (beneficiaryName = seller/supplier)
+        let autoSupplierName: string | null = null;
+        try {
+          const extractions = await storage.getDocumentExtractionsBySession(sessionId);
+          for (const ext of extractions) {
+            const fields = (ext.extractionJson as any)?.fields;
+            if (fields?.beneficiaryName) { autoSupplierName = fields.beneficiaryName; break; }
+            if (fields?.supplierName) { autoSupplierName = fields.supplierName; break; }
+          }
+        } catch {}
+
         request = await storage.createSupplierRequest({
           lookupId,
           userSessionId: sessionId,
@@ -1863,6 +1874,7 @@ export async function registerRoutes(
           docsReceived: [],
           uploadExpiresAt: expiresAt,
           status: "waiting",
+          ...(autoSupplierName ? { supplierName: autoSupplierName } : {}),
         });
 
         // Audit event: supplier link created

@@ -226,18 +226,24 @@
         "name": "Shield unique",
         "price": "189 $",
         "per": "par expédition",
+        "description": "Un contrôle complet pour une seule expédition — idéal pour les primo-importateurs ou les transactions ponctuelles.",
+        "tooltip": "Shield unique — 189 $ : rapport de conformité complet avec EUDR + CBAM, validation LC, lien fournisseur et piste d'audit TwinLog pour une expédition.",
         "features": "Rapport de conformité complet\nValidation croisée LC (UCP 600)\nContrôle EUDR + CBAM\nIndice de risque du corridor + recommandations\nLien d'envoi fournisseur\nPiste d'audit TwinLog"
       },
       "threePack": {
         "name": "Pack 3",
         "price": "499 $",
         "per": "166 $ par expédition",
+        "description": "Idéal pour les importateurs réguliers — couvrez 3 expéditions à moindre coût. Valable 12 mois.",
+        "tooltip": "Pack 3 — 499 $ (166 $/expédition) : tout ce qui est inclus dans le Shield unique pour 3 expéditions. Économisez 68 $. Valable 12 mois avec support prioritaire.",
         "features": "Tout ce qui est inclus dans le Shield unique\nÉconomisez 68 $ au total\nValable 12 mois\nSupport prioritaire"
       },
       "fivePack": {
         "name": "Pack 5",
         "price": "799 $",
         "per": "160 $ par expédition",
+        "description": "Coût le plus bas par expédition — pour les maisons de négoce gérant plusieurs corridors. Intégration dédiée incluse.",
+        "tooltip": "Pack 5 — 799 $ (160 $/expédition) : tout ce qui est inclus dans le Shield unique pour 5 expéditions. Économisez 146 $. Intégration dédiée et support prioritaire.",
         "features": "Tout ce qui est inclus dans le Shield unique\nÉconomisez 146 $ au total\nValable 12 mois\nSupport prioritaire\nIntégration dédiée"
       }
     },

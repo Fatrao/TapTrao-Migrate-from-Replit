@@ -226,18 +226,24 @@
         "name": "Single Shield",
         "price": "$189",
         "per": "per shipment",
+        "description": "One complete compliance check for a single shipment — ideal for first-time importers or one-off trades.",
+        "tooltip": "Single Shield — $189: Full compliance report with EUDR + CBAM screening, LC cross-validation, supplier upload link, and TwinLog audit trail for one shipment.",
         "features": "Full compliance report\nLC cross-validation (UCP 600)\nEUDR + CBAM screening\nCorridor risk rating + fix recommendations\nSupplier upload link\nTwinLog audit trail"
       },
       "threePack": {
         "name": "3-Pack",
         "price": "$499",
         "per": "$166 per shipment",
+        "description": "Best for regular traders — cover 3 shipments at a lower cost per check. Valid 12 months.",
+        "tooltip": "3-Pack — $499 ($166/shipment): Everything in Single Shield for 3 shipments. Save $68. Valid 12 months with priority support.",
         "features": "Everything in Single Shield\nSave $68 total\nValid for 12 months\nPriority support"
       },
       "fivePack": {
         "name": "5-Pack",
         "price": "$799",
         "per": "$160 per shipment",
+        "description": "Lowest cost per shipment — for trading houses managing multiple corridors. Includes dedicated onboarding.",
+        "tooltip": "5-Pack — $799 ($160/shipment): Everything in Single Shield for 5 shipments. Save $146. Includes dedicated onboarding and priority support.",
         "features": "Everything in Single Shield\nSave $146 total\nValid for 12 months\nPriority support\nDedicated onboarding"
       }
     },

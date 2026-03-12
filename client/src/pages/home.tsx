@@ -991,13 +991,17 @@ export default function Home() {
             { key: "threePack" as const, featured: true },
             { key: "fivePack" as const, featured: false },
           ]).map((plan) => (
-            <div key={plan.key} style={{
+            <div key={plan.key} title={t(`pricingSection.plans.${plan.key}.tooltip`)} style={{
               background: plan.featured ? "var(--dark)" : "#fff",
               color: plan.featured ? "#fff" : "var(--t1)",
               borderRadius: "var(--r)", padding: 32,
               boxShadow: plan.featured ? "0 8px 32px rgba(0,0,0,.15)" : "var(--shd)",
-              textAlign: "center",
-            }}>
+              textAlign: "center", cursor: "default", position: "relative",
+              transition: "transform 0.15s ease, box-shadow 0.15s ease",
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-4px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = plan.featured ? "0 12px 40px rgba(0,0,0,.25)" : "0 8px 24px rgba(0,0,0,.1)"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ""; (e.currentTarget as HTMLDivElement).style.boxShadow = plan.featured ? "0 8px 32px rgba(0,0,0,.15)" : "var(--shd)"; }}
+            >
               <div style={{
                 fontSize: 15, fontWeight: 600, letterSpacing: 1,
                 color: plan.featured ? "var(--sage-l)" : "var(--t3)",
@@ -1009,6 +1013,11 @@ export default function Home() {
               <div style={{
                 fontSize: 15, color: plan.featured ? "rgba(255,255,255,.8)" : "var(--t3)", marginBottom: 20,
               }}>{t(`pricingSection.plans.${plan.key}.per`)}</div>
+              {/* Tooltip description line */}
+              <div style={{
+                fontSize: 13, color: plan.featured ? "rgba(255,255,255,.65)" : "var(--t4)",
+                fontStyle: "italic", marginBottom: 16, lineHeight: 1.4,
+              }}>{t(`pricingSection.plans.${plan.key}.description`)}</div>
               <div style={{
                 fontSize: 15, color: plan.featured ? "rgba(255,255,255,.85)" : "var(--t2)",
                 lineHeight: 2, textAlign: "left", marginBottom: 20,

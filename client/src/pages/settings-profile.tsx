@@ -14,7 +14,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { AlertTriangle, CheckCircle2, Info, Save } from "lucide-react";
 import { usePageTitle } from "@/hooks/use-page-title";
 import type { CompanyProfile } from "@shared/schema";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 const profileSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
@@ -98,6 +98,11 @@ export default function SettingsProfile() {
     queryKey: ["/api/company-profile"],
   });
 
+  // Fetch document extractions for auto-fill suggestions
+  const extractionsQuery = useQuery<any[]>({
+    queryKey: ["/api/extractions"],
+  });
+
   const form = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -110,6 +115,16 @@ export default function SettingsProfile() {
       contactEmail: "",
     },
   });
+
+  // Extract company data from uploaded documents (LC terms have applicantName)
+  const extractedCompany = useMemo(() => {
+    if (!extractionsQuery.data?.length) return null;
+    for (const ext of extractionsQuery.data) {
+      const f = ext.fields || {};
+      if (f.applicantName) return { companyName: f.applicantName, source: ext.originalFilename };
+    }
+    return null;
+  }, [extractionsQuery.data]);
 
   useEffect(() => {
     if (profileQuery.data) {
@@ -184,6 +199,27 @@ export default function SettingsProfile() {
       </div>
 
       <div className="form-card" style={{ margin: "20px auto", maxWidth: 620, padding: "28px" }}>
+        {/* Auto-fill suggestion from uploaded documents */}
+        {!isComplete && extractedCompany && !form.getValues("companyName") && (
+          <div
+            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, borderRadius: 8, background: "#e8f0fe", border: "1px solid #c4d5f0", padding: "12px 16px", marginBottom: 16 }}
+          >
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#1a2744" }}>📄 We found your company name in an uploaded document</div>
+              <div style={{ fontSize: 12, color: "#5a6b85", marginTop: 2 }}>
+                <strong>{extractedCompany.companyName}</strong> — from {extractedCompany.source}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => form.setValue("companyName", extractedCompany.companyName)}
+              style={{ padding: "6px 14px", fontSize: 12, fontWeight: 600, borderRadius: 6, border: "1px solid #2563a8", background: "#fff", color: "#2563a8", cursor: "pointer", whiteSpace: "nowrap" }}
+            >
+              Use this
+            </button>
+          </div>
+        )}
+
         {isComplete && (
           <div
             style={{ display: "flex", alignItems: "center", gap: 8, borderRadius: 8, background: "var(--sage-xs)", border: "1px solid rgba(74,124,94,0.15)", padding: 12, marginBottom: 20 }}

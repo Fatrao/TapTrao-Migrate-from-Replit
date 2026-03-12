@@ -140,6 +140,12 @@ export default function EudrPage() {
     enabled: !!lookupId,
   });
 
+  // Fetch document extractions for auto-fill (supplier name from LC/invoice)
+  const extractionsQuery = useQuery<any[]>({
+    queryKey: ["/api/extractions"],
+    enabled: !!lookupId,
+  });
+
   useEffect(() => {
     if (eudrQuery.data) {
       setEudrId(eudrQuery.data.id);
@@ -164,7 +170,15 @@ export default function EudrPage() {
         evidenceType: rec.evidenceType || "",
         evidenceReference: rec.evidenceReference || "",
         evidenceDate: rec.evidenceDate ? rec.evidenceDate.split("T")[0] : "",
-        supplierName: rec.supplierName || "",
+        supplierName: rec.supplierName || (() => {
+          // Auto-fill from document extractions (beneficiaryName = supplier)
+          for (const ext of (extractionsQuery.data || [])) {
+            const f = ext.fields || {};
+            if (f.beneficiaryName) return f.beneficiaryName;
+            if (f.supplierName) return f.supplierName;
+          }
+          return "";
+        })(),
         supplierAddress: rec.supplierAddress || "",
         supplierRegNumber: rec.supplierRegNumber || "",
         sanctionsChecked: rec.sanctionsChecked || false,
