@@ -41,8 +41,10 @@ body:has(.cbam-dashboard-shell) #root{height:100vh;max-height:100vh;overflow:hid
 .cbam-tabs{display:flex;gap:0;background:#fff;border-radius:10px;padding:4px;width:fit-content;box-shadow:var(--shd);margin-bottom:14px}
 .cbam-tab{padding:7px 16px;border-radius:7px;border:none;background:transparent;font-family:var(--fb);font-size:13px;font-weight:500;color:var(--t3);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
 .cbam-tab.active{background:var(--cbam-dark);color:#fff;font-weight:600}
+.cbam-tab.done{color:var(--cbam-blue);font-weight:600}
 .cbam-tab-num{width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.2)}
 .cbam-tab:not(.active) .cbam-tab-num{background:var(--bg);color:var(--t3)}
+.cbam-tab-num.done{background:var(--cbam-blue);color:#fff}
 
 /* ═══ STATEMENT BANNER ═══ */
 .cbam-stmt-banner{display:flex;align-items:center;gap:12px;background:var(--cbam-light);border:1px solid rgba(37,99,168,.2);border-radius:10px;padding:12px 16px;margin-bottom:12px;flex-shrink:0}

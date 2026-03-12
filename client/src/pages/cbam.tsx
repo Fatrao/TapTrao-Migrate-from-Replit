@@ -98,6 +98,12 @@ export default function CbamPage() {
         carbonPricePaid: rec.carbonPricePaid?.toString() || "",
         carbonPriceCurrency: rec.carbonPriceCurrency || "EUR",
       }));
+      // Mark previously saved steps as completed
+      const done = new Set<number>();
+      if (rec.embeddedEmissions || rec.quantity) done.add(1);
+      if (rec.installationName || rec.installationCountry || rec.reportingPeriod) done.add(2);
+      if (rec.carbonPricePaid != null) done.add(3);
+      if (done.size > 0) setCompletedSteps(done);
     }
   }, [cbamQuery.data]);
 
@@ -123,13 +129,18 @@ export default function CbamPage() {
     }
   }, [lookupId, cbamId, cbamQuery.isLoading, cbamQuery.data]);
 
-  const saveDraft = useCallback(async (stepData: Partial<any>) => {
-    if (!cbamId) return;
+  const saveDraft = useCallback(async (stepData: Partial<any>): Promise<boolean> => {
+    if (!cbamId) return false;
     setSaving(true);
     try {
-      await apiRequest("PATCH", `/api/cbam/${cbamId}`, stepData);
-    } catch (_e) {}
-    setSaving(false);
+      const res = await apiRequest("PATCH", `/api/cbam/${cbamId}`, stepData);
+      await res.json(); // ensure response is fully consumed before proceeding
+      setSaving(false);
+      return true;
+    } catch (_e) {
+      setSaving(false);
+      return false;
+    }
   }, [cbamId]);
 
   const runAssessment = useCallback(async () => {
@@ -146,29 +157,39 @@ export default function CbamPage() {
     setAssessing(false);
   }, [lookupId]);
 
+  // Track which steps have been completed (saved)
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+
   const handleNext = async () => {
+    let saved = false;
     if (step === 1) {
-      await saveDraft({
+      saved = await saveDraft({
         embeddedEmissions: draft.embeddedEmissions || null,
         quantity: draft.quantity || null,
         emissionsSource: draft.emissionsSource,
       });
     }
     if (step === 2) {
-      await saveDraft({
+      saved = await saveDraft({
         installationName: draft.installationName || null,
         installationCountry: draft.installationCountry || null,
         reportingPeriod: draft.reportingPeriod || null,
       });
     }
     if (step === 3) {
-      await saveDraft({
+      saved = await saveDraft({
         carbonPricePaid: draft.carbonPricePaid || null,
         carbonPriceCurrency: draft.carbonPriceCurrency,
       });
-      setStep(4);
-      await runAssessment();
+      if (saved) {
+        setCompletedSteps(prev => new Set([...prev, step]));
+        setStep(4);
+        await runAssessment();
+      }
       return;
+    }
+    if (saved) {
+      setCompletedSteps(prev => new Set([...prev, step]));
     }
     setStep(step + 1);
   };
@@ -632,14 +653,18 @@ export default function CbamPage() {
         <div className="cbam-tabs" style={{ margin: "18px 0 20px" }}>
           {STEP_KEYS.map((key, i) => {
             const num = i + 1;
+            const isDone = completedSteps.has(num);
+            const isActive = num === step;
             return (
               <button
                 key={num}
-                className={`cbam-tab ${num === step ? "active" : ""}`}
+                className={`cbam-tab ${isActive ? "active" : isDone ? "done" : ""}`}
                 onClick={() => num <= step && setStep(num)}
-                style={{ cursor: num <= step ? "pointer" : "default", opacity: num > step ? 0.5 : 1 }}
+                style={{ cursor: num <= step ? "pointer" : "default", opacity: num > step && !isDone ? 0.5 : 1 }}
               >
-                <span className="cbam-tab-num">{num}</span> {t(key)}
+                <span className={`cbam-tab-num ${isDone && !isActive ? "done" : ""}`}>
+                  {isDone && !isActive ? "\u2713" : num}
+                </span> {t(key)}
               </button>
             );
           })}
