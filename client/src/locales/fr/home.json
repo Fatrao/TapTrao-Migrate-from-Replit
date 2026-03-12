@@ -10,9 +10,9 @@
   },
 
   "hero": {
-    "heading": "Voyez ce qui se dresse entre vous et le dédouanement.",
-    "subheading": "Entrez votre corridor commercial. Nous vous montrons chaque document, droit et réglementation sur votre chemin — et comment les gérer.",
-    "ctaPrimary": "Vérifier les exigences du corridor",
+    "heading": "Concentrez-vous sur vos négociations. TapTrao gère vos obligations.",
+    "subheading": "Chaque document, chaque réglementation, chaque échéance — pris en charge pour vous dès la réservation de l'expédition.",
+    "ctaPrimary": "Aperçu gratuit de votre corridor — risques en quelques secondes",
     "commodityPlaceholder": "Qu'achetez-vous ?",
     "originPlaceholder": "D'où ?",
     "destinationPlaceholder": "Vers où ?",
@@ -49,25 +49,76 @@
   },
 
   "trustBar": {
-    "corridors": "AFRIQUE → UE · UK · USA · CANADA · TÜRKIYE · SUISSE"
+    "corridors": "191 marchandises • 54 origines africaines • 7 destinations • Chaque réglementation cartographiée",
+    "regulations": "EUDR, CBAM, SPS, certificats d'origine, conditions LC, documentation douanière"
   },
 
-  "factsSection": {
-    "heading": "Ce que tout importateur de matières premières africaines doit savoir",
-    "subheading": "191 marchandises. 54 origines africaines. 7 destinations. Chaque réglementation cartographiée.",
-    "regulations": {
-      "heading": "Échéances réglementaires à venir",
-      "eudr": "EUDR : Entrée en application le 30 déc. 2025 pour les grands/moyens opérateurs ; 30 juin 2026 pour les micro/petites entreprises. Couvre le cacao, café, huile de palme, caoutchouc, soja, bois, bétail — et leurs dérivés.",
-      "cbam": "CBAM : Pleinement opérationnel à partir du 1er janv. 2026. Les importateurs au-dessus du seuil doivent acheter des certificats CBAM reflétant le carbone incorporé. Concerne l'aluminium, l'acier, le ciment, les engrais, l'hydrogène.",
-      "ukBtom": "Frontière UK : Contrôles SPS complets sur toutes les importations alimentaires/végétales. Certificats phytosanitaires obligatoires — l'absence signifie un refus automatique à la frontière."
+  "realCost": {
+    "heading": "Le vrai coût d'une erreur",
+    "subheading": "Un document manquant peut coûter plus cher que le contrôle de l'expédition lui-même.",
+    "demurrage": {
+      "title": "Surestaries",
+      "amount": "75–300 €/jour",
+      "detail": "De surestaries pendant que les documents sont bloqués au port."
     },
-    "costs": {
-      "heading": "Coût des défaillances de conformité",
-      "demurrage": "75–300 $/jour de surestaries à Felixstowe, Rotterdam, Hambourg pendant le blocage des documents",
-      "bankFee": "95–160 $ de frais bancaires pour une seule divergence LC",
-      "isfPenalty": "5 000 $ d'amende ISF américaine par infraction pour dépôt tardif",
-      "cascadeCost": "Un seul certificat d'origine manquant du Ghana, de Côte d'Ivoire ou du Kenya peut entraîner 1 500 $+ de retards et frais"
+    "lc": {
+      "title": "Écart LC",
+      "amount": "95–160 $",
+      "detail": "Pour un seul écart LC — frais de modification bancaire plus retards de paiement."
+    },
+    "sps": {
+      "title": "Certificat manquant",
+      "amount": "1 500 $+",
+      "detail": "De retards et frais pour un certificat d'origine ou phytosanitaire manquant."
+    },
+    "eudr": {
+      "title": "Infraction EUDR",
+      "amount": "Jusqu'à 4 % du CA UE",
+      "detail": "Pour les infractions graves à l'EUDR — amendes, saisie de la cargaison et interdiction de marché potentielle."
+    },
+    "cbam": {
+      "title": "Exposition CBAM",
+      "amount": "Variable",
+      "detail": "En raison de données d'émissions manquantes ou incorrectes — pénalités et achats rétroactifs de certificats."
     }
+  },
+
+  "pricingSection": {
+    "heading": "Protégez vos marges pour 189 $ par expédition.",
+    "subheading": "Un contrôle de conformité complet peut éviter des milliers d'euros de retards, pénalités et erreurs documentaires.",
+    "plans": {
+      "single": {
+        "name": "Shield unique",
+        "price": "189 $",
+        "per": "par expédition",
+        "description": "Un contrôle de conformité complet pour une seule expédition.",
+        "tooltip": "Shield unique — 189 $ : rapport de conformité complet avec EUDR + CBAM, validation LC, lien fournisseur et piste d'audit TwinLog pour une expédition.",
+        "features": "Liste complète des documents pour l'expédition\nContrôle réglementaire du corridor\nConditions LC incluses le cas échéant\nLien d'envoi fournisseur\nPreuve d'audit TwinLog",
+        "savings": "Économies typiques : 2 000–15 000 $+ en retards, frais et rejets de documents évités"
+      },
+      "threePack": {
+        "name": "Pack 3",
+        "price": "499 $",
+        "badge": "MEILLEUR RAPPORT QUALITÉ/PRIX",
+        "per": "166 $ par expédition",
+        "description": "Idéal pour les importateurs réguliers sur plusieurs expéditions.",
+        "tooltip": "Pack 3 — 499 $ (166 $/expédition) : tout ce qui est inclus dans le Shield unique pour 3 expéditions. Économisez 68 $. Valable 12 mois avec support prioritaire.",
+        "features": "Tout ce qui est inclus dans le Shield unique\nCoût réduit par expédition\nValable 12 mois\nSupport prioritaire",
+        "savings": "Économisez 68 $ au total"
+      },
+      "fivePack": {
+        "name": "Pack 5",
+        "price": "799 $",
+        "per": "160 $ par expédition",
+        "description": "Coût le plus bas par expédition pour les corridors réguliers.",
+        "tooltip": "Pack 5 — 799 $ (160 $/expédition) : tout ce qui est inclus dans le Shield unique pour 5 expéditions. Économisez 146 $. Intégration dédiée et support prioritaire.",
+        "features": "Tout ce qui est inclus dans le Shield unique\nCoût par expédition le plus bas\nIntégration dédiée",
+        "savings": "Économisez 146 $ au total"
+      }
+    },
+    "ctaFeatured": "Meilleur rapport qualité/prix →",
+    "ctaDefault": "Commencer →",
+    "previewBadge": "Aperçu gratuit"
   },
 
   "howItWorks": {
@@ -76,24 +127,62 @@
     "steps": {
       "step1": {
         "label": "CONNAÎTRE",
-        "title": "Cartographiez votre corridor",
-        "description": "Entrez votre marchandise, origine et destination. TapTrao cartographie chaque document requis, taux de droit et déclencheur réglementaire — EUDR, CBAM, SPS, CITES, et plus."
+        "title": "Cartographiez votre corridor d'expédition",
+        "description": "TapTrao identifie les documents, droits et déclencheurs réglementaires pour votre route — y compris EUDR, CBAM, SPS, CITES, et plus."
       },
       "step2": {
         "label": "DEMANDER",
-        "title": "Collectez auprès des fournisseurs",
-        "description": "Générez un lien d'envoi sans connexion pour votre fournisseur. Il voit exactement quels documents fournir et les envoie directement depuis son téléphone. Aucun compte requis."
+        "title": "Collectez les documents de vos fournisseurs",
+        "description": "Envoyez un lien d'envoi sans connexion. Votre fournisseur voit exactement quoi fournir et envoie directement depuis son téléphone."
       },
       "step3": {
         "label": "PROUVER",
-        "title": "Validez croisément tout",
-        "description": "Importez votre LC et vos documents commerciaux. TapTrao vérifie croisément chaque champ selon les règles UCP 600 et signale les divergences avant votre soumission à la banque."
+        "title": "Vérifiez tout avant le départ",
+        "description": "TapTrao vérifie l'ensemble — certificats d'origine, certificats phytosanitaires, conditions LC, déclarations douanières et documents justificatifs — signalant chaque lacune avant le départ du port."
       },
       "step4": {
         "label": "SURVEILLER",
-        "title": "Surveillez les changements",
-        "description": "Configurez des alertes corridor. Soyez notifié quand les taux de droits changent, de nouvelles réglementations s'appliquent ou des échéances approchent — avant qu'elles n'impactent votre expédition."
+        "title": "Gardez une longueur d'avance",
+        "description": "Recevez des alertes quand les réglementations changent, les échéances approchent ou de nouvelles obligations affectent votre corridor."
       }
+    }
+  },
+
+  "twinlog": {
+    "heading": "TwinLog : la preuve que vous êtes conforme",
+    "subheading": "Chaque vérification, chaque document, chaque soumission fournisseur — enregistrés de façon permanente et infalsifiable.",
+    "body": "Si une autorité douanière, une banque, un acheteur ou un auditeur remet en question votre expédition, vous avez la preuve vérifiable de ce qui a été vérifié, quand et par qui.",
+    "eudr": "Votre TwinLog EUDR — haché et exportable en PDF.",
+    "cbam": "Votre TwinLog CBAM — haché et exportable en PDF.",
+    "record": "Votre dossier de conformité complet — à conserver et à présenter sur demande.",
+    "closing": "TapTrao ne vous aide pas seulement à être conforme. Il vous aide à le prouver."
+  },
+
+  "supplierPreview": {
+    "heading": "Ce que votre fournisseur voit",
+    "subheading": "Un simple lien d'envoi. Pas de connexion. Pas de confusion.",
+    "noLogin": "Aucun compte requis",
+    "exactDocs": "Liste claire des documents requis",
+    "uploadPhone": "Envoi depuis n'importe quel téléphone",
+    "tracked": "Progression suivie dans TapTrao",
+    "cta": "Lancez un aperçu gratuit pour le voir en action"
+  },
+
+  "factsSection": {
+    "heading": "Ce que tout importateur doit savoir",
+    "subheading": "Échéances à venir, exemples de coûts de conformité réels et réglementations applicables à vos corridors.",
+    "regulations": {
+      "heading": "Réglementations clés",
+      "eudr": "EUDR — Entrée en application maintenant pour les grands opérateurs. Cacao, café, huile de palme, caoutchouc, soja, bois, bétail. L'absence d'une déclaration de diligence raisonnable signifie que votre expédition ne passe pas.",
+      "cbam": "CBAM — Pleinement opérationnel depuis janvier 2026. Les importateurs doivent acheter des certificats reflétant le carbone incorporé. Concerne les engrais, le ciment, l'aluminium, le fer et l'acier.",
+      "ukBtom": "UK BTOM — Contrôles SPS complets sur toutes les importations alimentaires et végétales. L'absence d'un certificat phytosanitaire signifie un refus automatique à la frontière."
+    },
+    "costs": {
+      "heading": "Coût des défaillances de conformité",
+      "demurrage": "75–300 $/jour de surestaries à Felixstowe, Rotterdam, Hambourg pendant le blocage des documents",
+      "bankFee": "95–160 $ de frais bancaires pour une seule divergence LC",
+      "isfPenalty": "5 000 $ d'amende ISF américaine par infraction pour dépôt tardif",
+      "cascadeCost": "Un seul certificat d'origine manquant du Ghana, de Côte d'Ivoire ou du Kenya peut entraîner 1 500 $+ de retards et frais"
     }
   },
 
@@ -209,82 +298,9 @@
     }
   },
 
-  "supplierPreview": {
-    "heading": "Ce que votre fournisseur voit",
-    "subheading": "Un lien d'envoi sans connexion. Il voit exactement quels documents fournir — depuis son téléphone.",
-    "noLogin": "Aucune connexion ni compte requis",
-    "exactDocs": "Liste claire des documents exacts à envoyer",
-    "tracked": "Progression suivie dans votre tableau de bord TapTrao",
-    "cta": "Lancez un aperçu gratuit pour le voir en action"
-  },
-
-  "realCost": {
-    "heading": "Le vrai coût d'une erreur",
-    "subheading": "Un document manquant. Un champ erroné. Voici ce que ça coûte.",
-    "eudr": {
-      "title": "Non-conformité EUDR",
-      "amount": "Jusqu'à 4% du CA UE",
-      "detail": "Amendes jusqu'à 4% du chiffre d'affaires annuel UE, saisie de la cargaison à la frontière et interdiction de marché pour les récidivistes."
-    },
-    "cbam": {
-      "title": "Défaut de déclaration CBAM",
-      "amount": "100 €/tonne",
-      "detail": "Pénalité de 100 € par tonne d'émissions non déclarées, plus frais d'audit et achats rétroactifs de certificats."
-    },
-    "demurrage": {
-      "title": "Retards et rejets à la frontière",
-      "amount": "100–300 €/jour",
-      "detail": "Surestaries de conteneurs à Rotterdam, Felixstowe et Hambourg — fréquent pour le cacao, les noix de cajou et le café bloqués en douane."
-    },
-    "lc": {
-      "title": "Écarts LC",
-      "amount": "50–200 $ par écart",
-      "detail": "Frais de modification bancaire par écart, plus retards de paiement de 2 à 4 semaines. Plusieurs écarts peuvent coûter 800 $+ et bloquer toute la transaction."
-    },
-    "sps": {
-      "title": "Défaillances SPS / phytosanitaires",
-      "amount": "1 500–5 000 $+",
-      "detail": "L'absence de certificats phytosanitaires du Ghana, du Nigeria ou de Côte d'Ivoire entraîne des frais d'inspection, de stockage portuaire et une destruction potentielle."
-    }
-  },
-
-  "pricingSection": {
-    "heading": "189 $ par expédition. Paiement unique. Sans engagement.",
-    "subheading": "Sans abonnement. Sans ERP. Aperçu de tout corridor gratuit.",
-    "plans": {
-      "single": {
-        "name": "Shield unique",
-        "price": "189 $",
-        "per": "par expédition",
-        "description": "Un contrôle complet pour une seule expédition — idéal pour les primo-importateurs ou les transactions ponctuelles.",
-        "tooltip": "Shield unique — 189 $ : rapport de conformité complet avec EUDR + CBAM, validation LC, lien fournisseur et piste d'audit TwinLog pour une expédition.",
-        "features": "Rapport de conformité complet\nValidation croisée LC (UCP 600)\nContrôle EUDR + CBAM\nIndice de risque du corridor + recommandations\nLien d'envoi fournisseur\nPiste d'audit TwinLog"
-      },
-      "threePack": {
-        "name": "Pack 3",
-        "price": "499 $",
-        "per": "166 $ par expédition",
-        "description": "Idéal pour les importateurs réguliers — couvrez 3 expéditions à moindre coût. Valable 12 mois.",
-        "tooltip": "Pack 3 — 499 $ (166 $/expédition) : tout ce qui est inclus dans le Shield unique pour 3 expéditions. Économisez 68 $. Valable 12 mois avec support prioritaire.",
-        "features": "Tout ce qui est inclus dans le Shield unique\nÉconomisez 68 $ au total\nValable 12 mois\nSupport prioritaire"
-      },
-      "fivePack": {
-        "name": "Pack 5",
-        "price": "799 $",
-        "per": "160 $ par expédition",
-        "description": "Coût le plus bas par expédition — pour les maisons de négoce gérant plusieurs corridors. Intégration dédiée incluse.",
-        "tooltip": "Pack 5 — 799 $ (160 $/expédition) : tout ce qui est inclus dans le Shield unique pour 5 expéditions. Économisez 146 $. Intégration dédiée et support prioritaire.",
-        "features": "Tout ce qui est inclus dans le Shield unique\nÉconomisez 146 $ au total\nValable 12 mois\nSupport prioritaire\nIntégration dédiée"
-      }
-    },
-    "ctaFeatured": "Meilleur rapport qualité/prix →",
-    "ctaDefault": "Commencer",
-    "previewBadge": "Aperçu gratuit"
-  },
-
   "finalCta": {
-    "heading": "Prêt à voir ce qui se dresse sur votre chemin ?",
-    "subheading": "Aperçu des exigences de conformité pour tout corridor de matières premières africaines. Gratuit.",
+    "heading": "Chaque document. Chaque réglementation. Chaque corridor africain.",
+    "subheading": "Concentrez-vous sur vos négociations. TapTrao gère vos obligations — et le prouve.",
     "button": "Vérifiez votre corridor →"
   },
 

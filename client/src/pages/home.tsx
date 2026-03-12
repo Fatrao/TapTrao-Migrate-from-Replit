@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -155,25 +155,6 @@ export default function Home() {
     setPhase("idle");
     setPreview(null);
   }
-
-  /* ── Demo carousel state ── */
-  const [activeDemo, setActiveDemo] = useState(0);
-  const [autoCycle, setAutoCycle] = useState(true);
-  const resumeRef = useRef<ReturnType<typeof setTimeout>>();
-  const DEMO_COUNT = 4;
-
-  useEffect(() => {
-    if (!autoCycle) return;
-    const id = setInterval(() => setActiveDemo((p) => (p + 1) % DEMO_COUNT), 6000);
-    return () => clearInterval(id);
-  }, [autoCycle]);
-
-  const handleTabClick = (idx: number) => {
-    setActiveDemo(idx);
-    setAutoCycle(false);
-    clearTimeout(resumeRef.current);
-    resumeRef.current = setTimeout(() => setAutoCycle(true), 15000);
-  };
 
   /* ── Stripe checkout ── */
   const PACK_KEYS: Record<string, string> = {
@@ -708,6 +689,9 @@ export default function Home() {
           <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: 2.5, color: "#fff", marginBottom: 10 }}>
             {t("trustBar.corridors")}
           </div>
+          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", letterSpacing: 1, marginBottom: 12 }}>
+            {t("trustBar.regulations")}
+          </div>
           <div style={{ fontSize: 32, letterSpacing: 8 }}>
             🇨🇮 🇬🇭 🇳🇬 🇰🇪 🇹🇿 🇪🇹{" "}
             <span style={{ color: "#fff", fontSize: 24 }}>&rarr;</span>{" "}
@@ -715,266 +699,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
-      {/* ═══ FACTS — What Every African Commodity Importer Should Know ═══ */}
-      <div className="hp-facts-section" style={{
-        background: "#fff", borderRadius: 24, margin: "0 40px",
-        padding: 60, boxShadow: "var(--shd)",
-      }}>
-        <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
-          {t("factsSection.heading")}
-        </h2>
-        <p style={{ fontSize: 16, color: "var(--t2)", marginBottom: 40, maxWidth: 600 }}>
-          {t("factsSection.subheading")}
-        </p>
-
-        {/* Regulatory deadlines */}
-        <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 16 }}>
-          {t("factsSection.regulations.heading")}
-        </h3>
-        <div className="hp-facts-regs" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 36 }}>
-          {(["eudr", "cbam", "ukBtom"] as const).map((key) => (
-            <div key={key} style={{
-              background: "var(--bg)", borderRadius: "var(--r)", padding: 24,
-              borderLeft: `3px solid ${key === "eudr" ? "var(--red)" : key === "cbam" ? "var(--amber)" : "var(--sage)"}`,
-            }}>
-              <div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginBottom: 8, color: key === "eudr" ? "var(--red)" : key === "cbam" ? "var(--amber)" : "var(--sage)" }}>
-                {key === "eudr" ? "EUDR" : key === "cbam" ? "CBAM" : "UK BTOM"}
-              </div>
-              <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.7, margin: 0 }}>
-                {t(`factsSection.regulations.${key}`)}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Cost stats */}
-        <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--t3)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 16 }}>
-          {t("factsSection.costs.heading")}
-        </h3>
-        <div className="hp-cost-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-          {(["demurrage", "bankFee", "isfPenalty", "cascadeCost"] as const).map((key) => (
-            <div key={key} style={{ background: "var(--bg)", borderRadius: "var(--r)", padding: 20 }}>
-              <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.6, margin: 0 }}>
-                {t(`factsSection.costs.${key}`)}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ═══ HOW IT WORKS — 4 Steps ═══ */}
-      <section id="how" style={{ padding: "80px 60px" }}>
-        <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
-          {t("howItWorks.heading")}
-        </h2>
-        <p style={{ fontSize: 15, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
-          {t("howItWorks.subheading")}
-        </p>
-
-        <div className="hp-steps-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
-          {(["step1", "step2", "step3", "step4"] as const).map((stepKey, i) => {
-            const icons = [Shield, Upload, FileCheck, Bell];
-            const Icon = icons[i];
-            return (
-              <div key={stepKey} style={{ background: "#fff", borderRadius: "var(--r)", padding: 28, boxShadow: "var(--shd)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                  <div style={{
-                    width: 32, height: 32, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center",
-                    background: "rgba(74,124,94,0.08)",
-                  }}>
-                    <Icon size={16} style={{ color: "var(--sage)" }} />
-                  </div>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "var(--sage)", letterSpacing: 2, textTransform: "uppercase" }}>
-                    {t(`howItWorks.steps.${stepKey}.label`)}
-                  </span>
-                </div>
-                <h3 style={{ fontFamily: "var(--fd)", fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
-                  {t(`howItWorks.steps.${stepKey}.title`)}
-                </h3>
-                <p style={{ fontSize: 14, color: "var(--t3)", lineHeight: 1.7, margin: 0 }}>
-                  {t(`howItWorks.steps.${stepKey}.description`)}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ═══ PLATFORM DEMO ═══ */}
-      <div id="validation" className="hp-validation-section" style={{
-        background: "var(--dark)", borderRadius: 24, margin: "0 40px", padding: 60, color: "#fff",
-      }}>
-        <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8, color: "#fff" }}>
-          {t("demo.heading")}
-        </h2>
-        <p style={{ fontSize: 15, color: "rgba(255,255,255,.8)", marginBottom: 32, maxWidth: 600 }}>
-          {t("demo.subheading")}
-        </p>
-
-        <div className="hp-demo-tabs" style={{ display: "flex", gap: 4, marginBottom: 24, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
-          {([
-            { tab: "check", label: t("demo.tabs.check") },
-            { tab: "dashboard", label: t("demo.tabs.dashboard") },
-            { tab: "lcVerify", label: t("demo.tabs.lcVerify") },
-            { tab: "inbox", label: t("demo.tabs.inbox") },
-          ] as const).map(({ tab, label }, i) => (
-            <button key={tab} onClick={() => handleTabClick(i)} style={{
-              padding: "10px 20px", borderRadius: 10, border: "none",
-              background: activeDemo === i ? "rgba(109,184,154,.15)" : "transparent",
-              color: activeDemo === i ? "var(--sage-l)" : "rgba(255,255,255,.5)",
-              fontFamily: "var(--fb)", fontSize: 15, fontWeight: activeDemo === i ? 600 : 400,
-              cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
-              borderBottom: activeDemo === i ? "2px solid var(--sage-l)" : "2px solid transparent",
-              transition: "all .2s",
-            }}>
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div key={activeDemo} className="hp-demo-panel" style={{
-          borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,.1)",
-          animation: "demoFadeIn .4s ease both", background: "#1a1a1c",
-        }}>
-          <img
-            src={["/demo/compliance.png", "/demo/trades.png", "/demo/lc-check.png", "/demo/inbox.png"][activeDemo]}
-            alt={[t("demo.tabs.check"), t("demo.tabs.dashboard"), t("demo.tabs.lcVerify"), t("demo.tabs.inbox")][activeDemo]}
-            style={{ width: "100%", maxHeight: "60vh", objectFit: "cover", objectPosition: "top left", display: "block" }}
-          />
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 20 }}>
-          {Array.from({ length: DEMO_COUNT }).map((_, i) => (
-            <button key={i} onClick={() => handleTabClick(i)} style={{
-              width: activeDemo === i ? 24 : 8, height: 8, borderRadius: 4, border: "none",
-              background: activeDemo === i ? "var(--sage-l)" : "rgba(255,255,255,.2)",
-              cursor: "pointer", transition: "all .3s", padding: 0,
-            }} />
-          ))}
-        </div>
-      </div>
-
-      {/* ═══ WHAT YOUR SUPPLIER SEES ═══ */}
-      <section style={{ padding: "80px 60px" }}>
-        <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
-          {t("supplierPreview.heading")}
-        </h2>
-        <p style={{ fontSize: 15, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
-          {t("supplierPreview.subheading")}
-        </p>
-
-        <div className="hp-supplier-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            {(["noLogin", "exactDocs", "tracked"] as const).map((key) => (
-              <div key={key} style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
-                <div style={{
-                  width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  background: "rgba(74,124,94,0.08)",
-                }}>
-                  <CheckCircle2 size={18} style={{ color: "var(--sage)" }} />
-                </div>
-                <span style={{ fontSize: 16, color: "var(--t2)", lineHeight: 1.6 }}>
-                  {t(`supplierPreview.${key}`)}
-                </span>
-              </div>
-            ))}
-            <Link href="/lookup" style={{
-              padding: "14px 28px", borderRadius: 12, border: "none",
-              background: "var(--sage)", color: "#fff",
-              fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600,
-              textDecoration: "none", display: "inline-block", alignSelf: "flex-start",
-              marginTop: 8,
-            }}>
-              {t("supplierPreview.cta")} &rarr;
-            </Link>
-          </div>
-
-          {/* Supplier upload mockup */}
-          <div style={{
-            background: "var(--dark)", borderRadius: 20, padding: 32,
-            border: "1px solid rgba(255,255,255,0.08)",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-              <img src="/logo.png?v=2" alt="" style={{ width: 24, height: 24, borderRadius: 6 }} />
-              <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, fontWeight: 600 }}>Secure Upload</span>
-            </div>
-            <div style={{
-              background: "linear-gradient(135deg, #1b3a2e, #2d4a38)", borderRadius: 12, padding: 20, marginBottom: 16,
-            }}>
-              <div style={{ fontSize: 16, fontWeight: 600, color: "#fff", marginBottom: 4 }}>🥜 Raw Cashew Nuts</div>
-              <div style={{ fontSize: 13, color: "#fff" }}>🇨🇮 Cote d'Ivoire &rarr; 🇬🇧 United Kingdom</div>
-            </div>
-            {["Certificate of Origin", "Phytosanitary Cert", "Bill of Lading"].map((doc, i) => (
-              <div key={doc} style={{
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                padding: "10px 14px", borderRadius: 8, marginBottom: 6,
-                background: i === 0 ? "rgba(74,124,94,0.12)" : "rgba(255,255,255,0.05)",
-              }}>
-                <span style={{ fontSize: 13, color: i === 0 ? "var(--sage-l)" : "rgba(255,255,255,0.5)" }}>
-                  {i === 0 ? "✓" : "○"} {doc}
-                </span>
-                {i !== 0 && <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Upload</span>}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ BLOG PREVIEW ═══ */}
-      <section id="blog" style={{ padding: "80px 60px" }}>
-        <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
-          From the TapTrao Blog
-        </h2>
-        <p style={{ fontSize: 15, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
-          What every small importer needs to know — before the next shipment.
-        </p>
-
-        <div className="hp-blog-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
-          {([
-            { slug: "/blog/sesame-seeds-nigeria", image: "/blog/sesame.jpg", tag: "Food Safety \u00B7 EU MRLs", title: "Why sesame seeds from Nigeria keep getting rejected at Rotterdam", readTime: "7 min read" },
-            { slug: "/blog/cocoa-eudr-importers", image: "/blog/cocoa.jpg", tag: "EUDR \u00B7 Cocoa \u00B7 Ghana", title: "What EUDR actually requires from cocoa importers \u2014 and why most small businesses aren't ready", readTime: "8 min read" },
-            { slug: "/blog/tropical-fruits-phytosanitary", image: "/blog/fruits.jpg", tag: "Phytosanitary \u00B7 UK Border", title: "The 14-day window that catches tropical fruit importers off guard", readTime: "7 min read" },
-            { slug: "/blog/bamboo-eudr-forest-product", image: "/blog/bamboo.jpg", tag: "EUDR \u00B7 Forest Products", title: "Bamboo is a forest product under EUDR. Most importers don't know that yet.", readTime: "7 min read" },
-          ]).map((post) => (
-            <Link key={post.slug} href={post.slug} style={{
-              background: "#fff", borderRadius: "var(--r)", overflow: "hidden",
-              textDecoration: "none", color: "inherit", display: "flex", flexDirection: "column",
-              boxShadow: "var(--shd)", transition: "box-shadow 0.25s, transform 0.25s",
-            }} className="hp-blog-card">
-              <img src={post.image} alt={post.title} style={{ width: "100%", height: 180, objectFit: "cover", display: "block" }} />
-              <div style={{ padding: "20px 22px 24px", display: "flex", flexDirection: "column", flex: 1 }}>
-                <span style={{
-                  fontSize: 10, fontWeight: 600, letterSpacing: "0.11em", textTransform: "uppercase",
-                  color: "var(--sage)", background: "rgba(107,144,128,0.1)",
-                  padding: "3px 10px", borderRadius: 100, alignSelf: "flex-start", marginBottom: 10,
-                }}>{post.tag}</span>
-                <div style={{
-                  fontFamily: "var(--fd)", fontSize: 15, fontWeight: 700, lineHeight: 1.35,
-                  color: "var(--dark)", marginBottom: 12, flex: 1,
-                }}>{post.title}</div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--dark)", borderBottom: "2px solid var(--sage)", paddingBottom: 1 }}>
-                    Continue reading &rarr;
-                  </span>
-                  <span style={{ fontSize: 12, color: "var(--t3)", opacity: 0.6 }}>{post.readTime}</span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        <div style={{ textAlign: "center", marginTop: 32 }}>
-          <Link href="/blog" style={{
-            display: "inline-block", padding: "12px 32px", borderRadius: 24,
-            border: "2px solid var(--sage)", color: "var(--sage)",
-            fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600, textDecoration: "none",
-          }}>
-            View All Articles
-          </Link>
-        </div>
-      </section>
 
       {/* ═══ REAL COST OF GETTING IT WRONG ═══ */}
       <section style={{ padding: "80px 60px", background: "linear-gradient(180deg, #faf8f5 0%, #fff 100%)" }}>
@@ -987,11 +711,11 @@ export default function Home() {
 
         <div className="hp-realcost-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
           {([
-            { key: "eudr" as const, icon: "\uD83C\uDF3F", accent: "#059669", accentBg: "rgba(5,150,105,0.08)", borderColor: "rgba(5,150,105,0.2)" },
-            { key: "cbam" as const, icon: "\uD83C\uDFED", accent: "#2563eb", accentBg: "rgba(37,99,235,0.08)", borderColor: "rgba(37,99,235,0.2)" },
             { key: "demurrage" as const, icon: "\u2693", accent: "#d97706", accentBg: "rgba(217,119,6,0.08)", borderColor: "rgba(217,119,6,0.2)" },
             { key: "lc" as const, icon: "\uD83D\uDCDC", accent: "#7c3aed", accentBg: "rgba(124,58,237,0.08)", borderColor: "rgba(124,58,237,0.2)" },
             { key: "sps" as const, icon: "\uD83D\uDEE1\uFE0F", accent: "#dc2626", accentBg: "rgba(220,38,38,0.08)", borderColor: "rgba(220,38,38,0.2)" },
+            { key: "eudr" as const, icon: "\uD83C\uDF3F", accent: "#059669", accentBg: "rgba(5,150,105,0.08)", borderColor: "rgba(5,150,105,0.2)" },
+            { key: "cbam" as const, icon: "\uD83C\uDFED", accent: "#2563eb", accentBg: "rgba(37,99,235,0.08)", borderColor: "rgba(37,99,235,0.2)" },
           ]).map((item) => (
             <div
               key={item.key}
@@ -1079,16 +803,36 @@ export default function Home() {
               <div style={{
                 fontSize: 15, color: plan.featured ? "rgba(255,255,255,.8)" : "var(--t3)", marginBottom: 20,
               }}>{t(`pricingSection.plans.${plan.key}.per`)}</div>
-              {/* Tooltip description line */}
+              {/* Badge for featured plan */}
+              {plan.featured && (
+                <div style={{
+                  position: "absolute", top: -1, right: 20,
+                  background: "var(--sage-l)", color: "var(--dark)",
+                  fontSize: 10, fontWeight: 700, letterSpacing: 1.5,
+                  padding: "4px 12px", borderRadius: "0 0 8px 8px",
+                  textTransform: "uppercase",
+                }}>
+                  {t(`pricingSection.plans.${plan.key}.badge` as any) || "BEST VALUE"}
+                </div>
+              )}
+              {/* Description line */}
               <div style={{
                 fontSize: 13, color: plan.featured ? "rgba(255,255,255,.65)" : "var(--t4)",
                 fontStyle: "italic", marginBottom: 16, lineHeight: 1.4,
               }}>{t(`pricingSection.plans.${plan.key}.description`)}</div>
               <div style={{
                 fontSize: 15, color: plan.featured ? "rgba(255,255,255,.85)" : "var(--t2)",
-                lineHeight: 2, textAlign: "left", marginBottom: 20,
+                lineHeight: 2, textAlign: "left", marginBottom: 12,
               }}>
                 {(t(`pricingSection.plans.${plan.key}.features`) as string).split("\n").map((f: string) => <div key={f}>{f}</div>)}
+              </div>
+              {/* Savings callout */}
+              <div style={{
+                fontSize: 13, fontWeight: 600, marginBottom: 20,
+                color: plan.featured ? "var(--sage-l)" : "var(--sage)",
+                fontStyle: "italic",
+              }}>
+                {t(`pricingSection.plans.${plan.key}.savings` as any)}
               </div>
               <button
                 onClick={() => checkoutMutation.mutate(PACK_KEYS[plan.key])}
@@ -1119,6 +863,236 @@ export default function Home() {
           border: "2px solid #c0c0c0", boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
         }}>
           <PromoCodeRedeem variant="light" />
+        </div>
+      </section>
+
+      {/* ═══ HOW IT WORKS — 4 Steps ═══ */}
+      <section id="how" style={{ padding: "80px 60px" }}>
+        <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
+          {t("howItWorks.heading")}
+        </h2>
+        <p style={{ fontSize: 15, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
+          {t("howItWorks.subheading")}
+        </p>
+
+        <div className="hp-steps-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
+          {(["step1", "step2", "step3", "step4"] as const).map((stepKey, i) => {
+            const icons = [Shield, Upload, FileCheck, Bell];
+            const Icon = icons[i];
+            return (
+              <div key={stepKey} style={{ background: "#fff", borderRadius: "var(--r)", padding: 28, boxShadow: "var(--shd)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                  <div style={{
+                    width: 32, height: 32, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center",
+                    background: "rgba(74,124,94,0.08)",
+                  }}>
+                    <Icon size={16} style={{ color: "var(--sage)" }} />
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "var(--sage)", letterSpacing: 2, textTransform: "uppercase" }}>
+                    {t(`howItWorks.steps.${stepKey}.label`)}
+                  </span>
+                </div>
+                <h3 style={{ fontFamily: "var(--fd)", fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
+                  {t(`howItWorks.steps.${stepKey}.title`)}
+                </h3>
+                <p style={{ fontSize: 14, color: "var(--t3)", lineHeight: 1.7, margin: 0 }}>
+                  {t(`howItWorks.steps.${stepKey}.description`)}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ═══ TWINLOG — Proof You Complied ═══ */}
+      <div className="hp-twinlog-section" style={{
+        background: "var(--dark)", borderRadius: 24, margin: "0 40px", padding: 60, color: "#fff",
+      }}>
+        <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8, color: "#fff" }}>
+          {t("twinlog.heading")}
+        </h2>
+        <p style={{ fontSize: 16, color: "rgba(255,255,255,.8)", marginBottom: 28, maxWidth: 600 }}>
+          {t("twinlog.subheading")}
+        </p>
+
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,.7)", lineHeight: 1.8, maxWidth: 600, marginBottom: 28 }}>
+          {t("twinlog.body")}
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
+          {(["eudr", "cbam", "record"] as const).map((key) => (
+            <div key={key} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8,
+                background: "rgba(109,184,154,0.15)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
+              }}>
+                <CheckCircle2 size={14} style={{ color: "var(--sage-l)" }} />
+              </div>
+              <span style={{ fontSize: 14, color: "rgba(255,255,255,.8)" }}>
+                {t(`twinlog.${key}`)}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <p style={{
+          fontSize: 16, fontWeight: 600, color: "var(--sage-l)", fontStyle: "italic",
+          borderLeft: "3px solid var(--sage-l)", paddingLeft: 16, margin: 0,
+        }}>
+          {t("twinlog.closing")}
+        </p>
+      </div>
+
+      {/* ═══ WHAT YOUR SUPPLIER SEES ═══ */}
+      <section style={{ padding: "80px 60px" }}>
+        <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
+          {t("supplierPreview.heading")}
+        </h2>
+        <p style={{ fontSize: 15, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
+          {t("supplierPreview.subheading")}
+        </p>
+
+        <div className="hp-supplier-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            {(["noLogin", "exactDocs", "uploadPhone", "tracked"] as const).map((key) => (
+              <div key={key} style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  background: "rgba(74,124,94,0.08)",
+                }}>
+                  <CheckCircle2 size={18} style={{ color: "var(--sage)" }} />
+                </div>
+                <span style={{ fontSize: 16, color: "var(--t2)", lineHeight: 1.6 }}>
+                  {t(`supplierPreview.${key}`)}
+                </span>
+              </div>
+            ))}
+            <Link href="/lookup" style={{
+              padding: "14px 28px", borderRadius: 12, border: "none",
+              background: "var(--sage)", color: "#fff",
+              fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600,
+              textDecoration: "none", display: "inline-block", alignSelf: "flex-start",
+              marginTop: 8,
+            }}>
+              {t("supplierPreview.cta")} &rarr;
+            </Link>
+          </div>
+
+          {/* Supplier upload mockup */}
+          <div style={{
+            background: "var(--dark)", borderRadius: 20, padding: 32,
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+              <img src="/logo.png?v=2" alt="" style={{ width: 24, height: 24, borderRadius: 6 }} />
+              <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, fontWeight: 600 }}>Secure Upload</span>
+            </div>
+            <div style={{
+              background: "linear-gradient(135deg, #1b3a2e, #2d4a38)", borderRadius: 12, padding: 20, marginBottom: 16,
+            }}>
+              <div style={{ fontSize: 16, fontWeight: 600, color: "#fff", marginBottom: 4 }}>🥜 Raw Cashew Nuts</div>
+              <div style={{ fontSize: 13, color: "#fff" }}>🇨🇮 Cote d'Ivoire &rarr; 🇬🇧 United Kingdom</div>
+            </div>
+            {["Certificate of Origin", "Phytosanitary Cert", "Bill of Lading"].map((doc, i) => (
+              <div key={doc} style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "10px 14px", borderRadius: 8, marginBottom: 6,
+                background: i === 0 ? "rgba(74,124,94,0.12)" : "rgba(255,255,255,0.05)",
+              }}>
+                <span style={{ fontSize: 13, color: i === 0 ? "var(--sage-l)" : "rgba(255,255,255,0.5)" }}>
+                  {i === 0 ? "✓" : "○"} {doc}
+                </span>
+                {i !== 0 && <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Upload</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ FACTS — What Every Importer Should Know ═══ */}
+      <div className="hp-facts-section" style={{
+        background: "#fff", borderRadius: 24, margin: "0 40px",
+        padding: 60, boxShadow: "var(--shd)",
+      }}>
+        <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
+          {t("factsSection.heading")}
+        </h2>
+        <p style={{ fontSize: 16, color: "var(--t2)", marginBottom: 40, maxWidth: 600 }}>
+          {t("factsSection.subheading")}
+        </p>
+
+        {/* Regulatory cards */}
+        <div className="hp-facts-regs" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 0 }}>
+          {(["eudr", "cbam", "ukBtom"] as const).map((key) => (
+            <div key={key} style={{
+              background: "var(--bg)", borderRadius: "var(--r)", padding: 24,
+              borderLeft: `3px solid ${key === "eudr" ? "var(--red)" : key === "cbam" ? "var(--amber)" : "var(--sage)"}`,
+            }}>
+              <div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginBottom: 8, color: key === "eudr" ? "var(--red)" : key === "cbam" ? "var(--amber)" : "var(--sage)" }}>
+                {key === "eudr" ? "EUDR" : key === "cbam" ? "CBAM" : "UK BTOM"}
+              </div>
+              <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.7, margin: 0 }}>
+                {t(`factsSection.regulations.${key}`)}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ═══ BLOG PREVIEW ═══ */}
+      <section id="blog" style={{ padding: "80px 60px" }}>
+        <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
+          From the TapTrao Blog
+        </h2>
+        <p style={{ fontSize: 15, color: "var(--t3)", marginBottom: 40, maxWidth: 500 }}>
+          What every small importer needs to know — before the next shipment.
+        </p>
+
+        <div className="hp-blog-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
+          {([
+            { slug: "/blog/sesame-seeds-nigeria", image: "/blog/sesame.jpg", tag: "Food Safety \u00B7 EU MRLs", title: "Why sesame seeds from Nigeria keep getting rejected at Rotterdam", readTime: "7 min read" },
+            { slug: "/blog/cocoa-eudr-importers", image: "/blog/cocoa.jpg", tag: "EUDR \u00B7 Cocoa \u00B7 Ghana", title: "What EUDR actually requires from cocoa importers \u2014 and why most small businesses aren't ready", readTime: "8 min read" },
+            { slug: "/blog/tropical-fruits-phytosanitary", image: "/blog/fruits.jpg", tag: "Phytosanitary \u00B7 UK Border", title: "The 14-day window that catches tropical fruit importers off guard", readTime: "7 min read" },
+            { slug: "/blog/bamboo-eudr-forest-product", image: "/blog/bamboo.jpg", tag: "EUDR \u00B7 Forest Products", title: "Bamboo is a forest product under EUDR. Most importers don't know that yet.", readTime: "7 min read" },
+          ]).map((post) => (
+            <Link key={post.slug} href={post.slug} style={{
+              background: "#fff", borderRadius: "var(--r)", overflow: "hidden",
+              textDecoration: "none", color: "inherit", display: "flex", flexDirection: "column",
+              boxShadow: "var(--shd)", transition: "box-shadow 0.25s, transform 0.25s",
+            }} className="hp-blog-card">
+              <img src={post.image} alt={post.title} style={{ width: "100%", height: 180, objectFit: "cover", display: "block" }} />
+              <div style={{ padding: "20px 22px 24px", display: "flex", flexDirection: "column", flex: 1 }}>
+                <span style={{
+                  fontSize: 10, fontWeight: 600, letterSpacing: "0.11em", textTransform: "uppercase",
+                  color: "var(--sage)", background: "rgba(107,144,128,0.1)",
+                  padding: "3px 10px", borderRadius: 100, alignSelf: "flex-start", marginBottom: 10,
+                }}>{post.tag}</span>
+                <div style={{
+                  fontFamily: "var(--fd)", fontSize: 15, fontWeight: 700, lineHeight: 1.35,
+                  color: "var(--dark)", marginBottom: 12, flex: 1,
+                }}>{post.title}</div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--dark)", borderBottom: "2px solid var(--sage)", paddingBottom: 1 }}>
+                    Continue reading &rarr;
+                  </span>
+                  <span style={{ fontSize: 12, color: "var(--t3)", opacity: 0.6 }}>{post.readTime}</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: 32 }}>
+          <Link href="/blog" style={{
+            display: "inline-block", padding: "12px 32px", borderRadius: 24,
+            border: "2px solid var(--sage)", color: "var(--sage)",
+            fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600, textDecoration: "none",
+          }}>
+            View All Articles
+          </Link>
         </div>
       </section>
 
@@ -1177,10 +1151,6 @@ export default function Home() {
 
       {/* Animations + Responsive overrides */}
       <style>{`
-        @keyframes demoFadeIn {
-          from { opacity: 0; transform: translateY(12px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(20px); }
           to   { opacity: 1; transform: translateY(0); }
@@ -1193,8 +1163,6 @@ export default function Home() {
           from { transform: rotate(0deg); }
           to   { transform: rotate(360deg); }
         }
-        .hp-demo-tabs::-webkit-scrollbar { display: none; }
-        .hp-demo-tabs { scrollbar-width: none; }
         .hp-blog-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.08) !important; }
 
         @media (max-width: 768px) {
@@ -1235,8 +1203,8 @@ export default function Home() {
           /* Steps */
           .hp-steps-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
 
-          /* Demo */
-          .hp-page .hp-validation-section { margin: 0 12px !important; padding: 28px 16px !important; border-radius: 16px !important; }
+          /* TwinLog */
+          .hp-page .hp-twinlog-section { margin: 0 12px !important; padding: 28px 16px !important; border-radius: 16px !important; }
 
           /* Supplier preview */
           .hp-supplier-grid { grid-template-columns: 1fr !important; gap: 24px !important; }

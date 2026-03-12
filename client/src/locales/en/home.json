@@ -10,9 +10,9 @@
   },
 
   "hero": {
-    "heading": "See what's between you and customs clearance.",
-    "subheading": "Enter your trade corridor. We'll show you every document, duty, and regulation standing in the way — and how to handle each one.",
-    "ctaPrimary": "Check Corridor Requirements",
+    "heading": "Focus on your negotiations. TapTrao handles your obligations.",
+    "subheading": "Every document, every regulation, every deadline — managed for you from the moment you book the shipment.",
+    "ctaPrimary": "Preview your corridor free — see risks in seconds",
     "commodityPlaceholder": "What are you buying?",
     "originPlaceholder": "Where from?",
     "destinationPlaceholder": "Where to?",
@@ -49,25 +49,76 @@
   },
 
   "trustBar": {
-    "corridors": "AFRICA → EU · UK · USA · CANADA · TÜRKIYE · SWITZERLAND"
+    "corridors": "191 commodities • 54 African origins • 7 destinations • Every regulation mapped",
+    "regulations": "EUDR, CBAM, SPS, Certificates of Origin, LC terms, customs documentation"
   },
 
-  "factsSection": {
-    "heading": "What every African commodity importer should know",
-    "subheading": "191 commodities. 54 African origins. 7 destinations. Every regulation mapped.",
-    "regulations": {
-      "heading": "Upcoming regulatory deadlines",
-      "eudr": "EUDR: Entry into application 30 Dec 2025 for large/medium operators; 30 Jun 2026 for micro/small enterprises. Covers cocoa, coffee, palm oil, rubber, soy, wood, cattle — and derived products.",
-      "cbam": "CBAM: Fully operational from 1 Jan 2026. Importers above the threshold must purchase CBAM certificates reflecting embedded carbon. Affects aluminium, iron, steel, cement, fertilisers, hydrogen.",
-      "ukBtom": "UK Border: Full SPS checks on all food/plant imports. Phytosanitary certificates mandatory — missing one means automatic rejection at the border."
+  "realCost": {
+    "heading": "The real cost of getting it wrong",
+    "subheading": "One missing document can cost more than the shipment check itself.",
+    "demurrage": {
+      "title": "Demurrage",
+      "amount": "€75–€300/day",
+      "detail": "In demurrage while documents are stuck at port."
     },
-    "costs": {
-      "heading": "Cost of compliance failures",
-      "demurrage": "$75–$300/day demurrage at Felixstowe, Rotterdam, Hamburg while documents are stuck",
-      "bankFee": "$95–$160 bank fee for a single LC discrepancy",
-      "isfPenalty": "$5,000 US ISF late-filing penalty per violation",
-      "cascadeCost": "A single missing Certificate of Origin from Ghana, Côte d'Ivoire, or Kenya can cascade into $1,500+ in delays and fees"
+    "lc": {
+      "title": "LC Discrepancy",
+      "amount": "$95–$160",
+      "detail": "For a single LC discrepancy — bank amendment fees plus payment delays."
+    },
+    "sps": {
+      "title": "Missing Certificate",
+      "amount": "$1,500+",
+      "detail": "In delays and fees from one missing certificate of origin or phytosanitary certificate."
+    },
+    "eudr": {
+      "title": "EUDR Breach",
+      "amount": "Up to 4% of EU turnover",
+      "detail": "For serious EUDR breaches — fines, shipment seizure, and potential market ban."
+    },
+    "cbam": {
+      "title": "CBAM Exposure",
+      "amount": "Variable",
+      "detail": "From missing or incorrect emissions data — penalties and retroactive certificate purchases."
     }
+  },
+
+  "pricingSection": {
+    "heading": "Protect your margins for $189 per shipment.",
+    "subheading": "One complete compliance check can prevent thousands in delays, penalties, and document errors.",
+    "plans": {
+      "single": {
+        "name": "Single Shield",
+        "price": "$189",
+        "per": "per shipment",
+        "description": "One complete compliance check for a single shipment.",
+        "tooltip": "Single Shield — $189: Full compliance report with EUDR + CBAM screening, LC cross-validation, supplier upload link, and TwinLog audit trail for one shipment.",
+        "features": "Complete document checklist for the shipment\nRegulation screening across the corridor\nLC terms included where applicable\nSupplier upload link\nTwinLog audit proof",
+        "savings": "Typical savings: $2,000–$15,000+ in avoided delays, fees, and rejected paperwork"
+      },
+      "threePack": {
+        "name": "3-Pack",
+        "price": "$499",
+        "badge": "BEST VALUE",
+        "per": "$166 per shipment",
+        "description": "Best for repeat traders across multiple shipments.",
+        "tooltip": "3-Pack — $499 ($166/shipment): Everything in Single Shield for 3 shipments. Save $68. Valid 12 months with priority support.",
+        "features": "Everything in Single Shield\nLower cost per shipment\nValid for 12 months\nPriority support",
+        "savings": "Save $68 total"
+      },
+      "fivePack": {
+        "name": "5-Pack",
+        "price": "$799",
+        "per": "$160 per shipment",
+        "description": "Lowest cost per shipment for regular corridor activity.",
+        "tooltip": "5-Pack — $799 ($160/shipment): Everything in Single Shield for 5 shipments. Save $146. Includes dedicated onboarding and priority support.",
+        "features": "Everything in Single Shield\nLowest per-shipment cost\nDedicated onboarding",
+        "savings": "Save $146 total"
+      }
+    },
+    "ctaFeatured": "Best Value →",
+    "ctaDefault": "Get Started →",
+    "previewBadge": "Free Preview"
   },
 
   "howItWorks": {
@@ -76,24 +127,62 @@
     "steps": {
       "step1": {
         "label": "KNOW",
-        "title": "Map your corridor",
-        "description": "Enter your commodity, origin, and destination. TapTrao maps every required document, duty rate, and regulatory trigger — EUDR, CBAM, SPS, CITES, and more."
+        "title": "Map your shipment corridor",
+        "description": "TapTrao identifies the documents, duties, and regulatory triggers for your route — including EUDR, CBAM, SPS, CITES, and more."
       },
       "step2": {
         "label": "ASK",
-        "title": "Collect from suppliers",
-        "description": "Generate a zero-login upload link for your supplier. They see exactly which documents to provide and upload directly from their phone. No account needed."
+        "title": "Collect documents from suppliers",
+        "description": "Send a zero-login upload link. Your supplier sees exactly what to provide and uploads directly from their phone."
       },
       "step3": {
         "label": "PROVE",
-        "title": "Cross-validate everything",
-        "description": "Upload your LC and trade documents. TapTrao cross-checks every field against UCP 600 rules and flags discrepancies before you submit to the bank."
+        "title": "Cross-check everything before it moves",
+        "description": "TapTrao checks the full picture — certificates of origin, phytosanitary certificates, LC terms, customs declarations, and supporting paperwork — flagging every gap before the shipment leaves port."
       },
       "step4": {
         "label": "MONITOR",
-        "title": "Watch for changes",
-        "description": "Set up corridor alerts. Get notified when duty rates change, new regulations apply, or deadlines approach — before they impact your shipment."
+        "title": "Stay ahead of changes",
+        "description": "Get alerts when regulations change, deadlines approach, or new obligations affect your corridor."
       }
+    }
+  },
+
+  "twinlog": {
+    "heading": "TwinLog: proof you complied",
+    "subheading": "Every check, every document, every supplier submission — permanently recorded and tamper-proof.",
+    "body": "If a customs authority, bank, buyer, or auditor ever questions your shipment, you have verifiable proof of what was checked, when it was checked, and who provided it.",
+    "eudr": "Your EUDR TwinLog — hashed and exportable as PDF.",
+    "cbam": "Your CBAM TwinLog — hashed and exportable as PDF.",
+    "record": "Your complete compliance record — yours to keep and present on demand.",
+    "closing": "TapTrao doesn't just help you comply. It helps you prove you complied."
+  },
+
+  "supplierPreview": {
+    "heading": "What your supplier sees",
+    "subheading": "A simple upload link. No login. No confusion.",
+    "noLogin": "No account required",
+    "exactDocs": "Clear checklist of required documents",
+    "uploadPhone": "Upload from any phone",
+    "tracked": "Progress tracked inside TapTrao",
+    "cta": "Run a free preview to see it in action"
+  },
+
+  "factsSection": {
+    "heading": "What every importer should know",
+    "subheading": "Upcoming deadlines, real compliance cost examples, and which regulations apply to your corridors.",
+    "regulations": {
+      "heading": "Key regulations",
+      "eudr": "EUDR — Entry into application now for large operators. Cocoa, coffee, palm oil, rubber, soy, wood, cattle. Missing a Due Diligence Statement means your shipment doesn't clear.",
+      "cbam": "CBAM — Fully operational from January 2026. Importers must purchase certificates reflecting embedded carbon. Affects fertilizers, cement, aluminium, iron and steel.",
+      "ukBtom": "UK BTOM — Full SPS checks on all food and plant imports. A missing phytosanitary certificate means automatic rejection at the border."
+    },
+    "costs": {
+      "heading": "Cost of compliance failures",
+      "demurrage": "$75–$300/day demurrage at Felixstowe, Rotterdam, Hamburg while documents are stuck",
+      "bankFee": "$95–$160 bank fee for a single LC discrepancy",
+      "isfPenalty": "$5,000 US ISF late-filing penalty per violation",
+      "cascadeCost": "A single missing Certificate of Origin from Ghana, Côte d'Ivoire, or Kenya can cascade into $1,500+ in delays and fees"
     }
   },
 
@@ -209,82 +298,9 @@
     }
   },
 
-  "supplierPreview": {
-    "heading": "What your supplier sees",
-    "subheading": "A zero-login upload link. They see exactly which documents to provide — from their phone.",
-    "noLogin": "No login or account required",
-    "exactDocs": "Clear checklist of exactly which documents to upload",
-    "tracked": "Progress tracked in your TapTrao dashboard",
-    "cta": "Run a free preview to see it in action"
-  },
-
-  "realCost": {
-    "heading": "The Real Cost of Getting It Wrong",
-    "subheading": "One missed document. One wrong field. Here's what it costs.",
-    "eudr": {
-      "title": "EUDR Non-Compliance",
-      "amount": "Up to 4% of EU turnover",
-      "detail": "Fines up to 4% of EU annual turnover, shipment seizure at the border, and potential market ban for repeat offenders."
-    },
-    "cbam": {
-      "title": "CBAM Reporting Failure",
-      "amount": "€100 per tonne",
-      "detail": "€100 penalty per tonne of unreported embedded emissions, plus potential audit fees and retroactive certificate purchases."
-    },
-    "demurrage": {
-      "title": "Border Delays & Rejections",
-      "amount": "€100–€300/day",
-      "detail": "Container demurrage at Rotterdam, Felixstowe, and Hamburg — common for cocoa, cashews, and coffee shipments stuck in customs."
-    },
-    "lc": {
-      "title": "LC Discrepancies",
-      "amount": "$50–$200 per issue",
-      "detail": "Bank amendment fees per discrepancy, plus payment delays of 2–4 weeks. Multiple discrepancies can cost $800+ and block the entire transaction."
-    },
-    "sps": {
-      "title": "SPS / Phytosanitary Failures",
-      "amount": "$1,500–$5,000+",
-      "detail": "Missing phytosanitary certificates from Ghana, Nigeria, or Côte d'Ivoire trigger inspection fees, port storage, and potential shipment destruction."
-    }
-  },
-
-  "pricingSection": {
-    "heading": "$189 per shipment. One-off. No contract.",
-    "subheading": "No subscription. No ERP. Preview any corridor for free.",
-    "plans": {
-      "single": {
-        "name": "Single Shield",
-        "price": "$189",
-        "per": "per shipment",
-        "description": "One complete compliance check for a single shipment — ideal for first-time importers or one-off trades.",
-        "tooltip": "Single Shield — $189: Full compliance report with EUDR + CBAM screening, LC cross-validation, supplier upload link, and TwinLog audit trail for one shipment.",
-        "features": "Full compliance report\nLC cross-validation (UCP 600)\nEUDR + CBAM screening\nCorridor risk rating + fix recommendations\nSupplier upload link\nTwinLog audit trail"
-      },
-      "threePack": {
-        "name": "3-Pack",
-        "price": "$499",
-        "per": "$166 per shipment",
-        "description": "Best for regular traders — cover 3 shipments at a lower cost per check. Valid 12 months.",
-        "tooltip": "3-Pack — $499 ($166/shipment): Everything in Single Shield for 3 shipments. Save $68. Valid 12 months with priority support.",
-        "features": "Everything in Single Shield\nSave $68 total\nValid for 12 months\nPriority support"
-      },
-      "fivePack": {
-        "name": "5-Pack",
-        "price": "$799",
-        "per": "$160 per shipment",
-        "description": "Lowest cost per shipment — for trading houses managing multiple corridors. Includes dedicated onboarding.",
-        "tooltip": "5-Pack — $799 ($160/shipment): Everything in Single Shield for 5 shipments. Save $146. Includes dedicated onboarding and priority support.",
-        "features": "Everything in Single Shield\nSave $146 total\nValid for 12 months\nPriority support\nDedicated onboarding"
-      }
-    },
-    "ctaFeatured": "Best Value →",
-    "ctaDefault": "Get Started",
-    "previewBadge": "Free Preview"
-  },
-
   "finalCta": {
-    "heading": "Ready to see what's standing in your way?",
-    "subheading": "Preview compliance requirements for any African commodity corridor. Free.",
+    "heading": "Every document. Every regulation. Every African corridor.",
+    "subheading": "Focus on your negotiations. TapTrao handles your obligations — and proves it.",
     "button": "Check Your Corridor →"
   },
 
