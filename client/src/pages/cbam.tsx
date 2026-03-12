@@ -57,6 +57,25 @@ function breakdownBarColor(pct: number) {
   return "red";
 }
 
+// CBAM Annex III transitional default emission factors (tCO₂e per ton of product)
+const CBAM_DEFAULT_FACTORS: Record<string, { factor: number; label: string }> = {
+  "72": { factor: 1.85, label: "Iron & steel (crude/semi-finished)" },
+  "73": { factor: 1.85, label: "Articles of iron/steel" },
+  "76": { factor: 8.50, label: "Aluminium" },
+  "31": { factor: 2.70, label: "Fertilisers" },
+  "28": { factor: 1.20, label: "Inorganic chemicals / hydrogen" },
+  "25": { factor: 0.75, label: "Cement / clinker" },
+  "2716": { factor: 0.40, label: "Electricity (tCO₂e/MWh)" },
+};
+
+function getDefaultFactor(hsCode: string): { factor: number; label: string } | null {
+  const hs = hsCode.replace(/\./g, "");
+  for (const prefix of ["2716", "72", "73", "76", "31", "28", "25"]) {
+    if (hs.startsWith(prefix)) return CBAM_DEFAULT_FACTORS[prefix];
+  }
+  return null;
+}
+
 // ── Main CBAM Page ──
 export default function CbamPage() {
   const { t } = useTranslation("trades");
@@ -135,13 +154,15 @@ export default function CbamPage() {
     try {
       const res = await apiRequest("PATCH", `/api/cbam/${cbamId}`, stepData);
       await res.json(); // ensure response is fully consumed before proceeding
+      // Invalidate cache so navigating back to earlier steps shows saved data
+      await queryClient.invalidateQueries({ queryKey: ["/api/cbam", lookupId] });
       setSaving(false);
       return true;
     } catch (_e) {
       setSaving(false);
       return false;
     }
-  }, [cbamId]);
+  }, [cbamId, lookupId]);
 
   const runAssessment = useCallback(async () => {
     if (!lookupId) return;
@@ -740,14 +761,28 @@ export default function CbamPage() {
                   </span>
                 </div>
               </div>
-              {hsCode && (
-                <div className="cbam-card">
-                  <div style={{ fontSize: 11, color: "var(--t3)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Annex III default reference</div>
-                  <div className="cbam-info-box">
-                    📌 CBAM Annex III default for <strong>{commodityName} (HS {hsCode})</strong>
+              {hsCode && (() => {
+                const def = getDefaultFactor(hsCode);
+                return (
+                  <div className="cbam-card">
+                    <div style={{ fontSize: 11, color: "var(--t3)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Annex III default reference</div>
+                    <div className="cbam-info-box">
+                      📌 CBAM Annex III default for <strong>{commodityName} (HS {hsCode})</strong>
+                    </div>
+                    {def ? (
+                      <div style={{ marginTop: 10, display: "flex", alignItems: "baseline", gap: 8 }}>
+                        <span style={{ fontSize: 22, fontWeight: 700, color: "var(--cbam-dark)" }}>{def.factor}</span>
+                        <span style={{ fontSize: 13, color: "var(--t3)" }}>tCO₂e / ton</span>
+                      </div>
+                    ) : (
+                      <div style={{ marginTop: 10, fontSize: 12, color: "var(--t4)" }}>No default factor available for this HS code. Actual supplier data required.</div>
+                    )}
+                    {def && (
+                      <div style={{ fontSize: 11, color: "var(--t4)", marginTop: 4 }}>{def.label} — EU transitional default value</div>
+                    )}
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
           </div>
         )}
