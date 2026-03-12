@@ -30,7 +30,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
           <Link href="/blog" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: "0.875rem" }}>Blog</Link>
           <a href="/#how" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: "0.875rem" }}>How It Works</a>
           <a href="/#pricing" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: "0.875rem" }}>Pricing</a>
-          <Link href="/lookup" style={{
+          <Link href="/new-check" style={{
             background: "var(--sage)", color: "#fff",
             padding: "8px 20px", borderRadius: 100, fontWeight: 600, fontSize: "0.875rem",
             textDecoration: "none",
@@ -58,7 +58,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
           <Link href="/blog" onClick={() => setMenuOpen(false)} style={{ color: "#fff", textDecoration: "none", fontSize: 15 }}>Blog</Link>
           <a href="/#how" onClick={() => setMenuOpen(false)} style={{ color: "rgba(255,255,255,.7)", textDecoration: "none", fontSize: 15 }}>How It Works</a>
           <a href="/#pricing" onClick={() => setMenuOpen(false)} style={{ color: "rgba(255,255,255,.7)", textDecoration: "none", fontSize: 15 }}>Pricing</a>
-          <Link href="/lookup" onClick={() => setMenuOpen(false)} style={{
+          <Link href="/new-check" onClick={() => setMenuOpen(false)} style={{
             background: "var(--sage)", color: "#fff", padding: "10px 20px",
             borderRadius: 100, fontWeight: 600, textDecoration: "none", textAlign: "center",
           }}>

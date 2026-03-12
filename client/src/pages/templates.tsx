@@ -205,7 +205,7 @@ export default function Templates() {
     try {
       await apiRequest("POST", `/api/templates/${template.id}/use`);
     } catch {}
-    navigate(`/lookup?templateId=${template.id}`);
+    navigate(`/new-check?templateId=${template.id}`);
   };
 
   const count = templatesList?.length ?? 0;

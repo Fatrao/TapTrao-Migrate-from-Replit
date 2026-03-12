@@ -226,7 +226,7 @@ export default function BlogFruits() {
             UK General Marketing Standards, pesticide MRL compliance, and commodity-specific import conditions —
             all in one check before your goods leave the origin country.
           </p>
-          <Link href="/lookup" className="blog-btn-sage">Run a Free Compliance Check</Link>
+          <Link href="/new-check" className="blog-btn-sage">Run a Free Compliance Check</Link>
         </div>
 
         {/* Related posts */}

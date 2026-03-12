@@ -197,7 +197,7 @@ export default function BlogSesame() {
             TapTrao's pre-shipment compliance check covers EU MRL verification, RASFF alerts, border control
             status, and documentation requirements — specific to your origin country and commodity.
           </p>
-          <Link href="/lookup" className="blog-btn-sage">Run a Free Compliance Check</Link>
+          <Link href="/new-check" className="blog-btn-sage">Run a Free Compliance Check</Link>
         </div>
 
         {/* Related posts */}

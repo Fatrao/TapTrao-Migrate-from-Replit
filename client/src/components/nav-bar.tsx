@@ -21,7 +21,7 @@ export function NavBar() {
   const templateCount = templateCountQuery.data?.count ?? 0;
 
   const navLinks = [
-    { href: "/lookup", label: t("nav.lookup"), testId: "lookup" },
+    { href: "/new-check", label: t("nav.lookup"), testId: "lookup" },
     { href: "/lc-check", label: t("nav.lcChecker"), testId: "lc-checker" },
     { href: "/trades", label: t("nav.myTrades"), testId: "my-trades" },
     { href: "/templates", label: t("nav.templates"), showCount: true, testId: "templates" },

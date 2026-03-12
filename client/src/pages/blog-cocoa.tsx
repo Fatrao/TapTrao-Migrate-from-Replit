@@ -189,7 +189,7 @@ export default function BlogCocoa() {
             validation, risk classification, and documentation completeness — specific to your supplier country
             and shipment details.
           </p>
-          <Link href="/lookup" className="blog-btn-sage">Run a Free Compliance Check</Link>
+          <Link href="/new-check" className="blog-btn-sage">Run a Free Compliance Check</Link>
         </div>
 
         {/* Related posts */}
