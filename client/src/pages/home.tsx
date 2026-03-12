@@ -252,7 +252,7 @@ export default function Home() {
               fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600, textDecoration: "none",
             }}>{t("nav.myTrades")}</Link>
           ) : (
-            <Link href="/new-check" style={{
+            <Link href="/lookup" style={{
               padding: "9px 22px", borderRadius: 20, border: "none",
               background: "var(--sage)", color: "#fff",
               fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600, textDecoration: "none",
@@ -293,7 +293,7 @@ export default function Home() {
                 textAlign: "center", fontWeight: 600, textDecoration: "none", fontSize: 15,
               }}>{t("nav.myTrades")}</Link>
             ) : (
-              <Link href="/new-check" onClick={() => setMobileMenuOpen(false)} style={{
+              <Link href="/lookup" onClick={() => setMobileMenuOpen(false)} style={{
                 padding: "12px 24px", borderRadius: 20, background: "var(--sage)", color: "#fff",
                 textAlign: "center", fontWeight: 600, textDecoration: "none", fontSize: 15,
               }}>{t("nav.freeComplianceCheck")}</Link>
@@ -880,7 +880,7 @@ export default function Home() {
                 </span>
               </div>
             ))}
-            <Link href="/new-check" style={{
+            <Link href="/lookup" style={{
               padding: "14px 28px", borderRadius: 12, border: "none",
               background: "var(--sage)", color: "#fff",
               fontFamily: "var(--fb)", fontSize: 15, fontWeight: 600,
@@ -1084,7 +1084,7 @@ export default function Home() {
         <div style={{ display: "flex", gap: 40, flexWrap: "wrap" }}>
           <div>
             <h4 style={{ fontSize: 15, fontWeight: 600, letterSpacing: 1, color: "rgba(255,255,255,.2)", marginBottom: 10, textTransform: "uppercase" }}>{t("footer.product")}</h4>
-            <Link href="/new-check" style={{ display: "block", fontSize: 15, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.freeCheck")}</Link>
+            <Link href="/lookup" style={{ display: "block", fontSize: 15, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.freeCheck")}</Link>
             <Link href="/pricing" style={{ display: "block", fontSize: 15, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.pricing")}</Link>
             <Link href="/lc-check" style={{ display: "block", fontSize: 15, color: "rgba(255,255,255,.8)", textDecoration: "none", marginBottom: 6 }}>{t("footer.lcCheck")}</Link>
           </div>

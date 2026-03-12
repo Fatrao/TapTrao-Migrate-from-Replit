@@ -410,7 +410,7 @@ export default function EudrPage() {
                 })}
               </div>
               <button className="eudr-hbtn" onClick={() => navigate("/alerts")}>🔔</button>
-              <button className="eudr-ntb" onClick={() => navigate("/new-check")}>+ New Trade</button>
+              <button className="eudr-ntb" onClick={() => navigate("/lookup")}>+ New Trade</button>
             </div>
           </div>
 

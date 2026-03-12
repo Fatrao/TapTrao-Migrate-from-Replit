@@ -374,7 +374,7 @@ export default function LcCheck() {
       topCenter={
         <>
           <Link href="/dashboard"><a>Dashboard</a></Link>
-          <Link href="/new-check"><a>Commodities</a></Link>
+          <Link href="/lookup"><a>Commodities</a></Link>
           <Link href="/inbox"><a>Suppliers</a></Link>
           <Link href="/lc-check"><a className="active">Compliance</a></Link>
           <Link href="/inbox"><a>Messages</a></Link>

@@ -50,7 +50,7 @@ function AlertCard({ alert, onVisible }: { alert: AlertItem; onVisible: (id: str
 
   const firstHs = alert.hsCodesAffected?.[0];
   const firstDest = alert.destIso2Affected?.[0];
-  const lookupHref = firstHs && firstDest ? `/new-check?hs=${firstHs}&dest=${firstDest}` : "/new-check";
+  const lookupHref = firstHs && firstDest ? `/lookup?hs=${firstHs}&dest=${firstDest}` : "/lookup";
 
   return (
     <div

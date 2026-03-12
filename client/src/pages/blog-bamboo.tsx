@@ -196,7 +196,7 @@ export default function BlogBamboo() {
             requirements, phytosanitary certification, and documentation completeness — specific to your
             commodity, origin, and destination.
           </p>
-          <Link href="/new-check" className="blog-btn-sage">Run a Free Compliance Check</Link>
+          <Link href="/lookup" className="blog-btn-sage">Run a Free Compliance Check</Link>
         </div>
 
         {/* Related posts */}

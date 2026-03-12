@@ -78,7 +78,7 @@ export default function BlogIndex() {
       <div className="blog-cta-bar">
         <h2>De-risk your next shipment before spending</h2>
         <p>Run a free compliance check on your commodity, corridor and documents in under two minutes.</p>
-        <Link href="/new-check" className="blog-btn-sage">Free Compliance Check</Link>
+        <Link href="/lookup" className="blog-btn-sage">Free Compliance Check</Link>
       </div>
     </BlogLayout>
   );

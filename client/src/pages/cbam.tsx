@@ -272,7 +272,7 @@ export default function CbamPage() {
               <button className="cbam-hbtn" onClick={() => navigate("/alerts")}>
                 🔔<span className="cbam-bell-dot" />
               </button>
-              <button className="cbam-ntb" onClick={() => navigate("/new-check")}>+ New Trade</button>
+              <button className="cbam-ntb" onClick={() => navigate("/lookup")}>+ New Trade</button>
             </div>
           </div>
 
@@ -617,7 +617,7 @@ export default function CbamPage() {
             <button className="cbam-hbtn" onClick={() => navigate("/alerts")}>
               🔔<span className="cbam-bell-dot" />
             </button>
-            <button className="cbam-ntb" onClick={() => navigate("/new-check")}>+ New Trade</button>
+            <button className="cbam-ntb" onClick={() => navigate("/lookup")}>+ New Trade</button>
           </div>
         </div>
 
