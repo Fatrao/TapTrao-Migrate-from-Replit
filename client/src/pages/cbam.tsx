@@ -102,8 +102,10 @@ export default function CbamPage() {
     enabled: !!lookupId,
   });
 
+  // Only populate draft from DB on initial load (not on every refetch)
+  const [draftLoaded, setDraftLoaded] = useState(false);
   useEffect(() => {
-    if (cbamQuery.data) {
+    if (cbamQuery.data && !draftLoaded) {
       setCbamId(cbamQuery.data.id);
       const rec = cbamQuery.data;
       setDraft((prev) => ({
@@ -123,8 +125,9 @@ export default function CbamPage() {
       if (rec.installationName || rec.installationCountry || rec.reportingPeriod) done.add(2);
       if (rec.carbonPricePaid != null) done.add(3);
       if (done.size > 0) setCompletedSteps(done);
+      setDraftLoaded(true);
     }
-  }, [cbamQuery.data]);
+  }, [cbamQuery.data, draftLoaded]);
 
   const lookup = lookupQuery.data;
   const resultJson = lookup?.resultJson as ComplianceResult | undefined;
@@ -153,16 +156,14 @@ export default function CbamPage() {
     setSaving(true);
     try {
       const res = await apiRequest("PATCH", `/api/cbam/${cbamId}`, stepData);
-      await res.json(); // ensure response is fully consumed before proceeding
-      // Invalidate cache so navigating back to earlier steps shows saved data
-      await queryClient.invalidateQueries({ queryKey: ["/api/cbam", lookupId] });
+      await res.json(); // ensure DB write completes before proceeding
       setSaving(false);
       return true;
     } catch (_e) {
       setSaving(false);
       return false;
     }
-  }, [cbamId, lookupId]);
+  }, [cbamId]);
 
   const runAssessment = useCallback(async () => {
     if (!lookupId) return;
