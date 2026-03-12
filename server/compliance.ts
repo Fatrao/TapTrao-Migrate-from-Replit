@@ -95,6 +95,7 @@ function portalGuideForDestination(dest: Destination): string | null {
   if (iso === "EU") return "Submit via TRACES NT (Trade Control and Expert System) — https://webgate.ec.europa.eu/tracesnt";
   if (iso === "CH") return "Submit via Swiss e-dec electronic customs declaration system — https://www.bazg.admin.ch/bazg/en/home.html";
   if (iso === "US") return "File via ACE (Automated Commercial Environment) — https://www.cbp.gov/trade/ace";
+  if (iso === "AE") return "File via Dubai Trade portal (Mirsal 2) — https://www.dubaitrade.ae";
   return null;
 }
 
