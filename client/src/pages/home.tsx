@@ -976,6 +976,72 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══ REAL COST OF GETTING IT WRONG ═══ */}
+      <section style={{ padding: "80px 60px", background: "linear-gradient(180deg, #faf8f5 0%, #fff 100%)" }}>
+        <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8, color: "var(--t1)" }}>
+          {t("realCost.heading")}
+        </h2>
+        <p style={{ fontSize: 15, color: "var(--t3)", marginBottom: 40, maxWidth: 560 }}>
+          {t("realCost.subheading")}
+        </p>
+
+        <div className="hp-realcost-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+          {([
+            { key: "eudr" as const, icon: "\uD83C\uDF3F", accent: "#059669", accentBg: "rgba(5,150,105,0.08)", borderColor: "rgba(5,150,105,0.2)" },
+            { key: "cbam" as const, icon: "\uD83C\uDFED", accent: "#2563eb", accentBg: "rgba(37,99,235,0.08)", borderColor: "rgba(37,99,235,0.2)" },
+            { key: "demurrage" as const, icon: "\u2693", accent: "#d97706", accentBg: "rgba(217,119,6,0.08)", borderColor: "rgba(217,119,6,0.2)" },
+            { key: "lc" as const, icon: "\uD83D\uDCDC", accent: "#7c3aed", accentBg: "rgba(124,58,237,0.08)", borderColor: "rgba(124,58,237,0.2)" },
+            { key: "sps" as const, icon: "\uD83D\uDEE1\uFE0F", accent: "#dc2626", accentBg: "rgba(220,38,38,0.08)", borderColor: "rgba(220,38,38,0.2)" },
+          ]).map((item) => (
+            <div
+              key={item.key}
+              style={{
+                background: "#fff",
+                borderRadius: "var(--r)",
+                padding: "24px 22px",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+                border: `1px solid ${item.borderColor}`,
+                borderTop: `3px solid ${item.accent}`,
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+                transition: "transform 0.2s, box-shadow 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLDivElement).style.transform = "translateY(-4px)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 32px rgba(0,0,0,0.12)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 10,
+                  background: item.accentBg,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 20, flexShrink: 0,
+                }}>
+                  {item.icon}
+                </div>
+                <div>
+                  <div style={{ fontFamily: "var(--fd)", fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>
+                    {t(`realCost.${item.key}.title`)}
+                  </div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: item.accent, fontFamily: "var(--fd)" }}>
+                    {t(`realCost.${item.key}.amount`)}
+                  </div>
+                </div>
+              </div>
+              <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.6, margin: 0 }}>
+                {t(`realCost.${item.key}.detail`)}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ═══ PRICING ═══ */}
       <section id="pricing" style={{ padding: "80px 60px" }}>
         <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8 }}>
@@ -1175,7 +1241,8 @@ export default function Home() {
           /* Supplier preview */
           .hp-supplier-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
 
-          /* Blog + Pricing */
+          /* Real Cost + Blog + Pricing */
+          .hp-realcost-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
           .hp-blog-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
           .hp-pricing-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
           .hp-pricing-grid > div { padding: 24px !important; }

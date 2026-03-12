@@ -495,6 +495,9 @@ export default function Trades() {
                     dailyRate: tr.demurrageDailyRate ? Number(tr.demurrageDailyRate) : null,
                     spsFlagged: tr.spsFlagged,
                     lcFlagged: tr.lcVerdict === "DISCREPANCIES_FOUND",
+                    eudrApplicable: tr.eudrApplicable === true,
+                    cbamApplicable: tr.cbamApplicable === true,
+                    tradeValue: tr.tradeValue ? Number(tr.tradeValue) : undefined,
                     tradeStatus: tr.tradeStatus,
                   })));
                   if (portfolio.totalExpected === 0 && portfolio.totalWorstCase === 0) return "—";
@@ -528,6 +531,9 @@ export default function Trades() {
               dailyRate: tr.demurrageDailyRate ? Number(tr.demurrageDailyRate) : null,
               spsFlagged: tr.spsFlagged,
               lcFlagged: tr.lcVerdict === "DISCREPANCIES_FOUND",
+              eudrApplicable: tr.eudrApplicable === true,
+              cbamApplicable: tr.cbamApplicable === true,
+              tradeValue: tr.tradeValue ? Number(tr.tradeValue) : undefined,
             }),
           })).filter(r => r.risk.expectedLoss > 0 || r.risk.worstCase > 0);
 

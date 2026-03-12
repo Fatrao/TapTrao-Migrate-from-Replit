@@ -218,6 +218,36 @@
     "cta": "Lancez un aperçu gratuit pour le voir en action"
   },
 
+  "realCost": {
+    "heading": "Le vrai coût d'une erreur",
+    "subheading": "Un document manquant. Un champ erroné. Voici ce que ça coûte.",
+    "eudr": {
+      "title": "Non-conformité EUDR",
+      "amount": "Jusqu'à 4% du CA UE",
+      "detail": "Amendes jusqu'à 4% du chiffre d'affaires annuel UE, saisie de la cargaison à la frontière et interdiction de marché pour les récidivistes."
+    },
+    "cbam": {
+      "title": "Défaut de déclaration CBAM",
+      "amount": "100 €/tonne",
+      "detail": "Pénalité de 100 € par tonne d'émissions non déclarées, plus frais d'audit et achats rétroactifs de certificats."
+    },
+    "demurrage": {
+      "title": "Retards et rejets à la frontière",
+      "amount": "100–300 €/jour",
+      "detail": "Surestaries de conteneurs à Rotterdam, Felixstowe et Hambourg — fréquent pour le cacao, les noix de cajou et le café bloqués en douane."
+    },
+    "lc": {
+      "title": "Écarts LC",
+      "amount": "50–200 $ par écart",
+      "detail": "Frais de modification bancaire par écart, plus retards de paiement de 2 à 4 semaines. Plusieurs écarts peuvent coûter 800 $+ et bloquer toute la transaction."
+    },
+    "sps": {
+      "title": "Défaillances SPS / phytosanitaires",
+      "amount": "1 500–5 000 $+",
+      "detail": "L'absence de certificats phytosanitaires du Ghana, du Nigeria ou de Côte d'Ivoire entraîne des frais d'inspection, de stockage portuaire et une destruction potentielle."
+    }
+  },
+
   "pricingSection": {
     "heading": "189 $ par expédition. Paiement unique. Sans engagement.",
     "subheading": "Sans abonnement. Sans ERP. Aperçu de tout corridor gratuit.",

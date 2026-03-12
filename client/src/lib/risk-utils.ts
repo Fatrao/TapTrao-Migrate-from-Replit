@@ -4,8 +4,18 @@
  * Per-trade risk estimate based on:
  *   - readiness score → delay probability
  *   - demurrage daily rate
- *   - SPS flag
+ *   - SPS flag (phytosanitary non-compliance)
  *   - LC discrepancy flag
+ *   - EUDR applicability (EU Reg 2023/1115)
+ *   - CBAM applicability (EU Reg 2023/956)
+ *   - trade value (scales regulatory fines)
+ *
+ * Penalty sources:
+ *   EUDR: Fines up to 4% of EU turnover + shipment seizure + market ban
+ *   CBAM: €100/tonne unreported emissions + potential audits
+ *   SPS/Phyto: $1,500–$5,000+ in fees/delays (rejection, re-export, storage)
+ *   LC Discrepancies: $50–$200 per issue + payment delays
+ *   Demurrage: €100–€300/day at major EU ports
  */
 
 export type RiskComponents = {
@@ -16,6 +26,10 @@ export type RiskComponents = {
   spsCostWorst: number;
   lcCostExpected: number;
   lcCostWorst: number;
+  eudrCostExpected: number;
+  eudrCostWorst: number;
+  cbamCostExpected: number;
+  cbamCostWorst: number;
 };
 
 export type TradeRiskEstimate = {
@@ -33,27 +47,59 @@ export function getDelayProbability(readinessScore: number | null): number {
   return 0.70;
 }
 
-/** SPS flag cost constants */
-const SPS_EXPECTED = 112;
-const SPS_WORST = 600;
+/**
+ * SPS/Phytosanitary penalty constants
+ * Real-world: missing certs from Ghana/Nigeria = $1,500–$5,000+
+ * Expected: inspection fee + delays (~$1,500)
+ * Worst: full rejection + re-export + storage ($5,000+)
+ */
+const SPS_EXPECTED = 1500;
+const SPS_WORST = 5000;
 
-/** LC discrepancy cost constants */
-const LC_EXPECTED = 80;
-const LC_WORST = 350;
+/**
+ * LC Discrepancy cost constants
+ * Real-world: $50–$200 per discrepancy + payment delays
+ * Expected: amendment fee + 1-2 discrepancies (~$250)
+ * Worst: multiple discrepancies + payment rejection ($800+)
+ */
+const LC_EXPECTED = 250;
+const LC_WORST = 800;
+
+/**
+ * EUDR penalty constants (when no trade value available)
+ * Real-world: up to 4% of EU annual turnover + seizure + ban
+ * Flat fallback when trade value is unknown
+ */
+const EUDR_EXPECTED_FLAT = 2500;
+const EUDR_WORST_FLAT = 8000;
+const EUDR_EXPECTED_PCT = 0.02; // 2% of trade value (expected)
+const EUDR_WORST_PCT = 0.04;   // 4% of trade value (worst case — regulation max)
+
+/**
+ * CBAM penalty constants
+ * Real-world: €100/tonne unreported + audit fees
+ * Expected: reporting penalty for moderate shipment
+ * Worst: full penalty + audit + retroactive levies
+ */
+const CBAM_EXPECTED = 1200;
+const CBAM_WORST = 4000;
 
 /**
  * Calculate per-trade risk estimate.
  *
- * Expected loss = (delayProb × dailyRate × 3) + SPS($112) + LC($80)
- * Worst case    = (dailyRate × 7) + SPS($600) + LC($350)
+ * Expected loss = (delayProb × dailyRate × 3) + SPS + LC + EUDR + CBAM
+ * Worst case    = (dailyRate × 7) + SPS + LC + EUDR + CBAM
  */
 export function calculateTradeRisk(params: {
   readinessScore: number | null;
   dailyRate: number | null;
   spsFlagged: boolean;
   lcFlagged: boolean;
+  eudrApplicable?: boolean;
+  cbamApplicable?: boolean;
+  tradeValue?: number;
 }): TradeRiskEstimate {
-  const { readinessScore, dailyRate, spsFlagged, lcFlagged } = params;
+  const { readinessScore, dailyRate, spsFlagged, lcFlagged, eudrApplicable, cbamApplicable, tradeValue } = params;
   const rate = dailyRate ?? 0;
   const delayProbability = getDelayProbability(readinessScore);
 
@@ -64,9 +110,29 @@ export function calculateTradeRisk(params: {
   const lcCostExpected = lcFlagged ? LC_EXPECTED : 0;
   const lcCostWorst = lcFlagged ? LC_WORST : 0;
 
+  // EUDR: scale to trade value if available, otherwise use flat amount
+  let eudrCostExpected = 0;
+  let eudrCostWorst = 0;
+  if (eudrApplicable) {
+    if (tradeValue && tradeValue > 0) {
+      eudrCostExpected = tradeValue * EUDR_EXPECTED_PCT;
+      eudrCostWorst = tradeValue * EUDR_WORST_PCT;
+    } else {
+      eudrCostExpected = EUDR_EXPECTED_FLAT;
+      eudrCostWorst = EUDR_WORST_FLAT;
+    }
+  }
+
+  // CBAM: flat penalties (could be enhanced with actual tonnage data)
+  const cbamCostExpected = cbamApplicable ? CBAM_EXPECTED : 0;
+  const cbamCostWorst = cbamApplicable ? CBAM_WORST : 0;
+
+  const expectedLoss = demurrageExpected + spsCostExpected + lcCostExpected + eudrCostExpected + cbamCostExpected;
+  const worstCase = demurrageWorst + spsCostWorst + lcCostWorst + eudrCostWorst + cbamCostWorst;
+
   return {
-    expectedLoss: Math.round(demurrageExpected + spsCostExpected + lcCostExpected),
-    worstCase: Math.round(demurrageWorst + spsCostWorst + lcCostWorst),
+    expectedLoss: Math.round(expectedLoss),
+    worstCase: Math.round(worstCase),
     components: {
       delayProbability,
       demurrageExpected: Math.round(demurrageExpected),
@@ -75,6 +141,10 @@ export function calculateTradeRisk(params: {
       spsCostWorst,
       lcCostExpected,
       lcCostWorst,
+      eudrCostExpected: Math.round(eudrCostExpected),
+      eudrCostWorst: Math.round(eudrCostWorst),
+      cbamCostExpected,
+      cbamCostWorst,
     },
   };
 }
@@ -89,6 +159,9 @@ export function calculatePortfolioRisk(
     dailyRate: number | null;
     spsFlagged: boolean;
     lcFlagged: boolean;
+    eudrApplicable?: boolean;
+    cbamApplicable?: boolean;
+    tradeValue?: number;
     tradeStatus: string | null;
   }>
 ): { totalExpected: number; totalWorstCase: number; tradeCount: number } {

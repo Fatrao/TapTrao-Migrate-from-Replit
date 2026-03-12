@@ -993,7 +993,10 @@ export default function TradeDetail() {
   const spsFlagged = result?.triggers?.sps === true;
   const lcFlagged = data?.latestLcCheck?.verdict === "DISCREPANCIES_FOUND";
   const dailyRate = lookup?.demurrageDailyRate ? Number(lookup.demurrageDailyRate) : null;
-  const risk = lookup ? calculateTradeRisk({ readinessScore: lookup.readinessScore, dailyRate, spsFlagged, lcFlagged }) : null;
+  const eudrApplicable = result?.triggers?.eudr === true;
+  const cbamApplicable = result?.triggers?.cbam === true;
+  const tradeValueNum = lookup?.tradeValue ? Number(lookup.tradeValue) : 0;
+  const risk = lookup ? calculateTradeRisk({ readinessScore: lookup.readinessScore, dailyRate, spsFlagged, lcFlagged, eudrApplicable, cbamApplicable, tradeValue: tradeValueNum }) : null;
   const destIso2 = lookup ? nameToIso2[lookup.destinationName] : undefined;
   const verdict = lookup?.readinessVerdict as "GREEN" | "AMBER" | "RED" | undefined;
   const demEstimate = destIso2 ? estimateDemurrageRange(destIso2, verdict || "AMBER") : null;
@@ -1080,7 +1083,7 @@ export default function TradeDetail() {
                   <>
                     <div className="stp-ms-value amber">${risk.expectedLoss.toLocaleString()}</div>
                     <div className="stp-ms-bar"><div className="stp-ms-fill" style={{ width: `${Math.min((risk.expectedLoss / Math.max(risk.worstCase, 1)) * 100, 100)}%`, background: "var(--stp-amber)" }} /></div>
-                    <div className="stp-ms-sub">{spsFlagged ? "SPS flag" : ""}{dailyRate ? " · Demurrage" : ""}</div>
+                    <div className="stp-ms-sub">{[spsFlagged && "SPS", dailyRate && "Demurrage", eudrApplicable && "EUDR", cbamApplicable && "CBAM"].filter(Boolean).join(" · ") || "—"}</div>
                   </>
                 ) : (
                   <div className="stp-ms-value muted">—</div>
@@ -1091,7 +1094,7 @@ export default function TradeDetail() {
                 {risk && risk.worstCase > 0 ? (
                   <>
                     <div className="stp-ms-value red">${risk.worstCase.toLocaleString()}</div>
-                    <div className="stp-ms-bar"><div className="stp-ms-fill" style={{ width: `${Math.min((risk.worstCase / 2000) * 100, 100)}%`, background: "#c44e3a" }} /></div>
+                    <div className="stp-ms-bar"><div className="stp-ms-fill" style={{ width: `${Math.min((risk.worstCase / 15000) * 100, 100)}%`, background: "#c44e3a" }} /></div>
                     <div className="stp-ms-sub">All risk scenarios</div>
                   </>
                 ) : (

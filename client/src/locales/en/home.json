@@ -218,6 +218,36 @@
     "cta": "Run a free preview to see it in action"
   },
 
+  "realCost": {
+    "heading": "The Real Cost of Getting It Wrong",
+    "subheading": "One missed document. One wrong field. Here's what it costs.",
+    "eudr": {
+      "title": "EUDR Non-Compliance",
+      "amount": "Up to 4% of EU turnover",
+      "detail": "Fines up to 4% of EU annual turnover, shipment seizure at the border, and potential market ban for repeat offenders."
+    },
+    "cbam": {
+      "title": "CBAM Reporting Failure",
+      "amount": "€100 per tonne",
+      "detail": "€100 penalty per tonne of unreported embedded emissions, plus potential audit fees and retroactive certificate purchases."
+    },
+    "demurrage": {
+      "title": "Border Delays & Rejections",
+      "amount": "€100–€300/day",
+      "detail": "Container demurrage at Rotterdam, Felixstowe, and Hamburg — common for cocoa, cashews, and coffee shipments stuck in customs."
+    },
+    "lc": {
+      "title": "LC Discrepancies",
+      "amount": "$50–$200 per issue",
+      "detail": "Bank amendment fees per discrepancy, plus payment delays of 2–4 weeks. Multiple discrepancies can cost $800+ and block the entire transaction."
+    },
+    "sps": {
+      "title": "SPS / Phytosanitary Failures",
+      "amount": "$1,500–$5,000+",
+      "detail": "Missing phytosanitary certificates from Ghana, Nigeria, or Côte d'Ivoire trigger inspection fees, port storage, and potential shipment destruction."
+    }
+  },
+
   "pricingSection": {
     "heading": "$189 per shipment. One-off. No contract.",
     "subheading": "No subscription. No ERP. Preview any corridor for free.",
