@@ -100,7 +100,7 @@ export const TradeCorridorsMap = memo(function TradeCorridorsMap({
     : corridors;
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+    <div style={{ position: "absolute", inset: 0 }}>
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{ scale: 120, center: [20, 20] }}

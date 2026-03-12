@@ -254,6 +254,7 @@ type CreatedRequest = {
   docsRequired: string[];
   commodityName: string;
   destinationName: string;
+  supplierWhatsapp: string | null;
 };
 
 function NewRequestDialog({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
@@ -310,6 +311,7 @@ function NewRequestDialog({ onClose, onCreated }: { onClose: () => void; onCreat
         docsRequired: Array.from(selectedDocs),
         commodityName: selectedLookup.commodityName,
         destinationName: selectedLookup.destinationName,
+        supplierWhatsapp: data.supplierRequest?.supplierWhatsapp || null,
       });
       setStep("share");
       onCreated();
@@ -326,7 +328,8 @@ function NewRequestDialog({ onClose, onCreated }: { onClose: () => void; onCreat
     const msg = encodeURIComponent(
       `Please upload your ${docList} for the ${created.commodityName} shipment to ${created.destinationName} using this link: ${created.uploadUrl}`
     );
-    window.open(`https://wa.me/?text=${msg}`, "_blank");
+    const phone = created.supplierWhatsapp?.replace(/[^0-9]/g, "") || "";
+    window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
   };
 
   const handleEmail = () => {

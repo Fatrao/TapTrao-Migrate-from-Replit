@@ -10,6 +10,7 @@ import type { LcPrefillData, SupplierDocsResponse } from "./constants";
 export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | null }) {
   const { t } = useTranslation("lcCheck");
   const [copiedLink, setCopiedLink] = useState(false);
+  const [supplierPhone, setSupplierPhone] = useState("");
   const lookupId = prefillData?.lookup_id;
 
   const createOrGetMutation = useMutation({
@@ -30,6 +31,13 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
       createOrGetMutation.mutate(lookupId);
     }
   }, [lookupId]);
+
+  // Sync phone input with supplier request data
+  useEffect(() => {
+    if (sr?.supplierWhatsapp && !supplierPhone) {
+      setSupplierPhone(sr.supplierWhatsapp as string);
+    }
+  }, [sr?.supplierWhatsapp]);
 
   const supplierData = createOrGetMutation.data;
   const sr = supplierData?.supplierRequest;
@@ -54,12 +62,19 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
   const handleSendWhatsApp = async () => {
     if (!lookupId) return;
     const data = createOrGetMutation.data || await createOrGetMutation.mutateAsync(lookupId);
+    // Persist the phone number if entered
+    if (supplierPhone.trim() && data.requestId) {
+      try {
+        await apiRequest("PATCH", `/api/supplier-requests/${data.requestId}`, { supplierWhatsapp: supplierPhone.trim() });
+      } catch {}
+    }
     await logSendMutation.mutateAsync({ requestId: data.requestId, channel: "whatsapp" });
     const commodity = prefillData?.commodity_name || "goods";
     const origin = prefillData?.origin_name || "";
     const dest = prefillData?.dest_name || "";
     const message = `Please upload your documents for ${commodity} (${origin} \u2192 ${dest}) here: ${data.uploadUrl}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank");
+    const cleanPhone = supplierPhone.replace(/\D/g, "");
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
   const handleSendEmail = async () => {
@@ -135,6 +150,26 @@ export function SupplierDocsTab({ prefillData }: { prefillData: LcPrefillData | 
                 ? t("supplier.lastSentVia", { channel: (sr.sentVia as string[])?.slice(-1)[0] || "link", time: relativeTime(sr.lastSentAt as unknown as string), status: sr.status })
                 : t("supplier.sendDescription")}
             </p>
+            <div style={{ marginBottom: 10 }}>
+              <input
+                type="tel"
+                placeholder={t("supplier.phonePlaceholder") !== "supplier.phonePlaceholder" ? t("supplier.phonePlaceholder") : "+1234567890"}
+                value={supplierPhone}
+                onChange={(e) => setSupplierPhone(e.target.value)}
+                style={{
+                  width: "100%",
+                  maxWidth: 240,
+                  background: "var(--card2)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 7,
+                  padding: "7px 12px",
+                  fontSize: 14,
+                  color: "var(--t1)",
+                  fontFamily: "var(--fb)",
+                }}
+                data-testid="input-supplier-phone"
+              />
+            </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <button
                 onClick={handleSendWhatsApp}

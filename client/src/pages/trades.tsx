@@ -265,10 +265,10 @@ const css = `
 .mt-cbr .cc span { font-size: 15px;font-weight:600;color:var(--t1) }
 .mt-cbr .cx { font-size: 15px;font-weight:600;color:var(--sage) }
 
-.mt-mp { background:#1b2a22;border-radius:var(--r);box-shadow:var(--shd);position:relative;overflow:hidden;display:flex;flex-direction:column;animation:mt-fu .3s ease both }
+.mt-mp { background:#1b2a22;border-radius:var(--r);box-shadow:var(--shd);position:relative;overflow:hidden;display:flex;flex-direction:column;height:100%;animation:mt-fu .3s ease both }
 .mt-mp h4 { font-family:var(--fd);font-size:16px;color:#fff;font-weight:600;padding:10px 14px 0;position:relative;z-index:2;flex-shrink:0;margin:0 }
 .mt-mp .ms { font-size: 15px;color:rgba(255,255,255,.4);padding:2px 14px;position:relative;z-index:2;flex-shrink:0 }
-.mt-mp-inner { flex:1;position:relative;min-height:0 }
+.mt-mp-inner { flex:1;position:relative;min-height:0;height:0 }
 .mt-ml { display:flex;gap:8px;padding:4px 14px 6px;position:relative;z-index:2;flex-shrink:0 }
 .mt-mll { display:flex;align-items:center;gap:4px;font-size: 15px;color:rgba(255,255,255,.4);font-weight:500 }
 .mt-mll span { width:6px;height:6px;border-radius:50% }
@@ -460,7 +460,7 @@ export default function Trades() {
               onChange={e => setSearch(e.target.value)}
               data-testid="input-search-trades"
             />
-            <button className="mt-hbtn">🔔</button>
+            <button className="mt-hbtn" onClick={() => navigate("/alerts")}>🔔</button>
             <button className="mt-ntb" onClick={() => navigate("/new-check")} data-testid="button-new-trade">
               <Plus size={12} /> {t("newTrade")}
             </button>
@@ -506,7 +506,7 @@ export default function Trades() {
             </div>
             <div className="mt-st-ic" style={{ background: "var(--amber-xs)" }}>⚠️</div>
           </div>
-          <div className="mt-st ac mt-st-click" onClick={() => { setFilter("issues"); setStatCardFilter(null); setSelectedCorridor(null); }}>
+          <div className="mt-st ac mt-st-click" onClick={() => { setFilter("issues"); setStatCardFilter(null); setSelectedCorridor(null); document.querySelector(".mt-tc")?.scrollIntoView({ behavior: "smooth" }); }}>
             <div>
               <div className="sl">{t("stat.needingAction")}</div>
               <div className="sv">{allTrades.filter(tr => tr.readinessVerdict === "RED" && tr.tradeStatus !== "closed" && tr.tradeStatus !== "archived").length}</div>

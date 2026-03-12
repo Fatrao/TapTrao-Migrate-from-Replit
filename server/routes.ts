@@ -1913,6 +1913,26 @@ export async function registerRoutes(
     }
   });
 
+  app.patch("/api/supplier-requests/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const request = await storage.getSupplierRequestById(id);
+      if (!request) {
+        res.status(404).json({ message: t("routes.supplier_request_not_found", getLocale(req)) });
+        return;
+      }
+      const { supplierWhatsapp } = req.body;
+      if (supplierWhatsapp !== undefined) {
+        const { supplierRequests } = await import("@shared/schema");
+        const { eq } = await import("drizzle-orm");
+        await db.update(supplierRequests).set({ supplierWhatsapp, updatedAt: new Date() }).where(eq(supplierRequests.id, id));
+      }
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   app.get("/api/supplier-requests/:id/uploads", async (req, res) => {
     try {
       const uploads = await storage.getSupplierUploadsByRequestId(req.params.id);

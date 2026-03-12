@@ -382,7 +382,7 @@ export default function EudrPage() {
           {/* hdr */}
           <div className="eudr-hdr">
             <div>
-              <a className="eudr-back" onClick={() => navigate(`/lookup?loadLookup=${lookupId}`)} data-testid="eudr-back">
+              <a className="eudr-back" onClick={() => navigate(`/trades/${lookupId}`)} data-testid="eudr-back">
                 ← {t("backToLookup")}
               </a>
               <h1>{t("title")}</h1>
@@ -787,7 +787,7 @@ export default function EudrPage() {
   return (
     <AppShell>
       <div className="eudr-form-page">
-        <button data-testid="eudr-back" onClick={() => navigate(`/lookup?loadLookup=${lookupId}`)} style={{ background: "none", border: "none", color: "#8a857f", cursor: "pointer", fontSize: 13, marginBottom: 18, padding: 0 }}>
+        <button data-testid="eudr-back" onClick={() => navigate(`/trades/${lookupId}`)} style={{ background: "none", border: "none", color: "#8a857f", cursor: "pointer", fontSize: 13, marginBottom: 18, padding: 0 }}>
           ← {t("backToLookup")}
         </button>
 

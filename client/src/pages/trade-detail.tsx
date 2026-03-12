@@ -47,6 +47,7 @@ import {
   Flame,
   Building2,
   DollarSign,
+  Download,
 } from "lucide-react";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
 import { estimateDemurrageRange } from "@/lib/demurrage-utils";
@@ -996,6 +997,7 @@ export default function TradeDetail() {
   const tradeId = params?.id;
 
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const { data, isLoading, error } = useQuery<TradeDetail>({
     queryKey: [`/api/trades/${tradeId}`],
     enabled: !!tradeId,
@@ -1015,6 +1017,18 @@ export default function TradeDetail() {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [scanningId, setScanningId] = useState<string | null>(null);
   const [scanResult, setScanResult] = useState<{ uploadId: string; details: string; confidence: string } | null>(null);
+
+  // TwinLog PDF download state
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  // Inline supplier request creation (avoids redirect to /lookup)
+  const createSupplierReq = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/supplier-requests/create-or-get", { lookupId: data?.lookup?.id });
+      return res.json();
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] }),
+  });
 
   // Trade value editing state
   const [editingValue, setEditingValue] = useState(false);
@@ -1374,18 +1388,18 @@ export default function TradeDetail() {
                         Upload Document
                       </button>
                     ) : (
-                      <Link href={`/lookup?lookupId=${data.lookup.id}`}>
-                        <button className="stp-btn-sm stp-btn-sage">Upload Document</button>
-                      </Link>
+                      <button className="stp-btn-sm stp-btn-sage" disabled={createSupplierReq.isPending} onClick={() => createSupplierReq.mutate()}>
+                        {createSupplierReq.isPending ? <><Loader2 size={11} className="animate-spin" style={{ marginRight: 4 }} /> Setting up...</> : "Upload Document"}
+                      </button>
                     )}
                   </div>
                   <div className="stp-doc-lane theirs">
                     <span className="stp-dl-label">From supplier</span>
                     <span className="stp-dl-desc">Send a secure link for your supplier to upload their documents.</span>
                     {!data.supplierRequest ? (
-                      <Link href={`/lookup?lookupId=${data.lookup.id}`}>
-                        <button className="stp-btn-sm stp-btn-ghost">{t("detail.sendUploadLink")}</button>
-                      </Link>
+                      <button className="stp-btn-sm stp-btn-ghost" disabled={createSupplierReq.isPending} onClick={() => createSupplierReq.mutate()}>
+                        {createSupplierReq.isPending ? <><Loader2 size={11} className="animate-spin" style={{ marginRight: 4 }} /> Setting up...</> : t("detail.sendUploadLink")}
+                      </button>
                     ) : (
                       <button className="stp-btn-sm stp-btn-ghost" disabled>{t("detail.sendUploadLink")}</button>
                     )}
@@ -1584,7 +1598,39 @@ export default function TradeDetail() {
               <div className="stp-card">
                 <div className="stp-card-hdr">
                   <span className="stp-card-title">TwinLog Audit Trail</span>
-                  <span style={{ fontSize: 11, color: "#8a9a8c" }}>{data.auditTrail.length} events</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 11, color: "#8a9a8c" }}>{data.auditTrail.length} events</span>
+                    <button
+                      className="stp-btn-sm stp-btn-sage"
+                      disabled={pdfLoading}
+                      onClick={async () => {
+                        setPdfLoading(true);
+                        try {
+                          const res = await fetch("/api/twinlog/generate", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            credentials: "include",
+                            body: JSON.stringify({ lookupId: data.lookup.id }),
+                          });
+                          if (!res.ok) throw new Error("PDF generation failed");
+                          const blob = await res.blob();
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          a.href = url;
+                          a.download = `TwinLog-${data.lookup.twinlogRef || data.lookup.id}.pdf`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                        } catch {
+                          toast({ title: "Error", description: "Could not generate TwinLog PDF", variant: "destructive" });
+                        } finally {
+                          setPdfLoading(false);
+                        }
+                      }}
+                      style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, padding: "3px 8px" }}
+                    >
+                      {pdfLoading ? <Loader2 size={10} className="animate-spin" /> : <Download size={10} />} Download PDF
+                    </button>
+                  </div>
                 </div>
                 {data.auditTrail.length === 0 ? (
                   <div style={{ fontSize: 11, color: "#8a9a8c", padding: "8px 0" }}>{t("detail.noAuditEvents")}</div>
