@@ -2851,6 +2851,27 @@ Rules:
     }
   });
 
+  // ── Document extractions for auto-fill ──
+
+  app.get("/api/extractions", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const rows = await storage.getDocumentExtractionsBySession(sessionId);
+      // Return only extraction fields (not raw text) for auto-fill
+      const result = rows.map((r: any) => ({
+        id: r.id,
+        documentType: r.documentType,
+        originalFilename: r.originalFilename,
+        fields: r.extractionJson?.fields || {},
+        overallConfidence: r.overallConfidence,
+        createdAt: r.createdAt,
+      }));
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // ── EUDR Due Diligence ──
 
   app.get("/api/eudr/:lookupId", async (req, res) => {

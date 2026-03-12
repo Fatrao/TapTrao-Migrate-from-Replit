@@ -76,6 +76,18 @@ function getDefaultFactor(hsCode: string): { factor: number; label: string } | n
   return null;
 }
 
+// Auto-fill source badge
+function AutoFillBadge({ source }: { source?: string }) {
+  if (!source) return null;
+  return (
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: 4,
+      fontSize: 10.5, color: "#2563a8", background: "#e8f0fe", borderRadius: 4,
+      padding: "2px 7px", fontWeight: 600, marginLeft: 8, whiteSpace: "nowrap",
+    }}>📄 {source}</span>
+  );
+}
+
 // ── Main CBAM Page ──
 export default function CbamPage() {
   const { t } = useTranslation("trades");
@@ -102,39 +114,101 @@ export default function CbamPage() {
     enabled: !!lookupId,
   });
 
+  // Fetch document extractions for auto-fill (quantity from invoices/BLs)
+  const extractionsQuery = useQuery<any[]>({
+    queryKey: ["/api/extractions"],
+    enabled: !!lookupId,
+  });
+
   // Only populate draft from DB on initial load (not on every refetch)
   const [draftLoaded, setDraftLoaded] = useState(false);
-  useEffect(() => {
-    if (cbamQuery.data && !draftLoaded) {
-      setCbamId(cbamQuery.data.id);
-      const rec = cbamQuery.data;
-      setDraft((prev) => ({
-        ...prev,
-        embeddedEmissions: rec.embeddedEmissions?.toString() || "",
-        quantity: rec.quantity?.toString() || "",
-        emissionsSource: rec.emissionsSource || "default",
-        installationName: rec.installationName || "",
-        installationCountry: rec.installationCountry || "",
-        reportingPeriod: rec.reportingPeriod || "",
-        carbonPricePaid: rec.carbonPricePaid?.toString() || "",
-        carbonPriceCurrency: rec.carbonPriceCurrency || "EUR",
-      }));
-      // Mark previously saved steps as completed
-      const done = new Set<number>();
-      if (rec.embeddedEmissions || rec.quantity) done.add(1);
-      if (rec.installationName || rec.installationCountry || rec.reportingPeriod) done.add(2);
-      if (rec.carbonPricePaid != null) done.add(3);
-      if (done.size > 0) setCompletedSteps(done);
-      setDraftLoaded(true);
-    }
-  }, [cbamQuery.data, draftLoaded]);
+  const [autoFilled, setAutoFilled] = useState<Record<string, string>>({});
 
   const lookup = lookupQuery.data;
   const resultJson = lookup?.resultJson as ComplianceResult | undefined;
   const hsCode = lookup?.hsCode || resultJson?.hsCode || "";
   const commodityName = resultJson?.commodity?.name || "";
   const originName = resultJson?.origin?.countryName || "";
+  const originIso2 = (resultJson?.origin as any)?.iso2 || "";
   const destName = resultJson?.destination?.countryName || "";
+
+  // Auto-detect current reporting quarter
+  const now = new Date();
+  const currentQuarter = `${now.getFullYear()}-Q${Math.ceil((now.getMonth() + 1) / 3)}`;
+
+  useEffect(() => {
+    if (cbamQuery.data && !draftLoaded) {
+      setCbamId(cbamQuery.data.id);
+      const rec = cbamQuery.data;
+
+      // Build auto-fill defaults from trade data (only for empty fields)
+      const defaultFactor = hsCode ? getDefaultFactor(hsCode) : null;
+      const filled: Record<string, string> = {};
+      const merged: Partial<CbamDraft> = {};
+
+      // Emissions: use Annex III default if not yet entered
+      if (!rec.embeddedEmissions && defaultFactor) {
+        merged.embeddedEmissions = defaultFactor.factor.toString();
+        merged.emissionsSource = "default";
+        filled.embeddedEmissions = `Annex III default (${defaultFactor.label})`;
+      }
+      // Quantity: try to extract from uploaded documents (invoice, BL, weight cert)
+      if (!rec.quantity && extractionsQuery.data?.length) {
+        for (const ext of extractionsQuery.data) {
+          const f = ext.fields || {};
+          // Look for quantity or weight fields and convert to metric tons
+          const rawQty = f.quantity || f.netWeight || f.grossWeight;
+          const unit = (f.quantityUnit || f.weightUnit || "").toLowerCase();
+          if (rawQty && parseFloat(rawQty) > 0) {
+            let tons = parseFloat(rawQty);
+            if (unit === "kg") tons = tons / 1000;
+            else if (unit === "lbs") tons = tons / 2204.62;
+            // MT or tons = keep as is
+            merged.quantity = tons.toString();
+            filled.quantity = `${ext.originalFilename} (${ext.documentType})`;
+            break;
+          }
+        }
+      }
+      // Installation country: default to origin country
+      if (!rec.installationCountry && originIso2) {
+        merged.installationCountry = originIso2;
+        filled.installationCountry = `Origin country (${originName})`;
+      }
+      // Reporting period: default to current quarter
+      if (!rec.reportingPeriod) {
+        merged.reportingPeriod = currentQuarter;
+        filled.reportingPeriod = "Current quarter";
+      }
+      // Carbon price: default to 0 for countries with no carbon tax
+      if (rec.carbonPricePaid == null || rec.carbonPricePaid === "") {
+        merged.carbonPricePaid = "0";
+        filled.carbonPricePaid = "No origin carbon tax";
+      }
+
+      setDraft((prev) => ({
+        ...prev,
+        embeddedEmissions: rec.embeddedEmissions?.toString() || merged.embeddedEmissions || "",
+        quantity: rec.quantity?.toString() || merged.quantity || "",
+        emissionsSource: rec.emissionsSource || merged.emissionsSource || "default",
+        installationName: rec.installationName || "",
+        installationCountry: rec.installationCountry || merged.installationCountry || "",
+        reportingPeriod: rec.reportingPeriod || merged.reportingPeriod || "",
+        carbonPricePaid: rec.carbonPricePaid?.toString() || merged.carbonPricePaid || "",
+        carbonPriceCurrency: rec.carbonPriceCurrency || "EUR",
+      }));
+
+      setAutoFilled(filled);
+
+      // Mark previously saved steps as completed
+      const done = new Set<number>();
+      if (rec.embeddedEmissions || rec.quantity) done.add(1);
+      if (rec.installationName || rec.installationCountry || rec.reportingPeriod) done.add(2);
+      if (rec.carbonPricePaid != null && rec.carbonPricePaid !== "") done.add(3);
+      if (done.size > 0) setCompletedSteps(done);
+      setDraftLoaded(true);
+    }
+  }, [cbamQuery.data, draftLoaded, hsCode, originIso2, originName, currentQuarter]);
 
   // Init CBAM record if none exists
   const initMutation = useMutation({
@@ -692,6 +766,46 @@ export default function CbamPage() {
           })}
         </div>
 
+        {/* Quick assessment banner — shown when auto-fill covers enough fields */}
+        {step === 1 && Object.keys(autoFilled).length >= 3 && !completedSteps.has(1) && draft.embeddedEmissions && (
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "14px 20px", marginBottom: 16,
+            background: "linear-gradient(135deg, #e8f0fe 0%, #f0f4ff 100%)",
+            border: "1px solid #c4d5f0", borderRadius: 10,
+          }}>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "var(--cbam-dark)" }}>⚡ Fields auto-filled from your trade data</div>
+              <div style={{ fontSize: 12, color: "var(--t3)", marginTop: 2 }}>Review the defaults below or skip straight to assessment</div>
+            </div>
+            <button
+              className="cbam-btn-save"
+              style={{ padding: "8px 20px", fontSize: 13 }}
+              onClick={async () => {
+                // Save all 3 steps at once and run assessment
+                setSaving(true);
+                await saveDraft({
+                  embeddedEmissions: draft.embeddedEmissions || null,
+                  quantity: draft.quantity || null,
+                  emissionsSource: draft.emissionsSource,
+                  installationName: draft.installationName || null,
+                  installationCountry: draft.installationCountry || null,
+                  reportingPeriod: draft.reportingPeriod || null,
+                  carbonPricePaid: draft.carbonPricePaid || null,
+                  carbonPriceCurrency: draft.carbonPriceCurrency,
+                });
+                setCompletedSteps(new Set([1, 2, 3]));
+                setSaving(false);
+                setStep(4);
+                await runAssessment();
+              }}
+              disabled={saving || !draft.quantity}
+            >
+              {saving ? "Saving..." : "Skip to Assessment →"}
+            </button>
+          </div>
+        )}
+
         {/* Step 1: Emissions Data */}
         {step === 1 && (
           <div className="cbam-form-grid">
@@ -711,15 +825,15 @@ export default function CbamPage() {
                 </div>
               </div>
               <div className="cbam-form-group">
-                <label className="cbam-form-label">Embedded emissions (tCO₂e / ton)</label>
+                <label className="cbam-form-label">Embedded emissions (tCO₂e / ton)<AutoFillBadge source={autoFilled.embeddedEmissions} /></label>
                 <input
                   className="cbam-form-input" type="number" step="any" placeholder="0.00"
                   value={draft.embeddedEmissions}
-                  onChange={e => setDraft(d => ({ ...d, embeddedEmissions: e.target.value }))}
+                  onChange={e => { setDraft(d => ({ ...d, embeddedEmissions: e.target.value })); setAutoFilled(f => ({ ...f, embeddedEmissions: "" })); }}
                 />
               </div>
               <div className="cbam-form-group">
-                <label className="cbam-form-label">Quantity (tons)</label>
+                <label className="cbam-form-label">Quantity (tons)<AutoFillBadge source={autoFilled.quantity} /></label>
                 <input
                   className="cbam-form-input" type="number" step="any" placeholder="0"
                   value={draft.quantity}
@@ -802,13 +916,17 @@ export default function CbamPage() {
                 />
               </div>
               <div className="cbam-form-group">
-                <label className="cbam-form-label">{t("cbam.installationCountry")}</label>
+                <label className="cbam-form-label">{t("cbam.installationCountry")}<AutoFillBadge source={autoFilled.installationCountry} /></label>
                 <select
                   className="cbam-form-select"
                   value={draft.installationCountry}
-                  onChange={e => setDraft(d => ({ ...d, installationCountry: e.target.value }))}
+                  onChange={e => { setDraft(d => ({ ...d, installationCountry: e.target.value })); setAutoFilled(f => ({ ...f, installationCountry: "" })); }}
                 >
                   <option value="">Select country</option>
+                  {/* Show origin country first if not in default list */}
+                  {originIso2 && !["ZA","CN","IN","TR","NG","UA","KZ"].includes(originIso2.toUpperCase()) && (
+                    <option value={originIso2.toUpperCase()}>🏭 {originName} ({originIso2.toUpperCase()}) — origin</option>
+                  )}
                   <option value="ZA">🇿🇦 South Africa (ZA)</option>
                   <option value="CN">🇨🇳 China (CN)</option>
                   <option value="IN">🇮🇳 India (IN)</option>
@@ -819,7 +937,7 @@ export default function CbamPage() {
                 </select>
               </div>
               <div className="cbam-form-group">
-                <label className="cbam-form-label">{t("cbam.reportingPeriod")}</label>
+                <label className="cbam-form-label">{t("cbam.reportingPeriod")}<AutoFillBadge source={autoFilled.reportingPeriod} /></label>
                 <select
                   className="cbam-form-select"
                   value={draft.reportingPeriod}
@@ -870,7 +988,7 @@ export default function CbamPage() {
             <div className="cbam-form-card">
               <div className="cbam-form-title">💶 Carbon Price at Origin</div>
               <div className="cbam-form-group">
-                <label className="cbam-form-label">Carbon price paid (per tCO₂e)</label>
+                <label className="cbam-form-label">Carbon price paid (per tCO₂e)<AutoFillBadge source={autoFilled.carbonPricePaid} /></label>
                 <div style={{ display: "flex", gap: 8 }}>
                   <input
                     className="cbam-form-input" type="number" step="any" placeholder="0.00" style={{ flex: 1 }}

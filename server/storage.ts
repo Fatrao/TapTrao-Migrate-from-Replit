@@ -1386,6 +1386,12 @@ export class DatabaseStorage implements IStorage {
     return row;
   }
 
+  async getDocumentExtractionsBySession(sessionId: string): Promise<DocumentExtraction[]> {
+    return db.select().from(documentExtractions)
+      .where(eq(documentExtractions.sessionId, sessionId))
+      .orderBy(desc(documentExtractions.createdAt));
+  }
+
   // ── API Keys ──
 
   async createApiKey(sessionId: string, name: string): Promise<{ id: string; key: string; name: string; createdAt: Date }> {

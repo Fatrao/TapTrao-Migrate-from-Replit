@@ -149,6 +149,8 @@ export default function EudrPage() {
       }
       const rec = eudrQuery.data;
       const coords = rec.plotCoordinates;
+      // Auto-fill plot country from trade origin if not yet set
+      const originIso2 = resultJson?.origin?.iso2 || "";
       setDraft((prev) => ({
         ...prev,
         coordType: coords?.type === "polygon" ? "polygon" : "point",
@@ -157,7 +159,7 @@ export default function EudrPage() {
         polygonPoints: coords?.points?.length
           ? coords.points.map((p: any) => ({ lat: String(p.lat), lng: String(p.lng) }))
           : [{ lat: "", lng: "" }],
-        plotCountryIso2: rec.plotCountryIso2 || "",
+        plotCountryIso2: rec.plotCountryIso2 || originIso2,
         plotCountryValid: rec.plotCountryValid ?? null,
         evidenceType: rec.evidenceType || "",
         evidenceReference: rec.evidenceReference || "",
