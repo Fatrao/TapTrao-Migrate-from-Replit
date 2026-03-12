@@ -480,22 +480,6 @@ export default function CbamPage() {
                 )}
               </div>
 
-              {/* Action buttons */}
-              <div className="cbam-card">
-                <button className="cbam-btn-gen" onClick={generateStatement} disabled={generatingPdf}>
-                  {generatingPdf ? "Generating..." : isComplete ? "↓ Re-download CBAM Statement" : t("cbam.generateStatement")}
-                </button>
-                <button className="cbam-btn-supplier" onClick={requestSupplierEmissions}>
-                  ✉ {t("cbam.requestSupplierEmissions")}
-                </button>
-              </div>
-
-            </div>
-            {/* end left */}
-
-            {/* RIGHT PANEL */}
-            <div className="cbam-pr">
-
               {/* Cost Scenarios — 5 card grid */}
               {costScenarios && costScenarios.length > 0 && (
                 <div className="cbam-card">
@@ -529,6 +513,22 @@ export default function CbamPage() {
                   </div>
                 </div>
               )}
+
+              {/* Action buttons */}
+              <div className="cbam-card">
+                <button className="cbam-btn-gen" onClick={generateStatement} disabled={generatingPdf}>
+                  {generatingPdf ? "Generating..." : isComplete ? "↓ Re-download CBAM Statement" : t("cbam.generateStatement")}
+                </button>
+                <button className="cbam-btn-supplier" onClick={requestSupplierEmissions}>
+                  ✉ {t("cbam.requestSupplierEmissions")}
+                </button>
+              </div>
+
+            </div>
+            {/* end left */}
+
+            {/* RIGHT PANEL */}
+            <div className="cbam-pr">
 
               {/* UK Advisory — teal gradient */}
               {ukCbam && (

@@ -52,8 +52,8 @@ body:has(.cbam-dashboard-shell) #root{height:100vh;max-height:100vh;overflow:hid
 .cbam-stmt-main{font-size:13px;font-weight:600;color:var(--cbam-blue)}
 .cbam-stmt-ref{font-size:11px;color:var(--t3);font-family:var(--fm,monospace);margin-top:2px}
 
-/* ═══ TWO PANELS (30/70) ═══ */
-.cbam-panels{flex:1;display:grid;grid-template-columns:30% 1fr;gap:16px;overflow:hidden;min-height:0;align-items:start}
+/* ═══ TWO PANELS (42/58) ═══ */
+.cbam-panels{flex:1;display:grid;grid-template-columns:42% 1fr;gap:16px;overflow:hidden;min-height:0;align-items:start}
 
 /* LEFT */
 .cbam-pl{display:flex;flex-direction:column;gap:14px;overflow-y:auto;overflow-x:hidden;max-height:100%}
@@ -135,7 +135,7 @@ body:has(.cbam-dashboard-shell) #root{height:100vh;max-height:100vh;overflow:hid
 .cbam-ets-label{font-size:11.5px;color:var(--t2,#555)}
 .cbam-ets-date{font-size:10px;color:var(--t3,#888)}
 .cbam-ets-price{font-size:13px;font-weight:700;color:var(--cbam-dark)}
-.cbam-scenario-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.cbam-scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .cbam-sc-card{background:#f5f7fc;border-radius:10px;padding:13px 10px;text-align:center;position:relative}
 .cbam-sc-card.base{background:var(--cbam-light);border:1.5px solid rgba(37,99,168,.25)}
 .cbam-sc-tag{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--cbam-blue);color:#fff;font-size:9px;font-weight:700;letter-spacing:.06em;padding:2px 7px;border-radius:8px;white-space:nowrap}
