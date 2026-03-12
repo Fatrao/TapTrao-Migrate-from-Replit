@@ -58,6 +58,328 @@ export const CBAM_HS_PREFIXES = [
   "2716",       // electricity
 ];
 
+// ── CBAM Carbon Price & Emissions Config ──
+
+export const CBAM_ETS_CONFIG = {
+  /** EU ETS carbon price — Q1 2026 quarterly average (EUR/tCO₂e) */
+  euEtsPrice: 71.50,
+  euEtsPriceDate: "2026-03-01",
+  /** UK ETS indicative price (GBP/tCO₂e) — for Phase 4 UK CBAM */
+  ukEtsPrice: 45.00,
+  ukEtsPriceDate: "2026-03-01",
+  /** UK CBAM effective date */
+  ukCbamEffective: "2027-01-01",
+  /** UK CBAM de minimis threshold (GBP) */
+  ukCbamThresholdGBP: 50_000,
+  /** Origin country carbon prices (EUR/tCO₂e equivalents) — used for CBAM offset credit */
+  originCarbonPrices: {
+    ZA: 10.0,    // South Africa carbon tax (~R175/tCO₂e)
+    CN: 8.5,     // China national ETS
+    TR: 0,       // Turkey — no carbon pricing
+    NG: 0,       // Nigeria — no carbon pricing
+    IN: 0,       // India — no carbon pricing
+    UA: 1.2,     // Ukraine ETS
+    KZ: 1.5,     // Kazakhstan ETS
+    MZ: 0,       // Mozambique — no carbon pricing
+    GH: 0,       // Ghana — no carbon pricing
+    ET: 0,       // Ethiopia — no carbon pricing
+    KE: 0,       // Kenya — no carbon pricing
+    TZ: 0,       // Tanzania — no carbon pricing
+    CD: 0,       // DRC — no carbon pricing
+    CM: 0,       // Cameroon — no carbon pricing
+  } as Record<string, number>,
+  /** Default emission factors by HS prefix (tCO₂e per ton of product) — CBAM Annex III transitional defaults */
+  defaultEmissionFactors: {
+    "72": 1.85,    // iron & steel (crude/semi-finished)
+    "73": 1.85,    // articles of iron/steel
+    "76": 8.50,    // aluminium
+    "31": 2.70,    // fertilisers
+    "28": 1.20,    // inorganic chemicals / hydrogen
+    "25": 0.75,    // cement / clinker
+    "2716": 0.40,  // electricity (tCO₂e/MWh)
+  } as Record<string, number>,
+} as const;
+
+// ── CBAM Levy Calculation ──
+
+export type CbamLevyBreakdown = {
+  embeddedEmissions: number;         // tCO₂e per ton of product
+  emissionsSource: "actual" | "default";
+  quantity: number;                  // tons
+  totalEmissions: number;            // embeddedEmissions × quantity
+  etsPrice: number;                  // EUR/tCO₂e
+  etsPriceDate: string;
+  grossLevy: number;                 // totalEmissions × etsPrice
+  originCountryIso2: string | null;
+  originCarbonPrice: number;         // EUR/tCO₂e from origin country
+  originCarbonCredit: number;        // totalEmissions × originCarbonPrice
+  netLevy: number;                   // grossLevy - originCarbonCredit
+  perTonLevy: number;               // netLevy / quantity
+};
+
+/**
+ * Compute the CBAM carbon levy for a trade.
+ * Uses actual supplier emissions if available, falls back to CBAM Annex III defaults by HS prefix.
+ * Returns null if there is insufficient data (no emissions source and no quantity).
+ */
+export function computeCbamLevy(
+  cbamRecord: CbamRecord | null,
+  hsCode: string | null,
+  originIso2: string | null,
+  quantityOverride?: number,
+  etsPriceOverride?: number,
+): CbamLevyBreakdown | null {
+  // Determine embedded emissions
+  let embeddedEmissions: number | null = null;
+  let emissionsSource: "actual" | "default" = "default";
+
+  if (cbamRecord?.embeddedEmissions != null && Number(cbamRecord.embeddedEmissions) > 0) {
+    embeddedEmissions = Number(cbamRecord.embeddedEmissions);
+    emissionsSource = "actual";
+  } else if (hsCode) {
+    // Look up default factor by HS prefix (try longest match first)
+    const hs = hsCode.replace(/\./g, "");
+    for (const prefix of ["2716", "72", "73", "76", "31", "28", "25"]) {
+      if (hs.startsWith(prefix)) {
+        embeddedEmissions = CBAM_ETS_CONFIG.defaultEmissionFactors[prefix] ?? null;
+        break;
+      }
+    }
+  }
+
+  // Determine quantity
+  const quantity = (cbamRecord?.quantity != null && Number(cbamRecord.quantity) > 0)
+    ? Number(cbamRecord.quantity)
+    : (quantityOverride && quantityOverride > 0 ? quantityOverride : null);
+
+  if (embeddedEmissions == null || quantity == null) return null;
+
+  const etsPrice = etsPriceOverride ?? CBAM_ETS_CONFIG.euEtsPrice;
+  const totalEmissions = embeddedEmissions * quantity;
+  const grossLevy = totalEmissions * etsPrice;
+
+  const originKey = originIso2?.toUpperCase() ?? "";
+  const originCarbonPrice = CBAM_ETS_CONFIG.originCarbonPrices[originKey] ?? 0;
+  const originCarbonCredit = totalEmissions * originCarbonPrice;
+  const netLevy = Math.max(0, grossLevy - originCarbonCredit);
+
+  return {
+    embeddedEmissions,
+    emissionsSource,
+    quantity,
+    totalEmissions: Math.round(totalEmissions * 100) / 100,
+    etsPrice,
+    etsPriceDate: CBAM_ETS_CONFIG.euEtsPriceDate,
+    grossLevy: Math.round(grossLevy * 100) / 100,
+    originCountryIso2: originIso2 ?? null,
+    originCarbonPrice,
+    originCarbonCredit: Math.round(originCarbonCredit * 100) / 100,
+    netLevy: Math.round(netLevy * 100) / 100,
+    perTonLevy: Math.round((netLevy / quantity) * 100) / 100,
+  };
+}
+
+// ── CBAM Reporting Deadlines ──
+
+export type CbamDeadlineInfo = {
+  reportingPeriod: string;           // "2026-Q1"
+  quarterlyReportDue: string;        // ISO date "2026-04-30"
+  annualDeclarationDue: string;      // ISO date "2027-09-30"
+  daysUntilQuarterly: number;
+  daysUntilAnnual: number;
+  urgency: "overdue" | "urgent" | "upcoming" | "ok";
+  ukCbamApplies: boolean;
+  ukCbamNote: string | null;
+};
+
+/**
+ * Compute CBAM reporting deadlines.
+ * Quarterly reports are due at the end of the month following the quarter.
+ * Annual declarations are due September 30 of the year following the reporting year.
+ */
+export function computeCbamDeadlines(
+  reportingPeriod: string | null,
+  destinationIso2: string,
+  referenceDate?: Date,
+): CbamDeadlineInfo {
+  const now = referenceDate ?? new Date();
+
+  // Auto-detect current quarter if not provided
+  let period = reportingPeriod;
+  if (!period) {
+    const q = Math.ceil((now.getMonth() + 1) / 3);
+    period = `${now.getFullYear()}-Q${q}`;
+  }
+
+  // Parse "YYYY-QN"
+  const match = period.match(/^(\d{4})-Q([1-4])$/);
+  const year = match ? parseInt(match[1]) : now.getFullYear();
+  const quarter = match ? parseInt(match[2]) : Math.ceil((now.getMonth() + 1) / 3);
+
+  // Quarterly report due: end of month after quarter
+  // Q1 (Jan-Mar) → Apr 30, Q2 (Apr-Jun) → Jul 31, Q3 (Jul-Sep) → Oct 31, Q4 (Oct-Dec) → Jan 31 next year
+  const quarterlyDueDates: Record<number, [number, number, number]> = {
+    1: [year, 3, 30],      // April 30 (month 3 = April in 0-indexed)
+    2: [year, 6, 31],      // July 31
+    3: [year, 9, 31],      // October 31
+    4: [year + 1, 0, 31],  // January 31 next year
+  };
+  const [qY, qM, qD] = quarterlyDueDates[quarter] || [year, 3, 30];
+  const quarterlyDue = new Date(qY, qM, qD);
+
+  // Annual declaration: September 30 of the following year
+  const annualDue = new Date(year + 1, 8, 30); // month 8 = September
+
+  const msPerDay = 86_400_000;
+  const daysUntilQuarterly = Math.ceil((quarterlyDue.getTime() - now.getTime()) / msPerDay);
+  const daysUntilAnnual = Math.ceil((annualDue.getTime() - now.getTime()) / msPerDay);
+
+  let urgency: CbamDeadlineInfo["urgency"] = "ok";
+  if (daysUntilQuarterly < 0) urgency = "overdue";
+  else if (daysUntilQuarterly <= 14) urgency = "urgent";
+  else if (daysUntilQuarterly <= 30) urgency = "upcoming";
+
+  // UK CBAM
+  const isGb = destinationIso2?.toUpperCase() === "GB";
+  const ukEffective = new Date(CBAM_ETS_CONFIG.ukCbamEffective);
+  const ukCbamApplies = isGb && now >= ukEffective;
+  let ukCbamNote: string | null = null;
+  if (isGb && !ukCbamApplies) {
+    ukCbamNote = "UK CBAM starts 1 January 2027. This trade corridor will be subject to UK CBAM when it takes effect.";
+  } else if (isGb && ukCbamApplies) {
+    ukCbamNote = "UK CBAM is active. Quarterly CBAM levies apply with UK ETS-derived rates.";
+  }
+
+  return {
+    reportingPeriod: period,
+    quarterlyReportDue: quarterlyDue.toISOString().slice(0, 10),
+    annualDeclarationDue: annualDue.toISOString().slice(0, 10),
+    daysUntilQuarterly,
+    daysUntilAnnual,
+    urgency,
+    ukCbamApplies,
+    ukCbamNote,
+  };
+}
+
+// ── CBAM Cost Scenario Simulation ──
+
+export type CbamCostScenario = {
+  label: string;
+  etsPrice: number;
+  originCarbonPrice: number;
+  netLevy: number;
+  delta: number;
+  deltaPercent: number;
+  probability: "likely" | "possible" | "tail_risk";
+};
+
+/**
+ * Generate 5 "what-if" cost scenarios for a CBAM levy.
+ * Used for pre-trade risk assessment and ETS price sensitivity.
+ */
+export function runCbamCostScenarios(baseLevyBreakdown: CbamLevyBreakdown): CbamCostScenario[] {
+  const { totalEmissions, originCarbonPrice, netLevy: baseNet } = baseLevyBreakdown;
+
+  function calc(etsPrice: number, originPrice: number): number {
+    const gross = totalEmissions * etsPrice;
+    const credit = totalEmissions * originPrice;
+    return Math.max(0, Math.round((gross - credit) * 100) / 100);
+  }
+
+  const scenarios: CbamCostScenario[] = [
+    {
+      label: "Base case",
+      etsPrice: baseLevyBreakdown.etsPrice,
+      originCarbonPrice,
+      netLevy: baseNet,
+      delta: 0,
+      deltaPercent: 0,
+      probability: "likely",
+    },
+    {
+      label: "ETS +10%",
+      etsPrice: Math.round(baseLevyBreakdown.etsPrice * 1.10 * 100) / 100,
+      originCarbonPrice,
+      netLevy: calc(baseLevyBreakdown.etsPrice * 1.10, originCarbonPrice),
+      delta: 0, deltaPercent: 0,
+      probability: "likely",
+    },
+    {
+      label: "ETS +25%",
+      etsPrice: Math.round(baseLevyBreakdown.etsPrice * 1.25 * 100) / 100,
+      originCarbonPrice,
+      netLevy: calc(baseLevyBreakdown.etsPrice * 1.25, originCarbonPrice),
+      delta: 0, deltaPercent: 0,
+      probability: "possible",
+    },
+    {
+      label: "ETS at €100",
+      etsPrice: 100,
+      originCarbonPrice,
+      netLevy: calc(100, originCarbonPrice),
+      delta: 0, deltaPercent: 0,
+      probability: "tail_risk",
+    },
+    {
+      label: "Origin carbon tax introduced",
+      etsPrice: baseLevyBreakdown.etsPrice,
+      originCarbonPrice: originCarbonPrice > 0 ? originCarbonPrice : 5.0,
+      netLevy: calc(baseLevyBreakdown.etsPrice, originCarbonPrice > 0 ? originCarbonPrice : 5.0),
+      delta: 0, deltaPercent: 0,
+      probability: "possible",
+    },
+  ];
+
+  // Fill in delta fields
+  for (const sc of scenarios) {
+    sc.delta = Math.round((sc.netLevy - baseNet) * 100) / 100;
+    sc.deltaPercent = baseNet > 0 ? Math.round((sc.delta / baseNet) * 10000) / 100 : 0;
+  }
+
+  return scenarios;
+}
+
+// ── UK CBAM Full Calculation ──
+
+export type UkCbamResult = {
+  levy: CbamLevyBreakdown | null;
+  belowThreshold: boolean;
+  thresholdNote: string;
+  ukEtsPrice: number;
+};
+
+/**
+ * Compute UK CBAM levy (effective from Jan 1, 2027).
+ * Uses UK ETS price and applies £50k de minimis threshold.
+ */
+export function computeUkCbamLevy(
+  cbamRecord: CbamRecord | null,
+  hsCode: string | null,
+  originIso2: string | null,
+  tradeValueGBP: number | null,
+  quantityOverride?: number,
+): UkCbamResult {
+  const belowThreshold = tradeValueGBP != null && tradeValueGBP < CBAM_ETS_CONFIG.ukCbamThresholdGBP;
+  const thresholdNote = belowThreshold
+    ? `Trade value £${(tradeValueGBP ?? 0).toLocaleString()} is below the £50,000 UK CBAM registration threshold.`
+    : tradeValueGBP != null
+      ? `Trade value £${tradeValueGBP.toLocaleString()} exceeds the £50,000 UK CBAM registration threshold.`
+      : "Trade value not specified. UK CBAM registration required if annual imports exceed £50,000.";
+
+  // Compute levy using UK ETS price
+  const levy = computeCbamLevy(
+    cbamRecord, hsCode, originIso2, quantityOverride, CBAM_ETS_CONFIG.ukEtsPrice,
+  );
+
+  return {
+    levy,
+    belowThreshold,
+    thresholdNote,
+    ukEtsPrice: CBAM_ETS_CONFIG.ukEtsPrice,
+  };
+}
+
 /** Country bounding boxes (heuristic, for EUDR geolocation check) */
 export const COUNTRY_BOUNDING_BOXES: Record<string, { minLat: number; maxLat: number; minLon: number; maxLon: number }> = {
   GH: { minLat: 4.73, maxLat: 11.17, minLon: -3.26, maxLon: 1.20 },
@@ -1077,8 +1399,9 @@ export type CbamAssessmentInput = {
 export function runCbamAssessment(input: CbamAssessmentInput): AssessmentOutput & { canConcludeCbamCompliant: boolean } {
   const { lookup, cbamRecord, crossCheckResults, commodityTriggersCbam, destinationIso2 } = input;
 
-  // Applicability: CBAM scope + EU destination
-  const applicable = commodityTriggersCbam && isEuDestination(destinationIso2);
+  // Applicability: CBAM scope + EU destination OR UK (upcoming/active)
+  const isGbDest = destinationIso2?.toUpperCase() === "GB";
+  const applicable = commodityTriggersCbam && (isEuDestination(destinationIso2) || isGbDest);
   if (!applicable) {
     return { applicable: false, score: null, band: null, canConcludeNegligibleRisk: false, canConcludeCbamCompliant: false, breakdown: null, topDrivers: [], checksRun: [] };
   }
@@ -1106,6 +1429,21 @@ export function runCbamAssessment(input: CbamAssessmentInput): AssessmentOutput 
     ...runCbamFinancialChecks(cbamRecord),
     ...runCbamDocConsistencyCheck(lookup, crossCheckResults),
   ];
+
+  // UK CBAM advisory check
+  if (isGbDest) {
+    const ukEffective = new Date(CBAM_ETS_CONFIG.ukCbamEffective);
+    const ukActive = new Date() >= ukEffective;
+    checks.push(mk(
+      "cbam_uk_status", "cbam", "regulatory", "UK CBAM status",
+      "warning", 0.5,
+      ukActive,
+      ukActive
+        ? "UK CBAM is active (from 1 January 2027). Quarterly levies apply using UK ETS-derived rates."
+        : "UK CBAM starts 1 January 2027. This trade will be subject to UK CBAM when it takes effect. Prepare emissions data now.",
+      "Monitor UK CBAM implementation timeline and ensure supplier emissions data is ready.",
+    ));
+  }
 
   const { score, band, breakdown, topDrivers } = computeRegulatoryScore(checks);
 

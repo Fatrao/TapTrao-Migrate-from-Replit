@@ -30,6 +30,7 @@ import AdminPromoCodes from "@/pages/admin-promo-codes";
 import AdminApiKeys from "@/pages/admin-api-keys";
 import AdminFeatureRequests from "@/pages/admin-feature-requests";
 import EudrPage from "@/pages/eudr";
+import CbamPage from "@/pages/cbam";
 import DemurragePage from "@/pages/demurrage";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
@@ -82,6 +83,7 @@ function Router() {
       <Route path="/inbox">{() => <AuthGuard><Inbox /></AuthGuard>}</Route>
       <Route path="/alerts">{() => <AuthGuard><AlertsPage /></AuthGuard>}</Route>
       <Route path="/eudr/:lookupId">{() => <AuthGuard><EudrPage /></AuthGuard>}</Route>
+      <Route path="/cbam/:lookupId">{() => <AuthGuard><CbamPage /></AuthGuard>}</Route>
 
       {/* Admin routes */}
       <Route path="/admin/data">{() => <AuthGuard><AdminData /></AuthGuard>}</Route>

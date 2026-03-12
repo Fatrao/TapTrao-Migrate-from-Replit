@@ -7,7 +7,8 @@ import { runComplianceCheck, computeReadinessScore } from "./compliance";
 import { runLcCrossCheck, computeLcHash, generateCorrectionEmail } from "./lc-engine";
 import { generateTwinlogPdf } from "./twinlog-pdf";
 import { generateEudrPdf } from "./eudr-pdf";
-import { runEudrAssessment, runCbamAssessment } from "./regulatory-assess";
+import { generateCbamPdf } from "./cbam-pdf";
+import { runEudrAssessment, runCbamAssessment, computeCbamLevy, computeCbamDeadlines, runCbamCostScenarios, computeUkCbamLevy, type CbamLevyBreakdown } from "./regulatory-assess";
 import { fetchGeospatialData, type GeospatialResult } from "./geospatial";
 import { appendTradeEvent, getTradeAuditChain, verifyAuditChain } from "./audit";
 import { hashPassword, comparePasswords } from "./auth";
@@ -3277,27 +3278,229 @@ Rules:
         destinationIso2: destIso2,
       });
 
-      // 6. Upsert to cbam_assessments
+      // 5b. Compute levy, deadlines, scenarios
+      const originIso2 = (lookup as any).originIso2 ?? "";
+      const levyBreakdown = result.applicable
+        ? computeCbamLevy(cbamRecord, lookup.hsCode, originIso2)
+        : null;
+      const deadlines = result.applicable
+        ? computeCbamDeadlines(cbamRecord?.reportingPeriod ?? null, destIso2)
+        : null;
+      const costScenarios = levyBreakdown
+        ? runCbamCostScenarios(levyBreakdown)
+        : null;
+
+      // 5c. UK CBAM (if destination is GB)
+      let ukCbam: any = null;
+      if (destIso2.toUpperCase() === "GB") {
+        const tradeValueGBP = lookup.tradeValueCurrency === "GBP" && lookup.tradeValue
+          ? parseFloat(lookup.tradeValue)
+          : null;
+        ukCbam = computeUkCbamLevy(cbamRecord, lookup.hsCode, originIso2, tradeValueGBP);
+      }
+
+      // 6. Merge enhanced data into breakdown JSONB
+      const enhancedBreakdown = {
+        ...(result.breakdown ?? {}),
+        levyBreakdown,
+        deadlines,
+        costScenarios,
+        ukCbam,
+      };
+
+      // 7. Upsert to cbam_assessments
       const assessment = await storage.createOrUpdateCbamAssessment({
         lookupId,
         applicable: result.applicable,
         score: result.score,
         band: result.band,
         canConcludeCbamCompliant: result.canConcludeCbamCompliant,
-        breakdown: result.breakdown,
+        breakdown: enhancedBreakdown,
         topDrivers: result.topDrivers,
         checksRun: result.checksRun,
       });
 
-      // 7. Audit event
+      // 8. Audit event
       await appendTradeEvent(lookupId, sessionId, "cbam_assessed", {
         score: result.score,
         band: result.band,
         applicable: result.applicable,
         canConcludeCbamCompliant: result.canConcludeCbamCompliant,
+        netLevy: levyBreakdown?.netLevy ?? null,
       });
 
       res.json(assessment);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ── CBAM Supplier Emissions Invite (WhatsApp) ──
+  app.post("/api/cbam/:lookupId/supplier-invite", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { lookupId } = req.params;
+
+      const lookup = await storage.getLookupById(lookupId);
+      if (!lookup || lookup.sessionId !== sessionId) {
+        res.status(404).json({ message: t("routes.trade_not_found", getLocale(req)) });
+        return;
+      }
+
+      // Get or create supplier request for this trade
+      const { supplierRequests } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      const existing = await db.select().from(supplierRequests).where(eq(supplierRequests.lookupId, lookupId));
+      let sr = existing[0];
+
+      if (!sr) {
+        // Create supplier request with CBAM context
+        sr = (await db.insert(supplierRequests).values({
+          id: crypto.randomUUID(),
+          lookupId,
+          sessionId,
+          status: "pending",
+          messageType: "cbam_emissions",
+        }).returning())[0];
+      }
+
+      const supplierPhone = (req.body.supplierPhone || sr?.supplierWhatsapp || "").replace(/\D/g, "");
+      const uploadUrl = `${req.protocol}://${req.get("host")}/supplier-upload/${sr.id}?type=cbam_emissions`;
+
+      const commodity = lookup.commodityName || "your product";
+      const message = `Hello,\n\nAs part of our CBAM (Carbon Border Adjustment Mechanism) compliance for the EU import of ${commodity}, we need your emissions data for our records.\n\nPlease use this secure link to submit your installation's embedded emissions data:\n${uploadUrl}\n\nWe need:\n• Embedded emissions (tCO₂e per ton)\n• Installation name & country\n• Any carbon price paid at origin\n\nThank you for your cooperation.`;
+
+      const whatsappLink = `https://wa.me/${supplierPhone}?text=${encodeURIComponent(message)}`;
+
+      await appendTradeEvent(lookupId, sessionId, "cbam_supplier_invited", {
+        supplierRequestId: sr.id,
+        method: "whatsapp",
+      });
+
+      res.json({ supplierRequestId: sr.id, uploadUrl, whatsappLink, message });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ── CBAM Generate Statement (PDF) ──
+  app.post("/api/cbam/:lookupId/generate-statement", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req, res);
+      const { lookupId } = req.params;
+
+      const lookup = await storage.getLookupById(lookupId);
+      if (!lookup || lookup.sessionId !== sessionId) {
+        res.status(404).json({ message: t("routes.trade_not_found", getLocale(req)) });
+        return;
+      }
+
+      const cbamRecord = await storage.getCbamRecordByLookupId(lookupId) || null;
+      const cbamAssessment = await storage.getCbamAssessmentByLookupId(lookupId);
+      const resultJson = lookup.resultJson as any;
+      const twinlogRef = lookup.twinlogRef || null;
+      const twinlogHash = lookup.twinlogHash || null;
+      const bd = cbamAssessment?.breakdown as any;
+
+      const profile = await storage.getCompanyProfile(sessionId);
+      const companyName = profile?.companyName || "OPERATOR (Not specified)";
+
+      const now = new Date();
+      const refSuffix = (cbamRecord?.id || lookupId).substring(0, 6).toUpperCase();
+      const cbamRef = `CBAM-${twinlogRef || "TT"}-${refSuffix}-${now.getFullYear()}`;
+
+      const { stream, hashPromise } = generateCbamPdf({
+        reference: cbamRef,
+        companyName,
+        statementDate: now.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }),
+        commodityName: resultJson?.commodity?.name || lookup.commodityName || "",
+        hsCode: lookup.hsCode || "",
+        originCountry: resultJson?.origin?.countryName || lookup.originName || "",
+        destination: resultJson?.destination?.countryName || lookup.destinationName || "",
+        embeddedEmissions: cbamRecord?.embeddedEmissions ? Number(cbamRecord.embeddedEmissions) : null,
+        emissionsSource: bd?.levyBreakdown?.emissionsSource || "default",
+        quantity: cbamRecord?.quantity ? Number(cbamRecord.quantity) : null,
+        totalEmissions: bd?.levyBreakdown?.totalEmissions ?? null,
+        installationName: cbamRecord?.installationName || null,
+        installationCountry: cbamRecord?.installationCountry || null,
+        reportingPeriod: cbamRecord?.reportingPeriod || `${now.getFullYear()}-Q${Math.ceil((now.getMonth() + 1) / 3)}`,
+        levyBreakdown: bd?.levyBreakdown || null,
+        deadlines: bd?.deadlines || null,
+        computedScore: cbamAssessment?.score ?? undefined,
+        computedBand: cbamAssessment?.band ?? undefined,
+        canConcludeCbamCompliant: (cbamAssessment as any)?.canConcludeCbamCompliant ?? undefined,
+        riskDrivers: cbamAssessment?.topDrivers as any[] || undefined,
+        costScenarios: bd?.costScenarios || null,
+        twinlogRef,
+        twinlogHash,
+      });
+
+      const filename = `CBAM-Statement-${cbamRef.replace(/[^a-zA-Z0-9-]/g, "_")}.pdf`;
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+
+      stream.on("error", (err: Error) => {
+        console.error("CBAM PDF stream error:", err);
+        if (!res.headersSent) {
+          res.status(500).json({ message: "PDF generation failed" });
+        }
+      });
+      stream.pipe(res);
+
+      // Store hash and log audit event after streaming
+      hashPromise.then(async (pdfHash) => {
+        try {
+          if (cbamAssessment) {
+            const existingBd = (cbamAssessment.breakdown as any) || {};
+            await storage.createOrUpdateCbamAssessment({
+              lookupId,
+              applicable: cbamAssessment.applicable,
+              score: cbamAssessment.score,
+              band: cbamAssessment.band,
+              canConcludeCbamCompliant: (cbamAssessment as any).canConcludeCbamCompliant,
+              breakdown: { ...existingBd, statementHash: pdfHash },
+              topDrivers: cbamAssessment.topDrivers,
+              checksRun: cbamAssessment.checksRun,
+            });
+          }
+          await appendTradeEvent(lookupId, sessionId, "cbam_statement_generated", {
+            reference: cbamRef,
+            pdfHash,
+          });
+        } catch (e) {
+          console.error("CBAM post-generation error:", e);
+        }
+      }).catch((e) => console.error("CBAM hash promise error:", e));
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ── CBAM Levy Simulation (no DB write — pure calculation) ──
+  app.post("/api/cbam/simulate-levy", async (req, res) => {
+    try {
+      const { hsCode, quantity, embeddedEmissions, originIso2, etsPrice } = req.body;
+      if (!hsCode || !quantity) {
+        res.status(400).json({ message: "hsCode and quantity are required" });
+        return;
+      }
+      // Build a minimal CbamRecord-like object for the calculator
+      const pseudoRecord = embeddedEmissions
+        ? { embeddedEmissions, quantity } as any
+        : { quantity } as any;
+      const levy = computeCbamLevy(
+        embeddedEmissions ? pseudoRecord : null,
+        hsCode,
+        originIso2 ?? null,
+        quantity,
+        etsPrice,
+      );
+      if (!levy) {
+        res.status(422).json({ message: "Could not compute levy — no emission factor available for this HS code" });
+        return;
+      }
+      const scenarios = runCbamCostScenarios(levy);
+      res.json({ levy, scenarios });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

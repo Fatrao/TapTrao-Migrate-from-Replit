@@ -1,0 +1,226 @@
+/* ═══ CBAM Step 4 Dashboard — navy/steel-blue identity ═══ */
+
+/* ── CBAM colour tokens ── */
+:root {
+  --cbam-dark:  #1a2744;
+  --cbam-mid:   #1e3a6e;
+  --cbam-blue:  #2563a8;
+  --cbam-light: #e8eef8;
+  --cbam-teal:  #0e7490;
+}
+
+/* Shell overrides */
+.cbam-dashboard-shell{flex:1;overflow:hidden;background:var(--bg);display:flex;flex-direction:column;min-height:0}
+body:has(.cbam-dashboard-shell) #root{height:100vh;max-height:100vh;overflow:hidden}
+
+/* ═══ MAIN ═══ */
+.cbam-mn{flex:1;display:flex;flex-direction:column;padding:18px 22px 18px 10px;gap:12px;overflow:hidden;min-width:0}
+
+/* Top bar */
+.cbam-hdr{display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;gap:16px}
+.cbam-back{font-size:11px;color:var(--t3);cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-bottom:4px;text-decoration:none}
+.cbam-hdr h1{font-family:var(--fd);font-size:22px;font-weight:600;color:var(--cbam-dark)}
+.cbam-hdr .cbam-sub{font-size:11px;color:var(--t3);margin-top:2px;font-weight:400}
+
+/* Eyebrow badge */
+.cbam-eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--cbam-light);color:var(--cbam-blue);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+
+/* Bell + New Trade — reuse eudr classes */
+.cbam-hbtn{width:34px;height:34px;border-radius:50%;border:none;background:#ffffff;box-shadow:var(--shd);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;color:var(--t2);position:relative}
+.cbam-bell-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--amber,#c8922a);border-radius:50%;border:2px solid #fff}
+.cbam-ntb{padding:8px 16px;border-radius:20px;border:none;background:var(--cbam-dark);color:#fff;font-family:var(--fb);font-size:11px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(26,39,68,.25)}
+
+/* Step nav — blue active */
+.cbam-step-nav{display:flex;gap:5px;flex-shrink:0}
+.cbam-sp{padding:6px 13px;border-radius:9px;font-size:11px;font-weight:500;white-space:nowrap}
+.cbam-sp.done{color:var(--cbam-blue)}
+.cbam-sp.active{background:var(--cbam-dark);color:#fff}
+.cbam-sp.pending{background:rgba(0,0,0,.04);color:var(--t4)}
+
+/* ═══ TAB NAV ═══ */
+.cbam-tabs{display:flex;gap:0;background:#fff;border-radius:10px;padding:4px;width:fit-content;box-shadow:var(--shd);margin-bottom:14px}
+.cbam-tab{padding:7px 16px;border-radius:7px;border:none;background:transparent;font-family:var(--fb);font-size:13px;font-weight:500;color:var(--t3);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.cbam-tab.active{background:var(--cbam-dark);color:#fff;font-weight:600}
+.cbam-tab-num{width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.2)}
+.cbam-tab:not(.active) .cbam-tab-num{background:var(--bg);color:var(--t3)}
+
+/* ═══ STATEMENT BANNER ═══ */
+.cbam-stmt-banner{display:flex;align-items:center;gap:12px;background:var(--cbam-light);border:1px solid rgba(37,99,168,.2);border-radius:10px;padding:12px 16px;margin-bottom:12px;flex-shrink:0}
+.cbam-stmt-icon{color:var(--cbam-blue);font-size:18px;flex-shrink:0}
+.cbam-stmt-main{font-size:13px;font-weight:600;color:var(--cbam-blue)}
+.cbam-stmt-ref{font-size:11px;color:var(--t3);font-family:var(--fm,monospace);margin-top:2px}
+
+/* ═══ TWO PANELS (30/70) ═══ */
+.cbam-panels{flex:1;display:grid;grid-template-columns:30% 1fr;gap:16px;overflow:hidden;min-height:0;align-items:start}
+
+/* LEFT */
+.cbam-pl{display:flex;flex-direction:column;gap:14px;overflow-y:auto;overflow-x:hidden;max-height:100%}
+.cbam-pl::-webkit-scrollbar{width:3px}
+.cbam-pl::-webkit-scrollbar-thumb{background:rgba(0,0,0,.06);border-radius:2px}
+
+/* RIGHT — scrollable */
+.cbam-pr{display:flex;flex-direction:column;gap:16px;overflow-y:auto;min-width:0;padding-right:2px;max-height:100%}
+.cbam-pr::-webkit-scrollbar{width:3px}
+.cbam-pr::-webkit-scrollbar-thumb{background:rgba(0,0,0,.06);border-radius:2px}
+
+/* Card base */
+.cbam-card{background:#ffffff;border-radius:var(--r,14px);box-shadow:var(--shd);padding:20px;overflow:hidden}
+.cbam-ct{font-size:13px;font-weight:600;color:var(--dark,#1a1a1a);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+
+/* ══ SCORE CARD — navy gradient ══ */
+.cbam-score-card{
+  background:linear-gradient(145deg,#1a2744 0%,#1e3a6e 55%,#163058 100%);
+  border-radius:var(--r,14px);padding:22px 22px 18px;
+  color:#fff;box-shadow:0 8px 40px rgba(0,0,0,.12);
+}
+.cbam-sc-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:8px}
+.cbam-sc-band{display:inline-flex;align-items:center;gap:6px;background:rgba(200,146,42,.25);border:1px solid rgba(200,146,42,.4);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#f0c060;margin-bottom:12px}
+.cbam-sc-band.negligible{background:rgba(74,124,94,.25);border-color:rgba(74,124,94,.4);color:#6db89a}
+.cbam-sc-band.low{background:rgba(200,146,42,.25);border-color:rgba(200,146,42,.4);color:#f0c060}
+.cbam-sc-band.high{background:rgba(196,78,58,.25);border-color:rgba(196,78,58,.4);color:#e06050}
+.cbam-sc-band-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.cbam-sc-num{display:flex;align-items:baseline;gap:3px;margin-bottom:4px}
+.cbam-sc-big{font-family:var(--fd);font-size:60px;font-weight:400;line-height:1;color:#fff}
+.cbam-sc-denom{font-size:20px;color:rgba(255,255,255,.4)}
+.cbam-sc-trend{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border-radius:6px;padding:3px 9px;font-size:11px;color:rgba(255,255,255,.65);margin-top:7px}
+.cbam-sc-verdict{display:inline-flex;align-items:center;gap:5px;background:rgba(37,99,168,.3);border:1px solid rgba(100,160,230,.35);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:#93c5fd;margin-top:8px;letter-spacing:.03em}
+.cbam-sc-verdict.issues{background:rgba(196,78,58,.25);border-color:rgba(196,78,58,.35);color:#f0a0a0}
+.cbam-sc-footer{font-size:11px;color:rgba(255,255,255,.35);margin-top:12px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.1);padding-top:10px}
+.cbam-sc-footer-val{font-weight:600;color:rgba(255,255,255,.65)}
+
+/* ══ BREAKDOWN BARS ══ */
+.cbam-bk-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:12px}
+.cbam-bk-label{color:var(--t2,#555);display:flex;align-items:center;gap:5px;flex:1}
+.cbam-bk-label small{font-size:11px;color:var(--t3,#888)}
+.cbam-bk-bar{width:60px;height:4px;background:var(--bg,#f0ebe3);border-radius:2px;margin:0 10px;overflow:hidden}
+.cbam-bk-fill{height:100%;border-radius:2px}
+.cbam-bk-fill.blue{background:var(--cbam-blue)}
+.cbam-bk-fill.amber{background:var(--amber,#c8922a)}
+.cbam-bk-fill.red{background:var(--red,#c0392b)}
+.cbam-bk-fill.green{background:#2e7d52}
+.cbam-bk-val{font-weight:600;color:var(--dark,#1a1a1a);font-size:12px;white-space:nowrap}
+
+/* ══ LEVY CARD ══ */
+.cbam-levy-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border,rgba(0,0,0,.06))}
+.cbam-levy-row:last-child{border-bottom:none}
+.cbam-levy-label{font-size:12.5px;color:var(--t2,#555);display:flex;align-items:center;gap:6px}
+.cbam-levy-val{font-size:13px;font-weight:600}
+.cbam-gauge-bar{height:6px;background:var(--bg,#f0ebe3);border-radius:3px;overflow:hidden;margin:10px 0 6px}
+.cbam-gauge-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--cbam-blue),#93c5fd)}
+.cbam-levy-net{background:var(--cbam-light);border-radius:8px;padding:12px 14px;margin-top:10px}
+.cbam-levy-net-label{font-size:11px;color:var(--cbam-blue);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.cbam-levy-net-val{font-family:var(--fd);font-size:32px;font-weight:500;color:var(--cbam-dark);margin-top:2px}
+.cbam-levy-per-ton{font-size:11px;color:var(--t3,#888);margin-top:2px}
+
+/* ══ DEADLINES ══ */
+.cbam-dl-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border,rgba(0,0,0,.06))}
+.cbam-dl-row:last-child{border-bottom:none}
+.cbam-dl-name{font-size:12.5px;color:var(--dark,#1a1a1a);font-weight:500}
+.cbam-dl-date{font-size:11.5px;color:var(--t3,#888);margin-top:1px}
+.cbam-urgency{font-size:11px;font-weight:600;padding:3px 9px;border-radius:10px;white-space:nowrap}
+.cbam-urgency-red{background:#fdecea;color:#c0392b}
+.cbam-urgency-amber{background:#fdf3e0;color:#c8922a}
+.cbam-urgency-blue{background:var(--cbam-light);color:var(--cbam-blue)}
+.cbam-urgency-green{background:#e6f4ed;color:#2e7d52}
+
+/* ══ ACTION BUTTONS ══ */
+.cbam-btn-gen{width:100%;padding:12px;background:var(--cbam-dark);color:#fff;border:none;border-radius:10px;font-family:var(--fb);font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:8px}
+.cbam-btn-gen:disabled{opacity:.5;cursor:not-allowed}
+.cbam-btn-supplier{width:100%;padding:11px;background:var(--cbam-light);color:var(--cbam-blue);border:none;border-radius:10px;font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+
+/* ══ COST SCENARIOS — 5 card grid ══ */
+.cbam-ets-row{display:flex;align-items:center;justify-content:space-between;background:#f0f4fb;border-radius:8px;padding:9px 12px;margin-bottom:14px}
+.cbam-ets-label{font-size:11.5px;color:var(--t2,#555)}
+.cbam-ets-date{font-size:10px;color:var(--t3,#888)}
+.cbam-ets-price{font-size:13px;font-weight:700;color:var(--cbam-dark)}
+.cbam-scenario-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.cbam-sc-card{background:#f5f7fc;border-radius:10px;padding:13px 10px;text-align:center;position:relative}
+.cbam-sc-card.base{background:var(--cbam-light);border:1.5px solid rgba(37,99,168,.25)}
+.cbam-sc-tag{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--cbam-blue);color:#fff;font-size:9px;font-weight:700;letter-spacing:.06em;padding:2px 7px;border-radius:8px;white-space:nowrap}
+.cbam-sc-card-label{font-size:10.5px;color:var(--t3,#888);font-weight:500;margin-bottom:6px;line-height:1.3}
+.cbam-sc-card-val{font-family:var(--fd);font-size:18px;font-weight:500;color:var(--dark,#1a1a1a)}
+.cbam-sc-card.base .cbam-sc-card-val{color:var(--cbam-blue)}
+.cbam-sc-delta{font-size:10.5px;font-weight:600;border-radius:6px;padding:2px 6px;display:inline-block;margin-top:4px}
+.cbam-delta-base{color:var(--cbam-blue);background:var(--cbam-light)}
+.cbam-delta-up{color:#c0392b;background:#fdecea}
+.cbam-delta-down{color:#2e7d52;background:#e6f4ed}
+.cbam-delta-amber{color:#c8922a;background:#fdf3e0}
+
+/* ══ UK ADVISORY — teal gradient ══ */
+.cbam-uk-card{background:linear-gradient(135deg,#0e4f6b 0%,#0e7490 100%);border-radius:var(--r,14px);padding:18px 20px;color:#fff;display:flex;align-items:center;gap:16px}
+.cbam-uk-flag{font-size:28px}
+.cbam-uk-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.cbam-uk-sub{font-size:12px;color:rgba(255,255,255,.6)}
+.cbam-uk-badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:rgba(255,255,255,.9);white-space:nowrap;text-align:center;flex-shrink:0}
+.cbam-uk-badge-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;text-align:center}
+
+/* ══ RISK DRIVERS ══ */
+.cbam-risk{padding:13px 0;border-bottom:1px solid var(--border,rgba(0,0,0,.06));display:flex;gap:12px;align-items:flex-start}
+.cbam-risk:last-child{border-bottom:none}
+.cbam-risk-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.cbam-risk-dot.red{background:#c0392b}
+.cbam-risk-dot.amber{background:#c8922a}
+.cbam-risk-dot.blue{background:var(--cbam-blue)}
+.cbam-risk-title{font-size:13px;font-weight:600;color:var(--dark,#1a1a1a);margin-bottom:2px}
+.cbam-risk-desc{font-size:12px;color:var(--t3,#888);margin-bottom:5px;line-height:1.4}
+.cbam-risk-action{font-size:11.5px;color:var(--cbam-blue)}
+
+/* ══ COMPLIANCE CHECKS ══ */
+.cbam-chk-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border,rgba(0,0,0,.06))}
+.cbam-chk-row:last-child{border-bottom:none}
+.cbam-chk-label{font-size:12.5px;color:var(--t2,#555);display:flex;align-items:center;gap:8px}
+.cbam-chk-ic{font-size:12px}
+.cbam-badge-pass{font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:6px;background:#e6f4ed;color:#2e7d52}
+.cbam-badge-fail{font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:6px;background:#fdecea;color:#c0392b}
+.cbam-badge-warn{font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:6px;background:#fdf3e0;color:#c8922a}
+
+/* ══ STEP FORMS (steps 1-3) ══ */
+.cbam-form-page{max-width:1280px;margin:0 auto;padding:0 28px 50px}
+.cbam-page-hdr{padding:18px 0 0}
+.cbam-form-grid{display:grid;grid-template-columns:38% 1fr;gap:16px;align-items:start}
+.cbam-form-card{background:#fff;border-radius:var(--r,14px);box-shadow:var(--shd);padding:20px}
+.cbam-form-title{font-size:13px;font-weight:600;color:var(--dark,#1a1a1a);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.cbam-form-group{margin-bottom:16px}
+.cbam-form-label{font-size:11px;font-weight:700;color:var(--t2,#555);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.07em}
+.cbam-form-input{width:100%;padding:10px 14px;border:1.5px solid var(--border,rgba(0,0,0,.06));border-radius:9px;font-family:var(--fb);font-size:14px;color:var(--dark,#1a1a1a);background:#f8f9fd;outline:none;transition:border-color .15s}
+.cbam-form-input:focus{border-color:var(--cbam-blue);background:#fff}
+.cbam-form-select{width:100%;padding:10px 14px;border:1.5px solid var(--border,rgba(0,0,0,.06));border-radius:9px;font-family:var(--fb);font-size:14px;color:var(--dark,#1a1a1a);background:#f8f9fd;outline:none;appearance:none;cursor:pointer}
+
+/* Toggle row */
+.cbam-toggle-row{display:flex;gap:0;background:#f8f9fd;border-radius:9px;padding:3px;border:1.5px solid var(--border,rgba(0,0,0,.06))}
+.cbam-toggle-opt{flex:1;padding:8px 12px;border-radius:7px;border:none;background:transparent;font-family:var(--fb);font-size:12.5px;font-weight:500;color:var(--t3,#888);cursor:pointer;transition:all .15s;text-align:center}
+.cbam-toggle-opt.active{background:#fff;color:var(--cbam-dark);font-weight:600;box-shadow:var(--shd)}
+
+/* Calc display */
+.cbam-calc{background:#f0f4fb;border-radius:10px;padding:16px 18px}
+.cbam-calc-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(37,99,168,.08);font-size:13px}
+.cbam-calc-row:last-child{border-bottom:none}
+.cbam-calc-label{color:var(--t2,#555)}
+.cbam-calc-val{font-weight:600;color:var(--dark,#1a1a1a)}
+.cbam-calc-total{font-family:var(--fd);font-size:28px;font-weight:500;color:var(--cbam-dark);margin-top:8px}
+
+/* Source badge */
+.cbam-source-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:9px;font-size:11px;font-weight:600}
+.cbam-source-actual{background:#e6f4ed;color:#2e7d52}
+.cbam-source-default{background:#fdf3e0;color:#c8922a}
+
+/* Info box */
+.cbam-info-box{background:#f0f4fb;border:1px solid rgba(37,99,168,.12);border-radius:8px;padding:10px 13px;font-size:12px;color:var(--cbam-blue);margin-top:8px;display:flex;align-items:flex-start;gap:7px}
+.cbam-origin-match{display:flex;align-items:center;gap:8px;padding:10px 13px;background:#e6f4ed;border-radius:8px;font-size:12.5px;color:#2e7d52;font-weight:500;margin-top:8px}
+.cbam-period-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:var(--cbam-light);color:var(--cbam-blue);border-radius:8px;font-size:12px;font-weight:600;margin-top:8px}
+
+/* Form action buttons */
+.cbam-btn-save{background:var(--cbam-dark);color:#fff;border:none;padding:11px 24px;border-radius:10px;font-family:var(--fb);font-size:13.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px}
+.cbam-btn-save:disabled{opacity:.5;cursor:not-allowed}
+.cbam-btn-back{background:transparent;color:var(--t2,#555);border:1.5px solid var(--border,rgba(0,0,0,.06));padding:10px 20px;border-radius:10px;font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer}
+.cbam-form-actions{display:flex;gap:10px;align-items:center;margin-top:10px}
+
+/* Responsive */
+@media(max-width:900px){
+  .cbam-panels{grid-template-columns:1fr;overflow-y:auto}
+  .cbam-form-grid{grid-template-columns:1fr}
+  .cbam-scenario-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:600px){
+  .cbam-scenario-grid{grid-template-columns:repeat(2,1fr)}
+}

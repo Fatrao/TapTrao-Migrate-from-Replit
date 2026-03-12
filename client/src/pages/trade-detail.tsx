@@ -793,202 +793,6 @@ function EudrInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }
   );
 }
 
-/* ── CBAM Inline Box ── */
-function CbamInlineBox({ data, tradeId }: { data: TradeDetail; tradeId: string }) {
-  const { t } = useTranslation("trades");
-  const queryClient = useQueryClient();
-  const [expanded, setExpanded] = useState(false);
-  const [assessing, setAssessing] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  const cbam = data.cbamRecord;
-  const assessment = data.cbamAssessment;
-  const bandC = assessment?.band ? BAND_COLORS[assessment.band] || BAND_COLORS.medium : null;
-
-  // Init CBAM record if it doesn't exist
-  const initCbam = useCallback(async () => {
-    if (cbam) return;
-    try {
-      await apiRequest("POST", "/api/cbam", { lookupId: tradeId });
-      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
-    } catch {}
-  }, [cbam, tradeId, queryClient]);
-
-  const handleExpand = () => {
-    if (!expanded) initCbam();
-    setExpanded(!expanded);
-  };
-
-  const saveCbamField = async (fields: Record<string, any>) => {
-    if (!cbam) return;
-    setSaving(true);
-    try {
-      await apiRequest("PATCH", `/api/cbam/${cbam.id}`, fields);
-      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const runAssessment = async () => {
-    setAssessing(true);
-    try {
-      await apiRequest("POST", `/api/cbam/${tradeId}/assess`);
-      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
-    } finally {
-      setAssessing(false);
-    }
-  };
-
-  // Form state
-  const [emissions, setEmissions] = useState(cbam?.embeddedEmissions || "");
-  const [quantity, setQuantity] = useState(cbam?.quantity || "");
-  const [installName, setInstallName] = useState(cbam?.installationName || "");
-  const [installCountry, setInstallCountry] = useState(cbam?.installationCountry || "");
-  const [reportingPeriod, setReportingPeriod] = useState(cbam?.reportingPeriod || "");
-  const [carbonPrice, setCarbonPrice] = useState(cbam?.carbonPricePaid || "");
-  const [carbonCurrency, setCarbonCurrency] = useState(cbam?.carbonPriceCurrency || "EUR");
-
-  return (
-    <Card>
-      <CardContent className="p-5">
-        {/* Collapsed header */}
-        <div
-          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}
-          onClick={handleExpand}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Factory className="w-4 h-4" style={{ color: "#2563eb" }} />
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", margin: 0 }}>
-              {t("detail.cbamAssessment")}
-            </h3>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {assessment && assessment.applicable && assessment.score != null && (
-              <span style={{
-                fontSize: 15, fontWeight: 600, padding: "2px 10px", borderRadius: 4,
-                background: bandC?.bg || "rgba(0,0,0,0.04)",
-                color: bandC?.color || "var(--t3)",
-              }}>
-                {assessment.score} · {assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : ""}
-              </span>
-            )}
-            {assessment && assessment.applicable === false && (
-              <span style={{ fontSize: 15, color: "var(--t3)", fontWeight: 500 }}>N/A</span>
-            )}
-            {!assessment && (
-              <span style={{ fontSize: 15, color: "var(--app-acapulco)", fontWeight: 500 }}>{t("detail.notAssessed")}</span>
-            )}
-            {expanded ? <ChevronUp className="w-4 h-4" style={{ color: "var(--t3)" }} /> : <ChevronDown className="w-4 h-4" style={{ color: "var(--t3)" }} />}
-          </div>
-        </div>
-
-        {/* Collapsed subtitle */}
-        {!expanded && assessment && assessment.applicable && (
-          <div style={{ fontSize: 15, color: "var(--t3)", marginTop: 4, marginLeft: 28 }}>
-            {assessment.canConcludeCbamCompliant
-              ? `✅ ${t("detail.cbamCompliant")}`
-              : `❌ ${t("detail.cbamComplianceIssues")}`}
-            {assessment.assessedAt && (
-              <span style={{ marginLeft: 8 }}>
-                · {t("detail.lastAssessed", { date: new Date(assessment.assessedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) })}
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Expanded content */}
-        {expanded && (
-          <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 12 }}>
-
-            {/* 1. Emissions Data */}
-            <FormSection title={t("detail.emissionsData")} icon={Flame}>
-              <FormField label={t("detail.embeddedEmissions")} value={emissions} onChange={setEmissions} type="number" placeholder="0.00" />
-              <FormField label={t("detail.quantityTons")} value={quantity} onChange={setQuantity} type="number" placeholder="0" />
-              <Button size="sm" disabled={saving} onClick={() => saveCbamField({
-                embeddedEmissions: emissions || null,
-                quantity: quantity || null,
-              })} style={{ fontSize: 15, marginTop: 4 }}>
-                {saving ? t("detail.saving") : t("detail.save")}
-              </Button>
-            </FormSection>
-
-            {/* 2. Installation */}
-            <FormSection title={t("detail.installation")} icon={Building2}>
-              <FormField label={t("detail.installationName")} value={installName} onChange={setInstallName} />
-              <FormField label={t("detail.installationCountry")} value={installCountry} onChange={setInstallCountry} placeholder="NG" />
-              <FormField label={t("detail.reportingPeriod")} value={reportingPeriod} onChange={setReportingPeriod} placeholder="2026-Q1" />
-              <Button size="sm" disabled={saving} onClick={() => saveCbamField({
-                installationName: installName || null,
-                installationCountry: installCountry || null,
-                reportingPeriod: reportingPeriod || null,
-              })} style={{ fontSize: 15, marginTop: 4 }}>
-                {saving ? t("detail.saving") : t("detail.save")}
-              </Button>
-            </FormSection>
-
-            {/* 3. Carbon Price */}
-            <FormSection title={t("detail.carbonPrice")} icon={DollarSign}>
-              <FormField label={t("detail.carbonPricePaid")} value={carbonPrice} onChange={setCarbonPrice} type="number" placeholder="0.00" />
-              <div className="form-group" style={{ marginBottom: 10 }}>
-                <label>{t("detail.currency")}</label>
-                <select
-                  value={carbonCurrency}
-                  onChange={e => setCarbonCurrency(e.target.value)}
-                >
-                  <option value="EUR">EUR</option>
-                  <option value="USD">USD</option>
-                  <option value="GBP">GBP</option>
-                </select>
-              </div>
-              <Button size="sm" disabled={saving} onClick={() => saveCbamField({
-                carbonPricePaid: carbonPrice || null,
-                carbonPriceCurrency: carbonCurrency,
-              })} style={{ fontSize: 15, marginTop: 4 }}>
-                {saving ? t("detail.saving") : t("detail.save")}
-              </Button>
-            </FormSection>
-
-            {/* Assessment Section */}
-            <div style={{ borderTop: "2px solid rgba(0,0,0,0.08)", paddingTop: 16, marginTop: 4 }}>
-              <Button size="sm" onClick={runAssessment} disabled={assessing} style={{ fontSize: 15 }}>
-                {assessing ? (
-                  <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> {t("detail.assessing")}</>
-                ) : (
-                  <><RefreshCw className="w-3 h-3 mr-1" /> {t("detail.runAssessment")}</>
-                )}
-              </Button>
-
-              {assessment && assessment.applicable && (
-                <div style={{ marginTop: 16 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 15, fontWeight: 600, color: bandC?.color || "var(--t3)" }}>
-                      {t("detail.score", { score: assessment.score, band: assessment.band ? assessment.band.charAt(0).toUpperCase() + assessment.band.slice(1) : "" })}
-                    </span>
-                    <span style={{ fontSize: 15, color: "var(--t2)" }}>
-                      {assessment.canConcludeCbamCompliant ? `✅ ${t("detail.canConcludeCbamCompliant")}` : `❌ ${t("detail.cannotConcludeCbamCompliant")}`}
-                    </span>
-                  </div>
-                  <ScoreBar score={assessment.score} band={assessment.band} />
-                  <BreakdownRow breakdown={assessment.breakdown} />
-                  <TopDrivers drivers={assessment.topDrivers as any[]} />
-                  <ChecksList checks={assessment.checksRun as any[]} />
-                </div>
-              )}
-
-              {assessment && assessment.applicable === false && (
-                <div style={{ marginTop: 12, fontSize: 15, color: "var(--t3)", padding: "8px 12px", background: "rgba(0,0,0,0.03)", borderRadius: 8 }}>
-                  {t("detail.cbamNotApplicable")}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
 /* ── Main Page Component ── */
 export default function TradeDetail() {
   const { t, i18n } = useTranslation("trades");
@@ -1509,21 +1313,51 @@ export default function TradeDetail() {
               )}
 
               {/* CBAM */}
-              {result?.triggers?.cbam && (
-                <div className="stp-card">
-                  <div className="stp-card-hdr">
-                    <span className="stp-card-title">⚡ {t("detail.cbamAssessment")}</span>
-                    {cbamAssessment && cbamAssessment.applicable && cbamAssessment.score != null ? (
-                      <span style={{ fontSize: 11, color: "#4a7c5e", fontWeight: 600 }}>Score: {cbamAssessment.score}</span>
-                    ) : (
-                      <span style={{ fontSize: 11, color: "#b8c2ba" }}>{t("detail.notAssessed")}</span>
+              {result?.triggers?.cbam && (() => {
+                const bd = cbamAssessment?.breakdown as any;
+                const levy = bd?.levyBreakdown as { netLevy: number; emissionsSource: string; perTonLevy: number } | null;
+                const deadlines = bd?.deadlines as { quarterlyReportDue: string; urgency: string; ukCbamNote: string | null } | null;
+                const urgencyColor = deadlines?.urgency === "overdue" ? "#ef4444" : deadlines?.urgency === "urgent" ? "#eab308" : deadlines?.urgency === "upcoming" ? "#f97316" : "#4a7c5e";
+                return (
+                  <div className="stp-card">
+                    <div className="stp-card-hdr">
+                      <span className="stp-card-title">⚡ {t("detail.cbamAssessment")}</span>
+                      {cbamAssessment && cbamAssessment.applicable && cbamAssessment.score != null ? (
+                        <span style={{ fontSize: 11, color: "#4a7c5e", fontWeight: 600 }}>Score: {cbamAssessment.score}</span>
+                      ) : (
+                        <span style={{ fontSize: 11, color: "#b8c2ba" }}>{t("detail.notAssessed")}</span>
+                      )}
+                    </div>
+                    <div className="stp-cbam-row"><span className="stp-cbam-l">Carbon border adjustment</span><span className={`stp-cbam-v ${cbamAssessment?.applicable ? "ok" : "na"}`}>{cbamAssessment?.applicable ? "Applicable" : "Check required"}</span></div>
+                    <div className="stp-cbam-row">
+                      <span className="stp-cbam-l">{t("detail.estimatedLevy")}</span>
+                      {levy ? (
+                        <span className="stp-cbam-v ok" title={`${levy.emissionsSource === "default" ? "Default factor" : "Actual"} · €${levy.perTonLevy}/ton`}>€{levy.netLevy.toLocaleString()}</span>
+                      ) : (
+                        <span className="stp-cbam-v na">{cbamAssessment ? t("detail.runAssessmentForLevy") : "—"}</span>
+                      )}
+                    </div>
+                    <div className="stp-cbam-row">
+                      <span className="stp-cbam-l">{t("detail.reportingDeadline")}</span>
+                      {deadlines ? (
+                        <span className="stp-cbam-v" style={{ color: urgencyColor, fontWeight: 600 }}>
+                          {new Date(deadlines.quarterlyReportDue).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                        </span>
+                      ) : (
+                        <span className="stp-cbam-v na">{data.cbamRecord?.reportingPeriod ? "—" : t("detail.setReportingPeriod")}</span>
+                      )}
+                    </div>
+                    {deadlines?.ukCbamNote && (
+                      <div className="stp-cbam-row"><span className="stp-cbam-l" style={{ fontSize: 10, color: "#8a9a8c" }}>🇬🇧 {deadlines.ukCbamNote}</span></div>
                     )}
+                    <div style={{ marginTop: 10 }}>
+                      <Link href={`/cbam/${tradeId}`}>
+                        <button className="stp-btn-dark">{t("detail.startCbamCheck")} →</button>
+                      </Link>
+                    </div>
                   </div>
-                  <div className="stp-cbam-row"><span className="stp-cbam-l">Carbon border adjustment</span><span className={`stp-cbam-v ${cbamAssessment?.applicable ? "ok" : "na"}`}>{cbamAssessment?.applicable ? "Applicable" : "Check required"}</span></div>
-                  <div className="stp-cbam-row"><span className="stp-cbam-l">Estimated carbon levy</span><span className="stp-cbam-v na">—</span></div>
-                  <div className="stp-cbam-row"><span className="stp-cbam-l">Reporting deadline</span><span className="stp-cbam-v na">—</span></div>
-                </div>
-              )}
+                );
+              })()}
 
             </div>
 
