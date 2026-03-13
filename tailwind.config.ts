@@ -105,9 +105,9 @@ export default {
       },
       fontFamily: {
         sans: ["'DM Sans'", 'sans-serif'],
-        heading: ["'Playfair Display'", 'serif'],
+        heading: ["'Roboto'", 'sans-serif'],
         mono: ["'DM Sans'", 'sans-serif'],
-        clash: ["'Playfair Display'", 'serif'],
+        clash: ["'Roboto'", 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {
