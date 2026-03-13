@@ -101,7 +101,7 @@ function getEudrBadge(band: string | null, t: (key: string) => string): { label:
 
 /* ─── Inline CSS (matches design mock) ─── */
 const css = `
-.mt-page { display:flex;flex-direction:column;padding:24px 30px 24px 20px;gap:12px;height:100%;overflow:hidden }
+.mt-page { display:flex;flex-direction:column;padding:24px 30px 24px 20px;gap:12px;height:100%;overflow-y:auto }
 .mt-hdr { display:flex;align-items:center;justify-content:space-between;flex-shrink:0 }
 .mt-hdr h1 { font-family:var(--fd);font-size:28px;font-weight:600;color:var(--t1);margin:0 }
 .mt-hdr .sub { font-size:15px;color:var(--t3);margin-top:1px }
@@ -158,10 +158,10 @@ const css = `
 .mt-rb-sub b.g { color:var(--sage) }
 
 /* Mid grid */
-.mt-mid { flex:1;display:grid;grid-template-columns:60fr 40fr;gap:10px;min-height:0 }
+.mt-mid { display:grid;grid-template-columns:60fr 40fr;gap:10px;min-height:0;max-height:480px }
 
 /* Trades card (left) */
-.mt-tc { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:16px 20px;display:flex;flex-direction:column;min-height:0;animation:mt-fu .3s ease both }
+.mt-tc { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:16px 20px;display:flex;flex-direction:column;min-height:0;overflow:hidden;animation:mt-fu .3s ease both }
 .mt-tc .th { display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-shrink:0 }
 .mt-tc h3 { font-family:var(--fd);font-size:18px;font-weight:600;color:var(--t1);margin:0 }
 .mt-tc .tsub { font-size: 15px;color:var(--t3);margin-bottom:10px;flex-shrink:0 }
@@ -291,7 +291,7 @@ const css = `
   .mt-stats { grid-template-columns:1fr 1fr;gap:8px }
   .mt-risk-banner { grid-template-columns:1fr 1fr;gap:12px;padding:12px 14px }
   .mt-rb-cell+.mt-rb-cell::before { display:none }
-  .mt-mid { grid-template-columns:1fr;height:auto }
+  .mt-mid { grid-template-columns:1fr;max-height:none }
   .mt-tc { max-height:none }
   .mt-right { gap:10px }
   .mt-bot { grid-template-columns:1fr;height:auto }
