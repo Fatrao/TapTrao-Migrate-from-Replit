@@ -507,18 +507,9 @@ export class DatabaseStorage implements IStorage {
     for (const k of sortedKeys) sortedObj[k] = (data.resultJson as Record<string, unknown>)[k];
     const twinlogHash = createHash("sha256").update(JSON.stringify(sortedObj)).digest("hex");
 
-    // Auto-generate nickname: "CommodityName #N" where N = count of user's trades with same commodity
-    let nickname: string | null = null;
-    if (sessionId) {
-      const countRows = await db.execute(sql`
-        SELECT COUNT(*)::int AS cnt FROM lookups
-        WHERE session_id = ${sessionId} AND commodity_name = ${data.commodityName}
-      `);
-      const n = (countRows.rows[0] as any)?.cnt ?? 1;
-      nickname = `${data.commodityName} #${n}`;
-    } else {
-      nickname = `${data.commodityName} #1`;
-    }
+    // Auto-generate trade code: "TRD-XXXX" (4 alphanumeric chars, uppercase)
+    const code = randomBytes(2).toString("hex").toUpperCase();
+    const nickname = `TRD-${code}`;
 
     await db.execute(sql`
       UPDATE lookups
