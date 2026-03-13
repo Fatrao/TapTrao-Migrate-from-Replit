@@ -273,6 +273,7 @@ export interface IStorage {
 export type EnrichedTrade = {
   id: string;
   commodityName: string;
+  nickname: string | null;
   hsCode: string;
   originIso2: string;
   originName: string;
@@ -506,15 +507,36 @@ export class DatabaseStorage implements IStorage {
     for (const k of sortedKeys) sortedObj[k] = (data.resultJson as Record<string, unknown>)[k];
     const twinlogHash = createHash("sha256").update(JSON.stringify(sortedObj)).digest("hex");
 
+    // Auto-generate nickname: "CommodityName #N" where N = count of user's trades with same commodity
+    let nickname: string | null = null;
+    if (sessionId) {
+      const countRows = await db.execute(sql`
+        SELECT COUNT(*)::int AS cnt FROM lookups
+        WHERE session_id = ${sessionId} AND commodity_name = ${data.commodityName}
+      `);
+      const n = (countRows.rows[0] as any)?.cnt ?? 1;
+      nickname = `${data.commodityName} #${n}`;
+    } else {
+      nickname = `${data.commodityName} #1`;
+    }
+
     await db.execute(sql`
       UPDATE lookups
       SET twinlog_ref = ${twinlogRef},
           twinlog_hash = ${twinlogHash},
-          twinlog_locked_at = NOW()
+          twinlog_locked_at = NOW(),
+          nickname = ${nickname}
       WHERE id = ${result.id}::uuid
     `);
 
-    return { ...result, twinlogRef, twinlogHash, twinlogLockedAt: new Date() };
+    return { ...result, twinlogRef, twinlogHash, twinlogLockedAt: new Date(), nickname };
+  }
+
+  async updateLookupNickname(id: string, nickname: string, sessionId?: string): Promise<Lookup | undefined> {
+    const conditions = [eq(lookups.id, id)];
+    if (sessionId) conditions.push(eq(lookups.sessionId, sessionId));
+    const [row] = await db.update(lookups).set({ nickname }).where(and(...conditions)).returning();
+    return row;
   }
 
   async getLookupById(id: string): Promise<Lookup | undefined> {
@@ -806,6 +828,7 @@ export class DatabaseStorage implements IStorage {
       SELECT DISTINCT ON (l.id)
         l.id,
         l.commodity_name AS "commodityName",
+        l.nickname AS "nickname",
         l.hs_code AS "hsCode",
         o.iso2 AS "originIso2",
         o.country_name AS "originName",
@@ -1521,8 +1544,9 @@ export class DatabaseStorage implements IStorage {
     return row;
   }
 
-  async updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string; tradeValue?: string; tradeValueCurrency?: string; demurragePort?: string; demurrageContainerType?: string; demurrageDailyRate?: string; demurrageFreeDays?: number; demurrageDaysHeld?: number; demurrageTotal?: string }, sessionId: string): Promise<Lookup | undefined> {
+  async updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string; tradeValue?: string; tradeValueCurrency?: string; nickname?: string; demurragePort?: string; demurrageContainerType?: string; demurrageDailyRate?: string; demurrageFreeDays?: number; demurrageDaysHeld?: number; demurrageTotal?: string }, sessionId: string): Promise<Lookup | undefined> {
     const updates: Record<string, unknown> = {};
+    if (fields.nickname !== undefined) updates.nickname = fields.nickname;
     if (fields.notes !== undefined) updates.notes = fields.notes;
     if (fields.estimatedArrival !== undefined) updates.estimatedArrival = fields.estimatedArrival;
     if (fields.actualArrival !== undefined) updates.actualArrival = fields.actualArrival;

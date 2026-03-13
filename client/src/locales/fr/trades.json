@@ -61,6 +61,7 @@
   "map.primary": "Principal",
   "map.secondary": "Secondaire",
   "map.atRisk": "À risque",
+  "detail.clickToRename": "Cliquez pour renommer cette transaction",
   "detail.pageTitle": "Détail de la transaction",
   "detail.breadcrumb": "Mes transactions",
   "detail.loading": "Chargement...",

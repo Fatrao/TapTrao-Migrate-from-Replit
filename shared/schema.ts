@@ -237,6 +237,7 @@ export const lookups = pgTable("lookups", {
   closedAt: timestamp("closed_at"),
   estimatedArrival: date("estimated_arrival"),
   actualArrival: date("actual_arrival"),
+  nickname: text("nickname"),
   notes: text("notes"),
   tradeValue: text("trade_value"),
   tradeValueCurrency: varchar("trade_value_currency", { length: 3 }).default("USD"),

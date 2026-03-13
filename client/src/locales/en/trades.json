@@ -72,6 +72,7 @@
   "map.secondary": "Secondary",
   "map.atRisk": "At Risk",
 
+  "detail.clickToRename": "Click to rename this trade",
   "detail.pageTitle": "Trade Detail",
   "detail.breadcrumb": "My Trades",
   "detail.loading": "Loading...",

@@ -48,6 +48,7 @@ import {
   Building2,
   DollarSign,
   Download,
+  Pencil,
 } from "lucide-react";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
 import { estimateDemurrageRange } from "@/lib/demurrage-utils";
@@ -834,6 +835,20 @@ export default function TradeDetail() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] }),
   });
 
+  // Nickname editing state
+  const [editingNickname, setEditingNickname] = useState(false);
+  const [nicknameValue, setNicknameValue] = useState("");
+  const saveNickname = async () => {
+    setEditingNickname(false);
+    const trimmed = nicknameValue.trim();
+    if (!trimmed || trimmed === (data?.lookup?.nickname || "")) return;
+    try {
+      await apiRequest("PATCH", `/api/trades/${tradeId}`, { nickname: trimmed });
+      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/trades"] });
+    } catch { /* silent */ }
+  };
+
   // Trade value editing state
   const [editingValue, setEditingValue] = useState(false);
   const [tradeValueInput, setTradeValueInput] = useState("");
@@ -1046,7 +1061,36 @@ export default function TradeDetail() {
 
             <div className="stp-title-row">
               <div>
-                <div className="stp-title">{translateCommodity(data.lookup.commodityName, lang)}</div>
+                {editingNickname ? (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <input
+                      autoFocus
+                      value={nicknameValue}
+                      onChange={e => setNicknameValue(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === "Enter") saveNickname();
+                        if (e.key === "Escape") { setEditingNickname(false); setNicknameValue(data.lookup.nickname || ""); }
+                      }}
+                      onBlur={saveNickname}
+                      style={{
+                        fontFamily: "var(--fh)", fontSize: 20, fontWeight: 700, color: "var(--t1)",
+                        background: "rgba(0,0,0,0.03)", border: "1px solid rgba(109,184,154,0.3)",
+                        borderRadius: 6, padding: "4px 10px", width: "100%", maxWidth: 400,
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className="stp-title"
+                    onClick={() => { setNicknameValue(data.lookup.nickname || translateCommodity(data.lookup.commodityName, lang)); setEditingNickname(true); }}
+                    style={{ cursor: "pointer" }}
+                    title={t("detail.clickToRename")}
+                  >
+                    {data.lookup.nickname || translateCommodity(data.lookup.commodityName, lang)}
+                    <Pencil size={13} style={{ marginLeft: 6, opacity: 0.3, verticalAlign: "middle" }} />
+                  </div>
+                )}
                 <div className="stp-corridor">
                   {nameFlag(data.lookup.originName)} {data.lookup.originName} → {nameFlag(data.lookup.destinationName)} {data.lookup.destinationName}
                 </div>

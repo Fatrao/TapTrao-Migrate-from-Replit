@@ -19,6 +19,7 @@ import { calculateTradeRisk, calculatePortfolioRisk } from "@/lib/risk-utils";
 type EnrichedTrade = {
   id: string;
   commodityName: string;
+  nickname: string | null;
   hsCode: string;
   originIso2: string;
   originName: string;
@@ -648,8 +649,8 @@ export default function Trades() {
                     >
                       <div className="fl">{iso2ToFlag(trade.originIso2)}{iso2ToFlag(trade.destIso2)}</div>
                       <div className="inf">
-                        <div className="nm">{translateCommodity(trade.commodityName, lang)}</div>
-                        <div className="rt">{trade.originName} → {trade.destName}</div>
+                        <div className="nm">{trade.nickname || translateCommodity(trade.commodityName, lang)}</div>
+                        <div className="rt">{trade.originName} → {trade.destName} · {new Date(trade.createdAt).toLocaleDateString(lang, { month: "short", day: "numeric" })}, {new Date(trade.createdAt).toLocaleTimeString(lang, { hour: "2-digit", minute: "2-digit" })}</div>
                       </div>
                       <div className="vl">{formatValue(trade.tradeValue, trade.tradeValueCurrency)}</div>
                       <div className="dc">{trade.docsRequiredCount > 0 ? `${trade.docsReceivedCount}/${trade.docsRequiredCount}` : "—"}</div>

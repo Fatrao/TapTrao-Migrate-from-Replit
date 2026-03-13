@@ -936,8 +936,8 @@ export async function registerRoutes(
   app.patch("/api/trades/:id", async (req, res) => {
     try {
       const sessionId = getSessionId(req, res);
-      const { notes, estimatedArrival, actualArrival, tradeValue, tradeValueCurrency } = req.body;
-      const updated = await storage.updateTradeFields(req.params.id, { notes, estimatedArrival, actualArrival, tradeValue, tradeValueCurrency }, sessionId);
+      const { notes, estimatedArrival, actualArrival, tradeValue, tradeValueCurrency, nickname } = req.body;
+      const updated = await storage.updateTradeFields(req.params.id, { notes, estimatedArrival, actualArrival, tradeValue, tradeValueCurrency, nickname }, sessionId);
       if (!updated) return res.status(404).json({ message: t("routes.trade_not_found_no_changes", getLocale(req)) });
       // Audit events for date changes
       if (estimatedArrival) {
