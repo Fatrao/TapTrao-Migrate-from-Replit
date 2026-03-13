@@ -103,6 +103,14 @@ const VALID_CHECK_TYPES = new Set([
   "emails_present_for_supplier_and_customer",
   "traces_reference_format",
   "numeric_positive",
+  // Phase 5: Value anomaly and cross-document checks
+  "weight_net_less_than_gross",
+  "price_per_kg_in_range",
+  "insurance_covers_110_percent_cif",
+  "phyto_within_14_days",
+  "container_number_format",
+  "incoterms_valid",
+  "currency_code_valid",
 ]);
 
 export function validateSpecShape(spec: unknown): ValidationSpec | null {
@@ -741,6 +749,115 @@ const CHECK_TYPE_REGISTRY: Record<string, (fields: Record<string, any>, ctx: Tra
       }
     }
     return { check: "numeric_positive", passed: true, detail: "All numeric fields are positive or not present" };
+  },
+
+  // ── Phase 5: Value anomaly checks ──
+
+  weight_net_less_than_gross: (fields) => {
+    const net = parseFloat(String(fields.netWeight ?? fields.net_weight ?? ""));
+    const gross = parseFloat(String(fields.grossWeight ?? fields.gross_weight ?? ""));
+    if (isNaN(net) || isNaN(gross)) return { check: "weight_net_less_than_gross", passed: true, detail: "Net/gross weights not both present — skipped" };
+    const passed = net <= gross;
+    return {
+      check: "weight_net_less_than_gross",
+      passed,
+      detail: passed
+        ? `Net weight (${net} kg) ≤ gross weight (${gross} kg)`
+        : `Net weight (${net} kg) exceeds gross weight (${gross} kg) — impossible`,
+    };
+  },
+
+  price_per_kg_in_range: (fields) => {
+    const total = parseFloat(String(fields.totalAmount ?? fields.invoiceTotal ?? ""));
+    const weight = parseFloat(String(fields.netWeight ?? fields.quantity ?? ""));
+    if (isNaN(total) || isNaN(weight) || weight <= 0) return { check: "price_per_kg_in_range", passed: true, detail: "Price/weight not extractable — skipped" };
+    const pricePerKg = total / weight;
+    // Flag if price per kg is suspiciously low (<$0.01) or extremely high (>$500)
+    const passed = pricePerKg >= 0.01 && pricePerKg <= 500;
+    return {
+      check: "price_per_kg_in_range",
+      passed,
+      detail: passed
+        ? `Price per kg: $${pricePerKg.toFixed(2)} — within reasonable range`
+        : `Price per kg: $${pricePerKg.toFixed(2)} — outside expected range ($0.01-$500/kg)`,
+    };
+  },
+
+  insurance_covers_110_percent_cif: (fields) => {
+    const coverage = parseFloat(String(fields.coverageAmount ?? fields.insuredValue ?? ""));
+    const invoiceTotal = parseFloat(String(fields.totalAmount ?? fields.cifValue ?? ""));
+    if (isNaN(coverage) || isNaN(invoiceTotal) || invoiceTotal <= 0) return { check: "insurance_covers_110_percent_cif", passed: true, detail: "Coverage/invoice amounts not both present — skipped" };
+    const ratio = coverage / invoiceTotal;
+    const passed = ratio >= 1.1;
+    return {
+      check: "insurance_covers_110_percent_cif",
+      passed,
+      detail: passed
+        ? `Insurance covers ${(ratio * 100).toFixed(0)}% of invoice value (UCP 600 Art. 28 requires ≥110%)`
+        : `Insurance covers only ${(ratio * 100).toFixed(0)}% of invoice value — UCP 600 Art. 28 requires minimum 110% of CIF value`,
+    };
+  },
+
+  phyto_within_14_days: (fields) => {
+    const issueDate = fields.dateOfIssue ?? fields.issueDate ?? fields.issue_date ?? null;
+    if (!issueDate) return { check: "phyto_within_14_days", passed: true, detail: "Issue date not extracted — skipped" };
+    const issued = new Date(String(issueDate));
+    if (isNaN(issued.getTime())) return { check: "phyto_within_14_days", passed: true, detail: "Could not parse issue date — skipped" };
+    const now = new Date();
+    const daysSinceIssue = Math.floor((now.getTime() - issued.getTime()) / (1000 * 60 * 60 * 24));
+    const passed = daysSinceIssue <= 14;
+    return {
+      check: "phyto_within_14_days",
+      passed,
+      detail: passed
+        ? `Phytosanitary certificate issued ${daysSinceIssue} day(s) ago — within 14-day validity`
+        : `Phytosanitary certificate issued ${daysSinceIssue} days ago — exceeds 14-day validity window (ISPM 12)`,
+    };
+  },
+
+  container_number_format: (fields) => {
+    const container = fields.containerNumber ?? fields.container_number ?? null;
+    if (!container) return { check: "container_number_format", passed: true, detail: "Container number not present — skipped" };
+    const str = String(container).trim().toUpperCase();
+    // ISO 6346: 4 letters (owner code + category) + 7 digits
+    const passed = /^[A-Z]{3}[UJZ]\d{7}$/.test(str.replace(/[\s\-]/g, ""));
+    return {
+      check: "container_number_format",
+      passed,
+      detail: passed
+        ? `Container number format valid: ${str}`
+        : `Container number "${str}" does not match ISO 6346 format (3 letters + U/J/Z + 7 digits)`,
+    };
+  },
+
+  incoterms_valid: (fields) => {
+    const incoterm = fields.incoterms ?? fields.incoterm ?? fields.tradeTerms ?? null;
+    if (!incoterm) return { check: "incoterms_valid", passed: true, detail: "Incoterms not extracted — skipped" };
+    const str = String(incoterm).toUpperCase().trim();
+    const validTerms = ["EXW", "FCA", "CPT", "CIP", "DAP", "DPU", "DDP", "FAS", "FOB", "CFR", "CIF"];
+    const found = validTerms.find(t => str.includes(t));
+    return {
+      check: "incoterms_valid",
+      passed: !!found,
+      detail: found
+        ? `Valid Incoterms 2020 term found: ${found}`
+        : `Incoterm "${incoterm}" is not a recognized Incoterms 2020 term`,
+    };
+  },
+
+  currency_code_valid: (fields) => {
+    const currency = fields.currency ?? fields.currencyCode ?? null;
+    if (!currency) return { check: "currency_code_valid", passed: true, detail: "Currency not extracted — skipped" };
+    const str = String(currency).toUpperCase().trim();
+    const commonCurrencies = new Set(["USD", "EUR", "GBP", "CHF", "CAD", "AED", "TRY", "XOF", "XAF", "GHS", "NGN", "KES", "TZS", "ETB", "ZAR", "JPY", "CNY", "INR", "BRL", "AUD"]);
+    const passed = commonCurrencies.has(str) || /^[A-Z]{3}$/.test(str);
+    return {
+      check: "currency_code_valid",
+      passed,
+      detail: passed
+        ? `Currency code valid: ${str}`
+        : `Currency "${currency}" is not a valid ISO 4217 currency code`,
+    };
   },
 };
 

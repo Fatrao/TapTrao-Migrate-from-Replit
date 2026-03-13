@@ -1037,19 +1037,44 @@ export async function seedComplianceRules() {
           rejectIfContainsAny: ["bill of lading", "packing list", "certificate of origin", "phytosanitary"],
         },
         expectedFields: [
-          { name: "beneficiaryName", description: "Seller/exporter name", required: true, severityIfMissing: "critical" },
+          // Seller/buyer identification (UCP 600 Art. 18 + customs requirements)
+          { name: "sellerName", description: "Full legal name of seller/exporter", required: true, severityIfMissing: "critical" },
+          { name: "sellerAddress", description: "Full postal address of seller/exporter", required: true, severityIfMissing: "critical" },
+          { name: "buyerName", description: "Full legal name of buyer/importer (applicant under UCP 600)", required: true, severityIfMissing: "critical" },
+          { name: "buyerAddress", description: "Full postal address of buyer/importer", required: true, severityIfMissing: "warning" },
+          { name: "taxId", description: "Tax/VAT/EORI number of seller or buyer", required: false, severityIfMissing: "warning" },
+          // Invoice identifiers
+          { name: "invoiceNumber", description: "Unique invoice number", required: true, severityIfMissing: "critical" },
+          { name: "invoiceDate", description: "Date of invoice", required: true, severityIfMissing: "critical" },
+          // Goods description (UCP 600 Art. 18(c) — must correspond to credit description)
+          { name: "goodsDescription", description: "Detailed description of goods (not generic terms per ICS2)", required: true, severityIfMissing: "critical" },
+          { name: "hsCode", description: "HS/CN code (min 6 digits; 8-10 for EU/US)", required: true, severityIfMissing: "critical" },
+          { name: "quantity", description: "Quantity of goods with unit of measure", required: true, severityIfMissing: "critical" },
+          { name: "unitPrice", description: "Unit price per item/unit", required: true, severityIfMissing: "critical" },
           { name: "totalAmount", description: "Total invoice amount", required: true, severityIfMissing: "critical" },
-          { name: "currency", description: "Currency code (USD, EUR, etc.)", required: true, severityIfMissing: "critical" },
-          { name: "quantity", description: "Quantity of goods", required: false, severityIfMissing: "warning" },
-          { name: "hsCode", description: "HS/tariff code", required: false, severityIfMissing: "warning" },
-          { name: "incoterms", description: "Incoterms (FOB, CIF, etc.)", required: false, severityIfMissing: "warning" },
-          { name: "goodsDescription", description: "Description of goods", required: true, severityIfMissing: "critical" },
+          { name: "currency", description: "Currency code (USD, EUR, GBP, etc.)", required: true, severityIfMissing: "critical" },
+          // Weights
+          { name: "netWeight", description: "Net weight in kg", required: false, severityIfMissing: "warning" },
+          { name: "grossWeight", description: "Gross weight in kg", required: false, severityIfMissing: "warning" },
+          // Trade terms
+          { name: "incoterms", description: "Incoterms 2020 with named place (e.g., FOB Abidjan)", required: true, severityIfMissing: "warning" },
+          { name: "countryOfOrigin", description: "Country where goods were manufactured/produced", required: true, severityIfMissing: "critical" },
+          // Payment & shipping
+          { name: "paymentTerms", description: "Payment terms (e.g., L/C, T/T, CAD)", required: false, severityIfMissing: "info" },
+          { name: "purchaseOrderNumber", description: "Buyer's PO or contract reference number", required: false, severityIfMissing: "info" },
+          // Declaration
+          { name: "declarationStatement", description: "Declaration confirming invoice accuracy and value correctness", required: false, severityIfMissing: "info" },
         ],
         consistencyChecks: [
           { type: "hs_prefix_matches_context", severity: "warning", message: "HS code does not match expected commodity." },
           { type: "numeric_positive", severity: "warning", message: "Invoice amounts must be positive values." },
+          { type: "origin_country_match", severity: "warning", message: "Country of origin does not match trade context." },
+          { type: "weight_net_less_than_gross", severity: "critical", message: "Net weight cannot exceed gross weight." },
+          { type: "price_per_kg_in_range", severity: "warning", message: "Price per kg is outside expected range — verify declared value." },
+          { type: "incoterms_valid", severity: "warning", message: "Incoterms term not recognized — must be valid Incoterms 2020." },
+          { type: "currency_code_valid", severity: "warning", message: "Currency code not recognized — must be valid ISO 4217." },
         ],
-        minimumAcceptable: { mustHave: ["beneficiaryName", "totalAmount"], ifMissing: "ISSUES_FOUND" },
+        minimumAcceptable: { mustHave: ["sellerName", "totalAmount", "goodsDescription"], ifMissing: "ISSUES_FOUND" },
       },
     },
     // ── 2. Packing List (always required) ──
@@ -1072,15 +1097,34 @@ export async function seedComplianceRules() {
           rejectIfContainsAny: ["invoice", "bill of lading", "certificate of origin"],
         },
         expectedFields: [
-          { name: "quantity", description: "Total quantity of items", required: true, severityIfMissing: "critical" },
-          { name: "grossWeight", description: "Gross weight with unit", required: false, severityIfMissing: "warning" },
-          { name: "netWeight", description: "Net weight with unit", required: false, severityIfMissing: "warning" },
-          { name: "numberOfPackages", description: "Number of packages/cartons", required: false, severityIfMissing: "warning" },
+          // Parties
+          { name: "shipperName", description: "Shipper/exporter name and address", required: true, severityIfMissing: "critical" },
+          { name: "consigneeName", description: "Consignee/receiver name and address", required: true, severityIfMissing: "warning" },
+          // References
+          { name: "packingListDate", description: "Date of packing list", required: true, severityIfMissing: "warning" },
+          { name: "invoiceReference", description: "Reference to corresponding commercial invoice number", required: false, severityIfMissing: "info" },
+          // Package details
+          { name: "numberOfPackages", description: "Total number of packages/cartons/bags/drums", required: true, severityIfMissing: "critical" },
+          { name: "packageType", description: "Type of packaging (box, crate, drum, bag, carton, pallet)", required: true, severityIfMissing: "warning" },
+          { name: "shippingMarks", description: "Shipping marks and numbers on each package", required: true, severityIfMissing: "warning" },
+          // Contents per package
+          { name: "goodsDescription", description: "Description of contents for each package", required: true, severityIfMissing: "critical" },
+          { name: "hsCode", description: "HS code for goods", required: false, severityIfMissing: "warning" },
+          { name: "quantity", description: "Quantity per item/package with unit of measure", required: true, severityIfMissing: "critical" },
+          // Weights
+          { name: "netWeight", description: "Net weight per package and total (in kg)", required: true, severityIfMissing: "critical" },
+          { name: "grossWeight", description: "Gross weight per package and total (in kg)", required: true, severityIfMissing: "critical" },
+          // Dimensions
+          { name: "dimensions", description: "Dimensions per package (L × W × H) in cm or inches", required: false, severityIfMissing: "warning" },
+          // Traceability
+          { name: "lotOrBatchNumber", description: "Lot/batch numbers for traceability", required: false, severityIfMissing: "warning" },
         ],
         consistencyChecks: [
           { type: "numeric_positive", severity: "warning", message: "Weights and quantities must be positive." },
+          { type: "weight_net_less_than_gross", severity: "critical", message: "Net weight cannot exceed gross weight." },
+          { type: "container_number_format", severity: "warning", message: "Container number does not match ISO 6346 format." },
         ],
-        minimumAcceptable: { mustHave: ["quantity"], ifMissing: "ISSUES_FOUND" },
+        minimumAcceptable: { mustHave: ["quantity", "netWeight", "numberOfPackages"], ifMissing: "ISSUES_FOUND" },
       },
     },
     // ── 3. Bill of Lading (always required) ──
@@ -1099,21 +1143,47 @@ export async function seedComplianceRules() {
       sortOrder: 12,
       validationSpec: {
         docTypeGate: {
-          mustContainAny: ["bill of lading", "B/L", "connaissement", "airway bill", "AWB"],
+          mustContainAny: ["bill of lading", "B/L", "connaissement", "airway bill", "AWB", "waybill"],
           rejectIfContainsAny: ["invoice", "packing list", "certificate of origin"],
         },
         expectedFields: [
-          { name: "shipperName", description: "Shipper/exporter name", required: true, severityIfMissing: "critical" },
-          { name: "consignee", description: "Consignee name", required: true, severityIfMissing: "critical" },
-          { name: "portOfLoading", description: "Port of loading", required: false, severityIfMissing: "warning" },
-          { name: "portOfDischarge", description: "Port of discharge", required: false, severityIfMissing: "warning" },
-          { name: "shippedOnBoardDate", description: "Shipped on board date", required: false, severityIfMissing: "warning" },
+          // Parties (Hague-Visby Rules Art. III)
+          { name: "shipperName", description: "Shipper/exporter full name and address", required: true, severityIfMissing: "critical" },
+          { name: "consignee", description: "Consignee full name and address (or 'To Order')", required: true, severityIfMissing: "critical" },
+          { name: "notifyParty", description: "Notify party name and address", required: false, severityIfMissing: "warning" },
+          // B/L identifiers
+          { name: "blNumber", description: "Bill of Lading number (unique reference)", required: true, severityIfMissing: "critical" },
+          { name: "bookingReference", description: "Booking or contract number", required: false, severityIfMissing: "info" },
+          // Carrier
+          { name: "carrierName", description: "Carrier/shipping line name", required: true, severityIfMissing: "warning" },
+          { name: "vesselName", description: "Vessel/flight name and voyage number", required: true, severityIfMissing: "warning" },
+          // Ports and routing
+          { name: "portOfLoading", description: "Port of loading", required: true, severityIfMissing: "critical" },
+          { name: "portOfDischarge", description: "Port of discharge/destination", required: true, severityIfMissing: "critical" },
+          { name: "placeOfDelivery", description: "Final place of delivery (if different from port)", required: false, severityIfMissing: "info" },
+          // Cargo details (Hague-Visby Art. III §3 — marks, number, quantity, weight)
+          { name: "goodsDescription", description: "Description of goods/commodity", required: true, severityIfMissing: "critical" },
+          { name: "numberOfPackages", description: "Number of packages, pieces, or containers", required: true, severityIfMissing: "critical" },
+          { name: "grossWeight", description: "Gross weight of cargo", required: true, severityIfMissing: "critical" },
+          { name: "shippingMarks", description: "Leading marks for cargo identification", required: true, severityIfMissing: "warning" },
+          { name: "containerNumber", description: "Container number(s) and seal number(s)", required: false, severityIfMissing: "warning" },
+          // Dates
+          { name: "shippedOnBoardDate", description: "Shipped on board date (or received for shipment date)", required: true, severityIfMissing: "critical" },
+          { name: "dateOfIssue", description: "Date B/L was issued", required: true, severityIfMissing: "warning" },
+          // Freight
+          { name: "freightTerms", description: "Freight prepaid or collect", required: false, severityIfMissing: "info" },
+          // Type indicators
+          { name: "blType", description: "Original/copy, negotiable/non-negotiable, clean/claused", required: false, severityIfMissing: "info" },
         ],
         consistencyChecks: [
           { type: "date_not_future", severity: "critical", message: "Shipped on board date cannot be in the future." },
           { type: "origin_country_match", severity: "warning", message: "Port of loading does not match expected origin." },
+          { type: "destination_country_match", severity: "warning", message: "Port of discharge does not match expected destination." },
+          { type: "numeric_positive", severity: "warning", message: "Package count and weight must be positive values." },
+          { type: "weight_net_less_than_gross", severity: "critical", message: "Net weight cannot exceed gross weight on B/L." },
+          { type: "container_number_format", severity: "warning", message: "Container number does not match ISO 6346 format." },
         ],
-        minimumAcceptable: { mustHave: ["shipperName", "consignee"], ifMissing: "ISSUES_FOUND" },
+        minimumAcceptable: { mustHave: ["shipperName", "consignee", "portOfLoading", "portOfDischarge", "shippedOnBoardDate"], ifMissing: "ISSUES_FOUND" },
       },
     },
     // ── 4. Certificate of Origin (always required) ──
@@ -1132,18 +1202,38 @@ export async function seedComplianceRules() {
       sortOrder: 13,
       validationSpec: {
         docTypeGate: {
-          mustContainAny: ["certificate of origin", "certificat d'origine", "EUR.1", "Form A"],
+          mustContainAny: ["certificate of origin", "certificat d'origine", "EUR.1", "EUR-MED", "Form A", "GSP Form A", "origin"],
           rejectIfContainsAny: ["invoice", "packing list", "bill of lading", "phytosanitary"],
         },
         expectedFields: [
-          { name: "exporterName", description: "Exporter/seller name", required: true, severityIfMissing: "critical" },
-          { name: "originCountry", description: "Country of origin", required: true, severityIfMissing: "critical" },
-          { name: "goodsDescription", description: "Description of goods", required: false, severityIfMissing: "warning" },
+          // Exporter (WCO Guidelines Box 1 / EUR.1 Box 1)
+          { name: "exporterName", description: "Full name and address of exporter/sender", required: true, severityIfMissing: "critical" },
+          { name: "exporterCountry", description: "Country of the exporter", required: true, severityIfMissing: "warning" },
+          // Consignee (WCO Box 2 / EUR.1 Box 2)
+          { name: "consigneeName", description: "Full name and address of consignee/importer", required: true, severityIfMissing: "warning" },
+          // Certificate identifiers
+          { name: "certificateNumber", description: "Unique certificate serial number", required: true, severityIfMissing: "critical" },
+          { name: "dateOfIssue", description: "Date of issue of the certificate", required: true, severityIfMissing: "critical" },
+          // Origin (WCO Box 3)
+          { name: "originCountry", description: "Country of origin of goods", required: true, severityIfMissing: "critical" },
+          { name: "originCriteria", description: "Origin criteria/rule satisfied (wholly obtained, sufficiently processed, cumulation)", required: false, severityIfMissing: "warning" },
+          // Transport (WCO Box 4)
+          { name: "transportDetails", description: "Means of transport and route (vessel, port, etc.)", required: false, severityIfMissing: "info" },
+          // Goods (WCO Box 5-8)
+          { name: "goodsDescription", description: "Description of goods", required: true, severityIfMissing: "critical" },
+          { name: "hsCode", description: "HS code of the goods", required: true, severityIfMissing: "warning" },
+          { name: "quantity", description: "Quantity or weight of goods", required: true, severityIfMissing: "warning" },
+          { name: "invoiceReference", description: "Commercial invoice number and date", required: false, severityIfMissing: "info" },
+          // Certification (WCO Box 11-12)
+          { name: "issuingAuthority", description: "Certifying body (Chamber of Commerce, customs authority, etc.)", required: true, severityIfMissing: "critical" },
+          { name: "officialStampOrSeal", description: "Official stamp, seal, or signature of certifying body", required: true, severityIfMissing: "critical" },
+          { name: "destinationCountry", description: "Destination/importing country", required: false, severityIfMissing: "warning" },
         ],
         consistencyChecks: [
           { type: "origin_country_match", severity: "critical", message: "Origin country does not match trade context." },
+          { type: "destination_country_match", severity: "warning", message: "Destination country does not match trade context." },
         ],
-        minimumAcceptable: { mustHave: ["exporterName", "originCountry"], ifMissing: "ISSUES_FOUND" },
+        minimumAcceptable: { mustHave: ["exporterName", "originCountry", "issuingAuthority"], ifMissing: "ISSUES_FOUND" },
       },
     },
     // ── 5. Phytosanitary / SPS Certificate (trigger: sps) ──
@@ -1164,18 +1254,51 @@ export async function seedComplianceRules() {
       validationSpec: {
         docTypeGate: {
           mustContainAny: ["phytosanitary", "plant health", "SPS", "certificat phytosanitaire", "IPPC"],
+          shouldContainAny: ["ISPM", "inspection", "pest free", "treatment", "fumigation"],
           rejectIfContainsAny: ["invoice", "packing list", "bill of lading"],
         },
         expectedFields: [
-          { name: "exporterName", description: "Exporter/applicant name", required: true, severityIfMissing: "critical" },
-          { name: "originCountry", description: "Country of origin", required: true, severityIfMissing: "critical" },
-          { name: "issuingAuthority", description: "Issuing authority (NPPO)", required: true, severityIfMissing: "critical" },
-          { name: "commodityDescription", description: "Commodity/product description", required: false, severityIfMissing: "warning" },
+          // ISPM 12 Model Certificate — all sections
+          // Header
+          { name: "certificateNumber", description: "Unique certificate identification number for trace-back", required: true, severityIfMissing: "critical" },
+          { name: "issuingOrganization", description: "Name of National Plant Protection Organization (NPPO)", required: true, severityIfMissing: "critical" },
+          { name: "issuingCountry", description: "Country of the issuing NPPO", required: true, severityIfMissing: "critical" },
+          // Parties
+          { name: "exporterName", description: "Name and address of exporter/applicant", required: true, severityIfMissing: "critical" },
+          { name: "consigneeName", description: "Name and address of consignee (declared)", required: true, severityIfMissing: "warning" },
+          // Origin
+          { name: "originCountry", description: "Country of origin of the plants/plant products", required: true, severityIfMissing: "critical" },
+          { name: "placeOfOrigin", description: "Specific place of origin within country (region, district)", required: false, severityIfMissing: "warning" },
+          // Transport
+          { name: "meansOfConveyance", description: "Declared means of conveyance (vessel, aircraft, truck)", required: true, severityIfMissing: "warning" },
+          { name: "entryPoint", description: "Declared point of entry at destination country", required: true, severityIfMissing: "warning" },
+          // Commodity identification
+          { name: "commodityDescription", description: "Name/description of commodity (common name)", required: true, severityIfMissing: "critical" },
+          { name: "botanicalName", description: "Botanical/scientific name of plant(s)", required: true, severityIfMissing: "critical" },
+          { name: "quantity", description: "Quantity declared (weight, volume, number of units)", required: true, severityIfMissing: "critical" },
+          { name: "numberOfPackages", description: "Number of packages", required: false, severityIfMissing: "warning" },
+          // Phytosanitary declaration
+          { name: "phytosanitaryDeclaration", description: "Standard IPPC declaration that products were inspected and found free from quarantine pests", required: true, severityIfMissing: "critical" },
+          // Treatments
+          { name: "treatmentType", description: "Treatment applied (e.g., fumigation, heat treatment, irradiation)", required: false, severityIfMissing: "warning" },
+          { name: "treatmentChemical", description: "Chemical/active ingredient used in treatment", required: false, severityIfMissing: "warning" },
+          { name: "treatmentDuration", description: "Duration and temperature of treatment", required: false, severityIfMissing: "warning" },
+          { name: "treatmentDate", description: "Date treatment was applied", required: false, severityIfMissing: "warning" },
+          // Additional declarations
+          { name: "additionalDeclarations", description: "Additional declarations required by importing country (pest-free area, specific conditions)", required: false, severityIfMissing: "info" },
+          // Certification
+          { name: "placeOfIssue", description: "Place where certificate was issued", required: true, severityIfMissing: "warning" },
+          { name: "dateOfIssue", description: "Date of issue", required: true, severityIfMissing: "critical" },
+          { name: "authorizedOfficerName", description: "Name of authorized officer who signed", required: true, severityIfMissing: "critical" },
+          { name: "officialStampOrSeal", description: "Official stamp or seal of the NPPO", required: true, severityIfMissing: "critical" },
         ],
         consistencyChecks: [
           { type: "origin_country_match", severity: "critical", message: "Origin country does not match trade context." },
+          { type: "date_not_future", severity: "critical", message: "Certificate issue date cannot be in the future." },
+          { type: "date_before_expiry", severity: "critical", message: "Phytosanitary certificates are typically valid for 14 days from inspection." },
+          { type: "phyto_within_14_days", severity: "critical", message: "Phytosanitary certificate exceeds 14-day validity from issue date (ISPM 12)." },
         ],
-        minimumAcceptable: { mustHave: ["exporterName", "issuingAuthority"], ifMissing: "ISSUES_FOUND" },
+        minimumAcceptable: { mustHave: ["certificateNumber", "exporterName", "issuingOrganization", "commodityDescription", "dateOfIssue"], ifMissing: "ISSUES_FOUND" },
       },
     },
     // ── 6. SPS compliance at destination (trigger: sps) ──
@@ -1265,6 +1388,59 @@ export async function seedComplianceRules() {
       owner: "IMPORTER",
       dueBy: "BEFORE_ARRIVAL",
       sortOrder: 43,
+      validationSpec: {
+        docTypeGate: {
+          mustContainAny: ["CHED", "Common Health Entry Document", "TRACES", "IMSOC", "food of non-animal origin"],
+          rejectIfContainsAny: ["invoice", "bill of lading", "packing list", "certificate of origin"],
+        },
+        expectedFields: [
+          // Part I boxes per Regulation (EU) 2019/1715 Annex II + TRACES NT help
+          // I.1 Consignor/Exporter
+          { name: "consignorExporter", description: "I.1 — Name, address, country of consignor/exporter (TRACES operator)", required: true, severityIfMissing: "critical" },
+          // I.2 CHED Reference
+          { name: "chedReference", description: "I.2 — Unique CHED reference number (auto-allocated by TRACES NT)", required: true, severityIfMissing: "critical" },
+          // I.4 Border Control Post
+          { name: "borderControlPost", description: "I.4 — Selected BCP competent for CHED-D (must match commodity competence)", required: true, severityIfMissing: "critical" },
+          // I.6 Consignee/Importer
+          { name: "consigneeImporter", description: "I.6 — Name, address, country of consignee/importer", required: true, severityIfMissing: "critical" },
+          // I.7 Place of destination
+          { name: "placeOfDestination", description: "I.7 — Place of destination in Member State (defaults to I.6 operator)", required: true, severityIfMissing: "warning" },
+          // I.8 Operator responsible for consignment
+          { name: "responsibleOperator", description: "I.8 — Operator in Member State responsible when presented at BCP", required: true, severityIfMissing: "critical" },
+          // I.9 Accompanying documents
+          { name: "accompanyingDocuments", description: "I.9 — Health certificate reference, commercial docs (AWB/B/L), document type and unique code", required: true, severityIfMissing: "critical" },
+          // I.10 Prior notification
+          { name: "estimatedArrivalDateTime", description: "I.10 — Estimated arrival date and time at BCP entry point", required: true, severityIfMissing: "critical" },
+          // I.11 Country of origin
+          { name: "countryOfOrigin", description: "I.11 — Country of origin (ISO code, auto-filled from I.31 commodities)", required: true, severityIfMissing: "critical" },
+          // I.13 Means of transport
+          { name: "meansOfTransport", description: "I.13 — Transport mode: Railway, Road vehicle, Airplane, or Vessel (with identification)", required: true, severityIfMissing: "warning" },
+          // I.14 Country of dispatch
+          { name: "countryOfDispatch", description: "I.14 — Country where goods placed on final transport to EU (ISO code)", required: true, severityIfMissing: "warning" },
+          // I.16 Transport conditions
+          { name: "transportConditions", description: "I.16 — Storage/transport temperature: ambient, chilled, or frozen (single selection)", required: false, severityIfMissing: "warning" },
+          // I.17 Container/Seal
+          { name: "containerNumber", description: "I.17 — Container number (3 capital letters + U/J/Z + 7 digits) and seal number", required: false, severityIfMissing: "info" },
+          // I.18 Certified as/for
+          { name: "certifiedAsFor", description: "I.18 — Purpose: human consumption, feedstuff, sample, etc. (options depend on CN code)", required: true, severityIfMissing: "critical" },
+          // I.20-I.26 Purpose (one must be selected)
+          { name: "purpose", description: "I.20-I.26 — Purpose selection: internal market (I.23), transfer to control point (I.20), transit (I.22), etc.", required: true, severityIfMissing: "critical" },
+          // I.31 Description of consignment
+          { name: "cnCode", description: "I.31 — Combined Nomenclature code (8-digit CN code from TRACES dropdown)", required: true, severityIfMissing: "critical" },
+          { name: "netWeight", description: "I.31 — Net weight of consignment", required: true, severityIfMissing: "critical" },
+          { name: "packageCount", description: "I.31 — Number of packages", required: true, severityIfMissing: "warning" },
+        ],
+        consistencyChecks: [
+          { type: "origin_country_match", severity: "warning", message: "Country of origin (I.11) does not match trade context." },
+          { type: "destination_country_match", severity: "warning", message: "Destination does not match EU Member State BCP." },
+          { type: "date_not_future", severity: "critical", message: "Estimated arrival date cannot be in the past for a new CHED-D." },
+          { type: "hs_prefix_matches_context", severity: "warning", message: "CN code in I.31 does not match expected HS code." },
+        ],
+        issuerRules: {
+          mustContain: ["TRACES", "IMSOC", "European Commission", "Border Control"],
+        },
+        minimumAcceptable: { mustHave: ["chedReference", "consigneeImporter", "cnCode", "netWeight"], ifMissing: "ISSUES_FOUND" },
+      },
     },
     // ── 11. UK IPAFFS — live animals (trigger: sps, dest: GB) ──
     {
@@ -1412,18 +1588,30 @@ export async function seedComplianceRules() {
           rejectIfContainsAny: ["fumigation", "bill of lading", "commercial invoice", "packing list"],
         },
         expectedFields: [
+          // Operator identification (Annex II, Regulation 2023/1115)
+          { name: "operator_name", description: "Name and contact details of operator or non-SME trader", required: true, severityIfMissing: "critical" },
+          { name: "operator_eori", description: "EORI number of the operator (per Regulation EU 952/2013)", required: true, severityIfMissing: "critical" },
+          { name: "activity_type", description: "Type of activity: import, domestic production, or export", required: true, severityIfMissing: "warning" },
+          // Product identification
           { name: "hs_code", description: "HS/CN code for relevant product(s)", required: true, severityIfMissing: "critical" },
           { name: "product_description", description: "Free-text product description incl. trade name", required: true, severityIfMissing: "critical" },
-          { name: "scientific_name", description: "Scientific name where applicable", required: false, severityIfMissing: "warning" },
-          { name: "quantity_net_mass_kg", description: "Quantity in kg net mass", required: true, severityIfMissing: "critical" },
-          { name: "country_of_production", description: "Country of production for commodities/products", required: true, severityIfMissing: "critical" },
-          { name: "geolocation_plots", description: "Geolocation for all production plots (point or polygon)", required: true, severityIfMissing: "critical" },
-          { name: "supplier_identity", description: "Name + postal address + email of supplier(s)", required: true, severityIfMissing: "critical" },
-          { name: "customer_identity", description: "Name + postal address + email of customer(s)", required: true, severityIfMissing: "critical" },
-          { name: "deforestation_free_evidence", description: "Conclusive info products are deforestation-free", required: true, severityIfMissing: "critical" },
-          { name: "legality_evidence", description: "Info commodities comply with country-of-production legislation", required: true, severityIfMissing: "critical" },
-          { name: "operator_declaration", description: "Declaration due diligence exercised, no/negligible risk", required: true, severityIfMissing: "critical" },
-          { name: "traces_reference_number", description: "TRACES NT reference number", required: true, severityIfMissing: "critical" },
+          { name: "scientific_name", description: "Scientific name where applicable (mandatory for wood products)", required: false, severityIfMissing: "warning" },
+          { name: "quantity_net_mass_kg", description: "Quantity in kg net mass plus supplementary units if applicable", required: true, severityIfMissing: "critical" },
+          // Geographic and production data
+          { name: "country_of_production", description: "Country where commodity was grown, harvested, or produced", required: true, severityIfMissing: "critical" },
+          { name: "geolocation_plots", description: "Geolocation for all production plots (point data <4ha, polygon data ≥4ha)", required: true, severityIfMissing: "critical" },
+          { name: "production_date_range", description: "Date or date range of production/harvest", required: true, severityIfMissing: "critical" },
+          // Supply chain actors
+          { name: "supplier_identity", description: "Name + postal address + email of supplier(s) in the supply chain", required: true, severityIfMissing: "critical" },
+          { name: "customer_identity", description: "Name + postal address + email of customer(s)/buyer(s)", required: true, severityIfMissing: "critical" },
+          // Due diligence assessment
+          { name: "deforestation_free_evidence", description: "Conclusive info that products are deforestation-free (no deforestation after 31 Dec 2020)", required: true, severityIfMissing: "critical" },
+          { name: "legality_evidence", description: "Info that commodities comply with country-of-production legislation", required: true, severityIfMissing: "critical" },
+          { name: "risk_assessment_conclusion", description: "Risk assessment conclusion (no risk, negligible risk, or non-negligible risk requiring mitigation)", required: true, severityIfMissing: "critical" },
+          { name: "operator_declaration", description: "Formal declaration that due diligence was exercised and no/negligible risk was found", required: true, severityIfMissing: "critical" },
+          // References
+          { name: "traces_reference_number", description: "TRACES NT / EUDR Information System reference number", required: true, severityIfMissing: "critical" },
+          { name: "prior_dds_references", description: "Reference numbers of prior due diligence statements (if using already-declared materials)", required: false, severityIfMissing: "info" },
         ],
         consistencyChecks: [
           { type: "hs_prefix_matches_context", severity: "warning", message: "HS code does not match expected commodity/HS context." },
@@ -1796,6 +1984,40 @@ export async function seedComplianceRules() {
       owner: "SUPPLIER",
       dueBy: "BEFORE_LOADING",
       sortOrder: 110,
+      validationSpec: {
+        docTypeGate: {
+          mustContainAny: ["CBAM", "carbon", "emissions", "CO2", "greenhouse gas", "embedded emissions"],
+          shouldContainAny: ["tonnes CO2", "tCO2", "direct emissions", "indirect emissions", "Regulation 2023/956"],
+          rejectIfContainsAny: ["phytosanitary", "certificate of origin", "packing list"],
+        },
+        expectedFields: [
+          // Installation/producer identification (Regulation 2023/956 Art. 6 + Annex IV)
+          { name: "installationName", description: "Name of the production installation/facility", required: true, severityIfMissing: "critical" },
+          { name: "installationLocation", description: "Address and country of the production installation", required: true, severityIfMissing: "critical" },
+          { name: "operatorName", description: "Name of the installation operator/producer", required: true, severityIfMissing: "critical" },
+          // Product identification
+          { name: "goodsType", description: "Type of CBAM goods (cement, iron/steel, aluminium, fertilisers, electricity, hydrogen)", required: true, severityIfMissing: "critical" },
+          { name: "cnCode", description: "Combined Nomenclature (CN) code of the goods", required: true, severityIfMissing: "critical" },
+          { name: "quantityImported", description: "Quantity of goods imported (tonnes)", required: true, severityIfMissing: "critical" },
+          // Emissions data
+          { name: "directEmissions", description: "Direct (Scope 1) embedded emissions in tonnes CO2e per tonne of product", required: true, severityIfMissing: "critical" },
+          { name: "indirectEmissions", description: "Indirect (Scope 2) embedded emissions from electricity in tonnes CO2e per tonne of product", required: true, severityIfMissing: "critical" },
+          { name: "totalEmbeddedEmissions", description: "Total embedded emissions for the declared quantity (tonnes CO2e)", required: true, severityIfMissing: "critical" },
+          { name: "emissionsMethodology", description: "Methodology used to calculate emissions (actual values or default values)", required: true, severityIfMissing: "warning" },
+          // Carbon price paid in country of origin
+          { name: "carbonPricePaid", description: "Any carbon price already paid in country of production (for deduction)", required: false, severityIfMissing: "warning" },
+          // Verification
+          { name: "verifierName", description: "Name of accredited verifier (if actual values used)", required: false, severityIfMissing: "warning" },
+          { name: "verificationDate", description: "Date of emissions verification", required: false, severityIfMissing: "info" },
+          // Period
+          { name: "reportingPeriod", description: "Reporting period covered by this declaration", required: true, severityIfMissing: "critical" },
+        ],
+        consistencyChecks: [
+          { type: "hs_prefix_matches_context", severity: "warning", message: "CN code does not match expected CBAM goods category." },
+          { type: "numeric_positive", severity: "critical", message: "Emissions values must be positive numbers." },
+        ],
+        minimumAcceptable: { mustHave: ["installationName", "goodsType", "totalEmbeddedEmissions"], ifMissing: "ISSUES_FOUND" },
+      },
     },
     // ── 40. CBAM emissions declaration GB (trigger: cbam, dest: GB) ──
     {
