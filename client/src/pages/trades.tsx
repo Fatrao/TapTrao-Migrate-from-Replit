@@ -242,7 +242,7 @@ const css = `
 .mt-dem-total .dtv { font-family:var(--fd);font-size:18px;font-weight:700;color:var(--red) }
 
 /* Bottom row */
-.mt-bot { display:grid;grid-template-columns:3fr 3fr 5fr;gap:10px;flex-shrink:0;height:260px }
+.mt-bot { display:grid;grid-template-columns:3fr 3fr 5fr;gap:10px;flex-shrink:0;height:360px }
 .mt-eudr { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:12px 14px;display:flex;flex-direction:column;overflow:hidden;animation:mt-fu .3s ease both }
 .mt-eudr h4 { font-family:var(--fd);font-size:16px;font-weight:600;color:var(--sage);margin:0 0 4px }
 .mt-eudr .es { font-size: 15px;color:var(--t3);margin-bottom:6px }
@@ -266,15 +266,17 @@ const css = `
 .mt-cbr .cc span { font-size: 15px;font-weight:600;color:var(--t1) }
 .mt-cbr .cx { font-size: 15px;font-weight:600;color:var(--sage) }
 
-.mt-mp { background:linear-gradient(135deg,#0e2a20,#0c3a28);border-radius:var(--r);box-shadow:var(--shd);position:relative;overflow:hidden;display:flex;flex-direction:column;height:100%;animation:mt-fu .3s ease both }
-.mt-mp h4 { font-family:var(--fd);font-size:16px;color:#fff;font-weight:600;padding:10px 14px 0;position:relative;z-index:2;flex-shrink:0;margin:0 }
-.mt-mp .ms { font-size:14px;color:rgba(255,255,255,.55);padding:2px 14px;position:relative;z-index:2;flex-shrink:0 }
-.mt-mp-inner { flex:1;position:relative;min-height:0;height:0 }
-.mt-mp-chips { display:flex;flex-wrap:wrap;gap:5px;padding:6px 14px;position:relative;z-index:2;flex-shrink:0 }
+.mt-mp { background:linear-gradient(135deg,#0e2a20,#0c3a28);border-radius:var(--r);box-shadow:var(--shd);overflow:hidden;display:grid;grid-template-columns:200px 1fr;height:100%;animation:mt-fu .3s ease both }
+.mt-mp-left { padding:16px 18px;display:flex;flex-direction:column;gap:10px;z-index:2 }
+.mt-mp-left h4 { font-family:var(--fd);font-size:16px;color:#fff;font-weight:600;margin:0 }
+.mt-mp-left .ms { font-size:13px;color:rgba(255,255,255,.55);line-height:1.4 }
+.mt-mp-chips { display:flex;flex-wrap:wrap;gap:5px }
 .mt-mp-chip { padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);letter-spacing:.03em }
-.mt-ml { display:flex;gap:10px;padding:4px 14px 8px;position:relative;z-index:2;flex-shrink:0 }
-.mt-mll { display:flex;align-items:center;gap:4px;font-size:12px;color:rgba(255,255,255,.55);font-weight:500 }
+.mt-ml { display:flex;flex-direction:column;gap:8px;margin-top:auto }
+.mt-mll { display:flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,.55);font-weight:500 }
 .mt-mll span { width:7px;height:7px;border-radius:50% }
+.mt-mp-inner { position:relative;min-height:0;overflow:hidden }
+.mt-mp-inner svg { width:100%;height:100% }
 
 /* Empty state */
 .mt-empty { text-align:center;padding:60px 20px }
@@ -296,6 +298,8 @@ const css = `
   .mt-right { gap:10px }
   .mt-bot { grid-template-columns:1fr;height:auto }
   .mt-bot > * { min-height:180px }
+  .mt-mp { grid-template-columns:1fr;grid-template-rows:auto 1fr }
+  .mt-mp-inner { min-height:200px }
   .mt-an-pie-only { flex-direction:column }
   .mt-dem-body { flex-direction:column }
   .mt-rw .vl,.mt-rw .dc,.mt-rw .pc,.mt-rw .bg,.mt-rw .arr { display:none }
@@ -942,17 +946,24 @@ export default function Trades() {
             </div>
           </div>
 
-          {/* Trade Corridors Map */}
+          {/* Trade Corridors Map — split layout: left info, right map */}
           <div className="mt-mp">
-            <h4>{t("map.title")}</h4>
-            <div className="ms">
-              {corridors.length || corridorAnalytics.length} active routes across{" "}
-              {new Set([...corridors.map(c => c.destIso2), ...corridorAnalytics.map(c => c.label.split(" → ")[1])]).size || "—"} destination markets
-            </div>
-            <div className="mt-mp-chips">
-              {Array.from(new Set(corridors.map(c => c.destIso2))).map(iso => (
-                <span key={iso} className="mt-mp-chip">{iso2ToFlag(iso)} {iso}</span>
-              ))}
+            <div className="mt-mp-left">
+              <h4>{t("map.title")}</h4>
+              <div className="ms">
+                {corridors.length || corridorAnalytics.length} active routes across{" "}
+                {new Set([...corridors.map(c => c.destIso2), ...corridorAnalytics.map(c => c.label.split(" → ")[1])]).size || "—"} markets
+              </div>
+              <div className="mt-mp-chips">
+                {Array.from(new Set(corridors.map(c => c.destIso2))).map(iso => (
+                  <span key={iso} className="mt-mp-chip">{iso2ToFlag(iso)} {iso}</span>
+                ))}
+              </div>
+              <div className="mt-ml">
+                <div className="mt-mll"><span style={{ background: "#4ade80" }} />Active</div>
+                <div className="mt-mll"><span style={{ background: "#eab308" }} />Waiting</div>
+                <div className="mt-mll"><span style={{ background: "#ef4444" }} />Issues</div>
+              </div>
             </div>
             <div className="mt-mp-inner">
               {corridors.length > 0 ? (
@@ -962,11 +973,6 @@ export default function Trades() {
                   <span style={{ fontSize: 15, color: "#fff" }}>{t("map.placeholder")}</span>
                 </div>
               )}
-            </div>
-            <div className="mt-ml">
-              <div className="mt-mll"><span style={{ background: "#4ade80" }} />Active</div>
-              <div className="mt-mll"><span style={{ background: "#eab308" }} />Waiting</div>
-              <div className="mt-mll"><span style={{ background: "#ef4444" }} />Issues</div>
             </div>
           </div>
         </div>

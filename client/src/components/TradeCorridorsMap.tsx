@@ -131,9 +131,10 @@ const CurvedArcs = memo(function CurvedArcs({ corridors }: { corridors: Corridor
             from={pt}
             to={points[j + 1]}
             stroke={color}
-            strokeWidth={2}
+            strokeWidth={3}
             strokeLinecap="round"
-            strokeOpacity={0.7}
+            strokeOpacity={0.8}
+            filter="url(#arc-glow)"
           />
         ));
       })}
@@ -158,7 +159,7 @@ export const TradeCorridorsMap = memo(function TradeCorridorsMap({
     <div style={{ position: "absolute", inset: 0 }}>
       <ComposableMap
         projection="geoMercator"
-        projectionConfig={{ scale: 120, center: [20, 20] }}
+        projectionConfig={{ scale: 150, center: [8, 18] }}
         style={{ width: "100%", height: "100%" }}
       >
         <defs>
@@ -173,6 +174,14 @@ export const TradeCorridorsMap = memo(function TradeCorridorsMap({
           {/* Soft glow for destination markers */}
           <filter id="dest-glow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="1.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          {/* Route arc glow */}
+          <filter id="arc-glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="1.2" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
