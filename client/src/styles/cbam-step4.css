@@ -75,7 +75,7 @@ body:has(.cbam-dashboard-shell) #root{height:100vh;max-height:100vh;overflow:hid
   border-radius:var(--r,14px);padding:22px 22px 18px;
   color:#fff;box-shadow:0 8px 40px rgba(0,0,0,.12);
 }
-.cbam-sc-label{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:8px}
+.cbam-sc-label{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.75);margin-bottom:8px}
 .cbam-sc-band{display:inline-flex;align-items:center;gap:6px;background:rgba(200,146,42,.25);border:1px solid rgba(200,146,42,.4);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#f0c060;margin-bottom:12px}
 .cbam-sc-band.negligible{background:rgba(74,124,94,.25);border-color:rgba(74,124,94,.4);color:#6db89a}
 .cbam-sc-band.low{background:rgba(200,146,42,.25);border-color:rgba(200,146,42,.4);color:#f0c060}
@@ -83,12 +83,12 @@ body:has(.cbam-dashboard-shell) #root{height:100vh;max-height:100vh;overflow:hid
 .cbam-sc-band-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
 .cbam-sc-num{display:flex;align-items:baseline;gap:3px;margin-bottom:4px}
 .cbam-sc-big{font-family:var(--fd);font-size:60px;font-weight:400;line-height:1;color:#fff}
-.cbam-sc-denom{font-size:20px;color:rgba(255,255,255,.4)}
-.cbam-sc-trend{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border-radius:6px;padding:3px 9px;font-size:11px;color:rgba(255,255,255,.65);margin-top:7px}
+.cbam-sc-denom{font-size:20px;color:rgba(255,255,255,0.65)}
+.cbam-sc-trend{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border-radius:6px;padding:3px 9px;font-size:11px;color:rgba(255,255,255,0.75);margin-top:7px}
 .cbam-sc-verdict{display:inline-flex;align-items:center;gap:5px;background:rgba(37,99,168,.3);border:1px solid rgba(100,160,230,.35);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:#93c5fd;margin-top:8px;letter-spacing:.03em}
 .cbam-sc-verdict.issues{background:rgba(196,78,58,.25);border-color:rgba(196,78,58,.35);color:#f0a0a0}
-.cbam-sc-footer{font-size:11px;color:rgba(255,255,255,.35);margin-top:12px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.1);padding-top:10px}
-.cbam-sc-footer-val{font-weight:600;color:rgba(255,255,255,.65)}
+.cbam-sc-footer{font-size:11px;color:rgba(255,255,255,0.55);margin-top:12px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.1);padding-top:10px}
+.cbam-sc-footer-val{font-weight:600;color:rgba(255,255,255,0.75)}
 
 /* ══ BREAKDOWN BARS ══ */
 .cbam-bk-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:14px}
@@ -152,9 +152,9 @@ body:has(.cbam-dashboard-shell) #root{height:100vh;max-height:100vh;overflow:hid
 .cbam-uk-card{background:linear-gradient(135deg,#0e4f6b 0%,#0e7490 100%);border-radius:var(--r,14px);padding:18px 20px;color:#fff;display:flex;align-items:center;gap:16px}
 .cbam-uk-flag{font-size:28px}
 .cbam-uk-title{font-size:13px;font-weight:600;margin-bottom:3px}
-.cbam-uk-sub{font-size:12px;color:rgba(255,255,255,.6)}
+.cbam-uk-sub{font-size:12px;color:rgba(255,255,255,0.75)}
 .cbam-uk-badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:rgba(255,255,255,.9);white-space:nowrap;text-align:center;flex-shrink:0}
-.cbam-uk-badge-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;text-align:center}
+.cbam-uk-badge-sub{font-size:10px;color:rgba(255,255,255,0.65);margin-top:2px;text-align:center}
 
 /* ══ RISK DRIVERS ══ */
 .cbam-risk{padding:13px 0;border-bottom:1px solid var(--border,rgba(0,0,0,.06));display:flex;gap:12px;align-items:flex-start}

@@ -100,13 +100,13 @@ export default {
         amber: '#c4882a',
         'tt-red': '#c44e3a',
         'text-dark': '#1b2a22',
-        'text-dark-secondary': '#2c3e2e',
-        'text-dark-muted': '#4a5c4c',
+        'text-dark-secondary': '#243524',
+        'text-dark-muted': '#3a4d3c',
       },
       fontFamily: {
-        sans: ["'DM Sans'", 'sans-serif'],
+        sans: ["'Roboto'", 'sans-serif'],
         heading: ["'Roboto'", 'sans-serif'],
-        mono: ["'DM Sans'", 'sans-serif'],
+        mono: ["'Roboto'", 'sans-serif'],
         clash: ["'Roboto'", 'sans-serif'],
       },
       keyframes: {

@@ -45,9 +45,9 @@
   --chart-3: 33 67% 47%;
   --chart-4: 7 57% 49%;
   --chart-5: 138 10% 60%;
-  --font-sans: 'DM Sans', sans-serif;
+  --font-sans: 'Roboto', sans-serif;
   --font-heading: 'Roboto', sans-serif;
-  --font-mono: 'DM Sans', sans-serif;
+  --font-mono: 'Roboto', sans-serif;
   --radius: .75rem;
   --shadow-2xs: 0px 1px 2px 0px rgba(0,0,0,0.06);
   --shadow-xs: 0px 1px 3px 0px rgba(0,0,0,0.10);
@@ -370,7 +370,7 @@
   border-radius: 12px;
   padding: 0;
   cursor: pointer;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.55);
   transition: all 0.25s ease;
   overflow: hidden;
   flex-shrink: 0;
@@ -387,7 +387,7 @@
   overflow: visible;
 }
 .mi:hover {
-  color: rgba(255,255,255,0.7);
+  color: rgba(255,255,255,0.85);
   background: rgba(255,255,255,0.06);
 }
 .mi.active {
@@ -417,7 +417,7 @@
   font-family: var(--fb);
   font-size: 15px;
   font-weight: 500;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.65);
   white-space: nowrap;
   opacity: 0;
   max-width: 0;
@@ -433,7 +433,7 @@
   font-weight: 600;
 }
 .mi:hover .mi-label {
-  color: rgba(255,255,255,0.7);
+  color: rgba(255,255,255,0.85);
 }
 
 /* ── Brand item ── */
@@ -538,7 +538,7 @@
   font-family: var(--fb);
   font-size: 15px;
   font-weight: 500;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.65);
   opacity: 0;
   max-width: 0;
   overflow: hidden;
@@ -835,7 +835,7 @@
   border-radius: 20px;
   padding: 5px 14px;
   font-size: 15px;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.75);
   position: relative;
 }
 .lc-hero-title {
@@ -1367,14 +1367,14 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.55);
   padding: 4px 12px 6px;
 }
 .hp-page .nav-dropdown-panel a {
   display: block;
   font-size: 15px;
   font-weight: 500;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255,255,255,0.85);
   text-decoration: none;
   padding: 7px 12px;
   border-radius: 6px;
@@ -1537,7 +1537,7 @@
 }
 
 .hp-page .btn-hero-secondary:hover {
-  border-color: rgba(255,255,255,0.5);
+  border-color: rgba(255,255,255,0.65);
   background: rgba(255,255,255,0.04);
 }
 
@@ -1579,7 +1579,7 @@
 }
 .hp-page .cost-strip-label {
   font-size: 15px;
-  color: rgba(255,255,255,0.50);
+  color: rgba(255,255,255,0.65);
   line-height: 1.5;
 }
 .hp-page .cost-strip-footer {
@@ -1589,7 +1589,7 @@
   border-top: 1px solid rgba(255,255,255,0.08);
   font-size: 15px;
   font-weight: 600;
-  color: rgba(255,255,255,0.80);
+  color: rgba(255,255,255,0.85);
 }
 
 /* === SECTION STYLES (light bg — floating rounded boxes) === */
@@ -2443,7 +2443,7 @@
 .top-nav-links a,
 .top-nav-links span {
   font-size: 15px;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255,255,255,0.85);
   text-decoration: none;
   transition: color 0.15s;
   font-weight: 400;
@@ -2505,7 +2505,7 @@
 .pack-card:hover { transform:translateY(-3px); }
 .pack-card.popular { box-shadow:0 0 0 2px var(--green),0 4px 24px rgba(74,140,111,.15); }
 .pack-card.popular::before { content:'MOST POPULAR'; position:absolute; top:12px; right:12px; font-size:15px; font-weight:700; letter-spacing:.06em; padding:3px 9px; border-radius:6px; background:var(--green); color:#000; }
-.trust-bar { margin:0 10px; padding:20px 28px; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; font-size:15px; color:rgba(255,255,255,.35); background:#1c1c1e; border-radius:14px; }
+.trust-bar { margin:0 10px; padding:20px 28px; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; font-size:15px; color:rgba(255,255,255,0.55); background:#1c1c1e; border-radius:14px; }
 .trust-bar .sep { width:1px; height:16px; background:rgba(255,255,255,.08); }
 
 /* ── Dashboard-specific ── */
@@ -2557,7 +2557,7 @@
   border-radius: 5px;
   padding: 4px 12px;
   font-size: 15px;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.55);
   margin: 0 12px;
   font-family: 'Inter', sans-serif;
 }
@@ -2575,7 +2575,7 @@
   cursor: pointer;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.55);
   border-bottom: 2px solid transparent;
   transition: all 0.15s;
   font-family: 'Inter', sans-serif;
@@ -2608,7 +2608,7 @@
 
 .hp-page .demo-subtitle {
   font-size: 15px;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.65);
   margin-bottom: 20px;
 }
 
@@ -2616,7 +2616,7 @@
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.08em;
-  color: rgba(255,255,255,0.28);
+  color: rgba(255,255,255,0.55);
   text-transform: uppercase;
   font-family: 'Inter', sans-serif;
 }
@@ -2743,7 +2743,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 15px;
-  color: rgba(255,255,255,0.28);
+  color: rgba(255,255,255,0.55);
   font-family: 'Inter', sans-serif;
 }
 
@@ -2764,12 +2764,12 @@
 .hp-page .demo-doc-name {
   flex: 1;
   font-size: 15px;
-  color: rgba(255,255,255,0.70);
+  color: rgba(255,255,255,0.85);
 }
 
 .hp-page .demo-doc-auth {
   font-size: 15px;
-  color: rgba(255,255,255,0.28);
+  color: rgba(255,255,255,0.55);
   font-family: 'Inter', sans-serif;
 }
 
@@ -2805,7 +2805,7 @@
 }
 
 .hp-page .demo-risk-label {
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.65);
 }
 
 .hp-page .demo-risk-value {
@@ -2823,7 +2823,7 @@
 
 .hp-page .demo-duty-label {
   font-size: 15px;
-  color: rgba(255,255,255,0.28);
+  color: rgba(255,255,255,0.55);
   font-family: 'Inter', sans-serif;
 }
 
@@ -2841,13 +2841,13 @@
 
 .hp-page .demo-email-body {
   font-size: 15px;
-  color: rgba(255,255,255,0.70);
+  color: rgba(255,255,255,0.85);
   line-height: 1.8;
 }
 
 .hp-page .demo-whatsapp-body {
   font-size: 15px;
-  color: rgba(255,255,255,0.70);
+  color: rgba(255,255,255,0.85);
   line-height: 2;
 }
 
@@ -2986,7 +2986,7 @@
   .home-nav { padding: 0 16px !important; }
   .home-hero { padding: 60px 16px 40px !important; }
   .home-hero-title { font-size: 32px !important; line-height: 1.15 !important; letter-spacing: 0 !important; }
-  .home-hero-subtitle { font-size: 15px !important; color: rgba(255,255,255,0.70) !important; margin-bottom: 24px !important; }
+  .home-hero-subtitle { font-size: 15px !important; color: rgba(255,255,255,0.85) !important; margin-bottom: 24px !important; }
   .home-hero-badge { margin-bottom: 16px !important; }
   .home-hero-buttons { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; }
   .home-hero-primary { width: 100% !important; justify-content: center !important; height: 48px !important; padding: 0 20px !important; }

@@ -51,18 +51,18 @@ body:has(.eudr-dashboard-shell) #root{height:100vh;max-height:100vh;overflow:hid
   pointer-events:none;
 }
 .eudr-sc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
-.eudr-sc-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.5);margin-bottom:4px}
+.eudr-sc-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,0.65);margin-bottom:4px}
 .eudr-sc-band{display:inline-flex;align-items:center;gap:4px;background:rgba(196,136,42,.2);border:1px solid rgba(196,136,42,.3);color:#f0b060;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.06em}
 .eudr-sc-band-dot{width:5px;height:5px;background:#f0b060;border-radius:50%}
 .eudr-sc-num{display:flex;align-items:baseline;gap:3px;margin-bottom:4px}
 .eudr-sc-big{font-family:var(--fd);font-size:48px;font-weight:700;color:#fff;line-height:1}
-.eudr-sc-denom{font-size:14px;color:rgba(255,255,255,.3);font-weight:400}
-.eudr-sc-trend{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.55);font-weight:400}
-.eudr-sc-trend-pill{background:rgba(255,255,255,.07);padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;color:rgba(255,255,255,.65);letter-spacing:.04em}
+.eudr-sc-denom{font-size:14px;color:rgba(255,255,255,0.55);font-weight:400}
+.eudr-sc-trend{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.75);font-weight:400}
+.eudr-sc-trend-pill{background:rgba(255,255,255,.07);padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.75);letter-spacing:.04em}
 .eudr-sc-divider{height:1px;background:rgba(255,255,255,.07);margin:12px 0}
 .eudr-sc-footer{display:flex;align-items:center;justify-content:space-between}
-.eudr-sc-art-label{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.45)}
-.eudr-sc-art-val{font-size:13px;font-weight:600;color:rgba(255,255,255,.75)}
+.eudr-sc-art-label{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,0.65)}
+.eudr-sc-art-val{font-size:13px;font-weight:600;color:rgba(255,255,255,0.85)}
 
 /* Breakdown */
 .eudr-bk-list{display:flex;flex-direction:column;gap:10px}

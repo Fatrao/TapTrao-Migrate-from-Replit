@@ -32,9 +32,9 @@
 
   /* Text hierarchy — dark on light (darkened for readability) */
   --t1:  #1a2b1c;
-  --t2:  #2a3d2c;
-  --t3:  #3a4d3c;
-  --t4:  #4d5e4f;
+  --t2:  #243524;
+  --t3:  #2e412f;
+  --t4:  #3a4d3c;
 
   /* Legacy text aliases */
   --txt:   #111;
@@ -47,7 +47,7 @@
 
   /* Fonts */
   --fd: 'Roboto', sans-serif;
-  --fb: 'DM Sans', sans-serif;
+  --fb: 'Roboto', sans-serif;
   --fh: 'Roboto', sans-serif;
 
   /* ── App-shell palette (backward compat aliases) ── */
@@ -65,8 +65,8 @@
   --app-acapulco-border:  rgba(109,184,154,0.20);
   --app-acapulco-glow:    rgba(109,184,154,0.06);
   --app-regent:           #4d5e4f;
-  --app-regent-light:     rgba(77,94,79,0.75);
-  --app-regent-faint:     rgba(77,94,79,0.5);
+  --app-regent-light:     rgba(77,94,79,0.85);
+  --app-regent-faint:     rgba(77,94,79,0.65);
   --app-text-heading:     #1b2a22;
 
   /* ── Homepage palette (legacy aliases) ── */
@@ -94,7 +94,7 @@
   --dark-text-secondary: #3a4d3c;
   --dark-text-muted:   #3a4d3c;
   --font-display:      'Roboto', sans-serif;
-  --font-body:         'DM Sans', sans-serif;
+  --font-body:         'Roboto', sans-serif;
   --bg-sidebar:        #1a1a1a;
 
   /* Legacy status aliases */

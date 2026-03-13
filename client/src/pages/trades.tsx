@@ -269,9 +269,9 @@ const css = `
 .mt-mp { background:linear-gradient(135deg,#0e2a20,#0c3a28);border-radius:var(--r);box-shadow:var(--shd);overflow:hidden;display:grid;grid-template-columns:200px 1fr;height:100%;animation:mt-fu .3s ease both }
 .mt-mp-left { padding:16px 18px;display:flex;flex-direction:column;gap:10px;z-index:2 }
 .mt-mp-left h4 { font-family:var(--fd);font-size:16px;color:#fff;font-weight:600;margin:0 }
-.mt-mp-left .ms { font-size:13px;color:rgba(255,255,255,.55);line-height:1.4 }
+.mt-mp-left .ms { font-size:13px;color:rgba(255,255,255,0.75);line-height:1.4 }
 .mt-ml { display:flex;flex-direction:column;gap:8px;margin-top:auto }
-.mt-mll { display:flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,.55);font-weight:500 }
+.mt-mll { display:flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,0.75);font-weight:500 }
 .mt-mll span { width:7px;height:7px;border-radius:50% }
 .mt-mp-inner { position:relative;min-height:0;overflow:hidden }
 .mt-mp-inner svg { width:100%;height:100% }
