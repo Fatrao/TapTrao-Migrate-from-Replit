@@ -99,9 +99,9 @@ export default {
         'gold-light': '#d4b87a',
         amber: '#c4882a',
         'tt-red': '#c44e3a',
-        'text-dark': '#2c3e2e',
-        'text-dark-secondary': '#5e7060',
-        'text-dark-muted': '#8a9a8c',
+        'text-dark': '#1b2a22',
+        'text-dark-secondary': '#2c3e2e',
+        'text-dark-muted': '#4a5c4c',
       },
       fontFamily: {
         sans: ["'DM Sans'", 'sans-serif'],

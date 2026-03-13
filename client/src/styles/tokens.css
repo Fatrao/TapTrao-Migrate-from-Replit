@@ -30,16 +30,16 @@
   --red-pale:   #fdeaea;
   --green-pale: #e8f5ee;
 
-  /* Text hierarchy — dark on light */
+  /* Text hierarchy — dark on light (darkened for readability) */
   --t1:  #1a2b1c;
-  --t2:  #3a4d3c;
-  --t3:  #4d5e4f;
-  --t4:  #6b7c6d;
+  --t2:  #2a3d2c;
+  --t3:  #3a4d3c;
+  --t4:  #4d5e4f;
 
   /* Legacy text aliases */
   --txt:   #111;
-  --txt2:  #333;
-  --txt3:  #555;
+  --txt2:  #222;
+  --txt3:  #333;
 
   /* Card shadows */
   --shd: 0 1px 3px rgba(0,0,0,.03), 0 4px 16px rgba(0,0,0,.05);
@@ -65,8 +65,8 @@
   --app-acapulco-border:  rgba(109,184,154,0.20);
   --app-acapulco-glow:    rgba(109,184,154,0.06);
   --app-regent:           #4d5e4f;
-  --app-regent-light:     rgba(77,94,79,0.6);
-  --app-regent-faint:     rgba(77,94,79,0.35);
+  --app-regent-light:     rgba(77,94,79,0.75);
+  --app-regent-faint:     rgba(77,94,79,0.5);
   --app-text-heading:     #1b2a22;
 
   /* ── Homepage palette (legacy aliases) ── */
@@ -84,7 +84,7 @@
   --border-accent:     rgba(74,124,94,0.20);
   --hp-text-primary:   #2c3e2e;
   --hp-text-secondary: #3a4d3c;
-  --hp-text-muted:     rgba(77,94,79,0.7);
+  --hp-text-muted:     rgba(77,94,79,0.85);
   --glow-green:        rgba(109,184,154,0.15);
   --neon-green:        #6db89a;
   --off-white:         #f8f6f2;
@@ -92,7 +92,7 @@
   --mid-gray:          #d0cac0;
   --dark-text:         #2c3e2e;
   --dark-text-secondary: #3a4d3c;
-  --dark-text-muted:   #4d5e4f;
+  --dark-text-muted:   #3a4d3c;
   --font-display:      'Playfair Display', serif;
   --font-body:         'DM Sans', sans-serif;
   --bg-sidebar:        #1a1a1a;
