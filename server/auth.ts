@@ -50,6 +50,9 @@ declare global {
 export function setupAuth(app: Express): void {
   const PgStore = connectPgSimple(session);
 
+  if (process.env.NODE_ENV === "production" && !process.env.SESSION_SECRET) {
+    throw new Error("SESSION_SECRET environment variable is required in production");
+  }
   const sessionSecret = process.env.SESSION_SECRET || "taptrao-dev-secret-change-in-production";
 
   app.use(

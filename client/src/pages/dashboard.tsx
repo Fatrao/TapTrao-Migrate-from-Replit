@@ -11,6 +11,10 @@ import { apiRequest } from "@/lib/queryClient";
 import { iso2ToFlag } from "@/components/CountryFlagBadge";
 import { translateCommodity } from "@/lib/commodity-i18n";
 
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 export default function Dashboard() {
   const { t, i18n } = useTranslation("dashboard");
   const lang = i18n.language;
@@ -412,7 +416,7 @@ export default function Dashboard() {
                 <div key={l.id} className="activity-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/trades/${l.id}`)}>
                   <div className="act-avatar" style={{ background: i === 0 ? "rgba(93,217,193,0.12)" : "rgba(234,179,8,0.12)", color: i === 0 ? "var(--app-acapulco)" : "#d97706" }}>F</div>
                   <div className="act-content">
-                    <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.complianceLookup", { commodity: translateCommodity(l.commodityName, lang) }) }} />
+                    <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.complianceLookup", { commodity: escapeHtml(translateCommodity(l.commodityName, lang)) }) }} />
                     <div className="act-time">{new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</div>
                   </div>
                 </div>
@@ -476,7 +480,7 @@ export default function Dashboard() {
               <div key={l.id} className="activity-item" style={{ cursor: "pointer" }} onClick={() => navigate(`/trades/${l.id}`)}>
                 <div className="act-avatar" style={{ background: "rgba(93,217,193,0.12)", color: "var(--app-acapulco)" }}>F</div>
                 <div className="act-content">
-                  <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.complianceLookup", { commodity: translateCommodity(l.commodityName, lang) }) }} />
+                  <div className="act-text" dangerouslySetInnerHTML={{ __html: t("activity.complianceLookup", { commodity: escapeHtml(translateCommodity(l.commodityName, lang)) }) }} />
                   <div className="act-time">{new Date(l.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</div>
                 </div>
               </div>

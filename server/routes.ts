@@ -1,6 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { randomUUID, createHash } from "crypto";
+import { randomUUID, createHash, timingSafeEqual } from "crypto";
 import { storage } from "./storage";
 import { seedPrompt2, seedPrompt3A, seedPrompt3B, seedPrompt3C, seedPrompt5, seedPrompt6, seedPrompt7, seedComplianceRules } from "./seed";
 import { runComplianceCheck, computeReadinessScore } from "./compliance";
@@ -24,6 +24,18 @@ import fs from "fs";
 function computeRegVersionHash(result: unknown): string {
   const stable = JSON.stringify(result);
   return createHash("sha256").update(stable).digest("hex");
+}
+
+/** Constant-time password comparison to prevent timing attacks. */
+function safeCompare(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) {
+    // Compare against self to keep constant time, but return false
+    timingSafeEqual(bufA, bufA);
+    return false;
+  }
+  return timingSafeEqual(bufA, bufB);
 }
 
 /** Middleware: requires authenticated user. Returns 401 with AUTH_REQUIRED code. */
@@ -114,6 +126,22 @@ export async function registerRoutes(
   await seedPrompt7();
   await seedComplianceRules();
 
+  // ── Rate limiting maps ──
+  const authRateLimits = new Map<string, { count: number; resetAt: number }>();
+  const adminRateLimits = new Map<string, { count: number; resetAt: number }>();
+
+  function checkIpRateLimit(map: Map<string, { count: number; resetAt: number }>, ip: string, maxAttempts: number, windowMs: number): boolean {
+    const now = Date.now();
+    const entry = map.get(ip);
+    if (entry && now < entry.resetAt && entry.count >= maxAttempts) return false;
+    if (!entry || now > (entry?.resetAt ?? 0)) {
+      map.set(ip, { count: 1, resetAt: now + windowMs });
+    } else {
+      entry.count++;
+    }
+    return true;
+  }
+
   // ── Protected User Guide (behind login wall) ──
   app.get("/user-guide", (req, res) => {
     if (!req.isAuthenticated?.()) {
@@ -133,6 +161,11 @@ export async function registerRoutes(
 
   app.post("/api/auth/register", async (req, res) => {
     try {
+      const ip = req.ip || "unknown";
+      if (!checkIpRateLimit(authRateLimits, ip, 5, 3600_000)) {
+        res.status(429).json({ message: "Too many registration attempts. Try again later." });
+        return;
+      }
       const locale = getLocale(req);
       const parsed = registerSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -202,6 +235,11 @@ export async function registerRoutes(
   });
 
   app.post("/api/auth/login", (req, res, next) => {
+    const ip = req.ip || "unknown";
+    if (!checkIpRateLimit(authRateLimits, ip, 10, 900_000)) {
+      res.status(429).json({ message: "Too many login attempts. Try again in 15 minutes." });
+      return;
+    }
     const locale = getLocale(req);
     const parsed = loginSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -969,8 +1007,9 @@ export async function registerRoutes(
 
   app.get("/api/lookups/:id", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const lookup = await storage.getLookupById(req.params.id);
-      if (!lookup) {
+      if (!lookup || lookup.sessionId !== sessionId) {
         res.status(404).json({ message: t("routes.lookup_not_found", getLocale(req)) });
         return;
       }
@@ -980,18 +1019,22 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/lc-checks/recent", async (_req, res) => {
+  app.get("/api/lc-checks/recent", async (req, res) => {
     try {
-      const data = await storage.getRecentLcChecks(10);
+      const sessionId = getSessionId(req, res);
+      const all = await storage.getRecentLcChecks(50);
+      const data = all.filter(c => c.sessionId === sessionId).slice(0, 10);
       res.json(data);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
 
-  app.get("/api/lc-checks", async (_req, res) => {
+  app.get("/api/lc-checks", async (req, res) => {
     try {
-      const data = await storage.getAllLcChecks();
+      const sessionId = getSessionId(req, res);
+      const all = await storage.getAllLcChecks();
+      const data = all.filter(c => c.sessionId === sessionId);
       res.json(data);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -1184,12 +1227,19 @@ export async function registerRoutes(
 
   app.post("/api/lc-checks/linked-lookups", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const { lookupIds } = req.body;
       if (!Array.isArray(lookupIds)) {
         res.status(400).json({ message: t("routes.lookupids_required", getLocale(req)) });
         return;
       }
-      const map = await storage.getLcChecksByLookupIds(lookupIds);
+      // Verify all lookupIds belong to this session
+      const ownedIds: string[] = [];
+      for (const lid of lookupIds) {
+        const lookup = await storage.getLookupById(lid);
+        if (lookup && lookup.sessionId === sessionId) ownedIds.push(lid);
+      }
+      const map = await storage.getLcChecksByLookupIds(ownedIds);
       res.json(map);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -1198,8 +1248,9 @@ export async function registerRoutes(
 
   app.get("/api/lc-checks/:id", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const check = await storage.getLcCheckById(req.params.id);
-      if (!check) {
+      if (!check || check.sessionId !== sessionId) {
         res.status(404).json({ message: t("routes.lc_check_not_found", getLocale(req)) });
         return;
       }
@@ -1223,8 +1274,9 @@ export async function registerRoutes(
 
   app.get("/api/lc-cases/by-lookup/:lookupId", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const lcCase = await storage.getLcCaseByLookupId(req.params.lookupId);
-      if (!lcCase) {
+      if (!lcCase || lcCase.sessionId !== sessionId) {
         res.status(404).json({ message: t("routes.lc_case_no_lookup", getLocale(req)) });
         return;
       }
@@ -1254,8 +1306,9 @@ export async function registerRoutes(
 
   app.get("/api/lc-cases/:id", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const lcCase = await storage.getLcCaseById(req.params.id);
-      if (!lcCase) {
+      if (!lcCase || lcCase.sessionId !== sessionId) {
         res.status(404).json({ message: t("routes.lc_case_not_found", getLocale(req)) });
         return;
       }
@@ -1267,6 +1320,12 @@ export async function registerRoutes(
 
   app.post("/api/lc-cases/:id/correction-request", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
+      const lcCase = await storage.getLcCaseById(req.params.id);
+      if (!lcCase || lcCase.sessionId !== sessionId) {
+        res.status(404).json({ message: t("routes.lc_case_not_found", getLocale(req)) });
+        return;
+      }
       const { channel, discrepancyCount } = req.body;
       if (!channel || typeof discrepancyCount !== "number") {
         res.status(400).json({ message: t("routes.channel_discrepancy_required", getLocale(req)) });
@@ -1298,6 +1357,12 @@ export async function registerRoutes(
 
   app.post("/api/lc-cases/:id/park", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
+      const lcCase = await storage.getLcCaseById(req.params.id);
+      if (!lcCase || lcCase.sessionId !== sessionId) {
+        res.status(404).json({ message: t("routes.lc_case_not_found", getLocale(req)) });
+        return;
+      }
       const updated = await storage.parkLcCase(req.params.id);
       res.json(updated);
     } catch (error: any) {
@@ -1307,12 +1372,17 @@ export async function registerRoutes(
 
   app.post("/api/lc-cases/:id/close", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
+      const lcCase = await storage.getLcCaseById(req.params.id);
+      if (!lcCase || lcCase.sessionId !== sessionId) {
+        res.status(404).json({ message: t("routes.lc_case_not_found", getLocale(req)) });
+        return;
+      }
       const { reason } = req.body;
       const updated = await storage.closeLcCase(req.params.id, reason || "Closed by user");
       // Audit event for case close
       if (updated.sourceLookupId) {
         try {
-          const sessionId = getSessionId(req, res);
           await appendTradeEvent(updated.sourceLookupId, sessionId, "trade_closed", {
             reason: reason || "Closed by user",
             finalStatus: updated.status,
@@ -1329,8 +1399,9 @@ export async function registerRoutes(
 
   app.get("/api/lc-cases/:id/comparison", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const lcCase = await storage.getLcCaseById(req.params.id);
-      if (!lcCase) {
+      if (!lcCase || lcCase.sessionId !== sessionId) {
         res.status(404).json({ message: t("routes.lc_case_not_found", getLocale(req)) });
         return;
       }
@@ -1595,8 +1666,9 @@ export async function registerRoutes(
 
   app.get("/api/twinlog/:lookupId/data", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const lookup = await storage.getLookupById(req.params.lookupId);
-      if (!lookup) {
+      if (!lookup || lookup.sessionId !== sessionId) {
         res.status(404).json({ message: t("routes.lookup_not_found", getLocale(req)) });
         return;
       }
@@ -2888,6 +2960,12 @@ Rules:
 
   app.get("/api/eudr/:lookupId", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
+      const lookup = await storage.getLookupById(req.params.lookupId);
+      if (!lookup || lookup.sessionId !== sessionId) {
+        res.status(404).json({ message: t("routes.trade_not_found", getLocale(req)) });
+        return;
+      }
       const record = await storage.getEudrRecordByLookupId(req.params.lookupId);
       res.json(record || null);
     } catch (error: any) {
@@ -2935,6 +3013,7 @@ Rules:
 
   app.patch("/api/eudr/:id", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const allowedFields = [
         "plotCoordinates", "plotCountryIso2", "plotCountryValid", "geospatialData",
         "evidenceType", "evidenceReference", "evidenceDate",
@@ -2947,7 +3026,7 @@ Rules:
       for (const key of allowedFields) {
         if (key in req.body) sanitized[key] = req.body[key];
       }
-      const updated = await storage.updateEudrRecord(req.params.id, sanitized);
+      const updated = await storage.updateEudrRecord(req.params.id, sanitized, sessionId);
       if (!updated) {
         res.status(404).json({ message: t("routes.eudr_not_found", getLocale(req)) });
         return;
@@ -3223,6 +3302,12 @@ Rules:
 
   app.get("/api/cbam/:lookupId", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
+      const lookup = await storage.getLookupById(req.params.lookupId);
+      if (!lookup || lookup.sessionId !== sessionId) {
+        res.status(404).json({ message: t("routes.trade_not_found", getLocale(req)) });
+        return;
+      }
       const record = await storage.getCbamRecordByLookupId(req.params.lookupId);
       res.json(record || null);
     } catch (error: any) {
@@ -3262,7 +3347,8 @@ Rules:
 
   app.patch("/api/cbam/:id", async (req, res) => {
     try {
-      const updated = await storage.updateCbamRecord(req.params.id, req.body);
+      const sessionId = getSessionId(req, res);
+      const updated = await storage.updateCbamRecord(req.params.id, req.body, sessionId);
       if (updated) {
         res.json(updated);
       } else {
@@ -3542,9 +3628,14 @@ Rules:
   // ── Admin Login ──
   app.post("/api/admin/login", async (req, res) => {
     try {
+      const ip = req.ip || "unknown";
+      if (!checkIpRateLimit(adminRateLimits, ip, 5, 60_000)) {
+        res.status(429).json({ message: "Too many login attempts. Try again in a minute." });
+        return;
+      }
       const { password } = req.body;
       const adminPw = process.env.ADMIN_PASSWORD;
-      if (!adminPw || password !== adminPw) {
+      if (!adminPw || !safeCompare(password, adminPw)) {
         res.status(401).json({ message: t("routes.invalid_admin_password", getLocale(req)) });
         return;
       }
@@ -3630,7 +3721,7 @@ Rules:
     try {
       const { admin_password, source, hs_codes_affected, dest_iso2_affected, summary, source_url, effective_date } = req.body;
       const adminPw = process.env.ADMIN_PASSWORD;
-      if (!adminPw || admin_password !== adminPw) {
+      if (!adminPw || !safeCompare(admin_password, adminPw)) {
         res.status(401).json({ message: t("routes.unauthorized", getLocale(req)) });
         return;
       }
@@ -4439,9 +4530,14 @@ Rules:
       const sessionId = getSessionId(req, res);
       const id = req.params.id as string;
 
-      // Get validation first to clean up file
+      // Verify ownership BEFORE deleting file
       const validation = await storage.getDocumentValidationById(id);
-      if (validation?.fileKey) {
+      if (!validation || validation.sessionId !== sessionId) {
+        return res.status(404).json({ message: t("routes.validation_access_denied", getLocale(req)) });
+      }
+
+      // Now safe to delete file
+      if (validation.fileKey) {
         try {
           fs.unlinkSync(validation.fileKey);
         } catch {

@@ -179,12 +179,12 @@ export interface IStorage {
   createRegulatoryAlert(data: InsertRegulatoryAlert): Promise<RegulatoryAlert>;
   createEudrRecord(data: InsertEudrRecord): Promise<EudrRecord>;
   getEudrRecordByLookupId(lookupId: string): Promise<EudrRecord | undefined>;
-  updateEudrRecord(id: string, data: Partial<InsertEudrRecord>): Promise<EudrRecord | undefined>;
+  updateEudrRecord(id: string, data: Partial<InsertEudrRecord>, sessionId?: string): Promise<EudrRecord | undefined>;
   markLookupEudrComplete(lookupId: string): Promise<void>;
   // CBAM Records (manual data entry)
   createCbamRecord(data: InsertCbamRecord): Promise<CbamRecord>;
   getCbamRecordByLookupId(lookupId: string): Promise<CbamRecord | undefined>;
-  updateCbamRecord(id: string, data: Partial<InsertCbamRecord>): Promise<CbamRecord | undefined>;
+  updateCbamRecord(id: string, data: Partial<InsertCbamRecord>, sessionId?: string): Promise<CbamRecord | undefined>;
   // EUDR Assessments (computed risk scores)
   createOrUpdateEudrAssessment(data: InsertEudrAssessment): Promise<EudrAssessment>;
   getEudrAssessmentByLookupId(lookupId: string): Promise<EudrAssessment | undefined>;
@@ -1102,10 +1102,12 @@ export class DatabaseStorage implements IStorage {
     return row;
   }
 
-  async updateEudrRecord(id: string, data: Partial<InsertEudrRecord>): Promise<EudrRecord | undefined> {
+  async updateEudrRecord(id: string, data: Partial<InsertEudrRecord>, sessionId?: string): Promise<EudrRecord | undefined> {
+    const conditions = [eq(eudrRecords.id, id)];
+    if (sessionId) conditions.push(eq(eudrRecords.userSessionId, sessionId));
     const [row] = await db.update(eudrRecords)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(eudrRecords.id, id))
+      .where(and(...conditions))
       .returning();
     return row;
   }
@@ -1128,10 +1130,12 @@ export class DatabaseStorage implements IStorage {
     return row;
   }
 
-  async updateCbamRecord(id: string, data: Partial<InsertCbamRecord>): Promise<CbamRecord | undefined> {
+  async updateCbamRecord(id: string, data: Partial<InsertCbamRecord>, sessionId?: string): Promise<CbamRecord | undefined> {
+    const conditions = [eq(cbamRecords.id, id)];
+    if (sessionId) conditions.push(eq(cbamRecords.userSessionId, sessionId));
     const [row] = await db.update(cbamRecords)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(cbamRecords.id, id))
+      .where(and(...conditions))
       .returning();
     return row;
   }
