@@ -270,8 +270,6 @@ const css = `
 .mt-mp-left { padding:16px 18px;display:flex;flex-direction:column;gap:10px;z-index:2 }
 .mt-mp-left h4 { font-family:var(--fd);font-size:16px;color:#fff;font-weight:600;margin:0 }
 .mt-mp-left .ms { font-size:13px;color:rgba(255,255,255,.55);line-height:1.4 }
-.mt-mp-chips { display:flex;flex-wrap:wrap;gap:5px }
-.mt-mp-chip { padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);letter-spacing:.03em }
 .mt-ml { display:flex;flex-direction:column;gap:8px;margin-top:auto }
 .mt-mll { display:flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,.55);font-weight:500 }
 .mt-mll span { width:7px;height:7px;border-radius:50% }
@@ -954,11 +952,6 @@ export default function Trades() {
                 {corridors.length || corridorAnalytics.length} active routes across{" "}
                 {new Set([...corridors.map(c => c.destIso2), ...corridorAnalytics.map(c => c.label.split(" → ")[1])]).size || "—"} markets
               </div>
-              <div className="mt-mp-chips">
-                {Array.from(new Set(corridors.map(c => c.destIso2))).map(iso => (
-                  <span key={iso} className="mt-mp-chip">{iso2ToFlag(iso)} {iso}</span>
-                ))}
-              </div>
               <div className="mt-ml">
                 <div className="mt-mll"><span style={{ background: "#4ade80" }} />Active</div>
                 <div className="mt-mll"><span style={{ background: "#eab308" }} />Waiting</div>
@@ -967,7 +960,7 @@ export default function Trades() {
             </div>
             <div className="mt-mp-inner">
               {corridors.length > 0 ? (
-                <TradeCorridorsMap corridors={corridors} />
+                <TradeCorridorsMap corridors={corridors} onCorridorClick={(label) => { setSelectedCorridor(selectedCorridor === label ? null : label); setFilter("all"); setStatCardFilter(null); }} />
               ) : (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", opacity: 0.3 }}>
                   <span style={{ fontSize: 15, color: "#fff" }}>{t("map.placeholder")}</span>
