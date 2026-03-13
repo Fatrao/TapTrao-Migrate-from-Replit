@@ -5,8 +5,8 @@
  * Fetches trade data via GET /api/trades/:id and renders a pixel-perfect
  * report view matching the trade-report-authenticated.html mockup.
  */
-import { useState, useEffect, useCallback } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useRoute, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/AppShell";
@@ -163,6 +163,44 @@ export default function TradeReport() {
   const handleStatusChange = useCallback((idx: number, status: DocumentStatus) => {
     setDocStatuses(prev => ({ ...prev, [idx]: status }));
   }, []);
+
+  /* Upload state for buyer docs */
+  const fileInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
+  const queryClient = useQueryClient();
+
+  const handleDocUpload = async (requirementIndex: number, file: File) => {
+    if (!lookup?.id) return;
+    setUploadingIdx(requirementIndex);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`/api/lookups/${lookup.id}/requirements/${requirementIndex}/validate`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Upload failed");
+      }
+      // Mark as READY locally and refetch trade data
+      setDocStatuses(prev => ({ ...prev, [requirementIndex]: "READY" }));
+      queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] });
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      alert(err.message || "Upload failed. Please try again.");
+    } finally {
+      setUploadingIdx(null);
+    }
+  };
+
+  /* Supplier link — create request if needed, then copy link */
+  const handleSendLink = async () => {
+    if (!lookup?.id) return;
+    // Navigate to the trade workspace which has the full supplier request flow
+    window.location.href = `/trades/${tradeId}`;
+  };
 
   /* Collapsed states for secondary cards */
   const [demurrageOpen, setDemurrageOpen] = useState(true);
@@ -489,10 +527,10 @@ export default function TradeReport() {
             background: S.amberLight, borderLeft: `3px solid ${S.amber}`, borderRadius: S.radiusSm,
             padding: "14px 18px", marginBottom: 20,
           }}>
-            <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>🌿</span>
+            <span style={{ fontSize: 26, flexShrink: 0, marginTop: 1 }}>🌿</span>
             <div>
-              <h4 style={{ fontSize: 13, fontWeight: 600, color: S.textDark, marginBottom: 3 }}>{tt("report.eudrApplies")}</h4>
-              <p style={{ fontSize: 12, color: S.textMid, lineHeight: 1.5 }}>
+              <h4 style={{ fontSize: 16, fontWeight: 700, color: S.textDark, marginBottom: 4 }}>{tt("report.eudrApplies")}</h4>
+              <p style={{ fontSize: 14, color: S.textMid, lineHeight: 1.5 }}>
                 {tt("report.eudrDescription", { commodity: commodityName, hsCode })}
               </p>
             </div>
@@ -660,12 +698,29 @@ export default function TradeReport() {
                         <span style={{ fontSize: 11, color: S.textMuted }}>{r.issuedBy}</span>
                       </div>
                     </div>
-                    <button style={{
-                      background: S.mutedSage, color: "white", border: "none", padding: "5px 12px",
-                      borderRadius: 6, fontSize: 11, fontWeight: 500, cursor: "pointer",
-                      fontFamily: "var(--fb)", flexShrink: 0, whiteSpace: "nowrap",
-                    }}>
-                      {tt("report.upload")}
+                    <input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png,.webp,.html,.txt"
+                      style={{ display: "none" }}
+                      ref={(el) => { fileInputRefs.current[i] = el; }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleDocUpload(i, file);
+                        e.target.value = "";
+                      }}
+                    />
+                    <button
+                      onClick={() => fileInputRefs.current[i]?.click()}
+                      disabled={uploadingIdx === i}
+                      style={{
+                        background: S.mutedSage, color: "white", border: "none", padding: "5px 12px",
+                        borderRadius: 6, fontSize: 11, fontWeight: 500,
+                        cursor: uploadingIdx === i ? "wait" : "pointer",
+                        fontFamily: "var(--fb)", flexShrink: 0, whiteSpace: "nowrap",
+                        opacity: uploadingIdx === i ? 0.5 : 1,
+                      }}
+                    >
+                      {uploadingIdx === i ? "Uploading..." : tt("report.upload")}
                     </button>
                   </div>
                 );
@@ -702,11 +757,14 @@ export default function TradeReport() {
                         <span style={{ fontSize: 11, color: S.textMuted }}>{r.issuedBy}</span>
                       </div>
                     </div>
-                    <button style={{
-                      background: "none", border: `1.5px solid ${S.mutedSage}`, color: S.mutedSage,
-                      padding: "5px 10px", borderRadius: 6, fontSize: 11, fontWeight: 500,
-                      cursor: "pointer", fontFamily: "var(--fb)", flexShrink: 0, whiteSpace: "nowrap",
-                    }}>
+                    <button
+                      onClick={handleSendLink}
+                      style={{
+                        background: "none", border: `1.5px solid ${S.mutedSage}`, color: S.mutedSage,
+                        padding: "5px 10px", borderRadius: 6, fontSize: 11, fontWeight: 500,
+                        cursor: "pointer", fontFamily: "var(--fb)", flexShrink: 0, whiteSpace: "nowrap",
+                      }}
+                    >
                       {tt("report.sendLink")}
                     </button>
                   </div>
