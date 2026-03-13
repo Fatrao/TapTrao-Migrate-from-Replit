@@ -121,6 +121,10 @@
   --s5: rgba(0,0,0,0.07);
 }
 
+/* ── Force lining (uniform-height) numerals on all Playfair Display text ── */
+:root {
+  font-variant-numeric: lining-nums;
+}
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 4px; }

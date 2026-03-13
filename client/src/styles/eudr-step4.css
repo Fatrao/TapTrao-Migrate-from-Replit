@@ -70,7 +70,7 @@ body:has(.eudr-dashboard-shell) #root{height:100vh;max-height:100vh;overflow:hid
 .eudr-bk-row{display:flex;align-items:center;justify-content:space-between}
 .eudr-bk-label{font-size:11px;color:var(--t2);display:flex;align-items:center;gap:5px}
 .eudr-bk-sub{font-size:9px;color:var(--t4);font-weight:400}
-.eudr-bk-score{font-size:10px;font-weight:700;color:var(--dark);font-variant-numeric:tabular-nums;white-space:nowrap}
+.eudr-bk-score{font-size:10px;font-weight:700;color:var(--dark);font-variant-numeric:lining-nums tabular-nums;white-space:nowrap}
 .eudr-bk-score.good{color:var(--sage)}
 .eudr-bk-score.warn{color:var(--amber)}
 .eudr-bk-score.bad{color:var(--red)}
