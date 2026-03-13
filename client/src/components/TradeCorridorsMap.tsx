@@ -10,7 +10,8 @@ import {
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 /* ISO2 → approximate [lng, lat] for trade route lines */
-const countryCoords: Record<string, [number, number]> = {
+export const countryCoords: Record<string, [number, number]> = {
+  // Africa (origins)
   GH: [-1.0, 7.9],
   CI: [-5.5, 7.5],
   ET: [38.7, 9.0],
@@ -30,7 +31,9 @@ const countryCoords: Record<string, [number, number]> = {
   BI: [29.9, -3.4],
   ZA: [22.9, -30.6],
   BF: [-1.6, 12.3],
-  // Destinations
+  ML: [-8.0, 17.6],
+  AO: [17.9, -11.2],
+  // Europe
   EU: [10.5, 50.1],
   GB: [-0.1, 51.5],
   DE: [10.4, 51.2],
@@ -40,18 +43,21 @@ const countryCoords: Record<string, [number, number]> = {
   NL: [5.3, 52.1],
   CH: [8.2, 46.8],
   AT: [14.6, 47.5],
+  PL: [19.1, 51.9],
+  // Americas
   US: [-95.7, 37.1],
-  CN: [104.2, 35.9],
-  AE: [54.0, 23.4],
-  TR: [32.9, 39.9],
-  // LATAM
+  CA: [-106.3, 56.1],
   BR: [-51.9, -14.2],
   MX: [-102.6, 23.6],
   AR: [-63.6, -38.4],
   CL: [-71.5, -35.7],
   CO: [-74.3, 4.6],
   PE: [-75.0, -9.2],
+  // Middle East
+  AE: [54.0, 23.4],
+  TR: [32.9, 39.9],
   // Asia
+  CN: [104.2, 35.9],
   IN: [78.9, 20.6],
   JP: [138.3, 36.2],
   KR: [127.8, 35.9],
@@ -63,7 +69,7 @@ const countryCoords: Record<string, [number, number]> = {
   PH: [121.8, 12.9],
 };
 
-type Corridor = {
+export type Corridor = {
   originIso2: string;
   originName: string;
   destIso2: string;
@@ -74,17 +80,66 @@ type Corridor = {
   waitingCount: number;
 };
 
-function getCorridorColor(c: Corridor): string {
+export function getCorridorColor(c: Corridor): string {
   if (c.issueCount > 0) return "#ef4444";
   if (c.waitingCount > 0) return "#eab308";
   return "#4ade80";
 }
 
-function getCorridorStatus(c: Corridor): string {
+export function getCorridorStatus(c: Corridor): string {
   if (c.issueCount > 0) return "Issues";
   if (c.waitingCount > 0) return "Waiting";
   return "Active";
 }
+
+/**
+ * Render curved arcs between origin and destination by sampling a quadratic
+ * Bezier curve into line segments that react-simple-maps can project.
+ */
+const CurvedArcs = memo(function CurvedArcs({ corridors }: { corridors: Corridor[] }) {
+  return (
+    <>
+      {corridors.map((c, i) => {
+        const from = countryCoords[c.originIso2];
+        const to = countryCoords[c.destIso2];
+        if (!from || !to) return null;
+        const color = getCorridorColor(c);
+
+        // Compute a control point perpendicular to the midpoint
+        const midLng = (from[0] + to[0]) / 2;
+        const midLat = (from[1] + to[1]) / 2;
+        const dx = to[0] - from[0];
+        const dy = to[1] - from[1];
+        const curveFactor = 0.2 + (i % 3) * 0.06; // slight variation per route
+        const ctrlLng = midLng - dy * curveFactor;
+        const ctrlLat = midLat + dx * curveFactor;
+
+        // Sample the Bezier curve into segments
+        const steps = 16;
+        const points: [number, number][] = [];
+        for (let s = 0; s <= steps; s++) {
+          const t = s / steps;
+          const lng = (1 - t) * (1 - t) * from[0] + 2 * (1 - t) * t * ctrlLng + t * t * to[0];
+          const lat = (1 - t) * (1 - t) * from[1] + 2 * (1 - t) * t * ctrlLat + t * t * to[1];
+          points.push([lng, lat]);
+        }
+
+        // Render each segment as a Line component
+        return points.slice(0, -1).map((pt, j) => (
+          <Line
+            key={`arc-${c.originIso2}-${c.destIso2}-${j}`}
+            from={pt}
+            to={points[j + 1]}
+            stroke={color}
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeOpacity={0.7}
+          />
+        ));
+      })}
+    </>
+  );
+});
 
 export const TradeCorridorsMap = memo(function TradeCorridorsMap({
   corridors,
@@ -106,18 +161,38 @@ export const TradeCorridorsMap = memo(function TradeCorridorsMap({
         projectionConfig={{ scale: 120, center: [20, 20] }}
         style={{ width: "100%", height: "100%" }}
       >
+        <defs>
+          {/* Glow filter for origin markers (Africa hub) */}
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          {/* Soft glow for destination markers */}
+          <filter id="dest-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="1.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* World geography — subtle translucent fills */}
         <Geographies geography={GEO_URL}>
           {({ geographies }) =>
             geographies.map((geo) => (
               <Geography
                 key={geo.rsmKey}
                 geography={geo}
-                fill="#2a4435"
-                stroke="rgba(109,184,154,0.25)"
+                fill="rgba(100,160,120,0.15)"
+                stroke="rgba(120,200,150,0.08)"
                 strokeWidth={0.5}
                 style={{
                   default: { outline: "none" },
-                  hover: { outline: "none", fill: "#3a5c48" },
+                  hover: { outline: "none", fill: "rgba(100,160,120,0.22)" },
                   pressed: { outline: "none" },
                 }}
               />
@@ -125,84 +200,37 @@ export const TradeCorridorsMap = memo(function TradeCorridorsMap({
           }
         </Geographies>
 
-        {displayCorridors.map((c) => {
-          const from = countryCoords[c.originIso2];
-          const to = countryCoords[c.destIso2];
-          if (!from || !to) return null;
-          const color = getCorridorColor(c);
-          return (
-            <Line
-              key={`${c.originIso2}-${c.destIso2}`}
-              from={from}
-              to={to}
-              stroke={color}
-              strokeWidth={1.5}
-              strokeLinecap="round"
-              strokeDasharray="4 2"
-            />
-          );
-        })}
+        {/* Curved arc routes */}
+        <CurvedArcs corridors={displayCorridors} />
 
-        {/* Origin markers */}
-        {displayCorridors.map((c) => {
-          const coords = countryCoords[c.originIso2];
+        {/* Origin markers (Africa hub) — bright green with glow */}
+        {Array.from(new Set(displayCorridors.map(c => c.originIso2))).map(iso => {
+          const coords = countryCoords[iso];
           if (!coords) return null;
           return (
-            <Marker key={`origin-${c.originIso2}`} coordinates={coords}>
-              <circle r={3} fill="#4ade80" stroke="#0e4e45" strokeWidth={1} />
+            <Marker key={`origin-${iso}`} coordinates={coords}>
+              <circle r={4} fill="#4ade80" filter="url(#glow)" />
+              <circle r={2} fill="#fff" />
             </Marker>
           );
         })}
 
-        {/* Destination markers */}
-        {displayCorridors.map((c) => {
-          const coords = countryCoords[c.destIso2];
+        {/* Destination markers — soft glow, color by worst status */}
+        {Array.from(new Set(displayCorridors.map(c => c.destIso2))).map(iso => {
+          const coords = countryCoords[iso];
           if (!coords) return null;
-          const color = getCorridorColor(c);
+          const destCorridors = displayCorridors.filter(c => c.destIso2 === iso);
+          const hasIssue = destCorridors.some(c => c.issueCount > 0);
+          const hasWaiting = destCorridors.some(c => c.waitingCount > 0);
+          const color = hasIssue ? "#ef4444" : hasWaiting ? "#eab308" : "#4ade80";
           return (
-            <Marker key={`dest-${c.destIso2}-${c.originIso2}`} coordinates={coords}>
-              <circle r={3} fill={color} stroke="#fff" strokeWidth={0.5} />
+            <Marker key={`dest-${iso}`} coordinates={coords}>
+              <circle r={3.5} fill={color} filter="url(#dest-glow)" opacity={0.8} />
+              <circle r={1.5} fill="#fff" />
             </Marker>
           );
         })}
       </ComposableMap>
-
-      {/* Legend */}
-      {!singleRoute && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: 12,
-            left: 16,
-            display: "flex",
-            gap: 16,
-            fontSize: 15,
-            color: "rgba(255,255,255,0.6)",
-          }}
-        >
-          {[
-            { color: "#4ade80", label: "Active" },
-            { color: "#eab308", label: "Waiting" },
-            { color: "#ef4444", label: "Issues" },
-          ].map((item) => (
-            <span key={item.label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: "50%",
-                  background: item.color,
-                  display: "inline-block",
-                }}
-              />
-              {item.label}
-            </span>
-          ))}
-        </div>
-      )}
     </div>
   );
 });
-
-export { getCorridorColor, getCorridorStatus, countryCoords };
-export type { Corridor };

@@ -122,7 +122,7 @@ const css = `
 .mt-st-bars { display:flex;align-items:flex-end;gap:2px;height:24px }
 .mt-st-bars span { width:3px;border-radius:1px;background:var(--sage) }
 .mt-st.ac { background:var(--sage) }
-.mt-st.ac .sl { color:rgba(255,255,255,.5) }
+.mt-st.ac .sl { color:#fff }
 .mt-st.ac .sv { color:#fff }
 .mt-st-ic { width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px }
 
@@ -210,16 +210,16 @@ const css = `
 .mt-an h3 { font-family:var(--fd);font-size:16px;font-weight:600;margin:0 0 10px;flex-shrink:0;color:var(--t1) }
 
 /* Big pie + vertical legend layout */
-.mt-an-pie-only { flex:1;display:flex;flex-direction:row;align-items:center;gap:16px;min-height:0;justify-content:center }
-.mt-an-pie-big { width:150px;height:150px;flex-shrink:0;filter:drop-shadow(0 3px 10px rgba(0,0,0,.08)) }
+.mt-an-pie-only { flex:1;display:flex;flex-direction:row;align-items:center;gap:20px;min-height:0;justify-content:center }
+.mt-an-pie-big { width:200px;height:200px;flex-shrink:0;filter:drop-shadow(0 3px 10px rgba(0,0,0,.08)) }
 .mt-pie-slice { cursor:pointer;transition:opacity .15s ease }
 .mt-pie-slice:hover { opacity:.85 }
-.mt-an-pie-leg-v { display:flex;flex-direction:column;gap:5px;width:100% }
-.mt-apl-v { display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:8px;cursor:pointer;transition:background .12s }
+.mt-an-pie-leg-v { display:flex;flex-direction:column;gap:8px;width:100% }
+.mt-apl-v { display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer;transition:background .12s }
 .mt-apl-v:hover { background:rgba(0,0,0,.03) }
-.mt-apl-v .apl-dot { width:8px;height:8px;border-radius:2px;flex-shrink:0 }
-.mt-apl-name { font-size:10px;font-weight:600;color:var(--t1) }
-.mt-apl-detail { font-size:8px;color:var(--t3) }
+.mt-apl-v .apl-dot { width:10px;height:10px;border-radius:2px;flex-shrink:0 }
+.mt-apl-name { font-size:14px;font-weight:600;color:var(--t1) }
+.mt-apl-detail { font-size:12px;color:var(--t3) }
 
 /* Demurrage */
 .mt-dem { background:#fff;border-radius:var(--r);box-shadow:var(--shd);padding:14px 16px;display:flex;flex-direction:column;flex:1;min-height:0;animation:mt-fu .3s ease both }
@@ -266,13 +266,15 @@ const css = `
 .mt-cbr .cc span { font-size: 15px;font-weight:600;color:var(--t1) }
 .mt-cbr .cx { font-size: 15px;font-weight:600;color:var(--sage) }
 
-.mt-mp { background:#1b2a22;border-radius:var(--r);box-shadow:var(--shd);position:relative;overflow:hidden;display:flex;flex-direction:column;height:100%;animation:mt-fu .3s ease both }
+.mt-mp { background:linear-gradient(135deg,#0e2a20,#0c3a28);border-radius:var(--r);box-shadow:var(--shd);position:relative;overflow:hidden;display:flex;flex-direction:column;height:100%;animation:mt-fu .3s ease both }
 .mt-mp h4 { font-family:var(--fd);font-size:16px;color:#fff;font-weight:600;padding:10px 14px 0;position:relative;z-index:2;flex-shrink:0;margin:0 }
-.mt-mp .ms { font-size: 15px;color:rgba(255,255,255,.4);padding:2px 14px;position:relative;z-index:2;flex-shrink:0 }
+.mt-mp .ms { font-size:14px;color:rgba(255,255,255,.55);padding:2px 14px;position:relative;z-index:2;flex-shrink:0 }
 .mt-mp-inner { flex:1;position:relative;min-height:0;height:0 }
-.mt-ml { display:flex;gap:8px;padding:4px 14px 6px;position:relative;z-index:2;flex-shrink:0 }
-.mt-mll { display:flex;align-items:center;gap:4px;font-size: 15px;color:rgba(255,255,255,.4);font-weight:500 }
-.mt-mll span { width:6px;height:6px;border-radius:50% }
+.mt-mp-chips { display:flex;flex-wrap:wrap;gap:5px;padding:6px 14px;position:relative;z-index:2;flex-shrink:0 }
+.mt-mp-chip { padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);letter-spacing:.03em }
+.mt-ml { display:flex;gap:10px;padding:4px 14px 8px;position:relative;z-index:2;flex-shrink:0 }
+.mt-mll { display:flex;align-items:center;gap:4px;font-size:12px;color:rgba(255,255,255,.55);font-weight:500 }
+.mt-mll span { width:7px;height:7px;border-radius:50% }
 
 /* Empty state */
 .mt-empty { text-align:center;padding:60px 20px }
@@ -943,7 +945,15 @@ export default function Trades() {
           {/* Trade Corridors Map */}
           <div className="mt-mp">
             <h4>{t("map.title")}</h4>
-            <div className="ms">{t("map.activeRoute", { count: corridors.length || corridorAnalytics.length })}</div>
+            <div className="ms">
+              {corridors.length || corridorAnalytics.length} active routes across{" "}
+              {new Set([...corridors.map(c => c.destIso2), ...corridorAnalytics.map(c => c.label.split(" → ")[1])]).size || "—"} destination markets
+            </div>
+            <div className="mt-mp-chips">
+              {Array.from(new Set(corridors.map(c => c.destIso2))).map(iso => (
+                <span key={iso} className="mt-mp-chip">{iso2ToFlag(iso)} {iso}</span>
+              ))}
+            </div>
             <div className="mt-mp-inner">
               {corridors.length > 0 ? (
                 <TradeCorridorsMap corridors={corridors} />
@@ -954,9 +964,9 @@ export default function Trades() {
               )}
             </div>
             <div className="mt-ml">
-              <div className="mt-mll"><span style={{ background: "var(--sage-l)" }} />{t("map.primary")}</div>
-              <div className="mt-mll"><span style={{ background: "var(--amber)" }} />{t("map.secondary")}</div>
-              <div className="mt-mll"><span style={{ background: "var(--red)" }} />{t("map.atRisk")}</div>
+              <div className="mt-mll"><span style={{ background: "#4ade80" }} />Active</div>
+              <div className="mt-mll"><span style={{ background: "#eab308" }} />Waiting</div>
+              <div className="mt-mll"><span style={{ background: "#ef4444" }} />Issues</div>
             </div>
           </div>
         </div>
