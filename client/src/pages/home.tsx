@@ -6,7 +6,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/analytics";
 import { usePageTitle } from "@/hooks/use-page-title";
-import { Menu, X, Globe, Loader2, AlertTriangle, CheckCircle2, XCircle, Shield, FileCheck, Upload, Bell } from "lucide-react";
+import { Menu, X, Globe, Loader2, AlertTriangle, CheckCircle2, XCircle, Shield, FileCheck, Upload, Bell, Lock, Hash, Download, Clock } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -189,7 +189,7 @@ export default function Home() {
   const canCheck = commodityId && originId && destinationId;
 
   return (
-    <div className="hp-page" style={{ fontFamily: "var(--fb)", background: "var(--bg)", color: "var(--t1)", minHeight: "100vh" }}>
+    <div id="top" className="hp-page" style={{ fontFamily: "var(--fb)", background: "var(--bg)", color: "var(--t1)", minHeight: "100vh" }}>
 
       {/* ═══ NAVIGATION ═══ */}
       <nav style={{
@@ -206,6 +206,7 @@ export default function Home() {
         </Link>
 
         <div className="hidden md:flex" style={{ gap: 28 }}>
+          <a href="#top" style={{ fontSize: 15, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>Home</a>
           <a href="#how" style={{ fontSize: 15, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.howItWorks")}</a>
           <a href="#validation" style={{ fontSize: 15, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.validation")}</a>
           <a href="#pricing" style={{ fontSize: 15, color: "var(--t2)", textDecoration: "none", fontWeight: 500 }}>{t("nav.pricing")}</a>
@@ -254,6 +255,7 @@ export default function Home() {
           background: "#fff", padding: "24px 32px",
           display: "flex", flexDirection: "column", gap: 16,
         }}>
+          <a href="#top" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>Home</a>
           <a href="#how" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>{t("nav.howItWorks")}</a>
           <a href="#validation" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>{t("nav.validation")}</a>
           <a href="#pricing" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: 16, color: "var(--t1)", textDecoration: "none", fontWeight: 500 }}>{t("nav.pricing")}</a>
@@ -695,7 +697,7 @@ export default function Home() {
           <div style={{ fontSize: 32, letterSpacing: 8 }}>
             🇨🇮 🇬🇭 🇳🇬 🇰🇪 🇹🇿 🇪🇹{" "}
             <span style={{ color: "#fff", fontSize: 24 }}>&rarr;</span>{" "}
-            🇪🇺 🇬🇧 🇩🇪 🇫🇷 🇮🇹 🇨🇭 🇺🇸 🇨🇦 🇹🇷
+            🇪🇺 🇬🇧 🇹🇷 🇨🇭 🇦🇪
           </div>
         </div>
       </div>
@@ -907,42 +909,111 @@ export default function Home() {
       {/* ═══ TWINLOG — Proof You Complied ═══ */}
       <div className="hp-twinlog-section" style={{
         background: "var(--dark)", borderRadius: 24, margin: "0 40px", padding: 60, color: "#fff",
+        display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center",
       }}>
-        <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8, color: "#fff" }}>
-          {t("twinlog.heading")}
-        </h2>
-        <p style={{ fontSize: 16, color: "rgba(255,255,255,.8)", marginBottom: 28, maxWidth: 600 }}>
-          {t("twinlog.subheading")}
-        </p>
+        {/* Left: copy */}
+        <div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(109,184,154,0.12)", borderRadius: 20, padding: "6px 14px", marginBottom: 20 }}>
+            <Lock size={13} style={{ color: "var(--sage-l)" }} />
+            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--sage-l)", letterSpacing: 1, textTransform: "uppercase" }}>Tamper-proof audit trail</span>
+          </div>
 
-        <p style={{ fontSize: 15, color: "rgba(255,255,255,.7)", lineHeight: 1.8, maxWidth: 600, marginBottom: 28 }}>
-          {t("twinlog.body")}
-        </p>
+          <h2 style={{ fontFamily: "var(--fd)", fontSize: 36, fontWeight: 600, marginBottom: 8, color: "#fff" }}>
+            {t("twinlog.heading")}
+          </h2>
+          <p style={{ fontSize: 16, color: "rgba(255,255,255,.8)", marginBottom: 20, maxWidth: 480 }}>
+            {t("twinlog.subheading")}
+          </p>
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,.65)", lineHeight: 1.8, maxWidth: 480, marginBottom: 28 }}>
+            {t("twinlog.body")}
+          </p>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
-          {(["eudr", "cbam", "record"] as const).map((key) => (
-            <div key={key} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{
-                width: 28, height: 28, borderRadius: 8,
-                background: "rgba(109,184,154,0.15)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                flexShrink: 0,
-              }}>
-                <CheckCircle2 size={14} style={{ color: "var(--sage-l)" }} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
+            {(["eudr", "cbam", "record"] as const).map((key) => (
+              <div key={key} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{
+                  width: 28, height: 28, borderRadius: 8,
+                  background: "rgba(109,184,154,0.15)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0,
+                }}>
+                  <CheckCircle2 size={14} style={{ color: "var(--sage-l)" }} />
+                </div>
+                <span style={{ fontSize: 14, color: "rgba(255,255,255,.8)" }}>
+                  {t(`twinlog.${key}`)}
+                </span>
               </div>
-              <span style={{ fontSize: 14, color: "rgba(255,255,255,.8)" }}>
-                {t(`twinlog.${key}`)}
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <p style={{
+            fontSize: 16, fontWeight: 600, color: "var(--sage-l)", fontStyle: "italic",
+            borderLeft: "3px solid var(--sage-l)", paddingLeft: 16, margin: 0,
+          }}>
+            {t("twinlog.closing")}
+          </p>
         </div>
 
-        <p style={{
-          fontSize: 16, fontWeight: 600, color: "var(--sage-l)", fontStyle: "italic",
-          borderLeft: "3px solid var(--sage-l)", paddingLeft: 16, margin: 0,
-        }}>
-          {t("twinlog.closing")}
-        </p>
+        {/* Right: visual mock of a TwinLog record */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* Mock TwinLog card */}
+          <div style={{
+            background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: 16, padding: "28px 24px", backdropFilter: "blur(8px)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(109,184,154,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Shield size={18} style={{ color: "var(--sage-l)" }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>EUDR TwinLog</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Cocoa Beans · CI → EU</div>
+                </div>
+              </div>
+              <div style={{ background: "rgba(109,184,154,0.15)", borderRadius: 6, padding: "4px 10px", fontSize: 11, fontWeight: 600, color: "var(--sage-l)" }}>VERIFIED</div>
+            </div>
+
+            {/* Mock data rows */}
+            {[
+              { icon: <Hash size={13} />, label: "Hash", value: "0x7f3a...e29d" },
+              { icon: <Clock size={13} />, label: "Timestamp", value: "2026-03-12 14:23 UTC" },
+              { icon: <FileCheck size={13} />, label: "Documents", value: "4 verified" },
+              { icon: <Upload size={13} />, label: "Supplier data", value: "Complete" },
+            ].map((row, i) => (
+              <div key={i} style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "10px 0",
+                borderTop: i === 0 ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(255,255,255,0.05)",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ color: "rgba(255,255,255,.4)" }}>{row.icon}</span>
+                  <span style={{ fontSize: 13, color: "rgba(255,255,255,.5)" }}>{row.label}</span>
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,.85)", fontFamily: "var(--fh)" }}>{row.value}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Action buttons row */}
+          <div style={{ display: "flex", gap: 10 }}>
+            <div style={{
+              flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              background: "var(--sage)", borderRadius: 10, padding: "12px 0",
+              fontSize: 13, fontWeight: 600, color: "#fff",
+            }}>
+              <Download size={14} /> Export PDF
+            </div>
+            <div style={{
+              flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)",
+              borderRadius: 10, padding: "12px 0",
+              fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,.8)",
+            }}>
+              <Shield size={14} /> Verify hash
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* ═══ WHAT YOUR SUPPLIER SEES ═══ */}
@@ -1204,7 +1275,7 @@ export default function Home() {
           .hp-steps-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
 
           /* TwinLog */
-          .hp-page .hp-twinlog-section { margin: 0 12px !important; padding: 28px 16px !important; border-radius: 16px !important; }
+          .hp-page .hp-twinlog-section { margin: 0 12px !important; padding: 28px 16px !important; border-radius: 16px !important; grid-template-columns: 1fr !important; gap: 24px !important; }
 
           /* Supplier preview */
           .hp-supplier-grid { grid-template-columns: 1fr !important; gap: 24px !important; }

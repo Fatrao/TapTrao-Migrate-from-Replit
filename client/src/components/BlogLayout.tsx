@@ -27,6 +27,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
 
         {/* Desktop links */}
         <div className="hidden md:flex" style={{ gap: 28, alignItems: "center" }}>
+          <Link href="/" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: "0.875rem" }}>Home</Link>
           <Link href="/blog" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: "0.875rem" }}>Blog</Link>
           <a href="/#how" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: "0.875rem" }}>How It Works</a>
           <a href="/#pricing" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: "0.875rem" }}>Pricing</a>
@@ -55,6 +56,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
           background: "var(--dark)", padding: "16px 24px",
           display: "flex", flexDirection: "column", gap: 16,
         }}>
+          <Link href="/" onClick={() => setMenuOpen(false)} style={{ color: "#fff", textDecoration: "none", fontSize: 15 }}>Home</Link>
           <Link href="/blog" onClick={() => setMenuOpen(false)} style={{ color: "#fff", textDecoration: "none", fontSize: 15 }}>Blog</Link>
           <a href="/#how" onClick={() => setMenuOpen(false)} style={{ color: "rgba(255,255,255,.7)", textDecoration: "none", fontSize: 15 }}>How It Works</a>
           <a href="/#pricing" onClick={() => setMenuOpen(false)} style={{ color: "rgba(255,255,255,.7)", textDecoration: "none", fontSize: 15 }}>Pricing</a>
