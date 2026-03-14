@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { db, getRegionalDb } from "./db";
 import { eq, and, sql, desc, inArray, lt, isNull, or, asc } from "drizzle-orm";
 import { createHash, randomBytes } from "crypto";
 import {
@@ -344,6 +344,30 @@ export type TradeDetail = {
 };
 
 export class DatabaseStorage implements IStorage {
+  // ── Regional Data Routing ──
+  // Cache of sessionId → dataRegion for the current request cycle.
+  // Set by middleware, used by data methods to pick the correct database.
+  private _regionCache = new Map<string, string>();
+
+  /**
+   * Set the data region for a session. Called from route middleware after
+   * determining the user's region (from auth user or default).
+   */
+  setSessionRegion(sessionId: string, region: string): void {
+    this._regionCache.set(sessionId, region);
+  }
+
+  /**
+   * Get the correct Drizzle database instance for a session's data region.
+   * Reference data (destinations, commodities, rules) always uses the primary db.
+   * User-generated PII data routes to the regional database.
+   */
+  private regionalDb(sessionId?: string): typeof db {
+    if (!sessionId) return db;
+    const region = this._regionCache.get(sessionId);
+    return getRegionalDb(region);
+  }
+
   async getDestinations(): Promise<Destination[]> {
     return db.select().from(destinations).orderBy(destinations.countryName);
   }
@@ -494,8 +518,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createLookup(data: InsertLookup, sessionId?: string): Promise<Lookup> {
+    const rdb = this.regionalDb(sessionId);
     const insertData = sessionId ? { ...data, sessionId } : data;
-    const [result] = await db.insert(lookups).values(insertData).returning();
+    const [result] = await rdb.insert(lookups).values(insertData).returning();
 
     const year = new Date().getFullYear();
     const refInput = result.id + result.createdAt.toISOString();
@@ -511,7 +536,7 @@ export class DatabaseStorage implements IStorage {
     const code = randomBytes(2).toString("hex").toUpperCase();
     const nickname = `TRD-${code}`;
 
-    await db.execute(sql`
+    await rdb.execute(sql`
       UPDATE lookups
       SET twinlog_ref = ${twinlogRef},
           twinlog_hash = ${twinlogHash},
@@ -524,29 +549,33 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateLookupNickname(id: string, nickname: string, sessionId?: string): Promise<Lookup | undefined> {
+    const rdb = this.regionalDb(sessionId);
     const conditions = [eq(lookups.id, id)];
     if (sessionId) conditions.push(eq(lookups.sessionId, sessionId));
-    const [row] = await db.update(lookups).set({ nickname }).where(and(...conditions)).returning();
+    const [row] = await rdb.update(lookups).set({ nickname }).where(and(...conditions)).returning();
     return row;
   }
 
-  async getLookupById(id: string): Promise<Lookup | undefined> {
-    const [result] = await db.select().from(lookups).where(eq(lookups.id, id));
+  async getLookupById(id: string, sessionId?: string): Promise<Lookup | undefined> {
+    const rdb = this.regionalDb(sessionId);
+    const [result] = await rdb.select().from(lookups).where(eq(lookups.id, id));
     return result;
   }
 
   async getRecentLookups(limit: number, sessionId?: string): Promise<Lookup[]> {
+    const rdb = this.regionalDb(sessionId);
     if (sessionId) {
-      return db.select().from(lookups).where(eq(lookups.sessionId, sessionId)).orderBy(desc(lookups.createdAt)).limit(limit);
+      return rdb.select().from(lookups).where(eq(lookups.sessionId, sessionId)).orderBy(desc(lookups.createdAt)).limit(limit);
     }
-    return db.select().from(lookups).orderBy(desc(lookups.createdAt)).limit(limit);
+    return rdb.select().from(lookups).orderBy(desc(lookups.createdAt)).limit(limit);
   }
 
   async getAllLookups(sessionId?: string): Promise<Lookup[]> {
+    const rdb = this.regionalDb(sessionId);
     if (sessionId) {
-      return db.select().from(lookups).where(eq(lookups.sessionId, sessionId)).orderBy(desc(lookups.createdAt));
+      return rdb.select().from(lookups).where(eq(lookups.sessionId, sessionId)).orderBy(desc(lookups.createdAt));
     }
-    return db.select().from(lookups).orderBy(desc(lookups.createdAt));
+    return rdb.select().from(lookups).orderBy(desc(lookups.createdAt));
   }
 
   async getAllLcChecks(): Promise<LcCheck[]> {
@@ -554,12 +583,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getDashboardStats(sessionId?: string): Promise<{ totalLookups: number; totalLcChecks: number; topCorridor: string | null; totalTradeValue: number }> {
+    const rdb = this.regionalDb(sessionId);
     const sessionFilter = sessionId ? sql`WHERE session_id = ${sessionId}` : sql``;
     const lcSessionFilter = sessionId ? sql`WHERE session_id = ${sessionId}` : sql``;
 
-    const lookupResult = await db.execute(sql`SELECT count(*) as count FROM lookups ${sessionFilter}`);
-    const lcResult = await db.execute(sql`SELECT count(*) as count FROM lc_checks ${lcSessionFilter}`);
-    const corridorResult = await db.execute(sql`
+    const lookupResult = await rdb.execute(sql`SELECT count(*) as count FROM lookups ${sessionFilter}`);
+    const lcResult = await rdb.execute(sql`SELECT count(*) as count FROM lc_checks ${lcSessionFilter}`);
+    const corridorResult = await rdb.execute(sql`
       SELECT origin_name || ' >> ' || destination_name as corridor, count(*) as count
       FROM lookups ${sessionFilter}
       GROUP BY origin_name || ' >> ' || destination_name
@@ -568,7 +598,7 @@ export class DatabaseStorage implements IStorage {
     `);
     let totalTradeValue = 0;
     try {
-      const tradeValueResult = await db.execute(sql`
+      const tradeValueResult = await rdb.execute(sql`
         SELECT COALESCE(SUM(CAST(trade_value AS NUMERIC)), 0) as total
         FROM lookups ${sessionFilter}
       `);
@@ -694,38 +724,44 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createTemplate(data: InsertTemplate): Promise<Template> {
-    const [result] = await db.insert(templates).values(data).returning();
+    const rdb = this.regionalDb(data.sessionId);
+    const [result] = await rdb.insert(templates).values(data).returning();
     return result;
   }
 
   async getTemplatesBySession(sessionId: string): Promise<Template[]> {
-    return db.select().from(templates)
+    const rdb = this.regionalDb(sessionId);
+    return rdb.select().from(templates)
       .where(eq(templates.sessionId, sessionId))
       .orderBy(desc(templates.createdAt));
   }
 
-  async getTemplateById(id: string): Promise<Template | undefined> {
-    const [result] = await db.select().from(templates).where(eq(templates.id, id));
+  async getTemplateById(id: string, sessionId?: string): Promise<Template | undefined> {
+    const rdb = this.regionalDb(sessionId);
+    const [result] = await rdb.select().from(templates).where(eq(templates.id, id));
     return result;
   }
 
   async deleteTemplate(id: string, sessionId: string): Promise<boolean> {
-    const result = await db.delete(templates)
+    const rdb = this.regionalDb(sessionId);
+    const result = await rdb.delete(templates)
       .where(sql`${templates.id} = ${id} AND ${templates.sessionId} = ${sessionId}`)
       .returning();
     return result.length > 0;
   }
 
-  async updateTemplateSnapshot(id: string, snapshotJson: unknown, regVersionHash: string): Promise<Template | undefined> {
-    const [result] = await db.update(templates)
+  async updateTemplateSnapshot(id: string, snapshotJson: unknown, regVersionHash: string, sessionId?: string): Promise<Template | undefined> {
+    const rdb = this.regionalDb(sessionId);
+    const [result] = await rdb.update(templates)
       .set({ snapshotJson, regVersionHash, lastUsedAt: new Date() })
       .where(eq(templates.id, id))
       .returning();
     return result;
   }
 
-  async incrementTemplateUsage(id: string): Promise<void> {
-    await db.update(templates)
+  async incrementTemplateUsage(id: string, sessionId?: string): Promise<void> {
+    const rdb = this.regionalDb(sessionId);
+    await rdb.update(templates)
       .set({
         timesUsed: sql`${templates.timesUsed} + 1`,
         lastUsedAt: new Date(),
@@ -734,41 +770,46 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTemplateCountBySession(sessionId: string): Promise<number> {
-    const [result] = await db.select({ count: sql<number>`count(*)` })
+    const rdb = this.regionalDb(sessionId);
+    const [result] = await rdb.select({ count: sql<number>`count(*)` })
       .from(templates)
       .where(eq(templates.sessionId, sessionId));
     return Number(result.count);
   }
 
   async getTemplateByCorridorAndSession(sessionId: string, commodityId: string, originIso2: string, destIso2: string): Promise<Template | undefined> {
-    const [result] = await db.select().from(templates)
+    const rdb = this.regionalDb(sessionId);
+    const [result] = await rdb.select().from(templates)
       .where(sql`${templates.sessionId} = ${sessionId} AND ${templates.commodityId} = ${commodityId} AND ${templates.originIso2} = ${originIso2} AND ${templates.destIso2} = ${destIso2}`);
     return result;
   }
 
   async getCompanyProfile(sessionId: string): Promise<CompanyProfile | undefined> {
-    const [result] = await db.select().from(companyProfiles).where(eq(companyProfiles.sessionId, sessionId));
+    const rdb = this.regionalDb(sessionId);
+    const [result] = await rdb.select().from(companyProfiles).where(eq(companyProfiles.sessionId, sessionId));
     return result;
   }
 
   async upsertCompanyProfile(data: InsertCompanyProfile): Promise<CompanyProfile> {
+    const rdb = this.regionalDb(data.sessionId);
     const profileComplete = !!(data.companyName && data.registeredAddress && data.countryIso2);
     const existing = await this.getCompanyProfile(data.sessionId);
     if (existing) {
-      const [result] = await db.update(companyProfiles)
+      const [result] = await rdb.update(companyProfiles)
         .set({ ...data, profileComplete, updatedAt: new Date() })
         .where(eq(companyProfiles.sessionId, data.sessionId))
         .returning();
       return result;
     }
-    const [result] = await db.insert(companyProfiles)
+    const [result] = await rdb.insert(companyProfiles)
       .values({ ...data, profileComplete })
       .returning();
     return result;
   }
 
   async createTwinlogDownload(data: { lookupId?: string; sessionId: string; companyName: string; eoriNumber?: string; documentStatuses: unknown; pdfHash: string }): Promise<TwinlogDownload> {
-    const [result] = await db.insert(twinlogDownloads)
+    const rdb = this.regionalDb(data.sessionId);
+    const [result] = await rdb.insert(twinlogDownloads)
       .values({
         lookupId: data.lookupId || null,
         sessionId: data.sessionId,
@@ -798,13 +839,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTradesSummary(sessionId?: string): Promise<{ total: number; needAttention: number; lcPending: number; archiveReady: number }> {
+    const rdb = this.regionalDb(sessionId);
     const sessionFilter = sessionId ? sql` AND l.session_id = ${sessionId}` : sql``;
     const lcSessionFilter = sessionId ? sql` AND lc.session_id = ${sessionId}` : sql``;
 
-    const totalRows = await db.execute(sql`SELECT count(*) as count FROM lookups l WHERE 1=1 ${sessionFilter}`);
-    const attentionRows = await db.execute(sql`SELECT count(*) as count FROM lookups l WHERE readiness_verdict IN ('RED','AMBER') ${sessionFilter}`);
-    const lcPendingRows = await db.execute(sql`SELECT count(*) as count FROM lc_checks lc WHERE verdict = 'DISCREPANCIES_FOUND' ${lcSessionFilter}`);
-    const archiveRows = await db.execute(sql`SELECT count(*) as count FROM lookups l WHERE (trade_status = 'archived' OR (trade_status IS NULL AND created_at < NOW() - INTERVAL '30 days')) ${sessionFilter}`);
+    const totalRows = await rdb.execute(sql`SELECT count(*) as count FROM lookups l WHERE 1=1 ${sessionFilter}`);
+    const attentionRows = await rdb.execute(sql`SELECT count(*) as count FROM lookups l WHERE readiness_verdict IN ('RED','AMBER') ${sessionFilter}`);
+    const lcPendingRows = await rdb.execute(sql`SELECT count(*) as count FROM lc_checks lc WHERE verdict = 'DISCREPANCIES_FOUND' ${lcSessionFilter}`);
+    const archiveRows = await rdb.execute(sql`SELECT count(*) as count FROM lookups l WHERE (trade_status = 'archived' OR (trade_status IS NULL AND created_at < NOW() - INTERVAL '30 days')) ${sessionFilter}`);
     return {
       total: Number((totalRows.rows as any[])[0]?.count ?? 0),
       needAttention: Number((attentionRows.rows as any[])[0]?.count ?? 0),
@@ -814,8 +856,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getEnrichedTrades(sessionId?: string): Promise<EnrichedTrade[]> {
+    const rdb = this.regionalDb(sessionId);
     const sessionFilter = sessionId ? sql`AND l.session_id = ${sessionId}` : sql``;
-    const rows = await db.execute(sql`
+    const rows = await rdb.execute(sql`
       SELECT DISTINCT ON (l.id)
         l.id,
         l.commodity_name AS "commodityName",
@@ -866,7 +909,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getMyTradesStats(sessionId: string): Promise<MyTradesStats> {
-    const rows = await db.execute(sql`
+    const rdb = this.regionalDb(sessionId);
+    const rows = await rdb.execute(sql`
       SELECT
         COUNT(*)::int AS "activeShipments",
         COALESCE(SUM(CASE WHEN l.trade_value IS NOT NULL THEN l.trade_value::numeric ELSE 0 END), 0)::float AS "activeShipmentValue",
@@ -889,7 +933,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTradeCorridors(sessionId: string): Promise<TradeCorridor[]> {
-    const rows = await db.execute(sql`
+    const rdb = this.regionalDb(sessionId);
+    const rows = await rdb.execute(sql`
       SELECT
         o.iso2 AS "originIso2",
         o.country_name AS "originName",
@@ -910,7 +955,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSupplierRequestsBySession(sessionId: string): Promise<EnrichedSupplierRequest[]> {
-    const rows = await db.execute(sql`
+    const rdb = this.regionalDb(sessionId);
+    const rows = await rdb.execute(sql`
       SELECT sr.*,
         c.name as commodity_name,
         o.iso2 as origin_iso2,
@@ -931,13 +977,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSupplierInboxSummary(sessionId: string): Promise<{ awaiting: number; blocking: number; completeThisWeek: number }> {
-    const [awaitingRow] = await db.select({ count: sql<number>`count(*)` })
+    const rdb = this.regionalDb(sessionId);
+    const [awaitingRow] = await rdb.select({ count: sql<number>`count(*)` })
       .from(supplierRequests)
       .where(sql`user_session_id = ${sessionId} AND status IN ('waiting','partial')`);
-    const [blockingRow] = await db.select({ count: sql<number>`count(*)` })
+    const [blockingRow] = await rdb.select({ count: sql<number>`count(*)` })
       .from(supplierRequests)
       .where(sql`user_session_id = ${sessionId} AND status = 'blocking'`);
-    const [completeRow] = await db.select({ count: sql<number>`count(*)` })
+    const [completeRow] = await rdb.select({ count: sql<number>`count(*)` })
       .from(supplierRequests)
       .where(sql`user_session_id = ${sessionId} AND status = 'complete' AND updated_at > NOW() - INTERVAL '7 days'`);
     return {
@@ -948,24 +995,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSupplierInboxBadgeCount(sessionId: string): Promise<number> {
-    const [row] = await db.select({ count: sql<number>`count(*)` })
+    const rdb = this.regionalDb(sessionId);
+    const [row] = await rdb.select({ count: sql<number>`count(*)` })
       .from(supplierRequests)
       .where(sql`user_session_id = ${sessionId} AND status IN ('waiting','blocking','partial')`);
     return Number(row.count);
   }
 
-  async getSupplierRequestByLookupId(lookupId: string): Promise<SupplierRequest | undefined> {
-    const [row] = await db.select().from(supplierRequests).where(eq(supplierRequests.lookupId, lookupId)).limit(1);
+  async getSupplierRequestByLookupId(lookupId: string, sessionId?: string): Promise<SupplierRequest | undefined> {
+    const rdb = this.regionalDb(sessionId);
+    const [row] = await rdb.select().from(supplierRequests).where(eq(supplierRequests.lookupId, lookupId)).limit(1);
     return row;
   }
 
   async createSupplierRequest(data: InsertSupplierRequest): Promise<SupplierRequest> {
-    const [row] = await db.insert(supplierRequests).values(data).returning();
+    const rdb = this.regionalDb(data.userSessionId);
+    const [row] = await rdb.insert(supplierRequests).values(data).returning();
     return row;
   }
 
-  async logSupplierSend(requestId: string, channel: string): Promise<void> {
-    await db.execute(sql`
+  async logSupplierSend(requestId: string, channel: string, sessionId?: string): Promise<void> {
+    const rdb = this.regionalDb(sessionId);
+    await rdb.execute(sql`
       UPDATE supplier_requests
       SET sent_via = array_append(sent_via, ${channel}),
           last_sent_at = NOW(),
@@ -1223,22 +1274,26 @@ export class DatabaseStorage implements IStorage {
   // ── LC Cases ──
 
   async createLcCase(data: InsertLcCase): Promise<LcCase> {
-    const [row] = await db.insert(lcCases).values(data).returning();
+    const rdb = this.regionalDb(data.sessionId);
+    const [row] = await rdb.insert(lcCases).values(data).returning();
     return row;
   }
 
-  async getLcCaseById(id: string): Promise<LcCase | undefined> {
-    const [row] = await db.select().from(lcCases).where(eq(lcCases.id, id));
+  async getLcCaseById(id: string, sessionId?: string): Promise<LcCase | undefined> {
+    const rdb = this.regionalDb(sessionId);
+    const [row] = await rdb.select().from(lcCases).where(eq(lcCases.id, id));
     return row;
   }
 
-  async getLcCaseByLookupId(lookupId: string): Promise<LcCase | undefined> {
-    const [row] = await db.select().from(lcCases).where(eq(lcCases.sourceLookupId, lookupId)).limit(1);
+  async getLcCaseByLookupId(lookupId: string, sessionId?: string): Promise<LcCase | undefined> {
+    const rdb = this.regionalDb(sessionId);
+    const [row] = await rdb.select().from(lcCases).where(eq(lcCases.sourceLookupId, lookupId)).limit(1);
     return row;
   }
 
   async getLcCasesBySession(sessionId: string): Promise<LcCase[]> {
-    return db.select().from(lcCases)
+    const rdb = this.regionalDb(sessionId);
+    return rdb.select().from(lcCases)
       .where(eq(lcCases.sessionId, sessionId))
       .orderBy(desc(lcCases.updatedAt));
   }
@@ -1517,11 +1572,12 @@ export class DatabaseStorage implements IStorage {
   // ── Trade Lifecycle ──
 
   async updateTradeStatus(lookupId: string, status: TradeStatus, sessionId: string): Promise<Lookup | undefined> {
+    const rdb = this.regionalDb(sessionId);
     const extra: Record<string, unknown> = { tradeStatus: status };
     if (status === "closed") extra.closedAt = new Date();
     if (status === "archived") extra.archivedAt = new Date();
 
-    const [row] = await db.update(lookups)
+    const [row] = await rdb.update(lookups)
       .set(extra as any)
       .where(and(eq(lookups.id, lookupId), eq(lookups.sessionId, sessionId)))
       .returning();
@@ -1529,7 +1585,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async archiveTrade(lookupId: string, sessionId: string): Promise<Lookup | undefined> {
-    const [row] = await db.update(lookups)
+    const rdb = this.regionalDb(sessionId);
+    const [row] = await rdb.update(lookups)
       .set({ tradeStatus: "archived" as any, archivedAt: new Date() })
       .where(and(eq(lookups.id, lookupId), eq(lookups.sessionId, sessionId)))
       .returning();
@@ -1537,6 +1594,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateTradeFields(lookupId: string, fields: { notes?: string; estimatedArrival?: string; actualArrival?: string; tradeValue?: string; tradeValueCurrency?: string; nickname?: string; demurragePort?: string; demurrageContainerType?: string; demurrageDailyRate?: string; demurrageFreeDays?: number; demurrageDaysHeld?: number; demurrageTotal?: string }, sessionId: string): Promise<Lookup | undefined> {
+    const rdb = this.regionalDb(sessionId);
     const updates: Record<string, unknown> = {};
     if (fields.nickname !== undefined) updates.nickname = fields.nickname;
     if (fields.notes !== undefined) updates.notes = fields.notes;
@@ -1553,7 +1611,7 @@ export class DatabaseStorage implements IStorage {
 
     if (Object.keys(updates).length === 0) return undefined;
 
-    const [row] = await db.update(lookups)
+    const [row] = await rdb.update(lookups)
       .set(updates as any)
       .where(and(eq(lookups.id, lookupId), eq(lookups.sessionId, sessionId)))
       .returning();
@@ -1561,46 +1619,47 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTradeDetail(lookupId: string, sessionId: string): Promise<TradeDetail | null> {
+    const rdb = this.regionalDb(sessionId);
     // 1. Get the lookup and verify ownership
-    const [lookup] = await db.select().from(lookups)
+    const [lookup] = await rdb.select().from(lookups)
       .where(and(eq(lookups.id, lookupId), eq(lookups.sessionId, sessionId)));
     if (!lookup) return null;
 
     // 2. Get LC case for this lookup
-    const [lcCase] = await db.select().from(lcCases)
+    const [lcCase] = await rdb.select().from(lcCases)
       .where(eq(lcCases.sourceLookupId, lookupId)).limit(1);
 
     // 3. Get latest LC check
     let latestLcCheck: LcCheck | null = null;
     if (lcCase?.latestCheckId) {
-      const [check] = await db.select().from(lcChecks)
+      const [check] = await rdb.select().from(lcChecks)
         .where(eq(lcChecks.id, lcCase.latestCheckId));
       latestLcCheck = check ?? null;
     }
 
     // 4. Get supplier request and uploads
-    const [supplierRequest] = await db.select().from(supplierRequests)
+    const [supplierRequest] = await rdb.select().from(supplierRequests)
       .where(eq(supplierRequests.lookupId, lookupId)).limit(1);
     let supplierUploadsList: SupplierUpload[] = [];
     if (supplierRequest) {
-      supplierUploadsList = await db.select().from(supplierUploads)
+      supplierUploadsList = await rdb.select().from(supplierUploads)
         .where(eq(supplierUploads.requestId, supplierRequest.id));
     }
 
     // 5. Get EUDR record + assessment
-    const [eudrRecord] = await db.select().from(eudrRecords)
+    const [eudrRecord] = await rdb.select().from(eudrRecords)
       .where(eq(eudrRecords.lookupId, lookupId));
-    const [eudrAssessment] = await db.select().from(eudrAssessments)
+    const [eudrAssessment] = await rdb.select().from(eudrAssessments)
       .where(eq(eudrAssessments.lookupId, lookupId));
 
     // 5b. Get CBAM record + assessment
-    const [cbamRecord] = await db.select().from(cbamRecords)
+    const [cbamRecord] = await rdb.select().from(cbamRecords)
       .where(eq(cbamRecords.lookupId, lookupId));
-    const [cbamAssessment] = await db.select().from(cbamAssessments)
+    const [cbamAssessment] = await rdb.select().from(cbamAssessments)
       .where(eq(cbamAssessments.lookupId, lookupId));
 
     // 6. Get audit trail from trade_events
-    const auditTrail = await db.select().from(tradeEvents)
+    const auditTrail = await rdb.select().from(tradeEvents)
       .where(eq(tradeEvents.lookupId, lookupId))
       .orderBy(tradeEvents.createdAt);
 

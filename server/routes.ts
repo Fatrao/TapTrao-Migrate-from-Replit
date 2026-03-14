@@ -96,6 +96,8 @@ function getSessionId(req: Request, res: Response): string {
         maxAge: 365 * 24 * 60 * 60 * 1000,
       });
     }
+    // Set the user's data region for regional DB routing
+    storage.setSessionRegion(userSessionId, req.user.dataRegion || "EU");
     return userSessionId;
   }
 
@@ -110,6 +112,8 @@ function getSessionId(req: Request, res: Response): string {
       maxAge: 365 * 24 * 60 * 60 * 1000,
     });
   }
+  // Anonymous users default to EU region
+  storage.setSessionRegion(sessionId, "EU");
   return sessionId;
 }
 
@@ -174,6 +178,9 @@ export async function registerRoutes(
       }
 
       const { email, password, displayName } = parsed.data;
+      // Accept dataRegion from request body (user selects at signup)
+      const requestedRegion = req.body.dataRegion;
+      const dataRegion = (requestedRegion === "US" || requestedRegion === "EU") ? requestedRegion : (process.env.DATA_REGION || "EU");
 
       // Check if email already exists
       const existing = await storage.getUserByEmail(email);
@@ -193,8 +200,9 @@ export async function registerRoutes(
       }
 
       const passwordHash = await hashPassword(password);
-      const dataRegion = process.env.DATA_REGION || "EU";
       const user = await storage.createUser({ email, passwordHash, sessionId, displayName, dataRegion });
+      // Set region in cache for immediate use after registration
+      storage.setSessionRegion(sessionId, dataRegion);
 
       // Auto-login after registration
       if (!req.session) {
@@ -295,8 +303,13 @@ export async function registerRoutes(
   });
 
   // ── Data Region Info ──
-  app.get("/api/region", (_req, res) => {
-    res.json({ region: process.env.DATA_REGION || "EU" });
+  app.get("/api/region", (req, res) => {
+    // Return the authenticated user's actual data region, or default
+    if (req.isAuthenticated?.() && req.user?.dataRegion) {
+      res.json({ region: req.user.dataRegion });
+    } else {
+      res.json({ region: process.env.DATA_REGION || "EU" });
+    }
   });
 
   // ── Password Reset ──

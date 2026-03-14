@@ -7,10 +7,43 @@ import { join } from "path";
 let db: any;
 let pool: any = null;
 
+// Regional database pools (EU = primary, US = secondary)
+let poolUS: Pool | null = null;
+let dbUS: any = null;
+
 if (process.env.DATABASE_URL) {
   // Production: synchronous initialization with static imports
+  // DATABASE_URL is the primary (EU) database
   pool = new Pool({ connectionString: process.env.DATABASE_URL });
   db = drizzle(pool, { schema });
+}
+
+// US regional database (optional — if not set, all data stays in primary)
+if (process.env.DATABASE_URL_US) {
+  poolUS = new Pool({ connectionString: process.env.DATABASE_URL_US });
+  dbUS = drizzle(poolUS, { schema });
+  console.log("🌎 US regional database connected");
+}
+
+/**
+ * Get the correct Drizzle instance for a user's data region.
+ * - "EU" → primary database (DATABASE_URL)
+ * - "US" → US database (DATABASE_URL_US), falls back to primary if not configured
+ *
+ * Reference data (destinations, commodities, compliance rules) should ALWAYS
+ * use the primary `db` export directly — only user-generated PII data is regional.
+ */
+export function getRegionalDb(region?: string): typeof db {
+  if (region === "US" && dbUS) return dbUS;
+  return db;
+}
+
+/**
+ * Get the regional pool for raw SQL queries (e.g., connect-pg-simple).
+ */
+export function getRegionalPool(region?: string): Pool | null {
+  if (region === "US" && poolUS) return poolUS;
+  return pool;
 }
 
 /**
@@ -55,6 +88,11 @@ export async function initLocalDb(): Promise<void> {
   if (db && pool) {
     // Production: run incremental migrations on the real database
     await runIncrementalMigrations((sql) => pool.query(sql));
+    // Also run migrations on US database if configured
+    if (poolUS) {
+      console.log("🌎 Running migrations on US regional database...");
+      await runIncrementalMigrations((sql) => poolUS!.query(sql));
+    }
     return;
   }
   if (db) return; // Already initialized by a previous call
@@ -102,4 +140,4 @@ export async function initLocalDb(): Promise<void> {
   await runIncrementalMigrations((sql) => client.query(sql));
 }
 
-export { db, pool };
+export { db, pool, dbUS, poolUS };

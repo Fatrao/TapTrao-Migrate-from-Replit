@@ -1,42 +1,21 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { AppShell } from "@/components/AppShell";
 import PromoCodeRedeem from "@/components/promo-code-redeem";
 
-function DataRegionBanner() {
-  const { t } = useTranslation("auth");
-  const { data } = useQuery<{ region: string }>({
-    queryKey: ["/api/region"],
-    queryFn: async () => {
-      const res = await fetch("/api/region");
-      return res.json();
-    },
-    staleTime: Infinity,
-  });
-  const region = data?.region || "EU";
-  const flag = region === "US" ? "\u{1F1FA}\u{1F1F8}" : "\u{1F1EA}\u{1F1FA}";
-  const location = region === "US" ? "US (Virginia)" : "EU (Amsterdam)";
-  return (
-    <div style={{
-      display: "flex", alignItems: "center", gap: 8,
-      padding: "10px 14px", marginBottom: 16, borderRadius: 8,
-      background: "rgba(74, 124, 89, 0.08)", border: "1px solid rgba(74, 124, 89, 0.15)",
-      fontSize: 13, color: "#555",
-    }}>
-      <span style={{ fontSize: 18 }}>{flag}</span>
-      <span>{t("register.dataRegionInfo", { region: location })}</span>
-    </div>
-  );
-}
+const REGIONS = [
+  { value: "EU", label: "EU (Amsterdam)", flag: "\u{1F1EA}\u{1F1FA}", description: "GDPR-compliant EU data residency" },
+  { value: "US", label: "US (Virginia)", flag: "\u{1F1FA}\u{1F1F8}", description: "US data residency" },
+] as const;
 
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [dataRegion, setDataRegion] = useState<"EU" | "US">("EU");
   const [error, setError] = useState("");
   const [, navigate] = useLocation();
   const { register, registerPending, isAuthenticated } = useAuth();
@@ -57,7 +36,7 @@ export default function Register() {
     e.preventDefault();
     setError("");
     try {
-      const result = await register({ email, password, displayName: displayName || undefined });
+      const result = await register({ email, password, displayName: displayName || undefined, dataRegion });
       if (result?.needsLogin) {
         // Account created but auto-login failed — redirect to login page with redirect preserved
         navigate(`/login?registered=1${redirectUrl !== "/dashboard" ? `&redirect=${encodeURIComponent(redirectUrl)}` : ""}`);
@@ -75,6 +54,8 @@ export default function Register() {
     }
   };
 
+  const selectedRegion = REGIONS.find(r => r.value === dataRegion)!;
+
   return (
     <AppShell contentClassName="content-area">
       <div className="green-hero-box" style={{ margin: "4px 24px 16px" }}>
@@ -87,7 +68,6 @@ export default function Register() {
       </div>
 
       <div className="form-card" style={{ margin: "0 24px 20px", maxWidth: 420 }}>
-        <DataRegionBanner />
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>{t("register.emailLabel")}</label>
@@ -126,6 +106,61 @@ export default function Register() {
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder={t("register.companyPlaceholder")}
             />
+          </div>
+
+          {/* Data Region Selector */}
+          <div className="form-group">
+            <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              {t("register.dataRegionLabel", "Data Region")}
+              <span style={{ fontSize: 11, color: "#999", fontWeight: 400 }}>
+                ({t("register.dataRegionPermanent", "cannot be changed later")})
+              </span>
+            </label>
+            <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+              {REGIONS.map((region) => (
+                <button
+                  key={region.value}
+                  type="button"
+                  onClick={() => setDataRegion(region.value as "EU" | "US")}
+                  style={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 4,
+                    padding: "12px 8px",
+                    borderRadius: 10,
+                    border: dataRegion === region.value
+                      ? "2px solid var(--sage)"
+                      : "2px solid #e0e0e0",
+                    background: dataRegion === region.value
+                      ? "rgba(74, 124, 89, 0.06)"
+                      : "#fff",
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  <span style={{ fontSize: 24 }}>{region.flag}</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: dataRegion === region.value ? "var(--sage)" : "#555" }}>
+                    {region.label}
+                  </span>
+                  <span style={{ fontSize: 11, color: "#888", textAlign: "center", lineHeight: 1.3 }}>
+                    {region.description}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Region confirmation banner */}
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8,
+            padding: "10px 14px", marginBottom: 16, borderRadius: 8,
+            background: "rgba(74, 124, 89, 0.08)", border: "1px solid rgba(74, 124, 89, 0.15)",
+            fontSize: 13, color: "#555",
+          }}>
+            <span style={{ fontSize: 16 }}>{selectedRegion.flag}</span>
+            <span>{t("register.dataRegionInfo", { region: selectedRegion.label })}</span>
           </div>
 
           {error && (
