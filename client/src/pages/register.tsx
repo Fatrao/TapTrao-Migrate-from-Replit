@@ -1,10 +1,37 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { AppShell } from "@/components/AppShell";
 import PromoCodeRedeem from "@/components/promo-code-redeem";
+
+function DataRegionBanner() {
+  const { t } = useTranslation("auth");
+  const { data } = useQuery<{ region: string }>({
+    queryKey: ["/api/region"],
+    queryFn: async () => {
+      const res = await fetch("/api/region");
+      return res.json();
+    },
+    staleTime: Infinity,
+  });
+  const region = data?.region || "EU";
+  const flag = region === "US" ? "\u{1F1FA}\u{1F1F8}" : "\u{1F1EA}\u{1F1FA}";
+  const location = region === "US" ? "US (Virginia)" : "EU (Amsterdam)";
+  return (
+    <div style={{
+      display: "flex", alignItems: "center", gap: 8,
+      padding: "10px 14px", marginBottom: 16, borderRadius: 8,
+      background: "rgba(74, 124, 89, 0.08)", border: "1px solid rgba(74, 124, 89, 0.15)",
+      fontSize: 13, color: "#555",
+    }}>
+      <span style={{ fontSize: 18 }}>{flag}</span>
+      <span>{t("register.dataRegionInfo", { region: location })}</span>
+    </div>
+  );
+}
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -60,6 +87,7 @@ export default function Register() {
       </div>
 
       <div className="form-card" style={{ margin: "0 24px 20px", maxWidth: 420 }}>
+        <DataRegionBanner />
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>{t("register.emailLabel")}</label>

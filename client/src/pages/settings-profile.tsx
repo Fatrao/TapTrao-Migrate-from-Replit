@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { AlertTriangle, CheckCircle2, Info, Save } from "lucide-react";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { useAuth } from "@/hooks/use-auth";
 import type { CompanyProfile } from "@shared/schema";
 import { useEffect, useMemo } from "react";
 
@@ -91,7 +92,7 @@ const COUNTRIES = [
 export default function SettingsProfile() {
   const { t } = useTranslation("settings");
   usePageTitle("Company Profile | TapTrao");
-
+  const { user } = useAuth();
   const { toast } = useToast();
 
   const profileQuery = useQuery<CompanyProfile | null>({
@@ -378,6 +379,22 @@ export default function SettingsProfile() {
                 </FormItem>
               )}
             />
+
+            {/* Data Region (read-only) */}
+            <div style={{
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "10px 14px", borderRadius: 8,
+              background: "rgba(74, 124, 89, 0.06)", border: "1px solid rgba(74, 124, 89, 0.12)",
+              fontSize: 13, color: "#666",
+            }}>
+              <span style={{ fontSize: 16 }}>{user?.dataRegion === "US" ? "\u{1F1FA}\u{1F1F8}" : "\u{1F1EA}\u{1F1FA}"}</span>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 13, color: "#333" }}>Data Region: {user?.dataRegion || "EU"}</div>
+                <div style={{ fontSize: 12, color: "#888" }}>
+                  {user?.dataRegion === "US" ? "Your data is stored in US (Virginia)" : "Your data is stored in EU (Amsterdam)"}
+                </div>
+              </div>
+            </div>
 
             <Button
               type="submit"

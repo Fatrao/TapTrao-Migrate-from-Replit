@@ -1037,6 +1037,7 @@ export const users = pgTable(
     displayName: text("display_name"),
     sessionId: text("session_id").notNull().unique(),
     emailVerified: boolean("email_verified").default(false).notNull(),
+    dataRegion: text("data_region").default("EU").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },

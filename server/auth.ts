@@ -41,6 +41,7 @@ declare global {
       displayName: string | null;
       sessionId: string;
       emailVerified: boolean;
+      dataRegion: string;
       createdAt: Date;
       updatedAt: Date;
     }

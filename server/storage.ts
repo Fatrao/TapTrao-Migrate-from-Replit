@@ -232,7 +232,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserById(id: string): Promise<User | undefined>;
   getUserBySessionId(sessionId: string): Promise<User | undefined>;
-  createUser(data: { email: string; passwordHash: string; sessionId: string; displayName?: string }): Promise<User>;
+  createUser(data: { email: string; passwordHash: string; sessionId: string; displayName?: string; dataRegion?: string }): Promise<User>;
   updateUserPassword(userId: string, passwordHash: string): Promise<void>;
   // Password reset
   createPasswordResetToken(userId: string, token: string, expiresAt: Date): Promise<PasswordResetToken>;
@@ -1467,12 +1467,13 @@ export class DatabaseStorage implements IStorage {
     return row;
   }
 
-  async createUser(data: { email: string; passwordHash: string; sessionId: string; displayName?: string }): Promise<User> {
+  async createUser(data: { email: string; passwordHash: string; sessionId: string; displayName?: string; dataRegion?: string }): Promise<User> {
     const [row] = await db.insert(users).values({
       email: data.email.toLowerCase(),
       passwordHash: data.passwordHash,
       sessionId: data.sessionId,
       displayName: data.displayName || null,
+      dataRegion: data.dataRegion || process.env.DATA_REGION || "EU",
     }).returning();
     return row;
   }

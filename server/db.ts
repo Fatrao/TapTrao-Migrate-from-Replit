@@ -32,6 +32,8 @@ async function runIncrementalMigrations(queryFn: (sql: string) => Promise<any>):
       "created_at" timestamp DEFAULT now() NOT NULL
     )`,
     `CREATE INDEX IF NOT EXISTS "feature_requests_session_idx" ON "feature_requests" ("session_id")`,
+    // Regional data separation
+    `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "data_region" text NOT NULL DEFAULT 'EU'`,
   ];
   for (const stmt of columnMigrations) {
     try {

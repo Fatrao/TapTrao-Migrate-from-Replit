@@ -6,6 +6,7 @@ type AuthUser = {
   email: string;
   displayName: string | null;
   emailVerified: boolean;
+  dataRegion: string;
 };
 
 export function useAuth() {

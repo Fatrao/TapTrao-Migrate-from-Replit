@@ -193,14 +193,15 @@ export async function registerRoutes(
       }
 
       const passwordHash = await hashPassword(password);
-      const user = await storage.createUser({ email, passwordHash, sessionId, displayName });
+      const dataRegion = process.env.DATA_REGION || "EU";
+      const user = await storage.createUser({ email, passwordHash, sessionId, displayName, dataRegion });
 
       // Auto-login after registration
       if (!req.session) {
         console.error("No session object on req — express-session middleware may have failed");
         // Still return success since the account was created
         res.json({
-          user: { id: user.id, email: user.email, displayName: user.displayName, emailVerified: user.emailVerified },
+          user: { id: user.id, email: user.email, displayName: user.displayName, emailVerified: user.emailVerified, dataRegion: user.dataRegion },
           needsLogin: true,
         });
         return;
@@ -211,7 +212,7 @@ export async function registerRoutes(
           console.error("Auto-login failed after registration:", err);
           // Still return success since the account was created — client will redirect to login
           res.json({
-            user: { id: user.id, email: user.email, displayName: user.displayName, emailVerified: user.emailVerified },
+            user: { id: user.id, email: user.email, displayName: user.displayName, emailVerified: user.emailVerified, dataRegion: user.dataRegion },
             needsLogin: true,
           });
           return;
@@ -226,7 +227,7 @@ export async function registerRoutes(
         });
 
         res.json({
-          user: { id: user.id, email: user.email, displayName: user.displayName, emailVerified: user.emailVerified },
+          user: { id: user.id, email: user.email, displayName: user.displayName, emailVerified: user.emailVerified, dataRegion: user.dataRegion },
         });
       });
     } catch (error: any) {
@@ -286,11 +287,16 @@ export async function registerRoutes(
   app.get("/api/auth/me", (req, res) => {
     if (req.isAuthenticated?.() && req.user) {
       res.json({
-        user: { id: req.user.id, email: req.user.email, displayName: req.user.displayName, emailVerified: req.user.emailVerified },
+        user: { id: req.user.id, email: req.user.email, displayName: req.user.displayName, emailVerified: req.user.emailVerified, dataRegion: req.user.dataRegion },
       });
     } else {
       res.json({ user: null });
     }
+  });
+
+  // ── Data Region Info ──
+  app.get("/api/region", (_req, res) => {
+    res.json({ region: process.env.DATA_REGION || "EU" });
   });
 
   // ── Password Reset ──

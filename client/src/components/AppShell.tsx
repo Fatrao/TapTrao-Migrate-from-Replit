@@ -462,6 +462,9 @@ export function AppShell({ children, contentClassName }: AppShellProps) {
             }}>{userInitial}</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 15, fontWeight: 600, color: "#fff" }}>{user?.displayName || user?.email}</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>
+                {user?.dataRegion === "US" ? "🇺🇸" : "🇪🇺"} {user?.dataRegion || "EU"} Region
+              </div>
             </div>
             <button onClick={handleLogout} style={{
               background: "none", border: "none", color: "rgba(255,255,255,0.4)",
