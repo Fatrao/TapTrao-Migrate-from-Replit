@@ -74,7 +74,7 @@
   "detail.lcDocCheck": "Vérification de documents LC",
   "detail.viewRecheck": "Voir / Revérifier",
   "detail.runLcCheck": "Lancer la vérification LC",
-  "detail.supplierDocs": "Documents fournisseur",
+  "detail.supplierDocs": "Documents",
   "detail.docProgress": "{{received}}/{{total}} documents reçus",
   "detail.sendBrief": "Envoyer le dossier",
   "detail.viewUploads": "Voir les imports",

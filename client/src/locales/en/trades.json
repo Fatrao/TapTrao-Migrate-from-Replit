@@ -88,7 +88,7 @@
   "detail.viewRecheck": "View / Re-check",
   "detail.runLcCheck": "Run LC Check",
 
-  "detail.supplierDocs": "Supplier Documents",
+  "detail.supplierDocs": "Documents",
   "detail.docProgress": "{{received}}/{{total}} documents received",
   "detail.sendBrief": "Send Brief",
   "detail.viewUploads": "View Uploads",
