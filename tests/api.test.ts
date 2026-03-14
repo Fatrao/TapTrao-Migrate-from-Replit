@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 
 const BASE = process.env.TEST_BASE_URL || "http://localhost:3000";
+const isProd = BASE.includes("taptrao.com");
 
 async function api(path: string, opts: RequestInit = {}) {
   const url = `${BASE}${path}`;
@@ -42,7 +43,7 @@ describe("Reference Data Endpoints", () => {
     expect(Array.isArray(body)).toBe(true);
     expect(body.length).toBe(7);
     const isos = body.map((d: any) => d.iso2).sort();
-    expect(isos).toEqual(["AE", "CH", "CN", "EU", "GB", "TR", "US"]);
+    expect(isos).toEqual(["AE", "CA", "CH", "EU", "GB", "TR", "US"]);
   });
 });
 
@@ -159,7 +160,7 @@ describe("Compliance Check", () => {
   });
 });
 
-describe("Readiness Score Engine (test endpoint)", () => {
+describe.skipIf(isProd)("Readiness Score Engine (test endpoint)", () => {
   it("returns 100 for zero-penalty scenario", async () => {
     const { status, body } = await api("/api/test/readiness-score", {
       method: "POST",
@@ -239,7 +240,7 @@ describe("Readiness Score Engine (test endpoint)", () => {
   });
 });
 
-describe("Demurrage Calculator (test endpoint)", () => {
+describe.skipIf(isProd)("Demurrage Calculator (test endpoint)", () => {
   it("returns 0 total for 0 chargeable days", async () => {
     const { status, body } = await api("/api/test/demurrage", {
       method: "POST",

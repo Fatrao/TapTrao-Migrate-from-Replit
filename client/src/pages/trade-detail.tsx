@@ -88,6 +88,7 @@ type TradeDetail = {
   tradeStatus: string;
   auditTrail: AuditEvent[];
   chainValid: boolean;
+  documentValidations?: any[];
 };
 
 type AuditEvent = {
@@ -823,6 +824,9 @@ export default function TradeDetail() {
   const [scanningId, setScanningId] = useState<string | null>(null);
   const [scanResult, setScanResult] = useState<{ uploadId: string; details: string; confidence: string } | null>(null);
 
+  // Tab state: workspace vs validation
+  const [activeTab, setActiveTab] = useState<"workspace" | "validation">("workspace");
+
   // TwinLog PDF download state
   const [pdfLoading, setPdfLoading] = useState(false);
 
@@ -1055,7 +1059,8 @@ export default function TradeDetail() {
                 <Link href={`/trades/${tradeId}/report`}>
                   <button className="stp-btn-outline-light">{t("report.tabReport")}</button>
                 </Link>
-                <button className="stp-btn-light-fill">{t("report.tabWorkspace")}</button>
+                <button className={activeTab === "workspace" ? "stp-btn-light-fill" : "stp-btn-outline-light"} onClick={() => setActiveTab("workspace")}>{t("report.tabWorkspace")}</button>
+                <button className={activeTab === "validation" ? "stp-btn-light-fill" : "stp-btn-outline-light"} onClick={() => setActiveTab("validation")}>{t("report.tabValidation")}</button>
               </div>
             </div>
 
@@ -1183,8 +1188,17 @@ export default function TradeDetail() {
             onStatusAdvanced={() => queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] })}
           />
 
+          {/* ── VALIDATION TAB ── */}
+          {activeTab === "validation" && (
+            <div className="stp-content">
+              <div className="stp-left" style={{ gridColumn: "1 / -1" }}>
+                <ValidationView validations={data.documentValidations || []} t={t} />
+              </div>
+            </div>
+          )}
+
           {/* ── CONTENT GRID ── */}
-          <div className="stp-content">
+          {activeTab === "workspace" && <div className="stp-content">
 
             {/* ── LEFT COLUMN ── */}
             <div className="stp-left">
@@ -1536,9 +1550,161 @@ export default function TradeDetail() {
               </div>
 
             </div>
-          </div>
+          </div>}
         </>
       )}
     </AppShell>
+  );
+}
+
+/* ── Validation Tab View ── */
+function ValidationView({ validations, t }: { validations: any[]; t: (key: string) => string }) {
+  if (!validations || validations.length === 0) {
+    return (
+      <div className="stp-card" style={{ textAlign: "center", padding: "48px 24px" }}>
+        <div style={{ fontSize: 40, marginBottom: 12 }}>📋</div>
+        <div className="stp-card-title" style={{ marginBottom: 8 }}>{t("validation.emptyTitle")}</div>
+        <div style={{ color: "var(--stp-t2, #5a6b5e)", fontSize: 14 }}>{t("validation.emptyDesc")}</div>
+      </div>
+    );
+  }
+
+  const passCount = validations.filter(v => v.verdict === "pass").length;
+  const failCount = validations.filter(v => v.verdict === "fail").length;
+  const unclearCount = validations.filter(v => v.verdict === "unclear").length;
+  const pendingCount = validations.filter(v => !v.verdict).length;
+
+  return (
+    <>
+      {/* Summary header */}
+      <div className="stp-card">
+        <div className="stp-card-hdr">
+          <span className="stp-card-title">{t("validation.summaryTitle")}</span>
+        </div>
+        <div style={{ display: "flex", gap: 24, marginTop: 12, flexWrap: "wrap" }}>
+          <div className="val-stat">
+            <span className="val-stat-num">{validations.length}</span>
+            <span className="val-stat-label">{t("validation.total")}</span>
+          </div>
+          <div className="val-stat">
+            <span className="val-stat-num" style={{ color: "#2e7d32" }}>{passCount}</span>
+            <span className="val-stat-label">{t("validation.passed")}</span>
+          </div>
+          <div className="val-stat">
+            <span className="val-stat-num" style={{ color: "#c44e3a" }}>{failCount}</span>
+            <span className="val-stat-label">{t("validation.failed")}</span>
+          </div>
+          {unclearCount > 0 && (
+            <div className="val-stat">
+              <span className="val-stat-num" style={{ color: "#c4882a" }}>{unclearCount}</span>
+              <span className="val-stat-label">{t("validation.unclear")}</span>
+            </div>
+          )}
+          {pendingCount > 0 && (
+            <div className="val-stat">
+              <span className="val-stat-num" style={{ color: "#888" }}>{pendingCount}</span>
+              <span className="val-stat-label">{t("validation.pending")}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Per-document validation cards */}
+      {validations.map((v) => (
+        <div className="stp-card" key={v.id} style={{ marginTop: 12 }}>
+          <div className="stp-card-hdr">
+            <div>
+              <span className="stp-card-title">{v.requirementTitle || v.originalFilename || "Document"}</span>
+              {v.originalFilename && v.requirementTitle && (
+                <div style={{ fontSize: 12, color: "var(--stp-t2, #5a6b5e)", marginTop: 2 }}>{v.originalFilename}</div>
+              )}
+            </div>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              {v.verdict && (
+                <span className={`val-verdict val-verdict-${v.verdict}`}>
+                  {v.verdict === "pass" ? "✅" : v.verdict === "fail" ? "❌" : "⚠️"} {v.verdict.toUpperCase()}
+                </span>
+              )}
+              {v.confidence && (
+                <span className="val-confidence">{v.confidence}</span>
+              )}
+              {!v.verdict && v.processingStatus && (
+                <span className="stp-status-badge stp-status-pending">{v.processingStatus}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Field status */}
+          {v.fieldStatus && typeof v.fieldStatus === "object" && Object.keys(v.fieldStatus).length > 0 && (
+            <div className="val-section">
+              <div className="val-section-title">{t("validation.fieldCheck")}</div>
+              {Object.entries(v.fieldStatus).map(([field, status]: [string, any]) => (
+                <div className="val-field-row" key={field}>
+                  <span className="val-field-icon">
+                    {status === "found" || status === "pass" || status === true ? "✅" : status === "not_found" || status === "missing" ? "⚠️" : "❌"}
+                  </span>
+                  <span className="val-field-name">{field.replace(/_/g, " ")}</span>
+                  {typeof status === "string" && <span className="val-field-value">{status}</span>}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Deterministic checks */}
+          {v.deterministicChecks && Array.isArray(v.deterministicChecks) && v.deterministicChecks.length > 0 && (
+            <div className="val-section">
+              <div className="val-section-title">{t("validation.consistencyChecks")}</div>
+              {v.deterministicChecks.map((check: any, i: number) => (
+                <div className="val-field-row" key={i}>
+                  <span className="val-field-icon">{check.passed ? "✅" : "❌"}</span>
+                  <span className="val-field-name">{check.label || check.check || `Check ${i + 1}`}</span>
+                  {check.detail && <span className="val-field-value">{check.detail}</span>}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Validation issues */}
+          {v.validationIssues && Array.isArray(v.validationIssues) && v.validationIssues.length > 0 && (
+            <div className="val-section">
+              <div className="val-section-title" style={{ color: "#c44e3a" }}>{t("validation.issues")}</div>
+              {v.validationIssues.map((issue: any, i: number) => (
+                <div className="val-issue" key={i}>
+                  <span>⚠️</span>
+                  <span>{typeof issue === "string" ? issue : issue.message || issue.finding || JSON.stringify(issue)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Evidence */}
+          {v.evidence && Array.isArray(v.evidence) && v.evidence.length > 0 && (
+            <div className="val-section">
+              <div className="val-section-title">{t("validation.evidence")}</div>
+              {v.evidence.map((e: any, i: number) => (
+                <div className="val-evidence" key={i}>
+                  "{typeof e === "string" ? e : e.quote || e.text || JSON.stringify(e)}"
+                  {e.page && <span className="val-evidence-page">(p.{e.page})</span>}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Summary */}
+          {v.validationSummary && (
+            <div className="val-section">
+              <div style={{ fontSize: 13, color: "var(--stp-t2, #5a6b5e)", fontStyle: "italic" }}>{v.validationSummary}</div>
+            </div>
+          )}
+
+          {/* Override indicator */}
+          {v.manualOverride && (
+            <div style={{ marginTop: 8, padding: "6px 10px", background: "#fef3cd", borderRadius: 6, fontSize: 12 }}>
+              🔄 {t("validation.overridden")}: {v.manualVerdict?.toUpperCase()} — {v.overrideReason}
+            </div>
+          )}
+        </div>
+      ))}
+    </>
   );
 }

@@ -341,6 +341,7 @@ export type TradeDetail = {
   tradeStatus: string;
   auditTrail: TradeEvent[];
   chainValid: boolean;
+  documentValidations: DocumentValidation[];
 };
 
 export class DatabaseStorage implements IStorage {
@@ -1663,7 +1664,10 @@ export class DatabaseStorage implements IStorage {
       .where(eq(tradeEvents.lookupId, lookupId))
       .orderBy(tradeEvents.createdAt);
 
-    // 7. Verify chain integrity
+    // 7. Get document validations
+    const docValidations = await this.getDocumentValidationsByLookup(lookupId);
+
+    // 8. Verify chain integrity
     let chainValid = true;
     for (let i = 0; i < auditTrail.length; i++) {
       const event = auditTrail[i];
@@ -1692,6 +1696,7 @@ export class DatabaseStorage implements IStorage {
       tradeStatus: (lookup as any).tradeStatus ?? "active",
       auditTrail,
       chainValid,
+      documentValidations: docValidations,
     };
   }
 
