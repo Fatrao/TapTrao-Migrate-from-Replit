@@ -1042,7 +1042,10 @@ export async function seedComplianceRules() {
           { name: "sellerAddress", description: "Full postal address of seller/exporter", required: true, severityIfMissing: "critical" },
           { name: "buyerName", description: "Full legal name of buyer/importer (applicant under UCP 600)", required: true, severityIfMissing: "critical" },
           { name: "buyerAddress", description: "Full postal address of buyer/importer", required: true, severityIfMissing: "warning" },
-          { name: "taxId", description: "Tax/VAT/EORI number of seller or buyer", required: false, severityIfMissing: "warning" },
+          { name: "exporterEORI", description: "Exporter EORI/Tax ID/VAT registration number (mandatory for EU/UK customs)", required: false, severityIfMissing: "warning" },
+          { name: "importerEORI", description: "Importer EORI/Tax ID/VAT registration number (mandatory for EU/UK customs)", required: false, severityIfMissing: "warning" },
+          { name: "consigneeName", description: "Consignee name and address (if different from buyer/importer)", required: false, severityIfMissing: "info" },
+          { name: "exporterContact", description: "Exporter contact person name, phone, and email", required: false, severityIfMissing: "info" },
           // Invoice identifiers
           { name: "invoiceNumber", description: "Unique invoice number", required: true, severityIfMissing: "critical" },
           { name: "invoiceDate", description: "Date of invoice", required: true, severityIfMissing: "critical" },
@@ -1057,11 +1060,20 @@ export async function seedComplianceRules() {
           { name: "netWeight", description: "Net weight in kg", required: false, severityIfMissing: "warning" },
           { name: "grossWeight", description: "Gross weight in kg", required: false, severityIfMissing: "warning" },
           // Trade terms
-          { name: "incoterms", description: "Incoterms 2020 with named place (e.g., FOB Abidjan)", required: true, severityIfMissing: "warning" },
+          { name: "incoterms", description: "Incoterms 2020 rule (e.g., FOB, CIF, DAP)", required: true, severityIfMissing: "warning" },
+          { name: "incotermsNamedPlace", description: "Named place for Incoterms (e.g., 'Abidjan Port' for FOB Abidjan) — required for correct customs valuation", required: true, severityIfMissing: "warning" },
           { name: "countryOfOrigin", description: "Country where goods were manufactured/produced", required: true, severityIfMissing: "critical" },
           // Payment & shipping
           { name: "paymentTerms", description: "Payment terms (e.g., L/C, T/T, CAD)", required: false, severityIfMissing: "info" },
           { name: "purchaseOrderNumber", description: "Buyer's PO or contract reference number", required: false, severityIfMissing: "info" },
+          // Charges (needed for customs value computation per WCO Valuation Agreement)
+          { name: "freightCharges", description: "Freight charges amount (needed for CIF/CIP valuation adjustments)", required: false, severityIfMissing: "info" },
+          { name: "insuranceCharges", description: "Insurance charges amount (needed for CIF/CIP valuation adjustments)", required: false, severityIfMissing: "info" },
+          { name: "otherCharges", description: "Other charges, commissions, or discounts affecting customs value", required: false, severityIfMissing: "info" },
+          // Export controls & compliance
+          { name: "reasonForExport", description: "Reason for export (sale, repair, return, sample, gift)", required: false, severityIfMissing: "info" },
+          { name: "exportControlClassification", description: "Export control classification (ECCN/EAR99) for controlled items", required: false, severityIfMissing: "info" },
+          { name: "sanctionsScreeningRef", description: "Sanctions screening case ID/timestamp as compliance artefact", required: false, severityIfMissing: "info" },
           // Declaration
           { name: "declarationStatement", description: "Declaration confirming invoice accuracy and value correctness", required: false, severityIfMissing: "info" },
         ],
@@ -1099,10 +1111,13 @@ export async function seedComplianceRules() {
         expectedFields: [
           // Parties
           { name: "shipperName", description: "Shipper/exporter name and address", required: true, severityIfMissing: "critical" },
-          { name: "consigneeName", description: "Consignee/receiver name and address", required: true, severityIfMissing: "warning" },
+          { name: "consigneeName", description: "Consignee/receiver name", required: true, severityIfMissing: "warning" },
+          { name: "consigneeAddress", description: "Consignee/receiver full postal address", required: false, severityIfMissing: "info" },
           // References
+          { name: "packingListNumber", description: "Unique packing list document number", required: true, severityIfMissing: "warning" },
           { name: "packingListDate", description: "Date of packing list", required: true, severityIfMissing: "warning" },
-          { name: "invoiceReference", description: "Reference to corresponding commercial invoice number", required: false, severityIfMissing: "info" },
+          { name: "invoiceReference", description: "Reference to corresponding commercial invoice number", required: true, severityIfMissing: "warning" },
+          { name: "purchaseOrderReference", description: "Purchase order or contract reference for traceability", required: false, severityIfMissing: "info" },
           // Package details
           { name: "numberOfPackages", description: "Total number of packages/cartons/bags/drums", required: true, severityIfMissing: "critical" },
           { name: "packageType", description: "Type of packaging (box, crate, drum, bag, carton, pallet)", required: true, severityIfMissing: "warning" },
@@ -1116,6 +1131,7 @@ export async function seedComplianceRules() {
           { name: "grossWeight", description: "Gross weight per package and total (in kg)", required: true, severityIfMissing: "critical" },
           // Dimensions
           { name: "dimensions", description: "Dimensions per package (L × W × H) in cm or inches", required: false, severityIfMissing: "warning" },
+          { name: "totalVolume", description: "Total volume/measurement (CBM) — often required for ocean freight", required: false, severityIfMissing: "info" },
           // Traceability
           { name: "lotOrBatchNumber", description: "Lot/batch numbers for traceability", required: false, severityIfMissing: "warning" },
         ],
@@ -1156,6 +1172,7 @@ export async function seedComplianceRules() {
           { name: "bookingReference", description: "Booking or contract number", required: false, severityIfMissing: "info" },
           // Carrier
           { name: "carrierName", description: "Carrier/shipping line name", required: true, severityIfMissing: "warning" },
+          { name: "carrierAddress", description: "Carrier address (Hamburg Rules — carrier identity)", required: false, severityIfMissing: "info" },
           { name: "vesselName", description: "Vessel/flight name and voyage number", required: true, severityIfMissing: "warning" },
           // Ports and routing
           { name: "portOfLoading", description: "Port of loading", required: true, severityIfMissing: "critical" },
@@ -1170,8 +1187,16 @@ export async function seedComplianceRules() {
           // Dates
           { name: "shippedOnBoardDate", description: "Shipped on board date (or received for shipment date)", required: true, severityIfMissing: "critical" },
           { name: "dateOfIssue", description: "Date B/L was issued", required: true, severityIfMissing: "warning" },
+          { name: "placeOfIssuance", description: "Place where B/L was issued (Hamburg Rules requirement)", required: false, severityIfMissing: "warning" },
           // Freight
           { name: "freightTerms", description: "Freight prepaid or collect", required: false, severityIfMissing: "info" },
+          // Hamburg Rules additional requirements
+          { name: "numberOfOriginals", description: "Number of original B/L copies issued (Hamburg Rules Art. 15)", required: false, severityIfMissing: "info" },
+          { name: "carrierSignature", description: "Carrier or agent signature (Hamburg Rules Art. 14)", required: false, severityIfMissing: "warning" },
+          { name: "packageType", description: "Type of packages (cartons, bags, drums, pallets)", required: false, severityIfMissing: "info" },
+          { name: "dangerousGoodsStatement", description: "Dangerous goods declaration if applicable (Hamburg Rules Art. 13)", required: false, severityIfMissing: "info" },
+          // Cross-document linkage
+          { name: "invoiceReference", description: "Commercial invoice number for cross-document verification", required: false, severityIfMissing: "info" },
           // Type indicators
           { name: "blType", description: "Original/copy, negotiable/non-negotiable, clean/claused", required: false, severityIfMissing: "info" },
         ],
@@ -1207,10 +1232,12 @@ export async function seedComplianceRules() {
         },
         expectedFields: [
           // Exporter (WCO Guidelines Box 1 / EUR.1 Box 1)
-          { name: "exporterName", description: "Full name and address of exporter/sender", required: true, severityIfMissing: "critical" },
+          { name: "exporterName", description: "Full legal name of exporter/sender", required: true, severityIfMissing: "critical" },
+          { name: "exporterAddress", description: "Full postal address of exporter (frequently required on chamber/authority forms)", required: true, severityIfMissing: "warning" },
           { name: "exporterCountry", description: "Country of the exporter", required: true, severityIfMissing: "warning" },
           // Consignee (WCO Box 2 / EUR.1 Box 2)
-          { name: "consigneeName", description: "Full name and address of consignee/importer", required: true, severityIfMissing: "warning" },
+          { name: "consigneeName", description: "Full name of consignee/importer", required: true, severityIfMissing: "warning" },
+          { name: "consigneeAddress", description: "Full postal address of consignee/importer", required: false, severityIfMissing: "info" },
           // Certificate identifiers
           { name: "certificateNumber", description: "Unique certificate serial number", required: true, severityIfMissing: "critical" },
           { name: "dateOfIssue", description: "Date of issue of the certificate", required: true, severityIfMissing: "critical" },
