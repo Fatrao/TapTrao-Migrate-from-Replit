@@ -1049,9 +1049,9 @@ export default function TradeDetail() {
         </div>
       ) : (
         <>
-          {/* ── DARK HEADER ── */}
-          <div className="stp-header">
-            <div className="stp-bc">
+          {/* ── DARK HEADER — only breadcrumb bar on TDCC tab ── */}
+          <div className="stp-header" style={activeTab === "validation" ? { padding: "12px 24px" } : undefined}>
+            <div className="stp-bc" style={activeTab === "validation" ? { marginBottom: 0 } : undefined}>
               <Link href="/trades"><a>{t("detail.breadcrumb")}</a></Link>
               <span className="stp-bc-sep">›</span>
               <span className="stp-bc-cur">{translateCommodity(data.lookup.commodityName, lang)}</span>
@@ -1064,6 +1064,7 @@ export default function TradeDetail() {
               </div>
             </div>
 
+            {activeTab === "workspace" && (
             <div className="stp-title-row">
               <div>
                   <div>
@@ -1119,9 +1120,10 @@ export default function TradeDetail() {
                 </div>
               </div>
             </div>
+            )}
 
-            {/* Money strip */}
-            <div className="stp-money">
+            {/* Money strip — workspace only */}
+            {activeTab === "workspace" && <div className="stp-money">
               <div className="stp-ms">
                 <div className="stp-ms-label">{t("detail.shipmentValue")}</div>
                 {tradeVal > 0 ? (
@@ -1169,33 +1171,35 @@ export default function TradeDetail() {
                   </>
                 )}
               </div>
-            </div>
+            </div>}
           </div>
 
-          {/* ── LIFECYCLE STEPPER ── */}
-          <div className="stp-lc-wrap">
-            <div className="stp-lc">
-              {LC_STEPS.map((step, i) => {
-                const state = i < lcIndex ? "done" : i === lcIndex ? "active" : "future";
-                return (
-                  <div key={step} className={`stp-lc-step stp-lc-step--${state}`}>
-                    <div className="stp-lc-bar" />
-                    <div className="stp-lc-body">
-                      <div className="stp-lc-num">{state === "done" ? "✓" : i + 1}</div>
-                      <span className="stp-lc-name">{LC_LABELS[step]}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Status advance dialog — reuse existing StatusStepper's confirm */}
-          <StatusStepper
-            current={data.tradeStatus}
-            tradeId={tradeId!}
-            onStatusAdvanced={() => queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] })}
-          />
+          {/* ── LIFECYCLE STEPPER — workspace only ── */}
+          {activeTab === "workspace" && (
+            <>
+              <div className="stp-lc-wrap">
+                <div className="stp-lc">
+                  {LC_STEPS.map((step, i) => {
+                    const state = i < lcIndex ? "done" : i === lcIndex ? "active" : "future";
+                    return (
+                      <div key={step} className={`stp-lc-step stp-lc-step--${state}`}>
+                        <div className="stp-lc-bar" />
+                        <div className="stp-lc-body">
+                          <div className="stp-lc-num">{state === "done" ? "✓" : i + 1}</div>
+                          <span className="stp-lc-name">{LC_LABELS[step]}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <StatusStepper
+                current={data.tradeStatus}
+                tradeId={tradeId!}
+                onStatusAdvanced={() => queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] })}
+              />
+            </>
+          )}
 
           {/* ── TRADES DOCS CONTROL CENTRE TAB ── */}
           {activeTab === "validation" && (
