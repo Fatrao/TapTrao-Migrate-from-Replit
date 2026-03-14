@@ -1066,36 +1066,45 @@ export default function TradeDetail() {
 
             <div className="stp-title-row">
               <div>
-                {editingNickname ? (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <input
-                      autoFocus
-                      value={nicknameValue}
-                      onChange={e => setNicknameValue(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === "Enter") saveNickname();
-                        if (e.key === "Escape") { setEditingNickname(false); setNicknameValue(data.lookup.nickname || ""); }
-                      }}
-                      onBlur={saveNickname}
-                      style={{
-                        fontFamily: "var(--fh)", fontSize: 20, fontWeight: 700, color: "var(--t1)",
-                        background: "rgba(0,0,0,0.03)", border: "1px solid rgba(109,184,154,0.3)",
-                        borderRadius: 6, padding: "4px 10px", width: "100%", maxWidth: 400,
-                        outline: "none",
-                      }}
-                    />
+                  <div>
+                    <div className="stp-title">
+                      {translateCommodity(data.lookup.commodityName, lang)}
+                    </div>
+                    {editingNickname ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+                        <input
+                          autoFocus
+                          placeholder={t("detail.addIdentifier")}
+                          value={nicknameValue}
+                          onChange={e => setNicknameValue(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === "Enter") saveNickname();
+                            if (e.key === "Escape") { setEditingNickname(false); setNicknameValue(data.lookup.nickname || ""); }
+                          }}
+                          onBlur={saveNickname}
+                          style={{
+                            fontFamily: "var(--stp-fb)", fontSize: 13, fontWeight: 500, color: "#fff",
+                            background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.3)",
+                            borderRadius: 6, padding: "4px 10px", width: "100%", maxWidth: 300,
+                            outline: "none",
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className="stp-nickname"
+                        onClick={() => { setNicknameValue(data.lookup.nickname || ""); setEditingNickname(true); }}
+                        style={{ cursor: "pointer" }}
+                        title={t("detail.clickToRename")}
+                      >
+                        {data.lookup.nickname ? (
+                          <>{data.lookup.nickname} <Pencil size={11} style={{ opacity: 0.3, verticalAlign: "middle" }} /></>
+                        ) : (
+                          <span style={{ opacity: 0.5 }}>+ {t("detail.addIdentifier")} <Pencil size={11} style={{ verticalAlign: "middle" }} /></span>
+                        )}
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <div
-                    className="stp-title"
-                    onClick={() => { setNicknameValue(data.lookup.nickname || translateCommodity(data.lookup.commodityName, lang)); setEditingNickname(true); }}
-                    style={{ cursor: "pointer" }}
-                    title={t("detail.clickToRename")}
-                  >
-                    {data.lookup.nickname || translateCommodity(data.lookup.commodityName, lang)}
-                    <Pencil size={13} style={{ marginLeft: 6, opacity: 0.3, verticalAlign: "middle" }} />
-                  </div>
-                )}
                 <div className="stp-corridor">
                   {nameFlag(data.lookup.originName)} {data.lookup.originName} → {nameFlag(data.lookup.destinationName)} {data.lookup.destinationName}
                 </div>

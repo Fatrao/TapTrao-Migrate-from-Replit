@@ -305,6 +305,8 @@
   "report.tabWorkspace": "Espace de travail",
   "report.tabValidation": "Validation",
 
+  "detail.addIdentifier": "Ajouter un identifiant",
+
   "validation.emptyTitle": "Aucune validation",
   "validation.emptyDesc": "T\u00e9l\u00e9chargez des documents dans l'onglet Espace de travail, puis scannez-les pour voir les r\u00e9sultats ici.",
   "validation.summaryTitle": "R\u00e9sum\u00e9 des validations",

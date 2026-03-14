@@ -653,7 +653,7 @@ export default function Trades() {
                     >
                       <div className="fl">{iso2ToFlag(trade.originIso2)}{iso2ToFlag(trade.destIso2)}</div>
                       <div className="inf">
-                        <div className="nm">{trade.nickname || translateCommodity(trade.commodityName, lang)}</div>
+                        <div className="nm">{trade.nickname ? <><strong>{trade.nickname}</strong> — </> : ""}{translateCommodity(trade.commodityName, lang)}</div>
                         <div className="rt">{trade.originName} → {trade.destName} · {new Date(trade.createdAt).toLocaleDateString(lang, { month: "short", day: "numeric" })}, {new Date(trade.createdAt).toLocaleTimeString(lang, { hour: "2-digit", minute: "2-digit" })}</div>
                       </div>
                       <div className="vl">{formatValue(trade.tradeValue, trade.tradeValueCurrency)}</div>

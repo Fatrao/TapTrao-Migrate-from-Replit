@@ -37,6 +37,8 @@
 /* Trade title row */
 .stp-title-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
 .stp-title{font-family:var(--stp-fd);font-size:28px;font-weight:600;color:#fff;line-height:1.15}
+.stp-nickname{font-size:13px;color:rgba(255,255,255,0.7);margin-top:3px}
+.stp-nickname:hover{color:#fff}
 .stp-corridor{font-size:14px;color:rgba(255,255,255,0.85);margin-top:4px;margin-bottom:8px}
 .stp-tags{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .stp-tag{display:inline-flex;align-items:center;padding:4px 11px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:.02em}

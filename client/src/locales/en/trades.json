@@ -337,6 +337,8 @@
   "report.tabWorkspace": "Workspace",
   "report.tabValidation": "Validation",
 
+  "detail.addIdentifier": "Add identifier",
+
   "validation.emptyTitle": "No validations yet",
   "validation.emptyDesc": "Upload documents in the Workspace tab, then scan them to see validation results here.",
   "validation.summaryTitle": "Document Validation Summary",
