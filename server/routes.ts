@@ -671,6 +671,7 @@ export async function registerRoutes(
   app.get("/api/tokens/verify-purchase", async (req, res) => {
     try {
       const locale = getLocale(req);
+      const callerSessionId = getSessionId(req, res);
       const stripeSessionId = req.query.session_id as string;
       if (!stripeSessionId) {
         res.status(400).json({ message: t("routes.session_id_required", locale) });
@@ -689,6 +690,11 @@ export async function registerRoutes(
       const session = await stripe.checkout.sessions.retrieve(stripeSessionId);
       if (session.payment_status === "paid") {
         const sessionId = session.metadata?.session_id;
+        // Verify the caller owns this Stripe session
+        if (sessionId && sessionId !== callerSessionId) {
+          res.status(403).json({ message: "Session mismatch" });
+          return;
+        }
         const pack = session.metadata?.pack;
         if (sessionId && pack === "lc_standalone") {
           const alreadyProcessed = await storage.hasStripeSessionBeenProcessed(stripeSessionId);
@@ -1511,8 +1517,9 @@ export async function registerRoutes(
 
   app.get("/api/templates/:id", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const template = await storage.getTemplateById(req.params.id);
-      if (!template) {
+      if (!template || template.sessionId !== sessionId) {
         res.status(404).json({ message: t("routes.template_not_found", getLocale(req)) });
         return;
       }
@@ -1524,8 +1531,9 @@ export async function registerRoutes(
 
   app.get("/api/templates/:id/stale-check", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const template = await storage.getTemplateById(req.params.id);
-      if (!template) {
+      if (!template || template.sessionId !== sessionId) {
         res.status(404).json({ message: t("routes.template_not_found", getLocale(req)) });
         return;
       }
@@ -1782,7 +1790,7 @@ export async function registerRoutes(
 
       if (lookupId) {
         const lookup = await storage.getLookupById(lookupId);
-        if (!lookup) {
+        if (!lookup || lookup.sessionId !== sessionId) {
           res.status(404).json({ message: t("routes.lookup_not_found", getLocale(req)) });
           return;
         }
@@ -1914,7 +1922,7 @@ export async function registerRoutes(
       }
 
       const lookup = await storage.getLookupById(lookupId);
-      if (!lookup) {
+      if (!lookup || lookup.sessionId !== sessionId) {
         res.status(404).json({ message: t("routes.lookup_not_found", getLocale(req)) });
         return;
       }
@@ -1984,6 +1992,7 @@ export async function registerRoutes(
 
   app.post("/api/supplier-requests/:id/log-send", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const { id } = req.params;
       const { channel } = req.body;
       if (!channel || !["whatsapp", "email", "link"].includes(channel)) {
@@ -1992,7 +2001,7 @@ export async function registerRoutes(
       }
 
       const request = await storage.getSupplierRequestById(id);
-      if (!request) {
+      if (!request || request.userSessionId !== sessionId) {
         res.status(404).json({ message: t("routes.supplier_request_not_found", getLocale(req)) });
         return;
       }
@@ -2006,9 +2015,10 @@ export async function registerRoutes(
 
   app.patch("/api/supplier-requests/:id", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
       const { id } = req.params;
       const request = await storage.getSupplierRequestById(id);
-      if (!request) {
+      if (!request || request.userSessionId !== sessionId) {
         res.status(404).json({ message: t("routes.supplier_request_not_found", getLocale(req)) });
         return;
       }
@@ -2026,6 +2036,12 @@ export async function registerRoutes(
 
   app.get("/api/supplier-requests/:id/uploads", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
+      const request = await storage.getSupplierRequestById(req.params.id);
+      if (!request || request.userSessionId !== sessionId) {
+        res.status(404).json({ message: t("routes.supplier_request_not_found", getLocale(req)) });
+        return;
+      }
       const uploads = await storage.getSupplierUploadsByRequestId(req.params.id);
       res.json(uploads);
     } catch (error: any) {
@@ -2738,6 +2754,12 @@ Rules:
 
   app.post("/api/templates/:id/use", async (req, res) => {
     try {
+      const sessionId = getSessionId(req, res);
+      const template = await storage.getTemplateById(req.params.id);
+      if (!template || template.sessionId !== sessionId) {
+        res.status(404).json({ message: t("routes.template_not_found", getLocale(req)) });
+        return;
+      }
       await storage.incrementTemplateUsage(req.params.id);
       res.json({ success: true });
     } catch (error: any) {
@@ -3087,7 +3109,7 @@ Rules:
       if (!eudrRecord) {
         eudrRecord = await storage.getEudrRecordByLookupId(req.params.id) || null;
       }
-      if (!eudrRecord) {
+      if (!eudrRecord || eudrRecord.userSessionId !== sessionId) {
         res.status(404).json({ message: t("routes.eudr_not_found", getLocale(req)) });
         return;
       }
@@ -3725,12 +3747,13 @@ Rules:
 
   app.post("/api/admin/alerts", async (req, res) => {
     try {
-      const { admin_password, source, hs_codes_affected, dest_iso2_affected, summary, source_url, effective_date } = req.body;
-      const adminPw = process.env.ADMIN_PASSWORD;
-      if (!adminPw || !safeCompare(admin_password, adminPw)) {
+      const sessionId = getSessionId(req, res);
+      const isAdmin = await storage.isAdminSession(sessionId);
+      if (!isAdmin) {
         res.status(401).json({ message: t("routes.unauthorized", getLocale(req)) });
         return;
       }
+      const { source, hs_codes_affected, dest_iso2_affected, summary, source_url, effective_date } = req.body;
       if (!summary) {
         res.status(400).json({ message: t("routes.summary_required", getLocale(req)) });
         return;
@@ -3981,7 +4004,7 @@ Rules:
     if (!sessionId) return;
     try {
       const lookup = await storage.getLookupById(req.params.id);
-      if (!lookup) {
+      if (!lookup || lookup.sessionId !== sessionId) {
         res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: t("routes.lookup_not_found", getLocale(req)) } });
         return;
       }
@@ -3996,7 +4019,7 @@ Rules:
     if (!sessionId) return;
     try {
       const check = await storage.getLcCheckById(req.params.id);
-      if (!check) {
+      if (!check || (check as any).sessionId !== sessionId) {
         res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: t("routes.lc_check_not_found", getLocale(req)) } });
         return;
       }
