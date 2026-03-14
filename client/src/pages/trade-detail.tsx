@@ -1201,7 +1201,7 @@ export default function TradeDetail() {
           {activeTab === "validation" && (
             <div className="stp-content">
               <div className="stp-left" style={{ gridColumn: "1 / -1" }}>
-                <ValidationView validations={data.documentValidations || []} t={t} />
+                <ValidationView validations={data.documentValidations || []} totalRequired={(result?.requirementsDetailed || []).length} t={t} />
               </div>
             </div>
           )}
@@ -1567,7 +1567,7 @@ export default function TradeDetail() {
 }
 
 /* ── Validation Tab View ── */
-function ValidationView({ validations, t }: { validations: any[]; t: (key: string) => string }) {
+function ValidationView({ validations, totalRequired, t }: { validations: any[]; totalRequired: number; t: (key: string) => string }) {
   if (!validations || validations.length === 0) {
     return (
       <div className="stp-card" style={{ textAlign: "center", padding: "48px 24px" }}>
@@ -1616,6 +1616,17 @@ function ValidationView({ validations, t }: { validations: any[]; t: (key: strin
             </div>
           )}
         </div>
+        {totalRequired > 0 && (
+          <div style={{ marginTop: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 6, color: "var(--stp-t2, #5a6b5e)" }}>
+              <span>{validations.length} of {totalRequired} required documents validated</span>
+              <span>{Math.round((validations.length / totalRequired) * 100)}%</span>
+            </div>
+            <div style={{ height: 6, borderRadius: 3, background: "rgba(0,0,0,0.06)", overflow: "hidden" }}>
+              <div style={{ height: "100%", borderRadius: 3, width: `${Math.min(100, Math.round((validations.length / totalRequired) * 100))}%`, background: validations.length >= totalRequired ? "#2e7d32" : "#c4882a", transition: "width 0.3s" }} />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Per-document validation cards */}
