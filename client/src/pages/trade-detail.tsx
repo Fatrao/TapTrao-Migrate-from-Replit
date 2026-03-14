@@ -1197,12 +1197,10 @@ export default function TradeDetail() {
             onStatusAdvanced={() => queryClient.invalidateQueries({ queryKey: [`/api/trades/${tradeId}`] })}
           />
 
-          {/* ── VALIDATION TAB ── */}
+          {/* ── TRADES DOCS CONTROL CENTRE TAB ── */}
           {activeTab === "validation" && (
-            <div className="stp-content">
-              <div className="stp-left" style={{ gridColumn: "1 / -1" }}>
-                <ValidationView validations={data.documentValidations || []} totalRequired={(result?.requirementsDetailed || []).length} t={t} lookup={data.lookup} />
-              </div>
+            <div className="tdcc-wrap">
+              <ValidationView validations={data.documentValidations || []} totalRequired={(result?.requirementsDetailed || []).length} t={t} lookup={data.lookup} />
             </div>
           )}
 
@@ -1567,74 +1565,46 @@ export default function TradeDetail() {
 }
 
 /* ── Validation Tab View ── */
-/* ── Trade Docs Control Centre ── */
+/* ── Trade Docs Control Centre — matches HTML mockup exactly ── */
 
-function isDocPass(v: any): boolean {
-  return v.verdict === "VALID" || v.verdict === "VALID_WITH_NOTES";
-}
-function isDocFail(v: any): boolean {
-  return v.verdict === "ISSUES_FOUND" || v.verdict === "WRONG_DOCUMENT" || v.verdict === "UNREADABLE";
-}
-
-/** Derive doc type from requirement or filename */
 function guessDocType(v: any): string {
-  const title = (v.requirementTitle || v.originalFilename || "").toLowerCase();
-  if (title.includes("invoice") || title.includes("payment") || title.includes("credit")) return "Finance";
-  if (title.includes("bill of lading") || title.includes("packing") || title.includes("shipping") || title.includes("bl") || title.includes("b/l")) return "Shipping";
-  if (title.includes("licence") || title.includes("license") || title.includes("agrément") || title.includes("export")) return "Export Licence";
+  const t = (v.requirementTitle || v.originalFilename || "").toLowerCase();
+  if (t.includes("invoice") || t.includes("payment") || t.includes("credit")) return "Finance";
+  if (t.includes("bill of lading") || t.includes("packing") || t.includes("shipping") || t.includes("bl") || t.includes("b/l")) return "Shipping";
+  if (t.includes("licence") || t.includes("license") || t.includes("agrément") || t.includes("export")) return "Export Licence";
   return "Compliance";
 }
 
-/** Derive owner from requirement code or title */
 function guessOwner(v: any): "buyer" | "supplier" {
-  const title = (v.requirementTitle || "").toLowerCase();
-  if (title.includes("eudr") || title.includes("due diligence") || title.includes("bill of lading") || title.includes("import")) return "buyer";
+  const t = (v.requirementTitle || "").toLowerCase();
+  if (t.includes("eudr") || t.includes("due diligence") || t.includes("bill of lading") || t.includes("import")) return "buyer";
   return "supplier";
 }
 
 function ValidationView({ validations, totalRequired, t, lookup }: { validations: any[]; totalRequired: number; t: (key: string) => string; lookup: any }) {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
 
-  // Map API validations into the display format
   const docs = validations.map((v) => {
-    const pass = isDocPass(v);
-    const fail = isDocFail(v);
-    const verdict = pass ? "pass" : fail ? "fail" : "pending";
+    const pass = v.verdict === "VALID" || v.verdict === "VALID_WITH_NOTES";
+    const fail = v.verdict === "ISSUES_FOUND" || v.verdict === "WRONG_DOCUMENT" || v.verdict === "UNREADABLE";
     const fields: { ok: number; n: string; v: string }[] = [];
     const consistency: { ok: number; n: string; v: string }[] = [];
 
-    // Field checks
     if (v.fieldStatus && Array.isArray(v.fieldStatus)) {
       v.fieldStatus.forEach((fs: any) => {
-        fields.push({
-          ok: fs.status === "present" ? 1 : 0,
-          n: (fs.field || "").replace(/_/g, " "),
-          v: fs.found || fs.status || "—",
-        });
+        fields.push({ ok: fs.status === "present" ? 1 : 0, n: (fs.field || "").replace(/_/g, " "), v: fs.found || fs.status || "—" });
       });
     }
-
-    // Deterministic / consistency checks
     if (v.deterministicChecks && Array.isArray(v.deterministicChecks)) {
       v.deterministicChecks.forEach((c: any) => {
-        consistency.push({
-          ok: c.passed ? 1 : 0,
-          n: (c.label || c.check || "Check").replace(/_/g, " "),
-          v: c.detail || (c.passed ? "Passed" : "Failed"),
-        });
+        consistency.push({ ok: c.passed ? 1 : 0, n: (c.label || c.check || "Check").replace(/_/g, " "), v: c.detail || (c.passed ? "Passed" : "Failed") });
       });
     }
 
-    const passedFields = fields.filter(f => f.ok).length;
-    const failedFields = fields.filter(f => !f.ok).length;
-    const passedConsistency = consistency.filter(c => c.ok).length;
-    const failedConsistency = consistency.filter(c => !c.ok).length;
-
-    // Build conclusion note
-    let note = "";
-    if (v.validationSummary) {
-      note = v.validationSummary;
-    } else if (v.validationIssues && Array.isArray(v.validationIssues) && v.validationIssues.length > 0) {
+    const p = fields.filter(f => f.ok).length + consistency.filter(c => c.ok).length;
+    const total = fields.length + consistency.length;
+    let note = v.validationSummary || "";
+    if (!note && v.validationIssues && Array.isArray(v.validationIssues) && v.validationIssues.length > 0) {
       note = v.validationIssues.map((iss: any) => typeof iss === "string" ? iss : iss.message || iss.finding || "").join(" ");
     }
 
@@ -1643,24 +1613,13 @@ function ValidationView({ validations, totalRequired, t, lookup }: { validations
       file: v.originalFilename || "—",
       type: guessDocType(v),
       owner: guessOwner(v),
-      v: verdict,
-      p: passedFields + passedConsistency,
-      f: failedFields + failedConsistency,
-      t: fields.length + consistency.length,
-      fields,
-      consistency,
-      note,
-      manualOverride: v.manualOverride,
-      manualVerdict: v.manualVerdict,
-      overrideReason: v.overrideReason,
-      processingStatus: v.processingStatus,
-      originalVerdict: v.verdict,
-      evidence: v.evidence,
-      validationIssues: v.validationIssues,
+      v: pass ? "pass" as const : fail ? "fail" as const : "pending" as const,
+      p, f: total - p, t: total,
+      fields, consistency, note,
     };
   });
 
-  // Empty state
+  /* ── Empty state ── */
   if (!validations || validations.length === 0) {
     return (
       <div className="tdcc-empty">
@@ -1671,48 +1630,33 @@ function ValidationView({ validations, totalRequired, t, lookup }: { validations
     );
   }
 
-  // Score for header
-  const passCount = docs.filter(d => d.v === "pass").length;
-  const failCount = docs.filter(d => d.v === "fail").length;
+  /* ── Score ── */
   const totalChecks = docs.reduce((s, d) => s + d.t, 0);
   const passedChecks = docs.reduce((s, d) => s + d.p, 0);
   const scorePercent = totalChecks > 0 ? Math.round((passedChecks / totalChecks) * 100) : 0;
-  const scoreColor = scorePercent >= 80 ? "#2d6a4f" : scorePercent >= 50 ? "#c4882a" : "#c0392b";
   const scoreLabel = scorePercent >= 80 ? "GREEN" : scorePercent >= 50 ? "AMBER" : "RED";
+  const scoreClass = scorePercent >= 80 ? "green" : scorePercent >= 50 ? "amber" : "red";
 
   const selected = selectedIdx !== null ? docs[selectedIdx] : null;
 
   return (
-    <div className="tdcc">
-      {/* ── Page header ── */}
-      <div className="tdcc-page-header">
-        <div className="tdcc-ph-title">Trade Documents Control Centre</div>
-        <div className="tdcc-ph-meta">
-          {lookup?.referenceNumber && <span className="tdcc-ph-ref">{lookup.referenceNumber}</span>}
-          {lookup?.referenceNumber && <span className="tdcc-ph-sep">·</span>}
-          {lookup?.commodityName && <span className="tdcc-ph-label">{lookup.commodityName}</span>}
-          {lookup?.originName && lookup?.destinationName && (
-            <>
-              <span className="tdcc-ph-sep">·</span>
-              <span className="tdcc-ph-label">{lookup.originName} → {lookup.destinationName}</span>
-            </>
-          )}
-          {lookup?.hsCode && (
-            <>
-              <span className="tdcc-ph-sep">·</span>
-              <span className="tdcc-ph-label">HS {lookup.hsCode}</span>
-            </>
-          )}
-          <span className="tdcc-ph-sep">·</span>
-          <span className={`tdcc-ph-score ${scorePercent >= 80 ? "green" : scorePercent >= 50 ? "amber" : "red"}`}>
-            {scorePercent}/100 — {scoreLabel}
-          </span>
+    <>
+      {/* ── PAGE HEADER — on cream, no card ── */}
+      <div className="page-header">
+        <div className="ph-title">Trade Documents Control Centre</div>
+        <div className="ph-meta-row">
+          {lookup?.referenceNumber && <><span className="ph-ref">{lookup.referenceNumber}</span><span className="ph-sep">·</span></>}
+          {lookup?.commodityName && <><span className="ph-label">{lookup.commodityName}</span><span className="ph-sep">·</span></>}
+          {lookup?.originName && lookup?.destinationName && <><span className="ph-label">{lookup.originName} → {lookup.destinationName}</span><span className="ph-sep">·</span></>}
+          {lookup?.hsCode && <><span className="ph-label">HS {lookup.hsCode}</span><span className="ph-sep">·</span></>}
+          {lookup?.createdAt && <><span className="ph-label">{new Date(lookup.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span><span className="ph-sep">·</span></>}
+          <span className={`ph-score ${scoreClass}`}>{scorePercent}/100 — {scoreLabel}</span>
         </div>
       </div>
 
-      {/* ── Document Table ── */}
-      <div className="tdcc-card">
-        <div className="tdcc-tbl-head">
+      {/* ── DOCUMENT TABLE — white card ── */}
+      <div className="card">
+        <div className="tbl-head">
           <div>Document</div>
           <div>Type</div>
           <div>Owner</div>
@@ -1721,152 +1665,67 @@ function ValidationView({ validations, totalRequired, t, lookup }: { validations
         </div>
         <div>
           {docs.map((d, i) => (
-            <div
-              className={`tdcc-tbl-row ${selectedIdx === i ? "active" : ""}`}
-              key={i}
-              onClick={() => setSelectedIdx(selectedIdx === i ? null : i)}
-            >
-              <div className="tdcc-doc-cell">
-                <div className={`tdcc-doc-icon ${d.v === "fail" ? "fail" : ""}`}>📄</div>
+            <div className={`tbl-row${selectedIdx === i ? " active" : ""}`} key={i} onClick={() => setSelectedIdx(selectedIdx === i ? null : i)}>
+              <div className="doc-cell">
+                <div className={`doc-icon ${d.v === "fail" ? "fail" : ""}`}>📄</div>
                 <div>
-                  <div className="tdcc-doc-name">{d.title}</div>
-                  <div className="tdcc-doc-file">{d.file}</div>
+                  <div className="doc-name">{d.title}</div>
+                  <div className="doc-file">{d.file}</div>
                 </div>
               </div>
-              <div className="tdcc-type-cell">{d.type}</div>
-              <div>
-                <span className={`tdcc-owner-pill ${d.owner}`}>
-                  {d.owner === "buyer" ? "Buyer" : "Supplier"}
-                </span>
-              </div>
-              <div className="tdcc-tally">
-                {d.processingStatus === "pending" || d.processingStatus === "processing"
-                  ? <span style={{ color: "#888" }}>⏳</span>
-                  : <><b>{d.p}</b>/{d.t}</>
-                }
-              </div>
-              <div>
-                {d.v === "pass" && <span className="tdcc-status-pill pass">Valid</span>}
-                {d.v === "fail" && <span className="tdcc-status-pill fail">Invalid</span>}
-                {d.v === "pending" && <span className="tdcc-status-pill pending">Pending</span>}
-              </div>
+              <div className="type-cell">{d.type}</div>
+              <div><span className={`owner-pill ${d.owner}`}>{d.owner === "buyer" ? "Buyer" : "Supplier"}</span></div>
+              <div className="tally"><b>{d.p}</b>/{d.t}</div>
+              <div><span className={`status-pill ${d.v}`}>{d.v === "pass" ? "Valid" : d.v === "fail" ? "Invalid" : "Pending"}</span></div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* ── Detail Modal (inline overlay) ── */}
+      {/* ── MODAL ── */}
       {selected !== null && selectedIdx !== null && (
-        <div className="tdcc-overlay" onClick={(e) => { if ((e.target as HTMLElement).classList.contains("tdcc-overlay")) setSelectedIdx(null); }}>
-          <div className="tdcc-modal">
-            {/* Modal header */}
-            <div className="tdcc-modal-head">
-              <div className="tdcc-mh-left">
-                <div className="tdcc-mh-doc-name">{selected.title}</div>
-                <div className="tdcc-mh-file">{selected.file}</div>
+        <div className="overlay" onClick={(e) => { if ((e.target as HTMLElement).classList.contains("overlay")) setSelectedIdx(null); }}>
+          <div className="modal">
+            <div className="modal-head">
+              <div className="mh-left">
+                <div className="mh-doc-name">{selected.title}</div>
+                <div className="mh-file">{selected.file}</div>
               </div>
-              <div className="tdcc-mh-right">
-                {selected.v === "pass" && <div className="tdcc-verdict-badge pass">✓ Valid</div>}
-                {selected.v === "fail" && <div className="tdcc-verdict-badge fail">✗ Invalid</div>}
-                {selected.v === "pending" && <div className="tdcc-verdict-badge pending">⏳ Pending</div>}
-
-                {selected.owner === "buyer" ? (
-                  <button className="tdcc-action-btn btn-download">↓ Download</button>
-                ) : (
-                  <>
-                    <button className="tdcc-action-btn btn-email">✉ Email supplier</button>
-                    <button className="tdcc-action-btn btn-whatsapp">WhatsApp</button>
-                  </>
-                )}
-                <button className="tdcc-btn-close" onClick={() => setSelectedIdx(null)}>✕</button>
+              <div className="mh-right">
+                <div className={`verdict-badge ${selected.v}`}>{selected.v === "pass" ? "✓ Valid" : selected.v === "fail" ? "✗ Invalid" : "⏳ Pending"}</div>
+                {selected.owner === "buyer"
+                  ? <button className="action-btn btn-download">↓ Download</button>
+                  : <><button className="action-btn btn-email">✉ Email supplier</button><button className="action-btn btn-whatsapp">WhatsApp</button></>
+                }
+                <button className="btn-close" onClick={() => setSelectedIdx(null)}>✕</button>
               </div>
             </div>
-
-            {/* Modal body */}
-            <div className="tdcc-modal-body">
-              {/* Field checks */}
-              {selected.fields.length > 0 && (
-                <>
-                  <div className="tdcc-section-label">{t("validation.fieldCheck")}</div>
-                  <table className="tdcc-field-table">
-                    <tbody>
-                      {selected.fields.map((r, ri) => (
-                        <tr key={ri} className={!r.ok ? "fail-row" : ""}>
-                          <td className="tdcc-td-icon" style={{ color: r.ok ? "#2d6a4f" : "#c0392b" }}>
-                            {r.ok ? "✅" : "❌"}
-                          </td>
-                          <td className={`tdcc-td-name ${!r.ok ? "fe" : ""}`}>{r.n}</td>
-                          <td className={`tdcc-td-val ${!r.ok ? "fe" : ""}`}>{r.v}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </>
-              )}
-
-              {/* Consistency checks */}
-              {selected.consistency.length > 0 && (
-                <>
-                  <div className="tdcc-section-label" style={{ marginTop: 20 }}>{t("validation.consistencyChecks")}</div>
-                  <table className="tdcc-field-table">
-                    <tbody>
-                      {selected.consistency.map((r, ri) => (
-                        <tr key={ri} className={!r.ok ? "fail-row" : ""}>
-                          <td className="tdcc-td-icon" style={{ color: r.ok ? "#2d6a4f" : "#c0392b" }}>
-                            {r.ok ? "✅" : "❌"}
-                          </td>
-                          <td className={`tdcc-td-name ${!r.ok ? "fe" : ""}`}>{r.n}</td>
-                          <td className={`tdcc-td-val ${!r.ok ? "fe" : ""}`}>{r.v}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </>
-              )}
-
-              {/* Issues */}
-              {selected.validationIssues && Array.isArray(selected.validationIssues) && selected.validationIssues.length > 0 && (
-                <>
-                  <div className="tdcc-section-label" style={{ marginTop: 20, color: "#c0392b" }}>{t("validation.issues")}</div>
-                  {selected.validationIssues.map((issue: any, ii: number) => (
-                    <div key={ii} style={{ display: "flex", gap: 6, padding: "4px 0", fontSize: 13, color: "#4a4a42", lineHeight: 1.4 }}>
-                      <span>⚠️</span>
-                      <span>{typeof issue === "string" ? issue : issue.message || issue.finding || JSON.stringify(issue)}</span>
-                    </div>
-                  ))}
-                </>
-              )}
-
-              {/* Evidence */}
-              {selected.evidence && Array.isArray(selected.evidence) && selected.evidence.length > 0 && (
-                <>
-                  <div className="tdcc-section-label" style={{ marginTop: 20 }}>{t("validation.evidence")}</div>
-                  {selected.evidence.map((e: any, ei: number) => (
-                    <div key={ei} style={{ fontSize: 13, color: "#4a4a42", fontStyle: "italic", padding: "3px 0", lineHeight: 1.4 }}>
-                      "{typeof e === "string" ? e : e.quote || e.text || JSON.stringify(e)}"
-                      {e.page && <span style={{ fontSize: 11, color: "#a8a89a", fontStyle: "normal", marginLeft: 4 }}>(p.{e.page})</span>}
-                    </div>
-                  ))}
-                </>
-              )}
-
-              {/* Conclusion */}
-              {selected.note && (
-                <div className={`tdcc-conclusion ${selected.v === "fail" ? "warn" : ""}`}>
-                  {selected.note}
-                </div>
-              )}
-
-              {/* Manual override indicator */}
-              {selected.manualOverride && (
-                <div style={{ marginTop: 12, padding: "8px 14px", background: "#fef3cd", borderRadius: 8, fontSize: 12, color: "#8a6d3b" }}>
-                  🔄 {t("validation.overridden")}: {selected.manualVerdict?.toUpperCase()} — {selected.overrideReason}
-                </div>
-              )}
+            <div className="modal-body">
+              <div className="section-label">Field Check</div>
+              <table className="field-table"><tbody>
+                {selected.fields.map((r, ri) => (
+                  <tr key={ri} className={!r.ok ? "fail-row" : ""}>
+                    <td className="td-icon" style={{ color: r.ok ? "#2d6a4f" : "#c0392b" }}>{r.ok ? "✅" : "❌"}</td>
+                    <td className={`td-name${!r.ok ? " fe" : ""}`}>{r.n}</td>
+                    <td className={`td-val${!r.ok ? " fe" : ""}`}>{r.v}</td>
+                  </tr>
+                ))}
+              </tbody></table>
+              <div className="section-label">Consistency Checks</div>
+              <table className="field-table"><tbody>
+                {selected.consistency.map((r, ri) => (
+                  <tr key={ri} className={!r.ok ? "fail-row" : ""}>
+                    <td className="td-icon" style={{ color: r.ok ? "#2d6a4f" : "#c0392b" }}>{r.ok ? "✅" : "❌"}</td>
+                    <td className={`td-name${!r.ok ? " fe" : ""}`}>{r.n}</td>
+                    <td className={`td-val${!r.ok ? " fe" : ""}`}>{r.v}</td>
+                  </tr>
+                ))}
+              </tbody></table>
+              {selected.note && <div className={`conclusion${selected.v === "fail" ? " warn" : ""}`}>{selected.note}</div>}
             </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
