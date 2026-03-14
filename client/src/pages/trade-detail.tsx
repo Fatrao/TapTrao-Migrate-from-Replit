@@ -1578,9 +1578,9 @@ function ValidationView({ validations, t }: { validations: any[]; t: (key: strin
     );
   }
 
-  const passCount = validations.filter(v => v.verdict === "pass").length;
-  const failCount = validations.filter(v => v.verdict === "fail").length;
-  const unclearCount = validations.filter(v => v.verdict === "unclear").length;
+  const passCount = validations.filter(v => v.verdict === "VALID" || v.verdict === "VALID_WITH_NOTES").length;
+  const failCount = validations.filter(v => v.verdict === "ISSUES_FOUND" || v.verdict === "WRONG_DOCUMENT" || v.verdict === "UNREADABLE").length;
+  const unclearCount = validations.filter(v => v.verdict && !["VALID", "VALID_WITH_NOTES", "ISSUES_FOUND", "WRONG_DOCUMENT", "UNREADABLE"].includes(v.verdict)).length;
   const pendingCount = validations.filter(v => !v.verdict).length;
 
   return (
@@ -1630,8 +1630,8 @@ function ValidationView({ validations, t }: { validations: any[]; t: (key: strin
             </div>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               {v.verdict && (
-                <span className={`val-verdict val-verdict-${v.verdict}`}>
-                  {v.verdict === "pass" ? "✅" : v.verdict === "fail" ? "❌" : "⚠️"} {v.verdict.toUpperCase()}
+                <span className={`val-verdict val-verdict-${v.verdict === "VALID" || v.verdict === "VALID_WITH_NOTES" ? "pass" : v.verdict === "ISSUES_FOUND" || v.verdict === "WRONG_DOCUMENT" || v.verdict === "UNREADABLE" ? "fail" : "unclear"}`}>
+                  {v.verdict === "VALID" || v.verdict === "VALID_WITH_NOTES" ? "✅" : v.verdict === "ISSUES_FOUND" || v.verdict === "WRONG_DOCUMENT" || v.verdict === "UNREADABLE" ? "❌" : "⚠️"} {v.verdict.replace(/_/g, " ")}
                 </span>
               )}
               {v.confidence && (
@@ -1644,16 +1644,16 @@ function ValidationView({ validations, t }: { validations: any[]; t: (key: strin
           </div>
 
           {/* Field status */}
-          {v.fieldStatus && typeof v.fieldStatus === "object" && Object.keys(v.fieldStatus).length > 0 && (
+          {v.fieldStatus && Array.isArray(v.fieldStatus) && v.fieldStatus.length > 0 && (
             <div className="val-section">
               <div className="val-section-title">{t("validation.fieldCheck")}</div>
-              {Object.entries(v.fieldStatus).map(([field, status]: [string, any]) => (
-                <div className="val-field-row" key={field}>
+              {v.fieldStatus.map((fs: any, i: number) => (
+                <div className="val-field-row" key={i}>
                   <span className="val-field-icon">
-                    {status === "found" || status === "pass" || status === true ? "✅" : status === "not_found" || status === "missing" ? "⚠️" : "❌"}
+                    {fs.status === "present" ? "✅" : fs.status === "missing" ? "❌" : "⚠️"}
                   </span>
-                  <span className="val-field-name">{field.replace(/_/g, " ")}</span>
-                  {typeof status === "string" && <span className="val-field-value">{status}</span>}
+                  <span className="val-field-name">{(fs.field || "").replace(/_/g, " ")}</span>
+                  <span className="val-field-value">{fs.found || fs.status}</span>
                 </div>
               ))}
             </div>
