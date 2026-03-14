@@ -7,4 +7,4 @@ vite.config.ts.*
 pglite-data
 .env
 .claude/
-design-refs/
+design-refs/gitleaks-report.json
